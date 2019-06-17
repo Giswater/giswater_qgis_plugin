@@ -27,6 +27,7 @@ import os
 import sys
 import re
 import json
+import subprocess
 from functools import partial
 from collections import OrderedDict
 import xml.etree.cElementTree as ET
@@ -219,8 +220,6 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
-        self.dlg_readsql.chk_parent.stateChanged.connect(partial(self.update_manage_ui, parent=True))
-
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -2130,8 +2129,10 @@ class UpdateSQL(ApiParent):
     def execute_import_ui(self):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
-        form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
+        tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
+        ui_path = tpath.document().toPlainText()
+        form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
+        status_update_childs = utils_giswater.getWidget(self.dlg_readsql, 'chk_parent').isChecked()
 
         # Control if ui path is invalid or null
         if ui_path is None:
@@ -2142,11 +2143,13 @@ class UpdateSQL(ApiParent):
         with open(str(ui_path)) as f:
             content = f.read()
         sql = ("INSERT INTO " + schema_name + ".temp_csv2pg(source, csv1, csv2pgcat_id) VALUES('" +
-               str(form_name) + "', '" + str(content) + "', 20);")
+               str(form_name_ui) + "', '" + str(content) + "', 20);")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
 
         # Import xml to database
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name) + "')::text")
+        # TODO:: Send value from checkbox parent
+        # sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(status_update_childs) + "', '" + str(form_name_ui) + "')::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "')::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
         if status:
             msg = "Imported data into 'config_api_form_fields' successfully."
@@ -2163,7 +2166,7 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
-        form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
+        form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
 
         # Control if ui path is invalid or null
         if ui_path is None:
@@ -2172,7 +2175,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Export xml from database
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name) + "')::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name_ui) + "')::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
 
         # Check status
@@ -2183,7 +2186,7 @@ class UpdateSQL(ApiParent):
 
         # Populate UI file
         sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user AND source = '" +
-               str(form_name) + "' ORDER BY id DESC")
+               str(form_name_ui) + "' ORDER BY id DESC")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         data = ET.Element(str(row[0]))
@@ -2193,8 +2196,12 @@ class UpdateSQL(ApiParent):
         data = data.replace(' />', '').replace('<<', '<')
         file_ui.write(data)
 
-        msg = "Imported data into '" + str(ui_path) + "' successfully."
-        self.controller.show_info_box(msg, "Info")
+        msg = "Imported data into '" + str(ui_path) + "' successfully. \n Do you want to open the UI form?"
+        result = self.controller.ask_question(msg, "Info")
+        if result:
+            file_path = self.controller.plugin_dir + "/ui/api_cf.ui"
+            opener = "C:\OSGeo4W64/bin/designer.exe"
+            subprocess.call([opener, ui_path])
 
         # Clear temp_csv2pg
         self.clear_temp_table()
@@ -2228,22 +2235,24 @@ class UpdateSQL(ApiParent):
         else:
             file_ui, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.ui')
 
-        self.dlg_readsql.tpath.setText(file_ui)
+        self.dlg_readsql.tpath.insertPlainText(file_ui)
 
 
     def update_manage_ui(self, parent=False):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
-        if parent and self.dlg_readsql.chk_parent.isChecked():
-            sql = ("SELECT DISTINCT(parent_layer), parent_layer FROM " + str(schema_name) + ".cat_feature")
-            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-            utils_giswater.set_item_data(self.dlg_readsql.cmb_formname, rows, 1)
+        # Control if schema_version is updated to 3.2
+        if str(self.project_data_schema_version).replace('.','') < '32000':
             return
 
-        sql = ("SELECT DISTINCT(formname), formname FROM " + str(schema_name) + ".config_api_form_fields")
+        sql = ("SELECT DISTINCT(child_layer), child_layer FROM " + str(schema_name) + ".cat_feature")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_readsql.cmb_formname, rows, 1)
+        utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
+
+        sql = ("SELECT DISTINCT(id), id FROM " + str(schema_name) + ".cat_feature")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
 
 
     def open_manage_field(self, action):
@@ -2258,23 +2267,23 @@ class UpdateSQL(ApiParent):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str(action):
                 utils_giswater.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
-        form_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname)
+        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
 
         if action == 'Create':
-            window_title = 'Create field on "' + str(form_name) + '"'
+            window_title = 'Create field on "' + str(form_name_fields) + '"'
             self.dlg_manage_fields.setWindowTitle(window_title)
-            self.manage_create_field(form_name)
+            self.manage_create_field(form_name_fields)
         elif action == 'Update':
-            window_title = 'Create field on "' + str(form_name) + '"'
+            window_title = 'Create field on "' + str(form_name_fields) + '"'
             self.dlg_manage_fields.setWindowTitle(window_title)
-            self.manage_update_field(form_name)
+            self.manage_update_field(form_name_fields)
         elif action == 'Delete':
-            window_title = 'Delete field on "' + str(form_name) + '"'
+            window_title = 'Delete field on "' + str(form_name_fields) + '"'
             self.dlg_manage_fields.setWindowTitle(window_title)
-            self.manage_delete_field(form_name)
+            self.manage_delete_field(form_name_fields)
 
         # Set listeners
-        self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.manage_accept, action, form_name, self.model_update_table))
+        self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.manage_accept, action, form_name_fields, self.model_update_table))
         self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
 
         self.dlg_manage_fields.show()
@@ -2306,6 +2315,7 @@ class UpdateSQL(ApiParent):
         self.model_update_table = QSqlTableModel()
         expr_filter = "formname ='" + form_name + "'"
         self.fill_table(qtable, 'config_api_form_fields', self.model_update_table, expr_filter)
+        self.set_table_columns(self.dlg_manage_fields, qtable, 'config_api_form_fields', schema_name)
 
 
     def manage_delete_field(self, form_name):

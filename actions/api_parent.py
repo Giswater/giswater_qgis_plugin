@@ -539,12 +539,15 @@ class ApiParent(ParentAction):
             pass
 
             
-    def set_table_columns(self, dialog, widget, table_name):
+    def set_table_columns(self, dialog, widget, table_name, schema_name=None):
         """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
+
+        if schema_name is not None:
+            self.schema_name = schema_name
 
         # Set width and alias of visible columns
         columns_to_delete = []
