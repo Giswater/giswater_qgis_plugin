@@ -265,8 +265,7 @@ class MincutConfig(ParentAction):
         utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
 
         sql = ("SELECT expl_id, name FROM " + self.schema_name + ".exploitation ORDER BY name")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql, log_sql=False))
+        rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
 

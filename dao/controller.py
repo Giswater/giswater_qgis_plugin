@@ -448,13 +448,14 @@ class DaoController(object):
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
-        
+
         sql = self.get_sql(sql, log_sql, params)
-        rows = self.dao.get_rows(sql, commit)
+        rows = None
+        rows2 = self.dao.get_rows(sql, commit)
         self.last_error = self.dao.last_error 
-        if not rows:
+        if not rows2:
             # Check if any error has been raised
             if self.last_error:
                 text = "Undefined error"
@@ -463,6 +464,12 @@ class DaoController(object):
                 self.show_warning_detail(text, str(self.dao.last_error))
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
+        else:
+            if add_empty_row:
+                rows = [('', '')]
+                rows.extend(rows2)
+            else:
+                rows = rows2
 
         return rows  
     

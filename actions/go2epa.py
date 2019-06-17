@@ -45,6 +45,7 @@ class Go2Epa(ApiParent):
         self.g2epa_opt = Go2EpaOptions(iface, settings, controller, plugin_dir)
         self.iterations = 0
 
+
     def set_project_type(self, project_type):
         self.project_type = project_type
 
@@ -65,7 +66,6 @@ class Go2Epa(ApiParent):
         if str(go2eparecurisve) == "FALSE":
             self.dlg_go2epa.chk_recurrent.setVisible(False)
             self.dlg_go2epa.chk_recurrent.setChecked(False)
-
 
         self.dlg_go2epa.progressBar.setMaximum(0)
         self.dlg_go2epa.progressBar.setMinimum(0)
@@ -214,12 +214,13 @@ class Go2Epa(ApiParent):
         else:
             sql = ("SELECT result_id FROM " + self.schema_name + ".rpt_cat_result "
                    " WHERE result_id='" + str(result_name) + "' LIMIT 1")
-            row = self.controller.get_row(sql, log_sql=False, commit=True)
+            row = self.controller.get_row(sql, commit=True)
             if row:
                 msg = "Result name already exists, do you want overwrite?"
                 answer = self.controller.ask_question(msg, title="Alert")
                 if not answer:
                     return False
+
         return True
 
 
@@ -477,6 +478,7 @@ class Go2Epa(ApiParent):
 
             line = line.rstrip() + "\n"
             file1.write(line)
+
         file1.close()
         del file1
 
@@ -537,10 +539,11 @@ class Go2Epa(ApiParent):
                 values = values[:-2] + ");\n"
                 sql += values
             if progress % 500 == 0:
-                self.controller.execute_sql(sql, log_sql=False, commit=True)
+                self.controller.execute_sql(sql, commit=True)
                 sql = ""
         if sql != "":
-            self.controller.execute_sql(sql, log_sql=False, commit=True)
+            self.controller.execute_sql(sql, commit=True)
+
         _file.close()
         del _file
 
@@ -572,7 +575,7 @@ class Go2Epa(ApiParent):
 
         if export_inp:
             sql = ("SELECT sector_id FROM " + self.schema_name + ".inp_selector_sector LIMIT 1")
-            row = self.controller.get_row(sql, log_sql=False, commit=True)
+            row = self.controller.get_row(sql, commit=True)
             if row is None:
                 msg = "You need to select some sector"
                 # self.controller.show_info_box(text=msg, title="Info")
@@ -672,8 +675,8 @@ class Go2Epa(ApiParent):
 
                     # delete previous values of user on temp table
                     sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
-                           " WHERE user_name=current_user AND csv2pgcat_id=11")
-                    self.controller.execute_sql(sql, log_sql=False)
+                           "WHERE user_name = current_user AND csv2pgcat_id = 11")
+                    self.controller.execute_sql(sql)
 
                     # Importing file to temporal table
                     self.insert_rpt_into_db(self.file_rpt)
@@ -759,7 +762,7 @@ class Go2Epa(ApiParent):
         model = QStringListModel()
 
         sql = ("SELECT " + field_name + " FROM " + self.schema_name + "." + viewname)
-        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
 
         if rows:
             for i in range(0, len(rows)):
@@ -790,7 +793,7 @@ class Go2Epa(ApiParent):
         """ Check data executing function 'gw_fct_pg2epa' """
 
         sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'True');"
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             return False
 
@@ -829,7 +832,7 @@ class Go2Epa(ApiParent):
         sql = ("SELECT table_id, column_id, error_message"
                " FROM " + self.schema_name + "." + tablename + ""
                " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
-        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             message = "No records found with selected 'result_id'"
             self.controller.show_warning(message, parameter=self.project_name)
@@ -878,14 +881,13 @@ class Go2Epa(ApiParent):
                "FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql))
+        rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
+
         if self.project_type == 'ws':
             sql = ("SELECT DISTINCT time, time FROM " + self.schema_name + ".rpt_arc "
-                   " WHERE result_id ILIKE '%%' ORDER BY time")
-            rows = [('', '')]
-            rows.extend(self.controller.get_rows(sql))
+                   "WHERE result_id ILIKE '%%' ORDER BY time")
+            rows = self.controller.get_rows(sql, add_empty_row=True)
             utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
             utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
 
@@ -897,21 +899,18 @@ class Go2Epa(ApiParent):
         if self.project_type == 'ud':
             # Populate GroupBox Selector date
             result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = ("SELECT DISTINCT(resultdate), resultdate  FROM " + self.schema_name + ".rpt_arc"
-                   " WHERE result_id ='"+str(result_id)+"'"
-                   " ORDER BY resultdate ")
-            rows = self.controller.get_rows(sql, log_sql=False)
+            sql = ("SELECT DISTINCT(resultdate), resultdate FROM " + self.schema_name + ".rpt_arc "
+                   "WHERE result_id = '" + str(result_id) + "' "
+                   "ORDER BY resultdate")
+            rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
                 selector_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
-                sql = ("SELECT DISTINCT(resulttime), resulttime  FROM " + self.schema_name + ".rpt_arc"
-                       " WHERE result_id ='"+str(result_id)+"' "
-                       " AND resultdate='" + str(selector_date) + "'"
-                       " ORDER BY resulttime ")
-                rows = [('', '')]
-                r = self.controller.get_rows(sql, log_sql=False)
-                if r is not None:
-                    rows.extend(r)
+                sql = ("SELECT DISTINCT(resulttime), resulttime FROM " + self.schema_name + ".rpt_arc "
+                       "WHERE result_id = '" + str(result_id) + "' "
+                       "AND resultdate = '" + str(selector_date) + "' "
+                       "ORDER BY resulttime")
+                rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
@@ -925,7 +924,7 @@ class Go2Epa(ApiParent):
             sql = ("SELECT DISTINCT(resultdate), resultdate  FROM " + self.schema_name + ".rpt_arc "
                    " WHERE result_id ='" + str(result_id_to_comp) + "'"
                    " ORDER BY resultdate ")
-            rows = self.controller.get_rows(sql, log_sql=False)
+            rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
                 selector_cmp_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
@@ -933,10 +932,7 @@ class Go2Epa(ApiParent):
                        " WHERE result_id ='" + str(result_id_to_comp) + "'"
                        " AND resultdate='" + str(selector_cmp_date) + "'"
                        " ORDER BY resulttime")
-                rows = [('', '')]
-                r = self.controller.get_rows(sql, log_sql=False)
-                if r is not None:
-                    rows.extend(r)
+                rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
@@ -964,14 +960,12 @@ class Go2Epa(ApiParent):
 
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
         date = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_date)
-        sql = ("SELECT DISTINCT(resulttime), resulttime  FROM " + self.schema_name + ".rpt_arc "
-               " WHERE result_id ='" + str(result_id) + "'"
-               " AND resultdate='" + str(date) + "'"
-               " ORDER BY resulttime")
-        rows = [('', '')]
-        r = self.controller.get_rows(sql, log_sql=False)
-        if r is not None:
-            rows.extend(r)
+        sql = ("SELECT DISTINCT(resulttime), resulttime "
+               "FROM " + self.schema_name + ".rpt_arc "
+               "WHERE result_id ='" + str(result_id) + "' "
+               "AND resultdate='" + str(date) + "' "
+               "ORDER BY resulttime")
+        rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
 
 
@@ -979,10 +973,11 @@ class Go2Epa(ApiParent):
         """ Populate combo times """
 
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
-        sql = ("SELECT DISTINCT time, time FROM " + self.schema_name + ".rpt_arc "
-               " WHERE result_id ILIKE '"+str(result_id)+"' ORDER BY time")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql))
+        sql = ("SELECT DISTINCT time, time "
+               "FROM " + self.schema_name + ".rpt_arc "
+               "WHERE result_id ILIKE '" + str(result_id) + "' "
+               "ORDER BY time")
+        rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
 
 
@@ -991,6 +986,7 @@ class Go2Epa(ApiParent):
 
         # Set project user
         user = self.controller.get_project_user()
+
         # Delete previous values
         sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result WHERE cur_user = '" + user + "';\n"
                "DELETE FROM " + self.schema_name + ".rpt_selector_compare WHERE cur_user = '" + user + "';\n")
@@ -1002,7 +998,7 @@ class Go2Epa(ApiParent):
             sql += ("DELETE FROM " + self.schema_name + ".rpt_selector_timestep WHERE cur_user = '" + user + "';\n"
                     "DELETE FROM " + self.schema_name + ".rpt_selector_timestep_compare "
                     " WHERE cur_user = '" + user + "';\n")
-        self.controller.execute_sql(sql, log_sql=False)
+        self.controller.execute_sql(sql)
 
         # Get new values from widgets of type QComboBox
         rpt_selector_result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
@@ -1020,30 +1016,30 @@ class Go2Epa(ApiParent):
         if rpt_selector_result_id not in (None, -1, ''):
             sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
                    " VALUES ('" + str(rpt_selector_result_id) + "', '" + user + "');\n")
-            self.controller.execute_sql(sql, log_sql=False)
+            self.controller.execute_sql(sql)
         if rpt_selector_compare_id not in (None, -1, ''):
             sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
                    " VALUES ('" + str(rpt_selector_compare_id) + "', '" + user + "');\n")
-            self.controller.execute_sql(sql, log_sql=False)
+            self.controller.execute_sql(sql)
         if self.project_type == 'ws':
             if time_to_show not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly(time, cur_user)"
                        " VALUES ('" + str(time_to_show) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql, log_sql=False)
+                self.controller.execute_sql(sql)
             if time_to_compare not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly_compare(time, cur_user)"
                        " VALUES ('" + str(time_to_compare) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql, log_sql=False)
+                self.controller.execute_sql(sql)
 
         if self.project_type == 'ud':
             if date_to_show not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_timestep(resultdate, resulttime, cur_user)"
                        " VALUES ('"+str(date_to_show)+"', '" + str(time_to_show) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql, log_sql=False)
+                self.controller.execute_sql(sql)
             if date_to_compare not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_timestep_compare(resultdate, resulttime, cur_user)"
                        " VALUES ('"+str(date_to_compare)+"', '" + str(time_to_compare) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql, log_sql=False)
+                self.controller.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"

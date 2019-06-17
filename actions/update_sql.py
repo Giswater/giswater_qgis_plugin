@@ -2124,12 +2124,15 @@ class UpdateSQL(ApiParent):
         msg = "The QGIS Projects templates was correctly created."
         self.controller.show_info_box(msg, "Info")
 
+
     """ Import / Export UI and manage fields """
 
     def execute_import_ui(self):
+
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
         form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
+
         # Control if ui path is invalid or null
         if ui_path is None:
             msg = "Please, select a valid UI Path."
@@ -2157,6 +2160,7 @@ class UpdateSQL(ApiParent):
 
 
     def execute_export_ui(self):
+
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
         form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
@@ -2197,6 +2201,7 @@ class UpdateSQL(ApiParent):
 
 
     def clear_temp_table(self):
+
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv2pg
         sql = ("DELETE FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user")
@@ -2227,14 +2232,13 @@ class UpdateSQL(ApiParent):
 
 
     def update_manage_ui(self, parent=False):
+
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         if parent and self.dlg_readsql.chk_parent.isChecked():
-
             sql = ("SELECT DISTINCT(parent_layer), parent_layer FROM " + str(schema_name) + ".cat_feature")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname, rows, 1)
-
             return
 
         sql = ("SELECT DISTINCT(formname), formname FROM " + str(schema_name) + ".config_api_form_fields")
@@ -2243,10 +2247,10 @@ class UpdateSQL(ApiParent):
 
 
     def open_manage_field(self, action):
+
         # Create the dialog and signals
         self.dlg_manage_fields = ManageFields()
         self.load_settings(self.dlg_manage_fields)
-
         self.model_update_table = None
 
         # Remove unused tabs
@@ -2305,6 +2309,7 @@ class UpdateSQL(ApiParent):
 
 
     def manage_delete_field(self, form_name):
+
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
@@ -2368,7 +2373,6 @@ class UpdateSQL(ApiParent):
             extras = '"action":"DELETE", "field":"' + field_value + '"'
             body = self.create_body(feature=feature, extras=extras)
 
-
             # Execute manage add fields function
             sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
             print(str(sql))
@@ -2382,8 +2386,8 @@ class UpdateSQL(ApiParent):
     def fill_table(self, qtable, table_name, model, expr_filter, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name not in table_name:
             table_name = schema_name + "." + table_name
 
@@ -2488,6 +2492,7 @@ class UpdateSQL(ApiParent):
                 self.controller.execute_sql(sql, commit=True)
             else:
                 self.controller.execute_sql(sql, commit=False)
+
         _file.close()
         del _file
 
@@ -2539,7 +2544,6 @@ class UpdateSQL(ApiParent):
                 self.populate_info_text(dialog, qtabwidget, qtextedit, data)
 
 
-    """ Info basic """
     def info_show_info(self):
         """ Button 36: Info show info, open giswater and visit web page """
 
