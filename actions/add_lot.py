@@ -16,30 +16,37 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     from builtins import range
 
-from qgis.PyQt.QtCore import QDate, Qt
+from qgis.PyQt.QtCore import QDate, Qt, QSortFilterProxyModel
 from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QAction, QAbstractItemView, QToolButton
-from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget
+from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget, QFileDialog
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsPoint, QgsGeometry
+from qgis.core import QgsPoint, QgsGeometry, QgsFeatureRequest
 from qgis.gui import QgsRubberBand
 
-import re
+import csv, os, re
 from functools import partial
 
 import utils_giswater
-from giswater.actions.manage_visit import ManageVisit
-from giswater.actions.parent_manage import ParentManage
-from giswater.ui_manager import AddLot
-from giswater.ui_manager import VisitManagement
+from .manage_visit import ManageVisit
+from .parent_manage import ParentManage
+from ..ui_manager import AddLot
+from ..ui_manager import LotManagement
+from ..ui_manager import BasicTable
 
 
 class AddNewLot(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
+
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         self.ids = []
+        self.rb_red = QgsRubberBand(self.canvas)
+        self.rb_red.setColor(Qt.darkRed)
+        self.rb_red.setIconSize(20)
+        self.rb_list = []
+        self.lot_date_format = 'yyyy-MM-dd'
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
@@ -73,15 +80,18 @@ class AddNewLot(ParentManage):
         self.dropdown.addAction(action_by_polygon)
         self.dropdown.setDefaultAction(action_by_expression)
 
-        self.dlg_lot.open()
-
         # Set icons
         self.set_icon(self.dlg_lot.btn_feature_insert, "111")
         self.set_icon(self.dlg_lot.btn_feature_delete, "112")
         self.set_icon(self.dlg_lot.btn_feature_snapping, "137")
 
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_startdate, self.dlg_lot.btn_accept, 1)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_enddate, self.dlg_lot.btn_accept, 1)
+        self.dlg_lot.enddate.textChanged.connect(self.check_dates_consistency)
+
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
-        self.id_val = self.dlg_lot.findChild(QLineEdit, "txt_idval")
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
         self.visit_class = self.dlg_lot.findChild(QComboBox, "cmb_visit_class")
 
@@ -93,7 +103,7 @@ class AddNewLot(ParentManage):
         self.feature_type.setEnabled(False)
 
         # Fill QWidgets of the form
-        self.fill_fields()
+        self.fill_fields(lot_id)
 
         new_lot_id = lot_id
         if lot_id is None:
@@ -101,8 +111,11 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot, self.lot_id, new_lot_id)
 
         self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
-        viewname = "v_edit_" + self.geom_type
-        self.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
+        if self.geom_type != '':
+            viewname = "v_edit_" + self.geom_type
+            self.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
+        else:
+            self.geom_type = 'arc'
         self.clear_selection()
 
         # Set actions signals
@@ -110,19 +123,23 @@ class AddNewLot(ParentManage):
         action_by_polygon.triggered.connect(partial(self.activate_selection, self.dlg_lot, action_by_polygon, 'mActionSelectPolygon'))
 
         # Set widgets signals
+        self.dlg_lot.cmb_ot.activated.connect(partial(self.set_ot_fields))
+        self.dlg_lot.cmb_ot.editTextChanged.connect(partial(self.filter_by_list, self.dlg_lot.cmb_ot))
+
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_row))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_feature_type_cmb)
+        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_tab_dis_enabled)
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_active_layer)
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.reload_table_visit))
+        self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.disbale_actions))
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
 
-        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature,self.dlg_lot.tbl_relation))
+        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
         # TODO pending to make function delete_visit
@@ -130,37 +147,222 @@ class AddNewLot(ParentManage):
 
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
+        self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
+        self.dlg_lot.cmb_man_team.clicked.connect(self.manage_team)
 
-        self.set_headers(self.tbl_relation)
-
+        self.set_headers()
+        self.set_active_layer()
         if lot_id is not None:
-            utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
-            self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
+            # utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
+
             self.set_values(lot_id)
+            self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
             sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(self.geom_type) + ""
                    " WHERE lot_id ='" + str(lot_id) + "'")
-            rows = self.controller.get_rows(sql, log_sql=True)
+            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             self.put_checkbox(self.tbl_relation, rows, 'status', 3)
             self.set_dates()
             self.reload_table_visit()
 
-        self.enable_feature_type(self.dlg_lot)
+        # Enable or disable QWidgets
+        self.dlg_lot.txt_ot_type.setReadOnly(True)
+        self.dlg_lot.txt_wotype_id.setReadOnly(True)
+        self.dlg_lot.txt_ot_address.setReadOnly(True)
+        self.dlg_lot.cmb_visit_class.setEnabled(False)
 
-        self.set_feature_type_cmb()
+        # Check if enable or disable tab relation if
+        self.set_tab_dis_enabled()
+
         # Set autocompleters of the form
         self.set_completers()
-
-        # Set model signals
-        self.tbl_relation.model().rowsInserted.connect(self.set_dates)
-        self.tbl_relation.model().rowsInserted.connect(self.reload_table_visit)
-        self.tbl_relation.model().rowsRemoved.connect(self.set_dates)
-        self.tbl_relation.model().rowsRemoved.connect(self.reload_table_visit)
-
+        self.hilight_features(self.rb_list)
+        # self.manage_widget_lot(lot_id)
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+
+
+    def manage_team(self):
+
+        self.dlg_basic_table = BasicTable()
+        self.load_settings(self.dlg_basic_table)
+        table_name = 'cat_team'
+        #@setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        model = QSqlTableModel()
+        #model = QStandardItemModel()
+        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, model, QSqlTableModel.OnManualSubmit)
+
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table, model))
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, model))
+        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, model))
+        self.open_dialog(self.dlg_basic_table)
+
+
+    def cancel_changes(self, model):
+
+        model.revertAll()
+        model.database().rollback()
+
+
+    def add_row(self, model):
+
+        list_id = []
+        exist = None
+        for x in range(0, model.rowCount()):
+            # for c in range(0, model.columnCount()-1):
+            index = model.index(x, 0)
+            item = model.data(index)
+
+            if item not in list_id:
+                list_id.append(item)
+            else:
+                exist = item
+                break
+        print(list_id)
+        print(exist)
+        for x in range(0, model.rowCount()):
+            index = model.index(x, 0)
+            item = model.data(index)
+            if item == exist:
+                # model.setData(index, QtCore.Qt.red, 9)
+                p = self.dlg_basic_table.tbl_basic.palette()
+                p.setColor(QPalette.Base, QColor("yellow"))
+                self.dlg_basic_table.tbl_basic.setPalette(p)
+                print("TEST")
+
+        record = model.record()
+        model.insertRecord(model.rowCount(), record)
+
+
+    def save_basic_table(self, model):
+
+        if model.submitAll():
+            print("ok")
+            # model.database().commit()
+        else:
+            print("KO ")
+
+
+    def fill_table(self, qtable, table_name, model, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model.setTable(table_name)
+        model.setEditStrategy(set_edit_strategy)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+        # Attach model to table view
+        qtable.setModel(model)
+
+
+    def manage_widget_lot(self, lot_id):
+        # Fill ComboBox cmb_ot
+        sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
+               " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id "
+               " FROM " + self.schema_name + ".ext_workorder "
+               " LEFT JOIN " + self.schema_name + ".om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
+               " WHERE om_visit_lot.serie IS NULL")
+        if lot_id:
+            _sql = ("SELECT serie FROM " + self.schema_name + ".om_visit_lot "
+                    " WHERE id = '"+str(lot_id)+"'")
+            ct = self.controller.get_row(_sql, commit=True)
+            sql += " OR ext_workorder.serie = '"+str(ct[0])+"'"
+        sql += " order by ct"
+
+        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+
+        self.list_to_show = ['']  # List to show
+        self.list_to_work = [['', '', '',  '', '', '', '']]  # List to work (find feature)
+        if rows:
+            for row in rows:
+                self.list_to_show.append(row[0])
+                #elem = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address,4-serie,5-visitclass_id)
+                elem = [row[1], row[2], row[3], row[4], row[5], row[6]]
+                self.list_to_work.append(elem)
+        self.set_model_by_list(self.list_to_show, self.dlg_lot.cmb_ot)
+
+
+    def filter_by_list(self, widget):
+        self.proxy_model.setFilterFixedString(widget.currentText())
+
+
+    def set_model_by_list(self, string_list, widget):
+
+        model = QStringListModel()
+        model.setStringList(string_list)
+        self.proxy_model = QSortFilterProxyModel()
+        self.proxy_model.setSourceModel(model)
+        self.proxy_model.setFilterKeyColumn(0)
+
+        proxy_model_aux = QSortFilterProxyModel()
+        proxy_model_aux.setSourceModel(model)
+        proxy_model_aux.setFilterKeyColumn(0)
+
+        widget.setModel(proxy_model_aux)
+        widget.setModelColumn(0)
+        completer = QCompleter()
+
+        completer.setModel(self.proxy_model)
+        completer.setCompletionColumn(0)
+        completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        widget.setCompleter(completer)
+
+
+    def check_dates_consistency(self):
+
+        # Get dates as text
+        startdate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate)
+        enddate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
+
+        if enddate == '':
+            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+            return
+
+        # Transform text dates as QDate
+        startdate = QDate.fromString(startdate, self.lot_date_format)
+        enddate = QDate.fromString(enddate, self.lot_date_format)
+
+        if startdate <= enddate:
+            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+        else:
+            self.dlg_lot.startdate.setStyleSheet("border: 1px solid red")
+            self.dlg_lot.enddate.setStyleSheet("border: 1px solid red")
+
+
+    def set_ot_fields(self, index):
+        item = self.list_to_work[index]
+        print(item)
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0])
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_wotype_id, item[2])
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[3])
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[1])
+        value = utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
+
+        for x in range(0, self.dlg_lot.tab_widget.count()):
+            if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab':
+                self.dlg_lot.tab_widget.setTabEnabled(x, value)
+                break
+
+    def disbale_actions(self):
+        class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
+        # 5=EXECUTAT, 6=REVISAT, 7=CANCEL.LAT
+        if class_id in (5, 6, 7):
+            self.dlg_lot.action_selector.setEnabled(False)
+            self.dlg_lot.btn_feature_insert.setEnabled(False)
+            self.dlg_lot.btn_feature_delete.setEnabled(False)
+            self.dlg_lot.btn_feature_snapping.setEnabled(False)
 
 
     def open_visit(self, qtable):
@@ -203,27 +405,32 @@ class AddNewLot(ParentManage):
         return rows
 
 
-    def fill_fields(self):
+    def fill_fields(self, lot_id):
         """ Fill combo boxes of the form """
 
         # Visit tab
         # Set current date and time
         current_date = QDate.currentDate()
-        self.dlg_lot.startdate.setDate(current_date)
-        self.dlg_lot.enddate.setDate(current_date)
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString(self.lot_date_format))
 
         # Set current user
         sql = "SELECT current_user"
         row = self.controller.get_row(sql, commit=self.autocommit)
         utils_giswater.setWidgetText(self.dlg_lot, self.user_name, row[0])
 
+        # Fill ComboBox cmb_ot
+        self.manage_widget_lot(lot_id)
+
         # Fill ComboBox cmb_visit_class
-        sql = ("SELECT id, idval, feature_type"
-               " FROM " + self.schema_name + ".om_visit_class "
-               " WHERE ismultifeature is False"
-               " ORDER BY idval")
-        visitclass_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
+               " FROM " + self.schema_name + ".om_visit_class"
+               " INNER JOIN " + self.schema_name + ".om_visit_class_x_wo ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
+               " INNER JOIN " + self.schema_name + ".config_api_visit ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
+               " WHERE ismultifeature is False AND feature_type IS NOT null")
+
+        visitclass_ids = self.controller.get_rows(sql, log_sql=True, commit=True)
         if visitclass_ids:
+            visitclass_ids.append(['', '', '', ''])
             utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
 
         # Fill ComboBox cmb_assigned_to
@@ -231,7 +438,7 @@ class AddNewLot(ParentManage):
                " FROM " + self.schema_name + ".cat_team "
                " WHERE active is True "
                " ORDER BY idval")
-        users = self.controller.get_rows(sql, commit=self.autocommit)
+        users = self.controller.get_rows(sql, commit=True)
         if users:
             utils_giswater.set_item_data(self.dlg_lot.cmb_assigned_to, users, 1)
 
@@ -240,10 +447,13 @@ class AddNewLot(ParentManage):
         sql = ("SELECT id, idval"
                " FROM " + self.schema_name + ".om_visit_class "
                " ORDER BY idval")
-        status = self.controller.get_rows(sql, commit=self.autocommit)
-        status = [(0, 'PLANIFICAT'), (1, 'EXITOS'), (2, 'FAIL'), (3, 'VALIDAT')]
+        status = self.controller.get_rows(sql, commit=True)
+        status = [[1, 'PLANIFICANT'], [2, 'PLANIFICAT'], [3, 'ASSIGNAT'], [4, 'EN CURS'], [5, 'EXECUTAT'],
+                  [6, 'REVISAT'], [7, 'CANCEL.LAT']]
         if status:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
+            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5'], 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, 'PLANIFICANT', 1)
 
         # Relations tab
         # fill feature_type
@@ -284,7 +494,7 @@ class AddNewLot(ParentManage):
         # fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
         # self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
-        self.set_headers(self.tbl_relation)
+        self.set_headers()
 
 
     def clear_selection(self, remove_groups=True):
@@ -330,34 +540,39 @@ class AddNewLot(ParentManage):
 
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
                " WHERE id ='"+str(lot_id)+"'")
-        lot = self.controller.get_row(sql, log_sql=False)
+        lot = self.controller.get_row(sql, log_sql=True, commit=True)
         if lot:
-            utils_giswater.setWidgetText(self.dlg_lot, 'txt_idval', lot['idval'])
-            utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', lot['startdate'])
-            utils_giswater.setCalendarDate(self.dlg_lot, 'enddate', lot['enddate'])
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['team_id'], 0)
-            utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, lot['status'], 0)
-            self.controller.log_info(str(lot['status']))
-            if lot['status'] not in (0, None):
+            value = str(lot['serie']) + " " + str(lot['class_id'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot, value)
+            index = self.dlg_lot.cmb_ot.currentIndex()
+            self.set_ot_fields(index)
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_startdate, lot['real_startdate'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_enddate, lot['real_enddate'])
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(lot['visitclass_id']), 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, str(lot['team_id']), 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, str(lot['status']), 0)
+
+            if lot['status'] not in (1, 2, 3, 4, 6, None):
+                self.dlg_lot.cmb_assigned_to.setEnabled(False)
                 self.dlg_lot.cmb_status.setEnabled(False)
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         table_name = "v_edit_" + str(feature_type)
 
-        self.set_headers(self.tbl_relation)
+        self.set_headers()
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
 
 
-    def set_headers(self, qtable):
+    def set_headers(self):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
         columns_name.append(['validate'])
         standard_model = QStandardItemModel()
-        qtable.setModel(standard_model)
-        qtable.horizontalHeader().setStretchLastSection(True)
+        self.tbl_relation.setModel(standard_model)
+        self.tbl_relation.horizontalHeader().setStretchLastSection(True)
 
         # # Get headers
         headers = []
@@ -373,7 +588,7 @@ class AddNewLot(ParentManage):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + ""
                " WHERE lot_id ='"+str(lot_id)+"'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         for row in rows:
             item = []
             for value in row:
@@ -406,7 +621,6 @@ class AddNewLot(ParentManage):
 
         # Attach model to table view
         widget.setModel(model)
-
 
 
     def update_id_list(self):
@@ -456,19 +670,7 @@ class AddNewLot(ParentManage):
                 if selected_id not in self.ids:
                     self.ids.append(selected_id)
         self.reload_table_relations()
-        self.enable_combos(dialog)
 
-
-    def enable_combos(self, dialog):
-
-        assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
-        visit_class = dialog.findChild(QComboBox, 'cmb_visit_class')
-        if len(self.ids) > 0:
-            assigned_to.setEnabled(False)
-            visit_class.setEnabled(False)
-        else:
-            assigned_to.setEnabled(True)
-            visit_class.setEnabled(True)
 
 
     def reload_table_relations(self):
@@ -482,22 +684,24 @@ class AddNewLot(ParentManage):
         layer_name = 'v_edit_' + utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
         field_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower() + str('_id')
         layer = self.controller.get_layer_by_tablename(layer_name)
-
         for feature_id in self.ids:
-            feature = self.get_feature_by_id(layer, feature_id, field_id)
             item = []
             if feature_id not in id_list:
+                feature = self.get_feature_by_id(layer, feature_id, field_id)
                 row = []
                 item.append(lot_id)
                 item.append(feature_id)
                 item.append(feature.attribute('code'))
                 item.append(0)
+
                 for value in item:
                     row.append(QStandardItem(str(value)))
                 if len(row) > 0:
                     standard_model.appendRow(row)
                     self.insert_single_checkbox(self.tbl_relation)
-
+        self.hilight_features(self.rb_list)
+        self.set_dates()
+        self.reload_table_visit()
 
     def insert_row(self):
         """ Inser single row into QStandardItemModel """
@@ -525,11 +729,13 @@ class AddNewLot(ParentManage):
                 standard_model.appendRow(row)
                 self.ids.append(feature_id)
                 self.insert_single_checkbox(self.tbl_relation)
-
+        self.hilight_features(self.rb_list)
+        self.set_dates()
+        self.reload_table_visit()
 
     def get_feature_by_id(self, layer, id_, field_id):
-
-        features = layer.getFeatures()
+        expr = ""+str(field_id) + "='" + str(id_) + "'"
+        features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(expr))
         for feature in features:
             if feature[field_id] == id_:
                 return feature
@@ -538,7 +744,6 @@ class AddNewLot(ParentManage):
 
     def insert_single_checkbox(self, qtable):
         """ Create one QCheckBox and put into QTableView at position @self.chk_position """
-
         cell_widget = QWidget()
         chk = QCheckBox()
         lay_out = QHBoxLayout(cell_widget)
@@ -570,9 +775,9 @@ class AddNewLot(ParentManage):
             feature_id = index.sibling(row, column_index).data()
             self.ids.remove(feature_id)
             model.takeRow(row)
-
-        self.enable_combos(dialog)
-
+        self.hilight_features(self.rb_list)
+        self.set_dates()
+        self.reload_table_visit()
 
     def set_active_layer(self):
 
@@ -587,7 +792,6 @@ class AddNewLot(ParentManage):
 
     def selection_init(self, dialog):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
         self.disconnect_signal_selection_changed()
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed(dialog)
@@ -601,10 +805,22 @@ class AddNewLot(ParentManage):
             pass
 
 
-    def set_feature_type_cmb(self):
+    def set_tab_dis_enabled(self):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
+        index = 0
+        for x in range(0, self.dlg_lot.tab_widget.count()):
+            if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab':
+                index = x
+                break
+        if feature_type in('', 'null', None, -1):
+            self.dlg_lot.tab_widget.setTabEnabled(index, False)
+            return
+        else:
+            self.dlg_lot.tab_widget.setTabEnabled(index, True)
+
         utils_giswater.set_combo_itemData(self.feature_type, feature_type, 1)
-        self.feature_type.setEnabled(False)
+
+
 
 
     def set_dates(self):
@@ -633,6 +849,7 @@ class AddNewLot(ParentManage):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         object_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.txt_filter)
+        lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.lot_id, False, False)
         visit_start = self.dlg_lot.date_event_from.date()
         visit_end = self.dlg_lot.date_event_to.date()
         # Get selected dates
@@ -644,28 +861,28 @@ class AddNewLot(ParentManage):
             return
 
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
+
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=True)
 
         table_name = row['tablename']
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
         # Create interval dates
-        format_low = 'yyyy-MM-dd 00:00:00.000'
-        format_high = 'yyyy-MM-dd 23:59:59.999'
+        format_low = self.lot_date_format + ' 00:00:00.000'
+        format_high = self.lot_date_format + ' 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
+        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0}"
+                       " OR enddate is NULL)".format(interval))
+
         if object_id != 'null':
             expr_filter += " AND " + str(feature_type) + "_id::TEXT ILIKE '%" + str(object_id) + "%'"
-
-        expr_filter += " AND " + str(feature_type) + "_id IN ('0', "
-        for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
+        if lot_id != '':
+            expr_filter += " AND lot_id='"+lot_id+"'"
 
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -687,7 +904,7 @@ class AddNewLot(ParentManage):
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         self.controller.log_info(str("TODO: ABRIR FORMULARIOS"))
         self.controller.log_info(str(row))
@@ -696,26 +913,45 @@ class AddNewLot(ParentManage):
     def save_lot(self):
 
         lot = {}
-        lot['idval'] = utils_giswater.getWidgetText(self.dlg_lot, 'txt_idval', False, False)
-        lot['startdate'] = utils_giswater.getCalendarDate(self.dlg_lot, 'startdate')
-        lot['enddate'] = utils_giswater.getCalendarDate(self.dlg_lot, 'enddate')
-        lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, 'descript', False, False)
-        lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
+        index = self.dlg_lot.cmb_visit_class.currentIndex()
+        item = self.list_to_work[index]
+        print("save ITEM : "+str(item))
+
+        # item = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address,4-serie,5-visitclass_id)
+        if item[0] in (None, ''):
+            msg = "Selecciona una OT"
+            self.controller.show_info_box(msg, "Warning")
+            return
+        lot['startdate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate, False, False)
+        lot['enddate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
+        #lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0, True)
+        lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0, True)
         lot['feature_type'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
-        lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
+        lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
+        lot['class_id'] = item[0]
+        lot['adreca'] = item[3]
+        lot['serie'] = item[4]
+        lot['visitclass_id'] = item[5]
+
+
+        print("save LOT : " + str(lot))
+
+
         keys = ""
         values = ""
         update = ""
         for key, value in list(lot.items()):
-            if value != '':
-                keys += ""+key+", "
+            keys += "" + key + ", "
+            if value not in ('', None):
                 if type(value) in (int, bool):
                     values += "$$"+str(value)+"$$, "
                     update += str(key) + "=$$" + str(value) + "$$, "
                 else:
                     values += "$$" + value + "$$, "
                     update += str(key) + "=$$" + value + "$$, "
+            else:
+                values += "null, "
+                update += str(key) + "=null, "
 
         keys = keys[:-2]
         values = values[:-2]
@@ -724,14 +960,14 @@ class AddNewLot(ParentManage):
         if self.is_new_lot is True:
             sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
                    " VALUES (" + values + ") RETURNING id")
-            row = self.controller.execute_returning(sql, log_sql=False)
+            row = self.controller.execute_returning(sql, log_sql=True, commit=True)
             lot_id = row[0]
         else:
             lot_id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
             sql = ("UPDATE " + self.schema_name + ".om_visit_lot "
                    " SET "+str(update)+""
                    " WHERE id = '" + str(lot_id) + "'; \n")
-            self.controller.execute_sql(sql, log_sql=False)
+            self.controller.execute_sql(sql, log_sql=False, commit=True)
         sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
                " WHERE lot_id = '"+str(lot_id)+"'; \n")
 
@@ -752,7 +988,7 @@ class AddNewLot(ParentManage):
             values = values[:-2]
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
                     " VALUES (" + values + "); \n")
-        status = self.controller.execute_sql(sql, log_sql=False)
+        status = self.controller.execute_sql(sql, log_sql=False, commit=True)
         if status:
             self.manage_rejected()
 
@@ -774,6 +1010,30 @@ class AddNewLot(ParentManage):
 
         model.setStringList(values)
         self.completer.setModel(model)
+
+
+    def reset_rb_list(self, rb_list):
+        self.rb_red.reset()
+        for rb in rb_list:
+            rb.reset()
+
+
+    def hilight_features(self, rb_list):
+        self.reset_rb_list(rb_list)
+        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
+        layer = self.iface.activeLayer()
+        if not layer:
+            return
+        field_id = feature_type + "_id"
+        for _id in self.ids:
+            feature = self.get_feature_by_id(layer, _id, field_id)
+            geometry = feature.geometry()
+            rb = QgsRubberBand(self.canvas)
+            rb.setToGeometry(geometry, None)
+            rb.setColor(QColor(0, 0, 240, 50))
+            rb.setWidth(5)
+            rb.show()
+            rb_list.append(rb)
 
 
     def zoom_to_feature(self, qtable):
@@ -814,24 +1074,22 @@ class AddNewLot(ParentManage):
 
     def manage_rejected(self):
         self.disconnect_signal_selection_changed()
+        layer = self.iface.activeLayer()
+        if layer:
+            layer.removeSelection()
         self.close_dialog(self.dlg_lot)
 
 
-    # TODO delete function draw_polyline(*args) when api_parent.py is integrated into giswater proyect
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
-
-        self.rubber_polygon = QgsRubberBand(self.canvas)
-        self.rubber_polygon.setColor(Qt.darkRed)
-        self.rubber_polygon.setIconSize(20)
-        rb = self.rubber_polygon
+        self.rb_red.reset()
+        rb = self.rb_red
         rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
         rb.setColor(color)
         rb.setWidth(width)
         rb.show()
 
 
-    # TODO delete function get_points(*args) when api_parent.py is integrated into giswater proyect
     def get_points(self, list_coord=None):
         """ Return list of QgsPoints taken from geometry
         :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
@@ -877,37 +1135,22 @@ class AddNewLot(ParentManage):
         """ Button 75: Lot manager """
 
         # Create the dialog
-        self.dlg_lot_man = VisitManagement()
+        self.dlg_lot_man = LotManagement()
         self.load_settings(self.dlg_lot_man)
-        self.dlg_lot_man.setWindowTitle("Lot management")
-        self.dlg_lot_man.lbl_filter.setText('Filter by idval: ')
-        self.dlg_lot_man.btn_open.setText('Open lot')
-        self.dlg_lot_man.btn_delete.setText('Delete lot')
+        self.load_user_values()
         # save previous dialog and set new one.
         # previous dialog will be set exiting the current one
         # self.previous_dialog = utils_giswater.dialog()
-        self.dlg_lot_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'ext_workorder_type')
+        self.populate_combo_filters(self.dlg_lot_man.cmb_estat, 'om_visit_lot_status')
 
-        # Set a model with selected filter. Attach that model to selected table
-        table_object = "om_visit_lot"
-        self.fill_table_object(self.dlg_lot_man.tbl_visit, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_visit, table_object)
-
-        # manage save and rollback when closing the dialog
-        self.dlg_lot_man.rejected.connect(partial(self.close_dialog, self.dlg_lot_man))
-        self.dlg_lot_man.accepted.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, table_object))
-
-        # Set signals
-        self.dlg_lot_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit))
-        self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit))
-        self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_visit))
-        self.dlg_lot_man.txt_filter.textChanged.connect(partial(self.filter_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter))
-
+        table_object = "v_ui_om_visit_lot"
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = ("SELECT MIN(startdate), MAX(enddate)"
-               " FROM {}.{}".format(self.schema_name, table_object))
-        row = self.controller.get_row(sql, log_info=True, commit=self.autocommit)
+        sql = ('SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
+               ' FROM {}.{}'.format(self.schema_name, table_object))
+        row = self.controller.get_row(sql, log_sql=True, commit=self.autocommit)
         if row:
             if row[0]:
                 self.dlg_lot_man.date_event_from.setDate(row[0])
@@ -916,18 +1159,126 @@ class AddNewLot(ParentManage):
             else:
                 self.dlg_lot_man.date_event_to.setDate(current_date)
 
-        # set date events
-        self.dlg_lot_man.date_event_from.dateChanged.connect(
-            partial(self.filter_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter))
-        self.dlg_lot_man.date_event_to.dateChanged.connect(
-            partial(self.filter_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter))
+        # Set a model with selected filter. Attach that model to selected table
+        self.fill_table_object(self.dlg_lot_man.tbl_lots, self.schema_name + "." + table_object)
+        self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_lots, table_object)
+
+        # manage open and close the dialog
+        self.dlg_lot_man.rejected.connect(self.save_user_values)
+        self.dlg_lot_man.btn_accept.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
+
+        # Set signals
+        self.dlg_lot_man.btn_path.clicked.connect(self.select_path)
+        self.dlg_lot_man.btn_import.clicked.connect(self.import_to_csv)
+        self.dlg_lot_man.tbl_lots.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
+
+        # Set filter events
+        self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
+        self.dlg_lot_man.cmb_actuacio.currentIndexChanged.connect(self.filter_lot)
+        self.dlg_lot_man.txt_address.textChanged.connect(self.filter_lot)
+        self.dlg_lot_man.cmb_estat.currentIndexChanged.connect(self.filter_lot)
+        self.dlg_lot_man.chk_assignacio.stateChanged.connect(self.filter_lot)
+        self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
+        self.dlg_lot_man.date_event_to.dateChanged.connect(self.filter_lot)
 
         # Open form
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
 
-    def delete_lot(self, qtable):
+    def save_user_values(self):
+        cur_user = self.controller.get_current_user()
+        csv_path = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path)
+        self.controller.plugin_settings_set_value("LotManagert" + cur_user, csv_path)
 
+
+    def load_user_values(self):
+        cur_user = self.controller.get_current_user()
+        csv_path = self.controller.plugin_settings_value('LotManagert' + cur_user)
+        utils_giswater.setWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path, str(csv_path))
+
+
+    def select_path(self):
+        csv_path = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path)
+        # Set default value if necessary
+        if csv_path is None or csv_path == '':
+            csv_path = self.plugin_dir
+
+        # Get directory of that file
+        folder_path = os.path.dirname(csv_path)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = self.controller.tr("Select CSV file")
+        if Qgis.QGIS_VERSION_INT < 29900:
+            csv_path = QFileDialog.getSaveFileName(None, message, "", '*.csv')
+        else:
+            csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
+
+        self.controller.set_path_from_qfiledialog(self.dlg_lot_man.txt_path, csv_path)
+
+
+    def import_to_csv(self):
+        csv_path = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path)
+        if not os.path.exists(csv_path):
+            message = "Csv path not exist"
+            self.controller.show_info(message, parameter=csv_path)
+            return
+
+        # Convert qtable values into list
+        all_rows = []
+        headers = []
+        for i in range(0, self.dlg_lot_man.tbl_lots.model().columnCount()):
+            headers.append(str(self.dlg_lot_man.tbl_lots.model().headerData(i, Qt.Horizontal)))
+        all_rows.append(headers)
+        for rows in range(0, self.dlg_lot_man.tbl_lots.model().rowCount()):
+            row = []
+            for col in range(0, self.dlg_lot_man.tbl_lots.model().columnCount()):
+                value = self.dlg_lot_man.tbl_lots.model().data(self.dlg_lot_man.tbl_lots.model().index(rows, col))
+                if str(value) == 'NULL':
+                    value = ''
+                elif type(value) == QDate:
+                    value = value.toString(self.lot_date_format)
+                row.append(value)
+            all_rows.append(row)
+
+        # Write list into csv file
+        try:
+            if os.path.exists(csv_path):
+                msg = "Are you sure you want to overwrite this file?"
+                answer = self.controller.ask_question(msg, "Overwrite")
+                if answer:
+                    self.write_to_csv(csv_path, all_rows)
+            else:
+                self.write_to_csv(csv_path, all_rows)
+        except:
+            msg = "File path doesn't exist or you dont have permission or file is opened"
+            self.controller.show_warning(msg)
+            pass
+
+
+    def write_to_csv(self,  folder_path=None, all_rows=None):
+
+        with open(folder_path, "w") as output:
+            writer = csv.writer(output, lineterminator='\n')
+            writer.writerows(all_rows)
+        message = "El fitxer csv ha estat importat correctament"
+        self.controller.show_info(message)
+
+
+    def populate_combo_filters(self, combo, table_name, fields="id, idval"):
+        sql = ("SELECT " + str(fields) + ""
+               " FROM " + self.schema_name + "." + str(table_name) + ""
+               " ORDER BY idval")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows.append(['', ''])
+        utils_giswater.set_item_data(combo, rows, 1)
+
+
+
+    def delete_lot(self, qtable):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -942,13 +1293,13 @@ class AddNewLot(ParentManage):
                    "DELETE FROM " + self.schema_name + ".om_visit_lot "
                    " WHERE id ='"+str(_id)+"'")
             self.controller.execute_sql(sql, log_sql=False)
-        self.filter_lot(self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter)
+        self.filter_lot()
 
 
-    def open_lot(self, dialog, widget):
+    def open_lot(self, dialog, qtable):
         """ Open object form with selected record of the table """
 
-        selected_list = widget.selectionModel().selectedRows()
+        selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
@@ -957,8 +1308,8 @@ class AddNewLot(ParentManage):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        selected_object_id = widget.model().record(row).value('id')
-        visitclass_id = widget.model().record(row).value('visitclass_id')
+        selected_object_id = qtable.model().record(row).value('id')
+        visitclass_id = qtable.model().record(row).value('visitclass_id')
 
         # Close this dialog and open selected object
         dialog.close()
@@ -968,12 +1319,17 @@ class AddNewLot(ParentManage):
         self.manage_lot(selected_object_id, is_new=False, visitclass_id=visitclass_id)
 
 
-    def filter_lot(self, dialog, widget_table, widget_txt):
-        """ Filter om_visit in self.dlg_lot_man.tbl_visit based on (id AND text AND between dates) """
+    def filter_lot(self):
+        """ Filter om_visit in self.dlg_lot_man.tbl_lots based on (id AND text AND between dates) """
 
-        object_id = utils_giswater.getWidgetText(dialog, widget_txt)
-        visit_start = dialog.date_event_from.date()
-        visit_end = dialog.date_event_to.date()
+        serie = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_codi_ot)
+        actuacio = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_actuacio, 0)
+        adreca = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_address, False, False)
+        status = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_estat, 1, add_quote=True)
+        assignat = utils_giswater.isChecked(self.dlg_lot_man, self.dlg_lot_man.chk_assignacio)
+
+        visit_start = self.dlg_lot_man.date_event_from.date()
+        visit_end = self.dlg_lot_man.date_event_to.date()
 
         if visit_start > visit_end:
             message = "Selected date interval is not valid"
@@ -981,16 +1337,25 @@ class AddNewLot(ParentManage):
             return
 
         # Create interval dates
-        format_low = 'yyyy-MM-dd 00:00:00.000'
-        format_high = 'yyyy-MM-dd 23:59:59.999'
+        format_low = self.lot_date_format + ' 00:00:00.000'
+        format_high = self.lot_date_format + ' 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0} or enddate is null)".format(interval))
-        if object_id != 'null':
-            expr_filter += " AND idval::TEXT ILIKE '%" + str(object_id) + "%'"
+        expr_filter = ("(\"Data inici planificada\" BETWEEN {0}) AND (\"Data final planificada\" BETWEEN {0} "
+                       " OR \"Data final planificada\" IS NULL)".format(interval))
+        if serie != 'null':
+            expr_filter += " AND \"Serie\" ILIKE '%" + str(serie) + "%'"
+        if actuacio != '':
+            expr_filter += " AND \"Tipus actuacio\" ILIKE '%" + str(actuacio) + "%' "
+        if adreca != '':
+            expr_filter += " AND adreca ILIKE '%" + str(adreca) + "%' "
+        if status != '':
+            expr_filter += " AND \"Estat\"::TEXT ILIKE '%" + str(status) + "%'"
+        if assignat:
+            expr_filter += " AND \"Serie\" IS NULL "
 
         # Refresh model with selected filter
-        widget_table.model().setFilter(expr_filter)
-        widget_table.model().select()
+        self.dlg_lot_man.tbl_lots.model().setFilter(expr_filter)
+        self.dlg_lot_man.tbl_lots.model().select()
 

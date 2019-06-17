@@ -14,19 +14,16 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-from qgis.PyQt.QtCore import Qt, QVariant
-from qgis.PyQt.QtGui import QColor, QIcon
-from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
-from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
-from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsMapLayerRegistry, QgsProject
 else:
     from qgis.core import QgsProject
 
-from qgis.core import QgsFeature, QgsGeometry
-from qgis.core import QgsVectorLayer, QgsField
+from qgis.core import QgsFeature, QgsGeometry, QgsVectorLayer, QgsField
+from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
+from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
+from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
 
 import os
 import json

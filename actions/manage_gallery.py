@@ -24,7 +24,8 @@ from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt
 
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
+import urllib.error
 import urllib.parse
 from functools import partial
 
@@ -63,7 +64,7 @@ class ManageGallery(ParentManage):
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
                " WHERE parameter = 'doc_absolute_path'")
         row = self.controller.get_row(sql)
-        if row[0] != None:
+        if row[0]:
             # If absolute_path exist in config_param_system
             for n in range(0, num):
                 path = str(row[0]) + str(rows[n][0])

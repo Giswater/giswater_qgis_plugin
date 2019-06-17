@@ -173,7 +173,10 @@
         <source>99_text</source>
         <translation>Project configuration</translation>
     </message>   
-    
+    <message>
+        <source>58_text</source>
+        <translation>Fasprint</translation>
+    </message>
 	<message>
         <source>Select the node and move to desired location</source>
         <translation>Select the node and move to desired location</translation>

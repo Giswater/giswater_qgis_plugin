@@ -8,15 +8,17 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint
 else:
     from qgis.core import  QgsPointXY
+
 from qgis.core import QgsPoint, QgsMapToPixel, QgsPointLocator
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QDoubleValidator
 
+from functools import partial
+
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui_manager import Cad_add_point
-from functools import partial
 
 
 class CadAddPoint(ParentMapTool):
@@ -25,7 +27,6 @@ class CadAddPoint(ParentMapTool):
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_point = False
@@ -33,7 +34,6 @@ class CadAddPoint(ParentMapTool):
         self.point_1 = None
         self.point_2 = None
         self.snap_to_selected_layer = False
-
 
 
     def init_create_point_form(self, point_1=None, point_2=None):
@@ -61,6 +61,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def get_values(self, point_1, point_2):
+
         self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
                                                   self.dlg_create_point.rb_left.isChecked())
         self.dist_x = self.dlg_create_point.dist_x.text()
@@ -101,6 +102,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def cancel(self):
+
         self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
                                                   self.dlg_create_point.rb_left.isChecked())
 
@@ -258,5 +260,4 @@ class CadAddPoint(ParentMapTool):
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
-        
         

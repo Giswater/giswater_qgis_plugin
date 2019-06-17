@@ -109,7 +109,7 @@ class DeleteNodeMapTool(ParentMapTool):
                + str(self.node_id) + "','" + str(workcat_id_end) + "','" + str(enddate_str) + "');")
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
-            message = "Node deleted successfully"
+            message = "Arc sucessfully fusioned. Node have been downgraded to state=0"
             self.controller.show_info(message)
 
             # Refresh map canvas

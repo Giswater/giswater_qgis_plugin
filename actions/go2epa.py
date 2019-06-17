@@ -742,7 +742,7 @@ class Go2Epa(ApiParent):
         self.save_user_values()
 
         self.show_widgets(False)
-
+        self.check_result_id()
 
 
     def set_completer_result(self, widget, viewname, field_name):

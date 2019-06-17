@@ -31,6 +31,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QT
 from functools import partial
 import os
 import operator
+
 from actions.HyperLinkLabel import HyperLinkLabel
 
 
@@ -375,16 +376,20 @@ def set_model_by_list(string_list, widget, proxy_model):
     widget.setCompleter(completer)
 
 
-def get_item_data(dialog, widget, index=0):
+def get_item_data(dialog, widget, index=0, add_quote=False):
     """ Get item data of current index of the @widget """
 
     code = -1
+    if add_quote:
+        code = ''
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
         if type(widget) is QComboBox:
             current_index = widget.currentIndex()     
             elem = widget.itemData(current_index)
+            if index == -1:
+                return elem
             code = elem[index]            
 
     return code
@@ -399,7 +404,8 @@ def set_combo_itemData(combo, value, item1):
         elem = combo.itemData(i)
         if value == str(elem[item1]):
             combo.setCurrentIndex(i)
-
+            return True
+    return False
 
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1):
     """ Populate @combo with list @rows and show field @index_to_show
@@ -429,6 +435,37 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     for record in records_sorted:
         combo.addItem(record[index_to_show], record)
         combo.blockSignals(False)
+
+
+def set_combo_item_unselectable_by_id(qcombo, list_id=[]):
+    """ Make items of QComboBox visibles but not selectable"""
+    for x in range(0, qcombo.count()):
+        if x in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, 0, Qt.UserRole - 1)
+
+
+def set_combo_item_selectable_by_id(qcombo, list_id=[]):
+    """ Make items of QComboBox selectable """
+    for x in range(0, qcombo.count()):
+        if x in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, (1 | 32), Qt.UserRole - 1)
+
+
+def set_combo_item_select_unselectable(qcombo, list_id=[], column=0, opt=0):
+    """ Make items of QComboBox visibles but not selectable
+        :param qcombo: QComboBox widget to manage
+        :param list_id: list of strings to manage ex. ['1','3','...'] or ['word1', 'word3','...']
+        :param column: column where to look up the values in the list
+        :param opt: 0 to set item not selectable
+        :param opt: (1 | 32 ) to set item selectable
+    """
+    for x in range(0, qcombo.count()):
+        elem = qcombo.itemData(x)
+        if str(elem[column]) in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, opt, Qt.UserRole - 1)
 
 
 def remove_tab_by_tabName(tab_widget, tab_name):

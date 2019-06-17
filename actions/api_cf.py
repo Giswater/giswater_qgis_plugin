@@ -12,20 +12,21 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
     import urlparse as parse
 else:
-    import urllib.parse
+    from qgis.PyQt.QtCore import QStringListModel
+    import urllib.parse as parse
     from qgis.core import QgsPointXY
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
-from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
+from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
 from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
 from qgis.PyQt.QtWidgets import QTextEdit
-
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel, QgsPoint, QgsGeometry
+from qgis.core import QgsMapToPixel, QgsPoint, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
 import json
@@ -39,7 +40,6 @@ from functools import partial
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
-from giswater.actions.HyperLinkLabel import HyperLinkLabel
 from giswater.actions.manage_document import ManageDocument
 from giswater.actions.manage_element import ManageElement
 from giswater.actions.manage_visit import ManageVisit
@@ -54,6 +54,7 @@ class ApiCF(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir, tab_type):
         """ Class constructor """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.iface = iface
         self.settings = settings
@@ -198,6 +199,7 @@ class ApiCF(ApiParent):
         self.tab_hydrometer_val_loaded = False
         self.tab_om_loaded = False
         self.tab_document_loaded = False
+        self.tab_rpt_loaded = False
         self.tab_plan_loaded = False
         self.dlg_is_destroyed = False
         self.layer = None
@@ -225,14 +227,12 @@ class ApiCF(ApiParent):
             extras = '"toolBar":"basic"'
         role = self.controller.get_restriction()
         extras += ', "rolePermissions":"' + role + '"'
+
         # IF insert new feature
         if point and feature_cat:
             self.new_feature_id = new_feature_id
             self.layer_new_feature = layer_new_feature
-
             self.iface.actionPan().trigger()
-            layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
-            layer.featureAdded.disconnect()
             feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
             extras += ', "coordinates":{'+str(point) + '}'
             body = self.create_body(feature=feature, extras=extras)
@@ -255,10 +255,15 @@ class ApiCF(ApiParent):
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False, None
+        # When info is nothing
         if 'results' in row[0]:
             if row[0]['results'] == 0:
                 self.controller.show_message(row[0]['message']['text'], 2)
                 return False, None
+        # When insert feature failed
+        if row[0]['status'] == "Failed":
+            self.controller.show_message(row[0]['message']['text'], 2)
+            return False, None
 
         # Control fail when insert new feature
         if 'status' in row[0]['body']['data']['fields']:
@@ -293,7 +298,7 @@ class ApiCF(ApiParent):
         for field in result['fields']:
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
-            if type(widget) is QLineEdit:
+            if type(widget) in(QLineEdit, QPushButton):
                 value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
                 value = utils_giswater.get_item_data(dialog, widget, 0)
@@ -301,6 +306,9 @@ class ApiCF(ApiParent):
                 value = utils_giswater.isChecked(dialog, widget)
             elif type(widget) is QgsDateTimeEdit:
                 value = utils_giswater.getCalendarDate(dialog, widget)
+            else:
+                print(type(widget))
+                print(type(widget.objectName()))
 
             if str(value) != '' and value is not None and value is not -1:
                 self.my_json[str(widget.property('column_id'))] = str(value)
@@ -511,6 +519,8 @@ class ApiCF(ApiParent):
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
+        self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
+        self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
         #self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -684,10 +694,12 @@ class ApiCF(ApiParent):
                 if widget.objectName() == field['widgetname']:
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
                         widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
-                                             " color: rgb(100, 100, 100)}")
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                     elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
                         widget.setEnabled(enable)
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+
+
         self.new_feature_id = None
         self.close_dialog(dialog)
 
@@ -701,12 +713,10 @@ class ApiCF(ApiParent):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                                 " color: rgb(100, 100, 100)}")
+                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);"
-                                                 " color: rgb(0, 0, 0)}")
+                            widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
                     elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
                         widget.setEnabled(field['iseditable'])
                         widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
@@ -908,8 +918,9 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
             result = self.fill_tab_rpt(self.complet_result)
+            self.tab_rpt_loaded = True
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self.fill_tab_plan(self.complet_result)
@@ -2133,13 +2144,14 @@ class ApiCF(ApiParent):
                 if row is None :
                     sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
                     self.controller.execute_sql(sql)
-
                     sql = ("SELECT id, id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql, commit=True)
                     if rows:
-                        cmb_workcat_id = self.dlg_cf.findChild(QComboBox, tab_type + "_workcat_id")
-                        utils_giswater.set_item_data(cmb_workcat_id, rows, index_to_show=1, combo_clear=True)
-                        utils_giswater.set_combo_itemData(cmb_workcat_id, cat_work_id, 1)
+                        cmb_workcat_id = self.dlg_cf.findChild(QWidget, tab_type + "_workcat_id")
+                        model = QStringListModel()
+                        completer = QCompleter()
+                        self.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
+                        utils_giswater.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
                     self.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "Este Workcat ya existe"
@@ -2210,7 +2222,7 @@ class ApiCF(ApiParent):
         feature_id = utils_giswater.getWidgetText(dialog, widget)
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
-        complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type=self.tab_type)
+        complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_node")
             return

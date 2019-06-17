@@ -33,7 +33,7 @@ class CadAddCircle(ParentMapTool):
 
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
-        # Call ParentMapTool constructor
+
         super(CadAddCircle, self).__init__(iface, settings, action, index_action)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
@@ -42,6 +42,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def init_create_circle_form(self, point):
+
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         self.load_settings(self.dlg_create_circle)

@@ -10,10 +10,18 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog
-from qgis.PyQt.QtWidgets import QLineEdit, QWidget, QComboBox, QLabel, QCheckBox
+from qgis.PyQt.QtWidgets import QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox
+from qgis.PyQt.QtWidgets import QAbstractButton, QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.gui import QgsDateTimeEdit
+from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
 import sys
@@ -21,12 +29,14 @@ import re
 import json
 from functools import partial
 from collections import OrderedDict
+import xml.etree.cElementTree as ET
 
 import utils_giswater
 
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ReadsqlCreateGisProject, ApiImportInp
+from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ReadsqlCreateGisProject, ApiImportInp, ManageFields
 from giswater.actions.create_gis_project import CreateGisProject
+
 
 
 class UpdateSQL(ApiParent):
@@ -104,6 +114,9 @@ class UpdateSQL(ApiParent):
 
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
+        # TODO:: remove this harcorded
+        utils_giswater.setWidgetText(self.dlg_readsql, 'tpath', 'C:/Users/Usuari/Desktop/test.ui')
+
         self.message_update = ''
 
         # Error counter variable
@@ -125,7 +138,6 @@ class UpdateSQL(ApiParent):
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "others")
             self.project_types = self.settings.value('system_variables/project_types')
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
@@ -188,6 +200,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
         btn_info.clicked.connect(partial(self.show_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui, parent=False))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_schema_name, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
@@ -199,6 +212,15 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
+        self.dlg_readsql.btn_path.clicked.connect(partial(self.select_file_ui))
+        self.dlg_readsql.btn_import_ui.clicked.connect(partial(self.execute_import_ui))
+        self.dlg_readsql.btn_export_ui.clicked.connect(partial(self.execute_export_ui))
+
+        self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
+        self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
+        self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
+        self.dlg_readsql.chk_parent.stateChanged.connect(partial(self.update_manage_ui, parent=True))
+
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -207,6 +229,7 @@ class UpdateSQL(ApiParent):
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
         self.dlg_readsql.setWindowTitle(window_title)
+
         self.dlg_readsql.show()
 
         if connection_status is False:
@@ -232,6 +255,7 @@ class UpdateSQL(ApiParent):
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
+        self.update_manage_ui(parent=False)
 
 
     def gis_create_project(self):
@@ -457,8 +481,8 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                        self.project_data_language + os.sep), '') is True:
+                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
@@ -476,8 +500,8 @@ class UpdateSQL(ApiParent):
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), ''):
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep), ''):
+                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
@@ -500,11 +524,11 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep), True)
+                                            self.project_data_language + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -525,8 +549,8 @@ class UpdateSQL(ApiParent):
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),'') is True:
+                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -545,8 +569,8 @@ class UpdateSQL(ApiParent):
                     if new_project:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
-                                if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep), '') is True:
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
@@ -562,10 +586,10 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), '') is True:
+                                        self.project_data_language + os.sep), '') is True:
                                     status = self.executeFiles(self.sql_dir + os.sep + str(
                                         project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
+                                        self.project_data_language + os.sep), True)
                                 elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
                                     status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'EN', True)
                                     if status is False:
@@ -585,10 +609,10 @@ class UpdateSQL(ApiParent):
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),'') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep), True)
+                                            self.project_data_language + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -610,11 +634,11 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep), True)
+                                            self.project_data_language + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -671,11 +695,11 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
+                                        self.project_data_language + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is False:
@@ -696,11 +720,11 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
+                                        self.project_data_language + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
@@ -724,11 +748,11 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep), True)
+                                    self.project_data_language + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -743,11 +767,11 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep), True)
+                                    self.project_data_language + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -915,15 +939,15 @@ class UpdateSQL(ApiParent):
                             if status is False:
                                 return False
                         if self.process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                 '') is True:
                             status = self.executeFiles(
                                 self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep), True)
+                                    self.project_data_language + os.sep), True)
                             if status is False:
                                 return False
                         elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + self.locale + os.sep, True)
+                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + self.project_data_language + os.sep, True)
                             if status is False:
                                 return False
                         if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
@@ -948,16 +972,16 @@ class UpdateSQL(ApiParent):
                                     return False
                             if self.process_folder(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep),
+                                        self.project_data_language + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
+                                        self.project_data_language + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
                                                    'EN') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + self.locale + os.sep,
+                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + self.project_data_language + os.sep,
                                     True)
                                 if status is False:
                                     return False
@@ -985,11 +1009,11 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.project_data_language + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
+                                        self.project_data_language + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -1018,11 +1042,11 @@ class UpdateSQL(ApiParent):
                                     return False
                             if self.process_folder(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep),
+                                        self.project_data_language + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
+                                        self.project_data_language + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
@@ -1634,6 +1658,10 @@ class UpdateSQL(ApiParent):
                     elem = [row[0], row[0]]
                     result_list.append(elem)
 
+        if result_list == []:
+            self.dlg_readsql.project_schema_name.clear()
+            return
+
         utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
 
 
@@ -1664,6 +1692,10 @@ class UpdateSQL(ApiParent):
             row = self.controller.get_row(sql)
             if row:
                 self.project_data_schema_version = str(row[0])
+            sql = "SELECT language FROM " + schema_name + ".version order by id desc LIMIT 1"
+            row = self.controller.get_row(sql)
+            if row:
+                self.project_data_language = str(row[0])
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -1698,6 +1730,7 @@ class UpdateSQL(ApiParent):
                + str(postgis_version[0]) + ' \n \n' + ''
                'Name: ' + schema_name + '\n' + ''
                'Version: ' + self.project_data_schema_version + ' \n' + ''
+               'Language: ' + self.project_data_language + ' \n' + ''
                'Title: ' + str(result[0]['title']) + '\n' + ''
                'Author: ' + str(result[0]['author']) + '\n' + ''
                'Date: ' + str(result[0]['date']))
@@ -2091,6 +2124,299 @@ class UpdateSQL(ApiParent):
         msg = "The QGIS Projects templates was correctly created."
         self.controller.show_info_box(msg, "Info")
 
+    """ Import / Export UI and manage fields """
+
+    def execute_import_ui(self):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
+        # Control if ui path is invalid or null
+        if ui_path is None:
+            msg = "Please, select a valid UI Path."
+            self.controller.show_info_box(msg, "Info")
+            return
+
+        with open(str(ui_path)) as f:
+            content = f.read()
+        sql = ("INSERT INTO " + schema_name + ".temp_csv2pg(source, csv1, csv2pgcat_id) VALUES('" +
+               str(form_name) + "', '" + str(content) + "', 20);")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+
+        # Import xml to database
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name) + "')::text")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        if status:
+            msg = "Imported data into 'config_api_form_fields' successfully."
+            self.controller.show_info_box(msg, "Info")
+        else:
+            msg = "Some error ocurred when import data into 'config_api_form_fields'."
+            self.controller.show_info_box(msg, "Info")
+
+        # Clear temp_csv2pg
+        self.clear_temp_table()
+
+
+    def execute_export_ui(self):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
+
+        # Control if ui path is invalid or null
+        if ui_path is None:
+            msg = "Please, select a valid UI Path."
+            self.controller.show_info_box(msg, "Info")
+            return
+
+        # Export xml from database
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name) + "')::text")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+
+        # Check status
+        if status is False:
+            msg = "Error on import/export call."
+            self.controller.show_info_box(msg, "Info")
+            return
+
+        # Populate UI file
+        sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user AND source = '" +
+               str(form_name) + "' ORDER BY id DESC")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        data = ET.Element(str(row[0]))
+        data = ET.tostring(data)
+        file_ui = open(ui_path, "w")
+        # TODO:: dont use replace for remove invalid characters
+        data = data.replace(' />', '').replace('<<', '<')
+        file_ui.write(data)
+
+        msg = "Imported data into '" + str(ui_path) + "' successfully."
+        self.controller.show_info_box(msg, "Info")
+
+        # Clear temp_csv2pg
+        self.clear_temp_table()
+
+
+    def clear_temp_table(self):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        # Clear temp_csv2pg
+        sql = ("DELETE FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+
+
+    def select_file_ui(self):
+        """ Select UI file """
+
+        file_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        # Set default value if necessary
+        if file_ui is None or file_ui == '':
+            file_ui = self.plugin_dir
+
+        # Get directory of that file
+        folder_path = os.path.dirname(file_ui)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = self.controller.tr("Select UI file")
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            file_ui = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+        else:
+            file_ui, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+
+        self.dlg_readsql.tpath.setText(file_ui)
+
+
+    def update_manage_ui(self, parent=False):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if parent and self.dlg_readsql.chk_parent.isChecked():
+
+            sql = ("SELECT DISTINCT(parent_layer), parent_layer FROM " + str(schema_name) + ".cat_feature")
+            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+            utils_giswater.set_item_data(self.dlg_readsql.cmb_formname, rows, 1)
+
+            return
+
+        sql = ("SELECT DISTINCT(formname), formname FROM " + str(schema_name) + ".config_api_form_fields")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_readsql.cmb_formname, rows, 1)
+
+
+    def open_manage_field(self, action):
+        # Create the dialog and signals
+        self.dlg_manage_fields = ManageFields()
+        self.load_settings(self.dlg_manage_fields)
+
+        self.model_update_table = None
+
+        # Remove unused tabs
+        for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
+            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str(action):
+                utils_giswater.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
+
+        form_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname)
+
+        if action == 'Create':
+            window_title = 'Create field on "' + str(form_name) + '"'
+            self.dlg_manage_fields.setWindowTitle(window_title)
+            self.manage_create_field(form_name)
+        elif action == 'Update':
+            window_title = 'Create field on "' + str(form_name) + '"'
+            self.dlg_manage_fields.setWindowTitle(window_title)
+            self.manage_update_field(form_name)
+        elif action == 'Delete':
+            window_title = 'Delete field on "' + str(form_name) + '"'
+            self.dlg_manage_fields.setWindowTitle(window_title)
+            self.manage_delete_field(form_name)
+
+        # Set listeners
+        self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.manage_accept, action, form_name, self.model_update_table))
+        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
+
+        self.dlg_manage_fields.show()
+
+
+    def manage_create_field(self, form_name):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        # Populate widgettype combo
+        sql = ("SELECT DISTINCT(widgettype), widgettype FROM " + schema_name + ".config_api_form_fields")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
+
+        # Configure column_id as typeahead
+        completer = QCompleter()
+        model = QStringListModel()
+        self.filter_typeahead(schema_name, form_name, self.dlg_manage_fields.column_id, completer, model)
+
+        # Set listeners
+        self.dlg_manage_fields.column_id.textChanged.connect(partial(self.filter_typeahead,schema_name, form_name, self.dlg_manage_fields.column_id, completer, model))
+
+
+    def manage_update_field(self, form_name):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
+        self.model_update_table = QSqlTableModel()
+        expr_filter = "formname ='" + form_name + "'"
+        self.fill_table(qtable, 'config_api_form_fields', self.model_update_table, expr_filter)
+
+
+    def manage_delete_field(self, form_name):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        # Populate widgettype combo
+        sql = ("SELECT DISTINCT(column_id), column_id FROM " + schema_name + ".config_api_form_fields WHERE formname = '"
+               + form_name + "'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
+
+
+    def manage_accept(self, action, form_name, model=None):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if action == 'Create':
+            list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
+            _json = {}
+            for widget in list_widgets:
+                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView):
+
+                    if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+                        value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
+                    elif type(widget) is QComboBox and widget.isEnabled():
+                        value = utils_giswater.get_item_data(self.dlg_manage_fields, widget, 0)
+                    elif type(widget) is QCheckBox and widget.isEnabled():
+                        value = utils_giswater.isChecked(self.dlg_manage_fields, widget)
+                    elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+                        value = utils_giswater.getCalendarDate(self.dlg_manage_fields, widget)
+
+                    if str(widget.objectName()) not in (None, 'null', '', ""):
+                        _json[str(widget.objectName())] = value
+                        result_json = json.dumps(_json)
+
+            # Create body
+            feature = '"catFeature":"' + form_name + '"'
+            extras = '"action":"CREATE", ' + result_json + ''
+            body = self.create_body(feature=feature, extras=extras)
+
+
+            # Execute manage add fields function
+            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
+            print(str(sql))
+            return
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        elif action == 'Update':
+
+            if model is not None and model.submitAll():
+                msg = "Update executed successfully."
+                self.controller.show_info_box(msg, "Info")
+            else:
+                msg = "Some failed in update execute. No changes have been made. \n "
+                self.controller.show_info_box(msg, "Info")
+
+        elif action == 'Delete':
+            self.controller.log_info(str("DELETE"))
+
+            field_value = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
+
+            # Create body
+            feature = '"catFeature":"' + form_name + '"'
+            extras = '"action":"DELETE", "field":"' + field_value + '"'
+            body = self.create_body(feature=feature, extras=extras)
+
+
+            # Execute manage add fields function
+            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
+            print(str(sql))
+            return
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        # Close dialog
+        self.close_dialog(self.dlg_manage_fields)
+
+
+    def fill_table(self, qtable, table_name, model, expr_filter, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if schema_name not in table_name:
+            table_name = schema_name + "." + table_name
+
+        # Set model
+        model.setTable(table_name)
+        model.setEditStrategy(set_edit_strategy)
+        if expr_filter is not None:
+            model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+        # Attach model to table view
+        qtable.setModel(model)
+
+
+    def filter_typeahead(self, schema_name, form_name, widget, completer, model):
+
+        filter = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
+        if filter == 'null':
+            filter = ''
+        # Get layers under mouse clicked
+        sql = ("SELECT DISTINCT(column_id) FROM " + schema_name + ".config_api_form_fields WHERE formname = '" + form_name + "'"
+               " AND column_id LIKE '%" + filter + "%'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        # print(str(rows))
+
+        # if not rows:
+        #     self.controller.show_message("NOT ROW FOR: " + sql, 2)
+        #     return False
+
+        # self.set_completer_object_api(completer, model, widget, rows)
 
     """ Take current project type changed """
 

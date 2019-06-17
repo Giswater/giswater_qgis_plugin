@@ -12,9 +12,8 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
+    pass
 else:
-    from qgis.PyQt.QtCore import QStringListModel
     from builtins import str
     from builtins import range
 
@@ -23,7 +22,8 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
-import json, operator
+import json
+import operator
 from collections import OrderedDict
 from functools import partial
 

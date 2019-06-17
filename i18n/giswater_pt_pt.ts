@@ -241,6 +241,10 @@
         <source>99_text</source>
         <translation>Project configuration</translation>
     </message>
+    <message>
+        <source>58_text</source>
+        <translation>Fasprint</translation>
+    </message>
 </context>
 
 

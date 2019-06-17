@@ -6,33 +6,15 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-from collections import OrderedDict
-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4 import QtCore, QtGui
-    from PyQt4.QtGui import QTabWidget, QWidget, QVBoxLayout
-    from PyQt4.QtCore import QDate
-    from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QHBoxLayout, QFormLayout, \
-        QSpacerItem, QSizePolicy, QIntValidator, QDoubleValidator, QLineEdit, QGraphicsLinearLayout
-    from PyQt4.QtGui import QGridLayout, QCompleter
-    from PyQt4.QtGui import QLabel
-    from PyQt4.QtGui import QLineEdit
-    from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsDateTimeEdit
+from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy
 
 import json
-import sys
 import operator
 from functools import partial
-from datetime import datetime
+from collections import OrderedDict
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
-from giswater.actions.parent import ParentAction
 from giswater.ui_manager import ApiCatalogUi
 
 
@@ -40,10 +22,14 @@ class ApiCatalog(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
 
+
     def set_project_type(self, project_type):
+
         self.project_type = project_type
+
 
     def api_catalog(self, previous_dialog, widget_name, geom_type):
 
@@ -54,7 +40,6 @@ class ApiCatalog(ApiParent):
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         groupBox_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
-
 
         self.dlg_catalog = ApiCatalogUi()
         self.load_settings(self.dlg_catalog)
@@ -74,7 +59,6 @@ class ApiCatalog(ApiParent):
             if field['layout_id'] == 1:
                 self.filter_form.addWidget(label, field['layout_order'], 0)
                 self.filter_form.addWidget(widget, field['layout_order'], 1)
-
 
         groupBox_1.setLayout(self.filter_form)
         main_layout.addWidget(groupBox_1)
@@ -144,7 +128,9 @@ class ApiCatalog(ApiParent):
                     widget.currentIndexChanged.connect(partial(self.fill_child, widget, geom_type))
                     widget.currentIndexChanged.connect(partial(self.populate_catalog_id, geom_type))
 
+
     def fill_child(self, widget, geom_type):
+
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_catalog, widget)
         # TODO cambiar por gw_api_getchilds
@@ -172,7 +158,9 @@ class ApiCatalog(ApiParent):
         row = self.controller.get_row(sql, log_sql=True)
         self.populate_combo(widget_id, row[0]['catalog_id'][0])
 
+
     def populate_child(self, combo_child, result):
+
         child = self.dlg_catalog.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
             self.populate_combo(child, combo_child)
@@ -187,16 +175,21 @@ class ApiCatalog(ApiParent):
         except AttributeError:
             pass
 
+
     def add_combobox(self, dialog, field):
+
         widget = QComboBox()
         widget.setObjectName(field['column_id'])
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+
         return widget
 
+
     def populate_combo(self, widget, field):
+
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
@@ -213,6 +206,7 @@ class ApiCatalog(ApiParent):
         if 'selectedId' in field:
             if str(field['selectedId']) != 'None':
                 utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+
 
     def fill_geomcat_id(self, previous_dialog, widget_name):
 

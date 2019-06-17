@@ -4,11 +4,13 @@ from qgis.PyQt.QtWidgets import QMainWindow, QDialog, QDockWidget
 import os
 
 
-def get_ui_class(ui_file_name):
+def get_ui_class(ui_file_name, subfolder=None):
     """ Get UI Python class from @ui_file_name """
 
     # Folder that contains UI files
     ui_folder_path = os.path.dirname(__file__) + os.sep + 'ui'
+    if subfolder:
+        ui_folder_path += os.sep + subfolder
     ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
     return uic.loadUiType(ui_file_path)[0]
 
@@ -28,14 +30,22 @@ class ApiCatalogUi(QMainWindow, FORM_CLASS):
 FORM_CLASS = get_ui_class('api_cf.ui')
 class ApiCfUi(QMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
+    key_pressed = QtCore.pyqtSignal()
+
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            print('event: {0}'.format(event))
+            self.key_pressed.emit()
+            return super(ApiCfUi, self).keyPressEvent(event)
+
     def closeEvent(self, event):
-        print('event: {0}'.format(event))
         self.dlg_closed.emit()
         return super(ApiCfUi, self).closeEvent(event)
+
 
 FORM_CLASS = get_ui_class('api_search.ui')
 class ApiSearchUi(QDockWidget, FORM_CLASS):
@@ -135,6 +145,13 @@ class ArcFusion(QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('audit_check_project_result.ui')
 class AuditCheckProjectResult(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('basic_table.ui')
+class BasicTable(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
@@ -284,6 +301,20 @@ FORM_CLASS = get_ui_class('load_profiles.ui')
 class LoadProfiles(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('lot_management.ui')
+class LotManagement(QDialog, FORM_CLASS):
+    def __init__(self):
+        super(LotManagement, self).__init__()
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('manage_addfields.ui')
+class ManageFields(QDialog, FORM_CLASS):
+    def __init__(self):
+        super(ManageFields, self).__init__()
         self.setupUi(self)
 
 
@@ -515,3 +546,26 @@ class WorkcatEndList(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
+
+
+""" Tree Manage forms """
+FORM_CLASS = get_ui_class('add_visit.ui', 'tm')
+class AddVisitTm(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('event_standard.ui', 'tm')
+class EventStandardTm(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('planning_unit.ui', 'tm')
+class PlaningUnit(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+

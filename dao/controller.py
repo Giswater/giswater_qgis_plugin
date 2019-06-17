@@ -359,10 +359,10 @@ class DaoController(object):
         msg_box.setText(detail_text)
         if title:
             title = self.tr(title)
-            msg_box.setWindowTitle(title);        
+            msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text)            
-            msg_box.setInformativeText(inf_text); 
+            msg_box.setInformativeText(inf_text)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)        
@@ -379,10 +379,10 @@ class DaoController(object):
         msg_box.setText(msg)
         if title:
             title = self.tr(title, context_name)
-            msg_box.setWindowTitle(title);        
+            msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text, context_name)
-            msg_box.setInformativeText(inf_text);        
+            msg_box.setInformativeText(inf_text)
         msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)  
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -406,10 +406,10 @@ class DaoController(object):
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         if title:
             title = self.tr(title, context_name)            
-            msg_box.setWindowTitle(title);        
+            msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text, context_name)            
-            msg_box.setInformativeText(inf_text);        
+            msg_box.setInformativeText(inf_text)
         msg_box.setDefaultButton(QMessageBox.No)        
         msg_box.exec_()
                           
@@ -448,12 +448,11 @@ class DaoController(object):
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False, commit=False):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
-        if log_sql:
-            self.log_info(sql, stack_level_increase=1)        
-        rows = self.dao.get_rows(sql, commit=commit)   
+        sql = self.get_sql(sql, log_sql, params)
+        rows = self.dao.get_rows(sql, commit)
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
@@ -473,7 +472,7 @@ class DaoController(object):
 
         if log_sql:
             self.log_info(sql, stack_level_increase=1)        
-        result = self.dao.execute_sql(sql, commit=commit)
+        result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
             if log_error:
@@ -486,17 +485,17 @@ class DaoController(object):
         else:
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit(commit=commit)
+                return self.get_error_from_audit(commit)
 
         return True
 
 
-    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False):
+    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
             self.log_info(sql, stack_level_increase=1)
-        value = self.dao.execute_returning(sql)
+        value = self.dao.execute_returning(sql, commit)
         self.last_error = self.dao.last_error
         if not value:
             if log_error:
@@ -509,7 +508,7 @@ class DaoController(object):
         else:
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit()
+                return self.get_error_from_audit(commit)
 
         return value
            
@@ -558,7 +557,7 @@ class DaoController(object):
 
         # Execute sql
         self.log_info(sql, stack_level_increase=1)
-        result = self.dao.execute_sql(sql, commit=commit)
+        result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
             text = "Undefined error"
@@ -578,7 +577,7 @@ class DaoController(object):
             self.get_postgresql_version()
 
         if int(self.postgresql_version) < 90500:   
-            self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values, commit=commit)
+            self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values, commit)
             return True
          
         # Set SQL for INSERT               
@@ -610,7 +609,7 @@ class DaoController(object):
         
         # Execute UPSERT
         self.log_info(sql, stack_level_increase=1)
-        result = self.dao.execute_sql(sql, commit=commit)
+        result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
             text = "Undefined error"
@@ -654,13 +653,13 @@ class DaoController(object):
                " ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
                " WHERE audit_cat_error.id != 0 AND debug_info is null"
                " ORDER BY audit_function_actions.id DESC LIMIT 1")
-        result = self.dao.get_row(sql, commit=commit)
+        result = self.dao.get_row(sql, commit)
         if result:
             if result['log_level'] <= 2:
                 sql = ("UPDATE " + self.schema_name + ".audit_function_actions"
                        " SET debug_info = 'showed'"
                        " WHERE id = " + str(result['id']))
-                self.dao.execute_sql(sql, commit=commit)
+                self.dao.execute_sql(sql, commit)
                 if result['show_user']:
                     self.show_message(result['error_message'], result['log_level'])
                 return False    
@@ -974,16 +973,31 @@ class DaoController(object):
             self.translate_form(dialog, locale_name)                              
       
       
-    def get_project_type(self):
+    def get_project_type(self, schemaname=None):
         """ Get water software from table 'version' """
-        
+
+        if schemaname is None:
+            schemaname = self.schema_name
+            if schemaname is None:
+                return None
+
+        schemaname = schemaname.replace('"', '')
+
         project_type = None
-        if self.schema_name is not None:
-            sql = ("SELECT lower(wsoftware)"
-                   " FROM " + self.schema_name + ".version ORDER BY id ASC LIMIT 1")
-            row = self.get_row(sql)
+        tablename = "version"
+        exists = self.check_table(tablename)
+        if exists:
+            sql = ("SELECT lower(wsoftware) "
+                   "FROM " + schemaname + "." + tablename + " "
+                   "ORDER BY id ASC LIMIT 1")
+            row = self.get_row(sql, commit=True)
             if row:
                 project_type = row[0]
+        else:
+            tablename = "version_tm"
+            exists = self.check_table(tablename)
+            if exists:
+                project_type = "tm"
 
         return project_type
     
@@ -992,11 +1006,15 @@ class DaoController(object):
         """ Get project version from table 'version' """
         
         project_version = None
-        sql = ("SELECT giswater"
-               " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1")
-        row = self.get_row(sql)
-        if row:
-            project_version = row[0]
+        tablename = "version"
+        exists = self.check_table(tablename)
+        if exists:
+            sql = ("SELECT giswater "
+                   "FROM " + self.schema_name + "." + tablename + " "
+                   "ORDER BY id DESC LIMIT 1")
+            row = self.get_row(sql)
+            if row:
+                project_version = row[0]
             
         return project_version    
     
@@ -1171,33 +1189,6 @@ class DaoController(object):
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
         
-        # role_admin = False
-        # role_master = self.check_role_user("role_master")
-        # role_epa = self.check_role_user("role_epa")
-        # role_edit = self.check_role_user("role_edit")
-        # role_om = self.check_role_user("role_om")
-        # role_basic = self.check_role_user("role_basic")
-        # super_users = self.settings.value('system_variables/super_users')
-        #
-        # # Manage user 'postgres'
-        # if self.user == 'postgres' or self.user == 'gisadmin':
-        #     role_master = True
-        #
-        # # Manage super_user
-        # if super_users is not None:
-        #     if self.user in super_users:
-        #         role_master = True
-        #
-        #
-        #
-        # project_role = None
-        # if Qgis.QGIS_VERSION_INT < 29900:
-        #     project_role = QgsExpressionContextUtils.projectScope().variable('project_role')
-        # else:
-        #     project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
-        # self.log_info(str(role_basic))
-        # self.log_info(str(project_role))
-
         restriction = self.get_restriction()
 
         if restriction == 'role_basic':

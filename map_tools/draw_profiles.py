@@ -341,7 +341,7 @@ class DrawProfiles(ParentMapTool):
     def activate_snapping(self, emit_point):
 
         self.canvas.setMapTool(emit_point)
-        snapper = self.get_snapper()
+        snapper = self.snapper_manager.get_snapper()
         self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
 
@@ -351,8 +351,7 @@ class DrawProfiles(ParentMapTool):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
-
+        self.snapper = self.snapper_manager.get_snapper()
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
         # widget = clicked button
@@ -652,6 +651,8 @@ class DrawProfiles(ParentMapTool):
                 self.memory[n][7] = row[7]
                 n = n + 1
 
+        if test_id_list == []:
+            return
         message = "Some parameters are missing (Values Defaults used for)"
         self.controller.show_info_box(message, "Info", str(test_id_list))
 

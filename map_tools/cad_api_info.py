@@ -4,27 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
 except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint
-else:
-    from qgis.core import QgsPointXY
-
-from qgis.core import QgsPointLocator, QgsMapToPixel
-from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsMapTool
-
-from qgis.PyQt.QtCore import QPoint, Qt, pyqtSignal
+from qgis.core import QgsMapToPixel
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor
-from qgis.PyQt.QtWidgets import QApplication
-
-
-from functools import partial
 
 from map_tools.parent import ParentMapTool
 from giswater.actions.api_cf import ApiCF
@@ -34,13 +22,16 @@ class CadApiInfo(ParentMapTool):
     """ Button 37: Info """
 
     def __init__(self, iface, settings, action, index_action):
+
         """ Class constructor """
         # Call ParentMapTool constructor
         super(CadApiInfo, self).__init__(iface, settings, action, index_action)
         self.index_action = index_action
         self.tab_type = None
 
+
     def create_point(self, event):
+
         x = event.pos().x()
         y = event.pos().y()
         try:
@@ -48,12 +39,14 @@ class CadApiInfo(ParentMapTool):
         except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return False
+
         return point
 
 
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
+
         if event.key() == Qt.Key_Escape:
             for rb in self.rubberband_list:
                 rb.reset()
@@ -62,13 +55,12 @@ class CadApiInfo(ParentMapTool):
             return
 
 
-
     def canvasMoveEvent(self, event):
         pass
 
 
-
     def canvasReleaseEvent(self, event):
+
         for rb in self.rubberband_list:
             rb.reset()
         complet_result = None
@@ -90,6 +82,7 @@ class CadApiInfo(ParentMapTool):
 
 
     def activate(self):
+
         # Check button
         self.action().setChecked(True)
         # Change map tool cursor
@@ -105,12 +98,10 @@ class CadApiInfo(ParentMapTool):
         self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
 
 
-
     def deactivate(self):
+
         for rb in self.rubberband_list:
             rb.reset()
         self.info_cf.resetRubberbands()
         ParentMapTool.deactivate(self)
-
-
 
