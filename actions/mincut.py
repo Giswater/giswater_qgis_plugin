@@ -42,7 +42,7 @@ from giswater.ui_manager import Mincut_add_connec
 from giswater.ui_manager import MincutComposer
 
 
-class MincutParent(ParentAction, MultipleSelection):
+class MincutParent(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
@@ -197,6 +197,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def set_id_val(self):
+
         # Show future id of mincut
         result_mincut_id = 1
         sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
@@ -212,6 +213,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mg_mincut(self):
         """ Button 26: New Mincut """
+
         self.is_new = True
         self.init_mincut_form()
         self.action = "mg_mincut"
@@ -1686,6 +1688,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def load_mincut(self, result_mincut_id):
         """ Load selected mincut """
+
         self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
