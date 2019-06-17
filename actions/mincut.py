@@ -41,7 +41,7 @@ from giswater.ui_manager import Mincut_add_connec
 from giswater.ui_manager import MincutComposer
 
 
-class MincutParent(ParentAction, MultipleSelection):
+class MincutParent(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
@@ -60,6 +60,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.hydro_list = []
         self.deleted_list = []
         self.connec_list = []
+
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
         self.current_state = None
@@ -70,9 +71,9 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Serialize data of table 'anl_mincut_cat_state' """
         
         self.states = {}
-        sql = ("SELECT id, name"
-               " FROM " + self.schema_name + ".anl_mincut_cat_state"
-               " ORDER BY id;")
+        sql = ("SELECT id, name "
+               "FROM " + self.schema_name + ".anl_mincut_cat_state "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return
@@ -91,6 +92,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
         self.hydro_list = []
         self.deleted_list = []
+
         # Refresh canvas, remove all old selections
         self.remove_selection()      
 
@@ -129,23 +131,23 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
         # Fill ComboBox type
-        sql = ("SELECT id, descript"
-               " FROM " + self.schema_name + ".anl_mincut_cat_type"
-               " ORDER BY id;")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
+        sql = ("SELECT id, descript "
+               "FROM " + self.schema_name + ".anl_mincut_cat_type "
+               "ORDER BY id")
+        rows = self.controller.get_rows(sql, log_sql=True)
+        utils_giswater.set_item_data(self.dlg_mincut.type, rows, 0)
 
         # Fill ComboBox cause
-        sql = ("SELECT id, descript"
-               " FROM " + self.schema_name + ".anl_mincut_cat_cause"
-               " ORDER BY id;")
+        sql = ("SELECT id, descript "
+               "FROM " + self.schema_name + ".anl_mincut_cat_cause "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
 
         # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT id, name"
-               " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY name;")
+        sql = ("SELECT id, name "
+               "FROM " + self.schema_name + ".cat_users "
+               "ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
         utils_giswater.fillComboBox(self.dlg_mincut, "exec_user", rows, False)
@@ -196,13 +198,14 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def set_id_val(self):
+
         # Show future id of mincut
         result_mincut_id = 1
-        sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+        sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM " + self.schema_name + ".anl_mincut_result_cat), true)")
         row = self.controller.get_row(sql, log_sql=True)
 
         if row:
-            if row[0] is not None:
+            if row[0]:
                 if self.is_new:
                     result_mincut_id = str(int(row[0])+1)
 
@@ -211,6 +214,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mg_mincut(self):
         """ Button 26: New Mincut """
+
         self.is_new = True
         self.init_mincut_form()
         self.action = "mg_mincut"
@@ -318,9 +322,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_number, address_number_current)
 
         # Fill ComboBox exec_user
-        sql = ("SELECT name"
-               " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY name;")
+        sql = ("SELECT name "
+               "FROM " + self.schema_name + ".cat_users "
+               "ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_fin, "exec_user", rows, False)
         assigned_to = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
