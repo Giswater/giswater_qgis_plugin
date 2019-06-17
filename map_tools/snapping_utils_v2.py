@@ -18,15 +18,8 @@
 from builtins import object
 
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.gui import QgsMapCanvasSnapper
-
-from qgis.core import QgsProject
+from qgis.gui import QgsMapCanvasSnapper
+from qgis.core import QgsProject, QgsPoint
 
 
 class SnappingConfigManager(object):
@@ -141,23 +134,27 @@ class SnappingConfigManager(object):
 
     def recover_snapping_options(self):
         """ Function to restore user configuration """
+
         self.apply_snapping_options(self.previous_snapping)
 
 
     def check_node_group(self, snapped_layer):
         """ Check if snapped layer is in the node group """
+
         if snapped_layer in self.layer_node_man:
             return 1
 
 
     def check_connec_group(self, snapped_layer):
         """ Check if snapped layer is in the connec group """
+
         if snapped_layer in self.layer_connec_man:
             return 1
 
 
     def check_gully_group(self, snapped_layer):
         """ Check if snapped layer is in the gully group """
+
         if self.layer_gully_man:
             if snapped_layer in self.layer_gully_man:
                 return 1
@@ -165,6 +162,7 @@ class SnappingConfigManager(object):
 
     def get_snapper(self):
         """ Return snapper """
+
         snapper = QgsMapCanvasSnapper(self.canvas)
         return snapper
 
@@ -188,7 +186,7 @@ class SnappingConfigManager(object):
         if vertex_marker:
             if result:
                 # Get the point and add marker on it
-                point = QgsPointXY(result.point())
+                point = QgsPoint(result.point())
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
