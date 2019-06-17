@@ -998,7 +998,7 @@ class Go2Epa(ApiParent):
             sql += ("DELETE FROM " + self.schema_name + ".rpt_selector_timestep WHERE cur_user = '" + user + "';\n"
                     "DELETE FROM " + self.schema_name + ".rpt_selector_timestep_compare "
                     " WHERE cur_user = '" + user + "';\n")
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, commit=True)
 
         # Get new values from widgets of type QComboBox
         rpt_selector_result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
@@ -1016,30 +1016,30 @@ class Go2Epa(ApiParent):
         if rpt_selector_result_id not in (None, -1, ''):
             sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
                    " VALUES ('" + str(rpt_selector_result_id) + "', '" + user + "');\n")
-            self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql, commit=True)
         if rpt_selector_compare_id not in (None, -1, ''):
             sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
                    " VALUES ('" + str(rpt_selector_compare_id) + "', '" + user + "');\n")
-            self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql, commit=True)
         if self.project_type == 'ws':
             if time_to_show not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly(time, cur_user)"
                        " VALUES ('" + str(time_to_show) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql)
+                self.controller.execute_sql(sql, commit=True)
             if time_to_compare not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly_compare(time, cur_user)"
                        " VALUES ('" + str(time_to_compare) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql)
+                self.controller.execute_sql(sql, commit=True)
 
         if self.project_type == 'ud':
             if date_to_show not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_timestep(resultdate, resulttime, cur_user)"
                        " VALUES ('"+str(date_to_show)+"', '" + str(time_to_show) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql)
+                self.controller.execute_sql(sql, commit=True)
             if date_to_compare not in (None, -1, ''):
                 sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_timestep_compare(resultdate, resulttime, cur_user)"
                        " VALUES ('"+str(date_to_compare)+"', '" + str(time_to_compare) + "', '" + user + "');\n")
-                self.controller.execute_sql(sql)
+                self.controller.execute_sql(sql, commit=True)
 
         # Show message to user
         message = "Values has been updated"
