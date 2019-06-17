@@ -150,8 +150,8 @@ class CadAddCircle(ParentMapTool):
                 self.iface.actionPan().trigger()
                 return
 
+            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
             if Qgis.QGIS_VERSION_INT < 29900:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
                 # Create point with snap reference
                 if result:
                     point = QgsPoint(result[0].snappedVertex)
@@ -159,7 +159,6 @@ class CadAddCircle(ParentMapTool):
                 else:
                     point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
             else:
-                result = self.snapper.snapToMap(event_point)
                 # Create point with snap reference
                 point = QgsPointXY(result.point())
                 if point.x() == 0 and point.y() == 0:

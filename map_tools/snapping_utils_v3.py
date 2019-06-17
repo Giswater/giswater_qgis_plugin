@@ -184,3 +184,10 @@ class SnappingConfigManager(object):
         vertex_marker.setCenter(point)
         vertex_marker.show()
 
+
+    def add_marker_result(self, result, vertex_marker):
+
+        point = QgsPointXY(result.point())
+        vertex_marker.setCenter(point)
+        vertex_marker.show()
+

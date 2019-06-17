@@ -100,20 +100,15 @@ class Dimensions(ParentDialog):
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if result:
             # Check feature
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node or snapped_point.layer == self.layer_connec:
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
 
         
     def click_button_orientation(self, point):  # @UnusedVariable
@@ -136,16 +131,13 @@ class Dimensions(ParentDialog):
         self.iface.setActiveLayer(layer)
         layer.startEditing()
 
-        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
         event_point = QPoint(x, y)
                      
         # Snapping
-        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-            
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if result:
             # Check feature
             for snapped_point in result:
@@ -157,7 +149,6 @@ class Dimensions(ParentDialog):
                     continue
                         
                 # Get the point
-                point = QgsPoint(snapped_point.snappedVertex)   
                 snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                 element_id = snapp_feature.attribute(feat_type + '_id')
  
@@ -172,9 +163,9 @@ class Dimensions(ParentDialog):
                 elif self.project_type == 'ud' and feat_type == 'connec':
                     fieldname = "connec_depth"                    
                     
-                sql = ("SELECT " + fieldname + ""
-                       " FROM " + self.schema_name + "." + feat_type + ""
-                       " WHERE " + feat_type + "_id = '" + element_id + "'")
+                sql = ("SELECT " + fieldname + " "
+                       "FROM " + self.schema_name + "." + feat_type + " "
+                       "WHERE " + feat_type + "_id = '" + element_id + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return

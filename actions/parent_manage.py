@@ -353,18 +353,14 @@ class ParentManage(ParentAction, object):
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if result:
             # Check feature
             for snapped_point in result:
-                self.snapped_point = QgsPoint(snapped_point.snappedVertex)
-                self.vertex_marker.setCenter(self.snapped_point)
-                self.vertex_marker.show()
+                self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 

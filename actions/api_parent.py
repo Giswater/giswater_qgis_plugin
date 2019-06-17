@@ -1225,15 +1225,14 @@ class ApiParent(ParentAction):
         if button == 2:
             self.dlg_destroyed()
             return
+
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if result:
             # Check feature
             for snapped_point in result:

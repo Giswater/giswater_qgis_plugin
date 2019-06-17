@@ -261,9 +261,7 @@ class ManNodeDialog(ParentDialog):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if result:
             # Check feature
             for snapped_point in result:
@@ -297,6 +295,7 @@ class ManNodeDialog(ParentDialog):
 
 
     def mouse_move(self, p):
+
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
@@ -484,16 +483,13 @@ class ManNodeDialog(ParentDialog):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if not result:
             return
             
         # Check snapped features
         for snapped_point in result:              
-            point = QgsPoint(snapped_point.snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
+            self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
             break 
         
                 

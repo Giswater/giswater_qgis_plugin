@@ -397,21 +397,17 @@ class DrawProfiles(ParentMapTool):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if result:
             # Check feature
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:
                     # Get the point
-                    #point = QgsPoint(snapped_point.snappedVertex)
                     snapp_feature = next(snapped_point.layer.getFeatures(
                         QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     element_id = snapp_feature.attribute('node_id')
                     self.element_id = str(element_id)
                     # Leave selection
-                    #snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
                         self.widget_point.setText(str(element_id))
                     if self.widget_point == self.widget_additional_point:

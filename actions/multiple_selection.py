@@ -131,8 +131,8 @@ class MultipleSelection(QgsMapTool):
             else:
                 x = e.pos().x()
                 y = e.pos().y()
-                eventPoint = QPoint(x, y)
-                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
+                event_point = QPoint(x, y)
+                (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
                 if result:
                     # Check feature
                     for snap_point in result:

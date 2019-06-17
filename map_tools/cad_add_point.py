@@ -140,30 +140,16 @@ class CadAddPoint(ParentMapTool):
             return
 
         # Snapping
-        if Qgis.QGIS_VERSION_INT < 29900:
-            if self.snap_to_selected_layer:
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
-            else:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
-
-            # That's the snapped features
-            if result:
-                # Get the point and add marker on it
-                point = QgsPoint(result[0].snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+        if self.snap_to_selected_layer:
+            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            if self.snap_to_selected_layer:
-                result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
-            else:
-                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
+            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
 
-            # That's the snapped features
-            if result:
-                # Get the point and add marker on it
-                point = QgsPointXY(result.point())
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+        # That's the snapped features
+        if result:
+            # Get the point and add marker on it
+            self.snapper_manager.add_marker_result(result, self.vertex_marker)
+
 
     def canvasReleaseEvent(self, event):
 
@@ -177,8 +163,9 @@ class CadAddPoint(ParentMapTool):
             except(TypeError, KeyError):
                 self.iface.actionPan().trigger()
                 return
+
+            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
             if Qgis.QGIS_VERSION_INT < 29900:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
                 # Create point with snap reference
                 if result:
                     point = QgsPoint(result[0].snappedVertex)
@@ -186,7 +173,6 @@ class CadAddPoint(ParentMapTool):
                 else:
                     point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
             else:
-                result = self.snapper.snapToMap(event_point)
                 if result:
                     point = QgsPointXY(result.point())
                     if point.x() == 0 and point.y() == 0:

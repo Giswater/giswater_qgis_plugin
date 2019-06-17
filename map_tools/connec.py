@@ -72,19 +72,14 @@ class ConnecMapTool(ParentMapTool):
             event_point = QPoint(x, y)
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-            # That's the snapped features
+            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
             if result:
                 for snapped_feat in result:
                     # Check if it belongs to 'connec' or 'gully' group
                     exist_connec = self.snapper_manager.check_connec_group(snapped_feat.layer)                     
                     exist_gully = self.snapper_manager.check_gully_group(snapped_feat.layer)                                      
                     if exist_connec or exist_gully: 
-                        # Get the point and add marker
-                        point = QgsPoint(result[0].snappedVertex)
-                        self.vertex_marker.setCenter(point)
-                        self.vertex_marker.show()
+                        self.snapper_manager.add_marker(snapped_feat, self.vertex_marker)
                         break
 
 
@@ -108,9 +103,7 @@ class ConnecMapTool(ParentMapTool):
             if not self.dragging:
 
                 # Snap to connec or gully
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-                # That's the snapped features
+                (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
                 if result:
                     # Check if it belongs to 'connec' or 'gully' group                  
                     exist_connec = self.snapper_manager.check_connec_group(result[0].layer)
@@ -243,6 +236,7 @@ class ConnecMapTool(ParentMapTool):
                        "('" + list_feature_id + "', '" + geom_type.upper() + "');")            
                 self.controller.execute_sql(sql, log_sql=True)
                 layer.removeSelection()
+
         # Refresh map canvas
         self.rubber_band.reset()
         self.refresh_map_canvas()

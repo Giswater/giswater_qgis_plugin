@@ -97,10 +97,10 @@ class TmMultipleSelection(QgsMapTool):
         if self.parent_manage: 
             self.parent_manage.disconnect_signal_selection_changed()           
         
-        for i in range(len(self.layers)):
-            layer = self.layers[i]
+        for layer in self.layers:
+
             if self.controller.is_layer_visible(layer):
-                # if (i == len(self.layers) - 1):
+
                 if self.parent_manage:
                     self.parent_manage.connect_signal_selection_changed(self.table_object)
 
@@ -122,8 +122,8 @@ class TmMultipleSelection(QgsMapTool):
                 else:
                     x = e.pos().x()
                     y = e.pos().y()
-                    eventPoint = QPoint(x, y)
-                    (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
+                    event_point = QPoint(x, y)
+                    (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
                     if result:
                         # Check feature
                         for snap_point in result:
@@ -147,6 +147,7 @@ class TmMultipleSelection(QgsMapTool):
         self.reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
+
         point1 = QgsPointXY(start_point.x(), start_point.y())
         point2 = QgsPointXY(start_point.x(), end_point.y())
         point3 = QgsPointXY(end_point.x(), end_point.y())

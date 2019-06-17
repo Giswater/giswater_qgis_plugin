@@ -56,19 +56,14 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             return
 
         # Snapping        
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable   
         self.current_layer = None
-
-        # That's the snapped features
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if result:
             for snapped_feat in result:
                 # Check if feature belongs to 'node' group
                 exist = self.snapper_manager.check_node_group(snapped_feat.layer)
                 if exist:
-                    # Get the point and set marker
-                    point = QgsPoint(snapped_feat.snappedVertex)
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+                    self.snapper_manager.add_marker(snapped_feat, self.vertex_marker)
                     # Data for function
                     self.current_layer = snapped_feat.layer
                     self.snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
