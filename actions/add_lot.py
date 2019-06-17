@@ -410,19 +410,17 @@ class AddNewLot(ParentManage):
 
         # Fill ComboBox cmb_assigned_to
         self.populate_cmb_team()
-        
+
         # TODO fill combo with correct table
         # Fill ComboBox cmb_status
         sql = ("SELECT id, idval"
-               " FROM " + self.schema_name + ".om_visit_class "
+               " FROM " + self.schema_name + ".om_visit_lot_status "
                " ORDER BY idval")
         status = self.controller.get_rows(sql, commit=True)
-        status = [[1, 'PLANIFICANT'], [2, 'PLANIFICAT'], [3, 'ASSIGNAT'], [4, 'EN CURS'], [5, 'EXECUTAT'],
-                  [6, 'REVISAT'], [7, 'CANCEL.LAT']]
         if status:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5'], 0)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, 'PLANIFICANT', 1)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, '1', 0)
 
         # Relations tab
         # fill feature_type
