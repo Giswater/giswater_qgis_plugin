@@ -134,8 +134,8 @@ class MincutParent(ParentAction):
         sql = ("SELECT id, descript "
                "FROM " + self.schema_name + ".anl_mincut_cat_type "
                "ORDER BY id")
-        rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_mincut.type, rows, 0)
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
         sql = ("SELECT id, descript "
@@ -203,7 +203,6 @@ class MincutParent(ParentAction):
         result_mincut_id = 1
         sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM " + self.schema_name + ".anl_mincut_result_cat), true)")
         row = self.controller.get_row(sql, log_sql=True)
-
         if row:
             if row[0]:
                 if self.is_new:
@@ -427,15 +426,15 @@ class MincutParent(ParentAction):
 
         # Check if id exist in table 'anl_mincut_result_cat'
         result_mincut_id = self.result_mincut_id.text()        
-        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat" 
-               " WHERE id = '" + str(result_mincut_id) + "';")        
+        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat " 
+               "WHERE id = '" + str(result_mincut_id) + "';")
         rows = self.controller.get_rows(sql)
         
         # If not found Insert just its 'id'
         sql = ""
         if not rows:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id)"
-                   " VALUES ('" + str(result_mincut_id) + "');\n")
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
+                   "VALUES ('" + str(result_mincut_id) + "');\n")
 
         # Update all the fields
         sql += ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
@@ -479,8 +478,8 @@ class MincutParent(ParentAction):
         
         # Update table 'anl_mincut_result_selector'
         sql += ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
-                " (current_user, " + str(result_mincut_id) + ");")
+                "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES "
+                "(current_user, " + str(result_mincut_id) + ");")
         
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec != "":
@@ -489,7 +488,7 @@ class MincutParent(ParentAction):
         if self.sql_hydro != "":
             sql += self.sql_hydro
                             
-        status = self.controller.execute_sql(sql, log_error=True, log_sql=False)
+        status = self.controller.execute_sql(sql, log_error=True)
         if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
@@ -504,30 +503,28 @@ class MincutParent(ParentAction):
         sql = ("SELECT mincut_state, mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat "
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
-        answer = False
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()
                 result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
                 sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
-                row = self.controller.get_row(sql, log_sql=False, commit=True)
-
+                row = self.controller.get_row(sql, commit=True)
                 if row:
-                    if row[0] is not None:
-                            message = "Mincut done, but has conflict and overlaps with "
-                            answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
-                            if answer:
-                                sql = ("SELECT * FROM "+ self.schema_name + ".selector_audit"
-                                       " WHERE fprocesscat_id='31' AND cur_user=current_user")
-                                row = self.controller.get_row(sql, log_sql=False)
-                                if not row:
-                                    sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
-                                           " VALUES('31', current_user)")
-                                    self.controller.execute_sql(sql, log_sql=False)
-                                views = 'v_anl_arc, v_anl_node, v_anl_connec'
-                                message = "To see the conflicts load the views"
-                                self.controller.show_info_box(message, "See layers", parameter=views)
-                                self.dlg_mincut.close()
+                    if row[0]:
+                        message = "Mincut done, but has conflict and overlaps with "
+                        answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
+                        if answer:
+                            sql = ("SELECT * FROM " + self.schema_name + ".selector_audit"
+                                   " WHERE fprocesscat_id='31' AND cur_user=current_user")
+                            row = self.controller.get_row(sql, log_sql=False)
+                            if not row:
+                                sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
+                                       " VALUES('31', current_user)")
+                                self.controller.execute_sql(sql, log_sql=False)
+                            views = 'v_anl_arc, v_anl_node, v_anl_connec'
+                            message = "To see the conflicts load the views"
+                            self.controller.show_info_box(message, "See layers", parameter=views)
+                            self.dlg_mincut.close()
                     else:
                         self.dlg_mincut.closeMainWin = True
                         self.dlg_mincut.mincutCanceled = False
@@ -541,6 +538,7 @@ class MincutParent(ParentAction):
             self.dlg_mincut.closeMainWin = True
             self.dlg_mincut.mincutCanceled = False
             self.dlg_mincut.close()
+
         self.iface.actionPan().trigger()
 
 
