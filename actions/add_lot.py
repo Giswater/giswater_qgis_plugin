@@ -47,6 +47,7 @@ class AddNewLot(ParentManage):
         self.rb_red.setIconSize(20)
         self.rb_list = []
         self.lot_date_format = 'yyyy-MM-dd'
+        self.max_team_id = 0
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
@@ -179,90 +180,70 @@ class AddNewLot(ParentManage):
         # Set autocompleters of the form
         self.set_completers()
         self.hilight_features(self.rb_list)
-        # self.manage_widget_lot(lot_id)
+
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
     def manage_team(self):
-
+        self.max_team_id = self.get_max_id('cat_team')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
         table_name = 'cat_team'
-        #@setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        model = QSqlTableModel()
-        #model = QStandardItemModel()
-        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, model, QSqlTableModel.OnManualSubmit)
 
-        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table, model))
+        #@setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
+        self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, model))
-        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, model))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table)
 
 
-    def cancel_changes(self, model):
+    def populate_cmb_team(self):
+        """ Fill ComboBox cmb_assigned_to """
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + ".cat_team "
+               " WHERE active is True "
+               " ORDER BY idval")
+        users = self.controller.get_rows(sql, commit=True)
+        if users:
+            utils_giswater.set_item_data(self.dlg_lot.cmb_assigned_to, users, 1)
 
+
+    def cancel_changes(self, qtable):
+        model = qtable.model()
         model.revertAll()
         model.database().rollback()
 
 
-    def add_row(self, model):
-
-        list_id = []
-        exist = None
-        for x in range(0, model.rowCount()):
-            # for c in range(0, model.columnCount()-1):
-            index = model.index(x, 0)
-            item = model.data(index)
-
-            if item not in list_id:
-                list_id.append(item)
-            else:
-                exist = item
-                break
-        print(list_id)
-        print(exist)
-        for x in range(0, model.rowCount()):
-            index = model.index(x, 0)
-            item = model.data(index)
-            if item == exist:
-                # model.setData(index, QtCore.Qt.red, 9)
-                p = self.dlg_basic_table.tbl_basic.palette()
-                p.setColor(QPalette.Base, QColor("yellow"))
-                self.dlg_basic_table.tbl_basic.setPalette(p)
-                print("TEST")
-
+    def add_row(self, qtable):
+        """ Append new record to model with correspondent id """
+        self.max_team_id += 1
+        model = qtable.model()
         record = model.record()
+        record.setValue("id", self.max_team_id)
         model.insertRecord(model.rowCount(), record)
 
 
-    def save_basic_table(self, model):
 
+    def get_max_id(self, table_name):
+        sql = ("SELECT MAX(id) FROM " + self.schema_name + "." + table_name)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
+        if row:
+            return int(row[0])
+        return 0
+
+
+    def save_basic_table(self, qtable):
+        model = qtable.model()
         if model.submitAll():
-            print("ok")
-            # model.database().commit()
+            self.close_dialog(self.dlg_basic_table)
+            self.populate_cmb_team()
         else:
             print("KO ")
-
-
-    def fill_table(self, qtable, table_name, model, set_edit_strategy=QSqlTableModel.OnManualSubmit):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
-
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
-
-        # Set model
-        model.setTable(table_name)
-        model.setEditStrategy(set_edit_strategy)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
-        # Attach model to table view
-        qtable.setModel(model)
 
 
     def manage_widget_lot(self, lot_id):
@@ -343,17 +324,11 @@ class AddNewLot(ParentManage):
 
     def set_ot_fields(self, index):
         item = self.list_to_work[index]
-        print(item)
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_wotype_id, item[2])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[3])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[1])
-        value = utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
-
-        for x in range(0, self.dlg_lot.tab_widget.count()):
-            if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab':
-                self.dlg_lot.tab_widget.setTabEnabled(x, value)
-                break
+        utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
 
     def disbale_actions(self):
         class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
@@ -434,14 +409,8 @@ class AddNewLot(ParentManage):
             utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
 
         # Fill ComboBox cmb_assigned_to
-        sql = ("SELECT id, idval"
-               " FROM " + self.schema_name + ".cat_team "
-               " WHERE active is True "
-               " ORDER BY idval")
-        users = self.controller.get_rows(sql, commit=True)
-        if users:
-            utils_giswater.set_item_data(self.dlg_lot.cmb_assigned_to, users, 1)
-
+        self.populate_cmb_team()
+        
         # TODO fill combo with correct table
         # Fill ComboBox cmb_status
         sql = ("SELECT id, idval"
@@ -565,10 +534,13 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
 
 
-    def set_headers(self):
+    def  set_headers(self):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
+        if feature_type == '':
+            return
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
+
         columns_name.append(['validate'])
         standard_model = QStandardItemModel()
         self.tbl_relation.setModel(standard_model)
@@ -808,6 +780,7 @@ class AddNewLot(ParentManage):
     def set_tab_dis_enabled(self):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         index = 0
+
         for x in range(0, self.dlg_lot.tab_widget.count()):
             if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab':
                 index = x
@@ -817,10 +790,7 @@ class AddNewLot(ParentManage):
             return
         else:
             self.dlg_lot.tab_widget.setTabEnabled(index, True)
-
         utils_giswater.set_combo_itemData(self.feature_type, feature_type, 1)
-
-
 
 
     def set_dates(self):
@@ -861,11 +831,14 @@ class AddNewLot(ParentManage):
             return
 
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
+        if visit_class_id == '':
+            return
 
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
         row = self.controller.get_row(sql, log_sql=True)
-
+        if not row:
+            return
         table_name = row['tablename']
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
@@ -915,16 +888,14 @@ class AddNewLot(ParentManage):
         lot = {}
         index = self.dlg_lot.cmb_visit_class.currentIndex()
         item = self.list_to_work[index]
-        print("save ITEM : "+str(item))
 
-        # item = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address,4-serie,5-visitclass_id)
+        # item = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address, 4-serie, 5-visitclass_id)
         if item[0] in (None, ''):
             msg = "Selecciona una OT"
             self.controller.show_info_box(msg, "Warning")
             return
         lot['startdate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate, False, False)
         lot['enddate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
-        #lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0, True)
         lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0, True)
         lot['feature_type'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
@@ -932,10 +903,6 @@ class AddNewLot(ParentManage):
         lot['adreca'] = item[3]
         lot['serie'] = item[4]
         lot['visitclass_id'] = item[5]
-
-
-        print("save LOT : " + str(lot))
-
 
         keys = ""
         values = ""
@@ -1077,6 +1044,7 @@ class AddNewLot(ParentManage):
         layer = self.iface.activeLayer()
         if layer:
             layer.removeSelection()
+        self.save_settings(self.dlg_lot)
         self.close_dialog(self.dlg_lot)
 
 
