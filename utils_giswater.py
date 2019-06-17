@@ -407,6 +407,7 @@ def set_combo_itemData(combo, value, item1):
             return True
     return False
 
+
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1):
     """ Populate @combo with list @rows and show field @index_to_show
     :param sort_by: sort combo by this element (column)
@@ -429,12 +430,16 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     if combo_clear:
         combo.clear()
     records_sorted = records
-    if sort_combo:
-        records_sorted = sorted(records, key=operator.itemgetter(sort_by))
 
-    for record in records_sorted:
-        combo.addItem(record[index_to_show], record)
-        combo.blockSignals(False)
+    try:
+        if sort_combo:
+            records_sorted = sorted(records, key=operator.itemgetter(sort_by))
+    except:
+        pass
+    finally:
+        for record in records_sorted:
+            combo.addItem(record[index_to_show], record)
+            combo.blockSignals(False)
 
 
 def set_combo_item_unselectable_by_id(qcombo, list_id=[]):
