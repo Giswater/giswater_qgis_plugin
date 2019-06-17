@@ -177,8 +177,9 @@ class MincutConfig(ParentAction):
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_anl_mincut_result_cat "
         rows = self.controller.get_rows(sql)
         values = []
-        for row in rows:
-            values.append(str(row[0]))
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
 
         model.setStringList(values)
         self.completer.setModel(model)
