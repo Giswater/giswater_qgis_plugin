@@ -352,7 +352,7 @@ class ParentAction(object):
         widget.setModel(self.model)
 
 
-    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit, expr_filter=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
@@ -371,6 +371,8 @@ class ParentAction(object):
             self.controller.show_warning(self.model.lastError().text())
         # Attach model to table view
         widget.setModel(self.model)
+        if expr_filter:
+            widget.model().setFilter(expr_filter)
 
 
     def fill_table_by_query(self, qtable, query):
