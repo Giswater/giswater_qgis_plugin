@@ -172,14 +172,23 @@ class ParentMapTool(QgsMapTool):
             pass
 
 
-    def reset_rubber_band(self):
+    def reset_rubber_band(self, geom_type="polygon"):
 
         try:
-            # Graphic elements
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.rubber_band.reset(Qgis.Polygon)
-            else:
-                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+
+            if geom_type == "polygon":
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    geom_type = Qgis.Polygon
+                else:
+                    geom_type = QgsWkbTypes.PolygonGeometry
+            elif geom_type == "line":
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    geom_type = Qgis.Line
+                else:
+                    geom_type = QgsWkbTypes.LineString
+
+            self.rubber_band.reset(geom_type)
+
         except:
             pass
 
