@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import next
 from builtins import range
 
 # -*- coding: utf-8 -*-
@@ -337,12 +336,9 @@ class ReplaceNodeMapTool(ParentMapTool):
         if not result:
             return
 
-        # Get the first feature
-        snapped_point = result[0]
-        snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-
+        # Get snapped feature
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
         if snapped_feat:
-
             # Get 'node_id' and 'nodetype'
             self.node_id = snapped_feat.attribute('node_id')
             if self.project_type == 'ws':

@@ -16,21 +16,8 @@
  ***************************************************************************/
 
 """
-from builtins import str
-from builtins import next
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint as QgsPointXY
-else:
-    from qgis.core import QgsPointXY
-
-from qgis.core import QgsMapToPixel, QgsFeatureRequest
+from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 
@@ -171,13 +158,12 @@ class MoveNodeMapTool(ParentMapTool):
             result = self.snapper_manager.snap_to_current_layer(event_point)
             if result:
                 # Get the point and add marker on it
-                snapped_point = result[0]
-                point = self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
-                # Set a new point to go on with
-                self.rubber_band.movePoint(point)
+                point = self.snapper_manager.add_marker(result, self.vertex_marker)
             else:
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-                self.rubber_band.movePoint(point)
+
+            # Set a new point to go on with
+            self.rubber_band.movePoint(point)
 
         # Snap to arc
         else:
@@ -190,22 +176,19 @@ class MoveNodeMapTool(ParentMapTool):
             # Snapping
             result = self.snapper_manager.snap_to_current_layer(event_point)
             
-            if result and result[0].snappedVertexNr == -1:
-
-                snapped_point = result[0]
-                point = self.snapper_manager.add_marker(snapped_point, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
-                
+            #if result and result[0].snappedVertexNr == -1:
+            if result:
+                layer = self.snapper_manager.get_snapped_layer(result)
+                feature_id = self.snapper_manager.get_snapped_feature_id(result)
+                point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
                 # Select the arc
-                snapped_point.layer.removeSelection()
-                snapped_point.layer.select([snapped_point.snappedAtGeometry])
-
-                # Bring the rubberband to the cursor i.e. the clicked point
-                self.rubber_band.movePoint(point)
-        
+                layer.removeSelection()
+                layer.select([feature_id])
             else:
                 # Bring the rubberband to the cursor i.e. the clicked point
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-                self.rubber_band.movePoint(point)
+
+            self.rubber_band.movePoint(point)
 
 
     def canvasReleaseEvent(self, event):
@@ -222,9 +205,8 @@ class MoveNodeMapTool(ParentMapTool):
                 if not result:
                     return
 
-                snapped_point = result[0]
-                self.snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                point = QgsPointXY(snapped_point.snappedVertex)
+                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                point = self.snapper_manager.get_snapped_point(result)
 
                 # Hide marker
                 self.vertex_marker.hide()
@@ -242,8 +224,9 @@ class MoveNodeMapTool(ParentMapTool):
                 if not result:
                     return
 
-                snapped_point = result[0]
-                point = self.toLayerCoordinates(snapped_point.layer, QgsPointXY(snapped_point.snappedVertex))
+                layer = self.snapper_manager.get_snapped_layer(result)
+                point = self.snapper_manager.get_snapped_point(result)
+                point = self.toLayerCoordinates(layer, point)
 
                 # Get selected feature (at this moment it will have one and only one)
                 node_id = self.snapped_feat.attribute('node_id')

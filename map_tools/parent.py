@@ -16,8 +16,6 @@
  ***************************************************************************/
 
 """
-from __future__ import absolute_import
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -350,12 +348,12 @@ class ParentMapTool(QgsMapTool):
 
         
     def canvasMoveEvent(self, event):
-        
+
         # Make sure active layer is always 'v_edit_node'
         cur_layer = self.iface.activeLayer()
         if cur_layer != self.layer_node and self.force_active_layer:
-            self.iface.setActiveLayer(self.layer_node) 
-          
+            self.iface.setActiveLayer(self.layer_node)
+
         # Hide highlight and get coordinates
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
@@ -363,8 +361,5 @@ class ParentMapTool(QgsMapTool):
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
-            # Check snapped features
-            for snapped_point in result:
-                self.snapper_manager.add_marker(snapped_point, self.vertext_marker)
-                break
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 

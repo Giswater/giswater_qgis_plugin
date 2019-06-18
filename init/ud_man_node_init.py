@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -308,9 +306,9 @@ class ManNodeDialog(ParentDialog):
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
+            layer = self.snapper_manager(result)
+            if layer == self.layer_node:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 

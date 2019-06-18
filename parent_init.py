@@ -2156,10 +2156,8 @@ class ParentDialog(QDialog):
         if not result:
             return
             
-        # Check snapped features
-        for snapped_point in result:
-            self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
-            break 
+        # Add marker to snapped feature
+        self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def action_copy_paste_canvas_clicked(self, point, btn):
@@ -2181,14 +2179,13 @@ class ParentDialog(QDialog):
         layer = self.iface.activeLayer()        
         layername = layer.name()        
         is_valid = False
-        for snapped_point in result:        
-            # Get only one feature
-            snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+
+        snapped_feature = self.snapper_manager.get_snapped_feature(result)
+        if snapped_feature:
             snapped_feature_attr = snapped_feature.attributes()
             # Leave selection
-            snapped_point.layer.select([snapped_point.snappedAtGeometry])
+            self.snapper_manager.select_snapped_feature(result, snapped_feature.id())
             is_valid = True
-            break
                 
         if not is_valid:
             message = "Any of the snapped features belong to selected layer"

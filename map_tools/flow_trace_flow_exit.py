@@ -16,8 +16,6 @@
  ***************************************************************************/
 
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsExpression
 from qgis.PyQt.QtCore import Qt

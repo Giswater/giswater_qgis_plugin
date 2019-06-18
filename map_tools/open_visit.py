@@ -16,10 +16,7 @@
  ***************************************************************************/
 
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtCore import Qt
@@ -61,11 +58,8 @@ class OpenVisit(ParentMapTool):
         if not result:
             return
 
-        # Get the first feature
-        snapped_point = result[0]
-        snapped_feat = next(
-            snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-
+        # Get snapped feature
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
         if snapped_feat:
             visit_id = snapped_feat.attribute('id')
             manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)

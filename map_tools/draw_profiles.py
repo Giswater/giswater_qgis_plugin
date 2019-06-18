@@ -9,7 +9,6 @@
  ***************************************************************************/
 """
 from __future__ import absolute_import
-from builtins import next
 from builtins import range
 
 # -*- coding: utf-8 -*-
@@ -373,9 +372,9 @@ class DrawProfiles(ParentMapTool):
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_node:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 

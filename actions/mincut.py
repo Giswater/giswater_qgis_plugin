@@ -1555,12 +1555,11 @@ class MincutParent(ParentAction):
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            for snapped_point in result:
-                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
-                if viewname == 'v_anl_mincut_result_valve':
-                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
-                    break
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == 'v_anl_mincut_result_valve':
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def mouse_move_node_arc(self, point):
@@ -1578,12 +1577,11 @@ class MincutParent(ParentAction):
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            for snapped_point in result:
-                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
-                if viewname == 'v_edit_arc':
-                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
-                    break
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == 'v_edit_arc':
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
@@ -1596,17 +1594,14 @@ class MincutParent(ParentAction):
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Check feature
-            for snapped_point in result:
-                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
-                if viewname == 'v_anl_mincut_result_valve':
-                    # Get the point. Leave selection
-                    snapp_feat = next(snapped_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    element_id = snapp_feat.attribute('node_id')
-                    self.custom_mincut_execute(element_id)
-                    self.set_visible_mincut_layers()                    
-                    break
+            layer = self.snapper_manager.get_snapped_layer(result)
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == 'v_anl_mincut_result_valve':
+                # Get the point. Leave selection
+                snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
+                element_id = snapped_feat.attribute('node_id')
+                self.custom_mincut_execute(element_id)
+                self.set_visible_mincut_layers()
 
 
     def custom_mincut_execute(self, elem_id):

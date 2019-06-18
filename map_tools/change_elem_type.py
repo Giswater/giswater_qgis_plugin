@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest
 from qgis.PyQt.QtCore import Qt
@@ -381,10 +379,11 @@ class ChangeElemType(ParentMapTool):
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Get the point
-            snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-            self.node_id = snapped_feat.attribute('node_id')
-            # Change node type
-            self.change_elem_type(snapped_feat)
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            if snapped_feat:
+                self.node_id = snapped_feat.attribute('node_id')
+                # Change node type
+                self.change_elem_type(snapped_feat)
 
 
     def activate(self):

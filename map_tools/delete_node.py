@@ -16,11 +16,7 @@
  ***************************************************************************/
 
 """
-from builtins import str
-from builtins import next
-
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest
 from qgis.PyQt.QtCore import Qt, QDate
 
 import utils_giswater
@@ -62,9 +58,7 @@ class DeleteNodeMapTool(ParentMapTool):
         snapped_feat = None
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
-            # Get the first feature
-            snapped_point = result[0]
-            snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')

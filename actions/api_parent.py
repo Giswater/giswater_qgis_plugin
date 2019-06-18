@@ -24,7 +24,7 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsGeometry
 from qgis.core import QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp
@@ -389,10 +389,8 @@ class ApiParent(ParentAction):
         if not result:
             return
 
-        # Check snapped features
-        for snapped_point in result:
-            self.snapper_manager.add_marker(snapped_point, self.vertext_marker)
-            break
+        # Add marker to snapped feature
+        self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, point, btn):
@@ -414,26 +412,16 @@ class ApiParent(ParentAction):
         layer = self.iface.activeLayer()
         layername = layer.name()
         is_valid = False
-        if Qgis.QGIS_VERSION_INT < 29900:
-            for snapped_point in result:
-                # Get only one feature
-                snapped_feature = next(
-                    snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                snapped_feature_attr = snapped_feature.attributes()
-                # Leave selection
-                snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                is_valid = True
-                break
-        else:
-            snapped_feature = next(result.layer().getFeatures(QgsFeatureRequest().setFilterFid(result.featureId())))
-            snapped_feature_attr = snapped_feature.attributes()
-            # Leave selection
-            result.layer().select([result.featureId()])
-            is_valid = True
 
+        # Get the point. Leave selection
+        snapped_feature = self.snapper_manager.get_snapped_feature(result, True)
+        snapped_feature_attr = snapped_feature.attributes()
+        is_valid = True
+
+        # TODO: Remove this?
         if not is_valid:
             message = "Any of the snapped features belong to selected layer"
-            self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)
+            self.controller.show_info(message, parameter=layername, duration=10)
             self.api_disable_copy_paste(dialog)
             return
 
@@ -1243,9 +1231,9 @@ class ApiParent(ParentAction):
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_node:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 

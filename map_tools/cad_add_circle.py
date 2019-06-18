@@ -4,18 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint
-else:
-    from qgis.core import  QgsPointXY
-
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
@@ -141,15 +130,9 @@ class CadAddCircle(ParentMapTool):
             y = event.pos().y()
             event_point = self.snapper_manager.get_event_point(event)
 
-            # TODO: Test it!
-            point = None
-            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
             # Create point with snap reference
-            if result:
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    point = QgsPoint(result[0].snappedVertex)
-                else:
-                    point = QgsPointXY(result.point())
+            result = self.snapper_manager.snap_to_background_layers(event_point)
+            point = self.snapper_manager.get_snapped_point(result)
 
             # Create point with mouse cursor reference
             if point is None:
