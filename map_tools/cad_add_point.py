@@ -137,7 +137,7 @@ class CadAddPoint(ParentMapTool):
         else:
             result = self.snapper_manager.snap_to_background_layers(event_point)
 
-        if result:
+        if self.snapper_manager.result_is_valid():
             # Get the point and add marker on it
             self.snapper_manager.add_marker(result, self.vertex_marker)
 

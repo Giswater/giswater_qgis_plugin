@@ -156,7 +156,7 @@ class MoveNodeMapTool(ParentMapTool):
             
             # Snapping
             result = self.snapper_manager.snap_to_current_layer(event_point)
-            if result:
+            if self.snapper_manager.result_is_valid():
                 # Get the point and add marker on it
                 point = self.snapper_manager.add_marker(result, self.vertex_marker)
             else:
@@ -177,7 +177,7 @@ class MoveNodeMapTool(ParentMapTool):
             result = self.snapper_manager.snap_to_current_layer(event_point)
             
             #if result and result[0].snappedVertexNr == -1:
-            if result:
+            if self.snapper_manager.result_is_valid():
                 layer = self.snapper_manager.get_snapped_layer(result)
                 feature_id = self.snapper_manager.get_snapped_feature_id(result)
                 point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
@@ -202,7 +202,7 @@ class MoveNodeMapTool(ParentMapTool):
             if self.snapped_feat is None:
 
                 result = self.snapper_manager.snap_to_current_layer(event_point)
-                if not result:
+                if not self.snapper_manager.result_is_valid():
                     return
 
                 self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
@@ -221,7 +221,7 @@ class MoveNodeMapTool(ParentMapTool):
             else:
 
                 result = self.snapper_manager.snap_to_current_layer(event_point)
-                if not result:
+                if not self.snapper_manager.result_is_valid():
                     return
 
                 layer = self.snapper_manager.get_snapped_layer(result)

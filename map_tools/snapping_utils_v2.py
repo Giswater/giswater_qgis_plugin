@@ -36,6 +36,7 @@ class SnappingConfigManager(object):
         self.layer_node = None
         self.previous_snapping = None
         self.controller = None
+        self.is_valid = None
 
         # Snapper
         try:
@@ -179,6 +180,7 @@ class SnappingConfigManager(object):
 
     def snap_to_current_layer(self, event_point, vertex_marker=None):
 
+        self.is_valid = False
         if event_point is None:
             return None, None
 
@@ -190,11 +192,13 @@ class SnappingConfigManager(object):
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
+        self.is_valid = result is not None
         return result
 
 
     def snap_to_background_layers(self, event_point, vertex_marker=None):
 
+        self.is_valid = False
         if event_point is None:
             return None, None
 
@@ -206,6 +210,7 @@ class SnappingConfigManager(object):
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
+        self.is_valid = result is not None
         return result
 
 
@@ -301,4 +306,9 @@ class SnappingConfigManager(object):
         snapped_point = result[0]
         layer = snapped_point.layer()
         layer.select([feature_id])
+
+
+    def result_is_valid(self):
+
+        return self.is_valid
 

@@ -36,6 +36,7 @@ class SnappingConfigManager(object):
         self.layer_node = None
         self.previous_snapping = None
         self.controller = None
+        self.is_valid = False
 
         # Snapper
         try:
@@ -167,39 +168,43 @@ class SnappingConfigManager(object):
 
     def snap_to_current_layer(self, event_point, vertex_marker=None):
 
+        self.is_valid = False
         if event_point is None:
             return None, None
 
         result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
         if vertex_marker:
-            if result:
+            if result.isValid():
                 # Get the point and add marker on it
                 point = QgsPointXY(result.point())
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
-        return result.isValid()
+        self.is_valid = result.isValid()
+        return result
 
 
     def snap_to_background_layers(self, event_point, vertex_marker=None):
 
+        self.is_valid = False
         if event_point is None:
             return None, None
 
         result = self.snapper.snapToMap(event_point)
         if vertex_marker:
-            if result:
+            if result.isValid():
                 # Get the point and add marker on it
                 point = QgsPointXY(result.point())
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
-        return result.isValid()
+        self.is_valid = result.isValid()
+        return result
 
 
     def add_marker(self, result, vertex_marker=None, icon_type=None):
 
-        if not result:
+        if not result.isValid():
             return None
 
         if vertex_marker is None:
@@ -236,7 +241,7 @@ class SnappingConfigManager(object):
     def get_snapped_layer(self, result):
 
         layer = None
-        if result:
+        if result.isValid():
             layer = result.layer()
 
         return layer
@@ -245,7 +250,7 @@ class SnappingConfigManager(object):
     def get_snapped_point(self, result):
 
         point = None
-        if result:
+        if result.isValid():
             point = QgsPointXY(result.point())
 
         return point
@@ -254,7 +259,7 @@ class SnappingConfigManager(object):
     def get_snapped_feature_id(self, result):
 
         feature_id = None
-        if result:
+        if result.isValid():
             feature_id = result.featureId()
 
         return feature_id
@@ -262,7 +267,7 @@ class SnappingConfigManager(object):
 
     def get_snapped_feature(self, result, select_feature=False):
 
-        if not result:
+        if not result.isValid():
             return None
 
         snapped_feat = None
@@ -281,11 +286,16 @@ class SnappingConfigManager(object):
 
     def select_snapped_feature(self, result, feature_id=None):
 
-        if not result:
+        if not result.isValid():
             return
 
         layer = result.layer()
         if feature_id is None:
             feature_id = result.featureId()
         layer.select([feature_id])
+
+
+    def result_is_valid(self):
+
+        return self.is_valid
 

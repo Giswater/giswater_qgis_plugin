@@ -377,7 +377,7 @@ class ChangeElemType(ParentMapTool):
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result:
+        if self.snapper_manager.result_is_valid():
             # Get the point
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
             if snapped_feat:

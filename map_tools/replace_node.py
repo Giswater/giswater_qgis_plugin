@@ -333,7 +333,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if not result:
+        if not self.snapper_manager.result_is_valid():
             return
 
         # Get snapped feature

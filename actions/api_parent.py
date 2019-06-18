@@ -386,7 +386,7 @@ class ApiParent(ParentAction):
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if not result:
+        if not self.snapper_manager.result_is_valid():
             return
 
         # Add marker to snapped feature
@@ -405,7 +405,7 @@ class ApiParent(ParentAction):
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if not result:
+        if not self.snapper_manager.result_is_valid():
             self.api_disable_copy_paste(dialog)
             return
 
@@ -1230,7 +1230,7 @@ class ApiParent(ParentAction):
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result:
+        if self.snapper_manager.result_is_valid():
             layer = self.snapper_manager.get_snapped_layer(result)
             if layer == self.layer_node:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
