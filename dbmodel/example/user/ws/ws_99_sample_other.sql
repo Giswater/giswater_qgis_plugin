@@ -13,8 +13,8 @@ INSERT INTO cat_users VALUES (3,'user3');
 INSERT INTO cat_users VALUES (4,'user4');
 
 
-INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1);
-INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2);
+INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1, '[]);
+INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2, '[]);
 
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';

@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -7,51 +7,60 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2702
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_grafanalytics(p_data json)
 RETURNS integer AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"base"}}}')
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"extended"}}}')
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"MSECTOR"}}')
+TO CONFIGURE
+-- set graf_delimiter field on node_type table
+-- set to_arc on anl_mincut_inlet_x_macroexploitation (for sectors)
+-- set to_arc on tables inp_valve (for presszone), inp_pump (for presszone), inp_shortpipe (for dqa, dma)
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"PZONEA", "upserAttributes":FALSE}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"PZONEA", "upserAttributes":FALSE, "arc":"2001"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"PZONEN", "upserAttributes":TRUE, "node":"1001"}}');
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"DMAA","upserAttributes":FALSE}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"DMAA", "upserAttributes":FALSE, "arc":"2001"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"DMAN", "upserAttributes":TRUE, "node":"1001"}}');
+TO EXECUTE
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"DQAA", "upserAttributes":TRUE}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"DQAA", "upserAttributes":TRUE, "arc":"2001"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"DQAN", "upserAttributes":TRUE, "node":"1001"}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"base"}}}')
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"extended"}}}')
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORA", "upserAttributes":FALSE,}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORA", "upserAttributes":FALSE, "arc":"2001"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORN", "upserAttributes":TRUE}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORN", "upserAttributes":TRUE, "node":"113766"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORN", "upserAttributes":TRUE, "node":"113952"}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"MSECTOR"}}')
 
-delete from SCHEMA_NAME.audit_log_data;
-delete from SCHEMA_NAME.anl_graf
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"PZONEA", "upserAttributes":FALSE, "exploitation": 2}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"PZONEA", "upserAttributes":FALSE, "arc":"2001"}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"PZONEN", "upserAttributes":TRUE, "node":"1001"}}');
+
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"DMAA","upserAttributes":FALSE, "exploitation": 2}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"DMAA", "upserAttributes":FALSE, "arc":"2001"}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"DMAN", "upserAttributes":TRUE, "node":"1001"}}');
+
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"DQAA", "upserAttributes":TRUE, "exploitation": 2}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"DQAA", "upserAttributes":TRUE, "arc":"2001"}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"DQAN", "upserAttributes":TRUE, "node":"1001"}}');
+
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORA", "upserAttributes":FALSE, "exploitation": 2}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORA", "upserAttributes":FALSE, "arc":"2001"}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORN", "upserAttributes":TRUE}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORN", "upserAttributes":TRUE, "node":"113766"}}');
+SELECT ws_sample.gw_fct_grafanalytics('{"data":{"grafClass":"SECTORN", "upserAttributes":TRUE, "node":"113952"}}');
+
+delete from ws_sample.audit_log_data;
+delete from ws_sample.anl_graf
 
 --RESULTS
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
 
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=43 AND user_name=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=44 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=43 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=44 AND user_name=current_user
 
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=46 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=46 AND user_name=current_user
 
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=47 AND user_name=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=48 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=47 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=48 AND user_name=current_user
 
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=49 AND user_name=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=30 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=49 AND user_name=current_user
+SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=30 AND user_name=current_user
 
 
 */
@@ -78,7 +87,7 @@ v_upsertattributes boolean;
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
 	-- get variables
 	v_class = (SELECT (p_data::json->>'data')::json->>'grafClass');
@@ -87,9 +96,9 @@ BEGIN
 	v_nodeid = (SELECT (p_data::json->>'data')::json->>'node');
 	v_arcid = (SELECT (p_data::json->>'data')::json->>'arc');
 	v_mincutid = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'id');
-	v_upsertattributes = ((SELECT (p_data::json->>'data')::json->>'upsertAttributes');
+	v_upsertattributes = (SELECT (p_data::json->>'data')::json->>'upsertAttributes');
+	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
 
-	
 	-- set fprocesscat
 	IF v_class = 'MINCUT' THEN v_fprocesscat=NULL; v_featuretype='arc';
 	ELSIF v_class = 'MSECTOR' THEN v_fprocesscat=34;  v_featuretype='arc';
@@ -111,6 +120,8 @@ BEGIN
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 	DELETE FROM selector_psector WHERE cur_user=current_user;
+	DELETE FROM selector_expl WHERE cur_user=current_user;
+	INSERT INTO selector_expl SELECT expl_id FROM exploitation where macroexpl_id = (SELECT macroexpl_id WHERE expl_id=v_expl);
 
 	-- create graf
 	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
@@ -119,6 +130,7 @@ BEGIN
 	UNION
 	SELECT  v_class, arc_id, node_2, node_1, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
+	
 	
 	-- set boundary conditions of graf table	
 	IF v_class = 'MINCUT' THEN
@@ -137,31 +149,74 @@ BEGIN
 		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter !='NONE' ;
 		
 	ELSIF v_class = 'PZONEA' OR v_class = 'PZONEN' THEN
+
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
 		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','PRESSZONE', 'MINSECTOR') AND closed=true ;
+
+		-- query text used below for recurrent selection of starting nodes 
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''PRESSZONE'' AND checkf=0 LIMIT 1';
 	
 	ELSIF v_class = 'DMAA'  OR v_class = 'DMAN' THEN
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
 		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','DMA','MINSECTOR') AND closed=true ;
+
+		-- query text used below for recurrent selection of starting nodes 
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''DMA'' AND checkf=0 LIMIT 1';
 
 	ELSIF v_class = 'DQAA'  OR v_class = 'DQAN' THEN
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
 		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','DQA','MINSECTOR') AND closed=true ;
+
+		-- query text used below for recurrent selection of starting nodes 
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''DQA'' AND checkf=0 LIMIT 1';
 
 	ELSIF v_class = 'SECTORA' OR v_class = 'SECTORN' THEN
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
 		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','MINSECTOR') AND closed=true ;
+
+		-- query text used below for recurrent selection of starting nodes 
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''SECTOR'' AND checkf=0 LIMIT 1';
 
 	END IF;
 
+	-- rectificate graf table (for determinated nodes enabled only one sense)
+	
+	-- UPDATE rows where flag=2 AND direction for specified node is not allowed (inp_pump.to_arc)
+	UPDATE anl_graf SET flag=0 WHERE id IN (
+				-- all rows where node_id participates AS node_1
+				SELECT id FROM ws_sample.anl_graf WHERE node_1 IN (SELECT node_1 FROM ws_sample.anl_graf JOIN ws_sample.inp_pump ON to_arc = arc_id AND node_1=node_id) EXCEPT 
+				-- especific rows where node_id participates AS node_1 and related arc_id is allowed on inp_pump table
+				SELECT id FROM ws_sample.anl_graf JOIN ws_sample.inp_pump ON to_arc = arc_id AND node_1=node_id)
+				AND flag=2;
+
+	-- UPDATE rows WHERE flag=2 (to flag=0) AND direction for especified node_id is not allowed (inp_valve.to_arc)
+	UPDATE anl_graf SET flag=0 WHERE id IN (
+				-- all rows where node_id participates AS node_1
+				SELECT id FROM ws_sample.anl_graf WHERE node_1 IN (SELECT node_1 FROM ws_sample.anl_graf JOIN ws_sample.inp_pump ON to_arc = arc_id AND node_1=node_id) EXCEPT 
+				-- especific rows where node_id participates AS node_1 and related arc_id is allowed on inp_valve table
+				SELECT id FROM ws_sample.anl_graf JOIN ws_sample.inp_vale ON to_arc = arc_id AND node_1=node_id)
+				AND flag=2;
+				
+	-- UPDATE rows WHERE flag=2 (to flag=0) AND direction for especified node_id is not allowed (inp_shortpipe.to_arc)
+	UPDATE anl_graf SET flag=0 WHERE id IN (
+				-- all rows where node_id participates AS node_1
+				SELECT id FROM ws_sample.anl_graf WHERE node_1 IN (SELECT node_1 FROM ws_sample.anl_graf JOIN ws_sample.inp_pump ON to_arc = arc_id AND node_1=node_id) EXCEPT 
+				-- especific rows where node_id participates AS node_1 and related arc_id is allowed on inp_shortpipe table
+				SELECT id FROM ws_sample.anl_graf JOIN ws_sample.inp_shortpipe ON to_arc = arc_id AND node_1=node_id)
+				AND flag=2;
+				
+	-- UPDATE rows WHERE flag=2 (to flag=0) AND direction for especified node_id is not allowed (anl_mincut_inlet_x_exploitation)
+	UPDATE anl_graf SET flag=0 WHERE id IN (
+				-- all rows where node_id participates AS node_1
+				SELECT id FROM ws_sample.anl_graf WHERE node_1 IN (SELECT node_1 FROM ws_sample.anl_graf JOIN ws_sample.inp_pump ON to_arc = arc_id AND node_1=node_id) EXCEPT 
+				-- especific rows where node_id participates AS node_1 and related arc_id is allowed on anl_mincut_inlet_x_exploitation table
+				SELECT id FROM ws_sample.anl_graf JOIN (SELECT node_id, json_array_elements_text(to_arc) as to_arc FROM ws_sample.anl_mincut_inlet_x_exploitation)a  ON to_arc = arc_id AND node_1=node_id
+				) AND flag=2;
+				
 	-- starting process
 	LOOP
 		EXIT WHEN cont1 = -1;
@@ -277,7 +332,7 @@ BEGIN
 
 		-- upsert presszone on parent tables
 		UPDATE node SET presszonecat_id = log_message FROM audit_log_data WHERE feature_id=node_id AND fprocesscat_id=43 AND user_name=current_user;
-		UPDATE SCHEMA_NAME.arc SET presszonecat_id = log_message FROM SCHEMA_NAME.audit_log_data WHERE feature_id=arc_id AND fprocesscat_id=43 AND user_name=current_user;
+		UPDATE ws_sample.arc SET presszonecat_id = log_message FROM ws_sample.audit_log_data WHERE feature_id=arc_id AND fprocesscat_id=43 AND user_name=current_user;
 		UPDATE connec SET presszonecat_id = arc.presszonecat_id FROM arc WHERE arc.arc_id=connec.arc_id;
 			
 		-- upsert dma on parent tables

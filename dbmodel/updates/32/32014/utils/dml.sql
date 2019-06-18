@@ -32,7 +32,7 @@ UPDATE node_type SET graf_delimiter = 'SECTOR' WHERE type IN ('TANK', 'WATERWELL
 
 DELETE FROM dattrib_type;
 
-UPDATE sys_fprocess_cat SET name='Sector inlet nodes' WHERE id=30;
+UPDATE sys_fprocess_cat SET fprocess_name='Sector inlet nodes' WHERE id=30;
 INSERT INTO sys_fprocess_cat VALUES (43, 'Presszone from inside arcs', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (44, 'Presszone inlet nodes', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (45, 'DQA from inside arcs', 'om', '', 'ws');
