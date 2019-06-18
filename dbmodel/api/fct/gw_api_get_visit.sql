@@ -105,7 +105,6 @@ DECLARE
 	v_inputformname text;
 	v_isclasschanged boolean = true;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
 	v_visitduration text; 	-- to fix the duration of visit. Important because if visit is active on feature, existing visit is showed
-	SCHEMA_NAME int8;  -- to 
 	v_status integer;  -- identifies the status of visit. Important because on status=0 visit is disabled
 	v_class integer;  -- identifies class of visit. Important because each class needs a diferent form
 	v_filterfeaturefield text;
@@ -118,6 +117,7 @@ DECLARE
 	v_value text;
 	v_tab_data boolean;
 	v_offline boolean;
+	v_lot integer;
 	
 
 BEGIN
@@ -155,6 +155,7 @@ BEGIN
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
 
+	--v_offline = 'true';
 
 	-- Check if exists some open visit on related feature with the class configured as vdefault for user  (0 for finished visits and 4 for suspended visit)
 	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
@@ -296,7 +297,10 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 		-- excode
 		v_visitextcode =  (SELECT value FROM config_param_user WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user)::text;		
 		--visitcat
-		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user)::integer;		
+		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user)::integer;
+
+		-- lot
+		v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);		
 	
 
 		-- statics (configured on config_param_user forcing values)--
@@ -458,6 +462,12 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 					IF (aux_json->>'column_id') = 'visitcat_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitcat::text);
 						RAISE NOTICE ' --- SETTING v_visitcat VALUE % ---',v_visitcat ;
+					END IF;
+
+					-- setting lot_id
+					IF (aux_json->>'column_id') = 'lot_id' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_lot::text);
+						RAISE NOTICE ' --- SETTING v_lot VALUE % ---',v_lot ;
 					END IF;
 									
 					-- setting startdate

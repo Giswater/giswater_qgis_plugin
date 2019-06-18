@@ -27,7 +27,12 @@ BEGIN
    v_version = (SELECT giswater FROM version ORDER by 1 desc LIMIT 1);
 
    IF TG_OP='INSERT' THEN
-	
+
+		-- get if its first visit of lot to set it with status = 4 (ON GOING)
+		IF (SELECT count (*) FROM om_visit WHERE lot_id=NEW.lot_id) = 1 THEN
+			UPDATE om_visit_lot SET status = 4 WHERE lot_id=NEW.lot_id;
+		END IF;
+		 	
 		-- automatic creation of workcat
 		IF (SELECT (value::json->>'AutoNewWorkcat') FROM config_param_system WHERE parameter='om_visit_parameters') THEN
 			INSERT INTO cat_work (id) VALUES (NEW.id);
