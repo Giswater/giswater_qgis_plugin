@@ -19,7 +19,7 @@ from builtins import object
 
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker
-from qgis.core import QgsProject, QgsPoint
+from qgis.core import QgsProject, QgsPoint, QgsFeatureRequest
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
 
@@ -206,7 +206,7 @@ class SnappingConfigManager(object):
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
-        return retval, result
+        return result
 
 
     def add_marker(self, result, vertex_marker=None, icon_type=None):
@@ -217,7 +217,7 @@ class SnappingConfigManager(object):
         if vertex_marker is None:
             vertex_marker = self.vertex_marker
 
-        point = QgsPoint(result.snappedVertex)
+        point = QgsPoint(result[0].snappedVertex)
         if icon_type:
             vertex_marker.setIconType(icon_type)
         vertex_marker.setCenter(point)
@@ -284,3 +284,21 @@ class SnappingConfigManager(object):
             layer = snapped_point.layer
             feature_id = snapped_point.snappedAtGeometry
             feature_request = QgsFeatureRequest().setFilterFid(feature_id)
+            snapped_feat = next(layer.getFeatures(feature_request))
+            if select_feature:
+                self.select_snapped_feature(result, feature_id)
+        except:
+            pass
+        finally:
+            return snapped_feat
+
+
+    def select_snapped_feature(self, result, feature_id):
+
+        if not result:
+            return
+
+        snapped_point = result[0]
+        layer = snapped_point.layer()
+        layer.select([feature_id])
+
