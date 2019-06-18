@@ -10,6 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE plan_psector ADD COLUMN status integer;
 
+ALTER TABLE anl_mincut_inlet_x_exploitation ADD COLUMN to_arc json;
+
 
 CREATE TABLE anl_graf (
 id SERIAL primary key,

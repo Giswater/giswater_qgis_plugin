@@ -21,7 +21,6 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2704, 'gw_fct_grafanalytics_engine', 'ws','function', 'Engine function of grafanalytics', 'role_om',FALSE, FALSE,FALSE);
 
 
-
 UPDATE config_param_system SET isenabled=false, isdeprecated='true' WHERE parameter='gw_trg_arc_orphannode_delete';
 
 UPDATE node_type SET graf_delimiter = 'NONE';

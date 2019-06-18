@@ -138,25 +138,25 @@ BEGIN
 		
 	ELSIF v_class = 'PZONEA' OR v_class = 'PZONEN' THEN
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
-		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('PRESSZONE', 'MINSECTOR') AND closed=true ;
+		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','PRESSZONE', 'MINSECTOR') AND closed=true ;
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''PRESSZONE'' AND checkf=0 LIMIT 1';
 	
 	ELSIF v_class = 'DMAA'  OR v_class = 'DMAN' THEN
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
-		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('DMA', 'MINSECTOR') AND closed=true ;
+		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','DMA','MINSECTOR') AND closed=true ;
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''DMA'' AND checkf=0 LIMIT 1';
 
 	ELSIF v_class = 'DQAA'  OR v_class = 'DQAN' THEN
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
-		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('DQA', 'MINSECTOR') AND closed=true ;
+		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','DQA','MINSECTOR') AND closed=true ;
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''DQA'' AND checkf=0 LIMIT 1';
 
 	ELSIF v_class = 'SECTORA' OR v_class = 'SECTORN' THEN
 		UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id JOIN man_valve d ON c.node_id=d.node_id
-		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR', 'MINSECTOR') AND closed=true ;
+		WHERE c.node_id=anl_graf.node_1 AND graf_delimiter IN ('SECTOR','MINSECTOR') AND closed=true ;
 		v_querytext = 'SELECT node_id FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 				JOIN anl_graf ON node_1=node_id WHERE graf_delimiter=''SECTOR'' AND checkf=0 LIMIT 1';
 
