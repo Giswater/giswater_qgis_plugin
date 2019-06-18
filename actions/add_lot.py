@@ -56,7 +56,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.chk_position = 6  # Variable used to set the position of the QCheckBox in the relations table
+        self.cmb_position = 15  # Variable used to set the position of the QCheckBox in the relations table
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -67,7 +67,7 @@ class AddNewLot(ParentManage):
 
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = self.controller.get_group_layers('gully', True)
 
         self.dlg_lot = AddLot()
         self.load_settings(self.dlg_lot)
@@ -139,7 +139,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
-        self.dlg_lot.btn_validate_all.clicked.connect(partial(self.validate_all, self.dlg_lot.tbl_relation))
+        self.dlg_lot.btn_validate_all.clicked.connect(partial(self.validate_all, self.dlg_lot.tbl_visit))
         self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
@@ -152,7 +152,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
         self.dlg_lot.cmb_man_team.clicked.connect(self.manage_team)
 
-        self.set_headers()
+        self.set_lot_headers()
         self.set_active_layer()
         if lot_id is not None:
             # utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
@@ -161,13 +161,15 @@ class AddNewLot(ParentManage):
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
-            sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(self.geom_type) + ""
-                   " WHERE lot_id ='" + str(lot_id) + "'")
-            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-            self.put_checkbox(self.tbl_relation, rows, 'status', 3)
-            self.set_checkbox_valueas()
+            # sql = ("SELECT * FROM " + self.schema_name + ".ve_lot_x_" + str(self.geom_type) + ""
+            #        " WHERE lot_id ='" + str(lot_id) + "'")
+            # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+            # if rows:
+            #     self.put_checkbox(self.tbl_relation, rows, 'status', 3)
+            #     self.set_checkbox_values()
             self.set_dates()
             self.reload_table_visit()
+
 
         # Enable or disable QWidgets
         self.dlg_lot.txt_ot_type.setReadOnly(True)
@@ -186,14 +188,14 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
-    def set_checkbox_valueas(self):
+    def set_checkbox_values(self):
         """ Set checkbox with the same values as the validate column """
         model = self.dlg_lot.tbl_relation.model()
         for x in range(0, model.rowCount()):
-            index = model.index(x, 5)
+            index = model.index(x, self.cmb_position-1)
             value = model.data(index)
 
-            widget_cell = self.dlg_lot.tbl_relation.model().index(x, self.chk_position)
+            widget_cell = self.dlg_lot.tbl_relation.model().index(x, self.cmb_position)
             widget = self.dlg_lot.tbl_relation.indexWidget(widget_cell)
             chk_list = widget.findChildren(QCheckBox)
             if str(value) == 'True':
@@ -204,10 +206,11 @@ class AddNewLot(ParentManage):
         """ Set all checkbox checked """
         model = qtable.model()
         for x in range(0, model.rowCount()):
-            widget_cell = qtable.model().index(x, self.chk_position)
+            widget_cell = qtable.model().index(x, self.cmb_position)
             widget = qtable.indexWidget(widget_cell)
-            chk_list = widget.findChildren(QCheckBox)
-            chk_list[0].setChecked(True)
+            cmb_list = widget.findChildren(QComboBox)
+            utils_giswater.set_combo_itemData(cmb_list[0], '2', 0)
+
 
 
     def manage_team(self):
@@ -355,6 +358,7 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[1])
         utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
 
+
     def disbale_actions(self):
         class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
         # 5=EXECUTAT, 6=REVISAT, 7=CANCEL.LAT
@@ -397,13 +401,13 @@ class AddNewLot(ParentManage):
                 value = model.data(index)
                 row[headers[c]] = value
 
-            widget_cell = qtable.model().index(x, self.chk_position)
-            widget = qtable.indexWidget(widget_cell)
-            chk_list = widget.findChildren(QCheckBox)
-            if chk_list[0].isChecked():
-                row['validate'] = 'True'
-            else:
-                row['validate'] = 'False'
+            # widget_cell = qtable.model().index(x, self.cmb_position)
+            # widget = qtable.indexWidget(widget_cell)
+            # chk_list = widget.findChildren(QCheckBox)
+            # if chk_list[0].isChecked():
+            #     row['validate'] = 'True'
+            # else:
+            #     row['validate'] = 'False'
             rows.append(row)
         return rows
 
@@ -442,7 +446,7 @@ class AddNewLot(ParentManage):
         # Fill ComboBox cmb_status
         sql = ("SELECT id, idval"
                " FROM " + self.schema_name + ".om_visit_lot_status "
-               " ORDER BY idval")
+               " ORDER BY id")
         status = self.controller.get_rows(sql, commit=True)
         if status:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
@@ -488,7 +492,7 @@ class AddNewLot(ParentManage):
         # fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
         # self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
-        self.set_headers()
+        self.set_lot_headers()
 
 
     def clear_selection(self, remove_groups=True):
@@ -555,46 +559,8 @@ class AddNewLot(ParentManage):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         table_name = "v_edit_" + str(feature_type)
 
-        self.set_headers()
+        self.set_lot_headers()
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
-
-
-    def  set_headers(self):
-
-        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
-        if feature_type == '':
-            return
-        columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
-
-        columns_name.append([''])
-        standard_model = QStandardItemModel()
-        self.tbl_relation.setModel(standard_model)
-        self.tbl_relation.horizontalHeader().setStretchLastSection(True)
-
-        # # Get headers
-        headers = []
-        for x in columns_name:
-            headers.append(x[0])
-        # Set headers
-        standard_model.setHorizontalHeaderLabels(headers)
-
-
-    def populate_table_relations(self, lot_id):
-
-        standard_model = self.tbl_relation.model()
-        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
-        sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + ""
-               " WHERE lot_id ='"+str(lot_id)+"'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        for row in rows:
-            item = []
-            for value in row:
-                if value is not None:
-                    item.append(QStandardItem(str(value)))
-                else:
-                    item.append(QStandardItem(None))
-            if len(row) > 0:
-                standard_model.appendRow(item)
 
 
     def populate_visits(self, widget, table_name, expr_filter=None):
@@ -685,17 +651,20 @@ class AddNewLot(ParentManage):
             item = []
             if feature_id not in id_list:
                 feature = self.get_feature_by_id(layer, feature_id, field_id)
-                row = []
-                item.append(lot_id)
+                item.append('')
                 item.append(feature_id)
                 item.append(feature.attribute('code'))
-                item.append(2)
-
+                item.append(lot_id)
+                item.append(1)  # Set status field of the table relation
+                item.append('No visitat')
+                item.append('')
+                item.append('False')
+                item.append(feature.geometry().asWkb().encode('hex').upper())
+                row = []
                 for value in item:
                     row.append(QStandardItem(str(value)))
                 if len(row) > 0:
                     standard_model.appendRow(row)
-                    self.insert_single_checkbox(self.tbl_relation)
         self.hilight_features(self.rb_list)
         self.set_dates()
         self.reload_table_visit()
@@ -740,7 +709,7 @@ class AddNewLot(ParentManage):
 
 
     def insert_single_checkbox(self, qtable):
-        """ Create one QCheckBox and put into QTableView at position @self.chk_position """
+        """ Create one QCheckBox and put into QTableView at position @self.cmb_position """
         cell_widget = QWidget()
         chk = QCheckBox()
         lay_out = QHBoxLayout(cell_widget)
@@ -748,7 +717,7 @@ class AddNewLot(ParentManage):
         lay_out.setAlignment(Qt.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
-        i = qtable.model().index(qtable.model().rowCount()-1, self.chk_position)
+        i = qtable.model().index(qtable.model().rowCount()-1, self.cmb_position)
         qtable.setIndexWidget(i, cell_widget)
 
 
@@ -865,8 +834,6 @@ class AddNewLot(ParentManage):
         if not row:
             return
         table_name = row['tablename']
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
 
         # Create interval dates
         format_low = self.lot_date_format + ' 00:00:00.000'
@@ -882,19 +849,99 @@ class AddNewLot(ParentManage):
         if lot_id != '':
             expr_filter += " AND lot_id='"+lot_id+"'"
 
-        model = QSqlTableModel()
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.setFilter(expr_filter)
-        model.sort(0, 1)
-        model.select()
+        columns_name = self.controller.get_columns_list(table_name)
+        standard_model = QStandardItemModel()
+        self.dlg_lot.tbl_visit.setModel(standard_model)
+        self.dlg_lot.tbl_visit.horizontalHeader().setStretchLastSection(True)
+        # # Get headers
+        headers = []
+        for x in columns_name:
+            headers.append(x[0])
+        # headers.insert(self.cmb_position, '')
+        # Set headers
+        headers.insert(self.cmb_position, '')
+        standard_model.setHorizontalHeaderLabels(headers)
 
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+        sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
+               " WHERE lot_id ='" + str(lot_id) + "'"
+               " AND " + str(expr_filter)+"")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
 
-        # Attach model to table view
-        self.dlg_lot.tbl_visit.setModel(model)
+        if rows is None:
+            return
+        for row in rows:
+            item = []
+            for value in row:
+                if value is not None:
+                    item.append(QStandardItem(str(value)))
+                else:
+                    item.append(QStandardItem(None))
+            if len(row) > 0:
+                standard_model.appendRow(item)
+
+        sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
+               " WHERE lot_id ='" + str(lot_id) + "'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        self.put_combobox(self.dlg_lot.tbl_visit, rows)
+
+
+
+    def put_combobox(self, qtable, rows):
+        """ Set one column of a QtableView as QCheckBox with values from database. """
+        sql = ("SELECT id, idval FROM " + self.schema_name + ".om_visit_cat_status")
+        status_list = self.controller.get_rows(sql, commit=True)
+
+        for x in range(0, len(rows)):
+            row = rows[x]
+            cell_widget = QWidget()
+            cmb = QComboBox()
+            utils_giswater.set_item_data(cmb, status_list, 1)
+            utils_giswater.set_combo_itemData(cmb, str(row['status']), 0)
+            lay_out = QHBoxLayout(cell_widget)
+            lay_out.addWidget(cmb)
+            lay_out.setAlignment(Qt.AlignCenter)
+            lay_out.setContentsMargins(0, 0, 0, 0)
+            cell_widget.setLayout(lay_out)
+            i = qtable.model().index(x, self.cmb_position)
+            qtable.setIndexWidget(i, cell_widget)
+
+
+    def populate_table_relations(self, lot_id):
+
+        standard_model = self.tbl_relation.model()
+        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
+        sql = ("SELECT * FROM " + self.schema_name + ".ve_lot_x_" + str(feature_type) + ""
+               " WHERE lot_id ='"+str(lot_id)+"'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+
+        if rows is None:
+            return
+        for row in rows:
+            item = []
+            for value in row:
+                if value is not None:
+                    item.append(QStandardItem(str(value)))
+                else:
+                    item.append(QStandardItem(None))
+            if len(row) > 0:
+                standard_model.appendRow(item)
+
+
+    def set_lot_headers(self):
+
+        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
+        if feature_type == '':
+            return
+        columns_name = self.controller.get_columns_list('ve_lot_x_' + str(feature_type))
+        standard_model = QStandardItemModel()
+        self.tbl_relation.setModel(standard_model)
+        self.tbl_relation.horizontalHeader().setStretchLastSection(True)
+        # # Get headers
+        headers = []
+        for x in columns_name:
+            headers.append(x[0])
+        # Set headers
+        standard_model.setHorizontalHeaderLabels(headers)
 
 
     def get_dialog(self):
@@ -909,7 +956,6 @@ class AddNewLot(ParentManage):
 
 
     def save_lot(self):
-
         lot = {}
         index = self.dlg_lot.cmb_visit_class.currentIndex()
         item = self.list_to_work[index]
@@ -969,7 +1015,7 @@ class AddNewLot(ParentManage):
             keys = "lot_id, "
             values = "$$"+str(lot_id)+"$$, "
             for key, value in list(item.items()):
-                if key != 'lot_id':
+                if key in (lot['feature_type']+'_id', 'code', 'status', 'observ', 'validate'):
                     if value not in('', None):
                         keys += ""+key+", "
                         if type(value) in (int, bool):
@@ -980,7 +1026,7 @@ class AddNewLot(ParentManage):
             values = values[:-2]
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
                     " VALUES (" + values + "); \n")
-        status = self.controller.execute_sql(sql, log_sql=False, commit=True)
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
         if status:
             self.manage_rejected()
 
@@ -1041,21 +1087,27 @@ class AddNewLot(ParentManage):
         row = index.row()
         column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type+'_id')
         feature_id = index.sibling(row, column_index).data()
-        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, "'"+feature_id+"'")
+        expr_filter = '"{}_id" IN ({})'.format(feature_type, "'"+feature_id+"'")
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
+
         self.select_features_by_ids(feature_type, expr)
         self.iface.actionZoomToSelected().trigger()
 
-
         layer = self.iface.activeLayer()
         features = layer.selectedFeatures()
+
         for f in features:
-            list_coord = f.geometry().asPolyline()
+            if feature_type == 'arc':
+                list_coord = f.geometry().asPolyline()
+            else:
+                return
+                # TODO
+                list_coord = [str(f.geometry().asPoint()) + " " + str(f.geometry().asPoint())]
             break
 
-        coords = "LINESTRING("
+        coords = "LINESTRING( "
         for c in list_coord:
             coords += str(c[0]) + " " + str(c[1]) + ","
         coords = coords[:-1] + ")"
@@ -1097,24 +1149,6 @@ class AddNewLot(ParentManage):
             point = QgsPoint(float(x), float(y))
             points.append(point)
         return points
-
-
-    def put_checkbox(self, qtable, rows, checker, value):
-        """ Set one column of a QtableView as QCheckBox with values from database. """
-
-        for x in range(0, len(rows)):
-            row = rows[x]
-            cell_widget = QWidget()
-            chk = QCheckBox()
-            if row[checker] == value:
-                chk.setCheckState(Qt.Checked)
-            lay_out = QHBoxLayout(cell_widget)
-            lay_out.addWidget(chk)
-            lay_out.setAlignment(Qt.AlignCenter)
-            lay_out.setContentsMargins(0, 0, 0, 0)
-            cell_widget.setLayout(lay_out)
-            i = qtable.model().index(x, self.chk_position)
-            qtable.setIndexWidget(i, cell_widget)
 
 
     def get_headers(self, qtable):
