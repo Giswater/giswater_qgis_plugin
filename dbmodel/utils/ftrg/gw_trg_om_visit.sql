@@ -18,6 +18,7 @@ v_featureid text;
 v_visittable text;
 v_querytext text;
 v_visit record;
+v_triggerfromtable text;
 
 
 BEGIN
@@ -26,25 +27,31 @@ BEGIN
    v_featuretype:= TG_ARGV[0];
    v_version = (SELECT giswater FROM version ORDER by 1 desc LIMIT 1);
 
-   IF TG_OP='INSERT' THEN
+   IF v_featuretype IS NULL THEN
+	v_triggerfromtable = 'om_visit';
+   ELSE 
+	v_triggerfromtable = 'om_visit_x_feature';
+   END IF;
 
-		-- get if its first visit of lot to set it with status = 4 (ON GOING)
-		IF (SELECT count (*) FROM om_visit WHERE lot_id=NEW.lot_id) = 1 THEN
-			UPDATE om_visit_lot SET status = 4 WHERE lot_id=NEW.lot_id;
-		END IF;
+   IF TG_OP='INSERT' THEN
 		 	
 		-- automatic creation of workcat
 		IF (SELECT (value::json->>'AutoNewWorkcat') FROM config_param_system WHERE parameter='om_visit_parameters') THEN
 			INSERT INTO cat_work (id) VALUES (NEW.id);
 		END IF;
 
-		IF v_featuretype IS NULL THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
+		IF v_triggerfromtable = 'om_visit' THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
+ 
+			-- get if its first visit of lot to set it with status = 4 (ON GOING)
+			IF (SELECT count (*) FROM om_visit WHERE lot_id=NEW.lot_id) = 1 THEN
+				UPDATE om_visit_lot SET status = 4 WHERE id=NEW.lot_id;
+			END IF;
 
 			IF NEW.status > 0 THEN 
 				NEW.enddate=null;
 			END IF;
 
-		ELSIF v_featuretype IS NOT NULL THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
+		ELSIF v_triggerfromtable ='om_visit_x_feature' THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
 
 			SELECT * INTO v_visit FROM om_visit WHERE id=NEW.visit_id;
 
@@ -73,7 +80,7 @@ BEGIN
 		RETURN NEW;
 
 
-    ELSIF TG_OP='UPDATE' AND v_featuretype IS NULL THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
+    ELSIF TG_OP='UPDATE' AND v_triggerfromtable ='om_visit' THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
 
 		-- move status of lot element to status=0
 		IF NEW.status = 0 AND OLD.status > 0 THEN 
