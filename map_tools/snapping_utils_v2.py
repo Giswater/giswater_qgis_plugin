@@ -226,19 +226,6 @@ class SnappingConfigManager(object):
         return point
 
 
-    def add_marker_result(self, result, vertex_marker=None):
-
-        if result is None:
-            return None
-
-        if vertex_marker is None:
-            vertex_marker = self.vertex_marker
-
-        point = QgsPoint(result.point())
-        vertex_marker.setCenter(point)
-        vertex_marker.show()
-
-
     def get_event_point(self, event=None, point=None):
         """ Get point """
 

@@ -137,10 +137,9 @@ class CadAddPoint(ParentMapTool):
         else:
             (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
 
-        # That's the snapped features
         if result:
             # Get the point and add marker on it
-            self.snapper_manager.add_marker_result(result, self.vertex_marker)
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
