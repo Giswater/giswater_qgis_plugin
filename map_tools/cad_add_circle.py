@@ -132,9 +132,11 @@ class CadAddCircle(ParentMapTool):
 
         # Snapping
         if self.snap_to_selected_layer:
-            self.snapper_manager.snap_to_current_layer(event_point, self.vertex)
+            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            self.snapper_manager.snap_to_background_layers(event_point, self.vertex)
+            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
+
+        self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -150,19 +152,19 @@ class CadAddCircle(ParentMapTool):
                 self.iface.actionPan().trigger()
                 return
 
+            # TODO: Test it!
+            point = None
             (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-            if Qgis.QGIS_VERSION_INT < 29900:
-                # Create point with snap reference
-                if result:
+            # Create point with snap reference
+            if result:
+                if Qgis.QGIS_VERSION_INT < 29900:
                     point = QgsPoint(result[0].snappedVertex)
-                # Create point with mouse cursor reference
                 else:
-                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-            else:
-                # Create point with snap reference
-                point = QgsPointXY(result.point())
-                if point.x() == 0 and point.y() == 0:
-                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+                    point = QgsPointXY(result.point())
+
+            # Create point with mouse cursor reference
+            if point is None:
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
             self.init_create_circle_form(point)
 

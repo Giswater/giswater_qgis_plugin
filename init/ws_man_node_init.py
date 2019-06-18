@@ -311,7 +311,7 @@ class ManNodeDialog(ParentDialog):
             
         # Check snapped features
         for snapped_point in result:
-            self.snapper_manager.add_vertex(snapped_point, self.vertex_marker)
+            self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
             break 
         
                 
