@@ -56,7 +56,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.chk_position = 5  # Variable used to set the position of the QCheckBox in the relations table
+        self.chk_position = 6  # Variable used to set the position of the QCheckBox in the relations table
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -139,7 +139,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
-
+        self.dlg_lot.btn_validate_all.clicked.connect(partial(self.validate_all, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
@@ -165,6 +165,7 @@ class AddNewLot(ParentManage):
                    " WHERE lot_id ='" + str(lot_id) + "'")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             self.put_checkbox(self.tbl_relation, rows, 'status', 3)
+            self.set_checkbox_valueas()
             self.set_dates()
             self.reload_table_visit()
 
@@ -183,6 +184,30 @@ class AddNewLot(ParentManage):
 
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+
+
+    def set_checkbox_valueas(self):
+        """ Set checkbox with the same values as the validate column """
+        model = self.dlg_lot.tbl_relation.model()
+        for x in range(0, model.rowCount()):
+            index = model.index(x, 5)
+            value = model.data(index)
+
+            widget_cell = self.dlg_lot.tbl_relation.model().index(x, self.chk_position)
+            widget = self.dlg_lot.tbl_relation.indexWidget(widget_cell)
+            chk_list = widget.findChildren(QCheckBox)
+            if str(value) == 'True':
+                chk_list[0].setChecked(True)
+
+
+    def validate_all(self, qtable):
+        """ Set all checkbox checked """
+        model = qtable.model()
+        for x in range(0, model.rowCount()):
+            widget_cell = qtable.model().index(x, self.chk_position)
+            widget = qtable.indexWidget(widget_cell)
+            chk_list = widget.findChildren(QCheckBox)
+            chk_list[0].setChecked(True)
 
 
     def manage_team(self):
@@ -364,18 +389,21 @@ class AddNewLot(ParentManage):
         headers = self.get_headers(qtable)
         rows = []
         model = qtable.model()
+
         for x in range(0, model.rowCount()):
             row = {}
             for c in range(0, model.columnCount()-1):
                 index = model.index(x, c)
-                item = model.data(index)
-                row[headers[c]] = item
+                value = model.data(index)
+                row[headers[c]] = value
 
             widget_cell = qtable.model().index(x, self.chk_position)
             widget = qtable.indexWidget(widget_cell)
             chk_list = widget.findChildren(QCheckBox)
             if chk_list[0].isChecked():
-                row['status'] = '3'
+                row['validate'] = 'True'
+            else:
+                row['validate'] = 'False'
             rows.append(row)
         return rows
 
@@ -411,7 +439,6 @@ class AddNewLot(ParentManage):
         # Fill ComboBox cmb_assigned_to
         self.populate_cmb_team()
 
-        # TODO fill combo with correct table
         # Fill ComboBox cmb_status
         sql = ("SELECT id, idval"
                " FROM " + self.schema_name + ".om_visit_lot_status "
@@ -539,7 +566,7 @@ class AddNewLot(ParentManage):
             return
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
 
-        columns_name.append(['validate'])
+        columns_name.append([''])
         standard_model = QStandardItemModel()
         self.tbl_relation.setModel(standard_model)
         self.tbl_relation.horizontalHeader().setStretchLastSection(True)
@@ -662,7 +689,7 @@ class AddNewLot(ParentManage):
                 item.append(lot_id)
                 item.append(feature_id)
                 item.append(feature.attribute('code'))
-                item.append(0)
+                item.append(2)
 
                 for value in item:
                     row.append(QStandardItem(str(value)))
