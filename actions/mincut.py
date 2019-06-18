@@ -1552,13 +1552,11 @@ class MincutParent(ParentAction):
             self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
 
 
-    def mouse_move_valve(self, p):
+    def mouse_move_valve(self, point):
 
+        # Get clicked point
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
@@ -1571,7 +1569,7 @@ class MincutParent(ParentAction):
                     break
 
 
-    def mouse_move_node_arc(self, p):
+    def mouse_move_node_arc(self, point):
 
         if not self.layer_arc:
             return
@@ -1579,11 +1577,9 @@ class MincutParent(ParentAction):
         # Set active layer
         self.iface.setActiveLayer(self.layer_arc)
 
+        # Get clicked point
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
@@ -1599,10 +1595,8 @@ class MincutParent(ParentAction):
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
         """ Custom mincut snapping function """
 
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        # Get clicked point
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)

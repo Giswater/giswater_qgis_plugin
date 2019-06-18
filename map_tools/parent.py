@@ -31,9 +31,9 @@ else:
     from qgis.core import QgsWkbTypes, QgsProject
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsPoint, QgsExpression
+from qgis.core import QgsExpression
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
-from qgis.PyQt.QtCore import Qt, QPoint
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
 
 import os
@@ -358,15 +358,8 @@ class ParentMapTool(QgsMapTool):
           
         # Hide highlight
         self.vertex_marker.hide()
-  
-        try:
-            # Get current mouse coordinates
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)

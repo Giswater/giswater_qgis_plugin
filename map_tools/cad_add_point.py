@@ -127,17 +127,9 @@ class CadAddPoint(ParentMapTool):
 
     def canvasMoveEvent(self, event):
 
-        # Hide highlight
+        # Hide highlight and get coordinates
         self.vertex_marker.hide()
-
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        try:
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         if self.snap_to_selected_layer:
@@ -155,14 +147,10 @@ class CadAddPoint(ParentMapTool):
 
         if event.button() == Qt.LeftButton:
 
-            # Get the click
+            # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
-            try:
-                event_point = QPoint(x, y)
-            except(TypeError, KeyError):
-                self.iface.actionPan().trigger()
-                return
+            event_point = self.snapper_manager.get_event_point(event)
 
             # TODO: Test it!
             point = None

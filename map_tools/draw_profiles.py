@@ -366,12 +366,9 @@ class DrawProfiles(ParentMapTool):
         self.emit_point.canvasClicked.connect(self.snapping_node)
 
 
-    def mouse_move(self, p):
+    def mouse_move(self, point):
 
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)

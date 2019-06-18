@@ -20,6 +20,7 @@ from builtins import object
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvasSnapper
 from qgis.core import QgsProject, QgsPoint
+from qgis.PyQt.QtCore import QPoint
 
 
 class SnappingConfigManager(object):
@@ -208,4 +209,23 @@ class SnappingConfigManager(object):
         point = QgsPoint(result.point())
         vertex_marker.setCenter(point)
         vertex_marker.show()
+
+
+    def get_event_point(self, event=None, point=None):
+        """ Get point """
+
+        event_point = None
+        try:
+            if event:
+                x = event.pos().x()
+                y = event.pos().y()
+            if point:
+                map_point = self.canvas.getCoordinateTransform().transform(point)
+                x = map_point.x()
+                y = map_point.y()
+            event_point = QPoint(x, y)
+        except:
+            pass
+        finally:
+            return event_point
 

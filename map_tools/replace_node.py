@@ -330,10 +330,7 @@ class ReplaceNodeMapTool(ParentMapTool):
             self.cancel_map_tool()
             return
 
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)

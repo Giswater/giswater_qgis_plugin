@@ -151,14 +151,7 @@ class MoveNodeMapTool(ParentMapTool):
         # Hide marker
         self.vertex_marker.hide()
         
-        try:
-            # Get current mouse coordinates
-            x = event.pos().x()
-            y = event.pos().y()            
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.set_action_pan()
-            return
+        event_point = self.snapper_manager.get_event_point(event)
         
         # Snap to node
         if self.snapped_feat is None:
@@ -213,55 +206,52 @@ class MoveNodeMapTool(ParentMapTool):
         """ Mouse release event """         
         
         if event.button() == Qt.LeftButton:
-            
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x,y)
+
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Snap to node
             if self.snapped_feat is None:
 
                 (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
-                
-                if result:
+                if not result:
+                    return
 
-                    snapped_point = result[0]
-                    self.snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    point = QgsPoint(snapped_point.snappedVertex)
+                snapped_point = result[0]
+                self.snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                point = QgsPoint(snapped_point.snappedVertex)
 
-                    # Hide marker
-                    self.vertex_marker.hide()
-                    
-                    # Set a new point to go on with
-                    self.rubber_band.addPoint(point)
+                # Hide marker
+                self.vertex_marker.hide()
 
-                    # Add arc snapping
-                    self.iface.setActiveLayer(self.layer_arc)
+                # Set a new point to go on with
+                self.rubber_band.addPoint(point)
+
+                # Add arc snapping
+                self.iface.setActiveLayer(self.layer_arc)
 
             # Snap to arc
             else:
 
                 (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
-                if result:
+                if not result:
+                    return
 
-                    snapped_point = result[0]
-                    point = self.toLayerCoordinates(snapped_point.layer, QgsPoint(snapped_point.snappedVertex))
+                snapped_point = result[0]
+                point = self.toLayerCoordinates(snapped_point.layer, QgsPoint(snapped_point.snappedVertex))
 
-                    # Get selected feature (at this moment it will have one and only one)
-                    node_id = self.snapped_feat.attribute('node_id')
+                # Get selected feature (at this moment it will have one and only one)
+                node_id = self.snapped_feat.attribute('node_id')
 
-                    # Move selected node to the released point
-                    # Show message before executing
-                    message = ("The procedure will delete features on database."
-                               " Please ensure that features has no undelete value on true."
-                               " On the other hand you must know that traceability table will storage precedent information.")
-                    title = "Info"
-                    answer = self.controller.ask_question(message, title)
-                    if answer:
-                        self.move_node(node_id, point)
+                # Move selected node to the released point
+                # Show message before executing
+                message = ("The procedure will delete features on database."
+                           " Please ensure that features has no undelete value on true."
+                           " On the other hand you must know that traceability table will storage precedent information.")
+                title = "Info"
+                answer = self.controller.ask_question(message, title)
+                if answer:
+                    self.move_node(node_id, point)
 
-        
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
             

@@ -7,7 +7,7 @@ or (at your option) any later version.
 from builtins import next
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest
+from qgis.core import QgsFeatureRequest
 from qgis.PyQt.QtCore import QPoint, Qt
 
 from functools import partial
@@ -375,9 +375,7 @@ class ChangeElemType(ParentMapTool):
             return
 
         # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)

@@ -294,12 +294,10 @@ class ManNodeDialog(ParentDialog):
                     utils_giswater.setWidgetText(self.dialog, 'top_elev', row[0]['top_elev'])
 
 
-    def mouse_move(self, p):
+    def mouse_move(self, point):
 
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        # Get clicked point
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)

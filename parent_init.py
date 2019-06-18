@@ -2149,10 +2149,7 @@ class ParentDialog(QDialog):
          
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
@@ -2173,10 +2170,7 @@ class ParentDialog(QDialog):
             return    
                 
         # Get clicked point
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
         
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
