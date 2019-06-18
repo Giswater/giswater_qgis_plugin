@@ -232,3 +232,42 @@ class SnappingConfigManager(object):
         finally:
             return event_point
 
+
+    def get_snapped_layer(self, result):
+
+        layer = None
+        if result:
+            layer = result.layer()
+
+        return layer
+
+
+    def get_snapped_point(self, result):
+
+        point = None
+        if result:
+            point = QgsPointXY(result.point())
+
+        return point
+
+
+    def get_snapped_feature_id(self, result):
+
+        feature_id = None
+        if result:
+            feature_id = result.featureId()
+
+        return feature_id
+
+
+    def get_snapped_feature(self, result, select_feature=False):
+
+        if not result:
+            return None
+
+        snapped_feat = None
+        try:
+            layer = result.layer()
+            feature_id = result.featureId()
+            feature_request = QgsFeatureRequest().setFilterFid(feature_id)
+            snapped_feat = next(layer.getFeatures(feature_request))
