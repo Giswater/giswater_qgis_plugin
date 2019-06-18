@@ -1553,7 +1553,7 @@ class MincutParent(ParentAction):
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Check feature
             for snapped_point in result:
@@ -1576,7 +1576,7 @@ class MincutParent(ParentAction):
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Check feature
             for snapped_point in result:
@@ -1593,7 +1593,7 @@ class MincutParent(ParentAction):
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Check feature
             for snapped_point in result:

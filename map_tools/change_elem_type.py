@@ -378,7 +378,7 @@ class ChangeElemType(ParentMapTool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Get the point
             snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))

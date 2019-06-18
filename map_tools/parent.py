@@ -361,7 +361,7 @@ class ParentMapTool(QgsMapTool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Check snapped features
             for snapped_point in result:

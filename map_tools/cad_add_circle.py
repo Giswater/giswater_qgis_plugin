@@ -124,10 +124,11 @@ class CadAddCircle(ParentMapTool):
 
         # Snapping
         if self.snap_to_selected_layer:
-            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+            result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_background_layers(event_point)
 
+        # Add marker
         self.snapper_manager.add_marker(result, self.vertex_marker)
 
 

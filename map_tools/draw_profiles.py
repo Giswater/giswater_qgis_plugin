@@ -371,7 +371,7 @@ class DrawProfiles(ParentMapTool):
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:

@@ -133,9 +133,9 @@ class CadAddPoint(ParentMapTool):
 
         # Snapping
         if self.snap_to_selected_layer:
-            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+            result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_background_layers(event_point)
 
         if result:
             # Get the point and add marker on it

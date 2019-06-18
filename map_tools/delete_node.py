@@ -60,7 +60,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Snapping
         snapped_feat = None
-        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Get the first feature
             snapped_point = result[0]
@@ -101,6 +101,7 @@ class DeleteNodeMapTool(ParentMapTool):
             message = "Database function not found"
             self.controller.show_warning(message, parameter=function_name)
             return
+
         sql = ("SELECT " + self.schema_name + "." + function_name + "('"
                + str(self.node_id) + "','" + str(workcat_id_end) + "','" + str(enddate_str) + "');")
         status = self.controller.execute_sql(sql, log_sql=True)

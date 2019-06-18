@@ -190,7 +190,7 @@ class SnappingConfigManager(object):
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
-        return retval, result
+        return result
 
 
     def snap_to_background_layers(self, event_point, vertex_marker=None):

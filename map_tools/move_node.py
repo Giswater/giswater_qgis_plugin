@@ -59,7 +59,6 @@ class MoveNodeMapTool(ParentMapTool):
                " WHERE node_id = '" + node_id + "'")
         status = self.controller.execute_sql(sql) 
         if status:
-
             
             # Execute SQL function and show result to the user
             function_name = "gw_fct_arc_divide"
@@ -71,6 +70,7 @@ class MoveNodeMapTool(ParentMapTool):
                     message = "Database function not found"
                     self.controller.show_warning(message, parameter=function_name)
                     return
+
             sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
             self.controller.execute_sql(sql, commit=True)
 
@@ -168,7 +168,7 @@ class MoveNodeMapTool(ParentMapTool):
                 self.iface.setActiveLayer(self.layer_node)             
             
             # Snapping
-            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+            result = self.snapper_manager.snap_to_current_layer(event_point)
             if result:
                 # Get the point and add marker on it
                 snapped_point = result[0]
@@ -188,7 +188,7 @@ class MoveNodeMapTool(ParentMapTool):
                 self.iface.setActiveLayer(self.layer_arc)               
 
             # Snapping
-            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+            result = self.snapper_manager.snap_to_current_layer(event_point)
             
             if result and result[0].snappedVertexNr == -1:
 
@@ -218,7 +218,7 @@ class MoveNodeMapTool(ParentMapTool):
             # Snap to node
             if self.snapped_feat is None:
 
-                (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+                result = self.snapper_manager.snap_to_current_layer(event_point)
                 if not result:
                     return
 
@@ -238,7 +238,7 @@ class MoveNodeMapTool(ParentMapTool):
             # Snap to arc
             else:
 
-                (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+                result = self.snapper_manager.snap_to_current_layer(event_point)
                 if not result:
                     return
 
