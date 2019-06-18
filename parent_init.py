@@ -2155,16 +2155,13 @@ class ParentDialog(QDialog):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if not result:
             return
             
         # Check snapped features
-        for snapped_point in result:              
-            point = QgsPoint(snapped_point.snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
+        for snapped_point in result:
+            self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
             break 
 
 
@@ -2182,10 +2179,8 @@ class ParentDialog(QDialog):
         event_point = QPoint(x, y)
         
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-        
-        # That's the snapped point
-        if not result:       
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result:
             self.disable_copy_paste()            
             return
                 
@@ -2194,7 +2189,6 @@ class ParentDialog(QDialog):
         is_valid = False
         for snapped_point in result:        
             # Get only one feature
-            point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
             snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
             snapped_feature_attr = snapped_feature.attributes()
             # Leave selection

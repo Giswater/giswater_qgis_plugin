@@ -43,6 +43,7 @@ class DeleteNodeMapTool(ParentMapTool):
     """ QgsMapTools inherited event functions """
                 
     def keyPressEvent(self, event):
+
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             return
@@ -61,13 +62,10 @@ class DeleteNodeMapTool(ParentMapTool):
         snapped_feat = None
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-            
-        # That's the snapped features
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Get the first feature
             snapped_feat = result[0]
-            point = QgsPoint(snapped_feat.snappedVertex)   #@UnusedVariable
             snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
 
         if snapped_feat:

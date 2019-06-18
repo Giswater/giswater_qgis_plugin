@@ -299,12 +299,10 @@ class ManNodeDialog(ParentDialog):
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
-
-        # That's the snapped features
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:
@@ -314,6 +312,7 @@ class ManNodeDialog(ParentDialog):
                     self.vertex_marker.show()
         else:
             self.vertex_marker.hide()
+
 
     def open_up_down_stream(self, qtable):
         """ Open selected node from @qtable """

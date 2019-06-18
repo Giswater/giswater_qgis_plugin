@@ -371,19 +371,14 @@ class DrawProfiles(ParentMapTool):
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
-
-        # That's the snapped features
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             for snapped_point in result:
-                if snapped_point.layer == self.layer_node:                
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+                if snapped_point.layer == self.layer_node:
+                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 

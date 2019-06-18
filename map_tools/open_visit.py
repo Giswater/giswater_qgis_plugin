@@ -57,18 +57,16 @@ class OpenVisit(ParentMapTool):
         x = event.pos().x()
         y = event.pos().y()
         event_point = QPoint(x, y)
-        snapped_feat = None
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result:
+            return
 
-        # That's the snapped features
-        if result:
-            # Get the first feature
-            snapped_feat = result[0]
-            point = QgsPoint(snapped_feat.snappedVertex)  # @UnusedVariable
-            snapped_feat = next(
-                snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
+        # Get the first feature
+        snapped_point = result[0]
+        snapped_feat = next(
+            snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
 
         if snapped_feat:
             visit_id = snapped_feat.attribute('id')

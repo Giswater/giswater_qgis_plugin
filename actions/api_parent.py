@@ -387,26 +387,14 @@ class ApiParent(ParentAction):
         event_point = QPoint(x, y)
 
         # Snapping
-        if Qgis.QGIS_VERSION_INT < 29900:
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
-            if not result:
-                return
-            # Check snapped features
-            for snapped_point in result:
-                point = QgsPoint(snapped_point.snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
-                break
-        else:
-            result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
-            if not result:
-                return
-            # That's the snapped features
-            if result:
-                # Get the point and add marker on it
-                point = QgsPointXY(result.point())
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result:
+            return
+
+        # Check snapped features
+        for snapped_point in result:
+            self.snapper_manager.add_marker(snapped_point, self.vertext_marker)
+            break
 
 
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, point, btn):
@@ -423,12 +411,7 @@ class ApiParent(ParentAction):
         event_point = QPoint(x, y)
 
         # Snapping
-        if Qgis.QGIS_VERSION_INT < 29900:
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-        else:
-            result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if not result:
             self.api_disable_copy_paste(dialog)
             return
@@ -439,7 +422,6 @@ class ApiParent(ParentAction):
         if Qgis.QGIS_VERSION_INT < 29900:
             for snapped_point in result:
                 # Get only one feature
-                point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
                 snapped_feature = next(
                     snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                 snapped_feature_attr = snapped_feature.attributes()
@@ -453,6 +435,7 @@ class ApiParent(ParentAction):
             # Leave selection
             result.layer().select([result.featureId()])
             is_valid = True
+
         if not is_valid:
             message = "Any of the snapped features belong to selected layer"
             self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)
@@ -1270,19 +1253,14 @@ class ApiParent(ParentAction):
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
-
-        # That's the snapped features
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 
@@ -1506,6 +1484,7 @@ class ApiParent(ParentAction):
 
 
     def set_function_associated(self, dialog, widget, field):
+
         function_name = 'no_function_associated'
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
@@ -1516,14 +1495,13 @@ class ApiParent(ParentAction):
         else:
             msg = "parameter button_function not found"
             self.controller.show_message(msg, 2)
+
         if type(widget) == QLineEdit:
+            # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
             if Qgis.QGIS_VERSION_INT < 29900:
-                # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
                 widget.lostFocus.connect(partial(getattr(self, function_name), dialog, self.my_json))
                 widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
-                #widget.textChanged.connect(partial(getattr(self, function_name), dialog, self.my_json))
             else:
-                # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
                 widget.editingFinished.connect(partial(getattr(self, function_name), dialog, self.my_json))
                 widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
 
@@ -1541,14 +1519,13 @@ class ApiParent(ParentAction):
 
 
     def hide_void_groupbox(self, dialog):
-        # Hide empty grupbox
+        """ Hide empty grupbox """
 
         grbox_list = dialog.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
                 grbox.setVisible(False)
-
 
 
 

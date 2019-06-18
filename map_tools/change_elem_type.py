@@ -378,24 +378,19 @@ class ChangeElemType(ParentMapTool):
         x = event.pos().x()
         y = event.pos().y()
         event_point = QPoint(x, y)
-        snapped_feat = None
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
-            
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Get the point
-            point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
             snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-            self.node_id = snapped_feat.attribute('node_id')           
-                  
+            self.node_id = snapped_feat.attribute('node_id')
             # Change node type
             self.change_elem_type(snapped_feat)
 
 
-
-
     def activate(self):
+
         # Check button
         self.action().setChecked(True)     
 

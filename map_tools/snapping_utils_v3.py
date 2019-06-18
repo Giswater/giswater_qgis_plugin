@@ -178,11 +178,14 @@ class SnappingConfigManager(object):
         return retval, result
 
 
-    def add_marker(self, result, vertex_marker):
+    def add_marker(self, result, vertex_marker, icon_type=None):
 
         point = QgsPointXY(result.snappedVertex)
+        if icon_type:
+            self.vertex_marker.setIconType(icon_type)
         vertex_marker.setCenter(point)
         vertex_marker.show()
+        return point
 
 
     def add_marker_result(self, result, vertex_marker):

@@ -169,14 +169,11 @@ class MoveNodeMapTool(ParentMapTool):
                 self.iface.setActiveLayer(self.layer_node)             
             
             # Snapping
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
-      
-            # That's the snapped features
-            if result:          
+            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
+            if result:
                 # Get the point and add marker on it
-                point = QgsPoint(result[0].snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()    
+                snapped_point = result[0]
+                point = self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
                 # Set a new point to go on with
                 self.rubber_band.movePoint(point)
             else:
@@ -192,20 +189,16 @@ class MoveNodeMapTool(ParentMapTool):
                 self.iface.setActiveLayer(self.layer_arc)               
 
             # Snapping
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
+            (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
             
             if result and result[0].snappedVertexNr == -1:
 
-                point = QgsPoint(result[0].snappedVertex)
-
-                # Set marker
-                self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)                 
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+                snapped_point = result[0]
+                point = self.snapper_manager.add_marker(snapped_point, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
                 
                 # Select the arc
-                result[0].layer.removeSelection()
-                result[0].layer.select([result[0].snappedAtGeometry])
+                snapped_point.layer.removeSelection()
+                snapped_point.layer.select([snapped_point.snappedAtGeometry])
 
                 # Bring the rubberband to the cursor i.e. the clicked point
                 self.rubber_band.movePoint(point)
@@ -229,12 +222,13 @@ class MoveNodeMapTool(ParentMapTool):
             # Snap to node
             if self.snapped_feat is None:
 
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
+                (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
                 
                 if result:
 
-                    self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                    point = QgsPoint(result[0].snappedVertex)
+                    snapped_point = result[0]
+                    self.snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                    point = QgsPoint(snapped_point.snappedVertex)
 
                     # Hide marker
                     self.vertex_marker.hide()
@@ -243,16 +237,16 @@ class MoveNodeMapTool(ParentMapTool):
                     self.rubber_band.addPoint(point)
 
                     # Add arc snapping
-                    self.iface.setActiveLayer(self.layer_arc)                    
-                    #self.snapper_manager.snap_to_arc()
+                    self.iface.setActiveLayer(self.layer_arc)
 
             # Snap to arc
             else:
-                
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
+
+                (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
                 if result:
 
-                    point = self.toLayerCoordinates(result[0].layer, QgsPoint(result[0].snappedVertex))
+                    snapped_point = result[0]
+                    point = self.toLayerCoordinates(snapped_point.layer, QgsPoint(snapped_point.snappedVertex))
 
                     # Get selected feature (at this moment it will have one and only one)
                     node_id = self.snapped_feat.attribute('node_id')
