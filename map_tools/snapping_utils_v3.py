@@ -18,9 +18,10 @@
 from builtins import object
 
 # -*- coding: utf-8 -*-
-from qgis.gui import QgsMapCanvas
+from qgis.gui import QgsMapCanvas, QgsVertexMarker
 from qgis.core import QgsProject, QgsSnappingUtils, QgsPointLocator, QgsTolerance, QgsPointXY
 from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtGui import QColor
 
 
 class SnappingConfigManager(object):
@@ -37,9 +38,20 @@ class SnappingConfigManager(object):
         self.controller = None
 
         # Snapper
-        self.snapper = self.get_snapper()
-        proj = QgsProject.instance()
-        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+        try:
+            self.snapper = self.get_snapper()
+            proj = QgsProject.instance()
+            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+        except:
+            pass
+        finally:
+            # Set default vertex marker
+            color = QColor(255, 100, 255)
+            self.vertex_marker = QgsVertexMarker(self.canvas)
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+            self.vertex_marker.setColor(color)
+            self.vertex_marker.setIconSize(15)
+            self.vertex_marker.setPenWidth(3)
 
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
@@ -155,6 +167,9 @@ class SnappingConfigManager(object):
 
     def snap_to_current_layer(self, event_point, vertex_marker=None):
 
+        if event_point is None:
+            return None, None
+
         (retval, result) = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
         if vertex_marker:
             if result:
@@ -168,6 +183,9 @@ class SnappingConfigManager(object):
 
     def snap_to_background_layers(self, event_point, vertex_marker=None):
 
+        if event_point is None:
+            return None, None
+
         (retval, result) = self.snapper.snapToMap(event_point)
         if vertex_marker:
             if result:
@@ -179,17 +197,30 @@ class SnappingConfigManager(object):
         return retval, result
 
 
-    def add_marker(self, result, vertex_marker, icon_type=None):
+    def add_marker(self, result, vertex_marker=None, icon_type=None):
+
+        if result is None:
+            return None
+
+        if vertex_marker is None:
+            vertex_marker = self.vertex_marker
 
         point = QgsPointXY(result.snappedVertex)
         if icon_type:
-            self.vertex_marker.setIconType(icon_type)
+            vertex_marker.setIconType(icon_type)
         vertex_marker.setCenter(point)
         vertex_marker.show()
+
         return point
 
 
-    def add_marker_result(self, result, vertex_marker):
+    def add_marker_result(self, result, vertex_marker=None):
+
+        if result is None:
+            return None
+
+        if vertex_marker is None:
+            vertex_marker = self.vertex_marker
 
         point = QgsPointXY(result.point())
         vertex_marker.setCenter(point)
