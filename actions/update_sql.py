@@ -2193,21 +2193,19 @@ class UpdateSQL(ApiParent):
         data = ET.Element(str(row[0]))
         data = ET.tostring(data)
         file_ui = open(tpath, "w")
+
         # TODO:: dont use replace for remove invalid characters
         data = data.replace(' />', '').replace('<<', '<')
         file_ui.write(data)
+        file_ui.close()
 
-        msg = "Imported data into '" + str(tpath) + "' successfully. \n Do you want to open the UI form?"
+        msg = "Exported data into '" + str(tpath) + "' successfully. \n Do you want to open the UI form?"
         result = self.controller.ask_question(msg, "Info")
+
         if result:
-            #TODO:: Open current UI, error from this file
-            return
-            file_path = self.controller.plugin_dir + "/ui/test.ui"
-            print(str(file_path))
-            print(str(tpath))
             opener = "C:\OSGeo4W64/bin/designer.exe"
-            # subprocess.call([opener, tpath])
-            subprocess.call([opener, file_path])
+            subprocess.call([opener, tpath])
+
         # Clear temp_csv2pg
         self.clear_temp_table()
 
@@ -2236,11 +2234,11 @@ class UpdateSQL(ApiParent):
         message = self.controller.tr("Select UI file")
 
         if Qgis.QGIS_VERSION_INT < 29900:
-            file_ui = QFileDialog.getSaveFileName(None, message, "", '*.ui')
+            file_ui = QFileDialog.getOpenFileName(None, message, "", '*.ui')
         else:
-            file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
+            file_ui, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.ui')
 
-        self.dlg_readsql.tpath.insertPlainText(file_ui)
+        utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
 
     def update_manage_ui(self, parent=False):
