@@ -21,9 +21,9 @@ else:
     from builtins import range
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime
+from qgis.PyQt.QtCore import Qt, QDate, QTime
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -1331,11 +1331,8 @@ class MincutParent(ParentAction):
     def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
 
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-        snapping_position = QgsPoint(point.x(), point.y())
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
@@ -1357,7 +1354,7 @@ class MincutParent(ParentAction):
                     QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                 element_id = snapp_feature.attribute(elem_type + '_id')
                 snap_point.layer.select([snap_point.snappedAtGeometry])
-                self.auto_mincut_execute(element_id, elem_type, snapping_position)
+                self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
                 self.set_visible_mincut_layers()
                 break   
 
@@ -1391,18 +1388,15 @@ class MincutParent(ParentAction):
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-        
-        real_snapping_position = QgsPoint(point.x(), point.y())
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
+
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(real_snapping_position.x()) + ", "
-               + str(real_snapping_position.y()) + ")," + str(srid) + ")"
+               " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(point.x()) + ", "
+               + str(point.y()) + ")," + str(srid) + ")"
                " WHERE id = '" + result_mincut_id_text + "'")
         status = self.controller.execute_sql(sql)
         if status:
@@ -1416,13 +1410,13 @@ class MincutParent(ParentAction):
 
         node_exist = False
         # Check feature
-        for snap_point in result:
-            if snap_point.layer == self.layer_node:
+        for snapped_point in result:
+            if snapped_point.layer == self.layer_node:
                 node_exist = True
-                snapp_feature = next(snap_point.layer.getFeatures(
-                    QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                snapp_feature = next(snapped_point.layer.getFeatures(
+                    QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                 # Leave selection
-                snap_point.layer.select([snap_point.snappedAtGeometry])
+                snapped_point.layer.select([snapped_point.snappedAtGeometry])
                 break
 
         if not node_exist:
@@ -1430,17 +1424,17 @@ class MincutParent(ParentAction):
             self.layernames_arc = []
             for layer in layers_arc:
                 self.layernames_arc.append(layer.name())
-            for snap_point in result:
-                element_type = snap_point.layer.name()
+            for snapped_point in result:
+                element_type = snapped_point.layer.name()
                 if element_type in self.layernames_arc:
-                    snapp_feature = next(snap_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                    snapp_feature = next(snapped_point.layer.getFeatures(
+                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     # Leave selection
-                    snap_point.layer.select([snap_point.snappedAtGeometry])
+                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     break
 
 
-    def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
+    def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
         srid = self.controller.plugin_settings_value('srid')
@@ -1487,8 +1481,8 @@ class MincutParent(ParentAction):
             
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                    " SET mincut_class = 1, "
-                   " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", "
-                   + str(snapping_position.y()) + "), " + str(srid) + "),"
+                   " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_x) + ", "
+                   + str(snapping_y) + "), " + str(srid) + "),"
                    " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
                    " anl_feature_id = '" + str(elem_id) + "'"
                    " WHERE id = '" + str(real_mincut_id) + "'")
