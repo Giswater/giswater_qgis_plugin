@@ -660,7 +660,7 @@
               <enum>QFrame::Raised</enum>
              </property>
              <property name="text">
-              <string>Folder:     </string>
+              <string>Folder:          </string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -763,19 +763,6 @@
            <item row="1" column="1" colspan="2">
             <widget class="QComboBox" name="cmb_formname_ui"/>
            </item>
-           <item row="2" column="1">
-            <widget class="QPlainTextEdit" name="tpath">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="1" colspan="2">
             <layout class="QGridLayout" name="gridLayout_16">
              <item row="1" column="0">
@@ -812,6 +799,13 @@
               </widget>
              </item>
             </layout>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="tpath">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

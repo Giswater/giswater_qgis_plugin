@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>tooltip</class>
- <widget class="QDialog" name="tooltip">
+ <class>dlg_man_addfields</class>
+ <widget class="QDialog" name="dlg_man_addfields">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -81,7 +81,14 @@
             <widget class="QSpinBox" name="field_length"/>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="formtype"/>
+            <widget class="QLineEdit" name="formtype">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item row="4" column="1">
             <widget class="QLineEdit" name="datatype"/>
@@ -283,7 +290,7 @@
             </widget>
            </item>
            <item row="13" column="1">
-            <widget class="QSpinBox" name="spinBox"/>
+            <widget class="QSpinBox" name="num_decimals"/>
            </item>
            <item row="7" column="1">
             <widget class="QLineEdit" name="label"/>
@@ -352,7 +359,7 @@
             </widget>
            </item>
            <item row="9" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit"/>
+            <widget class="QPlainTextEdit" name="tooltip"/>
            </item>
            <item row="18" column="1">
             <widget class="QPlainTextEdit" name="dv_querytext"/>

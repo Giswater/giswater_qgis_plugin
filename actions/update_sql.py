@@ -18,7 +18,7 @@ else:
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog
 from qgis.PyQt.QtWidgets import QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox
 from qgis.PyQt.QtWidgets import QAbstractButton, QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox
-from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtGui import QPixmap, QPlainTextEdit
 from qgis.PyQt.QtCore import QSettings, Qt
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -2129,27 +2129,26 @@ class UpdateSQL(ApiParent):
     def execute_import_ui(self):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
-        ui_path = tpath.document().toPlainText()
+        tpath = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
+        # ui_path = tpath.document().toPlainText()
         form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = utils_giswater.getWidget(self.dlg_readsql, 'chk_parent').isChecked()
 
         # Control if ui path is invalid or null
-        if ui_path is None:
+        if tpath is None:
             msg = "Please, select a valid UI Path."
             self.controller.show_info_box(msg, "Info")
             return
 
-        with open(str(ui_path)) as f:
+        with open(str(tpath)) as f:
             content = f.read()
         sql = ("INSERT INTO " + schema_name + ".temp_csv2pg(source, csv1, csv2pgcat_id) VALUES('" +
                str(form_name_ui) + "', '" + str(content) + "', 20);")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
 
         # Import xml to database
-        # TODO:: Send value from checkbox parent
-        # sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(status_update_childs) + "', '" + str(form_name_ui) + "')::text")
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "')::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "', '" + str(status_update_childs) + "')::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
         if status:
             msg = "Imported data into 'config_api_form_fields' successfully."
@@ -2165,11 +2164,13 @@ class UpdateSQL(ApiParent):
     def execute_export_ui(self):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        tpath = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
+        # ui_path = tpath.document().toPlainText()
         form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
 
         # Control if ui path is invalid or null
-        if ui_path is None:
+        if tpath is None:
             msg = "Please, select a valid UI Path."
             self.controller.show_info_box(msg, "Info")
             return
@@ -2191,18 +2192,22 @@ class UpdateSQL(ApiParent):
 
         data = ET.Element(str(row[0]))
         data = ET.tostring(data)
-        file_ui = open(ui_path, "w")
+        file_ui = open(tpath, "w")
         # TODO:: dont use replace for remove invalid characters
         data = data.replace(' />', '').replace('<<', '<')
         file_ui.write(data)
 
-        msg = "Imported data into '" + str(ui_path) + "' successfully. \n Do you want to open the UI form?"
+        msg = "Imported data into '" + str(tpath) + "' successfully. \n Do you want to open the UI form?"
         result = self.controller.ask_question(msg, "Info")
         if result:
-            file_path = self.controller.plugin_dir + "/ui/api_cf.ui"
+            #TODO:: Open current UI, error from this file
+            return
+            file_path = self.controller.plugin_dir + "/ui/test.ui"
+            print(str(file_path))
+            print(str(tpath))
             opener = "C:\OSGeo4W64/bin/designer.exe"
-            subprocess.call([opener, ui_path])
-
+            # subprocess.call([opener, tpath])
+            subprocess.call([opener, file_path])
         # Clear temp_csv2pg
         self.clear_temp_table()
 
@@ -2231,9 +2236,9 @@ class UpdateSQL(ApiParent):
         message = self.controller.tr("Select UI file")
 
         if Qgis.QGIS_VERSION_INT < 29900:
-            file_ui = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+            file_ui = QFileDialog.getSaveFileName(None, message, "", '*.ui')
         else:
-            file_ui, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+            file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
 
         self.dlg_readsql.tpath.insertPlainText(file_ui)
 
@@ -2298,6 +2303,9 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
+        # Set default value for formtype widget
+        utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
+
         # Configure column_id as typeahead
         completer = QCompleter()
         model = QStringListModel()
@@ -2335,20 +2343,25 @@ class UpdateSQL(ApiParent):
 
         if action == 'Create':
             list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
+
             _json = {}
             for widget in list_widgets:
-                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView):
+                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView)\
+                        and widget.objectName() not in ('qt_spinbox_lineedit'):
 
-                    if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+                    if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
-                    elif type(widget) is QComboBox and widget.isEnabled():
+                    elif type(widget) is QComboBox:
                         value = utils_giswater.get_item_data(self.dlg_manage_fields, widget, 0)
-                    elif type(widget) is QCheckBox and widget.isEnabled():
+                    elif type(widget) is QCheckBox:
                         value = utils_giswater.isChecked(self.dlg_manage_fields, widget)
-                    elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+                    elif type(widget) is QgsDateTimeEdit :
                         value = utils_giswater.getCalendarDate(self.dlg_manage_fields, widget)
+                    elif type(widget) is QPlainTextEdit:
+                        value = widget.document().toPlainText()
 
                     if str(widget.objectName()) not in (None, 'null', '', ""):
+
                         _json[str(widget.objectName())] = value
                         result_json = json.dumps(_json)
 
@@ -2416,7 +2429,7 @@ class UpdateSQL(ApiParent):
 
 
     def filter_typeahead(self, schema_name, form_name, widget, completer, model):
-
+        #TODO: put typeahead
         filter = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
         if filter == 'null':
             filter = ''
