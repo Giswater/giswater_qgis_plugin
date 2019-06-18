@@ -20,8 +20,8 @@ from builtins import str
 from builtins import next
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest
-from qgis.PyQt.QtCore import QPoint, Qt, QDate
+from qgis.core import QgsFeatureRequest
+from qgis.PyQt.QtCore import Qt, QDate
 
 import utils_giswater
 from functools import partial
@@ -55,18 +55,16 @@ class DeleteNodeMapTool(ParentMapTool):
             self.cancel_map_tool()
             return
 
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
-        snapped_feat = None
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
+        snapped_feat = None
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)
         if result:
             # Get the first feature
-            snapped_feat = result[0]
-            snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
+            snapped_point = result[0]
+            snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
 
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')

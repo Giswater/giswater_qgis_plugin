@@ -12,12 +12,13 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
     from qgis.PyQt.QtGui import QStringListModel
     import urlparse as parse
 else:
+    from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
     import urllib.parse as parse
-    from qgis.core import QgsPointXY
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
@@ -26,7 +27,7 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
 from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
 from qgis.PyQt.QtWidgets import QTextEdit
-from qgis.core import QgsMapToPixel, QgsPoint, QgsGeometry
+from qgis.core import QgsMapToPixel, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
 import json
@@ -139,7 +140,7 @@ class ApiCF(ApiParent):
                 polygon = coords.split(',')
                 for i in range(0, len(polygon)):
                     x, y = polygon[i].split(' ')
-                    point = QgsPoint(float(x), float(y))
+                    point = QgsPointXY(float(x), float(y))
                     points.append(point)
                 rb = QgsRubberBand(self.canvas)
                 rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
@@ -161,10 +162,7 @@ class ApiCF(ApiParent):
         if reset_rb is True:
             self.resetRubberbands()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            if Qgis.QGIS_VERSION_INT < 29900:
-                point = QgsPoint(float(max_x), float(max_y))
-            else:
-                point = QgsPointXY(float(max_x), float(max_y))
+            point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
         else:
             points = self.get_points(list_coord)

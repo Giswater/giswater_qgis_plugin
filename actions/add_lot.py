@@ -11,8 +11,10 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
     from qgis.PyQt.QtGui import QStringListModel
 else:
+    from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
     from builtins import range
 
@@ -21,7 +23,7 @@ from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QA
 from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget, QFileDialog
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsPoint, QgsGeometry, QgsFeatureRequest
+from qgis.core import QgsGeometry, QgsFeatureRequest
 from qgis.gui import QgsRubberBand
 
 import csv, os, re
@@ -1091,7 +1093,7 @@ class AddNewLot(ParentManage):
 
 
     def get_points(self, list_coord=None):
-        """ Return list of QgsPoints taken from geometry
+        """ Return list of points taken from geometry
         :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
         """
 
@@ -1101,7 +1103,7 @@ class AddNewLot(ParentManage):
 
         for i in range(0, len(polygon)):
             x, y = polygon[i].split(' ')
-            point = QgsPoint(float(x), float(y))
+            point = QgsPointXY(float(x), float(y))
             points.append(point)
         return points
 

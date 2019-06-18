@@ -17,7 +17,7 @@ else:
     from builtins import str
     from builtins import range
 
-from qgis.core import QgsFeatureRequest, QgsPoint
+from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor

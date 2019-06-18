@@ -18,7 +18,7 @@ else:
 
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial

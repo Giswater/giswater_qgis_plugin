@@ -28,11 +28,11 @@ else:
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
     import configparser
 
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
-from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QUrl, QDate, QDateTime
+from qgis.PyQt.QtCore import QSettings, Qt, QUrl, QDate, QDateTime
 from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor, QIcon
 from qgis.PyQt.QtWidgets import QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCompleter, QCheckBox, QFormLayout

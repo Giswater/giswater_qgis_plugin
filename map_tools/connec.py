@@ -23,8 +23,8 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle
-from qgis.PyQt.QtCore import QPoint, QRect, Qt
+from qgis.core import QgsVectorLayer, QgsRectangle
+from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
 
 from map_tools.parent import ParentMapTool
@@ -63,13 +63,9 @@ class ConnecMapTool(ParentMapTool):
 
         else:
 
-            # Hide marker
+            # Hide marker and get coordinates
             self.vertex_marker.hide()
-
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Snapping
             (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
@@ -94,10 +90,8 @@ class ConnecMapTool(ParentMapTool):
         
         if event.button() == Qt.LeftButton:
 
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
+            # Get coordinates
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Simple selection
             if not self.dragging:
@@ -148,7 +142,7 @@ class ConnecMapTool(ParentMapTool):
                 number_features += layer.selectedFeatureCount()
 
             if number_features > 0:
-                message = ("Number of features selected in the 'connec' group")
+                message = "Number of features selected in the 'connec' group"
                 title = "Interpolate value - Do you want to update values"
                 answer = self.controller.ask_question(message, title, parameter=str(number_features))
                 if answer:
@@ -162,7 +156,7 @@ class ConnecMapTool(ParentMapTool):
                     number_features += layer.selectedFeatureCount()
     
                 if number_features > 0:
-                    message = ("Number of features selected in the 'gully' group")
+                    message = "Number of features selected in the 'gully' group"
                     title = "Interpolate value - Do you want to update values"
                     answer = self.controller.ask_question(message, title, parameter=str(number_features))
                     if answer:

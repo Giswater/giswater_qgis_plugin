@@ -25,9 +25,14 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsPoint, QgsMapToPixel, QgsFeatureRequest
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
+else:
+    from qgis.core import QgsPointXY
+
+from qgis.core import QgsMapToPixel, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 
 from map_tools.parent import ParentMapTool
 
@@ -148,9 +153,10 @@ class MoveNodeMapTool(ParentMapTool):
     def canvasMoveEvent(self, event):
         """ Mouse movement event """      
 
-        # Hide marker
+        # Hide marker and get coordinates
         self.vertex_marker.hide()
-        
+        x = event.pos().x()
+        y = event.pos().y()
         event_point = self.snapper_manager.get_event_point(event)
         
         # Snap to node
@@ -218,7 +224,7 @@ class MoveNodeMapTool(ParentMapTool):
 
                 snapped_point = result[0]
                 self.snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                point = QgsPoint(snapped_point.snappedVertex)
+                point = QgsPointXY(snapped_point.snappedVertex)
 
                 # Hide marker
                 self.vertex_marker.hide()
@@ -237,7 +243,7 @@ class MoveNodeMapTool(ParentMapTool):
                     return
 
                 snapped_point = result[0]
-                point = self.toLayerCoordinates(snapped_point.layer, QgsPoint(snapped_point.snappedVertex))
+                point = self.toLayerCoordinates(snapped_point.layer, QgsPointXY(snapped_point.snappedVertex))
 
                 # Get selected feature (at this moment it will have one and only one)
                 node_id = self.snapped_feat.attribute('node_id')

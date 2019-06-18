@@ -16,6 +16,7 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
     from qgis.PyQt.QtGui import QStringListModel
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
@@ -24,9 +25,9 @@ else:
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
-from qgis.core import QgsPointLocator, QgsProject
+from qgis.core import QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
-from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
+from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
@@ -954,12 +955,9 @@ class ApiParent(ParentAction):
 
         for i in range(0, len(polygon)):
             x, y = polygon[i].split(' ')
-            # if Qgis.QGIS_VERSION_INT < 29900:
-            #     point = QgsPoint(float(x), float(y))
-            # else:
-            #     point = QgsPointXY(float(x), float(y))
-            point = QgsPoint(float(x), float(y))
+            point = QgsPointXY(float(x), float(y))
             points.append(point)
+
         return points
 
 
@@ -1007,10 +1005,7 @@ class ApiParent(ParentAction):
 
         self.resetRubberbands()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            if Qgis.QGIS_VERSION_INT < 29900:
-                point = QgsPoint(float(max_x), float(max_y))
-            else:
-                point = QgsPointXY(float(max_x), float(max_y))
+            point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
         else:
             points = self.get_points(list_coord)
@@ -1203,10 +1198,8 @@ class ApiParent(ParentAction):
             self.dlg_destroyed()
             return
 
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)

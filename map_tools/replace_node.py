@@ -18,9 +18,9 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
 
-from qgis.core import QgsPoint, QgsFeatureRequest
+from qgis.core import QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import QPoint, Qt, QDate
+from qgis.PyQt.QtCore import Qt, QDate
 
 from functools import partial
 from datetime import datetime

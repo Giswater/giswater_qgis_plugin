@@ -11,14 +11,15 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
     from qgis.gui import QgsMapCanvasSnapper
 else:
+    from qgis.core import QgsWkbTypes, QgsPointXY
     from qgis.gui import QgsMapCanvas
-    from qgis.core import QgsWkbTypes
     from builtins import next
     from builtins import range
 
-from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle
+from qgis.core import QgsFeatureRequest, QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
 from qgis.PyQt.QtWidgets import QApplication
@@ -156,10 +157,10 @@ class MultipleSelection(QgsMapTool):
         self.reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
-        point1 = QgsPoint(start_point.x(), start_point.y())
-        point2 = QgsPoint(start_point.x(), end_point.y())
-        point3 = QgsPoint(end_point.x(), end_point.y())
-        point4 = QgsPoint(end_point.x(), start_point.y())
+        point1 = QgsPointXY(start_point.x(), start_point.y())
+        point2 = QgsPointXY(start_point.x(), end_point.y())
+        point3 = QgsPointXY(end_point.x(), end_point.y())
+        point4 = QgsPointXY(end_point.x(), start_point.y())
 
         self.rubber_band.addPoint(point1, False)
         self.rubber_band.addPoint(point2, False)

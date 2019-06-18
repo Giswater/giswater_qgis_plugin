@@ -19,10 +19,10 @@
 from builtins import next
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest
+from qgis.core import QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QCursor
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 
 from map_tools.parent import ParentMapTool
 from giswater.actions.manage_visit import ManageVisit
@@ -53,10 +53,8 @@ class OpenVisit(ParentMapTool):
             self.cancel_map_tool()
             return
 
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_current_layer(event_point)

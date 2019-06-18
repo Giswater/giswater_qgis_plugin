@@ -12,11 +12,16 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
+else:
+    from qgis.core import QgsPointXY
+
 from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QObject, QTimer, QPoint
-from qgis.core import QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper, QgsVertexMarker
+from qgis.PyQt.QtCore import QTimer, QPoint
+from qgis.core import QgsFeatureRequest
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 import utils_giswater
 from giswater.parent_init import ParentDialog
@@ -194,11 +199,11 @@ class Dimensions(ParentDialog):
         self.timer_map_tips_clear.timeout.connect(self.clear_map_tip)
 
 
-    def map_tip_changed(self, p):
+    def map_tip_changed(self, point):
         """ SLOT. Initialize the Timer to show MapTips on the map """
         
         if self.canvas.underMouse(): 
-            self.last_map_position = QgsPoint(p.x(), p.y())
+            self.last_map_position = QgsPointXY(point.x(), point.y())
             self.map_tip_node.clear(self.canvas)
             self.map_tip_connec.clear(self.canvas)
             self.timer_map_tips.start(100)

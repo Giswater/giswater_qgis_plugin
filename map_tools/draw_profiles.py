@@ -23,9 +23,9 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import QgsLayout
 
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer, QgsProject
-from qgis.gui import  QgsMapToolEmitPoint
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject
+from qgis.gui import QgsMapToolEmitPoint
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
 from qgis.PyQt.QtXml import QDomDocument
 
@@ -382,11 +382,8 @@ class DrawProfiles(ParentMapTool):
 
     def snapping_node(self, point):   # @UnusedVariable
 
-        aux = ""
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        # Get clicked point
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
@@ -423,6 +420,7 @@ class DrawProfiles(ParentMapTool):
         # widget = clicked button
         # self.widget_start_point | self.widget_end_point : QLabels
         # start_end_node = [0] : node start | start_end_node = [1] : node end
+        aux = ""
         if str(self.widget_point.objectName()) == "start_point":
             self.start_end_node[0] = self.widget_point.text()
             aux = "node_id = '" + str(self.start_end_node[0]) + "'"

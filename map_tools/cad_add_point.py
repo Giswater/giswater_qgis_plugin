@@ -7,11 +7,11 @@ except ImportError:
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint
 else:
-    from qgis.core import  QgsPointXY
+    from qgis.core import QgsPointXY
 
-from qgis.core import QgsPoint, QgsMapToPixel, QgsPointLocator
+from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial

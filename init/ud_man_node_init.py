@@ -20,13 +20,13 @@ else:
 from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QPoint, Qt
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsMapToPixel
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
-from giswater.init.thread import Thread
 
 import utils_giswater
+from giswater.init.thread import Thread
 from giswater.parent_init import ParentDialog
 
 
@@ -70,6 +70,7 @@ class ManNodeDialog(ParentDialog):
         
     def init_config_form(self):
         """ Custom form initial configuration """
+
         # Get last point clicked on canvas
         last_click = self.canvas.mouseLastXY()
         self.last_point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
@@ -205,6 +206,7 @@ class ManNodeDialog(ParentDialog):
 
 
     def compare_depth(self, widget_ymax):
+
         widget_ymax.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, 'node_id')
         ymax = utils_giswater.getWidgetText(self.dialog, widget_ymax)
@@ -232,6 +234,7 @@ class ManNodeDialog(ParentDialog):
 
 
     def activate_snapping(self, emit_point):
+
         # Set circle vertex marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
@@ -250,11 +253,14 @@ class ManNodeDialog(ParentDialog):
         self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
+
     def snapping_node(self, point, button):
         """ Get id of selected nodes (node1 and node2) """
+
         if button == 2:
             self.dlg_destroyed()
             return
+
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -304,10 +310,7 @@ class ManNodeDialog(ParentDialog):
         if result:
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 

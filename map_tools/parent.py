@@ -356,9 +356,8 @@ class ParentMapTool(QgsMapTool):
         if cur_layer != self.layer_node and self.force_active_layer:
             self.iface.setActiveLayer(self.layer_node) 
           
-        # Hide highlight
+        # Hide highlight and get coordinates
         self.vertex_marker.hide()
-
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
