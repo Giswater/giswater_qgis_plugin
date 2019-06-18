@@ -33,7 +33,7 @@ CREATE TABLE plan_typevalue(
   idval text,
   descript text,
   addparam json,
-  CONSTRAINT om_visit_typevalue_pkey PRIMARY KEY (typevalue, id));
+  CONSTRAINT plan_typevalue_pkey PRIMARY KEY (typevalue, id));
 
 CREATE TABLE om_typevalue(
   typevalue text NOT NULL,
