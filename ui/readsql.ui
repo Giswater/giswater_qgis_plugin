@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>369</width>
-    <height>654</height>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,69 +18,13 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="4" column="4">
-     <widget class="QLabel" name="lbl_schema_name">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="12">
-     <spacer name="horizontalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="4" column="2">
-     <widget class="QLabel" name="lbl_status">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="3">
-     <widget class="QLabel" name="lbl_status_text">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="13">
-     <widget class="QPushButton" name="btn_close">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="0" colspan="14">
      <widget class="QTabWidget" name="tab_main">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="general">
        <attribute name="title">
@@ -640,6 +584,19 @@
            <string>Custom</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_10">
+           <item row="0" column="3">
+            <widget class="QPushButton" name="btn_custom_select_file">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_custom_node_type_15">
              <property name="sizePolicy">
@@ -670,16 +627,10 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
-            <widget class="QPushButton" name="btn_custom_select_file">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>...</string>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="custom_path_folder">
+             <property name="enabled">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -699,13 +650,6 @@
              </property>
              <property name="text">
               <string>Load SQL</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="custom_path_folder">
-             <property name="enabled">
-              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -792,7 +736,7 @@
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QCheckBox" name="chk_parent">
+              <widget class="QCheckBox" name="chk_multi_update">
                <property name="text">
                 <string>Update all childs on Importing</string>
                </property>
@@ -830,12 +774,82 @@
       </widget>
      </widget>
     </item>
+    <item row="5" column="4">
+     <widget class="QLabel" name="lbl_schema_name">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="2">
+     <widget class="QLabel" name="lbl_status">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="3">
+     <widget class="QLabel" name="lbl_status_text">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="12">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="5" column="13">
+     <widget class="QPushButton" name="btn_close">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Close</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="12">
+     <spacer name="verticalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
    </layout>
    <zorder>tab_main</zorder>
    <zorder>btn_close</zorder>
    <zorder>lbl_status</zorder>
    <zorder>lbl_status_text</zorder>
    <zorder>lbl_schema_name</zorder>
+   <zorder>verticalSpacer_3</zorder>
   </widget>
   <action name="action_create_sample">
    <property name="text">

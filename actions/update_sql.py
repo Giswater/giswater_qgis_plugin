@@ -2133,7 +2133,8 @@ class UpdateSQL(ApiParent):
         # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
         # ui_path = tpath.document().toPlainText()
         form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
-        status_update_childs = utils_giswater.getWidget(self.dlg_readsql, 'chk_parent').isChecked()
+        status_update_childs = utils_giswater.getWidget(self.dlg_readsql, 'chk_multi_update').isChecked()
+        print(status_update_childs)
 
         # Control if ui path is invalid or null
         if tpath is None:
@@ -2148,7 +2149,7 @@ class UpdateSQL(ApiParent):
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
 
         # Import xml to database
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "', '" + str(status_update_childs) + "')::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
         if status:
             msg = "Imported data into 'config_api_form_fields' successfully."
@@ -2176,7 +2177,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Export xml from database
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name_ui) + "')::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name_ui) + "', false)::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
 
         # Check status
@@ -2198,7 +2199,7 @@ class UpdateSQL(ApiParent):
         data = data.replace(' />', '').replace('<<', '<')
         file_ui.write(data)
         file_ui.close()
-
+        del file_ui
         msg = "Exported data into '" + str(tpath) + "' successfully. \n Do you want to open the UI form?"
         result = self.controller.ask_question(msg, "Info")
 
@@ -2234,9 +2235,9 @@ class UpdateSQL(ApiParent):
         message = self.controller.tr("Select UI file")
 
         if Qgis.QGIS_VERSION_INT < 29900:
-            file_ui = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+            file_ui = QFileDialog.getSaveFileName(None, message, "", '*.ui')
         else:
-            file_ui, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+            file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
 
         utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
@@ -2297,9 +2298,14 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = ("SELECT DISTINCT(widgettype), widgettype FROM " + schema_name + ".config_api_form_fields")
+        sql = ("SELECT DISTINCT(id), id FROM " + schema_name + ".man_addfields_cat_widgettype")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
+
+        # Populate datatype combo
+        sql = ("SELECT DISTINCT(id), id FROM " + schema_name + ".man_addfields_cat_datatype")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Set default value for formtype widget
         utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
@@ -2317,9 +2323,13 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
+        # Get child layer
+        sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
+        result_child_layer = self.controller.get_row(sql, log_sql=True, commit=True)
+
         qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel()
-        expr_filter = "formname ='" + form_name + "'"
+        expr_filter = "formname ='" + result_child_layer[0] + "'"
         self.fill_table(qtable, 'config_api_form_fields', self.model_update_table, expr_filter)
         self.set_table_columns(self.dlg_manage_fields, qtable, 'config_api_form_fields', schema_name)
 
@@ -2328,9 +2338,13 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
+        # Get child layer
+        sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
+        result_child_layer = self.controller.get_row(sql, log_sql=True, commit=True)
+
         # Populate widgettype combo
         sql = ("SELECT DISTINCT(column_id), column_id FROM " + schema_name + ".config_api_form_fields WHERE formname = '"
-               + form_name + "'")
+               + result_child_layer[0] + "'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
@@ -2365,15 +2379,20 @@ class UpdateSQL(ApiParent):
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", ' + result_json + ''
+            extras = '"action":"CREATE", "multi_create":"' + utils_giswater.isChecked(self.dlg_manage_fields, self.dlg_manage_fields.chk_multi_insert) + '", "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
-
+            body = body.replace('""', 'null')
 
             # Execute manage add fields function
             sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            print(str(sql))
-            return
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+            if status:
+                msg = "Created field into 'config_api_form_fields' successfully."
+                self.controller.show_info_box(msg, "Info")
+            else:
+                msg = "Some error ocurred when create field into 'config_api_form_fields'."
+                self.controller.show_info_box(msg, "Info")
+                return
 
         elif action == 'Update':
 
@@ -2381,8 +2400,9 @@ class UpdateSQL(ApiParent):
                 msg = "Update executed successfully."
                 self.controller.show_info_box(msg, "Info")
             else:
-                msg = "Some failed in update execute. No changes have been made. \n "
+                msg = "Some failed in update execute. No changes have been made."
                 self.controller.show_info_box(msg, "Info")
+                return
 
         elif action == 'Delete':
             self.controller.log_info(str("DELETE"))
@@ -2396,9 +2416,15 @@ class UpdateSQL(ApiParent):
 
             # Execute manage add fields function
             sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            print(str(sql))
-            return
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+
+            if status:
+                msg = "Imported data into 'config_api_form_fields' successfully."
+                self.controller.show_info_box(msg, "Info")
+            else:
+                msg = "Some error ocurred when import data into 'config_api_form_fields'."
+                self.controller.show_info_box(msg, "Info")
+                return
 
         # Close dialog
         self.close_dialog(self.dlg_manage_fields)
