@@ -267,23 +267,21 @@ class ManNodeDialog(ParentDialog):
         # Snapping
         result = self.snapper_manager.snap_to_background_layers(event_point)
         if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    # Get the point
-                    snapp_feature = next(snapped_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute('node_id')
+            if layer == self.layer_node:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                element_id = snapped_feat.attribute('node_id')
+                message = "Selected node"
+                if self.node1 is None:
+                    self.node1 = str(element_id)
+                    self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
+                elif self.node1 != str(element_id):
+                    self.node2 = str(element_id)
+                    self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
 
-                    message = "Selected node"
-                    if self.node1 is None:
-                        self.node1 = str(element_id)
-                        self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
-                    elif self.node1 != str(element_id):
-                        self.node2 = str(element_id)
-                        self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
-
-        if self.node1 is not None and self.node2 is not None:
+        if self.node1 and self.node2:
             self.iface.actionPan().trigger()
             self.iface.setActiveLayer(self.layer)
             self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
@@ -481,14 +479,12 @@ class ManNodeDialog(ParentDialog):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if not result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if not self.snapper_manager.result_is_valid():
             return
             
-        # Check snapped features
-        for snapped_point in result:              
-            self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
-            break 
+        # Add marker
+        self.snapper_manager.add_marker(result, self.vertex_marker)
         
                 
     def action_rotation_canvas_clicked(self, point, btn):

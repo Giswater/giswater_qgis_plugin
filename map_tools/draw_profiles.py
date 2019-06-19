@@ -388,33 +388,32 @@ class DrawProfiles(ParentMapTool):
         result = self.snapper_manager.snap_to_background_layers(event_point)
         if self.snapper_manager.result_is_valid():
             # Check feature
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    # Get the point
-                    snapp_feature = next(snapped_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute('node_id')
-                    self.element_id = str(element_id)
-                    # Leave selection
-                    if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
-                        self.widget_point.setText(str(element_id))
-                    if self.widget_point == self.widget_additional_point:
-                        # Check if node already exist in list of additional points
-                        # Clear list, its possible to have just one additional point
-                        self.widget_additional_point.clear()
-                        item_arc = QListWidgetItem(str(self.element_id))
-                        self.widget_additional_point.addItem(item_arc)
-                        n = len(self.start_end_node)
-                        if n <=2:
-                            self.start_end_node.insert(1, str(self.element_id))
-                        if n > 2:
-                            self.start_end_node[1] = str(self.element_id)
-                        self.exec_path()
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_node:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                element_id = snapped_feat.attribute('node_id')
+                self.element_id = str(element_id)
+                # Leave selection
+                if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
+                    self.widget_point.setText(str(element_id))
+                if self.widget_point == self.widget_additional_point:
+                    # Check if node already exist in list of additional points
+                    # Clear list, its possible to have just one additional point
+                    self.widget_additional_point.clear()
+                    item_arc = QListWidgetItem(str(self.element_id))
+                    self.widget_additional_point.addItem(item_arc)
+                    n = len(self.start_end_node)
+                    if n <=2:
+                        self.start_end_node.insert(1, str(self.element_id))
+                    if n > 2:
+                        self.start_end_node[1] = str(self.element_id)
+                    self.exec_path()
 
-                    sys_type = snapp_feature.attribute('sys_type').lower()
-                    # Select feature of v_edit_man_|feature 
-                    viewname = "v_edit_man_" + str(sys_type)
-                    self.layer_feature = self.controller.get_layer_by_tablename(viewname)
+                sys_type = snapped_feat.attribute('sys_type').lower()
+                # Select feature of v_edit_man_|feature
+                viewname = "v_edit_man_" + str(sys_type)
+                self.layer_feature = self.controller.get_layer_by_tablename(viewname)
 
         # widget = clicked button
         # self.widget_start_point | self.widget_end_point : QLabels

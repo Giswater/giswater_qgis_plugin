@@ -66,7 +66,6 @@ from .actions.manage_element import ManageElement
 from .actions.manage_gallery import ManageGallery
 from .models.sys_feature_cat import SysFeatureCat
 from .models.man_addfields_parameter import ManAddfieldsParameter
-from .map_tools.snapping_utils_v2 import SnappingConfigManager
 from .actions.manage_visit import ManageVisit
 
 

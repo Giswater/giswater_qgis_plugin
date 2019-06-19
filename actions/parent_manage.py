@@ -346,14 +346,12 @@ class ParentManage(ParentAction, object):
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
 
-    def mouse_move(self, p):
+    def mouse_move(self, point):
 
+        # Hide marker and get coordinates
         self.snapped_point = None
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         result = self.snapper_manager.snap_to_background_layers(event_point)
@@ -372,6 +370,7 @@ class ParentManage(ParentAction, object):
         else:
             self.x = point.x()
             self.y = point.y()
+
         message = "Geometry has been added!"
         self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
@@ -382,14 +381,17 @@ class ParentManage(ParentAction, object):
 
 
     def get_values_from_form(self, dialog):
+
         self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
+
 
     def tab_feature_changed(self, dialog, table_object):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
+
         self.get_values_from_form(dialog)
         tab_position = dialog.tab_feature.currentIndex()
         if tab_position == 0:

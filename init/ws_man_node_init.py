@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
-from qgis.PyQt.QtCore import QObject, QEvent, pyqtSignal, QPoint, Qt
+from qgis.PyQt.QtCore import QObject, QEvent, pyqtSignal, Qt
 from qgis.gui import QgsMapToolEmitPoint
 
 from functools import partial
@@ -285,20 +285,15 @@ class ManNodeDialog(ParentDialog):
          
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         result = self.snapper_manager.snap_to_background_layers(event_point)
         if not self.snapper_manager.result_is_valid():
             return
             
-        # Check snapped features
-        for snapped_point in result:
-            self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
-            break 
+        # Add marker
+        self.snapper_manager.add_marker(result, self.vertex_marker)
         
                 
     def action_rotation_canvas_clicked(self, dialog, point, btn):

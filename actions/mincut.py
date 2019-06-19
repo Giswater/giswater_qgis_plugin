@@ -1340,23 +1340,21 @@ class MincutParent(ParentAction):
             return
 
         # Check feature
-        for snap_point in result:
+        elem_type = None
+        layer = self.snapper_manager.get_snapped_layer(result)
+        if layer == self.layer_node:
+            elem_type = 'node'
+        elif layer == self.layer_arc:
+            elem_type = 'arc'
 
-            elem_type = None
-            if snap_point.layer == self.layer_node:            
-                elem_type = 'node'
-            elif snap_point.layer == self.layer_arc:
-                elem_type = 'arc'
-
-            if elem_type:
-                # Get the point. Leave selection
-                snapp_feature = next(snap_point.layer.getFeatures(
-                    QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                element_id = snapp_feature.attribute(elem_type + '_id')
-                snap_point.layer.select([snap_point.snappedAtGeometry])
-                self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
-                self.set_visible_mincut_layers()
-                break   
+        if elem_type:
+            # Get the point. Leave selection
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            feature_id = self.snapper_manager.get_feature_id(result)
+            element_id = snapped_feat.attribute(elem_type + '_id')
+            layer.select([feature_id])
+            self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
+            self.set_visible_mincut_layers()
 
 
     def set_visible_mincut_layers(self, zoom=False):
@@ -1409,29 +1407,21 @@ class MincutParent(ParentAction):
             return
 
         node_exist = False
+        layer = self.snapper_manager.get_snapped_layer(result)
         # Check feature
-        for snapped_point in result:
-            if snapped_point.layer == self.layer_node:
-                node_exist = True
-                snapp_feature = next(snapped_point.layer.getFeatures(
-                    QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                # Leave selection
-                snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                break
+        if layer == self.layer_node:
+            node_exist = True
+            self.snapper_manager.get_snapped_feature(result, True)
 
         if not node_exist:
             layers_arc = self.controller.get_group_layers('arc')
             self.layernames_arc = []
             for layer in layers_arc:
                 self.layernames_arc.append(layer.name())
-            for snapped_point in result:
-                element_type = snapped_point.layer.name()
-                if element_type in self.layernames_arc:
-                    snapp_feature = next(snapped_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    # Leave selection
-                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    break
+
+            element_type = layer.name()
+            if element_type in self.layernames_arc:
+                self.snapper_manager.get_snapped_feature(result, True)
 
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
