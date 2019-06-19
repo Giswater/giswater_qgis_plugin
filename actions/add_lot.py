@@ -360,19 +360,17 @@ class AddNewLot(ParentManage):
 
     def open_visit(self, qtable):
 
-        # Get selected rows
-        field_index = qtable.model().fieldIndex('visit_id')
-        selected_list = qtable.selectionModel().selectedRows(field_index)
-        if not selected_list:
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_info_box(message)
-            return
-        elif len(selected_list) > 1:
-            message = "More then one document selected. Select just one document."
             self.controller.show_warning(message)
             return
 
-        visit_id = selected_list[0].data()
+        index = selected_list[0]
+        row = index.row()
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'visit_id')
+        visit_id = index.sibling(row, column_index).data()
+
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.manage_visit(visit_id=visit_id)
 
