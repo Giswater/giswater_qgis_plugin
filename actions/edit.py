@@ -40,8 +40,8 @@ class Edit(ParentAction):
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
-            self.suppres_form = self.layer.featureFormSuppress()
-            self.layer.setFeatureFormSuppress(1)
+            self.suppres_form = self.layer.editFormConfig().suppress()
+            self.layer.editFormConfig().setSuppress(1)
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
