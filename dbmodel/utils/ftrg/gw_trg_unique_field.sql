@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2692
+--FUNCTION CODE: 2702
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_unique_field() RETURNS trigger AS 
 
@@ -21,7 +21,7 @@ BEGIN
    IF table_name = 'connec' AND NEW.state = 1 THEN 
    
 	   IF (SELECT count(connec_id) FROM connec WHERE state=1 AND customer_code=NEW.customer_code) > 1 THEN
-	       PERFORM audit_function(2692,3018);
+	       PERFORM audit_function(2702,3018);
 	   END IF;
 END IF;
 			

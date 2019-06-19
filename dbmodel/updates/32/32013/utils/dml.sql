@@ -91,7 +91,7 @@ UPDATE config_param_system SET descript='If status is TRUE, when insert a new co
 
 --19/06/2019
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated,istoolbox, isparametric)
-VALUES (2692,'gw_trg_unique_field','utils', 'trigger function','Check unique values of attributes in a table', 'role_edit', FALSE, FALSE, FALSE);
+VALUES (2702,'gw_trg_unique_field','utils', 'trigger function','Check unique values of attributes in a table', 'role_edit', FALSE, FALSE, FALSE);
 
 INSERT INTO audit_cat_error( id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3018, 'Customer code is duplicated for connecs with state=1','Review your data.',2, TRUE, 'utils', FALSE);
