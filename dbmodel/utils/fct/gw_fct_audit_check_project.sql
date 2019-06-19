@@ -97,7 +97,7 @@ BEGIN
 	END IF;
 	
 	-- rest of sequences
-	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
+	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq' AND isdeprecated IS NOT TRUE
 	LOOP 
 		query_string:= 'SELECT max('||table_record.sys_sequence_field||') FROM '||table_record.id||';' ;
 		EXECUTE query_string INTO max_aux;	
