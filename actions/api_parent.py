@@ -1159,8 +1159,8 @@ class ApiParent(ParentAction):
 
 
     def activate_snapping(self, emit_point):
-        # Set circle vertex marker
 
+        # Set circle vertex marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
@@ -1190,8 +1190,8 @@ class ApiParent(ParentAction):
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
             # Check feature
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:

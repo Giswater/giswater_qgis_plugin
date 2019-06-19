@@ -81,14 +81,14 @@ class TmMultipleSelection(QgsMapTool):
             self.show_rect(self.start_point, self.end_point)
 
 
-    def canvasReleaseEvent(self, e):
+    def canvasReleaseEvent(self, event):
         
         self.is_emitting_point = False
         rectangle = self.get_rectangle()
         selected_rectangle = None
         key = QApplication.keyboardModifiers()                
 
-        if e.button() != Qt.LeftButton:
+        if event.button() != Qt.LeftButton:
             self.rubber_band.hide()            
             return
         
@@ -120,16 +120,11 @@ class TmMultipleSelection(QgsMapTool):
 
                 # Selection one by one
                 else:
-                    x = e.pos().x()
-                    y = e.pos().y()
-                    event_point = QPoint(x, y)
-                    (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-                    if result:
-                        # Check feature
-                        for snap_point in result:
-                            # Get the point. Leave selection
-                            snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))   #@UnusedVariable
-                            snap_point.layer.select([snap_point.snappedAtGeometry])
+                    event_point = self.snapper_manager.get_event_point(event)
+                    result = self.snapper_manager.snap_to_background_layers(event_point)
+                    if self.snapper_manager.result_is_valid():
+                        # Get the point. Leave selection
+                        self.snapper_manager.get_snapped_feature(result, True)
 
         self.rubber_band.hide()
 

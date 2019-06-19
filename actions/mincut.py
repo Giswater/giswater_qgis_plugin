@@ -1335,8 +1335,8 @@ class MincutParent(ParentAction):
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if not result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if not self.snapper_manager.result_is_valid():
             return
 
         # Check feature
@@ -1404,8 +1404,8 @@ class MincutParent(ParentAction):
             self.controller.show_info(message)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if not result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if not self.snapper_manager.result_is_valid():
             return
 
         node_exist = False

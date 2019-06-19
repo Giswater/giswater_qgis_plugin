@@ -291,8 +291,8 @@ class ManNodeDialog(ParentDialog):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if not result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if not self.snapper_manager.result_is_valid():
             return
             
         # Check snapped features

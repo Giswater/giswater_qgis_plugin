@@ -356,11 +356,9 @@ class ParentManage(ParentAction, object):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if result:
-            # Check feature
-            for snapped_point in result:
-                self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 

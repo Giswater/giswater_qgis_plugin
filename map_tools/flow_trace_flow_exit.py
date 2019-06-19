@@ -45,17 +45,16 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
         # Snapping        
         self.current_layer = None
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if result:
-            for snapped_point in result:
-                # Check if feature belongs to 'node' group
-                exist = self.snapper_manager.check_node_group(snapped_point.layer)
-                if exist:
-                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
-                    # Data for function
-                    self.current_layer = snapped_point.layer
-                    self.snapped_feat = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                    break
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            # Check if feature belongs to 'node' group
+            exist = self.snapper_manager.check_node_group(layer)
+            if exist:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+                # Data for function
+                self.current_layer = layer
+                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
 
     def canvasReleaseEvent(self, event):

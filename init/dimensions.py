@@ -108,8 +108,9 @@ class Dimensions(ParentDialog):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node or snapped_point.layer == self.layer_connec:
@@ -142,8 +143,8 @@ class Dimensions(ParentDialog):
         event_point = QPoint(x, y)
                      
         # Snapping
-        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-        if result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
             # Check feature
             for snapped_point in result:
                 if snapped_point.layer == self.layer_node:             

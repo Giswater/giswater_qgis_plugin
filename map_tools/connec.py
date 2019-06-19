@@ -68,15 +68,15 @@ class ConnecMapTool(ParentMapTool):
             event_point = self.snapper_manager.get_event_point(event)
 
             # Snapping
-            (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-            if result:
-                for snapped_feat in result:
-                    # Check if it belongs to 'connec' or 'gully' group
-                    exist_connec = self.snapper_manager.check_connec_group(snapped_feat.layer)                     
-                    exist_gully = self.snapper_manager.check_gully_group(snapped_feat.layer)                                      
-                    if exist_connec or exist_gully: 
-                        self.snapper_manager.add_marker(snapped_feat, self.vertex_marker)
-                        break
+            result = self.snapper_manager.snap_to_background_layers(event_point)
+            if self.snapper_manager.result_is_valid():
+                # Check if it belongs to 'connec' or 'gully' group
+                layer = self.snapper_manager.get_snapped_layer(result)
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                exist_connec = self.snapper_manager.check_connec_group(layer)
+                exist_gully = self.snapper_manager.check_gully_group(layer)
+                if exist_connec or exist_gully:
+                    self.snapper_manager.add_marker(snapped_feat, self.vertex_marker)
 
 
     def canvasPressEvent(self, event):   #@UnusedVariable
@@ -97,24 +97,28 @@ class ConnecMapTool(ParentMapTool):
             if not self.dragging:
 
                 # Snap to connec or gully
-                (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
-                if result:
-                    # Check if it belongs to 'connec' or 'gully' group                  
-                    exist_connec = self.snapper_manager.check_connec_group(result[0].layer)
-                    exist_gully = self.snapper_manager.check_gully_group(result[0].layer)                    
-                    if exist_connec or exist_gully:                       
-                        key = QApplication.keyboardModifiers()   
-                        # If Ctrl+Shift is clicked: deselect snapped feature               
-                        if key == (Qt.ControlModifier | Qt.ShiftModifier):                   
-                            result[0].layer.deselect([result[0].snappedAtGeometry])                                                       
-                        else:
-                            # If Ctrl is not clicked: remove previous selection                            
-                            if key != Qt.ControlModifier:  
-                                result[0].layer.removeSelection()                                          
-                            result[0].layer.select([result[0].snappedAtGeometry])
-                            
-                        # Hide marker
-                        self.vertex_marker.hide()
+                result = self.snapper_manager.snap_to_background_layers(event_point)
+                if not self.snapper_manager.result_is_valid():
+                    return
+
+                # Check if it belongs to 'connec' or 'gully' group
+                layer = self.snapper_manager.get_snapped_layer(result)
+                feature_id = self.snapper_manager.get_snapped_feature_id(result)
+                exist_connec = self.snapper_manager.check_connec_group(layer)
+                exist_gully = self.snapper_manager.check_gully_group(layer)
+                if exist_connec or exist_gully:
+                    key = QApplication.keyboardModifiers()
+                    # If Ctrl+Shift is clicked: deselect snapped feature
+                    if key == (Qt.ControlModifier | Qt.ShiftModifier):
+                        layer.deselect([feature_id])
+                    else:
+                        # If Ctrl is not clicked: remove previous selection
+                        if key != Qt.ControlModifier:
+                            layer.removeSelection()
+                        layer.select([feature_id])
+
+                    # Hide marker
+                    self.vertex_marker.hide()
 
             # Multiple selection
             else:
