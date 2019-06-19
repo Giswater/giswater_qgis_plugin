@@ -40,6 +40,9 @@ v_querytext		text;
 v_nodearc_real 		float;
 v_nodearc_user 		float;
 v_result_id 		text;
+v_min 				numeric (12,4);
+v_max				numeric (12,4);
+v_headloss			text;
 
 BEGIN
 
@@ -321,8 +324,30 @@ BEGIN
 			count_aux=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, 'INFO: Materials checked. No mandadoty values missed');
-		END IF;	
+			VALUES (14, v_result_id, 'INFO: Roughness catalog checked. No mandadoty values missed');
+		END IF;
+		
+		-- check roughness inconsistency in function of headloss formula used
+		v_min = (SELECT min(roughness) FROM inp_cat_mat_roughness);
+		v_max = (SELECT max(roughness) FROM inp_cat_mat_roughness);
+		v_headloss = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_headloss');
+			
+		IF v_headloss = 'D-W' AND (v_min < 0.0025 AND v_max > 0.15) THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, concat('WARNING: There are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,')'));
+				count_global_aux=count_global_aux+1; 
+			
+		ELSIF v_headloss = 'H-W' AND (v_min < 110 AND v_max > 150) THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 	
+				VALUES (14, v_result_id, concat('WARNING: There are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,')'));
+				count_global_aux=count_global_aux+1; 
+			
+		ELSIF v_headloss = 'C-M' AND (v_min < 0.011 AND v_max > 0.017) THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, concat('WARNING: There are at least one value of roughnesss out of range using headloss formula C-M (0.011-0.017) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,')'));
+				count_global_aux=count_global_aux+1; 		
+		END IF;
+			
 		
 		-- Check conected nodes but with closed valves -->force to put values of demand on '0'	
 		-- TODO
