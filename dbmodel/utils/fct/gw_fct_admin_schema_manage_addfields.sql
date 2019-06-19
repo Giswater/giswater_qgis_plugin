@@ -57,6 +57,28 @@ DECLARE
 	v_feature_system_id text;
 	v_man_fields text;
 	rec record;
+	v_iseditable boolean;
+
+	v_formtype text;
+	v_placeholder text;
+	v_tooltip text;
+	v_typeahead json;
+	v_isparent boolean;
+	v_isenabled boolean;
+	v_dv_parent_id text;
+	v_dv_querytext text;
+	v_isnotupdate boolean;
+	v_dv_isnullvalue boolean;
+	v_stylesheet json;
+	v_chk_multi_insert boolean;
+	v_dv_querytext_filterc text;
+	v_isreload boolean;
+	v_widgetfunction text;
+	v_widgetdim integer;
+	v_isautoupdate boolean;
+	v_listfilterparam json;
+	v_action_function text;
+	v_editability json;
 
 BEGIN
 
@@ -64,21 +86,45 @@ BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- get input parameters
+ 
+	-- get input parameters -,man_addfields
 	v_schemaname = 'SCHEMA_NAME';
-	v_id = (SELECT nextval('man_addfields_parameter_id_seq') +1);
-	v_param_name = ((p_data ->>'data')::json->>'field')::text;
+	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'column_id')::text; 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
-	v_ismandatory = ((p_data ->>'data')::json->>'isMandatory')::text;
-	v_datatype = ((p_data ->>'data')::json->>'datatype')::text;
-	v_field_length = ((p_data ->>'data')::json->>'fieldLength')::text;
-	v_num_decimals = ((p_data ->>'data')::json->>'numDecimals')::text;
-	v_default_value = ((p_data ->>'data')::json->>'defaultValue')::text;
-	v_label = ((p_data ->>'data')::json->>'label')::text;
-	v_widgettype = ((p_data ->>'data')::json->>'widgettype')::text;
+	v_ismandatory = (((p_data ->>'data')::json->>'parameters')::json->>'ismandatory')::text;
+	v_datatype = (((p_data ->>'data')::json->>'parameters')::json->>'datatype')::text;
+	v_field_length = (((p_data ->>'data')::json->>'parameters')::json->>'field_length')::text;
+	v_num_decimals = (((p_data ->>'data')::json->>'parameters')::json->>'num_decimals')::text;
+	v_default_value = (((p_data ->>'data')::json->>'parameters')::json->>'defaultValue')::text;
+	v_label = (((p_data ->>'data')::json->>'parameters')::json->>'label')::text;
+	v_widgettype = (((p_data ->>'data')::json->>'parameters')::json->>'widgettype')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
-	v_active = ((p_data ->>'data')::json->>'active')::text;
-	v_orderby = ((p_data ->>'data')::json->>'orderby')::text;
+	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'active')::text;
+	v_orderby = (((p_data ->>'data')::json->>'parameters')::json->>'orderby')::text;
+	v_iseditable = (((p_data ->>'data')::json->>'parameters')::json ->>'iseditable')::text;
+
+-- get input parameters - config_api_form_fields
+	v_formtype = (((p_data ->>'data')::json->>'parameters')::json ->>'formtype')::text;
+	v_placeholder = (((p_data ->>'data')::json->>'parameters')::json->>'placeholder')::text;
+	v_tooltip = (((p_data ->>'data')::json->>'parameters')::json ->>'tooltip')::text;
+	v_typeahead = (((p_data ->>'data')::json->>'parameters')::json ->>'typeahead')::json;
+	v_isparent = (((p_data ->>'data')::json->>'parameters')::json ->>'isparent')::text;
+	v_isenabled = (((p_data ->>'data')::json->>'parameters')::json ->>'isenabled')::text;
+	v_dv_parent_id = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_parent_id')::text;
+	v_dv_querytext = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext')::text;
+	v_isnotupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isnotupdate')::text;
+	v_dv_isnullvalue = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_isnullvalue')::text;
+	v_action_function = (((p_data ->>'data')::json->>'parameters')::json ->>'action_function')::text;
+	v_editability = (((p_data ->>'data')::json->>'parameters')::json ->>'editability')::json;
+	v_stylesheet = (((p_data ->>'data')::json->>'parameters')::json ->>'stylesheet')::json;
+	v_chk_multi_insert = (((p_data ->>'data')::json->>'parameters')::json ->>'chk_multi_insert')::text;
+	v_dv_querytext_filterc = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext_filterc')::text;
+	v_isreload = (((p_data ->>'data')::json->>'parameters')::json ->>'isreload')::text;
+	v_widgetfunction = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetfunction')::text;
+	v_widgetdim = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetdim')::integer;
+	v_isautoupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isautoupdate')::text;
+	v_listfilterparam = (((p_data ->>'data')::json->>'parameters')::json ->>'listfilterparam')::json;
+
 
 
 	--Assign config widget types 
@@ -148,12 +194,14 @@ BEGIN
 		EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields'
 		INTO v_form_fields_id;
 
-
 		INSERT INTO config_api_form_fields (id, formname, formtype, column_id, layout_id, layout_order, isenabled, 
 		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
-		isautoupdate, isreload, layout_name)
-		VALUES (v_form_fields_id,v_viewname, 'feature', v_param_name, 1,v_layout_order,TRUE, v_datatype, v_config_widgettype,
-		v_label, v_field_length, v_num_decimals, v_ismandatory, FALSE, TRUE, FALSE, FALSE, 'layout_data_1');
+		isautoupdate, isreload, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
+		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
+		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_datatype, v_config_widgettype,
+		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_isreload, 'layout_data_1',
+		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
+		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_datatype,
@@ -186,6 +234,7 @@ BEGIN
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) = 1 AND v_action = 'CREATE' THEN
 		
 		IF v_man_fields IS NULL THEN
+			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 			SELECT v_'||v_feature_type||'.*,
 			a.'||v_param_name||'
@@ -198,7 +247,7 @@ BEGIN
 			ON a.feature_id::text=v_'||v_feature_type||'.'||v_feature_type||'_id;';
 		
 		ELSE
-		
+			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 			SELECT v_'||v_feature_type||'.*,
 			'||v_man_fields||',
