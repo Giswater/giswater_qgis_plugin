@@ -10,3 +10,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP TRIGGER IF EXISTS gw_trg_node_statecontrol ON node; 
 CREATE TRIGGER gw_trg_node_statecontrol  BEFORE INSERT OR UPDATE OF state
 ON node FOR EACH ROW EXECUTE PROCEDURE gw_trg_node_statecontrol();
+
+
+DROP TRIGGER IF EXISTS gw_trg_unique_field ON connec ;
+CREATE TRIGGER gw_trg_unique_field
+AFTER INSERT OR UPDATE OF customer_code, state
+ON connec  FOR EACH ROW EXECUTE PROCEDURE gw_trg_unique_field('connec');
