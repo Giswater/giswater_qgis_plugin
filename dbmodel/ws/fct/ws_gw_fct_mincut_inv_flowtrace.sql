@@ -139,7 +139,7 @@ BEGIN
 
 				-- call graf analytics function (MCEXTENDED)
 				v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "parameters":{"id":', result_id_arg ,', "process":"extended"}}}');
-				PERFORM gw_fct_grafanalytics(v_data);			
+				PERFORM gw_fct_grafanalytics_mincut(v_data);			
 				
 				--Valve has no exit. Update proposed value
 				UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id=rec_valve.node_id;		
