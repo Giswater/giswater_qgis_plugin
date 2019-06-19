@@ -58,10 +58,10 @@ UPDATE node_type SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
 UPDATE node_type SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
 UPDATE node_type SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
 
-INSERT INTO anl_mincut_valve_selector VALUES('CHECK-VALVE');
-INSERT INTO anl_mincut_valve_selector VALUES('FL-CONTR.VALVE');
-INSERT INTO anl_mincut_valve_selector VALUES('GEN-PURP.VALVE');
-INSERT INTO anl_mincut_valve_selector VALUES('THROTTLE-VALVE');
+INSERT INTO anl_mincut_selector_valve VALUES('CHECK-VALVE');
+INSERT INTO anl_mincut_selector_valve VALUES('FL-CONTR.VALVE');
+INSERT INTO anl_mincut_selector_valve VALUES('GEN-PURP.VALVE');
+INSERT INTO anl_mincut_selector_valve VALUES('THROTTLE-VALVE');
 
 
 INSERT INTO dqa (dqa_id, name) select dma_id, name from dma;
@@ -77,11 +77,6 @@ UPDATE sector SET nodeparent = '[113952]' WHERE sector_id=2;
 UPDATE sector SET nodeparent = '[1097]' WHERE sector_id=3;
 UPDATE sector SET nodeparent = '[1101]' WHERE sector_id=4;
 UPDATE sector SET nodeparent = '[2001]' WHERE sector_id=5;
-
-UPDATE cat_presszone SET nodeparent = '[-1]' WHERE id=-1;
-UPDATE cat_presszone SET nodeparent = '[113766]' WHERE id=1;
-UPDATE cat_presszone SET nodeparent = '[113952]' WHERE id=2;
-UPDATE cat_presszone SET nodeparent = '[1083]' WHERE id=3;
 
 UPDATE dqa SET nodeparent = '[-1]' WHERE dqa_id=-1;
 UPDATE dqa SET nodeparent = '[113766]' WHERE dqa_id=1;

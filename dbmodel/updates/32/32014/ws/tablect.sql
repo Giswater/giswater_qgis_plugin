@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ADD CONSTRAINT node_type_graf_delimiter_check CHECK (graf_delimiter::text = ANY (ARRAY['NONE','MINSECTOR', 'PRESSZONE', 'DQA', 'DMA', 'SECTOR']));
+ALTER TABLE node_type ADD CONSTRAINT node_type_graf_delimiter_check CHECK (graf_delimiter::text = ANY (ARRAY['NONE','MINSECTOR', 'PRESSZONE', 'DQA', 'DMA', 'SECTOR']));

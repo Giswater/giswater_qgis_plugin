@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -7,15 +7,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2708
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_grafanalytics_mincut(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mincut(p_data json)
 RETURNS integer AS
 $BODY$
 
 /*
 TO EXECUTE
 
-SELECT ws_sample.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"base"}}}')
-SELECT ws_sample.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"extended"}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"base"}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"extended"}}}')
 
 */
 
@@ -31,7 +31,7 @@ v_mincutprocess text;
 BEGIN
 
     -- Search path
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	-- get variables
 	v_class = (SELECT (p_data::json->>'data')::json->>'grafClass');

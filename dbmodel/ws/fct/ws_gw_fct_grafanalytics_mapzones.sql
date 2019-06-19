@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -33,7 +33,7 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"grafClass":"SECTOR",
 
 
 TO SEE RESULTS ON LOG TABLE
-SELECT count(*), log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=43 AND user_name=current_user group by log_message order by 2 --PZONE
+SELECT count(*), log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=48 AND user_name=current_user group by log_message order by 2 --PZONE
 SELECT count(*), log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=44 AND user_name=current_user group by log_message order by 2 --DQA
 SELECT count(*), log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user group by log_message order by 2 --DMA
 SELECT count(*), log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=30 AND user_name=current_user group by log_message order by 2 --SECTOR
@@ -75,7 +75,7 @@ BEGIN
 	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
 
 	-- set fprocesscat
-	IF v_class = 'PRESSZONE' THEN v_fprocesscat=43; 
+	IF v_class = 'PRESSZONE' THEN v_fprocesscat=48; 
 	ELSIF v_class = 'DQA' THEN v_fprocesscat=44;
 	ELSIF v_class = 'DMA' THEN v_fprocesscat=45; 
 	ELSIF v_class = 'SECTOR' THEN v_fprocesscat=30; 
@@ -225,13 +225,13 @@ BEGIN
 			ON CONFLICT DO NOTHING;
 		END LOOP;
 
-		IF v_fprocesscat=43 THEN
+		IF v_fprocesscat=48 THEN
 
 			-- upsert presszone on parent tables
 			UPDATE node SET presszonecat_id=a.id FROM audit_log_data JOIN (SELECT id, json_array_elements_text(nodeparent)::integer as nodeparent 
-							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=node_id AND fprocesscat_id=43 AND user_name=current_user;
+							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=node_id AND fprocesscat_id=48 AND user_name=current_user;
 			UPDATE arc SET presszonecat_id=a.id FROM audit_log_data JOIN (SELECT id, json_array_elements_text(nodeparent)::integer as nodeparent 
-							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=arc_id AND  fprocesscat_id=43 AND user_name=current_user;
+							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=arc_id AND  fprocesscat_id=48 AND user_name=current_user;
 			UPDATE connec SET presszonecat_id = arc.presszonecat_id FROM arc WHERE arc.arc_id=connec.arc_id;
 			
 		ELSIF v_fprocesscat=45 THEN
@@ -250,12 +250,8 @@ BEGIN
 			UPDATE arc SET sector_id=a.sector_id FROM audit_log_data JOIN (SELECT sector_id, json_array_elements_text(nodeparent)::integer as nodeparent 
 							      FROM sector)a ON nodeparent=log_message::integer WHERE feature_id=arc_id AND  fprocesscat_id=30 AND user_name=current_user;
 			UPDATE connec SET sector_id = arc.sector_id FROM arc WHERE arc.arc_id=connec.arc_id;
-		END IF;
-
-		-- especial case on inlet in order to catch derivated values as static pressure
-		IF v_fprocesscat=30 THEN
-	
-			-- trigger staticpressure (fprocesscat_id=46)
+			
+			-- in addition to minsector trigger staticpressure (fprocesscat_id=46)
 			DELETE FROM audit_log_data WHERE fprocesscat_id=46 AND user_name=current_user;
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) SELECT 46, 'node', n.node_id, (a.log_message::float - n.elevation) 
 			FROM node n JOIN audit_log_data a ON feature_id=node_id WHERE fprocesscat_id=30 AND user_name=current_user;
@@ -267,7 +263,9 @@ BEGIN
 			DELETE FROM man_addfields_value WHERE feature_id IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat) AND parameter_id = v_addparam.id;
 			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) 
 			SELECT feature_id, v_addparam.id, log_message FROM audit_log_data WHERE feature_type=v_addparam.cat_feature_id AND fprocesscat_id=46;		
+			
 		END IF;
+
 	END IF;
 
 RETURN v_cont1;
