@@ -56,7 +56,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.cmb_position = 15  # Variable used to set the position of the QCheckBox in the relations table
+        self.cmb_position = 14  # Variable used to set the position of the QCheckBox in the relations table
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -155,18 +155,10 @@ class AddNewLot(ParentManage):
         self.set_lot_headers()
         self.set_active_layer()
         if lot_id is not None:
-            # utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
-
             self.set_values(lot_id)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
-            # sql = ("SELECT * FROM " + self.schema_name + ".ve_lot_x_" + str(self.geom_type) + ""
-            #        " WHERE lot_id ='" + str(lot_id) + "'")
-            # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-            # if rows:
-            #     self.put_checkbox(self.tbl_relation, rows, 'status', 3)
-            #     self.set_checkbox_values()
             self.set_dates()
             self.reload_table_visit()
 
@@ -859,9 +851,9 @@ class AddNewLot(ParentManage):
             headers.append(x[0])
         # headers.insert(self.cmb_position, '')
         # Set headers
-        headers.insert(self.cmb_position, '')
         standard_model.setHorizontalHeaderLabels(headers)
 
+        # Populate table visit
         sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
                " WHERE lot_id ='" + str(lot_id) + "'"
                " AND " + str(expr_filter)+"")
@@ -879,35 +871,30 @@ class AddNewLot(ParentManage):
             if len(row) > 0:
                 standard_model.appendRow(item)
 
-        sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
-               " WHERE lot_id ='" + str(lot_id) + "'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         self.put_combobox(self.dlg_lot.tbl_visit, rows)
-
 
 
     def put_combobox(self, qtable, rows):
         """ Set one column of a QtableView as QCheckBox with values from database. """
         sql = ("SELECT id, idval FROM " + self.schema_name + ".om_visit_cat_status")
         status_list = self.controller.get_rows(sql, commit=True)
-
         for x in range(0, len(rows)):
+            combo = QComboBox()
             row = rows[x]
-            cell_widget = QWidget()
-            cmb = QComboBox()
-            utils_giswater.set_item_data(cmb, status_list, 1)
-            utils_giswater.set_combo_itemData(cmb, str(row['status']), 0)
-            lay_out = QHBoxLayout(cell_widget)
-            lay_out.addWidget(cmb)
-            lay_out.setAlignment(Qt.AlignCenter)
-            lay_out.setContentsMargins(0, 0, 0, 0)
-            cell_widget.setLayout(lay_out)
+            utils_giswater.set_item_data(combo, status_list, 1)
+            utils_giswater.set_combo_itemData(combo, str(row['status']), 0)
             i = qtable.model().index(x, self.cmb_position)
-            qtable.setIndexWidget(i, cell_widget)
+            qtable.setIndexWidget(i, combo)
+            combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x))
+
+
+    def update_status(self, combo, qtable, pos_x):
+        elem = combo.itemData(combo.currentIndex())
+        i = qtable.model().index(pos_x, self.cmb_position)
+        qtable.model().setData(i, elem[0])
 
 
     def populate_table_relations(self, lot_id):
-
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         sql = ("SELECT * FROM " + self.schema_name + ".ve_lot_x_" + str(feature_type) + ""
@@ -1006,11 +993,20 @@ class AddNewLot(ParentManage):
                    " SET "+str(update)+""
                    " WHERE id = '" + str(lot_id) + "'; \n")
             self.controller.execute_sql(sql, log_sql=False, commit=True)
+
+        status = self.save_relations(lot, lot_id)
+
+        if status:
+            self.manage_rejected()
+
+
+    def save_relations(self, lot, lot_id):
+        # Manage relations
         sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
                " WHERE lot_id = '"+str(lot_id)+"'; \n")
-
         model_rows = self.read_standaritemmodel(self.tbl_relation)
 
+        # Save relations
         for item in model_rows:
             keys = "lot_id, "
             values = "$$"+str(lot_id)+"$$, "
