@@ -2362,10 +2362,12 @@ class UpdateSQL(ApiParent):
                 msg = "Column_id and Label fields mandatory. Please set correctly value."
                 self.controller.show_info_box(msg, "Info")
                 return
-            elif str(utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)) == str(self.rows_typeahead[0]):
-                msg = "The column id value is already exists."
-                self.controller.show_info_box(msg, "Info")
-                return
+            elif str(self.rows_typeahead) != '':
+                if str(utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)) == str(self.rows_typeahead[0]):
+
+                    msg = "The column id value is already exists."
+                    self.controller.show_info_box(msg, "Info")
+                    return
 
             list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
 
@@ -2424,18 +2426,20 @@ class UpdateSQL(ApiParent):
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"DELETE", "field":"' + field_value + '"'
+            extras = '"action":"DELETE", "parameters":{"column_id":"' + field_value + '"}'
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
             sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
+
             status = self.controller.execute_sql(sql, log_sql=True, commit=True)
 
+
             if status:
-                msg = "Imported data into 'config_api_form_fields' successfully."
+                msg = "Delete executed successfully."
                 self.controller.show_info_box(msg, "Info")
             else:
-                msg = "Some error ocurred when import data into 'config_api_form_fields'."
+                msg = "Some error ocurred when try execute delete funcion."
                 self.controller.show_info_box(msg, "Info")
                 return
 
