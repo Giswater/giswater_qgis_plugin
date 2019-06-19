@@ -45,7 +45,7 @@ BEGIN
 	INSERT INTO ws.rtc_hydrometer_x_connec (hydrometer_id, connec_id)
 	SELECT hydrometer.id, connec.connec_id 
 		FROM crm.hydrometer 
-		JOIN ws.connec ON hydrometer.connec_id::text=customer_code;
+		JOIN ws.connec ON hydrometer.connec_id::text=customer_code WHERE state=1;
 
 	-- insert into traceability table
 	INSERT INTO crm.crm2gis_traceability (new_hydrometer,  new_hydrometer_x_connec) VALUES (v_new_hydrometer, v_new_hydrometer_x_connec);

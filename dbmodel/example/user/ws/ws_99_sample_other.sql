@@ -13,8 +13,8 @@ INSERT INTO cat_users VALUES (3,'user3');
 INSERT INTO cat_users VALUES (4,'user4');
 
 
-INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1, '[]);
-INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2, '[]);
+INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1, '[113906]');
+INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2, '[114146]');
 
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
@@ -50,6 +50,19 @@ update node set link='https://www.giswater.org';
 update arc set link='https://www.giswater.org';
 update connec set link='https://www.giswater.org';
 update rtc_hydrometer set link='https://www.giswater.org';
+
+
+UPDATE node_type SET graf_delimiter='NONE';
+UPDATE node_type SET graf_delimiter='MINSECTOR' WHERE id IN('CHECK-VALVE', 'FL-CONTR.VALVE', 'GEN-PURP.VALVE', 'SHUTOFF-VALVE', 'THROTTLE-VALVE');
+UPDATE node_type SET graf_delimiter='PRESSZONE' WHERE id IN('PR-BREAK.VALVE', 'PR-REDUC.VALVE', 'PR-SUSTA.VALVE');
+UPDATE node_type SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
+UPDATE node_type SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
+UPDATE node_type SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
+
+INSERT INTO anl_mincut_valve_selector VALUES('CHECK-VALVE');
+INSERT INTO anl_mincut_valve_selector VALUES('FL-CONTR.VALVE');
+INSERT INTO anl_mincut_valve_selector VALUES('GEN-PURP.VALVE');
+INSERT INTO anl_mincut_valve_selector VALUES('THROTTLE-VALVE');
 
 
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
