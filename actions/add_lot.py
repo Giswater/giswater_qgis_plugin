@@ -957,7 +957,7 @@ class AddNewLot(ParentManage):
 
     def save_lot(self):
         lot = {}
-        index = self.dlg_lot.cmb_visit_class.currentIndex()
+        index = self.dlg_lot.cmb_ot.currentIndex()
         item = self.list_to_work[index]
 
         # item = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address, 4-serie, 5-visitclass_id)
