@@ -1199,7 +1199,6 @@ class DaoController(object):
         restriction = self.get_restriction()
 
         if restriction == 'role_basic':
-            self.log_info(str("TEST 10"))
             pass
         elif restriction == 'role_om':
             if self.giswater.wsoftware == 'ws':
@@ -1221,6 +1220,11 @@ class DaoController(object):
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")
             self.giswater.enable_toolbar("epa")
+            self.giswater.enable_toolbar("master")
+            self.giswater.hide_action(False, 38)
+            self.giswater.hide_action(False, 47)
+            self.giswater.hide_action(False, 49)
+            self.giswater.hide_action(False, 50)
         elif restriction == 'role_master':
             self.giswater.enable_toolbar("master")
             self.giswater.enable_toolbar("epa")
