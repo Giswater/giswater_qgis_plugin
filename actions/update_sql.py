@@ -2362,6 +2362,11 @@ class UpdateSQL(ApiParent):
                 msg = "Column_id and Label fields mandatory. Please set correctly value."
                 self.controller.show_info_box(msg, "Info")
                 return
+            elif str(utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)) == str(self.rows_typeahead[0]):
+                msg = "The column id value is already exists."
+                self.controller.show_info_box(msg, "Info")
+                return
+
             list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
 
             _json = {}
@@ -2461,21 +2466,24 @@ class UpdateSQL(ApiParent):
 
 
     def filter_typeahead(self, schema_name, form_name, widget, completer, model):
-        #TODO: put typeahead
+
         filter = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
         if filter == 'null':
             filter = ''
-        # Get layers under mouse clicked
-        sql = ("SELECT DISTINCT(column_id) FROM " + schema_name + ".config_api_form_fields WHERE formname = '" + form_name + "'"
+
+        # Get child layer
+        sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
+        result_child_layer = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        sql = ("SELECT array_agg(DISTINCT(column_id)) FROM " + schema_name + ".config_api_form_fields WHERE formname = '" + result_child_layer[0] + "'"
                " AND column_id LIKE '%" + filter + "%'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        # print(str(rows))
+        self.rows_typeahead = self.controller.get_rows(sql, log_sql=True, commit=True)
+        self.rows_typeahead = self.rows_typeahead[0][0]
 
-        # if not rows:
-        #     self.controller.show_message("NOT ROW FOR: " + sql, 2)
-        #     return False
+        if self.rows_typeahead is None:
+            self.rows_typeahead = ''
 
-        # self.set_completer_object_api(completer, model, widget, rows)
+        self.set_completer_object_api(completer, model, widget, self.rows_typeahead)
 
     """ Take current project type changed """
 
