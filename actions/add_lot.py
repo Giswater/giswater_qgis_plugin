@@ -768,12 +768,9 @@ class AddNewLot(ParentManage):
 
     def set_dates(self):
         """ Set Max and Min date """
-        visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
-               " WHERE visitclass_id ='" + str(visit_class_id) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
+        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         sql = ("SELECT MIN(startdate), MAX(enddate)"
-               " FROM {}.{}".format(self.schema_name, row['tablename']))
+               " FROM {}.{}".format(self.schema_name, table_name))
         row = self.controller.get_row(sql)
         if row:
             if row[0]:
@@ -807,12 +804,7 @@ class AddNewLot(ParentManage):
         if visit_class_id == '':
             return
 
-        sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
-               " WHERE visitclass_id ='" + str(visit_class_id) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            return
-        table_name = row['tablename']
+        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
 
         # Create interval dates
         format_low = self.lot_date_format + ' 00:00:00.000'
