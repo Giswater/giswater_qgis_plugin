@@ -34,13 +34,6 @@ UPDATE audit_cat_function SET isdeprecated=TRUE WHERE id='2306';
 UPDATE audit_cat_function SET isdeprecated=TRUE WHERE id='2540';
 UPDATE audit_cat_function SET isdeprecated=TRUE WHERE id='2322';
 
-UPDATE node_type SET graf_delimiter = 'NONE';
-UPDATE node_type SET graf_delimiter = 'MINSECTOR' WHERE type='VALVE';
-UPDATE node_type SET graf_delimiter = 'PRESSZONE' WHERE type=NULL;
-UPDATE node_type SET graf_delimiter = 'DQA' WHERE type=NULL;
-UPDATE node_type SET graf_delimiter = 'DMA' WHERE type=NULL;
-UPDATE node_type SET graf_delimiter = 'SECTOR' WHERE type IN ('TANK', 'WATERWELL', 'WTP', 'SOURCE');
-
 DELETE FROM dattrib_type;
 
 UPDATE sys_fprocess_cat SET fprocess_name='Inlet Sectorization' WHERE id=30;
@@ -50,12 +43,6 @@ INSERT INTO sys_fprocess_cat VALUES (45, 'District Metering Areas', 'om', '', 'w
 INSERT INTO sys_fprocess_cat VALUES (46, 'Static pressure', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (47, 'Pipe capacity', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (48, 'Pressure Zonification', 'om', '', 'ws');
-
-INSERT INTO macroexploitation VALUES (-1, 'Undefined marcroexploitation');
-INSERT INTO exploitation VALUES (-1, 'Undefined exploitation',-1);
-INSERT INTO dma VALUES (-1, 'Undefined dma');
-INSERT INTO sector VALUES (-1, 'Undefined sector');
-INSERT INTO cat_presszone VALUES (-1, 'Undefined presszone',-1);
 
 -- 19/06/2019
 
