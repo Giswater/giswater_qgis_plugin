@@ -578,7 +578,13 @@ class Giswater(QObject):
             action = self.actions[key]
             action.setEnabled(enable)                   
 
+    def hide_action(self, visible=True, index=1):
+        """ Enable/disable selected action """
 
+        key = str(index).zfill(2)
+        if key in self.actions:
+            action = self.actions[key]
+            action.setVisible(visible)
     def enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
         
