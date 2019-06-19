@@ -46,6 +46,19 @@ CREATE TABLE om_typevalue(
  
 ALTER TABLE cat_arc ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE cat_node ALTER COLUMN id DROP DEFAULT;
-  
-  
-  
+
+ALTER TABLE sector ADD COLUMN nodeparent json;
+ALTER TABLE dma ADD COLUMN nodeparent json;
+ALTER TABLE cat_presszone ADD COLUMN nodeparent json;
+
+CREATE TABLE dqa (
+ dqa_id serial PRIMARY KEY,
+ name character varying(30),
+ expl_id integer,
+ macroqma_id integer,
+ descript text,
+ undelete boolean,
+ the_geom geometry(MultiPolygon,25831),
+ pattern_id character varying(16),
+ nodeparent json,
+ link text);
