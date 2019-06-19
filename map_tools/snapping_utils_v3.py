@@ -95,6 +95,7 @@ class SnappingConfigManager(object):
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_node_man:
             QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
+
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -108,6 +109,7 @@ class SnappingConfigManager(object):
         if self.layer_gully_man:
             for layer in self.layer_gully_man:
                 QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
+
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 

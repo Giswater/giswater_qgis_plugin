@@ -52,14 +52,10 @@ class ApiParent(ParentAction):
         self.tabs_removed = 0
         self.tab_type = None
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.rubber_point = QgsRubberBand(self.canvas, Qgis.Point)
-        else:
-            self.rubber_point = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
-
+        self.rubber_point = QgsRubberBand(self.canvas, 0)
         self.rubber_point.setColor(Qt.yellow)
         self.rubber_point.setIconSize(10)
-        self.rubber_polygon = QgsRubberBand(self.canvas)
+        self.rubber_polygon = QgsRubberBand(self.canvas, 2)
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
         self.list_update = []
@@ -1044,11 +1040,8 @@ class ApiParent(ParentAction):
 
     def resetRubberbands(self):
     
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.rubber_point.reset(Qgis.Point)
-        else:
-            self.rubber_point.reset(QgsWkbTypes.PointGeometry)
-        self.rubber_polygon.reset()
+        self.rubber_point.reset(0)
+        self.rubber_polygon.reset(2)
 
             
     def fill_table(self, widget, table_name, filter_=None):

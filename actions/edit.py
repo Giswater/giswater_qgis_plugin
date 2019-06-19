@@ -36,6 +36,7 @@ class Edit(ParentAction):
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
+
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
@@ -51,21 +52,21 @@ class Edit(ParentAction):
 
 
     def open_new_feature(self, feature_id):
+
         self.layer.featureAdded.disconnect(self.open_new_feature)
         feature = self.get_feature_by_id(self.layer, feature_id)
 
         geom = feature.geometry()
         list_points = None
-        if self.layer.geometryType() == Qgis.Point:
+        if self.layer.geometryType() == 0:
             points = geom.asPoint()
             list_points = '"x1":' + str(points.x()) + ', "y1":' + str(points.y())
-        elif self.layer.geometryType() in(Qgis.Line, Qgis.Polygon):
+        elif self.layer.geometryType() in(1, 2):
             points = geom.asPolyline()
             init_point = points[0]
             last_point = points[-1]
             list_points = '"x1":' + str(init_point.x()) + ', "y1":' + str(init_point.y())
             list_points += ', "x2":' + str(last_point.x()) + ', "y2":' + str(last_point.y())
-
         else:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
@@ -74,27 +75,29 @@ class Edit(ParentAction):
 
         self.layer.setFeatureFormSuppress(self.suppres_form)
 
-        if result is False:
+        if not result:
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
 
         #self.iface.actionPan().trigger()
 
+
     def get_feature_by_id(self, layer, id_):
-        iter = layer.getFeatures()
-        for feature in iter:
+
+        features = layer.getFeatures()
+        for feature in features:
             if feature.id() == id_:
                 return feature
         return False
 
 
     def edit_add_element(self):
-        """ Button 33: Add element """       
+        """ Button 33: Add element """
         self.manage_element.manage_element()
 
 
     def edit_add_file(self):
-        """ Button 34: Add document """   
+        """ Button 34: Add document """
         self.manage_document.manage_document()
         
     

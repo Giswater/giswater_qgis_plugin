@@ -88,10 +88,7 @@ class ParentMapTool(QgsMapTool):
                  
         # Set default rubber band
         color_selection = QColor(254, 178, 76, 63)
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
-        else:
-            self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(self.canvas, 2)
         self.rubber_band.setColor(color)
         self.rubber_band.setFillColor(color_selection)           
         self.rubber_band.setWidth(1)           
