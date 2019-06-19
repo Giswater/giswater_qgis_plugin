@@ -162,7 +162,6 @@ class AddNewLot(ParentManage):
             self.set_dates()
             self.reload_table_visit()
 
-
         # Enable or disable QWidgets
         self.dlg_lot.txt_ot_type.setReadOnly(True)
         self.dlg_lot.txt_wotype_id.setReadOnly(True)
@@ -204,14 +203,13 @@ class AddNewLot(ParentManage):
             utils_giswater.set_combo_itemData(cmb_list[0], '2', 0)
 
 
-
     def manage_team(self):
         self.max_team_id = self.get_max_id('cat_team')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
         table_name = 'cat_team'
 
-        #@setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
@@ -246,7 +244,6 @@ class AddNewLot(ParentManage):
         record = model.record()
         record.setValue("id", self.max_team_id)
         model.insertRecord(model.rowCount(), record)
-
 
 
     def get_max_id(self, table_name):
@@ -287,7 +284,7 @@ class AddNewLot(ParentManage):
         if rows:
             for row in rows:
                 self.list_to_show.append(row[0])
-                #elem = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address,4-serie,5-visitclass_id)
+                # elem = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address, 4-serie,5-visitclass_id)
                 elem = [row[1], row[2], row[3], row[4], row[5], row[6]]
                 self.list_to_work.append(elem)
         self.set_model_by_list(self.list_to_show, self.dlg_lot.cmb_ot)
@@ -392,14 +389,6 @@ class AddNewLot(ParentManage):
                 index = model.index(x, c)
                 value = model.data(index)
                 row[headers[c]] = value
-
-            # widget_cell = qtable.model().index(x, self.cmb_position)
-            # widget = qtable.indexWidget(widget_cell)
-            # chk_list = widget.findChildren(QCheckBox)
-            # if chk_list[0].isChecked():
-            #     row['validate'] = 'True'
-            # else:
-            #     row['validate'] = 'False'
             rows.append(row)
         return rows
 
@@ -423,8 +412,10 @@ class AddNewLot(ParentManage):
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
                " FROM " + self.schema_name + ".om_visit_class"
-               " INNER JOIN " + self.schema_name + ".om_visit_class_x_wo ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
-               " INNER JOIN " + self.schema_name + ".config_api_visit ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
+               " INNER JOIN " + self.schema_name + ".om_visit_class_x_wo "
+               " ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
+               " INNER JOIN " + self.schema_name + ".config_api_visit "
+               " ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
                " WHERE ismultifeature is False AND feature_type IS NOT null")
 
         visitclass_ids = self.controller.get_rows(sql, log_sql=True, commit=True)
@@ -478,12 +469,6 @@ class AddNewLot(ParentManage):
 
         viewname = "v_edit_" + self.geom_type
         self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
-
-        # set table model and completer
-        # set a fake where expression to avoid to set model to None
-        # fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
-        # self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
-
         self.set_lot_headers()
 
 
@@ -627,7 +612,6 @@ class AddNewLot(ParentManage):
         self.reload_table_relations()
 
 
-
     def reload_table_relations(self):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
@@ -661,8 +645,9 @@ class AddNewLot(ParentManage):
         self.set_dates()
         self.reload_table_visit()
 
+
     def insert_row(self):
-        """ Inser single row into QStandardItemModel """
+        """ Insert single row into QStandardItemModel """
 
         standard_model = self.tbl_relation.model()
         feature_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.feature_id)
@@ -690,6 +675,7 @@ class AddNewLot(ParentManage):
         self.hilight_features(self.rb_list)
         self.set_dates()
         self.reload_table_visit()
+
 
     def get_feature_by_id(self, layer, id_, field_id):
         expr = ""+str(field_id) + "='" + str(id_) + "'"
@@ -737,6 +723,7 @@ class AddNewLot(ParentManage):
         self.set_dates()
         self.reload_table_visit()
 
+
     def set_active_layer(self):
 
         self.current_layer = self.iface.activeLayer()
@@ -780,7 +767,7 @@ class AddNewLot(ParentManage):
 
 
     def set_dates(self):
-
+        """ Set Max and Min date """
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
@@ -845,15 +832,15 @@ class AddNewLot(ParentManage):
         standard_model = QStandardItemModel()
         self.dlg_lot.tbl_visit.setModel(standard_model)
         self.dlg_lot.tbl_visit.horizontalHeader().setStretchLastSection(True)
-        # # Get headers
+        # Get headers
         headers = []
         for x in columns_name:
             headers.append(x[0])
-        # headers.insert(self.cmb_position, '')
-        # Set headers
+
+        # Set headers to model
         standard_model.setHorizontalHeaderLabels(headers)
 
-        # Populate table visit
+        # Populate model visit
         sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
                " WHERE lot_id ='" + str(lot_id) + "'"
                " AND " + str(expr_filter)+"")
@@ -931,17 +918,6 @@ class AddNewLot(ParentManage):
         standard_model.setHorizontalHeaderLabels(headers)
 
 
-    def get_dialog(self):
-
-        visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
-               " WHERE visitclass_id ='" + str(visit_class_id) + "'")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        self.controller.log_info(str("TODO: ABRIR FORMULARIOS"))
-        self.controller.log_info(str(row))
-
-
     def save_lot(self):
         lot = {}
         index = self.dlg_lot.cmb_ot.currentIndex()
@@ -994,8 +970,8 @@ class AddNewLot(ParentManage):
                    " WHERE id = '" + str(lot_id) + "'; \n")
             self.controller.execute_sql(sql, log_sql=False, commit=True)
 
-        status = self.save_relations(lot, lot_id)
-
+        self.save_relations(lot, lot_id)
+        status = self.save_visits(lot_id)
         if status:
             self.manage_rejected()
 
@@ -1023,8 +999,31 @@ class AddNewLot(ParentManage):
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
                     " VALUES (" + values + "); \n")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
-        if status:
-            self.manage_rejected()
+        return status
+
+
+    def save_visits(self, lot_id):
+        # Manage visits
+        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
+        sql = ("DELETE FROM " + self.schema_name + "."+str(table_name)+" "
+               " WHERE lot_id = '"+str(lot_id)+"'; \n")
+        model_rows = self.read_standaritemmodel(self.dlg_lot.tbl_visit)
+        for item in model_rows:
+            keys = " "
+            values = " "
+            for key, value in list(item.items()):
+                if value not in('', None):
+                    keys += ""+key+", "
+                    if type(value) in (int, bool):
+                        values += "$$"+str(value)+"$$, "
+                    else:
+                        values += "$$" + value + "$$, "
+            keys = keys[:-2]
+            values = values[:-2]
+            sql += ("INSERT INTO " + self.schema_name + "."+str(table_name)+" " "("+keys+") "
+                    " VALUES (" + values + "); \n")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        return status
 
 
     def set_completers(self):
@@ -1161,9 +1160,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man = LotManagement()
         self.load_settings(self.dlg_lot_man)
         self.load_user_values()
-        # save previous dialog and set new one.
-        # previous dialog will be set exiting the current one
-        # self.previous_dialog = utils_giswater.dialog()
+
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'ext_workorder_type')
         self.populate_combo_filters(self.dlg_lot_man.cmb_estat, 'om_visit_lot_status')
@@ -1214,12 +1211,12 @@ class AddNewLot(ParentManage):
     def save_user_values(self):
         cur_user = self.controller.get_current_user()
         csv_path = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path)
-        self.controller.plugin_settings_set_value("LotManagert" + cur_user, csv_path)
+        self.controller.plugin_settings_set_value("LotManager" + cur_user, csv_path)
 
 
     def load_user_values(self):
         cur_user = self.controller.get_current_user()
-        csv_path = self.controller.plugin_settings_value('LotManagert' + cur_user)
+        csv_path = self.controller.plugin_settings_value('LotManager' + cur_user)
         utils_giswater.setWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path, str(csv_path))
 
 
@@ -1300,8 +1297,8 @@ class AddNewLot(ParentManage):
         utils_giswater.set_item_data(combo, rows, 1)
 
 
-
     def delete_lot(self, qtable):
+        """ Delete selected lots"""
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
