@@ -66,8 +66,8 @@ class SnappingConfigManager(object):
     def get_snapping_options(self):
         """ Function that collects all the snapping options and put it in an array """
 
-        globalSnappingConfig = QgsProject.instance().snappingConfig()
-        return globalSnappingConfig
+        global_snapping_config = QgsProject.instance().snappingConfig()
+        return global_snapping_config
 
 
     def store_snapping_options(self):
@@ -85,8 +85,10 @@ class SnappingConfigManager(object):
         # Loop through all the layers in the project
         for layer in layers:
             QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.All, 15, QgsTolerance.Pixels)
+
         QgsProject.instance().blockSignals(False)
-        #QgsProject.instance().snapSettingsChanged.emit()
+        snapping_config = self.get_snapping_options()
+        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
 
     def snap_to_node(self):
@@ -97,7 +99,8 @@ class SnappingConfigManager(object):
             QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
 
         QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snapSettingsChanged.emit()
+        snapping_config = self.get_snapping_options()
+        QgsProject.instance().snappingConfigChangedemit(snapping_config)
 
 
     def snap_to_connec_gully(self):
@@ -111,7 +114,8 @@ class SnappingConfigManager(object):
                 QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
 
         QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snapSettingsChanged.emit()
+        snapping_config = self.get_snapping_options()
+        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
 
     def snap_to_layer(self, layer):
