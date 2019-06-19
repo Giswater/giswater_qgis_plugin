@@ -89,3 +89,12 @@ VALUES (3016, 'New field overlaps the existing one', 'Modify the order value.', 
 UPDATE config_param_system SET value='{"status":"TRUE" , "field":"code"}' WHERE parameter='customer_code_autofill';
 UPDATE config_param_system SET descript='If status is TRUE, when insert a new connec, customer_code will be the same as field (connec_id or code)' WHERE parameter='customer_code_autofill';
 
+--19/06/2019
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated,istoolbox, isparametric)
+VALUES (2702,'gw_trg_unique_field','utils', 'trigger function','Check unique values of attributes in a table', 'role_edit', FALSE, FALSE, FALSE);
+
+INSERT INTO audit_cat_error( id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3018, 'Customer code is duplicated for connecs with state=1','Review your data.',2, TRUE, 'utils', FALSE);
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (43, 'Replace feature','Edit','Replace feature', 'utils');

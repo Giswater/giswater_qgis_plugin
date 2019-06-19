@@ -49,3 +49,9 @@ INSERT INTO exploitation VALUES (-1, 'Ficticius exploitation',-1);
 INSERT INTO dma VALUES (-1, 'Ficticius for node delimiters');
 INSERT INTO sector VALUES (-1, 'Ficticius for node delimiters');
 INSERT INTO cat_presszone VALUES (-1, 'Ficticius for node delimiters',-1);
+
+-- 19/06/2019
+
+INSERT INTO config_client_forms VALUES(19065, 'update_fields', 'utils', 'config_api_form_fields', 'layout_id', 5, FALSE)
+INSERT INTO config_client_forms VALUES(19066, 'update_fields', 'utils', 'config_api_form_fields', 'layout_order', 6, FALSE)
+INSERT INTO config_client_forms VALUES(19067, 'update_fields', 'utils', 'config_api_form_fields', 'layout_name', 32, FALSE)
