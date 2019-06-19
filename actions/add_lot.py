@@ -533,11 +533,8 @@ class AddNewLot(ParentManage):
                 self.dlg_lot.cmb_assigned_to.setEnabled(False)
                 self.dlg_lot.cmb_status.setEnabled(False)
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
-        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
-        table_name = "v_edit_" + str(feature_type)
 
         self.set_lot_headers()
-        self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
 
 
     def populate_visits(self, widget, table_name, expr_filter=None):
@@ -824,6 +821,7 @@ class AddNewLot(ParentManage):
         standard_model = QStandardItemModel()
         self.dlg_lot.tbl_visit.setModel(standard_model)
         self.dlg_lot.tbl_visit.horizontalHeader().setStretchLastSection(True)
+
         # Get headers
         headers = []
         for x in columns_name:
@@ -831,6 +829,9 @@ class AddNewLot(ParentManage):
 
         # Set headers to model
         standard_model.setHorizontalHeaderLabels(headers)
+
+        # Hide columns
+        self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
 
         # Populate model visit
         sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
@@ -840,6 +841,7 @@ class AddNewLot(ParentManage):
 
         if rows is None:
             return
+
         for row in rows:
             item = []
             for value in row:
@@ -851,6 +853,7 @@ class AddNewLot(ParentManage):
                 standard_model.appendRow(item)
 
         self.put_combobox(self.dlg_lot.tbl_visit, rows)
+
 
 
     def put_combobox(self, qtable, rows):
@@ -879,7 +882,8 @@ class AddNewLot(ParentManage):
         sql = ("SELECT * FROM " + self.schema_name + ".ve_lot_x_" + str(feature_type) + ""
                " WHERE lot_id ='"+str(lot_id)+"'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-
+        self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
+                               isQStandardItemModel=True)
         if rows is None:
             return
         for row in rows:
@@ -902,6 +906,7 @@ class AddNewLot(ParentManage):
         standard_model = QStandardItemModel()
         self.tbl_relation.setModel(standard_model)
         self.tbl_relation.horizontalHeader().setStretchLastSection(True)
+
         # # Get headers
         headers = []
         for x in columns_name:
@@ -909,6 +914,8 @@ class AddNewLot(ParentManage):
         # Set headers
         standard_model.setHorizontalHeaderLabels(headers)
 
+        self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
+                           isQStandardItemModel=True)
 
     def save_lot(self):
         lot = {}
