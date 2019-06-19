@@ -19,7 +19,6 @@ INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2, '[114146]');
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
 
-
 UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = '20651';
 
 INSERT INTO plan_psector_x_arc VALUES (4, '2065', 2, 0, false, NULL);
@@ -63,6 +62,38 @@ INSERT INTO anl_mincut_valve_selector VALUES('CHECK-VALVE');
 INSERT INTO anl_mincut_valve_selector VALUES('FL-CONTR.VALVE');
 INSERT INTO anl_mincut_valve_selector VALUES('GEN-PURP.VALVE');
 INSERT INTO anl_mincut_valve_selector VALUES('THROTTLE-VALVE');
+
+
+INSERT INTO dqa (dqa_id, name) select dma_id, name from dma;
+
+UPDATE dma SET nodeparent = '[-1]' WHERE dma_id=-1;
+UPDATE dma SET nodeparent = '[113766]' WHERE dma_id=1;
+UPDATE dma SET nodeparent = '[113952]' WHERE dma_id=2;
+UPDATE dma SET nodeparent = '[1080]' WHERE dma_id=3;
+
+UPDATE sector SET nodeparent = '[-1]' WHERE sector_id=-1;
+UPDATE sector SET nodeparent = '[113766]' WHERE sector_id=1;
+UPDATE sector SET nodeparent = '[113952]' WHERE sector_id=2;
+UPDATE sector SET nodeparent = '[1097]' WHERE sector_id=3;
+UPDATE sector SET nodeparent = '[1101]' WHERE sector_id=4;
+UPDATE sector SET nodeparent = '[2001]' WHERE sector_id=5;
+
+UPDATE cat_presszone SET nodeparent = '[-1]' WHERE id=-1;
+UPDATE cat_presszone SET nodeparent = '[113766]' WHERE id=1;
+UPDATE cat_presszone SET nodeparent = '[113952]' WHERE id=2;
+UPDATE cat_presszone SET nodeparent = '[1083]' WHERE id=3;
+
+UPDATE dqa SET nodeparent = '[-1]' WHERE dqa_id=-1;
+UPDATE dqa SET nodeparent = '[113766]' WHERE dqa_id=1;
+UPDATE dqa SET nodeparent = '[113952]' WHERE dqa_id=2;
+
+UPDATE cat_presszone SET nodeparent = '[-1]' WHERE id='-1';
+UPDATE cat_presszone SET nodeparent = '[113766]', id='1' WHERE id='High-Expl_01';
+UPDATE cat_presszone SET nodeparent = '[113952]', id='2' WHERE id='High-Expl_02';
+UPDATE cat_presszone SET nodeparent = '[1083]', id='3' WHERE id='Medium-Expl_01';
+UPDATE cat_presszone SET id='4' WHERE id='Low-Expl_01';
+UPDATE cat_presszone SET id='5' WHERE id='Medium-Expl_02';
+UPDATE cat_presszone SET id='6' WHERE id='Low-Expl_02';
 
 
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
