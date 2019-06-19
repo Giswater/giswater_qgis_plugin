@@ -2354,6 +2354,14 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         if action == 'Create':
+
+            # Control mandatory widgets
+            if utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
+                    utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
+
+                msg = "Column_id and Label fields mandatory. Please set correctly value."
+                self.controller.show_info_box(msg, "Info")
+                return
             list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
 
             _json = {}
@@ -2379,7 +2387,7 @@ class UpdateSQL(ApiParent):
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", "multi_create":"' + utils_giswater.isChecked(self.dlg_manage_fields, self.dlg_manage_fields.chk_multi_insert) + '", "parameters":' + result_json + ''
+            extras = '"action":"CREATE", "multi_create":"' + str(utils_giswater.isChecked(self.dlg_manage_fields, self.dlg_manage_fields.chk_multi_insert)) + '", "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
