@@ -429,7 +429,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 				END IF;
 				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
-				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP					
@@ -504,7 +504,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 					
 				END LOOP;
 			ELSE 
-				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 

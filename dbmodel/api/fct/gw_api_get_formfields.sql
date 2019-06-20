@@ -56,6 +56,7 @@ DECLARE
     v_orderby text;
     v_dv_querytext_child text;
     v_dv_querytext text;
+	v_dv_querytext_filterc text;
     v_image json;
     v_bmapsclient boolean;
     v_array text[];
@@ -160,15 +161,20 @@ BEGIN
 			END IF;
 
 			v_dv_querytext=(aux_json->>'dv_querytext');
+			v_dv_querytext_filterc=(aux_json->>'dv_querytext_filterc');
 
 			IF (aux_json->>'widgettype') = 'combo' THEN
-		raise notice'aghsarghrasfgh';
-		
+
 				-- Get combo id's
-				EXECUTE 'SELECT (array_agg(id)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
+				-- If widget is combo, parent or not child, execute if exist "dv_querytext_filterc" anyway.
+				IF v_dv_querytext_filterc IS NOT NULL THEN
+					EXECUTE 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext || v_dv_querytext_filterc ||' '||quote_literal(p_tablename)||') ORDER BY '||v_orderby||')a'
 					INTO v_array;
+				ELSE
+					EXECUTE 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext ||' ORDER BY '||v_orderby||')a'
+					INTO v_array;
+				END IF;
 				
-			raise notice'aghsarghrasfgh';
 				-- Enable null values
 				IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
 					v_array = array_prepend('',v_array);
@@ -178,8 +184,14 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));		
 
 				-- Get combo values
-				EXECUTE 'SELECT (array_agg(idval)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
+				-- If widget is combo, parent or not child, execute if exist "dv_querytext_filterc" anyway.
+				IF v_dv_querytext_filterc IS NOT NULL THEN
+					EXECUTE 'SELECT (array_agg(idval)) FROM ('|| v_dv_querytext || v_dv_querytext_filterc ||' '||quote_literal(p_tablename)||') ORDER BY '||v_orderby||')a'
 					INTO v_array;
+				ELSE
+					EXECUTE 'SELECT (array_agg(idval)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
+					INTO v_array;
+				END IF;
 
 				-- Enable null values
 				IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
