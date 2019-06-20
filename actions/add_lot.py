@@ -1238,7 +1238,7 @@ class AddNewLot(ParentManage):
         hide_right = [0, 1, 2]
 
         self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
-        self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers))
+        self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers, True))
 
         # Open dialog
         self.open_dialog(self.dlg_lot_sel, maximize_button=False)
