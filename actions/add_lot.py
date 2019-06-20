@@ -1220,10 +1220,11 @@ class AddNewLot(ParentManage):
     def lot_selector(self):
 
         self.dlg_lot_sel = Multirow_selector()
-        self.load_settings(self.dlg_lot_man)
+        self.load_settings(self.dlg_lot_sel)
 
         self.dlg_lot_sel.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_lot_sel))
         self.dlg_lot_sel.rejected.connect(partial(self.close_dialog, self.dlg_lot_sel))
+        self.dlg_lot_sel.rejected.connect(partial(self.save_settings, self.dlg_lot_sel))
         self.dlg_lot_sel.setWindowTitle("Selector de lots")
         utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_filter', self.controller.tr('Filtrar per: Lot id', context_name='labels'))
         utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_unselected', self.controller.tr('Lots disponibles:', context_name='labels'))
@@ -1235,7 +1236,7 @@ class AddNewLot(ParentManage):
         field_id_right = "lot_id"
         hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
         hide_right = [0, 1, 2]
-        # index = [0]
+
         self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
         self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers))
 
@@ -1386,7 +1387,10 @@ class AddNewLot(ParentManage):
 
         # Close this dialog and open selected object
         dialog.close()
-
+        sql = ("INSERT INTO " + self.schema_name + ".selector_lot(lot_id, cur_user) "
+               " VALUES("+str(selected_object_id)+", current_user) "
+               " ON CONFLICT DO NOTHING;")
+        self.controller.execute_sql(sql, commit=True)
         # set previous dialog
         # if hasattr(self, 'previous_dialog'):
         self.manage_lot(selected_object_id, is_new=False, visitclass_id=visitclass_id)
