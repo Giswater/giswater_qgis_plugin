@@ -42,33 +42,36 @@ BEGIN
 
 		IF v_triggerfromtable = 'om_visit' THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
  
-			-- get if its first visit of lot to set it with status = 4 (ON GOING)
+			-- get if its first visit of lot to set it with status (ON GOING)
 			IF (SELECT count (*) FROM om_visit WHERE lot_id=NEW.lot_id) = 1 THEN
 				UPDATE om_visit_lot SET status = 4 WHERE id=NEW.lot_id;
 			END IF;
 
-			IF NEW.status > 0 THEN 
+			IF NEW.status <> 4 THEN 
 				NEW.enddate=null;
+			-- when visit is finished and it has not lot_id assigned visit is automatic published
+			ELSIF NEW.status=4 AND NEW.lot_id IS NULL THEN
+				UPDATE om_visit SET publish=TRUE WHERE id=NEW.id;
 			END IF;
 
 		ELSIF v_triggerfromtable ='om_visit_x_feature' THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
 
 			SELECT * INTO v_visit FROM om_visit WHERE id=NEW.visit_id;
 
-			-- move status of lot element to status=0
-			IF v_visit.status=0 THEN
+			-- move status of lot element to status=4
+			IF v_visit.status=4 THEN
 
 				IF v_featuretype ='arc' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_arc SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND arc_id::text ='||quote_literal(NEW.arc_id);
+					v_querytext= 'UPDATE om_visit_lot_x_arc SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND arc_id::text ='||quote_literal(NEW.arc_id);
 					
 				ELSIF v_featuretype ='node' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_node SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND node_id::text ='||quote_literal(NEW.node_id);
+					v_querytext= 'UPDATE om_visit_lot_x_node SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND node_id::text ='||quote_literal(NEW.node_id);
 					
 				ELSIF v_featuretype ='connec' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_connec SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND connec_id::text ='||quote_literal(NEW.connec_id);
+					v_querytext= 'UPDATE om_visit_lot_x_connec SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND connec_id::text ='||quote_literal(NEW.connec_id);
 					
 				ELSIF v_featuretype ='gully' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_gully SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND gully_id::text ='||quote_literal(NEW.gully_id);
+					v_querytext= 'UPDATE om_visit_lot_x_gully SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND gully_id::text ='||quote_literal(NEW.gully_id);
 				END IF;
 				
 				IF v_querytext IS NOT NULL THEN
@@ -82,8 +85,10 @@ BEGIN
 
     ELSIF TG_OP='UPDATE' AND v_triggerfromtable ='om_visit' THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
 
-		-- move status of lot element to status=0
-		IF NEW.status = 0 AND OLD.status > 0 THEN 
+
+		-- move status of lot element to status=4
+
+		IF NEW.status = 4 AND OLD.status <> 4 THEN 
 		
 			v_featuretype = (SELECT lower(feature_type) FROM om_visit_lot WHERE id = NEW.lot_id LIMIT 1);
 
@@ -113,16 +118,24 @@ BEGIN
 
 			END IF;
 
-			v_querytext= 'UPDATE '||quote_ident(v_lottable) ||' SET status=0 WHERE lot_id::text=' || quote_literal (NEW.lot_id) ||' AND '||quote_ident(v_featureid)||'::text ='||quote_literal(v_id);
+			v_querytext= 'UPDATE '||quote_ident(v_lottable) ||' SET status=4 WHERE lot_id::text=' || quote_literal (NEW.lot_id) ||' AND '||quote_ident(v_featureid)||'::text ='||quote_literal(v_id);
 			IF v_querytext IS NOT NULL THEN
 				EXECUTE v_querytext; 
 			END IF;
 
-		-- change feature_x_lot status
-		ELSIF NEW.status > 0 THEN
+			-- when visit is finished and it has not lot_id assigned visit is automatic published
+			IF NEW.lot_id IS NULL THEN
+				UPDATE om_visit SET publish=TRUE WHERE id=NEW.id;
+			END IF;
+
+		ELSIF NEW.status <> 4 THEN
 			NEW.enddate=null;
-	
-		END IF;	
+
+			-- when visit is finished and it has lot_id assigned visit is automatic published
+			IF NEW.status=5 AND NEW.lot_id IS NOT NULL THEN
+				UPDATE om_visit SET publish=TRUE WHERE id=NEW.id;
+			END IF;
+		END IF;
 
 		IF v_version > '3.2.019' THEN
 			IF NEW.class_id != OLD.class_id THEN
