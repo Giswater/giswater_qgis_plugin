@@ -76,7 +76,7 @@ class ConnecMapTool(ParentMapTool):
                 exist_connec = self.snapper_manager.check_connec_group(layer)
                 exist_gully = self.snapper_manager.check_gully_group(layer)
                 if exist_connec or exist_gully:
-                    self.snapper_manager.add_marker(snapped_feat, self.vertex_marker)
+                    self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasPressEvent(self, event):   #@UnusedVariable
