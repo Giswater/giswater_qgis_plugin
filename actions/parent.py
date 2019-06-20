@@ -219,8 +219,8 @@ class ParentAction(object):
         
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
-                           index=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-                                  25, 26, 27, 28, 29, 30]):
+                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3]):
         
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
@@ -232,18 +232,18 @@ class ParentAction(object):
         query_left += " WHERE cur_user = current_user)"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
-        self.hide_colums(tbl_all_rows, index)
+        self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
 
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
+        query_right = "SELECT " + tableleft + "." + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
         query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_right += " WHERE cur_user = current_user"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
-        self.hide_colums(tbl_selected_rows, [1, 2, 3])
+        self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
