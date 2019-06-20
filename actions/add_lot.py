@@ -31,8 +31,9 @@ import utils_giswater
 from .manage_visit import ManageVisit
 from .parent_manage import ParentManage
 from ..ui_manager import AddLot
-from ..ui_manager import LotManagement
 from ..ui_manager import BasicTable
+from ..ui_manager import LotManagement
+from ..ui_manager import Multirow_selector
 
 
 class AddNewLot(ParentManage):
@@ -56,7 +57,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.cmb_position = 14  # Variable used to set the position of the QCheckBox in the relations table
+        self.cmb_position = 15  # Variable used to set the position of the QCheckBox in the relations table
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -281,7 +282,7 @@ class AddNewLot(ParentManage):
             sql += " OR ext_workorder.serie = '"+str(ct[0])+"'"
         sql += " order by ct"
 
-        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        rows = self.controller.get_rows(sql, commit=True, log_sql=False)
 
         self.list_to_show = ['']  # List to show
         self.list_to_work = [['', '', '',  '', '', '', '']]  # List to work (find feature)
@@ -420,7 +421,7 @@ class AddNewLot(ParentManage):
                " ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
                " WHERE ismultifeature is False AND feature_type IS NOT null")
 
-        visitclass_ids = self.controller.get_rows(sql, log_sql=True, commit=True)
+        visitclass_ids = self.controller.get_rows(sql, log_sql=False, commit=True)
         if visitclass_ids:
             visitclass_ids.append(['', '', '', ''])
             utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
@@ -514,7 +515,7 @@ class AddNewLot(ParentManage):
 
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
                " WHERE id ='"+str(lot_id)+"'")
-        lot = self.controller.get_row(sql, log_sql=True, commit=True)
+        lot = self.controller.get_row(sql, log_sql=False, commit=True)
         if lot:
             value = str(lot['serie']) + " " + str(lot['class_id'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot, value)
@@ -834,7 +835,7 @@ class AddNewLot(ParentManage):
         sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
                " WHERE lot_id ='" + str(lot_id) + "'"
                " AND " + str(expr_filter)+"")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
 
         if rows is None:
             return
@@ -885,7 +886,7 @@ class AddNewLot(ParentManage):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         sql = ("SELECT * FROM " + self.schema_name + ".ve_lot_x_" + str(feature_type) + ""
                " WHERE lot_id ='"+str(lot_id)+"'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
                                isQStandardItemModel=True)
         if rows is None:
@@ -964,7 +965,7 @@ class AddNewLot(ParentManage):
         if self.is_new_lot is True:
             sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
                    " VALUES (" + values + ") RETURNING id")
-            row = self.controller.execute_returning(sql, log_sql=True, commit=True)
+            row = self.controller.execute_returning(sql, log_sql=False, commit=True)
             lot_id = row[0]
         else:
             lot_id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
@@ -1001,7 +1002,7 @@ class AddNewLot(ParentManage):
             values = values[:-2]
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
                     " VALUES (" + values + "); \n")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.execute_sql(sql, log_sql=False, commit=True)
         return status
 
 
@@ -1025,7 +1026,7 @@ class AddNewLot(ParentManage):
             values = values[:-2]
             sql += ("INSERT INTO " + self.schema_name + "."+str(table_name)+" " "("+keys+") "
                     " VALUES (" + values + "); \n")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.execute_sql(sql, log_sql=False, commit=True)
         return status
 
 
@@ -1091,7 +1092,8 @@ class AddNewLot(ParentManage):
         (is_valid, expr) = self.check_expression(expr_filter)
 
         self.select_features_by_ids(feature_type, expr)
-        self.iface.actionZoomToSelected().trigger()
+        # self.iface.actionZoomToSelected().trigger()
+        self.iface.actionZoomActualSize ().trigger()
 
         layer = self.iface.activeLayer()
         features = layer.selectedFeatures()
@@ -1177,7 +1179,7 @@ class AddNewLot(ParentManage):
         current_date = QDate.currentDate()
         sql = ('SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
                ' FROM {}.{}'.format(self.schema_name, table_object))
-        row = self.controller.get_row(sql, log_sql=True, commit=self.autocommit)
+        row = self.controller.get_row(sql, log_sql=False, commit=self.autocommit)
         if row:
             if row[0]:
                 self.dlg_lot_man.date_event_from.setDate(row[0])
@@ -1214,6 +1216,46 @@ class AddNewLot(ParentManage):
 
         # Open form
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
+
+    def lot_selector(self):
+
+        self.dlg_lot_sel = Multirow_selector()
+        self.load_settings(self.dlg_lot_man)
+
+        self.dlg_lot_sel.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_lot_sel))
+        self.dlg_lot_sel.rejected.connect(partial(self.close_dialog, self.dlg_lot_sel))
+        self.dlg_lot_sel.setWindowTitle("Selector de lots")
+        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_filter', self.controller.tr('Filtrar per: Lot id', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_unselected', self.controller.tr('Lots disponibles:', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_selected', self.controller.tr('Lots seleccionats', context_name='labels'))
+
+        tableleft = "om_visit_lot"
+        tableright = "selector_lot"
+        field_id_left = "id"
+        field_id_right = "lot_id"
+        hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+        hide_right = [0, 1, 2]
+        # index = [0]
+        self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
+        self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers))
+
+        # Open dialog
+        self.open_dialog(self.dlg_lot_sel, maximize_button=False)
+
+
+    def set_visible_lot_layers(self, zoom=False):
+        """ Set visible lot layers """
+
+        # Refresh extension of layer
+        layer = self.controller.get_layer_by_tablename("ve_lot_x_gully")
+        if layer:
+            self.controller.set_layer_visible(layer)
+            if zoom:
+                # Refresh extension of layer
+                layer.updateExtents()
+                # Zoom to executed mincut
+                self.iface.setActiveLayer(layer)
+                self.iface.zoomToActiveLayer()
 
 
     def save_user_values(self, dialog):
