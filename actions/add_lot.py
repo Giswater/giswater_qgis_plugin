@@ -425,12 +425,9 @@ class AddNewLot(ParentManage):
         self.populate_cmb_team()
 
         # Fill ComboBox cmb_status
-        sql = ("SELECT id, idval"
-               " FROM " + self.schema_name + ".om_visit_lot_status "
-               " ORDER BY id")
-        status = self.controller.get_rows(sql, commit=True)
-        if status:
-            utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
+        rows = self.get_values_from_catalog('om_typevalue', 'lot_cat_status')
+        if rows:
+            utils_giswater.set_item_data(self.dlg_lot.cmb_status, rows, 1, sort_combo=False)
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5'], 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, '1', 0)
 
@@ -856,8 +853,13 @@ class AddNewLot(ParentManage):
 
     def put_combobox(self, qtable, rows):
         """ Set one column of a QtableView as QCheckBox with values from database. """
-        sql = ("SELECT id, idval FROM " + self.schema_name + ".om_visit_cat_status")
-        status_list = self.controller.get_rows(sql, commit=True)
+
+        # Fill ComboBox cmb_status
+        status_list = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+
+        if status_list is None:
+            return
+
         for x in range(0, len(rows)):
             combo = QComboBox()
             row = rows[x]
@@ -1160,8 +1162,11 @@ class AddNewLot(ParentManage):
 
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'ext_workorder_type')
-        self.populate_combo_filters(self.dlg_lot_man.cmb_estat, 'om_visit_lot_status')
-
+        rows = self.get_values_from_catalog('om_typevalue', 'lot_cat_status')
+        if rows:
+            rows.insert(0, ['', ''])
+            utils_giswater.set_item_data(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
+            
         table_object = "v_ui_om_visit_lot"
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
