@@ -529,7 +529,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="4" column="0">
-         <widget class="QGroupBox" name="groupBox_8">
+         <widget class="QGroupBox" name="grb_manage_addfields">
           <property name="title">
            <string>Manage Add Fields</string>
           </property>
@@ -657,7 +657,10 @@
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QGroupBox" name="groupBox_6">
+         <widget class="QGroupBox" name="grb_manage_ui">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="title">
            <string>Manage UI</string>
           </property>

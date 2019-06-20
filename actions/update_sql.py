@@ -2133,8 +2133,7 @@ class UpdateSQL(ApiParent):
         # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
         # ui_path = tpath.document().toPlainText()
         form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
-        status_update_childs = utils_giswater.getWidget(self.dlg_readsql, 'chk_multi_update').isChecked()
-        print(status_update_childs)
+        status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
 
         # Control if ui path is invalid or null
         if tpath is None:
@@ -2169,6 +2168,8 @@ class UpdateSQL(ApiParent):
         # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
         # ui_path = tpath.document().toPlainText()
         form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
+        status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
+
 
         # Control if ui path is invalid or null
         if tpath is None:
@@ -2177,7 +2178,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Export xml from database
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name_ui) + "', false)::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
 
         # Check status
@@ -2205,7 +2206,7 @@ class UpdateSQL(ApiParent):
 
         if result:
             opener = "C:\OSGeo4W64/bin/designer.exe"
-            subprocess.call([opener, tpath])
+            subprocess.Popen([opener, tpath])
 
         # Clear temp_csv2pg
         self.clear_temp_table()
@@ -2247,16 +2248,24 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Control if schema_version is updated to 3.2
-        if str(self.project_data_schema_version).replace('.','') < '32000':
+        if str(self.project_data_schema_version).replace('.','') < str(self.version_metadata).replace('.', ''):
+
+            utils_giswater.getWidget(self.dlg_readsql,self.dlg_readsql.grb_manage_addfields).setEnabled(False)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
             return
 
-        sql = ("SELECT DISTINCT(child_layer), child_layer FROM " + str(schema_name) + ".cat_feature")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
+        else:
 
-        sql = ("SELECT DISTINCT(id), id FROM " + str(schema_name) + ".cat_feature")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
+
+            sql = ("SELECT DISTINCT(child_layer), child_layer FROM " + str(schema_name) + ".cat_feature")
+            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+            utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
+
+            sql = ("SELECT DISTINCT(id), id FROM " + str(schema_name) + ".cat_feature")
+            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+            utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
 
 
     def open_manage_field(self, action):
