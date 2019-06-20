@@ -51,9 +51,9 @@ BEGIN
     
     -- select main values (stardate, node_id, mu_id)
     -- getting start date using event value (legacy)
-    SELECT value INTO startdate_aux FROM om_visit_event WHERE visit_id=visit_id_aux limit 1; 
+    SELECT startdate INTO startdate_aux FROM om_visit WHERE id=visit_id_aux limit 1; 
     -- select other parameters using other tables
-    SELECT mu_id, node.node_id INTO mu_id_aux, node_id_aux FROM node JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id WHERE visit_id=visit_id_aux;
+    SELECT muni_id, node.node_id INTO mu_id_aux, node_id_aux FROM node JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id WHERE visit_id=visit_id_aux;
     
     -- check if exits multiplier parameter (action type=1)
     v_parameter = (SELECT parameter_id2 FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
@@ -149,8 +149,13 @@ BEGIN
 	UPDATE om_visit SET class_id=v_newclass WHERE om_visit.id=visit_id_aux;
 	
       ELSE
-		--check if the function was planned before by unit
-		PERFORM tm_fct_planned_visit(visit_id_aux,1);
+				--check if the function was planned before by unit
+		IF (SELECT wsoftware FROM ud.version ORDER BY id DESC LIMIT 1) = 'TM' THEN
+		
+			PERFORM tm_fct_planned_visit(visit_id_aux,1);
+			
+		END IF;
+		
       END IF;
 
      -- check if exits sql sentence parameter related to the query text parameter (action type=4)
