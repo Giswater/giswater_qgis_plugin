@@ -145,6 +145,9 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
         # TODO pending to make function delete_visit
         # self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
+        ignore_columns = ('visitcat_id', 'ext_code', 'webclient_id', 'expl_id', 'the_geom', 'is_done','status')
+        self.dlg_lot.btn_export_visits.clicked.connect(partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_visit, ignore_columns))
+        self.dlg_lot.btn_path.clicked.connect(partial(self.select_path, self.dlg_lot))
 
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
@@ -1191,8 +1194,9 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
 
         # Set signals
-        self.dlg_lot_man.btn_path.clicked.connect(self.select_path)
-        self.dlg_lot_man.btn_import.clicked.connect(self.import_to_csv)
+        self.dlg_lot_man.btn_path.clicked.connect(partial(self.select_path, self.dlg_lot_man))
+        self.dlg_lot_man.btn_export.clicked.connect(
+            partial(self.export_model_to_csv, self.dlg_lot_man, self.dlg_lot_man.tbl_lots, ''))
         self.dlg_lot_man.tbl_lots.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
@@ -1222,8 +1226,8 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path, str(csv_path))
 
 
-    def select_path(self):
-        csv_path = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path)
+    def select_path(self, dialog):
+        csv_path = utils_giswater.getWidgetText(dialog, dialog.txt_path)
         # Set default value if necessary
         if csv_path is None or csv_path == '':
             csv_path = self.plugin_dir
@@ -1239,31 +1243,36 @@ class AddNewLot(ParentManage):
         else:
             csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
 
-        self.controller.set_path_from_qfiledialog(self.dlg_lot_man.txt_path, csv_path)
+        self.controller.set_path_from_qfiledialog(dialog.txt_path, csv_path)
 
 
-    def import_to_csv(self):
-        csv_path = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path)
+    def export_model_to_csv(self, dialog, qtable, ignore_columns=('')):
+        csv_path = utils_giswater.getWidgetText(dialog, dialog.txt_path)
         if not os.path.exists(csv_path):
             message = "Csv path not exist"
             self.controller.show_info(message, parameter=csv_path)
             return
 
-        # Convert qtable values into list
         all_rows = []
-        headers = []
-        for i in range(0, self.dlg_lot_man.tbl_lots.model().columnCount()):
-            headers.append(str(self.dlg_lot_man.tbl_lots.model().headerData(i, Qt.Horizontal)))
-        all_rows.append(headers)
-        for rows in range(0, self.dlg_lot_man.tbl_lots.model().rowCount()):
+        row = []
+        # Get headers from model
+        for h in range(0, qtable.model().columnCount()):
+            if qtable.model().headerData(h, Qt.Horizontal) not in ignore_columns:
+                row.append(str(qtable.model().headerData(h, Qt.Horizontal)))
+        all_rows.append(row)
+
+        # Get all rows from model
+        for r in range(0, qtable.model().rowCount()):
             row = []
-            for col in range(0, self.dlg_lot_man.tbl_lots.model().columnCount()):
-                value = self.dlg_lot_man.tbl_lots.model().data(self.dlg_lot_man.tbl_lots.model().index(rows, col))
-                if str(value) == 'NULL':
-                    value = ''
-                elif type(value) == QDate:
-                    value = value.toString(self.lot_date_format)
-                row.append(value)
+            for c in range(0, qtable.model().columnCount()):
+                if qtable.model().headerData(c, Qt.Horizontal) not in ignore_columns:
+                    value = qtable.model().data(qtable.model().index(r, c))
+                    if str(value) == 'NULL':
+                        value = ''
+                    elif type(value) == QDate:
+                        value = value.toString(self.lot_date_format)
+                    row.append(value)
+
             all_rows.append(row)
 
         # Write list into csv file
