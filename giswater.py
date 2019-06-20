@@ -456,14 +456,7 @@ class Giswater(QObject):
                         
            
     def initGui(self):
-        """ Create the menu entries and toolbar icons inside the QGIS GUI """ 
-        
-        # Get tables or views specified in 'db' config section         
-        self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
-        self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
-        self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
-        self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
-        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')
+        """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
         # Delete python compiled files
         self.delete_pyc_files()  
@@ -655,7 +648,7 @@ class Giswater(QObject):
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
 
         # Get SRID from table node
-        self.srid = self.controller.get_srid(self.table_node, self.schema_name)
+        self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
 
         # Set common plugin toolbars (one action class per toolbar)
@@ -728,51 +721,41 @@ class Giswater(QObject):
 
 
     def manage_layers(self):
-        """ Iterate over all layers to get the ones specified in 'db' config section """ 
-        
+        """ Get references to project main layers """
+
+        # Initialize variables
+        self.layer_arc = None
+        self.layer_connec = None
+        self.layer_dimensions = None
+        self.layer_gully = None
+        self.layer_node = None
+
         # Check if we have any layer loaded
         layers = self.controller.get_layers()
-            
+
         if len(layers) == 0:
-            return False   
-                
-        # Initialize variables
-        self.layer_arc_man_ud = []
-        self.layer_arc_man_ws = []
+            return False
 
-        self.layer_node_man_ud = []
-        self.layer_node_man_ws = []
-
-        self.layer_connec = None
-        self.layer_connec_man_ud = []
-        self.layer_connec_man_ws = []
-        self.layer_gully_man_ud = []     
-
-        self.layer_gully = None
-        self.layer_pgully = None
-        self.layer_version = None
-        self.layer_dimensions = None
-
-        # Iterate over all layers to get the ones specified in 'db' config section
+        # Iterate over all layers
         for cur_layer in layers:
-            
+
             uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
             if uri_table:
 
-                if self.table_connec == uri_table:
+                if 'v_edit_arc' == uri_table:
+                    self.layer_arc = cur_layer
+
+                elif 'v_edit_connec' == uri_table:
                     self.layer_connec = cur_layer
-                    self.layer_connec_man_ud.append(cur_layer)
-                    
-                if 'v_edit_dimensions' == uri_table:
+
+                elif 'v_edit_dimensions' == uri_table:
                     self.layer_dimensions = cur_layer
 
-                if self.table_gully == uri_table:
+                elif 'v_edit_gully' == uri_table:
                     self.layer_gully = cur_layer
-                    self.layer_gully_man_ud.append(cur_layer)
 
-                if self.table_pgully == uri_table:
-                    self.layer_pgully = cur_layer
-                    self.layer_gully_man_ud.append(cur_layer)
+                elif 'v_edit_node' == uri_table:
+                    self.layer_node = cur_layer
 
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
@@ -815,12 +798,10 @@ class Giswater(QObject):
 
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
-        
-        # WS
+
         if self.layer_connec:       
             self.set_layer_custom_form(self.layer_connec, 'connec')
 
-        # UD
         if self.layer_gully:       
             self.set_layer_custom_form(self.layer_gully, 'gully')
 
@@ -878,23 +859,21 @@ class Giswater(QObject):
             fieldname_node = "ymax"
             fieldname_connec = "connec_depth"
 
-        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        if layer_node:
+        if self.layer_node:
             display_field = 'depth : [% "' + fieldname_node + '" %]'
             if Qgis.QGIS_VERSION_INT < 29900:
-                layer_node.setDisplayField(display_field)
+                self.layer_node.setDisplayField(display_field)
             else:
-                layer_node.setMapTipTemplate(display_field)
-                layer_node.setDisplayExpression(display_field)
+                self.layer_node.setMapTipTemplate(display_field)
+                self.layer_node.setDisplayExpression(display_field)
 
-        layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
-        if layer_connec:
+        if self.layer_connec:
             display_field = 'depth : [% "' + fieldname_connec + '" %]'
             if Qgis.QGIS_VERSION_INT < 29900:
-                layer_node.setDisplayField(display_field)
+                self.layer_connec.setDisplayField(display_field)
             else:
-                layer_node.setMapTipTemplate(display_field)
-                layer_node.setDisplayExpression(display_field)
+                self.layer_connec.setMapTipTemplate(display_field)
+                self.layer_connec.setDisplayExpression(display_field)
 
     
     def manage_map_tools(self):
@@ -923,10 +902,6 @@ class Giswater(QObject):
         if map_tool_name in self.map_tools:
             map_tool = self.map_tools[map_tool_name]
             map_tool.set_controller(self.controller)
-            if self.basic.project_type == 'ws':
-                map_tool.set_layers(self.layer_arc_man_ws, self.layer_connec_man_ws, self.layer_node_man_ws)
-            elif self.basic.project_type == 'ud':
-                map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud, self.layer_gully_man_ud)
 
 
     def manage_actions_linux(self):
