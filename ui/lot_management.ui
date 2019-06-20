@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>visit_management</class>
- <widget class="QDialog" name="visit_management">
+ <class>lot_management</class>
+ <widget class="QDialog" name="lot_management">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -219,7 +219,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_import">
+         <widget class="QPushButton" name="btn_export">
           <property name="text">
            <string>Exportar a csv</string>
           </property>

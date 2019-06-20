@@ -927,12 +927,8 @@
               </property>
              </widget>
             </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_21">
             <item>
-             <spacer name="horizontalSpacer_16">
+             <spacer name="horizontalSpacer_17">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -948,6 +944,27 @@
              <widget class="QPushButton" name="btn_validate_all">
               <property name="text">
                <string>Validar totes</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_21">
+            <item>
+             <widget class="QLineEdit" name="txt_path"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_path">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_export_visits">
+              <property name="text">
+               <string>Exportar a csv</string>
               </property>
              </widget>
             </item>
