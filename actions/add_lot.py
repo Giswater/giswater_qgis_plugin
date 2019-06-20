@@ -71,6 +71,7 @@ class AddNewLot(ParentManage):
 
         self.dlg_lot = AddLot()
         self.load_settings(self.dlg_lot)
+        self.load_user_values(self.dlg_lot)
         self.dropdown = self.dlg_lot.findChild(QToolButton, 'action_selector')
         self.dropdown.setPopupMode(QToolButton.MenuButtonPopup)
 
@@ -1119,6 +1120,7 @@ class AddNewLot(ParentManage):
         if layer:
             layer.removeSelection()
         self.save_settings(self.dlg_lot)
+        self.save_user_values(self.dlg_lot)
         self.close_dialog(self.dlg_lot)
 
 
@@ -1161,7 +1163,7 @@ class AddNewLot(ParentManage):
         # Create the dialog
         self.dlg_lot_man = LotManagement()
         self.load_settings(self.dlg_lot_man)
-        self.load_user_values()
+        self.load_user_values(self.dlg_lot_man)
 
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'ext_workorder_type')
@@ -1189,7 +1191,7 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_lots, table_object)
 
         # manage open and close the dialog
-        self.dlg_lot_man.rejected.connect(self.save_user_values)
+        self.dlg_lot_man.rejected.connect(partial(self.save_user_values, self.dlg_lot_man))
         self.dlg_lot_man.btn_accept.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
 
@@ -1214,16 +1216,16 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
 
-    def save_user_values(self):
+    def save_user_values(self, dialog):
         cur_user = self.controller.get_current_user()
-        csv_path = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path)
-        self.controller.plugin_settings_set_value("LotManager" + cur_user, csv_path)
+        csv_path = utils_giswater.getWidgetText(dialog, dialog.txt_path)
+        self.controller.plugin_settings_set_value(dialog.objectName() + cur_user, csv_path)
 
 
-    def load_user_values(self):
+    def load_user_values(self, dialog):
         cur_user = self.controller.get_current_user()
-        csv_path = self.controller.plugin_settings_value('LotManager' + cur_user)
-        utils_giswater.setWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_path, str(csv_path))
+        csv_path = self.controller.plugin_settings_value(dialog.objectName() + cur_user)
+        utils_giswater.setWidgetText(dialog, dialog.txt_path, str(csv_path))
 
 
     def select_path(self, dialog):
