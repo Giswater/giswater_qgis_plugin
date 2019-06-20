@@ -177,8 +177,9 @@ class MincutConfig(ParentAction):
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_anl_mincut_result_cat "
         rows = self.controller.get_rows(sql)
         values = []
-        for row in rows:
-            values.append(str(row[0]))
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
 
         model.setStringList(values)
         self.completer.setModel(model)
@@ -265,8 +266,7 @@ class MincutConfig(ParentAction):
         utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
 
         sql = ("SELECT expl_id, name FROM " + self.schema_name + ".exploitation ORDER BY name")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql, log_sql=False))
+        rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
 
@@ -286,8 +286,8 @@ class MincutConfig(ParentAction):
         tableright = "anl_mincut_result_selector"
         field_id_left = "id"
         field_id_right = "result_id"
-        index = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
-        self.multi_row_selector(self.dlg_mincut_sel, tableleft, tableright, field_id_left, field_id_right, index=index)
+        hide_left = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+        self.multi_row_selector(self.dlg_mincut_sel, tableleft, tableright, field_id_left, field_id_right, hide_left=hide_left)
         self.dlg_mincut_sel.btn_select.clicked.connect(partial(self.mincut.set_visible_mincut_layers))
 
         # Open dialog

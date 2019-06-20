@@ -22,7 +22,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QPoint, QDate
+from qgis.PyQt.QtCore import Qt, QPoint, QDate, QDateTime
 
 from functools import partial
 
@@ -1123,8 +1123,12 @@ class ParentManage(ParentAction, object):
                 continue
 
             widget = getattr(dialog, field_name)
-            if type(widget) in [QDateEdit, QDateTimeEdit]:
-                widget.setDateTime(value if value else QDate.currentDate() )
+            if type(widget) == QDateEdit:
+                widget.setDate(value if value else QDate.currentDate())
+            elif type(widget) == QDateTimeEdit:
+                widget.setDateTime(value if value else QDateTime.currentDateTime())
+
+
             if type(widget) in [QLineEdit, QTextEdit]:
                 if value:
                     widget.setText(value)

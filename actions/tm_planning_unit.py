@@ -89,8 +89,7 @@ class TmPlanningUnit(TmParentAction):
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_campaign, rows, 1)
         sql = ("SELECT id, name FROM " + self.schema_name + ".cat_work")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql))
+        rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_work, rows, 1)
         self.load_default_values()
         table_name = "v_ui_planning_unit"

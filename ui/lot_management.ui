@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>visit_management</class>
- <widget class="QDialog" name="visit_management">
+ <class>lot_management</class>
+ <widget class="QDialog" name="lot_management">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -39,6 +39,20 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="4">
+         <widget class="QCheckBox" name="chk_assignacio">
+          <property name="text">
+           <string>Feines pendents d'assignacio a OT</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Estat:</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="5">
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -51,6 +65,9 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="txt_address"/>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="lbl_filter">
@@ -66,23 +83,6 @@
             <width>100</width>
             <height>16777215</height>
            </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="4">
-         <widget class="QCheckBox" name="chk_assignacio">
-          <property name="text">
-           <string>Feines pendents d'assignacio a OT</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="txt_address"/>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Estat:</string>
           </property>
          </widget>
         </item>
@@ -219,7 +219,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_import">
+         <widget class="QPushButton" name="btn_export">
           <property name="text">
            <string>Exportar a csv</string>
           </property>
