@@ -35,8 +35,8 @@ BEGIN
 	FROM v_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=v_node.node_id
-		JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL)) 
+		JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=v_node.node_id
+		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL)) ;
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 	
 
