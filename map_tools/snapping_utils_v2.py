@@ -33,6 +33,7 @@ class SnappingConfigManager(object):
         self.canvas = self.iface.mapCanvas()
         self.layer_arc = None
         self.layer_connec = None
+        self.layer_gully = None
         self.layer_node = None
         self.previous_snapping = None
         self.controller = None
@@ -53,14 +54,6 @@ class SnappingConfigManager(object):
             self.vertex_marker.setColor(color)
             self.vertex_marker.setIconSize(15)
             self.vertex_marker.setPenWidth(3)
-
-
-    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
-
-        self.layer_arc_man = layer_arc_man
-        self.layer_connec_man = layer_connec_man
-        self.layer_node_man = layer_node_man
-        self.layer_gully_man = layer_gully_man
 
 
     def get_snapping_options(self):
@@ -92,6 +85,7 @@ class SnappingConfigManager(object):
         # Loop through all the layers in the project
         for layer in layers:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, snapping_mode, 0, 1, False)
+
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -100,8 +94,11 @@ class SnappingConfigManager(object):
         """ Set snapping to 'node' """
 
         QgsProject.instance().blockSignals(True)
-        for layer in self.layer_node_man:
+
+        self.layer_node = self.controller.get_layer_by_tablename('v_edit_node')
+        if self.layer_node:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
+
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -110,11 +107,15 @@ class SnappingConfigManager(object):
         """ Set snapping to 'connec' and 'gully' """
 
         QgsProject.instance().blockSignals(True)
-        for layer in self.layer_connec_man:
+
+        self.layer_connec = self.controller.get_layer_by_tablename('v_edit_connec')
+        if self.layer_connec:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
-        if self.layer_gully_man:
-            for layer in self.layer_gully_man:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+
+        self.layer_gully = self.controller.get_layer_by_tablename('v_edit_gully')
+        if self.layer_gully:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -152,23 +153,19 @@ class SnappingConfigManager(object):
     def check_node_group(self, snapped_layer):
         """ Check if snapped layer is in the node group """
 
-        if snapped_layer in self.layer_node_man:
-            return 1
+        return snapped_layer == self.layer_node
 
 
     def check_connec_group(self, snapped_layer):
         """ Check if snapped layer is in the connec group """
 
-        if snapped_layer in self.layer_connec_man:
-            return 1
+        return snapped_layer == self.layer_connec
 
 
     def check_gully_group(self, snapped_layer):
         """ Check if snapped layer is in the gully group """
 
-        if self.layer_gully_man:
-            if snapped_layer in self.layer_gully_man:
-                return 1
+        return snapped_layer == self.layer_gully
 
 
     def get_snapper(self):
