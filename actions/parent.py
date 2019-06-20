@@ -799,3 +799,12 @@ class ParentAction(object):
                 current_date = QDate.currentDate()
                 widget_to.setDate(current_date)
 
+
+    def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + "." + table_name + ""
+               " WHERE typevalue = '" + typevalue + "'"
+               " ORDER BY " + order_by + "")
+
+        rows = self.controller.get_rows(sql, commit=True)
+        return rows
