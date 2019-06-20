@@ -100,7 +100,7 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(False)
         snapping_config = self.get_snapping_options()
-        QgsProject.instance().snappingConfigChangedemit(snapping_config)
+        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
 
     def snap_to_connec_gully(self):
