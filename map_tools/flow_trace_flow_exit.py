@@ -60,7 +60,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
         
-        if event.button() == Qt.LeftButton and self.current_layer is not None:
+        if event.button() == Qt.LeftButton and self.current_layer:
 
             # Execute SQL function
             if self.index_action == '56':
@@ -73,8 +73,8 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             result = self.controller.execute_sql(sql)
             if result:
                 # Get 'arc' and 'node' list and select them
-                self.select_features(self.layer_arc_man, 'arc')
-                self.select_features(self.layer_node_man, 'node')
+                self.select_features('arc')
+                self.select_features('node')
 
             # Refresh map canvas
             self.refresh_map_canvas()
@@ -83,13 +83,13 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             self.set_action_pan()
 
 
-    def select_features(self, layer_group, elem_type):
+    def select_features(self, elem_type):
  
         if self.index_action == '56':
-            tablename = "anl_flow_"+elem_type
+            tablename = "anl_flow_" + elem_type
             where = " WHERE context = 'Flow trace'"
         else:
-            tablename = "anl_flow_"+elem_type
+            tablename = "anl_flow_" + elem_type
             where = " WHERE context = 'Flow exit'"
             
         sql = "SELECT * FROM " + self.schema_name + "." + tablename
@@ -113,7 +113,9 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             return
 
         # Select features with these id's
-        for layer in layer_group:
+        tablename = 'v_edit_' + elem_type
+        layer = self.controller.get_layer_by_tablename(tablename)
+        if layer:
             it = layer.getFeatures(QgsFeatureRequest(expr))
             # Build a list of feature id's from the previous result
             id_list = [i.id() for i in it]
@@ -148,7 +150,9 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
-            self.iface.setActiveLayer(self.layer_node_man[0])
+            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            if layer:
+                self.iface.setActiveLayer(layer)
 
 
     def deactivate(self):
