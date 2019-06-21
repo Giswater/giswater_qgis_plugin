@@ -127,6 +127,9 @@ class ParentMapTool(QgsMapTool):
         # Restore previous snapping
         self.snapper_manager.recover_snapping_options()
 
+        # Enable snapping
+        self.snapper_manager.enable_snapping(True)
+
         # Recover cursor
         self.canvas.setCursor(self.std_cursor)
 

@@ -132,7 +132,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set snapping to node
         self.snapper_manager.snap_to_node()

@@ -78,7 +78,7 @@ class OpenVisit(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set active layer to 'v_edit_om_visit'
         self.layer_visit = self.controller.get_layer_by_tablename("v_edit_om_visit")

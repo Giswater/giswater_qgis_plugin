@@ -179,7 +179,7 @@ class ConnecMapTool(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()    
+        self.snapper_manager.enable_snapping()
 
         # Set snapping to 'connec' and 'gully'
         self.snapper_manager.snap_to_connec_gully()
@@ -196,7 +196,6 @@ class ConnecMapTool(ParentMapTool):
 
     def deactivate(self):
 
-        # Call parent method     
         ParentMapTool.deactivate(self)
 
 

@@ -15,7 +15,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
-    from qgis.core import QgsWkbTypes, QgsPointXY
+    from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
@@ -348,7 +348,7 @@ class ApiParent(ParentAction):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set snapping
         layer = self.iface.activeLayer()
