@@ -31,16 +31,13 @@ class SnappingConfigManager(object):
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
-        self.layer_arc = None
-        self.layer_connec = None
-        self.layer_gully = None
-        self.layer_node = None
         self.previous_snapping = None
         self.controller = None
         self.is_valid = False
 
         # Snapper
         try:
+            self.snapping_config = self.get_snapping_options()
             self.snapper = self.get_snapper()
             proj = QgsProject.instance()
             proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
@@ -56,8 +53,17 @@ class SnappingConfigManager(object):
             self.vertex_marker.setPenWidth(3)
 
 
+    def set_snapping_layers(self):
+        """ Set main snapping layers """
+
+        self.layer_arc = self.controller.get_layer_by_tablename('v_edit_arc')
+        self.layer_connec = self.controller.get_layer_by_tablename('v_edit_connec')
+        self.layer_gully = self.controller.get_layer_by_tablename('v_edit_gully')
+        self.layer_node = self.controller.get_layer_by_tablename('v_edit_node')
+
+
     def get_snapping_options(self):
-        """ Function that collects all the snapping options and put it in an array """
+        """ Function that collects all the snapping options """
 
         global_snapping_config = QgsProject.instance().snappingConfig()
         return global_snapping_config
@@ -70,76 +76,83 @@ class SnappingConfigManager(object):
         self.previous_snapping = self.get_snapping_options()
 
 
-    def clear_snapping(self):
-        """ Removing snap """
+    def enable_snapping(self, enable=False):
+        """ Enable/Disable snapping of all layers """
 
         QgsProject.instance().blockSignals(True)
+
         layers = self.controller.get_layers()
         # Loop through all the layers in the project
         for layer in layers:
-            QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.All, 15, QgsTolerance.Pixels)
+            layer_settings = self.snapping_config.individualLayerSettings(layer)
+            layer_settings.setEnabled(enable)
+            self.snapping_config.setIndividualLayerSettings(layer, layer_settings)
 
         QgsProject.instance().blockSignals(False)
-        snapping_config = self.get_snapping_options()
-        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
+        #QgsSnappingUtils.setConfig(self.snapping_config)
+
+
+    def snap_to_arc(self):
+        """ Set snapping to 'arc' """
+
+        QgsProject.instance().blockSignals(True)
+        self.snap_to_layer(self.layer_arc, QgsPointLocator.Edge, True)
+        QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
 
     def snap_to_node(self):
         """ Set snapping to 'node' """
 
         QgsProject.instance().blockSignals(True)
-
-        self.layer_node = self.controller.get_layer_by_tablename('v_edit_node')
-        if self.layer_node:
-            QgsSnappingUtils.LayerConfig(self.layer_node, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
-
+        self.snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
         QgsProject.instance().blockSignals(False)
-        snapping_config = self.get_snapping_options()
-        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
 
     def snap_to_connec_gully(self):
         """ Set snapping to 'connec' and 'gully' """
 
         QgsProject.instance().blockSignals(True)
-
-        self.layer_connec = self.controller.get_layer_by_tablename('v_edit_connec')
-        if self.layer_connec:
-            QgsSnappingUtils.LayerConfig(self.layer_connec, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
-
-        self.layer_gully = self.controller.get_layer_by_tablename('v_edit_gully')
-        if self.layer_gully:
-            QgsSnappingUtils.LayerConfig(self.layer_gully, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
-
+        self.snap_to_layer(self.layer_connec, QgsPointLocator.Vertex, True)
+        self.snap_to_layer(self.layer_gully, QgsPointLocator.Vertex, True)
         QgsProject.instance().blockSignals(False)
-        snapping_config = self.get_snapping_options()
-        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
 
-    def snap_to_layer(self, layer):
+    def snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):
         """ Set snapping to @layer """
 
         if layer is None:
             return
 
-        QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.All, 15, QgsTolerance.Pixels)
+        QgsSnappingUtils.LayerConfig(layer, point_locator, 15, QgsTolerance.Pixels)
+        if set_settings:
+            layer_settings = self.snapping_config.individualLayerSettings(layer)
+            layer_settings.setEnabled(True)
+            self.snapping_config.setIndividualLayerSettings(layer, layer_settings)
 
 
     def apply_snapping_options(self, snappings_options):
-        """ Function that restores the previous snapping """
+        """ Function that applies selected snapping configuration """
 
         QgsProject.instance().blockSignals(True)
-
         if snappings_options:
             QgsProject.instance().setSnappingConfig(snappings_options)
-
         QgsProject.instance().blockSignals(False)
 
 
     def recover_snapping_options(self):
-        """ Function to restore user configuration """
+        """ Function to restore the previous snapping configuration """
 
         self.apply_snapping_options(self.previous_snapping)
+
+
+    def check_arc_group(self, snapped_layer):
+        """ Check if snapped layer is in the arc group """
+
+        return snapped_layer == self.layer_arc
 
 
     def check_node_group(self, snapped_layer):
