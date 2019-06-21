@@ -14,8 +14,8 @@ $BODY$
 /*
 TO EXECUTE
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"base"}}}')
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":1, "process":"extended"}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":-1, "process":"base"}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":-1, "process":"extended"}}}')
 
 */
 
@@ -91,7 +91,7 @@ BEGIN
 		(SELECT node_1,water FROM anl_graf WHERE grafclass=''MINCUT'' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
 		GROUP BY node_1, water HAVING water=1 AND count(node_1)=2) b';
 
-RETURN cont1;
+RETURN 1;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

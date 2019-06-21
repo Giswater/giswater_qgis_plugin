@@ -43,11 +43,10 @@ BEGIN
 		AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
 	END IF;
 
-	--RAISE NOTICE 'v_querytext %',v_querytext;
 	EXECUTE v_querytext;
 
 	-- inundation process
-	LOOP
+	LOOP	
 		cont1 = cont1+1;
 		UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
 		GET DIAGNOSTICS affected_rows =row_count;

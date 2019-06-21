@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER SEQUENCE anl_mincut_result_cat_seq MINVALUE -1;
 
 ALTER TABLE anl_mincut_inlet_x_exploitation ADD to_arc json;
 

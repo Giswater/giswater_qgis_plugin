@@ -7,20 +7,32 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2222
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean, boolean);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_dumpsubcatchment boolean, p_isrecursive boolean)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa(p_data)  
 RETURNS json AS 
 $BODY$
 
 /*example
-SELECT "SCHEMA_NAME".gw_fct_pg2epa('r1', false, false, false)  
+SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"data":{"status":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true" "}}$$)
 */
 
 DECLARE
 	check_count_aux integer; 
 	v_return json;
 	v_input json;
-
+	v_result text;
+	v_usnetworkgeom boolean;
+	v_dumpsubcatch boolean;
+	
 BEGIN
+
+
+--  Get input data
+	v_result =  (p_data->>'data')::json->>'resultId';
+	v_usnetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
+	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
 
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
@@ -34,23 +46,15 @@ BEGIN
 	UPDATE inp_junction SET y0=(SELECT value FROM config_param_user WHERE parameter='epa_junction_y0_vdefault' AND cur_user=current_user)::float WHERE y0 IS NULL;
 	UPDATE raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault' AND cur_user=current_user)::float WHERE scf IS NULL;
 		
-	
-	IF p_isrecursive IS TRUE THEN
-		-- Modify the contourn conditions to dynamic recursive strategy
+	-- Upsert on rpt_cat_table
+	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
+	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
 		
-	ELSE
-		-- Upsert on rpt_cat_table
-		DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
-		INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
-		
-		-- Upsert on node rpt_inp result manager table
-		DELETE FROM inp_selector_result WHERE cur_user=current_user;
-		INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
-		
-	END IF;
+	-- Upsert on node rpt_inp result manager table
+	DELETE FROM inp_selector_result WHERE cur_user=current_user;
+	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 	
-	
-	IF p_use_networkgeom IS FALSE THEN
+	IF v_usenetworkgeom IS FALSE THEN
 
 		-- Fill inprpt tables
 		PERFORM gw_fct_pg2epa_fill_data(result_id_var);
@@ -66,22 +70,13 @@ BEGIN
 	
 	END IF;
 	
-	IF p_dumpsubcatchment THEN
+	IF v_dumpsubcatch THEN
 		-- Dump subcatchments
 		PERFORM gw_fct_pg2epa_dump_subcatch ();
 	END IF;
 		
 	-- Calling for the export function
 	PERFORM gw_fct_utils_csv2pg_export_swmm_inp(result_id_var, null);
-	
-	IF p_isrecursive IS TRUE THEN
-		DELETE FROM temp_table WHERE id IN (SELECT id FROM temp_table WHERE fprocesscat_id=35 AND text_column::json->>'result_id'=result_id_var LIMIT 1); 
-		IF (SELECT count(*) FROM temp_table WHERE fprocesscat_id=35 AND text_column::json->>'result_id'=result_id_var)>0 THEN
-			RETURN 1;
-		ELSE
-			RETURN 0;
-		END IF;
-	END IF;
 	
 	-- manage return message
 	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',result_id_var,'"},"saveOnDatabase":true}}')::json;

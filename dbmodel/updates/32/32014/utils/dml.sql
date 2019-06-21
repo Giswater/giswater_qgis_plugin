@@ -27,6 +27,8 @@ VALUES (2710, 'gw_fct_grafanalytics_mapzones', 'ws','function', '{"featureType":
 {"widgetname":"node", "label":"Nodeid:","widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layout_order":3,"value":null}]',
 'Function to analyze graf of network. Multiple analysis is avaliable' ,'role_om',FALSE, TRUE, TRUE);
 
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2712, 'gw_fct_grafanalytics_mincutzones', 'ws','function', 'Function of grafanalytics for massive mincutzones identification', 'role_om',FALSE, FALSE,FALSE);
 
 UPDATE config_param_system SET isenabled=false, isdeprecated='true' WHERE parameter='gw_trg_arc_orphannode_delete';
 
@@ -38,14 +40,24 @@ DELETE FROM dattrib_type;
 
 UPDATE sys_fprocess_cat SET fprocess_name='Inlet Sectorization' WHERE id=30;
 
+UPDATE sys_fprocess_cat SET fprocess_name='Mincutzones identification' WHERE id=29;
+
+
 INSERT INTO sys_fprocess_cat VALUES (44, 'District Quality Areas', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (45, 'District Metering Areas', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (46, 'Static pressure', 'om', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (47, 'Pipe capacity', 'om', '', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (47, 'EPA hydrant analysis', 'epa', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (48, 'Pressure Zonification', 'om', '', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (49, 'EPA optimization', 'epa', '', 'ws');
+
 
 -- 19/06/2019
 
 INSERT INTO config_client_forms VALUES(19065, 'update_fields', 'utils', 'config_api_form_fields', 'layout_id', 5, FALSE);
 INSERT INTO config_client_forms VALUES(19066, 'update_fields', 'utils', 'config_api_form_fields', 'layout_order', 6, FALSE);
 INSERT INTO config_client_forms VALUES(19067, 'update_fields', 'utils', 'config_api_form_fields', 'layout_name', 32, FALSE);
+
+-- deprecate variables due new approach of grafanalytics faster an simple
+UPDATE audit_cat_param_user SET isdeprecated = true WHERE id='om_mincut_analysis_dminsector';
+UPDATE audit_cat_param_user SET isdeprecated = true WHERE id='om_mincut_analysis_pipehazard';
+UPDATE audit_cat_param_user SET isdeprecated = true WHERE id='om_mincut_analysis_dinletsector';

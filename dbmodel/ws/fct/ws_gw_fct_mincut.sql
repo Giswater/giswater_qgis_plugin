@@ -6,54 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2304
 
-------------------------------------------
--- Mincut function with massive parameters
-------------------------------------------
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(p_feature_id character varying, p_feature_type character varying, p_result_id integer, counter int8, total int8)
-  RETURNS void AS
-$BODY$
-
-/*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_mincut(arc_id, 'arc', 1, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.v_edit_arc)) FROM SCHEMA_NAME.v_edit_arc;
-*/
-
-DECLARE
-
-BEGIN
-    -- Search path
-    SET search_path = SCHEMA_NAME, public;
-  	
-	PERFORM gw_fct_mincut (p_feature_id, p_feature_type, p_result_id);
-	
-	-- raise notice
-	IF counter>0 AND total>0 THEN
-		RAISE NOTICE '[%/%]  Feature id: % ', counter, total, p_feature_id;
-	ELSIF counter>0 THEN
-		RAISE NOTICE '[%] Feature id: % ', counter, p_feature_id;
-	ELSE
-		RAISE NOTICE 'Feature id: % ', p_feature_id;
-	END IF;
-	
-	
-	RETURN;
-
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-	
-	
-------------------------------------------
--- Mincut function (with nornal parameters)
-------------------------------------------
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', 1)
+SELECT SCHEMA_NAME.gw_fct_mincut('2205', 'arc', -1)
 */
 
 DECLARE
@@ -223,9 +181,11 @@ BEGIN
 		v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
 				JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
 				JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-				JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg GROUP BY category_id limit 1)a);	
+				JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg GROUP BY category_id limit 1)a);
+				
+		IF v_priority IS NULL THEN v_priority='{}'; END IF;
 	
-		v_return = concat('{"arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"number":"',v_numhydrometer,'","priority":',v_priority,'}}}');
+		v_return = concat('{"minsector":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"number":"',v_numhydrometer,'","priority":',v_priority,'}}}');
 			
 		INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_return);
 
