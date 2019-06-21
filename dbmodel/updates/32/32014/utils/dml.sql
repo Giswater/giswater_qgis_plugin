@@ -45,11 +45,8 @@ UPDATE sys_fprocess_cat SET fprocess_name='Mincutzones identification' WHERE id=
 
 INSERT INTO sys_fprocess_cat VALUES (44, 'District Quality Areas', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (45, 'District Metering Areas', 'om', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (46, 'Static pressure', 'om', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (47, 'EPA hydrant analysis', 'epa', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (48, 'Pressure Zonification', 'om', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (49, 'EPA optimization', 'epa', '', 'ws');
-
+INSERT INTO sys_fprocess_cat VALUES (46, 'Pressure Zonification', 'om', '', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (47, 'Static pressure value', 'om', '', 'ws');
 
 -- 19/06/2019
 

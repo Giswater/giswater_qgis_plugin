@@ -75,9 +75,9 @@ BEGIN
 	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
 
 	-- set fprocesscat
-	IF v_class = 'PRESSZONE' THEN v_fprocesscat=48; 
-	ELSIF v_class = 'DQA' THEN v_fprocesscat=44;
+	IF v_class = 'PRESSZONE' THEN v_fprocesscat=46; 
 	ELSIF v_class = 'DMA' THEN v_fprocesscat=45; 
+	ELSIF v_class = 'DQA' THEN v_fprocesscat=44;
 	ELSIF v_class = 'SECTOR' THEN v_fprocesscat=30; 
 	END IF;
 
@@ -225,16 +225,16 @@ BEGIN
 			ON CONFLICT DO NOTHING;
 		END LOOP;
 
-		IF v_fprocesscat=48 THEN
+		IF v_fprocesscat=46 THEN -- presszone
 
 			-- upsert presszone on parent tables
 			UPDATE node SET presszonecat_id=a.id FROM audit_log_data JOIN (SELECT id, json_array_elements_text(nodeparent)::integer as nodeparent 
-							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=node_id AND fprocesscat_id=48 AND user_name=current_user;
+							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=node_id AND fprocesscat_id=46 AND user_name=current_user;
 			UPDATE arc SET presszonecat_id=a.id FROM audit_log_data JOIN (SELECT id, json_array_elements_text(nodeparent)::integer as nodeparent 
-							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=arc_id AND  fprocesscat_id=48 AND user_name=current_user;
+							      FROM cat_presszone)a ON nodeparent=log_message::integer WHERE feature_id=arc_id AND  fprocesscat_id=46 AND user_name=current_user;
 			UPDATE connec SET presszonecat_id = arc.presszonecat_id FROM arc WHERE arc.arc_id=connec.arc_id;
 			
-		ELSIF v_fprocesscat=45 THEN
+		ELSIF v_fprocesscat=45 THEN -- dma
 			
 			-- upsert dma on parent tables
 			UPDATE node SET dma_id=a.dma_id FROM audit_log_data JOIN (SELECT dma_id, json_array_elements_text(nodeparent)::integer as nodeparent 
@@ -243,7 +243,7 @@ BEGIN
 							      FROM dma)a ON nodeparent=log_message::integer WHERE feature_id=arc_id AND  fprocesscat_id=45 AND user_name=current_user;
 			UPDATE connec SET dma_id = arc.dma_id FROM arc WHERE arc.arc_id=connec.arc_id;
 
-		ELSIF v_fprocesscat=30 THEN
+		ELSIF v_fprocesscat=30 THEN -- sector
 			-- upsert sector on parent tables
 			UPDATE node SET sector_id=a.sector_id FROM audit_log_data JOIN (SELECT sector_id, json_array_elements_text(nodeparent)::integer as nodeparent 
 							      FROM sector)a ON nodeparent=log_message::integer WHERE feature_id=node_id AND fprocesscat_id=30 AND user_name=current_user;
@@ -251,13 +251,13 @@ BEGIN
 							      FROM sector)a ON nodeparent=log_message::integer WHERE feature_id=arc_id AND  fprocesscat_id=30 AND user_name=current_user;
 			UPDATE connec SET sector_id = arc.sector_id FROM arc WHERE arc.arc_id=connec.arc_id;
 			
-			-- in addition to minsector trigger staticpressure (fprocesscat_id=46)
-			DELETE FROM audit_log_data WHERE fprocesscat_id=46 AND user_name=current_user;
-			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) SELECT 46, 'node', n.node_id, (a.log_message::float - n.elevation) 
+			-- force recalculate staticpressure (fprocesscat_id=47)
+			DELETE FROM audit_log_data WHERE fprocesscat_id=47 AND user_name=current_user;
+			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) SELECT 47, 'node', n.node_id, (a.log_message::float - n.elevation) 
 			FROM node n JOIN audit_log_data a ON feature_id=node_id WHERE fprocesscat_id=30 AND user_name=current_user;
 
-			-- get addfield parameter related to staticpressure (fprocesscat_id=46)
-			SELECT * INTO v_addparam FROM man_addfields_parameter WHERE (default_value::json->>'fprocesscat_id')=46::text;
+			-- get addfield parameter related to staticpressure (fprocesscat_id=47)
+			SELECT * INTO v_addparam FROM man_addfields_parameter WHERE (default_value::json->>'fprocesscat_id')=47::text;
 
 			-- upsert parameter
 			DELETE FROM man_addfields_value WHERE feature_id IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat) AND parameter_id = v_addparam.id;
