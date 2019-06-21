@@ -188,7 +188,6 @@ BEGIN
 		--call engine function
 		v_data = '{"grafClass":"'||v_class||'", "node":"'|| (v_featureid) ||'"}';
 
-		--RAISE NOTICE 'v_text %', v_text;		
 		RAISE NOTICE 'v_data %', v_data;
 		PERFORM gw_fct_grafanalytics_engine(v_data);
 		

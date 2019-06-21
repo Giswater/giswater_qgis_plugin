@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(p_data)  
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(p_data json)  
 RETURNS json AS 
 $BODY$
 
@@ -19,8 +19,6 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 */
 
 DECLARE
-	valve_rec	record;
-	check_count_aux integer;
 	v_mandatory_nodarc boolean = false;
 	v_return json;
 	v_input json;

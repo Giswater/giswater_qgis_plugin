@@ -91,6 +91,24 @@ UPDATE cat_presszone SET id='5' WHERE id='Medium-Expl_02';
 UPDATE cat_presszone SET id='6' WHERE id='Low-Expl_02';
 
 
+
+SELECT setval('SCHEMA_NAME.man_addfields_parameter_id_seq', (SELECT max(id) FROM man_addfields_parameter), true);
+INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, widgettype_id) 
+VALUES ('minsector', 'PIPE', true, 'integer', NULL, NULL, '{"fprocesscat_id":"34"}', 'as', 'QTextEdit');
+INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, widgettype_id) 
+VALUES ('minsector', 'JUNCTION', true, 'integer', NULL, NULL, '{"fprocesscat_id":"34"}', 'AS', 'QTextEdit');
+INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, widgettype_id) 
+VALUES ('dqa', 'PIPE', true, 'integer', NULL, NULL, '{"fprocesscat_id":"44"}', 'as', 'QTextEdit');
+INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, widgettype_id) 
+VALUES ('dqa', 'JUNCTION', true, 'integer', NULL, NULL, '{"fprocesscat_id":"44"}', 'AS', 'QTextEdit');
+INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, widgettype_id) 
+VALUES ('staticpressure', 'PIPE', true, 'integer', NULL, NULL, '{"fprocesscat_id":"47"}', 'as', 'QTextEdit');
+INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, widgettype_id) 
+VALUES ('staticpressure', 'JUNCTION', true, 'integer', NULL, NULL, '{"fprocesscat_id":"47"}', 'AS', 'QTextEdit');
+
+
+
+
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 
@@ -104,5 +122,6 @@ where ext_rtc_hydrometer.id = a.hydrometer_id;
 
 
 select gw_fct_audit_check_project(1);
+
 
 
