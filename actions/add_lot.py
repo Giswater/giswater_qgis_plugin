@@ -1119,6 +1119,7 @@ class AddNewLot(ParentManage):
 
 
     def manage_rejected(self):
+
         self.disconnect_signal_selection_changed()
         layer = self.iface.activeLayer()
         if layer:
@@ -1130,9 +1131,14 @@ class AddNewLot(ParentManage):
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
+
         self.rb_red.reset()
         rb = self.rb_red
-        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            polyline = QgsGeometry.fromPolyline(points)
+        else:
+            polyline = QgsGeometry.fromPolylineXY(points)
+        rb.setToGeometry(polyline, None)
         rb.setColor(color)
         rb.setWidth(width)
         rb.show()

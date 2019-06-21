@@ -19,8 +19,7 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsGeometry
-from qgis.core import QgsProject
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsGeometry, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
@@ -158,6 +157,7 @@ class ApiParent(ParentAction):
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
+
         try:
             self.save_settings(dlg)
             dlg.close()
@@ -200,6 +200,7 @@ class ApiParent(ParentAction):
 
     def start_editing(self):
         """ start or stop the edition based on your current status"""
+
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
 
 
@@ -1013,10 +1014,15 @@ class ApiParent(ParentAction):
         """ Draw 'line' over canvas following list of points """
 
         rb = self.rubber_polygon
-        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            polyline = QgsGeometry.fromPolyline(points)
+        else:
+            polyline = QgsGeometry.fromPolylineXY(points)
+        rb.setToGeometry(polyline, None)
         rb.setColor(color)
         rb.setWidth(width)
         rb.show()
+
         # wait to simulate a flashing effect
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
@@ -1028,12 +1034,17 @@ class ApiParent(ParentAction):
         """ Draw 'polygon' over canvas following list of points """
 
         rb = self.rubber_polygon
-        rb.setToGeometry(QgsGeometry.fromPolygon([points]), None)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            polygon = QgsGeometry.fromPolygon([points])
+        else:
+            polygon = QgsGeometry.fromPolygonXY([points])
+        rb.setToGeometry(polygon, None)
         rb.setColor(border)
         if fill_color:
             rb.setFillColor(fill_color)
         rb.setWidth(width)
         rb.show()
+
         # wait to simulate a flashing effect
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
@@ -1475,6 +1486,7 @@ class ApiParent(ParentAction):
 
         if result['geometry'] is None:
             return
+
         list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
         points = self.get_points(list_coord)
         self.draw_polyline(points)
