@@ -187,7 +187,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (0o1, 0o2, 33, 34, 66, 67, 68):
+            elif int(index_action) in (1, 2, 33, 34, 66, 67, 68):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -270,17 +270,19 @@ class Giswater(QObject):
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
+
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
-            if (index_action == '01' and feature_cat.feature_type.upper() == 'CONNEC'):
+            if index_action == '01' and feature_cat.feature_type.upper() == 'CONNEC':
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
+
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
-            if (index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.wsoftware == 'ud'):
+            if index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.wsoftware == 'ud':
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addSeparator()
@@ -304,9 +306,11 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 58, 86, 64, 65, 66, 67, 68, 74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206,
-                                 301, 302, 303, 304, 305):
+        list_actions = (19, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49,
+                        50, 58, 86, 64, 65, 66, 67, 68, 74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206,
+                        301, 302, 303, 304, 305)
+
+        if int(index_action) in list_actions:
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
 
         # Buttons checkable (normally related with 'map_tools')                
@@ -387,8 +391,6 @@ class Giswater(QObject):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
         """
-                        
-        list_actions = None
 
         toolbar_id = "om_ws"
         list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84']
@@ -472,44 +474,21 @@ class Giswater(QObject):
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
         self.feature_cat = {}
-        sql = ("SELECT * FROM " + self.schema_name + ".cat_feature"
-               " WHERE active is True")
-        rows = self.controller.dao.get_rows(sql)
+        sql = ("SELECT * FROM " + self.schema_name + ".cat_feature "
+               "WHERE active is True")
+        rows = self.controller.get_rows(sql)
         if not rows:
             return False
 
         for row in rows:
             tablename = row['child_layer']
-            # elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
             elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
                                  row['parent_layer'], row['child_layer'], row['active'])
             self.feature_cat[tablename] = elem
 
         self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
+
         return True
-    
-
-    def manage_layer_names(self):
-        """ Get current layer name (the one set in the TOC) 
-            of the tables recorded in the table 'sys_feature_cat'
-        """
-        
-        # Manage records from table 'sys_feature_type'
-        if not self.manage_feature_cat():
-            return
-        
-        # Check if we have any layer loaded
-        layers = self.controller.get_layers()
-        if len(layers) == 0:
-            return
-
-        # Iterate over all layers. Set the layer_name to the ones related with table 'sys_feature_cat'
-        for cur_layer in layers:
-            uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
-            if uri_table:
-                if uri_table in list(self.feature_cat.keys()):
-                    elem = self.feature_cat[uri_table]
-                    elem.layername = cur_layer.name()
 
 
     def unload(self, remove_modules=True):
@@ -568,6 +547,7 @@ class Giswater(QObject):
             action = self.actions[key]
             action.setEnabled(enable)                   
 
+
     def hide_action(self, visible=True, index=1):
         """ Enable/disable selected action """
 
@@ -575,6 +555,8 @@ class Giswater(QObject):
         if key in self.actions:
             action = self.actions[key]
             action.setVisible(visible)
+
+
     def enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
         
@@ -681,9 +663,9 @@ class Giswater(QObject):
         if not self.manage_layers():
             return
 
-        # Manage layer names of the tables present in table 'sys_feature_cat'
-        self.manage_layer_names()   
-        
+        # Manage records from table 'sys_feature_type'
+        self.manage_feature_cat()
+
         # Manage snapping layers
         self.manage_snapping_layers()
 
