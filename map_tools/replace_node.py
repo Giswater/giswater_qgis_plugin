@@ -38,8 +38,8 @@ class ReplaceNodeMapTool(ParentMapTool):
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
         super(ReplaceNodeMapTool, self).__init__(iface, settings, action, index_action)
+        self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
 
 
     def init_replace_node_form(self, feature):
@@ -48,35 +48,38 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.dlg_nodereplace = NodeReplace()
         self.load_settings(self.dlg_nodereplace)
 
-        sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+        sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.fillComboBox(self.dlg_nodereplace, self.dlg_nodereplace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_nodereplace.workcat_id_end)
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'workcat_vdefault'")
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               "WHERE cur_user = current_user AND parameter = 'workcat_vdefault'")
         row = self.controller.get_row(sql)
         if row:
-            self.dlg_nodereplace.workcat_id_end.setCurrentIndex(self.dlg_nodereplace.workcat_id_end.findText(row[0]))
+            workcat_vdefault = self.dlg_nodereplace.workcat_id_end.findText(row[0])
+            self.dlg_nodereplace.workcat_id_end.setCurrentIndex(workcat_vdefault)
 
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
         row = self.controller.get_row(sql)
         if row:
-            self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
+            enddate_vdefault = row[0]
+            self.enddate_aux = datetime.strptime(enddate_vdefault, '%Y-%m-%d').date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_nodereplace, self.dlg_nodereplace.workcat_id_end)
             sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work"
-                   " WHERE id ='"+str(work_id)+"'")
+                   " WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
             if row:
-                if row[0] != 'null' and row[0] is not None:
-                    self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+                builtdate = row[0]
+                if builtdate != 'null' and builtdate:
+                    self.enddate_aux = datetime.strptime(str(builtdate), '%Y-%m-%d').date()
                 else:
-                    self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+                    self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
             else:
-                self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+                self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
 
         self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
@@ -118,12 +121,16 @@ class ReplaceNodeMapTool(ParentMapTool):
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_nodereplace, self.dlg_nodereplace.workcat_id_end)
             sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work"
-                   " WHERE id ='"+str(work_id)+"'")
+                   " WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
             if row:
-                self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+                builtdate = row[0]
+                if builtdate != 'null' and builtdate:
+                    self.enddate_aux = datetime.strptime(str(builtdate), '%Y-%m-%d').date()
+                else:
+                    self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
             else:
-                self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+                self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
 
         self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
@@ -137,9 +144,8 @@ class ReplaceNodeMapTool(ParentMapTool):
         table_object = "cat_work"
         self.set_completer_object(table_object,self.dlg_new_workcat.cat_work_id,'id')
 
-        #Set signals
+        # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
-
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
@@ -245,6 +251,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         node_node_type_new = utils_giswater.getWidgetText(dialog, dialog.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(dialog, dialog.node_nodecat_id)
         layer = self.controller.get_layer_by_nodetype(node_node_type_new, log_info=True)
+        print(str(layer))
 
         if node_node_type_new != "null" and node_nodecat_id != "null":
             
@@ -252,52 +259,45 @@ class ReplaceNodeMapTool(ParentMapTool):
             message = "Are you sure you want to replace selected node with a new one?"
             answer = self.controller.ask_question(message, "Replace node")
             if answer:
+
+                # TODO: Replace to function gw_fct_feature_replace(json)
                 # Execute SQL function and show result to the user
                 function_name = "gw_fct_node_replace"
                 sql = ("SELECT " + self.schema_name + "." + function_name + "('"
                        + str(self.node_id) + "', '" + str(self.workcat_id_end_aux) + "', '" + str(self.enddate_aux) + "', '"
                        + str(utils_giswater.isChecked(dialog, "keep_elements")) + "');")
-                new_node_id = self.controller.get_row(sql, commit=True)
+                new_node_id = self.controller.get_row(sql, log_sql=True, commit=True)
                 if new_node_id:
                     message = "Node replaced successfully"
                     self.controller.show_info(message)
                     self.iface.setActiveLayer(layer)
-                    self.force_active_layer = False
                 else:
                     message = "Error replacing node"
                     self.controller.show_warning(message)
+                    self.deactivate()
+                    self.set_action_pan()
+                    self.close_dialog(dialog, set_action_pan=False)
+                    return
 
                 # Force user to manage with state = 1 features
                 current_user = self.controller.get_project_user()
                 sql = ("DELETE FROM " + self.schema_name + ".selector_state "
                        "WHERE state_id = 1 AND cur_user = '" + str(current_user) + "';"
-                       "\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                       "\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user) "
                        "VALUES (1, '" + str(current_user) + "');")
                 self.controller.execute_sql(sql)
 
                 # Update field 'nodecat_id'
-                sql = ("UPDATE " + self.schema_name + ".v_edit_node"
-                       " SET nodecat_id = '" + str(node_nodecat_id) + "'"
-                       " WHERE node_id = '" + str(new_node_id[0]) + "'")
+                sql = ("UPDATE " + self.schema_name + ".v_edit_node "
+                       "SET nodecat_id = '" + str(node_nodecat_id) + "' "
+                       "WHERE node_id = '" + str(new_node_id[0]) + "'")
                 self.controller.execute_sql(sql)
 
                 if project_type == 'ud':
-                    sql = ("UPDATE " + self.schema_name + ".v_edit_node"
-                           " SET node_type = '" + str(node_node_type_new) + "'"
-                           " WHERE node_id = '" + str(new_node_id[0]) + "'")
+                    sql = ("UPDATE " + self.schema_name + ".v_edit_node "
+                           "SET node_type = '" + str(node_node_type_new) + "' "
+                           "WHERE node_id = '" + str(new_node_id[0]) + "'")
                     self.controller.execute_sql(sql)
-
-                sql = ("SELECT man_table FROM " + self.schema_name + ".node_type"
-                       " WHERE id = '" + str(node_node_type_new) + "'")
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-
-                # Set active layer
-                viewname = "v_edit_" + str(row[0])
-                layer = self.controller.get_layer_by_tablename(viewname)
-                if layer:
-                    self.iface.setActiveLayer(layer)
                     
                 message = "Values has been updated"
                 self.controller.show_info(message)
@@ -318,9 +318,26 @@ class ReplaceNodeMapTool(ParentMapTool):
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
+
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             return
+
+
+    def canvasMoveEvent(self, event):
+
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snapping layers 'v_edit_'
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            tablename = self.controller.get_layer_source_table_name(layer)
+            # TODO: Enable for v_edit_*
+            if 'v_edit_node' in tablename:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -332,21 +349,20 @@ class ReplaceNodeMapTool(ParentMapTool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_background_layers(event_point)
         if not self.snapper_manager.result_is_valid():
             return
 
         # Get snapped feature
         snapped_feat = self.snapper_manager.get_snapped_feature(result)
         if snapped_feat:
-            # Get 'node_id' and 'nodetype'
-            self.node_id = snapped_feat.attribute('node_id')
-            if self.project_type == 'ws':
-                nodetype_id = snapped_feat.attribute('nodetype_id')
-            elif self.project_type == 'ud':
-                nodetype_id = snapped_feat.attribute('node_type')
-
-            self.init_replace_node_form(snapped_feat)
+            # Get 'node_id'
+            layer = self.snapper_manager.get_snapped_layer(result)
+            tablename = self.controller.get_layer_source_table_name(layer)
+            # TODO: Enable for v_edit_*
+            if 'v_edit_node' in tablename:
+                self.node_id = snapped_feat.attribute('node_id')
+                self.init_replace_node_form(snapped_feat)
 
 
     def open_custom_form(self, layer, node_id):
@@ -367,24 +383,26 @@ class ReplaceNodeMapTool(ParentMapTool):
 
 
     def activate(self):
+
         # Check button
         self.action().setChecked(True)
+
+        # Set main snapping layers
+        self.snapper_manager.set_snapping_layers()
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
-        # Clear snapping
-        self.snapper_manager.clear_snapping()
+        # Disable snapping
+        self.snapper_manager.enable_snapping()
 
-        # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)   
-        self.force_active_layer = True           
+        # Set snapping to 'node', 'arc', 'connec' and 'gully'
+        self.snapper_manager.snap_to_arc()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec_gully()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
-        
-        self.project_type = self.controller.get_project_type()         
 
         # Show help message when action is activated
         if self.show_help:
@@ -393,7 +411,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
 
     def deactivate(self):
-        # Call parent method
+
         ParentMapTool.deactivate(self)
 
 
@@ -412,9 +430,9 @@ class ReplaceNodeMapTool(ParentMapTool):
             if project_type == 'ws':
                 # Fill 3rd combo_box-catalog_id
                 utils_giswater.setWidgetEnabled(self.dlg_nodereplace, self.dlg_nodereplace.node_nodecat_id, True)
-                sql = ("SELECT DISTINCT(id)"
-                       " FROM " + self.schema_name + ".cat_node"
-                       " WHERE nodetype_id = '" + str(node_node_type_new) + "'")
+                sql = ("SELECT DISTINCT(id) "
+                       "FROM " + self.schema_name + ".cat_node "
+                       "WHERE nodetype_id = '" + str(node_node_type_new) + "'")
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_nodereplace, self.dlg_nodereplace.node_nodecat_id, rows)
     
