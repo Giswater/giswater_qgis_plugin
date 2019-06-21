@@ -48,6 +48,7 @@ Rest of arcs are clasified as NON HYDRANT (H4) arcs
 DECLARE
 	v_step integer;
 	v_text text;
+	v_return text;
       
 BEGIN
 

@@ -22,7 +22,7 @@ DECLARE
 	v_return json;
 	v_input json;
 	v_result text;
-	v_usnetworkgeom boolean;
+	v_usenetworkgeom boolean;
 	v_dumpsubcatch boolean;
 	
 BEGIN
@@ -30,7 +30,7 @@ BEGIN
 
 --  Get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
-	v_usnetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
+	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
 	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
 
 --  Search path
@@ -46,26 +46,26 @@ BEGIN
 	UPDATE raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault' AND cur_user=current_user)::float WHERE scf IS NULL;
 		
 	-- Upsert on rpt_cat_table
-	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
-	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
+	DELETE FROM rpt_cat_result WHERE result_id=v_result;
+	INSERT INTO rpt_cat_result (result_id) VALUES (v_result);
 		
 	-- Upsert on node rpt_inp result manager table
 	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
 	
 	IF v_usenetworkgeom IS FALSE THEN
 
 		-- Fill inprpt tables
-		PERFORM gw_fct_pg2epa_fill_data(result_id_var);
+		PERFORM gw_fct_pg2epa_fill_data(v_result);
 	
 		-- Make virtual arcs (EPA) transparents for hydraulic model
-		PERFORM gw_fct_pg2epa_join_virtual(result_id_var);
+		PERFORM gw_fct_pg2epa_join_virtual(v_result);
 		
 		-- Call nod2arc function
-		PERFORM gw_fct_pg2epa_nod2arc_geom(result_id_var);
+		PERFORM gw_fct_pg2epa_nod2arc_geom(v_result);
 		
 		-- Calling for gw_fct_pg2epa_flowreg_additional function
-		PERFORM gw_fct_pg2epa_nod2arc_data(result_id_var);
+		PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
 	
 	END IF;
 	
@@ -75,10 +75,10 @@ BEGIN
 	END IF;
 		
 	-- Calling for the export function
-	PERFORM gw_fct_utils_csv2pg_export_swmm_inp(result_id_var, null);
+	PERFORM gw_fct_utils_csv2pg_export_swmm_inp(v_result, null);
 	
 	-- manage return message
-	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',result_id_var,'"},"saveOnDatabase":true}}')::json;
+	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"},"saveOnDatabase":true}}')::json;
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;

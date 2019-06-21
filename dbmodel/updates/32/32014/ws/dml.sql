@@ -22,5 +22,5 @@ INSERT INTO dma VALUES (-1, 'Undefined dma');
 INSERT INTO sector VALUES (-1, 'Undefined sector');
 INSERT INTO cat_presszone VALUES (-1, 'Undefined presszone',-1);
 
-INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '1', 'HYDRANT ANALYSIS', null, '{"functionName":"gw_fct_go2epa_hdyrant", "storeAllResults":"false", "steps":"5"}');
-INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '2', 'EPA OPTIMIZATION', null, '{"functionName":"gw_fct_go2epa_gaoptimization", "storeAllResults":"true", "steps":"9999"}');
+INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '1', 'HYDRANT ANALYSIS', null, '{"functionName":"gw_fct_pg2epa_hydrant", "storeAllResults":"false", "steps":"5"}');
+INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '2', 'EPA OPTIMIZATION', null, '{"functionName":"gw_fct_pg2epa_gaoptimization", "storeAllResults":"true", "steps":"9999"}');
