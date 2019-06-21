@@ -49,6 +49,7 @@ class ParentManage(ParentAction, object):
         self.xyCoordinates_conected = False
         self.remove_ids = True
 
+
     def reset_lists(self):
         """ Reset list of selected records """
 

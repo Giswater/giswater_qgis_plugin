@@ -51,8 +51,6 @@ class MultipleSelection(QgsMapTool):
         self.reset()
         self.selected_features = []
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            snapper = QgsMapCanvasSnapper(self.canvas)
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()

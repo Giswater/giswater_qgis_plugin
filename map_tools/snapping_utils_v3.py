@@ -90,7 +90,6 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
-        #QgsSnappingUtils.setConfig(self.snapping_config)
 
 
     def snap_to_arc(self):
@@ -298,14 +297,12 @@ class SnappingConfigManager(object):
             return snapped_feat
 
 
-    def select_snapped_feature(self, result, feature_id=None):
+    def select_snapped_feature(self, result, feature_id):
 
         if not result.isValid():
             return
 
         layer = result.layer()
-        if feature_id is None:
-            feature_id = result.featureId()
         layer.select([feature_id])
 
 
