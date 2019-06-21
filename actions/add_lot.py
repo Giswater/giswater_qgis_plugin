@@ -89,6 +89,7 @@ class AddNewLot(ParentManage):
         self.set_icon(self.dlg_lot.btn_feature_delete, "112")
         self.set_icon(self.dlg_lot.btn_feature_snapping, "137")
 
+        # Set date format to date widgets
         utils_giswater.set_regexp_date_validator(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
         utils_giswater.set_regexp_date_validator(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
         utils_giswater.set_regexp_date_validator(self.dlg_lot.real_startdate, self.dlg_lot.btn_accept, 1)
@@ -233,6 +234,7 @@ class AddNewLot(ParentManage):
 
 
     def manage_team(self):
+        """ Open dialog of teams"""
         self.max_team_id = self.get_max_id('cat_team')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
@@ -320,11 +322,14 @@ class AddNewLot(ParentManage):
 
 
     def filter_by_list(self, widget):
+        """ The combination of this function and the function self.set_model_by_list(List, QCombobox),
+        make the QCombobox can filter by text as if it were a ILIKE"""
         self.proxy_model.setFilterFixedString(widget.currentText())
 
 
     def set_model_by_list(self, string_list, widget):
-
+        """ The combination of this function and the function self.filter_by_list(QCombobox),
+        make the QCombobox can filter by text as if it were a ILIKE"""
         model = QStringListModel()
         model.setStringList(string_list)
         self.proxy_model = QSortFilterProxyModel()
@@ -346,7 +351,7 @@ class AddNewLot(ParentManage):
 
 
     def check_dates_consistency(self):
-
+        """ Check that the date 'from' is lees than the date 'to'"""
         # Get dates as text
         startdate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate)
         enddate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
