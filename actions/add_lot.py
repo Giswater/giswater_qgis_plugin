@@ -137,6 +137,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_active_layer)
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.reload_table_visit))
+        self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.manage_cmb_status))
         self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.disbale_actions))
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
@@ -183,6 +184,28 @@ class AddNewLot(ParentManage):
 
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+
+
+    def manage_cmb_status(self):
+        """ Control of status_lot and widgets according to the selected status_lot """
+        value = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
+        # Set all options enabled
+        all_index = ['1', '2', '3', '4', '5', '6', '7']
+        utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, all_index, 0, (1 | 32))
+        self.dlg_lot.btn_validate_all.setEnabled(True)
+        self.dlg_lot.tbl_visit.setEnabled(True)
+        self.dlg_lot.btn_delete_visit.setEnabled(True)
+
+        # Disable option according combo selection
+        if value in (1, 2, 3, 7):
+            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5', '6'], 0)
+        elif value in (4, 5):
+            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['1', '2', '3', '7'], 0)
+        elif value == 6:
+            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['1', '2', '3', '4', '7'], 0)
+            self.dlg_lot.btn_validate_all.setEnabled(False)
+            self.dlg_lot.tbl_visit.setEnabled(False)
+            self.dlg_lot.btn_delete_visit.setEnabled(False)
 
 
     def set_checkbox_values(self):
@@ -433,7 +456,7 @@ class AddNewLot(ParentManage):
         rows = self.get_values_from_catalog('om_typevalue', 'lot_cat_status')
         if rows:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, rows, 1, sort_combo=False)
-            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5'], 0)
+            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5', '6'], 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, '1', 0)
 
         # Relations tab
@@ -1239,6 +1262,7 @@ class AddNewLot(ParentManage):
 
         self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
         self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers, True))
+        self.dlg_lot_sel.btn_unselect.clicked.connect(partial(self.set_visible_lot_layers, True))
 
         # Open dialog
         self.open_dialog(self.dlg_lot_sel, maximize_button=False)

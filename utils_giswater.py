@@ -502,7 +502,7 @@ def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
                 else:
                     widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                          " color: rgb(100, 100, 100)}")
-            elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+            elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit, QTableView):
                 widget.setEnabled(enable)
 
 
