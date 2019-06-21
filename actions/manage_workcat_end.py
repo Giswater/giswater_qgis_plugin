@@ -108,19 +108,16 @@ class ManageWorkcatEnd(ParentManage):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'edit_arc_downgrade_force' "
-               " AND cur_user=current_user")
-
+               "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                   " SET value = '" + str(value) + "'"
-                   " WHERE parameter = 'edit_arc_downgrade_force' "
-                   " AND cur_user=current_user")
+                   "SET value = '" + str(value) + "' "
+                   "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
             self.controller.execute_sql(sql, log_sql=True)
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user)"
-                   " VALUES ('edit_arc_downgrade_force', '"+str(value)+"', current_user)")
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                   "VALUES ('edit_arc_downgrade_force', '" + str(value) + "', current_user)")
             self.controller.execute_sql(sql, commit=self.autocommit)
 
 
@@ -128,7 +125,7 @@ class ManageWorkcatEnd(ParentManage):
         """ Fill dates and combo cat_work """
 
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
+               "WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             enddate = QDate.fromString(row[0], 'yyyy-MM-dd')
@@ -141,7 +138,7 @@ class ManageWorkcatEnd(ParentManage):
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
+               "WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
@@ -152,9 +149,9 @@ class ManageWorkcatEnd(ParentManage):
         
         workcat_id = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
 
-        sql = ("SELECT descript, builtdate"
-               " FROM " + self.controller.schema_name + ".cat_work"
-               " WHERE id = '" + workcat_id + "'")
+        sql = ("SELECT descript, builtdate "
+               "FROM " + self.controller.schema_name + ".cat_work "
+               "WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
@@ -194,8 +191,8 @@ class ManageWorkcatEnd(ParentManage):
         ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
         row = None
         if ids_list:
-            sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
-                   " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
+            sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations "
+                   "WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
             row = self.controller.get_row(sql)
             ids_list = None
 
@@ -208,7 +205,8 @@ class ManageWorkcatEnd(ParentManage):
             self.set_completer()
 
             table_relations = "v_ui_arc_x_relations"
-            self.dlg_work.arc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
+            self.dlg_work.arc_id.textChanged.connect(
+                partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
 
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -220,10 +218,12 @@ class ManageWorkcatEnd(ParentManage):
             filter_ += " AND arc_state = '1' "
 
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
-            self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
+            self.tbl_arc_x_relations.doubleClicked.connect(
+                partial(self.open_selected_object, self.tbl_arc_x_relations))
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
 
+        # TODO: Function update_geom_type() don't use parameter ids_list
         else:
             # Update tablename of every geom_type
             ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
@@ -237,6 +237,7 @@ class ManageWorkcatEnd(ParentManage):
             if str(self.project_type) == 'ud':
                 ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
                 self.update_geom_type("gully", ids_list)
+
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True)
 
 
@@ -249,10 +250,10 @@ class ManageWorkcatEnd(ParentManage):
 
         sql = ""
         for id_ in self.selected_list:
-            sql += ("UPDATE " + self.schema_name + "." + tablename + ""
-                    " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
-                    " enddate = '" + str(self.enddate) + "'"
-                    " WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
+            sql += ("UPDATE " + self.schema_name + "." + tablename + " "
+                    "SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "', "
+                    "enddate = '" + str(self.enddate) + "' "
+                    "WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
         if sql != "":
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:

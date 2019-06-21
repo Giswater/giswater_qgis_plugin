@@ -1096,16 +1096,14 @@ class DaoController(object):
         return row
     
 
-    def get_group_layers(self, geom_type, union=False):
+    def get_group_layers(self, geom_type):
         """ Get layers of the group @geom_type """
         
         list_items = []        
-        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat "
-               "WHERE type = '" + geom_type.upper() + "' ")
-        if union:
-            sql += ("UNION SELECT parent_layer FROM " + self.schema_name + ".cat_feature "
-                    "WHERE feature_type='" + geom_type.upper() + "'")
-        rows = self.get_rows(sql)
+        sql = ("SELECT parent_layer "
+               "FROM " + self.schema_name + ".cat_feature "
+               "WHERE upper(feature_type) = '" + geom_type.upper() + "'")
+        rows = self.get_rows(sql, log_sql=True)
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
