@@ -201,7 +201,7 @@ class AddNewLot(ParentManage):
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5', '6'], 0)
         elif value in (4, 5):
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['1', '2', '3', '7'], 0)
-        elif value == 6:
+        elif value in [6]:
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['1', '2', '3', '4', '7'], 0)
             self.dlg_lot.btn_validate_all.setEnabled(False)
             self.dlg_lot.tbl_visit.setEnabled(False)
@@ -378,6 +378,10 @@ class AddNewLot(ParentManage):
 
     def disbale_actions(self):
         class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
+        self.dlg_lot.action_selector.setEnabled(True)
+        self.dlg_lot.btn_feature_insert.setEnabled(True)
+        self.dlg_lot.btn_feature_delete.setEnabled(True)
+        self.dlg_lot.btn_feature_snapping.setEnabled(True)
         # 5=EXECUTAT, 6=REVISAT, 7=CANCEL.LAT
         if class_id in (5, 6, 7):
             self.dlg_lot.action_selector.setEnabled(False)
