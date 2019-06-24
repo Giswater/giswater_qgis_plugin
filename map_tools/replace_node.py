@@ -250,8 +250,6 @@ class ReplaceNodeMapTool(ParentMapTool):
         project_type = self.controller.get_project_type()
         node_node_type_new = utils_giswater.getWidgetText(dialog, dialog.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(dialog, dialog.node_nodecat_id)
-        layer = self.controller.get_layer_by_nodetype(node_node_type_new, log_info=True)
-        print(str(layer))
 
         if node_node_type_new != "null" and node_nodecat_id != "null":
             

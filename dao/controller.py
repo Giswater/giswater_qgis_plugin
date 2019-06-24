@@ -781,30 +781,7 @@ class DaoController(object):
             self.log_info("Layer not found", parameter=tablename)
                                       
         return layer        
-    
-        
-    def get_layer_by_nodetype(self, nodetype_id, show_warning=False, log_info=False):
-        """ Get layer related with selected @nodetype_id """
-        
-        layer = None
-        sql = ("SELECT sys_feature_cat.tablename"
-               " FROM " + self.schema_name + ".node_type"
-               " INNER JOIN " + self.schema_name + ".sys_feature_cat"
-               " ON node_type.type = sys_feature_cat.id"
-               " WHERE node_type.id = '" + nodetype_id + "'")
-        row = self.get_row(sql)
-        if row:
-            tablename = row[0]
-            layer = self.get_layer_by_tablename(tablename)
-        
-        if layer is None and show_warning:
-            self.show_warning("Layer not found", parameter=tablename)
-                           
-        if layer is None and log_info:
-            self.log_info("Layer not found", parameter=tablename)
-                                      
-        return layer  
-                     
+
         
     def get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
