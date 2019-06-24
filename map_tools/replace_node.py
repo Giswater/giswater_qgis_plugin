@@ -336,7 +336,7 @@ class ReplaceNodeMapTool(ParentMapTool):
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
             # TODO: Enable for v_edit_*
-            if 'v_edit_node' in tablename:
+            if tablename and 'v_edit_node' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
@@ -360,7 +360,7 @@ class ReplaceNodeMapTool(ParentMapTool):
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
             # TODO: Enable for v_edit_*
-            if 'v_edit_node' in tablename:
+            if tablename and 'v_edit_node' in tablename:
                 self.node_id = snapped_feat.attribute('node_id')
                 self.init_replace_node_form(snapped_feat)
 

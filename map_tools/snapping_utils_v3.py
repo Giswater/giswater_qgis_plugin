@@ -36,21 +36,18 @@ class SnappingConfigManager(object):
         self.is_valid = False
 
         # Snapper
-        try:
-            self.snapping_config = self.get_snapping_options()
-            self.snapper = self.get_snapper()
-            proj = QgsProject.instance()
-            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
-        except:
-            pass
-        finally:
-            # Set default vertex marker
-            color = QColor(255, 100, 255)
-            self.vertex_marker = QgsVertexMarker(self.canvas)
-            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-            self.vertex_marker.setColor(color)
-            self.vertex_marker.setIconSize(15)
-            self.vertex_marker.setPenWidth(3)
+        self.snapping_config = self.get_snapping_options()
+        self.snapper = self.get_snapper()
+        proj = QgsProject.instance()
+        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+
+        # Set default vertex marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
 
 
     def set_snapping_layers(self):

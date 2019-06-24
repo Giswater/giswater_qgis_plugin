@@ -175,6 +175,9 @@ class ConnecMapTool(ParentMapTool):
         # Rubber band
         self.rubber_band.reset()
 
+        # Set main snapping layers
+        self.snapper_manager.set_snapping_layers()
+
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
