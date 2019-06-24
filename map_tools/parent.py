@@ -357,3 +357,20 @@ class ParentMapTool(QgsMapTool):
         if self.snapper_manager.result_is_valid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras:
+            data += ', ' + extras
+        data += '}'
+        body = "" + client + form + feature + data
+
+        return body
+
