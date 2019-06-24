@@ -89,6 +89,8 @@ BEGIN
  
 	-- get input parameters -,man_addfields
 	v_schemaname = 'SCHEMA_NAME';
+	v_id = (SELECT nextval('man_addfields_parameter_id_seq') +1);
+	
 	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'column_id')::text; 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_ismandatory = (((p_data ->>'data')::json->>'parameters')::json->>'ismandatory')::text;
