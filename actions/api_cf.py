@@ -25,8 +25,7 @@ from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
-from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
-from qgis.PyQt.QtWidgets import QTextEdit
+from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 from qgis.core import QgsMapToPixel, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
