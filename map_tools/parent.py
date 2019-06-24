@@ -51,14 +51,10 @@ class ParentMapTool(QgsMapTool):
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))
         self.index_action = index_action
         self.layer_arc = None        
-        self.layer_connec = None        
-        self.layer_node = None   
-        
-        self.layer_arc_man = None        
-        self.layer_connec_man = None        
-        self.layer_node_man = None
-        self.layer_gully_man = None 
-            
+        self.layer_connec = None
+        self.layer_gully = None
+        self.layer_node = None
+
         self.schema_name = None        
         self.controller = None        
         self.dao = None 
@@ -113,17 +109,6 @@ class ParentMapTool(QgsMapTool):
             cursor = QCursor(Qt.ArrowCursor)  
                 
         return cursor
-     
-
-    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
-        """ Sets layers involved in Map Tools functions
-            Sets Snapper Manager """
-
-        self.layer_arc_man = layer_arc_man
-        self.layer_connec_man = layer_connec_man
-        self.layer_node_man = layer_node_man
-        self.layer_gully_man = layer_gully_man
-        self.snapper_manager.set_layers(layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man)
 
 
     def set_controller(self, controller):
@@ -141,6 +126,9 @@ class ParentMapTool(QgsMapTool):
 
         # Restore previous snapping
         self.snapper_manager.recover_snapping_options()
+
+        # Enable snapping
+        self.snapper_manager.enable_snapping(True)
 
         # Recover cursor
         self.canvas.setCursor(self.std_cursor)

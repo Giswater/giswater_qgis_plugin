@@ -791,6 +791,7 @@ class ParentAction(object):
         :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
         :return:
         """
+
         role = self.controller.get_restriction()
         if role in restriction:
             widget_list = dialog.findChildren(QWidget)
@@ -824,10 +825,11 @@ class ParentAction(object):
 
 
     def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
+
         sql = ("SELECT id, idval"
                " FROM " + self.schema_name + "." + table_name + ""
                " WHERE typevalue = '" + typevalue + "'"
                " ORDER BY " + order_by + "")
-
         rows = self.controller.get_rows(sql, commit=True)
         return rows
+

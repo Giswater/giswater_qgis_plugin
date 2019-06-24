@@ -1198,7 +1198,11 @@ class AddNewLot(ParentManage):
 
         self.rb_red.reset()
         rb = self.rb_red
-        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            polyline = QgsGeometry.fromPolyline(points)
+        else:
+            polyline = QgsGeometry.fromPolylineXY(points)
+        rb.setToGeometry(polyline, None)
         rb.setColor(color)
         rb.setWidth(width)
         rb.show()

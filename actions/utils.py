@@ -10,11 +10,6 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import range
-
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
 
@@ -31,7 +26,6 @@ from giswater.actions.api_manage_composer import ApiManageComposer
 from giswater.actions.gw_toolbox import GwToolBox
 from giswater.actions.parent import ParentAction
 from giswater.actions.manage_visit import ManageVisit
-from giswater.ui_manager import Toolbox
 from giswater.ui_manager import Csv2Pg
 
 
@@ -39,6 +33,7 @@ class Utils(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
+
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
@@ -49,172 +44,15 @@ class Utils(ParentAction):
         self.project_type = project_type
 
 
-    def utils_arc_topo_repair(self):
-        """ Button 19: Topology repair """
-
-        # Create dialog to check wich topology functions we want to execute
-        self.dlg_toolbox = Toolbox()
-        self.load_settings(self.dlg_toolbox)
-        project_type = self.controller.get_project_type()
-
-        # Remove tab WS or UD
-        if project_type == 'ws':
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.tabWidget_3, "tab_edit_ud")
-        elif project_type == 'ud':
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.tabWidget_3, "tab_edit_ws")
-
-        role_admin = self.controller.check_role_user("role_admin")
-        role_master = self.controller.check_role_user("role_master")
-        role_edit = self.controller.check_role_user("role_edit")
-
-        # Manage user 'postgres'
-        if self.controller.user == 'postgres' or self.controller.user == 'gisadmin':
-            role_admin = True
-
-        # Remove tab for role
-        if role_admin:
-            pass
-        elif role_master:
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_admin")
-        elif role_edit:
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_admin")
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_master")
-
-        # Set signals
-        self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
-        self.dlg_toolbox.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_toolbox))
-        self.dlg_toolbox.rejected.connect(partial(self.close_dialog, self.dlg_toolbox))
-
-        # Open dialog
-        self.open_dialog(self.dlg_toolbox, dlg_name='toolbox', maximize_button=False)
-
-
-    def utils_arc_topo_repair_accept(self):
-        """ Button 19: Executes functions that are selected """
-
-        # Delete previous values for current user
-        tablename = "selector_audit"
-        sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
-               " WHERE cur_user = current_user;\n")
-        self.controller.execute_sql(sql)
-
-        # Edit - Utils - Check project / data
-        if self.dlg_toolbox.check_qgis_project.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(1);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(1)
-        if self.dlg_toolbox.check_user_vdefault_parameters.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(19);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(19)
-
-        # Edit - Utils - Topology Builder
-        if self.dlg_toolbox.check_create_nodes_from_arcs.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_built_nodefromarc();")
-            self.controller.execute_sql(sql)
-
-        # Edit - Utils - Topology review
-        if self.dlg_toolbox.check_node_orphan.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_orphan();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_node_duplicated.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_topology_coherence.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_arc_same_start_end.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_arcs_without_nodes_start_end.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_no_startend_node();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_connec_duplicated.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_mincut_data.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(25);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(25)
-        if self.dlg_toolbox.check_profile_tool_data.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_edit_audit_check_data(26);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(26)
-
-        # Edit - Utils - Topology Repair
-        if self.dlg_toolbox.check_arc_searchnodes.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_repair_arc_searchnodes();")
-            self.controller.execute_sql(sql)
-
-        # Edit - UD
-        if self.dlg_toolbox.check_node_sink.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_sink();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_node_flow_regulator.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_flowregulator();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_node_exit_upper_node_entry.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_node_exit_upper_intro();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_arc_intersection_without_node.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_intersection();")
-            self.controller.execute_sql(sql)
-        if self.dlg_toolbox.check_inverted_arcs.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_anl_arc_inverted();")
-            self.controller.execute_sql(sql)
-
-        # Master - Prices
-        if self.dlg_toolbox.check_reconstruction_price.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(15);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(15)
-        if self.dlg_toolbox.check_rehabilitation_price.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_audit_check_data(16);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(16)
-
-        # Master - Advanced_topology_review
-        if self.dlg_toolbox.check_arc_multi_psector.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(20);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(20)
-        if self.dlg_toolbox.check_node_multi_psector.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(21);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(21)
-        if self.dlg_toolbox.check_node_orphan_2.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(22);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(22)
-        if self.dlg_toolbox.check_node_duplicated_2.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(23);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(23)
-        if self.dlg_toolbox.check_arcs_without_nodes_start_end_2.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_plan_anl_topology(24);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(24)
-
-        # Admin - Check data
-        if self.dlg_toolbox.check_schema_data.isChecked():
-            sql = ("SELECT "+self.schema_name+".gw_fct_audit_check_project(2);")
-            self.controller.execute_sql(sql)
-            self.insert_selector_audit(2)
-
-        # Close the dialog
-        self.close_dialog(self.dlg_toolbox)
-
-        # Refresh map canvas
-        self.refresh_map_canvas()
-
-
     def api_config(self):
+
         self.config = ApiConfig(self.iface, self.settings, self.controller, self.plugin_dir)
         self.config.api_config()
 
 
     def utils_import_csv(self):
         """ Button 83: Import CSV """
+
         self.func_name  = None
         self.dlg_csv = Csv2Pg()
         self.load_settings(self.dlg_csv)
@@ -251,6 +89,7 @@ class Utils(ParentAction):
 
 
     def get_function_name(self):
+
         self.func_name = utils_giswater.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
         self.controller.log_info(str(self.func_name))
 
@@ -267,6 +106,7 @@ class Utils(ParentAction):
 
     def update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
+
         dialog.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
 
 
@@ -361,6 +201,7 @@ class Utils(ParentAction):
 
 
     def read_csv_file(self, model, file_input, delimiter, _unicode):
+
         rows = csv.reader(file_input, delimiter=delimiter)
         for row in rows:
             if Qgis.QGIS_VERSION_INT < 29900:
@@ -373,13 +214,15 @@ class Utils(ParentAction):
 
     def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
         """ Delete records from temp_csv2pg for current user and selected cat """
+
         sql = ("DELETE FROM " + self.schema_name + "." + temp_tablename + " "
-               " WHERE csv2pgcat_id = '" + str(csv2pgcat_id_aux) + "' AND user_name = current_user")
+               "WHERE csv2pgcat_id = '" + str(csv2pgcat_id_aux) + "' AND user_name = current_user")
         self.controller.execute_sql(sql, log_sql=True)
 
 
     def write_csv(self, dialog, temp_tablename):
         """ Write csv in postgre and call gw_fct_utils_csv2pg function """
+
         insert_status = True
         if not self.validate_params(dialog):
             return
@@ -429,10 +272,8 @@ class Utils(ParentAction):
             self.controller.show_info_box(message)
 
 
-
-
-
     def insert_into_db(self, dialog, csvfile, delimiter, _unicode):
+
         sql = ""
         progress = 0
         dialog.progressBar.setVisible(True)
@@ -477,6 +318,7 @@ class Utils(ParentAction):
             status = self.controller.execute_sql(sql, commit=True)
             if not status:
                 return False
+
         return True
 
 
@@ -528,19 +370,22 @@ class Utils(ParentAction):
         """ Insert @fprocesscat_id for current_user in table 'selector_audit' """
 
         tablename = "selector_audit"
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
-               " WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND cur_user = current_user;")
+        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+               "WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND cur_user = current_user;")
         row = self.controller.get_row(sql)
         if not row:
-            sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user)"
-                   " VALUES (" + str(fprocesscat_id) + ", current_user);")
+            sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user) "
+                   "VALUES (" + str(fprocesscat_id) + ", current_user);")
         self.controller.execute_sql(sql)
 
 
     def utils_toolbox(self):
+
         self.toolbox.open_toolbox()
 
 
     def utils_print_composer(self):
+
         self.api_composer = ApiManageComposer(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_composer.composer()
+

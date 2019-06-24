@@ -127,7 +127,9 @@ class ApiCF(ApiParent):
 
         main_menu.exec_(click_point)
 
+
     def identify_all(self, complet_list, rb_list):
+
         self.resetRubberbands()
         for rb in rb_list:
             rb.reset()
@@ -142,7 +144,11 @@ class ApiCF(ApiParent):
                     point = QgsPointXY(float(x), float(y))
                     points.append(point)
                 rb = QgsRubberBand(self.canvas)
-                rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    polyline = QgsGeometry.fromPolyline(points)
+                else:
+                    polyline = QgsGeometry.fromPolylineXY(points)
+                rb.setToGeometry(polyline, None)
                 rb.setColor(QColor(255, 0, 0, 100))
                 rb.setWidth(5)
                 rb.show()
@@ -151,6 +157,7 @@ class ApiCF(ApiParent):
 
     def draw_by_action(self, feature, rb_list, reset_rb=True):
         """ Draw lines based on geometry """
+
         for rb in rb_list:
             rb.reset()
         if feature['geometry'] is None:

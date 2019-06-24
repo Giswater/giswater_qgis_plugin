@@ -447,7 +447,7 @@ class ManNodeDialog(ParentDialog):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping(False)
 
         # Set snapping 
         layer = self.controller.get_layer_by_tablename("v_edit_arc")

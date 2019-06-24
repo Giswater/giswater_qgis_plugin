@@ -72,7 +72,6 @@ class ConnecMapTool(ParentMapTool):
             if self.snapper_manager.result_is_valid():
                 # Check if it belongs to 'connec' or 'gully' group
                 layer = self.snapper_manager.get_snapped_layer(result)
-                snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 exist_connec = self.snapper_manager.check_connec_group(layer)
                 exist_gully = self.snapper_manager.check_gully_group(layer)
                 if exist_connec or exist_gully:
@@ -131,7 +130,6 @@ class ConnecMapTool(ParentMapTool):
                     self.select_rect.setBottom(self.select_rect.bottom() + 1)
 
                 self.set_rubber_band()
-                selected_geom = self.rubber_band.asGeometry()   #@UnusedVariable
                 self.select_multiple_features(self.selected_rectangle)
                 self.dragging = False
 
@@ -142,7 +140,8 @@ class ConnecMapTool(ParentMapTool):
 
             # Check selected records
             number_features = 0
-            for layer in self.layer_connec_man:
+            layer = self.snapper_manager.layer_connec
+            if layer:
                 number_features += layer.selectedFeatureCount()
 
             if number_features > 0:
@@ -151,13 +150,13 @@ class ConnecMapTool(ParentMapTool):
                 answer = self.controller.ask_question(message, title, parameter=str(number_features))
                 if answer:
                     # Create link
-                    self.link_selected_features('connec', self.layer_connec_man)
+                    self.link_selected_features('connec', layer)
                     
-            if self.layer_gully_man:            
+            layer = self.snapper_manager.layer_gully
+            if layer:
                 # Check selected records
                 number_features = 0
-                for layer in self.layer_gully_man:
-                    number_features += layer.selectedFeatureCount()
+                number_features += layer.selectedFeatureCount()
     
                 if number_features > 0:
                     message = "Number of features selected in the 'gully' group"
@@ -165,7 +164,7 @@ class ConnecMapTool(ParentMapTool):
                     answer = self.controller.ask_question(message, title, parameter=str(number_features))
                     if answer:
                         # Create link
-                        self.link_selected_features('gully', self.layer_gully_man)                    
+                        self.link_selected_features('gully', layer)
 
 
     def activate(self):
@@ -176,11 +175,14 @@ class ConnecMapTool(ParentMapTool):
         # Rubber band
         self.rubber_band.reset()
 
+        # Set main snapping layers
+        self.snapper_manager.set_snapping_layers()
+
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()    
+        self.snapper_manager.enable_snapping()
 
         # Set snapping to 'connec' and 'gully'
         self.snapper_manager.snap_to_connec_gully()
@@ -197,18 +199,14 @@ class ConnecMapTool(ParentMapTool):
 
     def deactivate(self):
 
-        # Call parent method     
         ParentMapTool.deactivate(self)
 
 
-    def link_selected_features(self, geom_type, layers):
+    def link_selected_features(self, geom_type, layer):
         """ Link selected @geom_type to the pipe """
 
         # Check features selected
-        number_features = 0
-        for layer in layers:
-            number_features += layer.selectedFeatureCount()
-            
+        number_features = layer.selectedFeatureCount()
         if number_features == 0:
             message = "You have to select at least one feature!"
             self.controller.show_warning(message)
@@ -217,23 +215,21 @@ class ConnecMapTool(ParentMapTool):
         # Get selected features from layers of selected @geom_type
         aux = "{"
         field_id = geom_type + "_id"
-        
-        # Iterate over all layers
-        for layer in layers:
-            if layer.selectedFeatureCount() > 0:
-                # Get selected features of the layer
-                features = layer.selectedFeatures()
-                for feature in features:
-                    feature_id = feature.attribute(field_id)
-                    aux += str(feature_id) + ", "
-                list_feature_id = aux[:-2] + "}"
-        
-                # Execute function
-                function_name = "gw_fct_connect_to_network"
-                sql = ("SELECT " + self.schema_name + "." + function_name + ""
-                       "('" + list_feature_id + "', '" + geom_type.upper() + "');")            
-                self.controller.execute_sql(sql, log_sql=True)
-                layer.removeSelection()
+
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            for feature in features:
+                feature_id = feature.attribute(field_id)
+                aux += str(feature_id) + ", "
+            list_feature_id = aux[:-2] + "}"
+
+            # Execute function
+            function_name = "gw_fct_connect_to_network"
+            sql = ("SELECT " + self.schema_name + "." + function_name + ""
+                   "('" + list_feature_id + "', '" + geom_type.upper() + "');")
+            self.controller.execute_sql(sql, log_sql=True)
+            layer.removeSelection()
 
         # Refresh map canvas
         self.rubber_band.reset()
@@ -265,10 +261,7 @@ class ConnecMapTool(ParentMapTool):
 
     def select_multiple_features(self, selectGeometry):
 
-        if self.layer_connec_man is None and self.layer_gully_man is None:
-            return
-
-        key = QApplication.keyboardModifiers() 
+        key = QApplication.keyboardModifiers()
         
         # If Ctrl+Shift clicked: remove features from selection
         if key == (Qt.ControlModifier | Qt.ShiftModifier):                
@@ -281,10 +274,11 @@ class ConnecMapTool(ParentMapTool):
             behaviour = QgsVectorLayer.AddToSelection
 
         # Selection for all connec and gully layers
-        for layer in self.layer_connec_man:
+        layer = self.snapper_manager.layer_connec
+        if layer:
             layer.selectByRect(selectGeometry, behaviour)
             
-        if self.layer_gully_man:                
-            for layer in self.layer_gully_man:
-                layer.selectByRect(selectGeometry, behaviour)
+        layer = self.snapper_manager.layer_gully
+        if layer:
+            layer.selectByRect(selectGeometry, behaviour)
         

@@ -95,7 +95,7 @@ class MoveNodeMapTool(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Get active layer
         self.active_layer = self.iface.activeLayer()

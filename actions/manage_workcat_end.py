@@ -104,26 +104,20 @@ class ManageWorkcatEnd(ParentManage):
         self.open_dialog(self.dlg_work_end, maximize_button=False)
 
 
-    # def filter_by_list(self, widget):
-    #     self.proxy_model.setFilterFixedString(widget.currentText())
-
     def set_edit_arc_downgrade_force(self, value):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'edit_arc_downgrade_force' "
-               " AND cur_user=current_user")
-
+               "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                   " SET value = '" + str(value) + "'"
-                   " WHERE parameter = 'edit_arc_downgrade_force' "
-                   " AND cur_user=current_user")
+                   "SET value = '" + str(value) + "' "
+                   "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
             self.controller.execute_sql(sql, log_sql=True)
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user)"
-                   " VALUES ('edit_arc_downgrade_force', '"+str(value)+"', current_user)")
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+                   "VALUES ('edit_arc_downgrade_force', '" + str(value) + "', current_user)")
             self.controller.execute_sql(sql, commit=self.autocommit)
 
 
@@ -131,7 +125,7 @@ class ManageWorkcatEnd(ParentManage):
         """ Fill dates and combo cat_work """
 
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
+               "WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             enddate = QDate.fromString(row[0], 'yyyy-MM-dd')
@@ -139,13 +133,12 @@ class ManageWorkcatEnd(ParentManage):
             enddate = QDate.currentDate()
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
-
         sql = ("SELECT id FROM " + self.controller.schema_name + ".cat_work")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
+               "WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
@@ -156,9 +149,9 @@ class ManageWorkcatEnd(ParentManage):
         
         workcat_id = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
 
-        sql = ("SELECT descript, builtdate"
-               " FROM " + self.controller.schema_name + ".cat_work"
-               " WHERE id = '" + workcat_id + "'")
+        sql = ("SELECT descript, builtdate "
+               "FROM " + self.controller.schema_name + ".cat_work "
+               "WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
@@ -176,30 +169,34 @@ class ManageWorkcatEnd(ParentManage):
         if selected_list is None:
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=False)
             return
+
         for x in range(0, selected_list.rowCount()):
             index = selected_list.index(x, 0)
             id_ = selected_list.data(index)
             self.selected_list.append(id_)
             ids_list = ids_list + "'" + id_ + "'" + ","
         ids_list = ids_list[:-1]
+
         return ids_list
 
 
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
+
         if self.workcat_id_end == 'null' or self.workcat_id_end is None:
             message = "Please select a workcat id end"
             self.controller.show_warning(message)
             return
+
         ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
         row = None
-        if ids_list is not None:
-            sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
-                   " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
+        if ids_list:
+            sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations "
+                   "WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
             row = self.controller.get_row(sql)
             ids_list = None
 
-        if row is not None:
+        if row:
             self.dlg_work = WorkcatEndList()
             self.load_settings(self.dlg_work)
 
@@ -208,7 +205,8 @@ class ManageWorkcatEnd(ParentManage):
             self.set_completer()
 
             table_relations = "v_ui_arc_x_relations"
-            self.dlg_work.arc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
+            self.dlg_work.arc_id.textChanged.connect(
+                partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
 
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -220,9 +218,12 @@ class ManageWorkcatEnd(ParentManage):
             filter_ += " AND arc_state = '1' "
 
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
-            self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
+            self.tbl_arc_x_relations.doubleClicked.connect(
+                partial(self.open_selected_object, self.tbl_arc_x_relations))
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
+
+        # TODO: Function update_geom_type() don't use parameter ids_list
         else:
             # Update tablename of every geom_type
             ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
@@ -236,21 +237,23 @@ class ManageWorkcatEnd(ParentManage):
             if str(self.project_type) == 'ud':
                 ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
                 self.update_geom_type("gully", ids_list)
+
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True)
 
 
     def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
+
         tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return
 
         sql = ""
         for id_ in self.selected_list:
-            sql += ("UPDATE " + self.schema_name + "." + tablename + ""
-                    " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
-                    " enddate = '" + str(self.enddate) + "'"
-                    " WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
+            sql += ("UPDATE " + self.schema_name + "." + tablename + " "
+                    "SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "', "
+                    "enddate = '" + str(self.enddate) + "' "
+                    "WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
         if sql != "":
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
@@ -260,8 +263,10 @@ class ManageWorkcatEnd(ParentManage):
     def fill_table(self, widget, table_name, filter_):
         """ Set a model with selected filter.
         Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
@@ -423,26 +428,28 @@ class ManageWorkcatEnd(ParentManage):
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
         if force_downgrade:
-            sql = ("SELECT feature_type, feature_id, log_message  FROM " + self.schema_name + ".audit_log_data "
-                   " WHERE  fprocesscat_id = '28' "
-                   " AND user_name = current_user")
+            sql = ("SELECT feature_type, feature_id, log_message "
+                   "FROM " + self.schema_name + ".audit_log_data "
+                   "WHERE  fprocesscat_id = '28' AND user_name = current_user")
             rows = self.controller.get_rows(sql, log_sql=False)
             ids_ = ""
-            for row in rows:
-                ids_ += str(row[1]) + ", "
-                state_statetype = str(row['log_message']).split(',')
-                sql = ("UPDATE " + self.schema_name + "." + str(row[0].lower()) + ""
-                       " SET state='"+str(state_statetype[0])+"', state_type='"+str(state_statetype[1])+"' "
-                       " WHERE "+str(row[0])+"_id='"+str(row[1])+"'")
+            if rows:
+                for row in rows:
+                    ids_ += str(row[1]) + ", "
+                    state_statetype = str(row['log_message']).split(',')
+                    sql = ("UPDATE " + self.schema_name + "." + str(row[0].lower()) + " "
+                           "SET state = '" + str(state_statetype[0]) + "', state_type = '" + str(state_statetype[1]) + "' "
+                           "WHERE " + str(row[0]) + "_id = '" + str(row[1]) + "';")
+                    self.controller.execute_sql(sql)
+
+                self.set_edit_arc_downgrade_force('False')
+                ids_ = ids_[:-2]
+                if show_warning and len(ids_) != 0:
+                    msg = 'These items could not be downgrade to state 0'
+                    self.controller.show_info_box(msg, title="Warning", inf_text=str(ids_))
+                sql = ("DELETE FROM " + self.schema_name + ".audit_log_data "
+                       "WHERE fprocesscat_id ='28' AND user_name = current_user")
                 self.controller.execute_sql(sql)
-            self.set_edit_arc_downgrade_force('False')
-            ids_ = ids_[:-2]
-            if show_warning and len(ids_) != 0:
-                msg = 'These items could not be downgrade to state 0'
-                self.controller.show_info_box(msg, title="Warning", inf_text=str(ids_), context_name=None, parameter=None)
-            sql = ("DELETE FROM " + self.schema_name + ".audit_log_data "
-                   " WHERE fprocesscat_id ='28' AND user_name = current_user")
-            self.controller.execute_sql(sql)
 
         self.canvas.refresh()
 
@@ -497,31 +504,33 @@ class ManageWorkcatEnd(ParentManage):
             fields += 'builtdate, '
             values += ("'" + str(builtdate) + "', ")
 
-        if values != "":
-            fields = fields[:-2]
-            values = values[:-2]
-            if cat_work_id == 'null':
-                msg = "Work_id field is empty"
-                self.controller.show_info_box(msg, "Warning")
+        if values == "":
+            return
+
+        fields = fields[:-2]
+        values = values[:-2]
+        if cat_work_id == 'null':
+            msg = "Work_id field is empty"
+            self.controller.show_info_box(msg, "Warning")
+        else:
+            # Check if this element already exists
+            sql = ("SELECT DISTINCT(id)"
+                   " FROM " + self.schema_name + "." + str(table_object) + ""
+                   " WHERE id = '" + str(cat_work_id) + "'")
+            row = self.controller.get_row(sql, log_info=False, log_sql=True)
+            if row is None:
+                sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
+                self.controller.execute_sql(sql, log_sql=True)
+                sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+                rows = self.controller.get_rows(sql)
+                if rows:
+                    utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
+                    aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))
+                    self.dlg_work_end.workcat_id_end.setCurrentIndex(aux)
+
+                self.close_dialog(self.dlg_new_workcat)
+
             else:
-                # Check if this element already exists
-                sql = ("SELECT DISTINCT(id)"
-                       " FROM " + self.schema_name + "." + str(table_object) + ""
-                       " WHERE id = '" + str(cat_work_id) + "'")
-                row = self.controller.get_row(sql, log_info=False, log_sql=True)
-                if row is None:
-                    sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
-                    self.controller.execute_sql(sql, log_sql=True)
-
-                    sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
-                    rows = self.controller.get_rows(sql)
-                    if rows:
-                        utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
-                        self.dlg_work_end.workcat_id_end.setCurrentIndex(self.dlg_work_end.workcat_id_end.findText(str(cat_work_id)))
-
-                    self.close_dialog(self.dlg_new_workcat)
-                    
-                else:
-                    msg = "This Workcat is already exist"
-                    self.controller.show_info_box(msg, "Warning")        
+                msg = "This Workcat already exist"
+                self.controller.show_info_box(msg, "Warning")
         

@@ -2123,7 +2123,7 @@ class ParentDialog(QDialog):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set snapping 
         layer = self.iface.activeLayer()

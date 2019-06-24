@@ -395,7 +395,7 @@ class ChangeElemType(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
