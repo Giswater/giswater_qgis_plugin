@@ -20,11 +20,10 @@ else:
 from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QTimer, QPoint
-from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 import utils_giswater
-from giswater.parent_init import ParentDialog
+from giswater.init.parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
