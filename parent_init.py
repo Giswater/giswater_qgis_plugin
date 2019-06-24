@@ -28,11 +28,11 @@ else:
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
     import configparser
 
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
-from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QUrl, QDate, QDateTime
+from qgis.PyQt.QtCore import QSettings, Qt, QUrl, QDate, QDateTime
 from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor, QIcon
 from qgis.PyQt.QtWidgets import QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCompleter, QCheckBox, QFormLayout
@@ -66,7 +66,6 @@ from .actions.manage_element import ManageElement
 from .actions.manage_gallery import ManageGallery
 from .models.sys_feature_cat import SysFeatureCat
 from .models.man_addfields_parameter import ManAddfieldsParameter
-from .map_tools.snapping_utils_v2 import SnappingConfigManager
 from .actions.manage_visit import ManageVisit
 
 
@@ -2149,23 +2148,15 @@ class ParentDialog(QDialog):
          
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-
-        if not result:
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not self.snapper_manager.result_is_valid():
             return
             
-        # Check snapped features
-        for snapped_point in result:              
-            point = QgsPoint(snapped_point.snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-            break 
+        # Add marker to snapped feature
+        self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def action_copy_paste_canvas_clicked(self, point, btn):
@@ -2176,31 +2167,24 @@ class ParentDialog(QDialog):
             return    
                 
         # Get clicked point
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
         
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-        
-        # That's the snapped point
-        if not result:       
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not self.snapper_manager.result_is_valid():
             self.disable_copy_paste()            
             return
                 
         layer = self.iface.activeLayer()        
         layername = layer.name()        
         is_valid = False
-        for snapped_point in result:        
-            # Get only one feature
-            point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
-            snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+
+        snapped_feature = self.snapper_manager.get_snapped_feature(result)
+        if snapped_feature:
             snapped_feature_attr = snapped_feature.attributes()
             # Leave selection
-            snapped_point.layer.select([snapped_point.snappedAtGeometry])
+            self.snapper_manager.select_snapped_feature(result, snapped_feature.id())
             is_valid = True
-            break
                 
         if not is_valid:
             message = "Any of the snapped features belong to selected layer"

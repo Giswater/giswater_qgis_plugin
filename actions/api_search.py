@@ -12,12 +12,12 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
 
-from qgis.core import QgsPoint
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -178,7 +178,7 @@ class ApiSearch(ApiParent):
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
-            point = QgsPoint(float(x1), float(y1))
+            point = QgsPointXY(float(x1), float(y1))
 
             self.draw_point(point)
             self.zoom_to_rectangle(x1, y1, x1, y1)
@@ -198,7 +198,7 @@ class ApiSearch(ApiParent):
         elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
             x1 = item['sys_x']
             y1 = item['sys_y']
-            point = QgsPoint(float(x1), float(y1))
+            point = QgsPointXY(float(x1), float(y1))
             self.draw_point(point)
             self.zoom_to_rectangle(x1, y1, x1, y1)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
@@ -224,10 +224,7 @@ class ApiSearch(ApiParent):
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.resetRubberbands()
-            if Qgis.QGIS_VERSION_INT < 29900:
-                point = QgsPoint(float(max_x), float(max_y))
-            else:
-                point = QgsPointXY(float(max_x), float(max_y))
+            point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])

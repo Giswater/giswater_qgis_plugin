@@ -11,7 +11,7 @@ try:
     from qgis.core import Qgis
 except ImportError:
     from qgis.core import QGis as Qgis
-from qgis.PyQt.QtWidgets import QAction, QComboBox, QLineEdit, QMessageBox, QPushButton, QTableView, QTabWidget
+from qgis.PyQt.QtWidgets import QAction, QComboBox, QLineEdit, QPushButton, QTableView, QTabWidget
 from qgis.core import QgsExpression, QgsFeatureRequest
 
 from functools import partial

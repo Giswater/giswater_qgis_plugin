@@ -590,7 +590,6 @@ class Giswater(QObject):
         
         # Enable/Disable actions
         self.enable_actions(visible)
-        
         try:
             for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:                

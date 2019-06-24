@@ -42,10 +42,7 @@ class TmMultipleSelection(QgsMapTool):
         QgsMapTool.__init__(self, self.canvas)
 
         self.controller = controller
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
-        else:
-            self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(self.canvas, 2)
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
@@ -57,10 +54,7 @@ class TmMultipleSelection(QgsMapTool):
     def reset_rubber_band(self):
 
         try:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.rubber_band.reset(Qgis.Polygon)
-            else:
-                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(2)
         except:
             pass
 
@@ -81,14 +75,14 @@ class TmMultipleSelection(QgsMapTool):
             self.show_rect(self.start_point, self.end_point)
 
 
-    def canvasReleaseEvent(self, e):
+    def canvasReleaseEvent(self, event):
         
         self.is_emitting_point = False
         rectangle = self.get_rectangle()
         selected_rectangle = None
         key = QApplication.keyboardModifiers()                
 
-        if e.button() != Qt.LeftButton:
+        if event.button() != Qt.LeftButton:
             self.rubber_band.hide()            
             return
         
@@ -97,10 +91,10 @@ class TmMultipleSelection(QgsMapTool):
         if self.parent_manage: 
             self.parent_manage.disconnect_signal_selection_changed()           
         
-        for i in range(len(self.layers)):
-            layer = self.layers[i]
+        for layer in self.layers:
+
             if self.controller.is_layer_visible(layer):
-                # if (i == len(self.layers) - 1):
+
                 if self.parent_manage:
                     self.parent_manage.connect_signal_selection_changed(self.table_object)
 
@@ -120,16 +114,11 @@ class TmMultipleSelection(QgsMapTool):
 
                 # Selection one by one
                 else:
-                    x = e.pos().x()
-                    y = e.pos().y()
-                    eventPoint = QPoint(x, y)
-                    (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
-                    if result:
-                        # Check feature
-                        for snap_point in result:
-                            # Get the point. Leave selection
-                            snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))   #@UnusedVariable
-                            snap_point.layer.select([snap_point.snappedAtGeometry])
+                    event_point = self.snapper_manager.get_event_point(event)
+                    result = self.snapper_manager.snap_to_background_layers(event_point)
+                    if self.snapper_manager.result_is_valid():
+                        # Get the point. Leave selection
+                        self.snapper_manager.get_snapped_feature(result, True)
 
         self.rubber_band.hide()
 
@@ -147,6 +136,7 @@ class TmMultipleSelection(QgsMapTool):
         self.reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
+
         point1 = QgsPointXY(start_point.x(), start_point.y())
         point2 = QgsPointXY(start_point.x(), end_point.y())
         point3 = QgsPointXY(end_point.x(), end_point.y())

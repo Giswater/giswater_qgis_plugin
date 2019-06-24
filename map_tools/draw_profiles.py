@@ -9,7 +9,6 @@
  ***************************************************************************/
 """
 from __future__ import absolute_import
-from builtins import next
 from builtins import range
 
 # -*- coding: utf-8 -*-
@@ -20,10 +19,12 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
+else:
+    from qgis.core import QgsLayout
 
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer
-from qgis.gui import  QgsMapToolEmitPoint
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject
+from qgis.gui import QgsMapToolEmitPoint
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
 from qgis.PyQt.QtXml import QDomDocument
 
@@ -96,7 +97,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_delete_additional_point.clicked.connect(self.delete_additional_point)
         self.dlg_draw_profile.btn_save_profile.clicked.connect(self.save_profile)
         self.dlg_draw_profile.btn_load_profile.clicked.connect(self.load_profile)
-
         self.dlg_draw_profile.btn_draw.clicked.connect(self.execute_profiles)
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
@@ -250,7 +250,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         node_id = []
         for element_id in arc_id:
@@ -290,7 +290,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         # Select arcs of shortest path on v_edit_arc for ZOOM SELECTION
         expr_filter = "\"arc_id\" IN ("
@@ -365,75 +365,60 @@ class DrawProfiles(ParentMapTool):
         self.emit_point.canvasClicked.connect(self.snapping_node)
 
 
-    def mouse_move(self, p):
+    def mouse_move(self, point):
 
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
-
-        # That's the snapped features
-        if result:
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:                
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_node:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 
 
     def snapping_node(self, point):   # @UnusedVariable
 
-        aux = ""
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        # Get clicked point
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
             # Check feature
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    # Get the point
-                    #point = QgsPoint(snapped_point.snappedVertex)
-                    snapp_feature = next(snapped_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute('node_id')
-                    self.element_id = str(element_id)
-                    # Leave selection
-                    #snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
-                        self.widget_point.setText(str(element_id))
-                    if self.widget_point == self.widget_additional_point:
-                        # Check if node already exist in list of additional points
-                        # Clear list, its possible to have just one additional point
-                        self.widget_additional_point.clear()
-                        item_arc = QListWidgetItem(str(self.element_id))
-                        self.widget_additional_point.addItem(item_arc)
-                        n = len(self.start_end_node)
-                        if n <=2:
-                            self.start_end_node.insert(1, str(self.element_id))
-                        if n > 2:
-                            self.start_end_node[1] = str(self.element_id)
-                        self.exec_path()
+            layer = self.snapper_manager.get_snapped_layer(result)
+            if layer == self.layer_node:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                element_id = snapped_feat.attribute('node_id')
+                self.element_id = str(element_id)
+                # Leave selection
+                if self.widget_point == self.widget_start_point or self.widget_point == self.widget_end_point:
+                    self.widget_point.setText(str(element_id))
+                if self.widget_point == self.widget_additional_point:
+                    # Check if node already exist in list of additional points
+                    # Clear list, its possible to have just one additional point
+                    self.widget_additional_point.clear()
+                    item_arc = QListWidgetItem(str(self.element_id))
+                    self.widget_additional_point.addItem(item_arc)
+                    n = len(self.start_end_node)
+                    if n <=2:
+                        self.start_end_node.insert(1, str(self.element_id))
+                    if n > 2:
+                        self.start_end_node[1] = str(self.element_id)
+                    self.exec_path()
 
-                    sys_type = snapp_feature.attribute('sys_type').lower()
-                    # Select feature of v_edit_man_|feature 
-                    viewname = "v_edit_man_" + str(sys_type)
-                    self.layer_feature = self.controller.get_layer_by_tablename(viewname)
+                sys_type = snapped_feat.attribute('sys_type').lower()
+                # Select feature of v_edit_man_|feature
+                viewname = "v_edit_man_" + str(sys_type)
+                self.layer_feature = self.controller.get_layer_by_tablename(viewname)
 
         # widget = clicked button
         # self.widget_start_point | self.widget_end_point : QLabels
         # start_end_node = [0] : node start | start_end_node = [1] : node end
+        aux = ""
         if str(self.widget_point.objectName()) == "start_point":
             self.start_end_node[0] = self.widget_point.text()
             aux = "node_id = '" + str(self.start_end_node[0]) + "'"
@@ -450,7 +435,7 @@ class DrawProfiles(ParentMapTool):
 
         # Select snapped features
         selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-        self.layer_feature.setSelectedFeatures([k.id() for k in selection])
+        self.layer_feature.selectByIds([k.id() for k in selection])
 
         self.exec_path()
 
@@ -576,7 +561,7 @@ class DrawProfiles(ParentMapTool):
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
             sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code"
-                   " FROM  " + self.schema_name + ".v_edit_node"
+                   " FROM " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
@@ -814,7 +799,6 @@ class DrawProfiles(ParentMapTool):
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
                  self.memory[indx][14], fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
-
 
         # Fill y_max and elevation
         # 1st node : y_max,y2 and top_elev, elev2
@@ -1150,7 +1134,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         # Select nodes of shortest path on layers v_edit_man_|feature
         for element_id in self.node_id:
@@ -1172,7 +1156,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
         expr_filter = "\"arc_id\" IN ("
@@ -1263,83 +1247,127 @@ class DrawProfiles(ParentMapTool):
 
     def generate_composer(self):
 
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT > 29900:
-            return
-
-        # Plugin path
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        composers = self.iface.activeComposers()
-
         # Check if template is selected
         if str(self.dlg_draw_profile.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            self.controller.show_warning(str(message))
+            self.controller.show_warning(message)
             return
 
-        # Check if title
-        title = self.dlg_draw_profile.title.text()
+        # Check if template file exists
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
+        if not os.path.exists(template_path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=template_path)
+            return
 
         # Check if composer exist
-        index = 0
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
-            
-        if index == num_comp:
+        composers = self.get_composers_list()
+        index = self.get_composer_index(str(self.template))
+
+        # Composer not found
+        if index == len(composers):
+
             # Create new composer with template selected in combobox(self.template)
-            template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
-            template_file = file(template_path, 'rt')
+            template_file = open(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()
             document.setContent(template_content)
-            comp_view = self.iface.createNewComposer(str(self.template))
-            comp_view.composition().loadFromTemplate(document)
-        index = 0
-        composers = self.iface.activeComposers()
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
 
-        comp_view = self.iface.activeComposers()[index]
-        composition = comp_view.composition()
-        comp_view.composerWindow().show()
-        
-        # Set profile
-        picture_item = composition.getComposerItemById('profile')
+            # TODO: Test it!
+            if Qgis.QGIS_VERSION_INT < 29900:
+                comp_view = self.iface.createNewComposer(str(self.template))
+                comp_view.composition().loadFromTemplate(document)
+            else:
+                project = QgsProject.instance()
+                comp_view = QgsLayout(project)
+                comp_view.loadFromTemplate(document)
+                layout_manager = project.layoutManager()
+                layout_manager.addLayout(comp_view)
+
+        else:
+            comp_view = composers[index]
+
+        # Manage profile layout
+        self.manage_profile_layout(comp_view, plugin_path)
+
+
+    def manage_profile_layout(self, layout, plugin_path):
+        """ Manage profile layout """
+
+        if layout is None:
+            self.controller.log_warning("Layout not found")
+            return
+
+        # Get values from dialog
         profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
-        picture_item.setPictureFile(profile)
-
-        # Refresh map, zoom map to extent
-        map_item = composition.getComposerItemById('Mapa')
-        map_item.setMapCanvas(self.canvas)
-        map_item.zoomToExtent(self.canvas.extent())
-
+        title = self.dlg_draw_profile.title.text()
+        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
         first_node = self.dlg_draw_profile.start_point.text()
         end_node = self.dlg_draw_profile.end_point.text()
 
-        # Fill data in composer template
-        first_node_item = composition.getComposerItemById('first_node')
-        first_node_item.setText(str(first_node))
-        end_node_item = composition.getComposerItemById('end_node')
-        end_node_item.setText(str(end_node))
-        length_item = composition.getComposerItemById('length')
-        length_item.setText(str(self.start_point[-1]))
-        profile_title = composition.getComposerItemById('title')
-        profile_title.setText(str(title))
+        if Qgis.QGIS_VERSION_INT < 29900:
 
-        composition.setAtlasMode(QgsComposition.PreviewAtlas)
-        # if self.dlg_draw_profile.rotation.text() == '':
+            # Show layout
+            main_window = layout.composerWindow()
+            #main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
+            main_window.show()
 
-        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
-        map_item.setMapRotation(rotation)
+            # Set profile
+            composition = layout.composition()
+            picture_item = composition.getComposerItemById('profile')
+            picture_item.setPictureFile(profile)
 
-        composition.refreshItems()
-        composition.update()
+            # Zoom map to extent, rotation
+            map_item = composition.getComposerItemById('Mapa')
+            map_item.setMapCanvas(self.canvas)
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+
+            # Fill data in composer template
+            first_node_item = composition.getComposerItemById('first_node')
+            first_node_item.setText(str(first_node))
+            end_node_item = composition.getComposerItemById('end_node')
+            end_node_item.setText(str(end_node))
+            length_item = composition.getComposerItemById('length')
+            length_item.setText(str(self.start_point[-1]))
+            profile_title = composition.getComposerItemById('title')
+            profile_title.setText(str(title))
+
+            # Preview Atlas and refresh items
+            composition.setAtlasMode(QgsComposition.PreviewAtlas)
+            composition.refreshItems()
+            composition.update()
+
+        # TODO: Test it!
+        else:
+
+            # Show layout
+            self.iface.openLayoutDesigner(layout)
+
+            # Set profile
+            picture_item = layout.itemById('profile')
+            picture_item.setPictureFile(profile)
+
+            # Zoom map to extent, rotation
+            map_item = layout.itemById('Mapa')
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+
+            # Fill data in composer template
+            first_node_item = layout.itemById('first_node')
+            first_node_item.setText(str(first_node))
+            end_node_item = layout.itemById('end_node')
+            end_node_item.setText(str(end_node))
+            length_item = layout.itemById('length')
+            length_item.setText(str(self.start_point[-1]))
+            profile_title = layout.itemById('title')
+            profile_title.setText(str(title))
+
+            # Refresh items
+            layout.refresh()
+            layout.updateBounds()
 
 
     def set_template(self):
@@ -1481,7 +1509,7 @@ class DrawProfiles(ParentMapTool):
 
                 # Select snapped features
                 selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-                self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+                self.layer_feature.selectByIds([a.id() for a in selection])
 
             # Select nodes of shortest path on layers v_edit_man_|feature
             for element_id in self.node_id:
@@ -1503,7 +1531,7 @@ class DrawProfiles(ParentMapTool):
 
                 # Select snapped features
                 selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-                self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+                self.layer_feature.selectByIds([a.id() for a in selection])
 
             # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
             expr_filter = "\"arc_id\" IN ("
@@ -1617,7 +1645,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_delete_additional_point.setDisabled(True)
         self.widget_additional_point.clear()
         self.start_end_node.pop(1)
-        # Reload path
         self.exec_path()
         
         

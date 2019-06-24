@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -20,13 +18,13 @@ else:
 from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QPoint, Qt
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsMapToPixel
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
-from giswater.init.thread import Thread
 
 import utils_giswater
+from giswater.init.thread import Thread
 from giswater.parent_init import ParentDialog
 
 
@@ -70,6 +68,7 @@ class ManNodeDialog(ParentDialog):
         
     def init_config_form(self):
         """ Custom form initial configuration """
+
         # Get last point clicked on canvas
         last_click = self.canvas.mouseLastXY()
         self.last_point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
@@ -205,6 +204,7 @@ class ManNodeDialog(ParentDialog):
 
 
     def compare_depth(self, widget_ymax):
+
         widget_ymax.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, 'node_id')
         ymax = utils_giswater.getWidgetText(self.dialog, widget_ymax)
@@ -232,6 +232,7 @@ class ManNodeDialog(ParentDialog):
 
 
     def activate_snapping(self, emit_point):
+
         # Set circle vertex marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
@@ -250,38 +251,37 @@ class ManNodeDialog(ParentDialog):
         self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
+
     def snapping_node(self, point, button):
         """ Get id of selected nodes (node1 and node2) """
+
         if button == 2:
             self.dlg_destroyed()
             return
+
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    # Get the point
-                    snapp_feature = next(snapped_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    element_id = snapp_feature.attribute('node_id')
+            if layer == self.layer_node:
+                # Get the point
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                element_id = snapped_feat.attribute('node_id')
+                message = "Selected node"
+                if self.node1 is None:
+                    self.node1 = str(element_id)
+                    self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
+                elif self.node1 != str(element_id):
+                    self.node2 = str(element_id)
+                    self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
 
-                    message = "Selected node"
-                    if self.node1 is None:
-                        self.node1 = str(element_id)
-                        self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
-                    elif self.node1 != str(element_id):
-                        self.node2 = str(element_id)
-                        self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
-
-        if self.node1 is not None and self.node2 is not None:
+        if self.node1 and self.node2:
             self.iface.actionPan().trigger()
             self.iface.setActiveLayer(self.layer)
             self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
@@ -296,25 +296,20 @@ class ManNodeDialog(ParentDialog):
                     utils_giswater.setWidgetText(self.dialog, 'top_elev', row[0]['top_elev'])
 
 
-    def mouse_move(self, p):
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
+    def mouse_move(self, point):
+
+        # Get clicked point
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
-
-        # That's the snapped features
-        if result:
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager(result)
+            if layer == self.layer_node:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
+
 
     def open_up_down_stream(self, qtable):
         """ Open selected node from @qtable """
@@ -484,17 +479,12 @@ class ManNodeDialog(ParentDialog):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        if not result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if not self.snapper_manager.result_is_valid():
             return
             
-        # Check snapped features
-        for snapped_point in result:              
-            point = QgsPoint(snapped_point.snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-            break 
+        # Add marker
+        self.snapper_manager.add_marker(result, self.vertex_marker)
         
                 
     def action_rotation_canvas_clicked(self, point, btn):

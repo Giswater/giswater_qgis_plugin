@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import next
 from builtins import range
 
 # -*- coding: utf-8 -*-
@@ -18,9 +17,9 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
 
-from qgis.core import QgsPoint, QgsFeatureRequest
+from qgis.core import QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import QPoint, Qt, QDate
+from qgis.PyQt.QtCore import Qt, QDate
 
 from functools import partial
 from datetime import datetime
@@ -110,6 +109,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
 
     def update_date(self):
+
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
         row = self.controller.get_row(sql)
@@ -269,10 +269,9 @@ class ReplaceNodeMapTool(ParentMapTool):
 
                 # Force user to manage with state = 1 features
                 current_user = self.controller.get_project_user()
-                sql = ("DELETE FROM " + self.schema_name + ".selector_state"
-                       " WHERE state_id = 1 AND cur_user='" + str(current_user) + "';")
-                self.controller.execute_sql(sql)
-                sql = ("\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
+                sql = ("DELETE FROM " + self.schema_name + ".selector_state "
+                       "WHERE state_id = 1 AND cur_user = '" + str(current_user) + "';"
+                       "\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
                        "VALUES (1, '" + str(current_user) + "');")
                 self.controller.execute_sql(sql)
 
@@ -330,32 +329,22 @@ class ReplaceNodeMapTool(ParentMapTool):
             self.cancel_map_tool()
             return
 
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
-        snapped_feat = None
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-                
-        if result:
-            # Get the first feature
-            snapped_feat = result[0]
-            point = QgsPoint(snapped_feat.snappedVertex)   #@UnusedVariable
-            snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))                
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not self.snapper_manager.result_is_valid():
+            return
 
+        # Get snapped feature
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
         if snapped_feat:
-
             # Get 'node_id' and 'nodetype'
             self.node_id = snapped_feat.attribute('node_id')
             if self.project_type == 'ws':
                 nodetype_id = snapped_feat.attribute('nodetype_id')
             elif self.project_type == 'ud':
                 nodetype_id = snapped_feat.attribute('node_type')
-            layer = self.controller.get_layer_by_nodetype(nodetype_id, log_info=True) 
-            if not layer:
-                return
 
             self.init_replace_node_form(snapped_feat)
 

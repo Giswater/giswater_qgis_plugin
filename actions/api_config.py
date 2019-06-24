@@ -19,9 +19,9 @@ from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
 
-from collections import OrderedDict
 import json
 import operator
+from collections import OrderedDict
 from functools import partial
 
 import utils_giswater

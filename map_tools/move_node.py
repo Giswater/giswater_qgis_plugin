@@ -16,18 +16,10 @@
  ***************************************************************************/
 
 """
-from builtins import str
-from builtins import next
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-from qgis.core import QgsPoint, QgsMapToPixel, QgsFeatureRequest
+from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 
 from map_tools.parent import ParentMapTool
 
@@ -54,7 +46,6 @@ class MoveNodeMapTool(ParentMapTool):
                " WHERE node_id = '" + node_id + "'")
         status = self.controller.execute_sql(sql) 
         if status:
-
             
             # Execute SQL function and show result to the user
             function_name = "gw_fct_arc_divide"
@@ -66,6 +57,7 @@ class MoveNodeMapTool(ParentMapTool):
                     message = "Database function not found"
                     self.controller.show_warning(message, parameter=function_name)
                     return
+
             sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
             self.controller.execute_sql(sql, commit=True)
 
@@ -140,7 +132,7 @@ class MoveNodeMapTool(ParentMapTool):
             self.iface.setActiveLayer(self.active_layer)           
 
         try:
-            self.rubber_band.reset(Qgis.Line)
+            self.reset_rubber_band("line")
         except AttributeError:
             pass
 
@@ -148,17 +140,11 @@ class MoveNodeMapTool(ParentMapTool):
     def canvasMoveEvent(self, event):
         """ Mouse movement event """      
 
-        # Hide marker
+        # Hide marker and get coordinates
         self.vertex_marker.hide()
-        
-        try:
-            # Get current mouse coordinates
-            x = event.pos().x()
-            y = event.pos().y()            
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.set_action_pan()
-            return
+        x = event.pos().x()
+        y = event.pos().y()
+        event_point = self.snapper_manager.get_event_point(event)
         
         # Snap to node
         if self.snapped_feat is None:
@@ -169,19 +155,15 @@ class MoveNodeMapTool(ParentMapTool):
                 self.iface.setActiveLayer(self.layer_node)             
             
             # Snapping
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
-      
-            # That's the snapped features
-            if result:          
+            result = self.snapper_manager.snap_to_current_layer(event_point)
+            if self.snapper_manager.result_is_valid():
                 # Get the point and add marker on it
-                point = QgsPoint(result[0].snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()    
-                # Set a new point to go on with
-                self.rubber_band.movePoint(point)
+                point = self.snapper_manager.add_marker(result, self.vertex_marker)
             else:
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-                self.rubber_band.movePoint(point)
+
+            # Set a new point to go on with
+            self.rubber_band.movePoint(point)
 
         # Snap to arc
         else:
@@ -192,82 +174,73 @@ class MoveNodeMapTool(ParentMapTool):
                 self.iface.setActiveLayer(self.layer_arc)               
 
             # Snapping
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
+            result = self.snapper_manager.snap_to_current_layer(event_point)
             
-            if result and result[0].snappedVertexNr == -1:
-
-                point = QgsPoint(result[0].snappedVertex)
-
-                # Set marker
-                self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)                 
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
-                
+            #if result and result[0].snappedVertexNr == -1:
+            if self.snapper_manager.result_is_valid():
+                layer = self.snapper_manager.get_snapped_layer(result)
+                feature_id = self.snapper_manager.get_snapped_feature_id(result)
+                point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
                 # Select the arc
-                result[0].layer.removeSelection()
-                result[0].layer.select([result[0].snappedAtGeometry])
-
-                # Bring the rubberband to the cursor i.e. the clicked point
-                self.rubber_band.movePoint(point)
-        
+                layer.removeSelection()
+                layer.select([feature_id])
             else:
                 # Bring the rubberband to the cursor i.e. the clicked point
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-                self.rubber_band.movePoint(point)
+
+            self.rubber_band.movePoint(point)
 
 
     def canvasReleaseEvent(self, event):
         """ Mouse release event """         
         
         if event.button() == Qt.LeftButton:
-            
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x,y)
+
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Snap to node
             if self.snapped_feat is None:
 
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
-                
-                if result:
+                result = self.snapper_manager.snap_to_current_layer(event_point)
+                if not self.snapper_manager.result_is_valid():
+                    return
 
-                    self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                    point = QgsPoint(result[0].snappedVertex)
+                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                point = self.snapper_manager.get_snapped_point(result)
 
-                    # Hide marker
-                    self.vertex_marker.hide()
-                    
-                    # Set a new point to go on with
-                    self.rubber_band.addPoint(point)
+                # Hide marker
+                self.vertex_marker.hide()
 
-                    # Add arc snapping
-                    self.iface.setActiveLayer(self.layer_arc)                    
-                    #self.snapper_manager.snap_to_arc()
+                # Set a new point to go on with
+                self.rubber_band.addPoint(point)
+
+                # Add arc snapping
+                self.iface.setActiveLayer(self.layer_arc)
 
             # Snap to arc
             else:
-                
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
-                if result:
 
-                    point = self.toLayerCoordinates(result[0].layer, QgsPoint(result[0].snappedVertex))
+                result = self.snapper_manager.snap_to_current_layer(event_point)
+                if not self.snapper_manager.result_is_valid():
+                    return
 
-                    # Get selected feature (at this moment it will have one and only one)
-                    node_id = self.snapped_feat.attribute('node_id')
+                layer = self.snapper_manager.get_snapped_layer(result)
+                point = self.snapper_manager.get_snapped_point(result)
+                point = self.toLayerCoordinates(layer, point)
 
-                    # Move selected node to the released point
-                    # Show message before executing
-                    message = ("The procedure will delete features on database."
-                               " Please ensure that features has no undelete value on true."
-                               " On the other hand you must know that traceability table will storage precedent information.")
-                    title = "Info"
-                    answer = self.controller.ask_question(message, title)
-                    if answer:
-                        self.move_node(node_id, point)
+                # Get selected feature (at this moment it will have one and only one)
+                node_id = self.snapped_feat.attribute('node_id')
 
-        
+                # Move selected node to the released point
+                # Show message before executing
+                message = ("The procedure will delete features on database."
+                           " Please ensure that features has no undelete value on true."
+                           " On the other hand you must know that traceability table will storage precedent information.")
+                title = "Info"
+                answer = self.controller.ask_question(message, title)
+                if answer:
+                    self.move_node(node_id, point)
+
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
             

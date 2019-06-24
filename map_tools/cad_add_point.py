@@ -1,17 +1,13 @@
+"""
+This file is part of Giswater 3.1
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint
-else:
-    from qgis.core import  QgsPointXY
-
-from qgis.core import QgsPoint, QgsMapToPixel, QgsPointLocator
+from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
@@ -127,71 +123,40 @@ class CadAddPoint(ParentMapTool):
 
     def canvasMoveEvent(self, event):
 
-        # Hide highlight
+        # Hide highlight and get coordinates
         self.vertex_marker.hide()
-
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        try:
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        if Qgis.QGIS_VERSION_INT < 29900:
-            if self.snap_to_selected_layer:
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
-            else:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
-
-            # That's the snapped features
-            if result:
-                # Get the point and add marker on it
-                point = QgsPoint(result[0].snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+        if self.snap_to_selected_layer:
+            result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            if self.snap_to_selected_layer:
-                result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
-            else:
-                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
+            result = self.snapper_manager.snap_to_background_layers(event_point)
 
-            # That's the snapped features
-            if result:
-                # Get the point and add marker on it
-                point = QgsPointXY(result.point())
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+        if self.snapper_manager.result_is_valid():
+            # Get the point and add marker on it
+            self.snapper_manager.add_marker(result, self.vertex_marker)
+
 
     def canvasReleaseEvent(self, event):
 
         if event.button() == Qt.LeftButton:
 
-            # Get the click
+            # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
-            try:
-                event_point = QPoint(x, y)
-            except(TypeError, KeyError):
-                self.iface.actionPan().trigger()
-                return
-            if Qgis.QGIS_VERSION_INT < 29900:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-                # Create point with snap reference
-                if result:
-                    point = QgsPoint(result[0].snappedVertex)
-                # Create point with mouse cursor reference
-                else:
-                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-            else:
-                result = self.snapper.snapToMap(event_point)
-                if result:
-                    point = QgsPointXY(result.point())
-                    if point.x() == 0 and point.y() == 0:
-                        point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-                
+            event_point = self.snapper_manager.get_event_point(event)
+
+            # Create point with snap reference
+            result = self.snapper_manager.snap_to_background_layers(event_point)
+            point = None
+            if self.snapper_manager.result_is_valid():
+                point = self.snapper_manager.get_snapped_point(result)
+
+            # Create point with mouse cursor reference
+            if point is None:
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+
             if self.point_1 is None:
                 self.point_1 = point
             else:

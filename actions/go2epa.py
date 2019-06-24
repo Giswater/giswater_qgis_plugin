@@ -24,7 +24,11 @@ from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
 from qgis.PyQt.QtWidgets import QCompleter, QFileDialog, QMessageBox
 
-import csv, json, os, re, subprocess
+import csv
+import json
+import os
+import re
+import subprocess
 from collections import OrderedDict
 from functools import partial
 

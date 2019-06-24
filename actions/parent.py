@@ -747,6 +747,29 @@ class ParentAction(object):
         return active_composers
 
 
+    def get_composer_name(self, composer):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            composer_name = composer.composerWindow().windowTitle()
+        else:
+            composer_name = composer.name()
+
+        return composer_name
+
+
+    def get_composer_index(self, name):
+
+        index = 0
+        composers = self.get_composers_list()
+        for comp_view in composers:
+            composer_name = self.get_composer_name(comp_view)
+            if composer_name == name:
+                break
+            index += 1
+
+        return index
+
+
     def get_all_actions(self):
 
         self.controller.log_info(str("TEST"))

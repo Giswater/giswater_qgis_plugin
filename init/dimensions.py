@@ -12,11 +12,16 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
+else:
+    from qgis.core import QgsPointXY
+
 from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QObject, QTimer, QPoint
-from qgis.core import QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper, QgsVertexMarker
+from qgis.PyQt.QtCore import QTimer, QPoint
+from qgis.core import QgsFeatureRequest
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 import utils_giswater
 from giswater.parent_init import ParentDialog
@@ -94,26 +99,19 @@ class Dimensions(ParentDialog):
         self.emit_point.canvasClicked.connect(self.click_button_snapping)
 
 
-    def mouse_move(self, p):
+    def mouse_move(self, point):
 
+        # Hide marker and get coordinates
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node or snapped_point.layer == self.layer_connec:
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+            if layer == self.layer_node or layer == self.layer_connec:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
         
     def click_button_orientation(self, point):  # @UnusedVariable
@@ -136,53 +134,49 @@ class Dimensions(ParentDialog):
         self.iface.setActiveLayer(layer)
         layer.startEditing()
 
-        snapper = self.get_snapper()
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
                      
         # Snapping
-        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-            
-        # That's the snapped point
-        if result:
-            # Check feature
-            for snapped_point in result:
-                if snapped_point.layer == self.layer_node:             
-                    feat_type = 'node'
-                elif snapped_point.layer == self.layer_connec:
-                    feat_type = 'connec'
-                else:
-                    continue
-                        
-                # Get the point
-                point = QgsPoint(snapped_point.snappedVertex)   
-                snapp_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                element_id = snapp_feature.attribute(feat_type + '_id')
- 
-                # Leave selection
-                snapped_point.layer.select([snapped_point.snappedAtGeometry])
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
 
-                # Get depth of the feature 
-                if self.project_type == 'ws':
-                    fieldname = "depth"
-                elif self.project_type == 'ud' and feat_type == 'node':
-                    fieldname = "ymax"             
-                elif self.project_type == 'ud' and feat_type == 'connec':
-                    fieldname = "connec_depth"                    
-                    
-                sql = ("SELECT " + fieldname + ""
-                       " FROM " + self.schema_name + "." + feat_type + ""
-                       " WHERE " + feat_type + "_id = '" + element_id + "'")
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-                
-                utils_giswater.setText(self.dialog, "depth", row[0])
-                utils_giswater.setText(self.dialog, "feature_id", element_id)
-                utils_giswater.setText(self.dialog, "feature_type", feat_type.upper())
-               
+            layer = self.snapper_manager.get_snapped_layer(result)
+            # Check feature
+            if layer == self.layer_node:
+                feat_type = 'node'
+            elif layer == self.layer_connec:
+                feat_type = 'connec'
+            else:
+                return
+
+            # Get the point
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            feature_id = self.snapper_manager.get_feature_id(result)
+            element_id = snapped_feat.attribute(feat_type + '_id')
+
+            # Leave selection
+            layer.select([feature_id])
+
+            # Get depth of the feature
+            if self.project_type == 'ws':
+                fieldname = "depth"
+            elif self.project_type == 'ud' and feat_type == 'node':
+                fieldname = "ymax"
+            elif self.project_type == 'ud' and feat_type == 'connec':
+                fieldname = "connec_depth"
+
+            sql = ("SELECT " + fieldname + " "
+                   "FROM " + self.schema_name + "." + feat_type + " "
+                   "WHERE " + feat_type + "_id = '" + element_id + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+
+            utils_giswater.setText(self.dialog, "depth", row[0])
+            utils_giswater.setText(self.dialog, "feature_id", element_id)
+            utils_giswater.setText(self.dialog, "feature_type", feat_type.upper())
+
     
     def create_map_tips(self):
         """ Create MapTips on the map """
@@ -203,11 +197,11 @@ class Dimensions(ParentDialog):
         self.timer_map_tips_clear.timeout.connect(self.clear_map_tip)
 
 
-    def map_tip_changed(self, p):
+    def map_tip_changed(self, point):
         """ SLOT. Initialize the Timer to show MapTips on the map """
         
         if self.canvas.underMouse(): 
-            self.last_map_position = QgsPoint(p.x(), p.y())
+            self.last_map_position = QgsPointXY(point.x(), point.y())
             self.map_tip_node.clear(self.canvas)
             self.map_tip_connec.clear(self.canvas)
             self.timer_map_tips.start(100)

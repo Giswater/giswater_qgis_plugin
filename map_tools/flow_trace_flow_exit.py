@@ -16,11 +16,9 @@
  ***************************************************************************/
 
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from qgis.PyQt.QtCore import QPoint, Qt 
+from qgis.core import QgsFeatureRequest, QgsExpression
+from qgis.PyQt.QtCore import Qt
 
 from map_tools.parent import ParentMapTool
 
@@ -41,38 +39,22 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
     def canvasMoveEvent(self, event):
 
-        # Hide highlight
+        # Hide marker and get coordinates
         self.vertex_marker.hide()
-
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-
-        # Plugin reloader bug, MapTool should be deactivated
-        try:
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping        
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)   #@UnusedVariable   
         self.current_layer = None
-
-        # That's the snapped features
-        if result:
-            for snapped_feat in result:
-                # Check if feature belongs to 'node' group
-                exist = self.snapper_manager.check_node_group(snapped_feat.layer)
-                if exist:
-                    # Get the point and set marker
-                    point = QgsPoint(snapped_feat.snappedVertex)
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    # Data for function
-                    self.current_layer = snapped_feat.layer
-                    self.snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                    break
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            # Check if feature belongs to 'node' group
+            exist = self.snapper_manager.check_node_group(layer)
+            if exist:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+                # Data for function
+                self.current_layer = layer
+                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
 
     def canvasReleaseEvent(self, event):

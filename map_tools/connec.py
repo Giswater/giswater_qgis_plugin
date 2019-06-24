@@ -23,8 +23,8 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle
-from qgis.PyQt.QtCore import QPoint, QRect, Qt
+from qgis.core import QgsVectorLayer, QgsRectangle
+from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
 
 from map_tools.parent import ParentMapTool
@@ -63,35 +63,26 @@ class ConnecMapTool(ParentMapTool):
 
         else:
 
-            # Hide marker
+            # Hide marker and get coordinates
             self.vertex_marker.hide()
-
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-            # That's the snapped features
-            if result:
-                for snapped_feat in result:
-                    # Check if it belongs to 'connec' or 'gully' group
-                    exist_connec = self.snapper_manager.check_connec_group(snapped_feat.layer)                     
-                    exist_gully = self.snapper_manager.check_gully_group(snapped_feat.layer)                                      
-                    if exist_connec or exist_gully: 
-                        # Get the point and add marker
-                        point = QgsPoint(result[0].snappedVertex)
-                        self.vertex_marker.setCenter(point)
-                        self.vertex_marker.show()
-                        break
+            result = self.snapper_manager.snap_to_background_layers(event_point)
+            if self.snapper_manager.result_is_valid():
+                # Check if it belongs to 'connec' or 'gully' group
+                layer = self.snapper_manager.get_snapped_layer(result)
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                exist_connec = self.snapper_manager.check_connec_group(layer)
+                exist_gully = self.snapper_manager.check_gully_group(layer)
+                if exist_connec or exist_gully:
+                    self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.select_rect.setRect(0, 0, 0, 0)
-        self.rubber_band.reset(Qgis.Polygon)
+        self.rubber_band.reset(2)
 
 
     def canvasReleaseEvent(self, event):
@@ -99,35 +90,35 @@ class ConnecMapTool(ParentMapTool):
         
         if event.button() == Qt.LeftButton:
 
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
+            # Get coordinates
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Simple selection
             if not self.dragging:
 
                 # Snap to connec or gully
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+                result = self.snapper_manager.snap_to_background_layers(event_point)
+                if not self.snapper_manager.result_is_valid():
+                    return
 
-                # That's the snapped features
-                if result:
-                    # Check if it belongs to 'connec' or 'gully' group                  
-                    exist_connec = self.snapper_manager.check_connec_group(result[0].layer)
-                    exist_gully = self.snapper_manager.check_gully_group(result[0].layer)                    
-                    if exist_connec or exist_gully:                       
-                        key = QApplication.keyboardModifiers()   
-                        # If Ctrl+Shift is clicked: deselect snapped feature               
-                        if key == (Qt.ControlModifier | Qt.ShiftModifier):                   
-                            result[0].layer.deselect([result[0].snappedAtGeometry])                                                       
-                        else:
-                            # If Ctrl is not clicked: remove previous selection                            
-                            if key != Qt.ControlModifier:  
-                                result[0].layer.removeSelection()                                          
-                            result[0].layer.select([result[0].snappedAtGeometry])
-                            
-                        # Hide marker
-                        self.vertex_marker.hide()
+                # Check if it belongs to 'connec' or 'gully' group
+                layer = self.snapper_manager.get_snapped_layer(result)
+                feature_id = self.snapper_manager.get_snapped_feature_id(result)
+                exist_connec = self.snapper_manager.check_connec_group(layer)
+                exist_gully = self.snapper_manager.check_gully_group(layer)
+                if exist_connec or exist_gully:
+                    key = QApplication.keyboardModifiers()
+                    # If Ctrl+Shift is clicked: deselect snapped feature
+                    if key == (Qt.ControlModifier | Qt.ShiftModifier):
+                        layer.deselect([feature_id])
+                    else:
+                        # If Ctrl is not clicked: remove previous selection
+                        if key != Qt.ControlModifier:
+                            layer.removeSelection()
+                        layer.select([feature_id])
+
+                    # Hide marker
+                    self.vertex_marker.hide()
 
             # Multiple selection
             else:
@@ -155,7 +146,7 @@ class ConnecMapTool(ParentMapTool):
                 number_features += layer.selectedFeatureCount()
 
             if number_features > 0:
-                message = ("Number of features selected in the 'connec' group")
+                message = "Number of features selected in the 'connec' group"
                 title = "Interpolate value - Do you want to update values"
                 answer = self.controller.ask_question(message, title, parameter=str(number_features))
                 if answer:
@@ -169,7 +160,7 @@ class ConnecMapTool(ParentMapTool):
                     number_features += layer.selectedFeatureCount()
     
                 if number_features > 0:
-                    message = ("Number of features selected in the 'gully' group")
+                    message = "Number of features selected in the 'gully' group"
                     title = "Interpolate value - Do you want to update values"
                     answer = self.controller.ask_question(message, title, parameter=str(number_features))
                     if answer:
@@ -243,6 +234,7 @@ class ConnecMapTool(ParentMapTool):
                        "('" + list_feature_id + "', '" + geom_type.upper() + "');")            
                 self.controller.execute_sql(sql, log_sql=True)
                 layer.removeSelection()
+
         # Refresh map canvas
         self.rubber_band.reset()
         self.refresh_map_canvas()
@@ -261,7 +253,7 @@ class ConnecMapTool(ParentMapTool):
         ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubber_band.reset(Qgis.Polygon)
+        self.rubber_band.reset(2)
         self.rubber_band.addPoint(ll, False)
         self.rubber_band.addPoint(lr, False)
         self.rubber_band.addPoint(ur, False)
