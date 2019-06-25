@@ -54,40 +54,36 @@ class ParentMapTool(QgsMapTool):
         self.layer_connec = None
         self.layer_gully = None
         self.layer_node = None
-
         self.schema_name = None        
         self.controller = None        
-        self.dao = None 
+        self.dao = None
+        self.snapper_manager = None
         
         # Call superclass constructor and set current action        
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 
-        # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper = self.snapper_manager.get_snapper()
-        
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.CrossCursor)
 
         # Get default cursor
-        self.std_cursor = self.parent().cursor()    
-        
+        self.std_cursor = self.parent().cursor()
+
         # Set default vertex marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)  
-                 
+        self.vertex_marker.setPenWidth(3)
+
         # Set default rubber band
         color_selection = QColor(254, 178, 76, 63)
         self.rubber_band = QgsRubberBand(self.canvas, 2)
         self.rubber_band.setColor(color)
-        self.rubber_band.setFillColor(color_selection)           
-        self.rubber_band.setWidth(1)           
+        self.rubber_band.setFillColor(color_selection)
+        self.rubber_band.setWidth(1)
         self.reset()
         
         self.force_active_layer = True
@@ -115,7 +111,9 @@ class ParentMapTool(QgsMapTool):
 
         self.controller = controller
         self.schema_name = controller.schema_name
-        self.plugin_dir = self.controller.plugin_dir 
+        self.plugin_dir = self.controller.plugin_dir
+        if self.snapper_manager is None:
+            self.snapper_manager = SnappingConfigManager(self.iface)
         self.snapper_manager.controller = controller
         
         

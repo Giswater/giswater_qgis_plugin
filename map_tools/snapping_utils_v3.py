@@ -50,6 +50,10 @@ class SnappingConfigManager(object):
         self.vertex_marker.setPenWidth(3)
 
 
+    def init_snapping_config(self):
+        pass
+
+
     def set_snapping_layers(self):
         """ Set main snapping layers """
 
