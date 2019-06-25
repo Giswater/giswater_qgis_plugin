@@ -72,7 +72,7 @@ class AddNewLot(ParentManage):
 
         # Add 'gully' for 'UD' projects
         if self.controller.get_project_type() == 'ud':
-            self.layers['gully'] = self.controller.get_group_layers('gully', True)
+            self.layers['gully'] = self.controller.get_layer_by_tablename('v_edit_gully')
 
         self.dlg_lot = AddLot()
         self.load_settings(self.dlg_lot)
@@ -152,7 +152,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
 
         # TODO pending to make function delete_visit
-        # self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
+        self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
         ignore_columns = ('visitcat_id', 'ext_code', 'webclient_id', 'expl_id', 'the_geom', 'is_done', 'status')
         self.dlg_lot.btn_export_visits.clicked.connect(
             partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_visit, ignore_columns, self.lot_date_format))
@@ -417,9 +417,44 @@ class AddNewLot(ParentManage):
             self.dlg_lot.btn_feature_snapping.setEnabled(False)
 
 
+    def delete_visit(self, qtable):
+        selected_list = qtable.selectionModel().selectedRows()
+        feature_type = utils_giswater.get_item_data(None, self.dlg_lot.cmb_visit_class, 2).lower()
+        self.controller.log_info(str(selected_list))
+        self.controller.log_info(str(feature_type))
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        message = "Are you sure you want to delete these records? \n"
+        msg_records = ""
+        id_list = "(  "
+        for x in range(0, len(selected_list)):
+            # Get index of row and row[index]
+            row_index = selected_list[x]
+            row = row_index.row()
+            index_visit = utils_giswater.get_col_index_by_col_name(qtable, 'visit_id')
+            visit_id = row_index.sibling(row, index_visit).data()
+            # Get index of column 'feature_id' and get value of this column in current row
+            index_feature = utils_giswater.get_col_index_by_col_name(qtable, str(feature_type) + '_id')
+            feature_id = row_index.sibling(row, index_feature).data()
+            id_list += "'"+feature_id+"', "
+            msg_records += "visit_id: " + str(visit_id) + ", "+str(feature_type)+"_id = '" + str(feature_id) + "';\n"
+        id_list = id_list[:-2] + ")"
+        answer = self.controller.ask_question(message, "Delete records", msg_records)
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + ".om_visit_x_" + str(feature_type) + ""
+                   " WHERE visit_id = '"+str(visit_id)+"' "
+                   " AND "+str(feature_type)+"_id IN " + str(id_list) + ";\n")
+            self.controller.execute_sql(sql, commit=True)
+
+        self.reload_table_visit()
+
+
     def open_visit(self, qtable):
 
         selected_list = qtable.selectionModel().selectedRows()
+
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
@@ -1426,8 +1461,9 @@ class AddNewLot(ParentManage):
                "FROM " + self.schema_name + "." + str(table_name) + " "
                "ORDER BY idval")
         rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(combo, rows, 1)
+        if rows:
+            rows.append(['', ''])
+            utils_giswater.set_item_data(combo, rows, 1)
 
 
     def delete_lot(self, qtable):
