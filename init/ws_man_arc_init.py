@@ -296,16 +296,16 @@ class ManArcDialog(ParentDialog):
         for column_name in columns:                                      
             utils_giswater.setWidgetText(self.dialog, column_name, str(row[column_name]))
 
-        utils_giswater.setWidgetText("arc_cost_2", str(row["arc_cost"]))
-        utils_giswater.setWidgetText("m2pavement_cost", str(row["m2pav_cost"]))
-        utils_giswater.setWidgetText("m2mlpavement", str(row["m2mlpav"]))
-        utils_giswater.setWidgetText("other_budget", str(row["other_budget"]))
-        utils_giswater.setWidgetText("m3mlexc_2", str(row["m3mlexc"]))
-        utils_giswater.setWidgetText("m3mlfill_2", str(row["m3mlfill"]))
-        utils_giswater.setWidgetText("m3mlexcess_2", str(row["m3mlexcess"]))
-        utils_giswater.setWidgetText("m2mltrenchl_2", str(row["m2mltrenchl"]))
-        utils_giswater.setWidgetText("m2mlbottom_2", str(row["m2mlbottom"]))
-        utils_giswater.setWidgetText("b_2", str(row["b"]))
+        utils_giswater.setWidgetText(self.dialog, "arc_cost_2", str(row["arc_cost"]))
+        utils_giswater.setWidgetText(self.dialog, "m2pavement_cost", str(row["m2pav_cost"]))
+        utils_giswater.setWidgetText(self.dialog, "m2mlpavement", str(row["m2mlpav"]))
+        utils_giswater.setWidgetText(self.dialog, "other_budget", str(row["other_budget"]))
+        utils_giswater.setWidgetText(self.dialog, "m3mlexc_2", str(row["m3mlexc"]))
+        utils_giswater.setWidgetText(self.dialog, "m3mlfill_2", str(row["m3mlfill"]))
+        utils_giswater.setWidgetText(self.dialog, "m3mlexcess_2", str(row["m3mlexcess"]))
+        utils_giswater.setWidgetText(self.dialog, "m2mltrenchl_2", str(row["m2mltrenchl"]))
+        utils_giswater.setWidgetText(self.dialog, "m2mlbottom_2", str(row["m2mlbottom"]))
+        utils_giswater.setWidgetText(self.dialog, "b_2", str(row["b"]))
 
             # Get additional values
         sql_common = ("SELECT descript FROM " + self.schema_name + ".v_price_x_arc"
@@ -330,9 +330,9 @@ class ManArcDialog(ParentDialog):
         if row:
             m3protec = row[0]
         
-        utils_giswater.setWidgetText("arc_element", element)
-        utils_giswater.setWidgetText("arc_bottom", m2bottom)
-        utils_giswater.setWidgetText("arc_protection", m3protec)
+        utils_giswater.setWidgetText(self.dialog, "arc_element", element)
+        utils_giswater.setWidgetText(self.dialog, "arc_bottom", m2bottom)
+        utils_giswater.setWidgetText(self.dialog, "arc_protection", m3protec)
         
         m3exc = None
         m3fill = None
@@ -359,10 +359,10 @@ class ManArcDialog(ParentDialog):
         if row:
             m2trenchl = row[0]
         
-        utils_giswater.setWidgetText("soil_excavation", m3exc)
-        utils_giswater.setWidgetText("soil_filling", m3fill)
-        utils_giswater.setWidgetText("soil_excess", m3excess)
-        utils_giswater.setWidgetText("soil_trenchlining", m2trenchl)
+        utils_giswater.setWidgetText(self.dialog, "soil_excavation", m3exc)
+        utils_giswater.setWidgetText(self.dialog, "soil_filling", m3fill)
+        utils_giswater.setWidgetText(self.dialog, "soil_excess", m3excess)
+        utils_giswater.setWidgetText(self.dialog, "soil_trenchlining", m2trenchl)
 
         
     def fill_tab_relations(self):
