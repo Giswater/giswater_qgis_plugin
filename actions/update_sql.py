@@ -2382,8 +2382,8 @@ class UpdateSQL(ApiParent):
 
             _json = {}
             for widget in list_widgets:
-                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView)\
-                        and widget.objectName() not in ('qt_spinbox_lineedit'):
+                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView) \
+                        and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
@@ -2403,7 +2403,7 @@ class UpdateSQL(ApiParent):
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", "multi_create":"' + str(utils_giswater.isChecked(self.dlg_manage_fields, self.dlg_manage_fields.chk_multi_insert)) + '", "parameters":' + result_json + ''
+            extras = '"action":"CREATE", "multi_create":' + str(utils_giswater.isChecked(self.dlg_manage_fields,self.dlg_manage_fields.chk_multi_insert)).lower() + ', "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
