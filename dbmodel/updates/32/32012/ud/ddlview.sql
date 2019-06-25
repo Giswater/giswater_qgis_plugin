@@ -231,16 +231,17 @@ CREATE OR REPLACE VIEW ve_node_chamber AS
     man_chamber.accessibility,
     man_chamber.name,
     a.chamber_param_1,
-    a.chamber_param_2,
-    a.chamber_param_3
+    a.chamber_param_2
    FROM SCHEMA_NAME.v_node
      JOIN SCHEMA_NAME.man_chamber ON man_chamber.node_id::text = v_node.node_id::text
-     LEFT JOIN ( SELECT ct.feature_id, ct.chamber_param_1,ct.chamber_param_2, ct.chamber_param_3
+     LEFT JOIN ( SELECT ct.feature_id, ct.chamber_param_1,ct.chamber_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                     FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CHAMBER''
-                    ORDER  BY 1,2'::text, ' VALUES (''3''),(''4''),(''5'')'::text) 
-                    ct(feature_id character varying, chamber_param_1 text, chamber_param_2 text, chamber_param_3 text)) a ON a.feature_id::text = v_node.node_id::text
+                    ORDER  BY 1,2'::text, ' VALUES (''3''),(''4'')'::text) 
+                    ct(feature_id character varying, chamber_param_1 text, chamber_param_2 date)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'CHAMBER'::text;
+
+
 
 
 
@@ -312,10 +313,17 @@ CREATE OR REPLACE VIEW ve_node_weir AS
     man_chamber.inlet,
     man_chamber.bottom_channel,
     man_chamber.accessibility,
-    man_chamber.name
-   FROM v_node
-     JOIN man_chamber ON man_chamber.node_id::text = v_node.node_id::text
-      WHERE node_type = 'WEIR';
+    man_chamber.name,
+    a.weir_param_1,
+    a.weir_param_2
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_chamber ON man_chamber.node_id::text = v_node.node_id::text
+     LEFT JOIN ( SELECT ct.feature_id, ct.weir_param_1,ct.weir_param_2
+            FROM crosstab('SELECT feature_id, parameter_id, value_param
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''WEIR''
+                    ORDER  BY 1,2'::text, ' VALUES (''47''),(''48'')'::text) 
+                    ct(feature_id character varying, weir_param_1 integer, weir_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                    WHERE v_node.node_type::text = 'WEIR'::text;
 
 
 DROP VIEW IF EXISTS ve_node_pumpstation;
@@ -451,10 +459,17 @@ CREATE OR REPLACE VIEW ve_node_register AS
     v_node.unconnected,
     v_node.macrodma_id,
     v_node.expl_id,
-    v_node.num_value
-   FROM v_node
-     JOIN man_junction ON man_junction.node_id::text = v_node.node_id::text
-     WHERE node_type = 'REGISTER';
+    v_node.num_value,
+    a.register_param_1,
+    a.register_param_2
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_junction ON man_junction.node_id::text = v_node.node_id::text
+     LEFT JOIN ( SELECT ct.feature_id, ct.register_param_1,ct.register_param_2
+            FROM crosstab('SELECT feature_id, parameter_id, value_param
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''REGISTER''
+                    ORDER  BY 1,2'::text, ' VALUES (''28''),(''29'')'::text) 
+                    ct(feature_id character varying, register_param_1 date, register_param_2 integer)) a ON a.feature_id::text = v_node.node_id::text
+                    WHERE v_node.node_type::text = 'REGISTER'::text;
 
 
 DROP VIEW IF EXISTS ve_node_change;
@@ -781,16 +796,17 @@ CREATE OR REPLACE VIEW ve_node_circmanhole AS
     man_manhole.bottom_channel,
     man_manhole.accessibility,
     a.circmanhole_param_1,
-    a.circmanhole_param_2,
-    a.circmanhole_param_3
+    a.circmanhole_param_2
    FROM SCHEMA_NAME.v_node
      JOIN SCHEMA_NAME.man_manhole ON man_manhole.node_id::text = v_node.node_id::text
-     LEFT JOIN ( SELECT ct.feature_id, ct.circmanhole_param_1,ct.circmanhole_param_2, ct.circmanhole_param_3
+     LEFT JOIN ( SELECT ct.feature_id, ct.circmanhole_param_1,ct.circmanhole_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                     FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CIRC-MANHOLE''
-                    ORDER  BY 1,2'::text, ' VALUES (''10''),(''11''),(''12'')'::text) 
-                    ct(feature_id character varying, circmanhole_param_1 text, circmanhole_param_2 text, circmanhole_param_3 text)) a ON a.feature_id::text = v_node.node_id::text
+                    ORDER  BY 1,2'::text, ' VALUES (''5''),(''6'')'::text) 
+                    ct(feature_id character varying, circmanhole_param_1 integer, circmanhole_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'CIRC-MANHOLE'::text;
+
+
 
 
 DROP VIEW IF EXISTS ve_node_rectmanhole;
@@ -866,7 +882,7 @@ CREATE OR REPLACE VIEW ve_node_rectmanhole AS
      LEFT JOIN ( SELECT ct.feature_id, ct.rectmanhole_param_1,ct.rectmanhole_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                     FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''RECT-MANHOLE''
-                    ORDER  BY 1,2'::text, ' VALUES (''22''),(''23'')'::text) 
+                    ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
                     ct(feature_id character varying, rectmanhole_param_1 text, rectmanhole_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'RECT-MANHOLE'::text;
 
@@ -1215,11 +1231,17 @@ CREATE OR REPLACE VIEW ve_node_overflowstorage AS
     man_storage.util_volume,
     man_storage.min_height,
     man_storage.accessibility,
-    man_storage.name
-   FROM v_node
-     JOIN man_storage ON man_storage.node_id::text = v_node.node_id::text
-     WHERE node_type = 'OWERFLOW-STORAGE';
-
+    man_storage.name,
+    a.owestorage_param_1,
+    a.owestorage_param_2
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_storage ON man_storage.node_id::text = v_node.node_id::text
+     LEFT JOIN ( SELECT ct.feature_id, ct.owestorage_param_1,ct.owestorage_param_2
+            FROM crosstab('SELECT feature_id, parameter_id, value_param
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''OWERFLOW-STORAGE''
+                    ORDER  BY 1,2'::text, ' VALUES (''22''),(''23'')'::text) 
+                    ct(feature_id character varying, owestorage_param_1 text, owestorage_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                    WHERE v_node.node_type::text = 'OWERFLOW-STORAGE'::text;
 
 
 DROP VIEW IF EXISTS ve_node_sewerstorage;
@@ -1297,10 +1319,9 @@ CREATE OR REPLACE VIEW ve_node_sewerstorage AS
      LEFT JOIN ( SELECT ct.feature_id, ct.sewerstorage_param_1,ct.sewerstorage_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                     FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''SEWER-STORAGE''
-                    ORDER  BY 1,2'::text, ' VALUES (''24''),(''25'')'::text) 
-                    ct(feature_id character varying, sewerstorage_param_1 text, sewerstorage_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                    ORDER  BY 1,2'::text, ' VALUES (''35''),(''36'')'::text) 
+                    ct(feature_id character varying, sewerstorage_param_1 text, sewerstorage_param_2 integer)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'SEWER-STORAGE'::text;
-
 
 
 DROP VIEW IF EXISTS ve_node_valve;
@@ -1362,17 +1383,10 @@ CREATE OR REPLACE VIEW ve_node_valve AS
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value,
-    man_valve.name,
-    a.valve_param_1,
-    a.valve_param_2
-   FROM SCHEMA_NAME.v_node
-     JOIN SCHEMA_NAME.man_valve ON man_valve.node_id::text = v_node.node_id::text
-     LEFT JOIN ( SELECT ct.feature_id, ct.valve_param_1,ct.valve_param_2
-            FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''VALVE''
-                    ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
-                    ct(feature_id character varying, valve_param_1 text, valve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
-                    WHERE v_node.node_type::text = 'VALVE'::text;
+    man_valve.name
+   FROM v_node
+    JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text
+    WHERE v_node.node_type::text = 'VALVE'::text;
 
 
 
@@ -1658,7 +1672,86 @@ CREATE OR REPLACE VIEW ve_gully_gully AS
      LEFT JOIN gully_type ON gully.gully_type::text = gully_type.id::text;
 
 
+CREATE OR REPLACE VIEW ve_gully_pgully AS 
+ SELECT gully.gully_id,
+    gully.code,
+    gully.top_elev,
+    gully.ymax,
+    gully.sandbox,
+    gully.matcat_id,
+    gully.gully_type,
+    gully_type.type AS sys_type,
+    gully.gratecat_id,
+    cat_grate.matcat_id AS cat_grate_matcat,
+    gully.units,
+    gully.groove,
+    gully.siphon,
+    gully.connec_arccat_id,
+    gully.connec_length,
+    gully.connec_depth,
+    gully.arc_id,
+    gully.sector_id,
+    sector.macrosector_id,
+    gully.state,
+    gully.state_type,
+    gully.annotation,
+    gully.observ,
+    gully.comment,
+    gully.dma_id,
+    gully.soilcat_id,
+    gully.function_type,
+    gully.category_type,
+    gully.fluid_type,
+    gully.location_type,
+    gully.workcat_id,
+    gully.workcat_id_end,
+    gully.buildercat_id,
+    gully.builtdate,
+    gully.enddate,
+    gully.ownercat_id,
+    gully.muni_id,
+    gully.postcode,
+    gully.streetaxis_id,
+    gully.postnumber,
+    gully.postcomplement,
+    gully.streetaxis2_id,
+    gully.postnumber2,
+    gully.postcomplement2,
+    gully.descript,
+    cat_grate.svg,
+    gully.rotation,
+    concat(gully_type.link_path, gully.link) AS link,
+    gully.verified,
+    gully.the_geom,
+    gully.undelete,
+    gully.featurecat_id,
+    gully.feature_id,
+    gully.label_x,
+    gully.label_y,
+    gully.label_rotation,
+    gully.publish,
+    gully.inventory,
+    gully.expl_id,
+    dma.macrodma_id,
+    gully.uncertain,
+    gully.num_value,
+    a.grate_param_1,
+    a.grate_param_2
+   FROM SCHEMA_NAME.gully
+     JOIN SCHEMA_NAME.v_state_gully ON gully.gully_id::text = v_state_gully.gully_id::text
+     LEFT JOIN SCHEMA_NAME.cat_grate ON gully.gratecat_id::text = cat_grate.id::text
+     LEFT JOIN SCHEMA_NAME.ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
+     LEFT JOIN SCHEMA_NAME.dma ON gully.dma_id = dma.dma_id
+     LEFT JOIN SCHEMA_NAME.sector ON gully.sector_id = sector.sector_id
+     LEFT JOIN SCHEMA_NAME.gully_type ON gully.gully_type::text = gully_type.id::text
+     LEFT JOIN ( SELECT ct.feature_id, ct.grate_param_1,ct.grate_param_2
+            FROM crosstab('SELECT feature_id, parameter_id, value_param
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''SEWER-STORAGE''
+                    ORDER  BY 1,2'::text, ' VALUES (''35''),(''36'')'::text) 
+                    ct(feature_id character varying, grate_param_1 text, grate_param_2 boolean)) a ON a.feature_id::text = gully.gully_id::text
+                    WHERE gully.gully_type::text = 'SEWER-STORAGE'::text;     
 --arc
+
 
 DROP VIEW IF EXISTS ve_arc_pumppipe;
 CREATE OR REPLACE VIEW ve_arc_pumppipe AS 
@@ -1731,10 +1824,17 @@ CREATE OR REPLACE VIEW ve_arc_pumppipe AS
     v_arc_x_node.uncertain,
     v_arc_x_node.macrodma_id,
     v_arc_x_node.expl_id,
-    v_arc_x_node.num_value
-   FROM v_arc_x_node
-     JOIN man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
-     WHERE arc_type = 'PUMP-PIPE';
+    v_arc_x_node.num_value,
+    a.pumpipe_param_1,
+    a.pumpipe_param_2
+   FROM SCHEMA_NAME.v_arc_x_node
+     JOIN SCHEMA_NAME.man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
+     LEFT JOIN ( SELECT ct.feature_id, ct.pumpipe_param_1,ct.pumpipe_param_2
+            FROM crosstab('SELECT feature_id, parameter_id, value_param
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''PUMP-PIPE''
+                    ORDER  BY 1,2'::text, ' VALUES (''24''),(''25'')'::text) 
+                    ct(feature_id character varying, pumpipe_param_1 boolean, pumpipe_param_2 text)) a ON a.feature_id::text = v_arc_x_node.arc_id::text
+                    WHERE v_arc_x_node.arc_type::text = 'PUMP-PIPE'::text;
 
 
 
@@ -1810,17 +1910,10 @@ CREATE OR REPLACE VIEW ve_arc_conduit AS
     v_arc_x_node.uncertain,
     v_arc_x_node.macrodma_id,
     v_arc_x_node.expl_id,
-    v_arc_x_node.num_value,
-    a.conduit_param_1,
-    a.conduit_param_2
-   FROM SCHEMA_NAME.v_arc_x_node
-     JOIN SCHEMA_NAME.man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
-     LEFT JOIN ( SELECT ct.feature_id, ct.conduit_param_1,ct.conduit_param_2
-            FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CONDUIT''
-                    ORDER  BY 1,2'::text, ' VALUES (''30''),(''31'')'::text) 
-                    ct(feature_id character varying, conduit_param_1 text, conduit_param_2 text)) a ON a.feature_id::text = v_arc_x_node.arc_id::text
-                    WHERE v_arc_x_node.arc_type::text = 'CONDUIT'::text;
+    v_arc_x_node.num_value
+   FROM v_arc_x_node
+   JOIN man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
+   WHERE v_arc_x_node.arc_type::text = 'CONDUIT'::text;
 
 
 

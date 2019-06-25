@@ -621,8 +621,8 @@ SELECT v_node.node_id,
                     WHERE v_node.nodetype_id::text = 'SHUTOFF-VALVE'::text;
 
 
-DROP VIEW IF EXISTS ve_node_checkoffvalve;
-CREATE VIEW ve_node_checkoffvalve AS 
+DROP VIEW IF EXISTS ve_node_checkvalve;
+CREATE VIEW ve_node_checkvalve AS 
 SELECT v_node.node_id,
     v_node.code,
     v_node.elevation,
@@ -703,12 +703,12 @@ SELECT v_node.node_id,
                     FROM SCHEMA_NAME.man_addfields_value 
                     JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CHECK-VALVE''
                     ORDER  BY 1,2'::text, ' VALUES (''47''),(''48'')'::text) 
-                    ct(feature_id character varying, checkvalve_param_1 text, checkvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                    ct(feature_id character varying, checkvalve_param_1 integer, checkvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.nodetype_id::text = 'CHECK-VALVE'::text;
 
 
-DROP VIEW IF EXISTS ve_node_prbkvalve;
-CREATE VIEW ve_node_prbkvalve AS 
+DROP VIEW IF EXISTS ve_node_prbreakvalve;
+CREATE VIEW ve_node_prbreakvalve AS 
 SELECT v_node.node_id,
     v_node.code,
     v_node.elevation,
@@ -779,11 +779,18 @@ SELECT v_node.node_id,
     man_valve.exit_type,
     man_valve.exit_code,
     man_valve.drive_type,
-    man_valve.cat_valve2
+    man_valve.cat_valve2,
+    a.prbkvalve_param_1,
+    a.prbkvalve_param_2
    FROM v_node
      JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text
-     WHERE nodetype_id='PR-BREAK.VALVE';
-
+     LEFT JOIN ( SELECT ct.feature_id, ct.prbkvalve_param_1,ct.prbkvalve_param_2
+            FROM crosstab('SELECT feature_id, parameter_id, value_param
+                    FROM SCHEMA_NAME.man_addfields_value 
+                    JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''PR-BREAK.VALVE''
+                    ORDER  BY 1,2'::text, ' VALUES (''35''),(''36'')'::text) 
+                    ct(feature_id character varying, prbkvalve_param_1 text, prbkvalve_param_2 integer)) a ON a.feature_id::text = v_node.node_id::text
+                    WHERE v_node.nodetype_id::text = 'PR-BREAK.VALVE'::text;
 
 DROP VIEW IF EXISTS ve_node_flcontrvalve;
 CREATE VIEW ve_node_flcontrvalve AS 
@@ -1345,7 +1352,7 @@ SELECT v_node.node_id,
                 FROM SCHEMA_NAME.man_addfields_value 
                 JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''GREEN-VALVE''
                 ORDER  BY 1,2'::text, ' VALUES (''24''),(''25'')'::text) 
-                ct(feature_id character varying, greenvalve_param_1 text, greenvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                ct(feature_id character varying, greenvalve_param_1 boolean, greenvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'GREEN-VALVE'::text;
 
 
@@ -1432,7 +1439,7 @@ SELECT v_node.node_id,
                 FROM SCHEMA_NAME.man_addfields_value 
                 JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''OUTFALL-VALVE''
                 ORDER  BY 1,2'::text, ' VALUES (''11''),(''12'')'::text) 
-                ct(feature_id character varying, outfallvalve_param_1 text, outfallvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                ct(feature_id character varying, outfallvalve_param_1 text, outfallvalve_param_2 boolean)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'OUTFALL-VALVE'::text;
 
 
@@ -1495,16 +1502,16 @@ CREATE VIEW ve_node_bypassregister AS
     v_node.hemisphere,
     v_node.num_value,
     man_register.pol_id,
-    a.register_param_1,
-    a.register_param_2
+    a.bpregister_param_1,
+    a.bpregister_param_2
    FROM v_node
      JOIN man_register ON v_node.node_id::text = man_register.node_id::text
-     LEFT JOIN ( SELECT ct.feature_id, ct.register_param_1,ct.register_param_2
+     LEFT JOIN ( SELECT ct.feature_id, ct.bpregister_param_1,ct.bpregister_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                 FROM SCHEMA_NAME.man_addfields_value 
                 JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''BYPASS-REGISTER''
                 ORDER  BY 1,2'::text, ' VALUES (''3''),(''4'')'::text) 
-                ct(feature_id character varying, register_param_1 text, register_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                ct(feature_id character varying, bpregister_param_1 text, bpregister_param_2 date)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'BYPASS-REGISTER'::text;
 
 
@@ -1631,11 +1638,18 @@ CREATE VIEW ve_node_valveregister AS
     v_node.expl_id,
     v_node.hemisphere,
     v_node.num_value,
-    man_register.pol_id
+    man_register.pol_id,
+    a.valregister_param_1,
+    a.valregister_param_2
    FROM v_node
      JOIN man_register ON v_node.node_id::text = man_register.node_id::text
-     WHERE nodetype_id='VALVE-REGISTER';
-
+     LEFT JOIN ( SELECT ct.feature_id, ct.valregister_param_1,ct.valregister_param_2
+            FROM crosstab('SELECT feature_id, parameter_id, value_param
+                FROM SCHEMA_NAME.man_addfields_value 
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''VALVE-REGISTER''
+                ORDER  BY 1,2'::text, ' VALUES (''5''),(''6'')'::text) 
+                ct(feature_id character varying, valregister_param_1 integer, valregister_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                WHERE v_node.nodetype_id::text = 'VALVE-REGISTER'::text;
 
 
 DROP VIEW IF EXISTS ve_node_controlregister;
@@ -1706,13 +1720,13 @@ CREATE VIEW ve_node_controlregister AS
                 FROM SCHEMA_NAME.man_addfields_value 
                 JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CONTROL-REGISTER''
                 ORDER  BY 1,2'::text, ' VALUES (''28''),(''29'')'::text) 
-                ct(feature_id character varying, ctrlregister_param_1 text, ctrlregister_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
+                ct(feature_id character varying, ctrlregister_param_1 date, ctrlregister_param_2 integer)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'CONTROL-REGISTER'::text;
 
 
 
-DROP VIEW IF EXISTS ve_node_expansiontank;
-CREATE VIEW ve_node_expansiontank AS 
+DROP VIEW IF EXISTS ve_node_expantank;
+CREATE VIEW ve_node_expantank AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.elevation,
