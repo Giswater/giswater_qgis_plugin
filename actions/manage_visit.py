@@ -363,7 +363,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.ext_code = self.ext_code.text()
         self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
         self.current_visit.descript = utils_giswater.getWidgetText(self.dlg_add_visit, 'descript', False, False)
-        self.current_visit.is_done = utils_giswater.isChecked(self.dlg_add_visit, 'is_done')
+        self.current_visit.status = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.status, 0)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
             
@@ -657,9 +657,9 @@ class ManageVisit(ParentManage, QObject):
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
-            sql = ("SELECT value"
-                " FROM " + self.schema_name + ".config_param_user"
-                " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+            sql = ("SELECT value "
+                   "FROM " + self.schema_name + ".config_param_user "
+                   "WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user ")
             row = self.controller.get_row(sql, commit=self.autocommit)
             if row:
                 # if int then look for default row ans set it
@@ -684,6 +684,17 @@ class ManageVisit(ParentManage, QObject):
                        " ORDER BY name")
                 row = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
+
+        # Fill ComboBox status
+        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        if rows:
+            utils_giswater.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
+            if visit_id is not None:
+                sql = ("SELECT status "
+                       "FROM " + self.schema_name + ".om_visit "
+                       "WHERE id ='" + str(visit_id) + "' ")
+                status = self.controller.get_row(sql)
+                utils_giswater.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
 
         # Relations tab
         # fill feature_type
