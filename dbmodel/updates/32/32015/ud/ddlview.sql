@@ -9,6 +9,32 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
+
+
+CREATE OR REPLACE VIEW v_state_gully AS 
+(
+         SELECT gully.gully_id
+           FROM selector_state,
+            selector_expl,
+            gully
+          WHERE gully.state = selector_state.state_id AND gully.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+        EXCEPT
+         SELECT plan_psector_x_gully.gully_id
+           FROM selector_psector,
+            selector_expl,
+            plan_psector_x_gully
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+          WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
+) UNION
+ SELECT plan_psector_x_gully.gully_id
+   FROM selector_psector,
+    selector_expl,
+    plan_psector_x_gully
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_gully.psector_id
+  WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_gully.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
