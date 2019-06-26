@@ -719,10 +719,12 @@ class ParentAction(object):
         return body
 
 
-    def populate_info_text(self, dialog, qtabwidget, qtextedit, data):
+    def populate_info_text(self, dialog, qtabwidget, qtextedit, data, reset_text=True):
 
         cahange_tab = False
         text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
+        if reset_text:
+            text = ""
         for item in data['info']['values']:
             if 'message' in item:
                 if item['message'] is not None:
