@@ -58,20 +58,20 @@ BEGIN
 
 			SELECT * INTO v_visit FROM om_visit WHERE id=NEW.visit_id;
 
-			-- move status of lot element to status=4
+			-- move status of lot element to status=0 (visited)
 			IF v_visit.status=4 THEN
 
 				IF v_featuretype ='arc' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_arc SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND arc_id::text ='||quote_literal(NEW.arc_id);
+					v_querytext= 'UPDATE om_visit_lot_x_arc SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND arc_id::text ='||quote_literal(NEW.arc_id);
 					
 				ELSIF v_featuretype ='node' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_node SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND node_id::text ='||quote_literal(NEW.node_id);
+					v_querytext= 'UPDATE om_visit_lot_x_node SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND node_id::text ='||quote_literal(NEW.node_id);
 					
 				ELSIF v_featuretype ='connec' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_connec SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND connec_id::text ='||quote_literal(NEW.connec_id);
+					v_querytext= 'UPDATE om_visit_lot_x_connec SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND connec_id::text ='||quote_literal(NEW.connec_id);
 					
 				ELSIF v_featuretype ='gully' THEN	
-					v_querytext= 'UPDATE om_visit_lot_x_gully SET status=4 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND gully_id::text ='||quote_literal(NEW.gully_id);
+					v_querytext= 'UPDATE om_visit_lot_x_gully SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND gully_id::text ='||quote_literal(NEW.gully_id);
 				END IF;
 				
 				IF v_querytext IS NOT NULL THEN
@@ -86,7 +86,7 @@ BEGIN
     ELSIF TG_OP='UPDATE' AND v_triggerfromtable ='om_visit' THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
 
 
-		-- move status of lot element to status=4
+		-- move status of lot element to status=0 (visited)
 
 		IF NEW.status = 4 AND OLD.status <> 4 THEN 
 		
@@ -118,7 +118,7 @@ BEGIN
 
 			END IF;
 
-			v_querytext= 'UPDATE '||quote_ident(v_lottable) ||' SET status=4 WHERE lot_id::text=' || quote_literal (NEW.lot_id) ||' AND '||quote_ident(v_featureid)||'::text ='||quote_literal(v_id);
+			v_querytext= 'UPDATE '||quote_ident(v_lottable) ||' SET status=0 WHERE lot_id::text=' || quote_literal (NEW.lot_id) ||' AND '||quote_ident(v_featureid)||'::text ='||quote_literal(v_id);
 			IF v_querytext IS NOT NULL THEN
 				EXECUTE v_querytext; 
 			END IF;
