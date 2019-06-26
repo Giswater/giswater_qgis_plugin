@@ -95,18 +95,6 @@ BEGIN
 		-- set counter
 		v_currentstep = v_steps - v_count;
 				
-		--continue (or not)		
-		IF v_count > 0 THEN
-			-- force true the return to make signal to client that there are more than one pending calls. Return from gw_fct_pg2epa is always false
-			v_return =  gw_fct_json_object_set_key (v_return::json, 'continue', true);								
-		
-			-- setting counter
-			v_return =  gw_fct_json_object_set_key (v_return, 'steps', v_steps);
-		ELSE 
-			RETURN '{"message":{"priority":1, "text":"Last inp export done succesfully"}}';
-		END IF;	
-
-	
 		-- setting v_data to call recursive function
 		v_data = (SELECT text_column FROM SCHEMA_NAME.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
 		
@@ -116,6 +104,19 @@ BEGIN
 		
 		-- call go2epa function
 		SELECT gw_fct_pg2epa(p_data) INTO v_return;
+		
+		--continue (or not)        
+		IF v_count > 0 THEN
+		    -- force true the return to make signal to client that there are more than one pending calls. Return from gw_fct_pg2epa is always false
+		    v_return =  gw_fct_json_object_set_key (v_return::json, 'continue', true);                                
+		    -- setting counter
+		    v_return =  gw_fct_json_object_set_key (v_return, 'steps', v_steps);
+		ELSE
+		    --force true the return to make signal to client that there are more than one pending calls. Return from gw_fct_pg2epa is always false
+		    v_return =  gw_fct_json_object_set_key (v_return::json, 'continue', false);                                
+		    -- setting counter
+		    v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
+		END IF;    
 
 		-- replace message
 		v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
