@@ -25,7 +25,7 @@ BEGIN
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, y0, ysur, apond, the_geom
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_junction ON v_edit_node.node_id=inp_junction.node_id
@@ -34,7 +34,7 @@ BEGIN
 	UNION
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, y0, ysur, apond, v_edit_node.the_geom
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_divider ON v_edit_node.node_id=inp_divider.node_id
@@ -43,7 +43,7 @@ BEGIN
 	UNION
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, y0, ysur, apond, v_edit_node.the_geom
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_storage ON v_edit_node.node_id=inp_storage.node_id
@@ -52,7 +52,7 @@ BEGIN
 	UNION
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, null, null, null, the_geom
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, null, null, null, v_edit_node.the_geom
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_outfall ON v_edit_node.node_id=inp_outfall.node_id
@@ -66,13 +66,13 @@ BEGIN
 	SELECT
 	result_id_var,
 	v_arc_x_node.arc_id, node_1, node_2, v_arc_x_node.sys_elev1, v_arc_x_node.sys_elev2, v_arc_x_node.arc_type, arccat_id, epa_type, v_arc_x_node.sector_id, v_arc_x_node.state, 
-	v_arc_x_node.state_type, annotation, st_length2d(the_geom),
+	v_arc_x_node.state_type, v_arc_x_node.annotation, st_length2d(v_arc_x_node.the_geom),
 	CASE
 		WHEN custom_n IS NOT NULL THEN custom_n
 		ELSE n
 	END AS n,
-	expl_id, 
-	the_geom
+	v_arc_x_node.expl_id, 
+	v_arc_x_node.the_geom
 	FROM inp_selector_sector, v_arc_x_node
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN cat_arc ON v_arc_x_node.arccat_id = cat_arc.id
