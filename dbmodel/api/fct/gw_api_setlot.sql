@@ -54,6 +54,13 @@ BEGIN
 	v_descript = ((p_data ->>'data')::json->>'fields')::json->>'descript'::text;
 	v_status = ((p_data ->>'data')::json->>'fields')::json->>'status'::text;
 	v_visitclass_id = ((p_data ->>'data')::json->>'fields')::json->>'visitclass_id'::text;
+	
+	-- Control NULL's
+	v_tablename := COALESCE(v_tablename, '');
+	v_descript := COALESCE(v_descript, '');
+	v_status := COALESCE(v_status, '');
+	v_visitclass_id := COALESCE(v_visitclass_id, '');
+	v_id := COALESCE(v_id, '');
 
 	-- setting values on table om_visit_lot_x_user 
 	-- TOD DO: set lot
