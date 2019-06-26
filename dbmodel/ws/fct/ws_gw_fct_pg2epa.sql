@@ -13,7 +13,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"status":"start", "resultId":"test1", "useNetworkGeom":"true"}}$$)
 */

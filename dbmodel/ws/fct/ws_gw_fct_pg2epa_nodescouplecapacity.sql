@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2698
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_hydrant(p_data json)  
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nodescouplecapacity(p_data json)  
 RETURNS json AS 
 $BODY$
 

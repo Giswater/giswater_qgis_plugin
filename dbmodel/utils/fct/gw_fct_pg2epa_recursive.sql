@@ -15,15 +15,15 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"status":"start", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"recursive":"start", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"status":"ongoing", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"recursive":"ongoing", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"status":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true" "}}$$)
+"data":{"recursive":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true" "}}$$)
 
 */
 
@@ -63,8 +63,7 @@ BEGIN
 		--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_recursive' AND cur_user=current_user);
 		v_functionid = '1'; 
 		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
-		v_steps = (SELECT (addparam::json->>'steps') FROM SCHEMA_NAME.inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
-		v_storeallresults = (SELECT (addparam::json->>'storeAllResults') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
+		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
 
 		-- setting temp_table with any rows any calls using steps number defined on inp_typevalue parameter
 		IF v_status='start' THEN
@@ -116,18 +115,6 @@ BEGIN
 
 		-- replace message
 		v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
-			
-		-- storing results into audit_log_data table (in case of recursive fuction is defined with true)
-		IF v_storeallresults THEN
-			FOR v_tableid IN SELECT id FROM audit_cat_table WHERE id like 'rpt_'
-			LOOP
-		
-			EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, log_message)
-					SELECT 35, concat (''"resultId":"'''||result_id||'''", "step":"'','||v_currentstep||'''", 
-					"table":"'','||quote_ident(id)||'''", "values":{'',row_to_json(a),''}'')
-					FROM ( SELECT * FROM '||quote_ident(id)||' WHERE result_id = v_result)';
-			END LOOP;
-		END IF;
 
 	END IF;
 

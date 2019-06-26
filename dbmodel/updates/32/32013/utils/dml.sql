@@ -76,7 +76,10 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2696, 'gw_fct_om_visit_event_manager', 'utils','function', 'Manager to work with advanced functionalities on events configurable using action_type on parameter_x_parameter table' ,'role_admin',FALSE, FALSE,FALSE);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2698, 'gw_fct_pg2epa_hydrant', 'ws','function', 'Function with four steps to analyze full network if it is valid according spanish engineering rules' ,'role_epa',FALSE, FALSE,FALSE);
+VALUES (2697, 'gw_fct_pg2epa_singlenodecapacity', 'ws','function', 'Function with unlimited steps to analyze full network with different demands on one single node on network' ,'role_epa',FALSE, FALSE,FALSE);
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2698, 'gw_fct_pg2epa_nodescouplecapacity', 'ws','function', 'Function with five steps to analyze full network with different demands using couples of nodes on network (according spanish rules for firetap analytics)' ,'role_epa',FALSE, FALSE,FALSE);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2700, 'gw_fct_admin_manage_fields', 'utils','function', 'Function to administrate fields on tables used on sql file to prevent conflict when field exists' ,'role_admin',FALSE, FALSE,FALSE);
