@@ -719,7 +719,6 @@ class AddNewLot(ParentManage):
                 item.append(1)  # Set status field of the table relation
                 item.append('No visitat')
                 item.append('')
-                item.append('False')
                 item.append(feature.geometry().asWkb().encode('hex').upper())
                 row = []
                 for value in item:

@@ -979,11 +979,6 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="ReportTab">
-         <attribute name="title">
-          <string>Report</string>
-         </attribute>
-        </widget>
        </widget>
       </item>
      </layout>
