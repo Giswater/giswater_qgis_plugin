@@ -34,7 +34,7 @@ DECLARE
 	v_return json;
 	v_projecttype text;
 	v_recursive text;
-    v_continue text;
+	v_continue text;
 BEGIN
 
 --  Search path
@@ -44,7 +44,7 @@ BEGIN
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_currentstep =  (p_data->>'data')::json->>'currentStep';
 	v_recursive =  (p_data->>'data')::json->>'recursive';
-    v_continue =  (p_data->>'continue')::json->>'continue';
+	v_continue =  (p_data->>'data')::json->>'continue';
 
 	
 	-- get variables
