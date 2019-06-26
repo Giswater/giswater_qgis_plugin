@@ -127,7 +127,7 @@ BEGIN
 				work_aux := (select action_value::text from om_visit_parameter_x_parameter WHERE parameter_id1=rec_parameter.parameter_id2 AND action_type=5);
 				builder_aux:= (select om_visit_cat.id from om_visit_cat JOIN om_visit ON om_visit_cat.id=om_visit.visitcat_id WHERE om_visit.id=visit_id_aux);
 				size_id_aux= (select size_id FROM node WHERE node_id=rec_node.node_id);
-				event_date_aux=(SELECT date(value) FROM om_visit_event WHERE id=rec_parameter.id);
+				event_date_aux=(SELECT date(startdate) FROM om_visit WHERE om_visit.id=visit_id_aux);
 				campaign_aux=(select id FROM cat_campaign WHERE start_date<=event_date_aux and end_date>=event_date_aux AND active = TRUE);
 				price_aux = (select price FROM cat_price WHERE size_id=size_id_aux AND work_id=work_aux AND campaign_id=campaign_aux);
 
@@ -204,7 +204,7 @@ BEGIN
 
             builder_aux:= (select om_visit_cat.id from om_visit_cat JOIN om_visit ON om_visit_cat.id=om_visit.visitcat_id WHERE om_visit.id=visit_id_aux);
             size_id_aux= (select size_id FROM node WHERE node_id=node_id_aux);
-            event_date_aux=(SELECT date(value) FROM om_visit_event WHERE id=rec_parameter.id);
+            event_date_aux=(SELECT date(startdate) FROM om_visit WHERE om_visit.id=visit_id_aux);
             campaign_aux=(select id FROM cat_campaign WHERE start_date<=event_date_aux and end_date>=event_date_aux AND active = TRUE);
             price_aux = (select price FROM cat_price WHERE size_id=size_id_aux AND work_id=work_aux AND campaign_id=campaign_aux);
               
