@@ -31,7 +31,7 @@ BEGIN
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
 	SELECT 
 	result_id_var,
-	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, the_geom
+	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom
 	FROM v_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=v_node.node_id
@@ -44,7 +44,7 @@ BEGIN
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, the_geom)
 	SELECT
 	result_id_var,
-	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, annotation,
+	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
 	CASE
 		WHEN custom_dint IS NOT NULL THEN custom_dint
 		ELSE dint
@@ -54,7 +54,7 @@ BEGIN
 		ELSE roughness
 	END AS roughness,
 	length,
-	the_geom
+	v_arc.the_geom
 	FROM inp_selector_sector, v_arc
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
