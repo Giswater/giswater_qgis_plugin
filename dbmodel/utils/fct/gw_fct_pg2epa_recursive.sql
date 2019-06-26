@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -23,12 +23,12 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true" "}}$$)
+"data":{"recursive":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
 */
 
 DECLARE
-v_status text;
+v_recursive text;
 v_result text;
 v_id integer;
 v_data json;
@@ -50,10 +50,10 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --  Get input data
-	v_status = (p_data->>'data')::json->>'status';
+	v_recursive = (p_data->>'data')::json->>'recursive';
 	v_result =  (p_data->>'data')::json->>'resultId';
 	
-	IF v_status='off' THEN -- normal call
+	IF v_recursive='off' THEN -- normal call
 			SELECT gw_fct_pg2epa(p_data) INTO v_return;
 			
 	ELSE -- recursive call 
@@ -65,8 +65,10 @@ BEGIN
 		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
 		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
 
+		raise notice ' v_functionname % v_steps % ', v_functionname, v_steps;
+
 		-- setting temp_table with any rows any calls using steps number defined on inp_typevalue parameter
-		IF v_status='start' THEN
+		IF v_recursive='start' THEN
 
 			-- delete values from tables
 			DELETE FROM temp_table WHERE fprocesscat_id = 35 AND user_name=current_user;
@@ -74,12 +76,14 @@ BEGIN
 
 			-- inserting process rows
 			LOOP 
+				raise notice ' loop %', v_rownumber;
+				
 				v_rownumber = v_rownumber + 1;
 				INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35, concat('{"data":{"step":"',v_rownumber,'", "resultId":"',v_result,'"}}'));
 				EXIT WHEN v_rownumber = v_steps;						
 			END LOOP;
 		
-		ELSIF v_status='ongoing' THEN
+		ELSIF v_recursive='ongoing' THEN
 		
 			DELETE FROM temp_table WHERE id = (SELECT id FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user ORDER BY id asc LIMIT 1);
 											

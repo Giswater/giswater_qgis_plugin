@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg_recursive(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_recursive(result_id_var character varying)  
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_recursive(p_data json)  
 RETURNS json AS $BODY$
 
 /*EXAMPLE
@@ -26,8 +26,12 @@ DECLARE
 	v_result text;
 	v_usenetworkgeom boolean;
 	v_tableid text;
+	v_functionid text;
+	v_functionname text;
+	v_steps integer;
 	v_currentstep integer;
-      
+	v_storeallresults boolean;
+	v_return json;
 
 BEGIN
 
@@ -59,21 +63,17 @@ BEGIN
 					SELECT 35, concat (''"resultId":"'''||v_result||'''", "step":"'','||v_currentstep||'''", 
 					"table":"'','||quote_ident(id)||'''", "values":{'',row_to_json(a),''}'')
 					FROM ( SELECT * FROM '||quote_ident(id)||' WHERE result_id = v_result)';
-			END LOOP;
-		END IF;	
+		END LOOP;
+	END IF;	
 
 	-- enhance report message.
 	showing step by step to user what is happening...	
 */
 
 	-- return message
-	v_return = '{"message":{"priority":0, "text":"Rpt import done succesfully"}}'
-
-	END IF;
+	v_return = '{"message":{"priority":0, "text":"Rpt import done succesfully"}}';
 
 RETURN v_return;
-
-RETURN 0;
 		
 END;
 $BODY$

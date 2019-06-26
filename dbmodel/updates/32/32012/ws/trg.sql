@@ -152,11 +152,11 @@ CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR DELETE OR UPDAT
 DROP TRIGGER IF EXISTS gw_trg_edit_node_shutoffvalve ON "SCHEMA_NAME".ve_node_shutoffvalve;
 CREATE TRIGGER gw_trg_edit_node_shutoffvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_shutoffvalve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('SHUTOFF-VALVE');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_node_checkoffvalve ON "SCHEMA_NAME".ve_node_checkoffvalve;
-CREATE TRIGGER gw_trg_edit_node_checkoffvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_checkoffvalve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('CHECK-VALVE');
+DROP TRIGGER IF EXISTS gw_trg_edit_node_checkoffvalve ON "SCHEMA_NAME".ve_node_checkvalve;
+CREATE TRIGGER gw_trg_edit_node_checkoffvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_checkvalve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('CHECK-VALVE');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_node_prbkvalve ON "SCHEMA_NAME".ve_node_prbkvalve;
-CREATE TRIGGER gw_trg_edit_node_prbkvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_prbkvalve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('PR-BREAK.VALVE');
+DROP TRIGGER IF EXISTS gw_trg_edit_node_prbkvalve ON "SCHEMA_NAME".ve_node_prbreakvalve;
+CREATE TRIGGER gw_trg_edit_node_prbkvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_prbreakvalve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('PR-BREAK.VALVE');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node_flcontrvalve ON "SCHEMA_NAME".ve_node_flcontrvalve;
 CREATE TRIGGER gw_trg_edit_node_flcontrvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_flcontrvalve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('FL-CONTR.VALVE');
@@ -194,8 +194,8 @@ CREATE TRIGGER gw_trg_edit_node_valveregister INSTEAD OF INSERT OR DELETE OR UPD
 DROP TRIGGER IF EXISTS gw_trg_edit_node_controlregister ON "SCHEMA_NAME".ve_node_controlregister;
 CREATE TRIGGER gw_trg_edit_node_controlregister INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_controlregister FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('CONTROL-REGISTER');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_node_expansiontank ON "SCHEMA_NAME".ve_node_expansiontank;
-CREATE TRIGGER gw_trg_edit_node_expansiontank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_expansiontank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('EXPANTANK');
+DROP TRIGGER IF EXISTS gw_trg_edit_node_expansiontank ON "SCHEMA_NAME".ve_node_expantank;
+CREATE TRIGGER gw_trg_edit_node_expansiontank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_expantank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('EXPANTANK');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node_filter ON "SCHEMA_NAME".ve_node_filter;
 CREATE TRIGGER gw_trg_edit_node_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node_filter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node('FILTER');

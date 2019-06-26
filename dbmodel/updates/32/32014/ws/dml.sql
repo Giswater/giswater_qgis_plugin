@@ -22,5 +22,5 @@ INSERT INTO dma VALUES (-1, 'Undefined dma');
 INSERT INTO sector VALUES (-1, 'Undefined sector');
 INSERT INTO cat_presszone VALUES (-1, 'Undefined presszone',-1);
 
-INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '1', 'SINGLE NODE CAPACITY', null, '{"functionName":"gw_fct_pg2epa_singlenodecapacity", "sytemParameters":{"storeAllResults":"false", "steps":"999"}, "userParameters":{"demand":{"min":"10", "max":"280", "increase":"1"}}}');
-INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '2', 'NODES COUPLE CAPACITY', null, '{"functionName":"gw_fct_pg2epa_nodescouplecapacity", "sytemParameters":{"storeAllResults":"false", "steps":"5"}, "userParameters":{"demand":{"single":"60"}}');
+INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '1', 'NODES COUPLE CAPACITY', null, '{"functionName":"gw_fct_pg2epa_nodescouplecapacity", "systemParameters":{"storeAllResults":"false", "steps":"5"}, "userParameters":{"demand":{"single":"60"}}}');
+INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '2', 'SINGLE NODE CAPACITY', null, '{"functionName":"gw_fct_pg2epa_singlenodecapacity", "systemParameters":{"storeAllResults":"false", "steps":"999"}, "userParameters":{"demand":{"min":"10", "max":"280", "increase":"1"}}}');
