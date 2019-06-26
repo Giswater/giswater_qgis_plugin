@@ -649,7 +649,7 @@ class ParentAction(object):
         return cursor        
                     
                 
-    def set_table_columns(self, dialog, widget, table_name):
+    def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(dialog, widget)
@@ -677,12 +677,16 @@ class ParentAction(object):
                 widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
-        # widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
+        if isQStandardItemModel:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+        else:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+
+        return widget
 
 
     def connect_signal_selection_changed(self, option):
@@ -934,5 +938,16 @@ class ParentAction(object):
         for action in actions_list:
            self.controller.log_info(str(action.objectName()))
            action.triggered.connect(partial(self.show_action_name, action))
+
+
     def show_action_name(self, action):
         self.controller.log_info(str(action.objectName()))
+
+
+    def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + "." + table_name + ""
+               " WHERE typevalue = '" + typevalue + "'"
+               " ORDER BY " + order_by + "")
+        rows = self.controller.get_rows(sql, commit=True)
+        return rows

@@ -110,6 +110,13 @@ class AuditCheckProjectResult(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('basic_table.ui')
+class BasicTable(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('cad_add_circle.ui')
 class Cad_add_circle(QDialog, FORM_CLASS):
     def __init__(self):
@@ -247,6 +254,13 @@ FORM_CLASS = get_ui_class('load_profiles.ui')
 class LoadProfiles(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('lot_management.ui')
+class LotManagement(QDialog, FORM_CLASS):
+    def __init__(self):
+        super(LotManagement, self).__init__()
         self.setupUi(self)
 
 
