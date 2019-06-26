@@ -44,13 +44,13 @@ BEGIN
 			IF psector_type_aux='plan' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
-				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id
+				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
 		
 			ELSIF psector_type_aux='om' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id
+				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
 
 			END IF;
@@ -59,17 +59,17 @@ BEGIN
 			IF psector_type_aux='plan' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
-				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id
-				select the_geom from gully join plan_psector_x_gully ON plan_psector_x_gully.gully_id=gully.gully_id where psector_id=NEW.psector_id
+				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
+				select the_geom from gully join plan_psector_x_gully ON plan_psector_x_gully.gully_id=gully.gully_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
 		
 			ELSIF psector_type_aux='om' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id
-				select the_geom from gully join om_psector_x_gully ON om_psector_x_gully.gully_id=gully.gully_id where psector_id=NEW.psector_id
+				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
+				select the_geom from gully join om_psector_x_gully ON om_psector_x_gully.gully_id=gully.gully_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
-
+			END IF;
 		END IF;
 		
 		x1=st_xmax(collect_aux)+5;
@@ -144,14 +144,14 @@ BEGIN
 		IF v_projecttype = 'WS' THEN 
 			IF psector_type_aux='plan' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
-				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
-				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id
+				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id  UNION
+				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
 		
 			ELSIF psector_type_aux='om' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id
+				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id UNION
 				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
 
 			END IF;
@@ -160,17 +160,17 @@ BEGIN
 			IF psector_type_aux='plan' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join plan_psector_x_arc ON plan_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
-				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id
-				select the_geom from gully join plan_psector_x_gully ON plan_psector_x_gully.gully_id=gully.gully_id where psector_id=OLD.psector_id
+				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id UNION
+				select the_geom from gully join plan_psector_x_gully ON plan_psector_x_gully.gully_id=gully.gully_id where psector_id=OLD.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
 		
 			ELSIF psector_type_aux='om' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id
-				select the_geom from gully join om_psector_x_gully ON om_psector_x_gully.gully_id=gully.gully_id where psector_id=OLD.psector_id
+				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id UNION
+				select the_geom from gully join om_psector_x_gully ON om_psector_x_gully.gully_id=gully.gully_id where psector_id=OLD.psector_id UNION
 				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
-
+			END IF;
 		END IF;
 		
 		x1=st_xmax(collect_aux)+5;
