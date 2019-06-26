@@ -43,18 +43,29 @@ v_querytext text;
 rec_parameter_child record;
 result text;
 v_newclass integer;
+v_schema text;
 
 BEGIN
 
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
     
+    v_schema = (SELECT wsoftware FROM version ORDER BY id DESC LIMIT 1);
+
     -- select main values (stardate, node_id, mu_id)
     -- getting start date using event value (legacy)
     SELECT startdate INTO startdate_aux FROM om_visit WHERE id=visit_id_aux limit 1; 
     -- select other parameters using other tables
-    SELECT muni_id, node.node_id INTO mu_id_aux, node_id_aux FROM node JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id WHERE visit_id=visit_id_aux;
-    
+
+	IF v_schema = 'TM' THEN
+	    SELECT mu_id, node.node_id INTO mu_id_aux, node_id_aux FROM node 
+	    JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id WHERE visit_id=visit_id_aux;
+	ELSE
+	    SELECT muni_id, node.node_id INTO mu_id_aux, node_id_aux FROM node 
+	    JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id WHERE visit_id=visit_id_aux;
+
+	END IF;
+
     -- check if exits multiplier parameter (action type=1)
     v_parameter = (SELECT parameter_id2 FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
 		   JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE' limit 1);
@@ -93,8 +104,10 @@ BEGIN
 			RAISE NOTICE 'inserting new event %',id_event ;
 
 			--check if the function was planned before by poblacion
-			PERFORM tm_fct_planned_visit(id_last, 2);
-			
+			IF v_schema = 'TM' THEN
+				PERFORM tm_fct_planned_visit(id_last, 2);
+			END IF;
+
 			-- sql parameter (action_type=4)
 			FOR rec_parameter_child IN SELECT * FROM om_visit_parameter_x_parameter WHERE parameter_id1=v_parameter AND action_type=4
 			LOOP 
@@ -150,7 +163,7 @@ BEGIN
 	
       ELSE
 				--check if the function was planned before by unit
-		IF (SELECT wsoftware FROM ud.version ORDER BY id DESC LIMIT 1) = 'TM' THEN
+		IF v_schema = 'TM' THEN
 		
 			PERFORM tm_fct_planned_visit(visit_id_aux,1);
 			
