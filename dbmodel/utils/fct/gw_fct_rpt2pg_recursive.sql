@@ -14,11 +14,11 @@ RETURNS json AS $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_rpt2pg_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"off", "resultId":"test1"}}$$)
+"data":{"recursive":"disabled", "resultId":"test1"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_rpt2pg_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"ongoing", "resultId":"test1", "currentStep":"2"}}$$)
+"data":{"recursive":"enabled", "resultId":"test1", "currentStep":"2", "continue":"true"}}$$)
 */
 
 DECLARE
@@ -33,7 +33,8 @@ DECLARE
 	v_storeallresults boolean;
 	v_return json;
 	v_projecttype text;
-
+	v_recursive text;
+    v_continue text;
 BEGIN
 
 --  Search path
@@ -42,15 +43,21 @@ BEGIN
 	--  Get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_currentstep =  (p_data->>'data')::json->>'currentStep';
+	v_recursive =  (p_data->>'data')::json->>'recursive';
+    v_continue =  (p_data->>'continue')::json->>'continue';
 
 	
 	-- get variables
 	v_projecttype = (SELECT wsoftware FROM version LIMIT 1);
-	--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_recursive' AND cur_user=current_user);
-	v_functionid = '1'; 
-	v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
-	v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
-	v_storeallresults = (SELECT ((addparam::json->>'systemParameters')::json->>'storeAllResults') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
+
+	-- get if function is on recursive mode
+	IF v_recursive = 'enabled' THEN 
+		--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_recursive' AND cur_user=current_user);
+		v_functionid = '1'; 
+		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
+		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
+		v_storeallresults = (SELECT ((addparam::json->>'systemParameters')::json->>'storeAllResults') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
+	END IF;
 
 	
 	-- call rpt2pg function

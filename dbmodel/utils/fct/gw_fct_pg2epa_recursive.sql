@@ -101,7 +101,7 @@ BEGIN
 			v_return =  gw_fct_json_object_set_key (v_return::json, 'continue', true);								
 		
 			-- setting counter
-			v_return =  gw_fct_json_object_set_key (v_return, 'counter', v_currentstep);
+			v_return =  gw_fct_json_object_set_key (v_return, 'steps', v_steps);
 		ELSE 
 			RETURN '{"message":{"priority":1, "text":"Last inp export done succesfully"}}';
 		END IF;	
