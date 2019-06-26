@@ -3089,7 +3089,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Ucertain</string>
+     <string>Uncertain</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="inventory">
