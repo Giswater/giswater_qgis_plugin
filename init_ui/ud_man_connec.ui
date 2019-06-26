@@ -17,7 +17,7 @@
    <widget class="QCheckBox" name="undelete">
     <property name="geometry">
      <rect>
-      <x>395</x>
+      <x>335</x>
       <y>538</y>
       <width>81</width>
       <height>17</height>
@@ -3154,19 +3154,6 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QCheckBox" name="unconnected">
-    <property name="geometry">
-     <rect>
-      <x>135</x>
-      <y>538</y>
-      <width>106</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Unconnected</string>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="uncertain">
     <property name="geometry">
      <rect>
@@ -3177,7 +3164,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Ucertain</string>
+     <string>Uncertain</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="connec_id">
@@ -3199,7 +3186,7 @@
    <widget class="QCheckBox" name="inventory">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>175</x>
       <y>538</y>
       <width>91</width>
       <height>17</height>
@@ -3929,7 +3916,6 @@
   <tabstop>state</tabstop>
   <tabstop>state_type</tabstop>
   <tabstop>uncertain</tabstop>
-  <tabstop>unconnected</tabstop>
   <tabstop>inventory</tabstop>
   <tabstop>undelete</tabstop>
   <tabstop>publish</tabstop>
