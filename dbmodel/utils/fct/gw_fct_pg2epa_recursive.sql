@@ -112,7 +112,7 @@ BEGIN
 
 	END IF;
 	--continue (or not)        
-	IF v_count > 0 THEN
+	IF v_count > 1 THEN
 	    -- force true the return to make signal to client that there are more than one pending calls. Return from gw_fct_pg2epa is always false
 	    v_return =  gw_fct_json_object_set_key (v_return::json, 'continue', true);                                
 	    -- setting counter
