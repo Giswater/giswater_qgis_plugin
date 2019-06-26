@@ -139,7 +139,7 @@ BEGIN
 
 		-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
 		IF rec_flowreg.flw_type='pump' THEN
-			UPDATE rpt_inp_node SET ysur=9999 WHERE node_id=record_new_arc.node_2;
+			UPDATE rpt_inp_node SET y0=0, ysur=9999 WHERE node_id=record_new_arc.node_2;
 		END IF;
 
 		
