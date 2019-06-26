@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
-"data":{"parameters":{"resultId":"r1"}}}$$)
+"data":{"resultId":"r1"}}$$)
 */
 
 DECLARE
@@ -45,8 +45,8 @@ BEGIN
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- get input data
-	v_result_id := (((p_data ->>'data')::json->>'parameters')::json->>'resultId')::text;
-	v_path := ((p_data ->>'data')::json->>'parameters')::json->>'path'::text;
+	v_result_id := (((p_data ->>'data')::json->>'resultId')::text;
+	v_path := ((p_data ->>'data')::json->>'path'::text;
 
 	-- delete previous data on log table
 	DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=40;

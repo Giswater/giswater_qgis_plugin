@@ -32,6 +32,7 @@ DECLARE
 	v_currentstep integer;
 	v_storeallresults boolean;
 	v_return json;
+	v_projecttype text;
 
 BEGIN
 
@@ -44,15 +45,23 @@ BEGIN
 
 	
 	-- get variables
+	v_projecttype = (SELECT wsoftware FROM version LIMIT 1);
 	--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_recursive' AND cur_user=current_user);
 	v_functionid = '1'; 
 	v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
 	v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
 	v_storeallresults = (SELECT ((addparam::json->>'systemParameters')::json->>'storeAllResults') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
 
+	
 	-- call rpt2pg function
-	PERFORM gw_fct_rpt2pg(v_result);
-
+	IF v_projecttype = 'WS' THEN
+		SELECT gw_fct_utils_csv2pg_import_epanet_rpt(p_data) INTO v_result;
+	
+	ELSIF v_projecttype = 'UD' THEN
+		SELECT gw_fct_utils_csv2pg_import_swmm_rpt(p_data) INTO v_result;	
+	
+	END IF;
+	
 /*  to do
 	-- storing results into audit_log_data table (in case of recursive fuction is defined with true)
 	IF v_storeallresults THEN
