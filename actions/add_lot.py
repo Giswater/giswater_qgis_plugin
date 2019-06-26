@@ -477,7 +477,7 @@ class AddNewLot(ParentManage):
 
         for x in range(0, model.rowCount()):
             row = {}
-            for c in range(0, model.columnCount()-1):
+            for c in range(0, model.columnCount()):
                 index = model.index(x, c)
                 value = model.data(index)
                 row[headers[c]] = value
