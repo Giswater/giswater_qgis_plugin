@@ -675,7 +675,8 @@ class Utils(ParentAction):
 
         temp_tablename = 'temp_csv2pg'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', roles, False)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, readheader', 'sys_csv2pg_cat', roles, False)
+
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -838,6 +839,7 @@ class Utils(ParentAction):
             return
 
         csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
+        readheader = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 3)
         self.delete_table_csv(temp_tablename, csv2pgcat_id_aux)
         path = utils_giswater.getWidgetText(dialog, dialog.txt_file_csv)
         label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import)
@@ -858,6 +860,9 @@ class Utils(ParentAction):
                 csvfile.seek(0)  # Position the cursor at position 0 of the file
                 reader = csv.reader(csvfile, delimiter=delimiter)
                 for row in reader:
+                    if readheader is False:
+                        readheader = True
+                        continue
                     if len(row) > 0:
                         sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
                         values = "VALUES("+str(csv2pgcat_id_aux)+", "
