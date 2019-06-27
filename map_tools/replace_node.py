@@ -66,7 +66,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         row = self.controller.get_row(sql)
         if row:
             enddate_vdefault = row[0]
-            self.enddate_aux = datetime.strptime(enddate_vdefault, '%Y-%m-%d').date()
+            self.enddate_aux = datetime.strptime(enddate_vdefault, '%Y/%m/%d').date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_nodereplace, self.dlg_nodereplace.workcat_id_end)
             sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work "
@@ -75,11 +75,11 @@ class ReplaceNodeMapTool(ParentMapTool):
             if row:
                 builtdate = row[0]
                 if builtdate != 'null' and builtdate:
-                    self.enddate_aux = datetime.strptime(str(builtdate), '%Y-%m-%d').date()
+                    self.enddate_aux = datetime.strptime(str(builtdate), '%Y/%m/%d').date()
                 else:
-                    self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
+                    self.enddate_aux = datetime.strptime(self.current_date, '%Y/%m/%d').date()
             else:
-                self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
+                self.enddate_aux = datetime.strptime(self.current_date, '%Y/%m/%d').date()
 
         self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
