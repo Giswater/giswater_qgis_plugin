@@ -1390,16 +1390,17 @@ class ApiCF(ApiParent):
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY id")
         rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
+        if rows:
+            rows.append(['', ''])
+            utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
         sql = ("SELECT DISTINCT(parameter_type), parameter_type FROM " + self.schema_name + "." + table_name_event_id + ""
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY parameter_type")
         rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
-
+        if rows:
+            rows.append(['', ''])
+            utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
 
         # Get selected dates
         date_from = self.date_event_from.date()
