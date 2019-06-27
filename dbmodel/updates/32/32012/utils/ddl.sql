@@ -63,5 +63,6 @@ ALTER TABLE sys_feature_type ADD COLUMN icon character varying(30);
 --24/05/2019
 ALTER TABLE man_addfields_parameter ADD COLUMN orderby integer;
 ALTER TABLE man_addfields_parameter ADD COLUMN active boolean;
+ALTER TABLE man_addfields_parameter ADD COLUMN  iseditable boolean;
 
 --ALTER TABLE ext_municipality ADD COLUMN active boolean;
