@@ -10,6 +10,20 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='price_simple';
 
-UPDATE sys_csv2pg_cat SET readheader=TRUE;
-UPDATE sys_csv2pg_cat SET readheader=FALSE where id=1; -- importdbprices
 
+
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=1 WHERE id=1;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=1 WHERE id=1;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=2 WHERE id=3;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=3  WHERE id=4;
+UPDATE sys_csv2pg_cat SET readheader=true, orderby=4  WHERE id=8;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=5  WHERE id=9;
+UPDATE sys_csv2pg_cat SET readheader=true, orderby=6  WHERE id=10;
+UPDATE sys_csv2pg_cat SET readheader=true, orderby=7  WHERE id=11;
+UPDATE sys_csv2pg_cat SET readheader=true, orderby=8  WHERE id=12;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=9  WHERE id=13;
+UPDATE sys_csv2pg_cat SET name='Import node visits', name_i18n='Import node visits', readheader=false, orderby=10  WHERE id=14;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=11  WHERE id=15;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=12  WHERE id=16;
+UPDATE sys_csv2pg_cat SET readheader=false, orderby=13  WHERE id=17;
+UPDATE sys_csv2pg_cat SET name='Import visit file', name_i18n='import visit file', csv_structure='Import visit file', readheader=true, orderby=14  WHERE id=18;

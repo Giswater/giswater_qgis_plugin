@@ -15,7 +15,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_csv2pg_
 
 CREATE TABLE om_psector_x_connec(
   id serial NOT NULL,
-  connec_id character varying(16),
+  connec_id character varying(16) NOT NULL,
+  arc_id character varying(16),
   psector_id integer,
   descript character varying(254),
   CONSTRAINT om_psector_x_connec_pkey PRIMARY KEY (id),
@@ -31,10 +32,13 @@ CREATE TABLE om_psector_x_connec(
 CREATE TABLE plan_psector_x_connec(
   id serial NOT NULL,
   connec_id character varying(16) NOT NULL,
+  arc_id character varying(16),
   psector_id integer NOT NULL,
   state smallint NOT NULL,
   doable boolean NOT NULL,
   descript character varying(254),
+  link_geom geometry (LINESTRING, SRID_VALUE),
+  vnode_geom geometry (POINT, SRID_VALUE),
   CONSTRAINT plan_psector_x_connec_pkey PRIMARY KEY (id),
   CONSTRAINT plan_psector_x_connec_connec_id_fkey FOREIGN KEY (connec_id)
       REFERENCES connec (connec_id) MATCH SIMPLE

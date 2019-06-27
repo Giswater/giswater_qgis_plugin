@@ -11,6 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE TABLE om_psector_x_gully(
   id serial NOT NULL,
   gully_id character varying(16),
+  arc_id character varying(16),
   psector_id integer,
   descript character varying(254),
   CONSTRAINT om_psector_x_gully_pkey PRIMARY KEY (id),
@@ -26,10 +27,13 @@ CREATE TABLE om_psector_x_gully(
 CREATE TABLE plan_psector_x_gully(
   id serial NOT NULL,
   gully_id character varying(16) NOT NULL,
+  arc_id character varying(16),
   psector_id integer NOT NULL,
   state smallint NOT NULL,
   doable boolean NOT NULL,
   descript character varying(254),
+  link_geom geometry (LINESTRING, SRID_VALUE),
+  vnode_geom geometry (POINT, SRID_VALUE),
   CONSTRAINT plan_psector_x_gully_pkey PRIMARY KEY (id),
   CONSTRAINT plan_psector_x_gully_gully_id_fkey FOREIGN KEY (gully_id)
       REFERENCES gully (gully_id) MATCH SIMPLE
