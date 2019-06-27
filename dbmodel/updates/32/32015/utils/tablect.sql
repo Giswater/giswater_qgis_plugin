@@ -12,3 +12,9 @@ ALTER TABLE inp_controls_x_arc DROP CONSTRAINT inp_controls_x_arc_id_fkey;
 ALTER TABLE inp_controls_x_node DROP CONSTRAINT inp_controls_x_node_id_fkey;
 
 ALTER TABLE sys_csv2pg_cat ALTER COLUMN readheader SET DEFAULT true;
+
+ALTER TABLE price_compost ADD CONSTRAINT price_compost_pricecat_id_fkey FOREIGN KEY (pricecat_id)
+REFERENCES price_cat_simple (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE audit_price_simple DROP CONSTRAINT audit_price_simple_pkey;
+ALTER TABLE audit_price_simple ADD CONSTRAINT audit_price_simple_pkey PRIMARY KEY (id, pricecat_id);

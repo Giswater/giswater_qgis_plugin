@@ -56,7 +56,7 @@ BEGIN
 	
 		-- control of price units (csv2)
 		SELECT csv2 INTO v_units FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1
-		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT unit FROM price_compost);
+		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT id FROM price_value_unit);
 
 		IF v_units IS NOT NULL THEN
 			RETURN audit_function(2088,2440,(v_units)::text);
@@ -77,10 +77,10 @@ BEGIN
 		END IF;
 	
 		-- Insert into audit table
-		INSERT INTO audit_log_csv2pg  (csv2pgcat_id, user_name, csv1, csv2, csv3, csv4, csv5)
-		SELECT csv2pgcat_id, user_name, csv1, csv2, csv3, csv4, csv5
+		INSERT INTO audit_price_simple (id, pricecat_id, unit, descript, text, price, cur_user)
+		SELECT csv1, label_aux, csv2, csv3, csv4, csv5::numeric(12,4), current_user
 		FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
-
+				
 		-- Insert into price_cat_simple table
 		IF label_aux NOT IN (SELECT id FROM price_cat_simple) THEN
 			INSERT INTO price_cat_simple (id) VALUES (label_aux);
