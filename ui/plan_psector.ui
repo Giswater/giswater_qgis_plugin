@@ -784,7 +784,7 @@
           <item>
            <widget class="QTabWidget" name="tab_feature">
             <property name="currentIndex">
-             <number>0</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="Arc">
              <attribute name="title">
@@ -803,6 +803,26 @@
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <item>
                <widget class="QTableView" name="tbl_psector_x_node"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="Connec">
+             <attribute name="title">
+              <string>Connec</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_psector_x_connec"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="Gully">
+             <attribute name="title">
+              <string>Gully</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_psector_x_gully"/>
               </item>
              </layout>
             </widget>
@@ -827,8 +847,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>400</width>
-                 <height>385</height>
+                 <width>412</width>
+                 <height>414</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -900,8 +920,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>400</width>
-                 <height>385</height>
+                 <width>161</width>
+                 <height>139</height>
                 </rect>
                </property>
                <attribute name="label">
