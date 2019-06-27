@@ -234,7 +234,7 @@ SELECT link.link_id,
     link.state,
     st_length2d(link.the_geom) AS gis_length,
     link.userdefined_geom,
-case when link_geom IS NULL THEN link.the_geom ELSE link_geom END AS the_geom 
+case when link_geom IS NULL THEN link.the_geom ELSE link_geom END 
 from link 
 LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
 join v_edit_gully ON link.feature_id=gully_id
@@ -252,11 +252,11 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
     vnode.dma_id,
     vnode.state,
     vnode.annotation,
-    case when vnode_geom IS NULL THEN vnode.the_geom ELSE vnode_geom END, 
+    case when vnode_geom IS NULL THEN vnode.the_geom ELSE vnode_geom END AS the_geom, 
     vnode.expl_id
    FROM vnode 
    JOIN v_edit_link ON exit_id::integer=vnode_id AND exit_type='VNODE'
-   join v_edit_connec ON feature_id=connec_id
+   join v_edit_connec ON v_edit_link.feature_id=connec_id
    join arc USING (arc_id)
    left join plan_psector_x_connec USING (arc_id, connec_id)
    UNION
@@ -270,6 +270,6 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
     vnode.expl_id
    FROM vnode 
    JOIN v_edit_link ON exit_id::integer=vnode_id AND exit_type='VNODE'
-   join v_edit_gully ON feature_id=gully_id
+   join v_edit_gully ON v_edit_link.feature_id=gully_id
    join arc USING (arc_id)
    left join plan_psector_x_gully USING (arc_id, gully_id) ;
