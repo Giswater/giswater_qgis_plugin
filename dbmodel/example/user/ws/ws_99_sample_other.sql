@@ -105,7 +105,7 @@ INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, d
 widgettype_id,orderby, active, iseditable)
 VALUES ('dqa', 'PIPE', true, 'integer', NULL, NULL, '{"fprocesscat_id":"44"}', 'as', 'QTextEdit', 2 , true, false);
 
-INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_manCREATdatory, datatype_id, field_length, num_decimals, default_value, form_label,
+INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label,
 widgettype_id,orderby, active, iseditable)
 VALUES ('dqa', 'JUNCTION', true, 'integer', NULL, NULL, '{"fprocesscat_id":"44"}', 'AS', 'QTextEdit', 2 , true, false);
 
