@@ -269,7 +269,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
                 # TODO: Replace to function gw_fct_feature_replace(json)
                 # Execute SQL function and show result to the user
-                function_name = "gw_fct_node_replace"
+                function_name = "gw_fct_feature_replace"
                 sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
                 new_feature_id = self.controller.get_row(sql, log_sql=True, commit=True)
                 if new_feature_id:
