@@ -5,11 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION gw_trg_plan_psector_x_connec()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_gully()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    v_stateaux smallint;	
+    v_stateaux smallint;
 	v_link_geom public.geometry;
 	v_vnode_geom public.geometry;
 
@@ -17,8 +17,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	SELECT connec.state INTO v_stateaux FROM connec WHERE connec_id=NEW.connec_id;
-		
+	SELECT gully.state INTO v_stateaux FROM gully WHERE gully_id=NEW.gully_id;
 	IF v_stateaux=1	THEN 
 		NEW.state=0;
 		NEW.doable=false;
@@ -32,7 +31,7 @@ BEGIN
 	v_vnode_geom = ST_EndPoint(v_link_geom);
 	
 	UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom WHERE id=NEW.id;
-
+	
 RETURN NEW;
 
 END;  
