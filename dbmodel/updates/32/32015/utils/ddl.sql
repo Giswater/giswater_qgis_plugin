@@ -8,6 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+ALTER TABLE price_compost ADD COLUMN pricecat_id character varying(16);
+
+
 CREATE TABLE om_psector_x_connec(
   id serial NOT NULL,
   connec_id character varying(16),
