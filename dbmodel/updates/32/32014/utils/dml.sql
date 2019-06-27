@@ -58,3 +58,12 @@ INSERT INTO config_client_forms VALUES(19067, 'update_fields', 'utils', 'config_
 UPDATE audit_cat_param_user SET isdeprecated = true WHERE id='om_mincut_analysis_dminsector';
 UPDATE audit_cat_param_user SET isdeprecated = true WHERE id='om_mincut_analysis_pipehazard';
 UPDATE audit_cat_param_user SET isdeprecated = true WHERE id='om_mincut_analysis_dinletsector';
+
+
+--27/06/2019
+UPDATE audit_cat_function SET isdeprecated=true WHERE function_name = 'gw_fct_node_replace';
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2714, 'gw_fct_feature_replace', 'utils', 'function', 
+'Replace one node, connec or gully on service for another one, copying all attributes, setting old one on obsolete and reconnecting other features with the new one',
+'role_edit', false, false,false);
