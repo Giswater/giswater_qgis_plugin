@@ -872,12 +872,12 @@ class ApiParent(ParentAction):
             widget.setText(field['value'])
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-        function_name = 'no_function_associated'
+        func_name = 'no_function_associated'
         real_name = widget.objectName()[5:len(widget.objectName())]
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 func_name = field['widgetfunction']
-                exist = self.controller.check_python_function(self, function_name)
+                exist = self.controller.check_python_function(self, func_name)
                 if not exist:
                     msg = "widget {0} have associated function {1}, but {1} not exist".format(real_name, func_name)
                     self.controller.show_message(msg, 2)
@@ -889,7 +889,7 @@ class ApiParent(ParentAction):
             msg = "parameter widgetfunction not found"
             self.controller.show_message(msg, 2)
         # Call def gw_api_open_url(self, widget) or def no_function_associated(self, widget=None, message_level=1)
-        widget.clicked.connect(partial(getattr(self, function_name), widget))
+        widget.clicked.connect(partial(getattr(self, func_name), widget))
         return widget
 
         
