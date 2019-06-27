@@ -42,6 +42,20 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
 
 
+    def manage_dates(self, date_value):
+        """ Manage dates """
+
+        date_result = None
+        try:
+            date_result = str(date_value)
+            date_result = date_result.replace("-", "/")
+            date_result = datetime.strptime(date_result, '%Y/%m/%d')
+        except Exception as e:
+            self.controller.log_warning(str(e))
+        finally:
+            return date_result
+
+
     def init_replace_node_form(self, feature):
 
         # Create the dialog and signals
@@ -65,21 +79,21 @@ class ReplaceNodeMapTool(ParentMapTool):
                "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
         row = self.controller.get_row(sql)
         if row:
-            enddate_vdefault = row[0]
-            self.enddate_aux = datetime.strptime(enddate_vdefault, '%Y/%m/%d').date()
+            self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_nodereplace, self.dlg_nodereplace.workcat_id_end)
             sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work "
                    "WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
             if row:
-                builtdate = row[0]
+                builtdate = self.manage_dates(row[0])
+                current_date = self.manage_dates(self.current_date)
                 if builtdate != 'null' and builtdate:
-                    self.enddate_aux = datetime.strptime(str(builtdate), '%Y/%m/%d').date()
+                    self.enddate_aux = builtdate.date()
                 else:
-                    self.enddate_aux = datetime.strptime(self.current_date, '%Y/%m/%d').date()
+                    self.enddate_aux = current_date.date()
             else:
-                self.enddate_aux = datetime.strptime(self.current_date, '%Y/%m/%d').date()
+                self.enddate_aux = current_date.date()
 
         self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
@@ -117,20 +131,21 @@ class ReplaceNodeMapTool(ParentMapTool):
                "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
         row = self.controller.get_row(sql)
         if row:
-            self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
+            self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_nodereplace, self.dlg_nodereplace.workcat_id_end)
             sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work "
                    "WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
             if row:
-                builtdate = row[0]
+                builtdate = self.manage_dates(row[0])
+                current_date = self.manage_dates(self.current_date)
                 if builtdate != 'null' and builtdate:
-                    self.enddate_aux = datetime.strptime(str(builtdate), '%Y-%m-%d').date()
+                    self.enddate_aux = builtdate.date()
                 else:
-                    self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
+                    self.enddate_aux = current_date.date()
             else:
-                self.enddate_aux = datetime.strptime(self.current_date, '%Y-%m-%d').date()
+                self.enddate_aux = current_date.date()
 
         self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
@@ -203,7 +218,8 @@ class ReplaceNodeMapTool(ParentMapTool):
                     rows = self.controller.get_rows(sql)
                     if rows:
                         utils_giswater.fillComboBox(self.dlg_nodereplace, self.dlg_nodereplace.workcat_id_end, rows)
-                        self.dlg_nodereplace.workcat_id_end.setCurrentIndex(self.dlg_nodereplace.workcat_id_end.findText(str(cat_work_id)))
+                        current_index = self.dlg_nodereplace.workcat_id_end.findText(str(cat_work_id))
+                        self.dlg_nodereplace.workcat_id_end.setCurrentIndex(current_index)
 
                     self.close_dialog(self.dlg_new_workcat)
                 else:
