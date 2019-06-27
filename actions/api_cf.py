@@ -699,9 +699,13 @@ class ApiCF(ApiParent):
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                    elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                    elif type(widget) is QPushButton:
+                        if not field['iseditable']:
+                            widget.setEnabled(field['iseditable'])
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
 
 
         self.new_feature_id = None
