@@ -267,7 +267,6 @@ class ReplaceNodeMapTool(ParentMapTool):
                 extras += ', "keep_elements":"' + str(utils_giswater.isChecked(dialog, "keep_elements")) + '"'
                 body = self.create_body(feature=feature, extras=extras)
 
-                # TODO: Replace to function gw_fct_feature_replace(json)
                 # Execute SQL function and show result to the user
                 function_name = "gw_fct_feature_replace"
                 sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
@@ -398,8 +397,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Disable snapping
         self.snapper_manager.enable_snapping()
 
-        # Set snapping to 'node', 'arc', 'connec' and 'gully'
-        self.snapper_manager.snap_to_arc()
+        # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec_gully()
 
