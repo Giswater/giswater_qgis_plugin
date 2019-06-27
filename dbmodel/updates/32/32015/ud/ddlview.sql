@@ -203,10 +203,10 @@ CREATE OR REPLACE VIEW v_edit_link AS
     link.state,
     st_length2d(link.the_geom) AS gis_length,
     link.userdefined_geom,
-    case when plan_psector_x_connec.link_geom IS NULL THEN link.the_geom ELSE plan_psector_x_connec.the_geom END AS the_geom
+    case when link_geom IS NULL THEN link.the_geom ELSE link_geom END AS the_geom
 from link 
 LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
-join v_edit_connec ON feature_id=connec_id
+join v_edit_connec ON link.feature_id=connec_id
 join arc USING (arc_id)
 JOIN sector ON sector.sector_id::text = v_edit_connec.sector_id::text
 JOIN dma ON dma.dma_id::text = v_edit_connec.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
@@ -234,10 +234,10 @@ SELECT link.link_id,
     link.state,
     st_length2d(link.the_geom) AS gis_length,
     link.userdefined_geom,
-case when plan_psector_x_gully.the_geom IS NULL THEN link.the_geom ELSE plan_psector_x_gully.the_geom END AS the_geom 
+case when link_geom IS NULL THEN link.the_geom ELSE link_geom END AS the_geom 
 from link 
 LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
-join v_edit_gully ON feature_id=gully_id
+join v_edit_gully ON link.feature_id=gully_id
 join arc USING (arc_id)
 JOIN sector ON sector.sector_id::text = v_edit_gully.sector_id::text
 JOIN dma ON dma.dma_id::text = v_edit_gully.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
