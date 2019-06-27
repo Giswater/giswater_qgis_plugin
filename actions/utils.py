@@ -867,14 +867,10 @@ class Utils(ParentAction):
                         sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
                         values = "VALUES("+str(csv2pgcat_id_aux)+", "
                         for x in range(0, len(row)):
-                            if "''" not in row[x]:
-                                sql += "csv" + str(x + 1) + ", "
-                                value = "'" + row[x].strip().replace("\n", "") + "', "
-                                value = str(value.decode(str(_unicode)))
-                                values += value.replace("''", "null")
-                            else:
-                                sql += "csv" + str(x + 1) + ", "
-                                values = "VALUES(null, "
+                            sql += "csv" + str(x + 1) + ", "
+                            value = "$$" + row[x].strip().replace("\n", "") + "$$, "
+                            value = str(value.decode(str(_unicode)))
+                            values += value.replace("$$$$", "null")
                         sql = sql[:-2] + ") "
                         values = values[:-2] + ");\n"
                         sql += values
@@ -888,7 +884,7 @@ class Utils(ParentAction):
                         sql = ""
                 if sql != "":
                     status = self.controller.execute_sql(sql, commit=True)
-                self.controller.log_info(str(sql))
+
         except Exception as e:
             self.controller.show_warning(str(e))
 
