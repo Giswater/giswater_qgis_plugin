@@ -937,7 +937,10 @@ class AddNewLot(ParentManage):
             item = []
             for value in row:
                 if value is not None:
-                    item.append(QStandardItem(str(value)))
+                    if type(value) != unicode:
+                        item.append(QStandardItem(str(value)))
+                    else:
+                        item.append(QStandardItem(value))
                 else:
                     item.append(QStandardItem(None))
             if len(row) > 0:
