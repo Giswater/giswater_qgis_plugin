@@ -150,7 +150,11 @@ BEGIN
         field_value := COALESCE(field_value, '');
         
 --      Update array
-        fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
+		IF (aux_json->>'widgettype')='combo' THEN
+			fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'selectedId', field_value);
+		ELSE
+			fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
+		END IF;
            
     END LOOP;
    
