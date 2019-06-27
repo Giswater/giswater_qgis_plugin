@@ -9,10 +9,16 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2019/05/24
-ALTER TABLE sys_csv2pg_cat ADD COLUMN orderby integer;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_csv2pg_cat", "column":"orderby", "dataType":"integer"}}$$);
 
 -- 2019/05/27
-ALTER TABLE audit_cat_param_user ADD COLUMN editability json;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_param_user", "column":"editability", "dataType":"json"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_cat_period", "column":"period_type", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"pattern_id", "dataType":"varchar(16)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_typevalue", "column":"addparam", "dataType":"json"}}$$);
 
 
 CREATE TABLE ext_hydrometer_category_x_pattern(
@@ -29,10 +35,6 @@ CREATE TABLE ext_cat_period_type(
   descript text
 );
 
-ALTER TABLE ext_cat_period ADD column period_type integer;
-
-ALTER TABLE ext_rtc_hydrometer_x_data ADD pattern_id character varying (16);
 
 ALTER TABLE polygon ALTER COLUMN pol_id SET DEFAULT nextval('SCHEMA_NAME.urn_id_seq'::regclass);
 
-ALTER TABLE inp_typevalue ADD COLUMN addparam json;

@@ -57,14 +57,11 @@ ALTER TABLE ext_rtc_hydrometer ADD COLUMN connec_customer_code character varying
 ALTER TABLE om_visit_cat ADD COLUMN extusercat_id integer;
 ALTER TABLE om_visit_cat ADD COLUMN duration text;
 
-ALTER TABLE sys_feature_type ADD COLUMN  icon character varying(30);
+ALTER TABLE sys_feature_type ADD COLUMN icon character varying(30);
 
-
---21/05/2019
-ALTER TABLE sys_csv2pg_cat ADD COLUMN  isheader boolean NOT NULL DEFAULT false;
 
 --24/05/2019
-ALTER TABLE man_addfields_parameter ADD COLUMN  orderby integer;
-ALTER TABLE man_addfields_parameter ADD COLUMN  active boolean;
+ALTER TABLE man_addfields_parameter ADD COLUMN orderby integer;
+ALTER TABLE man_addfields_parameter ADD COLUMN active boolean;
 
 --ALTER TABLE ext_municipality ADD COLUMN active boolean;

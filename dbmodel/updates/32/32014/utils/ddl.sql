@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE plan_psector ADD COLUMN status integer;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"status", "dataType":"integer"}}$$);
 
 
 CREATE TABLE plan_typevalue(

@@ -10,4 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='price_simple';
 
+UPDATE sys_csv2pg_cat SET readheader=TRUE;
+UPDATE sys_csv2pg_cat SET readheader=FALSE where id=1; -- importdbprices
 

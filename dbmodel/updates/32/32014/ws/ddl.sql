@@ -9,9 +9,17 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER SEQUENCE anl_mincut_result_cat_seq MINVALUE -1;
 
-ALTER TABLE anl_mincut_inlet_x_exploitation ADD to_arc json;
 
-ALTER TABLE cat_presszone ADD COLUMN nodeparent json;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_mincut_inlet_x_exploitation", "column":"to_arc", "dataType":"json"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_presszone", "column":"nodeparent", "dataType":"json"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_type", "column":"graf_delimiter", "dataType":"varchar(20)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"nodeparent", "dataType":"json"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"nodeparent", "dataType":"json"}}$$);
+
 
 CREATE TABLE dqa (
  dqa_id serial PRIMARY KEY,
@@ -37,7 +45,3 @@ flag int2,
 checkf int2,
 user_name text);
 
-ALTER TABLE node_type ADD column graf_delimiter varchar(20);
-
-ALTER TABLE sector ADD COLUMN nodeparent json;
-ALTER TABLE dma ADD COLUMN nodeparent json;

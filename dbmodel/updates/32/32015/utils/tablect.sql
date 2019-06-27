@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE inp_controls_x_arc DROP CONSTRAINT inp_controls_x_arc_id_fkey;
 ALTER TABLE inp_controls_x_node DROP CONSTRAINT inp_controls_x_node_id_fkey;
+
+ALTER TABLE sys_csv2pg_cat ALTER COLUMN readheader SET DEFAULT true;
