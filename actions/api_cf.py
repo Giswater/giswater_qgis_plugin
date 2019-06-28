@@ -939,7 +939,7 @@ class ApiCF(ApiParent):
     def fill_tab_element(self):
         """ Fill tab 'Element' """
 
-        table_element = "ve_ui_element_x_" + self.geom_type
+        table_element = "v_ui_element_x_" + self.geom_type
         self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
         self.set_columns_config(self.tbl_element, table_element)
 
@@ -957,7 +957,7 @@ class ApiCF(ApiParent):
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))
-        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "ve_ui_element"))
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
         btn_new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
 
         # Set model of selected widget
@@ -1088,7 +1088,7 @@ class ApiCF(ApiParent):
             return
 
         utils_giswater.setWidgetText(dialog, "element_id", elem.element_id)
-        self.add_object(self.tbl_element, "element", "ve_ui_element")
+        self.add_object(self.tbl_element, "element", "v_ui_element")
 
         self.tbl_element.model().select()
 
