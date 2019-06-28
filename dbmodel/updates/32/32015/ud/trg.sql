@@ -24,3 +24,9 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('plan');
 --28/06/2019
 CREATE TRIGGER gw_trg_ui_event_x_gully INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_event_x_gully
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_event('om_visit_event');
+
+
+DROP TRIGGER gw_trg_man_addfields_value_gully_control ON gully;
+
+CREATE TRIGGER gw_trg_edit_foreignkey AFTER UPDATE OF gully_id OR DELETE ON gully
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('gully_id');

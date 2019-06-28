@@ -13,48 +13,50 @@ CREATE OR REPLACE FUNCTION gw_trg_man_addfields_value_control()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-feature_type_aux varchar;
-feature_new_aux varchar;
-feature_old_aux varchar;
+v_featuretype varchar;
+v_featurenew varchar;
+v_featureold varchar;
     
 BEGIN
     
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    feature_type_aux:= TG_ARGV[0];
-
+    v_featuretype:= TG_ARGV[0];
+    v_tablename:= TG_ARGV[1];
+	v_fieldname:= TG_ARGV[2];
 
     IF TG_OP ='UPDATE' THEN
-
-		IF feature_type_aux='NODE' THEN
-			feature_new_aux:= NEW.node_id;
-			feature_old_aux:= OLD.node_id;	
-		ELSIF feature_type_aux='ARC' THEN
-			feature_new_aux:= NEW.arc_id;
-			feature_old_aux:= OLD.arc_id;
-		ELSIF feature_type_aux='CONNEC' THEN
-			feature_new_aux:= NEW.connec_id;
-			feature_old_aux:= OLD.connec_id;
-		ELSIF feature_type_aux='GULLY' THEN
-			feature_new_aux:= NEW.gully_id;
-			feature_old_aux:= OLD.gully_id;
+	
+		IF v_featuretype='NODE' THEN
+			v_featurenew:= NEW.node_id;
+			v_featureold:= OLD.node_id;	
+		ELSIF v_featuretype='ARC' THEN
+			v_featurenew:= NEW.arc_id;
+			v_featureold:= OLD.arc_id;
+		ELSIF v_featuretype='CONNEC' THEN
+			v_featurenew:= NEW.connec_id;
+			v_featureold:= OLD.connec_id;
+		ELSIF v_featuretype='GULLY' THEN
+			v_featurenew:= NEW.gully_id;
+			v_featureold:= OLD.gully_id;
 		END IF;
 
-    	UPDATE man_addfields_value SET feature_id=feature_new_aux  WHERE feature_id=feature_old_aux;
+		EXECUTE 'UPDATE '||quote_ident(v_tablename)||' SET '||quote_ident(v_fieldname)||' = '||quote_literal(v_featureold)
+				||'  WHERE '||quote_ident(v_fieldname)||' = '||quote_literal(v_featureold);
 
     ELSIF TG_OP ='DELETE' THEN
 
-    	IF feature_type_aux='NODE' THEN
-			feature_old_aux:= OLD.node_id;	
-		ELSIF feature_type_aux='ARC' THEN
-			feature_old_aux:= OLD.arc_id;
-		ELSIF feature_type_aux='CONNEC' THEN
-			feature_old_aux:= OLD.connec_id;
-		ELSIF feature_type_aux='GULLY' THEN
-			feature_old_aux:= OLD.gully_id;
+    	IF v_featuretype='NODE' THEN
+			v_featureold:= OLD.node_id;	
+		ELSIF v_featuretype='ARC' THEN
+			v_featureold:= OLD.arc_id;
+		ELSIF v_featuretype='CONNEC' THEN
+			v_featureold:= OLD.connec_id;
+		ELSIF v_featuretype='GULLY' THEN
+			v_featureold:= OLD.gully_id;
 		END IF;
     
-		DELETE FROM man_addfields_value WHERE feature_id=feature_old_aux;	
+		EXECUTE ' DELETE FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_fieldname)||' = '||quote_literal(v_featureold);	
 
     END IF;
 

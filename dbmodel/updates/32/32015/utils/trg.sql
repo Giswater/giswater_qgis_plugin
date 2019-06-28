@@ -32,3 +32,21 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_event('om_visit_event');
 
 CREATE TRIGGER gw_trg_ui_event_x_node INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_event_x_node
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_event('om_visit_event');
+
+-- DROP TRIGGER gw_trg_man_addfields_value_arc_control ON ud_sample.arc;
+
+DROP TRIGGER gw_trg_man_addfields_value_arc_control ON arc;
+DROP TRIGGER gw_trg_man_addfields_value_node_control ON node;
+DROP TRIGGER gw_trg_man_addfields_value_connec_control ON connec;
+
+CREATE TRIGGER gw_trg_edit_foreignkey AFTER UPDATE OF arc_id OR DELETE ON arc
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('arc_id');
+
+CREATE TRIGGER gw_trg_edit_foreignkey AFTER UPDATE OF node_id OR DELETE ON node
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('node_id');
+
+CREATE TRIGGER gw_trg_edit_foreignkey AFTER UPDATE OF connec_id OR DELETE ON connec
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('connec_id');
+
+
+

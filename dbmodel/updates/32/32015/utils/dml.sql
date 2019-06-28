@@ -31,3 +31,8 @@ UPDATE sys_csv2pg_cat SET name='Import visit file', name_i18n='import visit file
 --28/06/2019
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2716, 'gw_fct_admin_manage_child_views', 'utils', 'function', 'Create ve_* custom views', 'role_admin',false,false,false);
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2718, 'gw_trg_edit_foreignkey', 'utils', 'trigger', 'Trigger to manage foreign keys with not possibility to create an automatic db fk', 'role_edit',false,false,false);
+
+UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_man_addfields_value_control';
