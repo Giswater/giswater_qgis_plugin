@@ -15,7 +15,7 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"PIPE"},
- "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
+ "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE", "polygon_view":"True" }}$$);
 
 */
 
@@ -31,6 +31,8 @@ DECLARE
 	rec record;
 	v_multi_create boolean;
 	v_created_addfields record;
+	v_polygon_view text;
+	v_project_type text;
 
 BEGIN
 
@@ -42,14 +44,17 @@ BEGIN
 	-- get input parameters
 	v_schemaname = 'SCHEMA_NAME';
 
+	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
+	v_polygon_view = ((p_data ->>'data')::json->>'polygon_view')::text;
 
 --if the view should be created for all the features loop over the cat_features
 IF v_multi_create IS TRUE THEN
 	
 	FOR rec IN (SELECT * FROM cat_feature WHERE active IS TRUE ORDER BY id) LOOP
-	
+	RAISE NOTICE 'rec.id,%',rec.id;
 	--get the system type and system_id of the feature and view name
 	v_feature_type = (SELECT type FROM cat_feature where id=rec.id);
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
@@ -59,12 +64,14 @@ IF v_multi_create IS TRUE THEN
 		UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=rec.id;
 	END IF;
 	v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
-
+RAISE NOTICE 'v_viewname,%',v_viewname;
 	--check if the defined view exists and create it id it doesn't
 	IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
 			EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
 			INTO v_definition;
 	END IF;
+	
+RAISE NOTICE 'v_definition,%',v_definition;
 
 	IF v_definition IS NULL THEN
 
@@ -73,7 +80,7 @@ IF v_multi_create IS TRUE THEN
 		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
 		and column_name!='''||v_feature_type||'_id'''
 		INTO v_man_fields;	
-
+raise notice '4/addfields=1,v_man_fields,%',v_man_fields;	
 		--check and select the addfields if are already created
 		IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
 		raise notice '4/addfields=1,v_man_fields,%',v_man_fields;		
@@ -86,8 +93,8 @@ IF v_multi_create IS TRUE THEN
 				FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;		
 			
 			--create views with fields from parent table,man table and addfields 	
-			IF v_man_fields IS NULL THEN
-				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+				( v_feature_type='arc' OR v_feature_type='node')) THEN
 			
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*,
@@ -101,8 +108,21 @@ IF v_multi_create IS TRUE THEN
 				ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 				WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
 
+			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+
+				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+				SELECT ve_'||v_feature_type||'.*,
+				'||v_created_addfields.a_param||'
+				FROM '||v_schemaname||'.ve_'||v_feature_type||'
+				LEFT JOIN (SELECT ct.feature_id, '||v_created_addfields.ct_param||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
+				FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
+				WHERE cat_feature_id='''''||rec.id||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
+				''VALUES '||v_created_addfields.id_param||'''::text) ct(feature_id character varying,'||v_created_addfields.datatype||' )) a 
+				ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
+				WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
+
 			ELSE
-				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*,
 				'||v_man_fields||',
@@ -121,9 +141,9 @@ IF v_multi_create IS TRUE THEN
 			
 		ELSE
 			--create views with fields from parent table and man table
-			IF v_man_fields IS NULL THEN
-				
-				EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+				( v_feature_type='arc' OR v_feature_type='node')) THEN
+				RAISE NOTICE'XXX';
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*
 				FROM '||v_schemaname||'.ve_'||v_feature_type||'
@@ -131,9 +151,14 @@ IF v_multi_create IS TRUE THEN
 				ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id 
 				WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
 
+			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+				SELECT ve_'||v_feature_type||'.*
+				FROM '||v_schemaname||'.ve_'||v_feature_type||'
+				WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';		
+
 			ELSE
 				
-				EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*,
 				'||v_man_fields||'
@@ -196,9 +221,9 @@ RAISE NOTICE 'v_man_fields,%',v_man_fields;
 				INTO v_created_addfields
 				FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;		
 			--create views with fields from parent table,man table and addfields 	
-			IF v_man_fields IS NULL THEN
-				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			
+			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+				( v_feature_type='arc' OR v_feature_type='node')) THEN
+
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*,
 				'||v_created_addfields.a_param||'
@@ -211,9 +236,20 @@ RAISE NOTICE 'v_man_fields,%',v_man_fields;
 				ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 				WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
 
+			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+				SELECT ve_'||v_feature_type||'.*,
+				'||v_created_addfields.a_param||'
+				FROM '||v_schemaname||'.ve_'||v_feature_type||'
+				LEFT JOIN (SELECT ct.feature_id, '||v_created_addfields.ct_param||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
+				FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
+				WHERE cat_feature_id='''''||v_cat_feature||''''' OR cat_feature_id is null ORDER BY 1,2''::text, 
+				''VALUES '||v_created_addfields.id_param||'''::text) ct(feature_id character varying,'||v_created_addfields.datatype||' )) a 
+				ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
+				WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
 
 			ELSE
-				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*,
 				'||v_man_fields||',
@@ -232,9 +268,9 @@ RAISE NOTICE 'v_man_fields,%',v_man_fields;
 
 		ELSE
 			--create views with fields from parent table and man table
-			IF v_man_fields IS NULL THEN
+			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+				( v_feature_type='arc' OR v_feature_type='node')) THEN
 				
-				EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*
 				FROM '||v_schemaname||'.ve_'||v_feature_type||'
@@ -242,9 +278,14 @@ RAISE NOTICE 'v_man_fields,%',v_man_fields;
 				ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id 
 				WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
 
+			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+				SELECT ve_'||v_feature_type||'.*
+				FROM '||v_schemaname||'.ve_'||v_feature_type||'
+				WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
+
 			ELSE
-				
-				EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+					
 				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 				SELECT ve_'||v_feature_type||'.*,
 				'||v_man_fields||'
@@ -263,8 +304,10 @@ RAISE NOTICE 'v_man_fields,%',v_man_fields;
 	EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
 	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
+	
 	END IF;
 END IF;
+
 
 
 
