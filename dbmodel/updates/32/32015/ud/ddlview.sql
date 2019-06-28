@@ -465,3 +465,44 @@ CREATE OR REPLACE VIEW vi_loadings AS
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
 
+
+--28/06/2019
+CREATE OR REPLACE VIEW v_ui_event_x_gully AS
+SELECT om_visit_event.id AS event_id,
+   om_visit.id AS visit_id,
+   om_visit.ext_code AS code,
+   om_visit.visitcat_id,
+   om_visit.startdate AS visit_start,
+   om_visit.enddate AS visit_end,
+   om_visit.user_name,
+   om_visit.is_done,
+   date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+   om_visit_x_gully.gully_id,
+   om_visit_event.parameter_id,
+   om_visit_parameter.parameter_type,
+   om_visit_parameter.feature_type,
+   om_visit_parameter.form_type,
+   om_visit_parameter.descript,
+   om_visit_event.value,
+   om_visit_event.xcoord,
+   om_visit_event.ycoord,
+   om_visit_event.compass,
+   om_visit_event.event_code,
+       CASE
+           WHEN a.event_id IS NULL THEN false
+           ELSE true
+       END AS gallery,
+       CASE
+           WHEN b.visit_id IS NULL THEN false
+           ELSE true
+       END AS document
+  FROM om_visit
+    JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+    JOIN om_visit_x_gully ON om_visit_x_gully.visit_id = om_visit.id
+    JOIN om_visit_parameter ON om_visit_parameter.id::text = om_visit_event.parameter_id::text
+    LEFT JOIN gully ON gully.gully_id::text = om_visit_x_gully.gully_id::text
+    LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+          FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+    LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+          FROM doc_x_visit) b ON b.visit_id = om_visit.id
+ ORDER BY om_visit_x_gully.gully_id;
