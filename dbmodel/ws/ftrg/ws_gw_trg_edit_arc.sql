@@ -241,7 +241,8 @@ BEGIN
 
 	-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
-			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter 
+			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
 			LOOP
 				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
 					USING NEW
@@ -348,7 +349,8 @@ BEGIN
 
 -- man addfields update
 	IF v_customfeature IS NOT NULL THEN
-		FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+		FOR v_addfields IN SELECT * FROM man_addfields_parameter 
+		WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
 		LOOP
 
 			EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
