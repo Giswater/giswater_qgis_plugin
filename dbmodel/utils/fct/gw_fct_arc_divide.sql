@@ -285,8 +285,10 @@ BEGIN
 			
 			-- Insert new records into arc table
 			UPDATE config SET arc_searchnodes_control='false';
+			UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
+			UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
 			UPDATE config SET arc_searchnodes_control='true';
 
 			-- update node_1 and node_2 because it's not possible to pass using parameters
