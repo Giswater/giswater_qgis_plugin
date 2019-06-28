@@ -46,6 +46,7 @@ SELECT SCHEMA_NAME.gw_api_get_featureinfo('ve_arc_pipe', '2001', 3, 100, 'true')
     v_query_text text;
     aux_json_child json;  
     v_tabname text = 'data';
+    v_idname text;
 
 
 
@@ -65,6 +66,15 @@ BEGIN
 --  Get if field's table are configured on config_api_layer_field
     -- DONT FORCE CONFIGTABLE
     --p_configtable = False;
+
+    -- get idname
+    EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+		AND t.relname = $1 
+		AND s.nspname = $2
+		ORDER BY a.attnum LIMIT 1'
+		INTO v_idname
+		USING p_table_id, schemas_array[1];
+		
     IF  p_configtable THEN 
 
        raise notice 'Configuration fields are defined on config_api_layer_field';
