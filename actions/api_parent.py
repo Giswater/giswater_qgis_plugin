@@ -345,7 +345,9 @@ class ApiParent(ParentAction):
         self.geom_type = geom_type
 
         # Store user snapping configuration
-        self.snapper_manager = SnappingConfigManager(self.iface, self.controller)
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        if self.snapper_manager.controller is None:
+            self.snapper_manager.set_controller(self.controller)
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping

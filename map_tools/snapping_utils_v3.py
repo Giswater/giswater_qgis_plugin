@@ -54,6 +54,10 @@ class SnappingConfigManager(object):
         pass
 
 
+    def set_controller(self, controller):
+        self.controller = controller
+
+
     def set_snapping_layers(self):
         """ Set main snapping layers """
 
