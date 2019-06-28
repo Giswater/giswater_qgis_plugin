@@ -30,3 +30,18 @@ CREATE OR REPLACE VIEW v_state_connec AS
     plan_psector_x_connec
      JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+  
+  
+CREATE OR REPLACE VIEW v_price_compost AS
+SELECT price_compost.id,
+   price_compost.unit,
+   price_compost.descript,
+       CASE
+           WHEN price_compost.price IS NOT NULL THEN price_compost.price::numeric(14,2)
+           ELSE  sum(a.price * price_compost_value.value)::numeric(14,2)
+       END AS price
+  FROM price_compost
+    LEFT JOIN price_compost_value ON price_compost.id::text = price_compost_value.compost_id::text
+    LEFT JOIN price_compost a ON a.id::text = price_compost_value.simple_id::text
+ GROUP BY price_compost.id, price_compost.unit, price_compost.descript;

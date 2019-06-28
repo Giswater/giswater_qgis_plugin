@@ -45,3 +45,6 @@ CREATE TABLE plan_psector_x_gully(
       REFERENCES value_state (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+
+ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_node_id_fkey;

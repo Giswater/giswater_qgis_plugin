@@ -273,3 +273,195 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
    join v_edit_gully ON v_edit_link.feature_id=gully_id
    join arc USING (arc_id)
    left join plan_psector_x_gully USING (arc_id, gully_id) ;
+   
+   
+  
+ CREATE OR REPLACE VIEW v_edit_subcatchment AS 
+ SELECT subcatchment.subc_id,
+    subcatchment.node_id,
+    subcatchment.rg_id,
+    subcatchment.area,
+    subcatchment.imperv,
+    subcatchment.width,
+    subcatchment.slope,
+    subcatchment.clength,
+    subcatchment.snow_id,
+    subcatchment.nimp,
+    subcatchment.nperv,
+    subcatchment.simp,
+    subcatchment.sperv,
+    subcatchment.zero,
+    subcatchment.routeto,
+    subcatchment.rted,
+    subcatchment.maxrate,
+    subcatchment.minrate,
+    subcatchment.decay,
+    subcatchment.drytime,
+    subcatchment.maxinfil,
+    subcatchment.suction,
+    subcatchment.conduct,
+    subcatchment.initdef,
+    subcatchment.curveno,
+    subcatchment.conduct_2,
+    subcatchment.drytime_2,
+    subcatchment.sector_id,
+    subcatchment.hydrology_id,
+    subcatchment.the_geom,
+    subcatchment.parent_id,
+    subcatchment.descript
+   FROM inp_selector_sector,
+    inp_selector_hydrology,
+    subcatchment
+  WHERE subcatchment.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text 
+  AND subcatchment.hydrology_id = inp_selector_hydrology.hydrology_id AND inp_selector_hydrology.cur_user = "current_user"()::text;
+
+ 
+ 
+ 
+CREATE OR REPLACE VIEW vi_coverages AS 
+ SELECT v_edit_subcatchment.subc_id,
+    inp_coverage_land_x_subc.landus_id,
+    inp_coverage_land_x_subc.percent
+   FROM inp_coverage_land_x_subc
+     JOIN v_edit_subcatchment ON inp_coverage_land_x_subc.subc_id::text = v_edit_subcatchment.subc_id::text
+	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id;
+		
+
+CREATE OR REPLACE VIEW vi_groundwater AS 
+ SELECT inp_groundwater.subc_id,
+    inp_groundwater.aquif_id,
+    inp_groundwater.node_id,
+    inp_groundwater.surfel,
+    inp_groundwater.a1,
+    inp_groundwater.b1,
+    inp_groundwater.a2,
+    inp_groundwater.b2,
+    inp_groundwater.a3,
+    inp_groundwater.tw,
+    inp_groundwater.h
+   FROM v_edit_subcatchment
+     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_subcatchment.subc_id::text
+	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id;
+
+  
+
+CREATE OR REPLACE VIEW vi_infiltration AS 
+ SELECT v_edit_subcatchment.subc_id,
+    v_edit_subcatchment.curveno AS other1,
+    v_edit_subcatchment.conduct_2 AS other2,
+    v_edit_subcatchment.drytime_2 AS other3,
+    NULL::integer AS other4,
+    NULL::double precision AS other5
+   FROM v_edit_subcatchment
+     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
+	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id
+  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
+UNION
+ SELECT v_edit_subcatchment.subc_id,
+    v_edit_subcatchment.suction AS other1,
+    v_edit_subcatchment.conduct AS other2,
+    v_edit_subcatchment.initdef AS other3,
+    NULL::integer AS other4,
+    NULL::double precision AS other5
+   FROM v_edit_subcatchment
+     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
+	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id
+  WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
+UNION
+ SELECT v_edit_subcatchment.subc_id,
+    v_edit_subcatchment.maxrate AS other1,
+    v_edit_subcatchment.minrate AS other2,
+    v_edit_subcatchment.decay AS other3,
+    v_edit_subcatchment.drytime AS other4,
+    v_edit_subcatchment.maxinfil AS other5
+   FROM v_edit_subcatchment
+     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
+	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id
+  WHERE cat_hydrology.infiltration::text = 'MODIFIED_HORTON'::text OR cat_hydrology.infiltration::text = 'HORTON'::text
+  ORDER BY 2;
+ 
+ 
+CREATE OR REPLACE VIEW vi_lid_usage AS 
+ SELECT inp_lidusage_subc_x_lidco.subc_id,
+    inp_lidusage_subc_x_lidco.lidco_id,
+    inp_lidusage_subc_x_lidco.number::integer AS number,
+    inp_lidusage_subc_x_lidco.area,
+    inp_lidusage_subc_x_lidco.width,
+    inp_lidusage_subc_x_lidco.initsat,
+    inp_lidusage_subc_x_lidco.fromimp,
+    inp_lidusage_subc_x_lidco.toperv::integer AS toperv,
+    inp_lidusage_subc_x_lidco.rptfile
+   FROM v_edit_subcatchment
+     JOIN inp_lidusage_subc_x_lidco ON inp_lidusage_subc_x_lidco.subc_id::text = v_edit_subcatchment.subc_id::text
+	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id;
+
+ 
+ 
+CREATE OR REPLACE VIEW vi_loadings AS 
+ SELECT inp_loadings_pol_x_subc.subc_id,
+    inp_loadings_pol_x_subc.poll_id,
+    inp_loadings_pol_x_subc.ibuildup
+   FROM v_edit_subcatchment
+     JOIN inp_loadings_pol_x_subc ON inp_loadings_pol_x_subc.subc_id::text = v_edit_subcatchment.subc_id::text
+	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id;
+
+ 
+ 
+ CREATE OR REPLACE VIEW vi_subareas AS 
+ SELECT v_edit_subcatchment.subc_id,
+    v_edit_subcatchment.nimp,
+    v_edit_subcatchment.nperv,
+    v_edit_subcatchment.simp,
+    v_edit_subcatchment.sperv,
+    v_edit_subcatchment.zero,
+    v_edit_subcatchment.routeto,
+    v_edit_subcatchment.rted
+   FROM v_edit_subcatchment
+   	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id;
+
+ 
+ 
+ drop VIEW vi_subcatchments;
+ CREATE OR REPLACE VIEW vi_subcatchments AS 
+ SELECT v_edit_subcatchment.subc_id,
+    v_edit_subcatchment.rg_id,
+        CASE
+            WHEN v_edit_subcatchment.parent_id IS NULL THEN b.node_id
+            ELSE v_edit_subcatchment.parent_id
+        END AS node_id,
+    v_edit_subcatchment.area,
+    v_edit_subcatchment.imperv,
+    v_edit_subcatchment.width,
+    v_edit_subcatchment.slope,
+    v_edit_subcatchment.clength,
+    v_edit_subcatchment.snow_id
+   FROM v_edit_subcatchment
+	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+			ON v_edit_subcatchment.subc_id=b.subc_id;
+
