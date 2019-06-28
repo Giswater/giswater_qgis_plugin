@@ -27,3 +27,7 @@ UPDATE sys_csv2pg_cat SET readheader=false, orderby=11  WHERE id=15;
 UPDATE sys_csv2pg_cat SET readheader=false, orderby=12  WHERE id=16;
 UPDATE sys_csv2pg_cat SET readheader=false, orderby=13  WHERE id=17;
 UPDATE sys_csv2pg_cat SET name='Import visit file', name_i18n='import visit file', csv_structure='Import visit file', readheader=true, orderby=14  WHERE id=18;
+
+--28/06/2019
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2716, 'gw_fct_admin_manage_child_views', 'utils', 'function', 'Create ve_* custom views', 'role_admin',false,false,false);
