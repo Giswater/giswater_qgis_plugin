@@ -31,7 +31,7 @@ DECLARE
 	v_node_proximity double precision;
 	v_dsbl_error boolean;
 	v_psector_id integer;
-
+	v_tempvalue text;
 
 BEGIN
 
@@ -111,7 +111,17 @@ BEGIN
 								v_arcrecord.node_2 = NEW.node_id;
 							END IF;
 	
+							-- set temporary values for config variables
+							SELECT value INTO v_tempvalue FROM config_param_system WHERE parameter='edit_enable_arc_nodes_update';
 							UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',false) where parameter='arc_searchnodes';
+							UPDATE config_param_system  SET value='TRUE' WHERE parameter='edit_enable_arc_nodes_update';
+	
+							-- Insert new records into arc table
+							INSERT INTO v_edit_arc SELECT v_arcrecord.*;
+
+							-- restore temporary value for config variables
+							UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',true) where parameter='arc_searchnodes';
+							UPDATE config_param_system SET value=v_tempvalue WHERE parameter='edit_enable_arc_nodes_update';
 	
 							-- Insert new records into arc table
 							INSERT INTO v_edit_arc SELECT v_arcrecord.*;
@@ -130,7 +140,6 @@ BEGIN
 							-- insert old arc on the alternative							
 							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector_id, v_arc.arc_id, 0, FALSE);
 	
-							UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',false) where parameter='arc_searchnodes';
 						END IF;
 					END LOOP;				
 								
