@@ -134,5 +134,6 @@ where ext_rtc_hydrometer.id = a.hydrometer_id;
 
 select gw_fct_audit_check_project(1);
 
-
+SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"PIPE"},
+ "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
 
