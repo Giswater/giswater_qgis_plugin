@@ -37,6 +37,9 @@ class ApiCatalog(ApiParent):
         body = self.create_body(form)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         groupBox_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()

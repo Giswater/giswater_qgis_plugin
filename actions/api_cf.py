@@ -375,7 +375,7 @@ class ApiCF(ApiParent):
             self.iface.setActiveLayer(self.layer)
         else:
             self.controller.show_message("Layer not found: " + self.table_parent, 2)
-            return False
+            return False, self.dlg_cf
 
         # Remove unused tabs
         tabs_to_show = []
@@ -847,6 +847,9 @@ class ApiCF(ApiParent):
 
 
     def fill_child(self, dialog, widget):
+        """ Find QComboBox child and populate it
+        :param widget: QComboBox parent
+        """
         combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
 
@@ -874,6 +877,9 @@ class ApiCF(ApiParent):
 
 
     def show_actions(self, tab_name):
+        """ Hide all actions and show actions for the corresponding tab
+        :param tab_name: corresponding tab
+        """
         actions_list = self.dlg_cf.findChildren(QAction)
         for action in actions_list:
             action.setVisible(False)
@@ -1022,7 +1028,7 @@ class ApiCF(ApiParent):
 
         # If object not exist perform an INSERT
         else:
-            sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
+            sql = ("INSERT INTO " + self.schema_name + "." + tablename + " "
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
             self.controller.execute_sql(sql, log_sql=False)
@@ -1133,6 +1139,7 @@ class ApiCF(ApiParent):
             # Manage signal 'doubleClicked'
             self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))
 
+
     def fill_tab_relations(self):
         """ Fill tab 'Relations' """
 
@@ -1140,6 +1147,7 @@ class ApiCF(ApiParent):
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         self.set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
+
 
     def open_relation(self, field_id):
         """ Open feature form of selected element """
@@ -1157,8 +1165,6 @@ class ApiCF(ApiParent):
             field_object_id = "feature_id"
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
         sys_type = self.tbl_relations.model().record(row).value("sys_type")
-
-
 
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
@@ -1331,7 +1337,7 @@ class ApiCF(ApiParent):
         # self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['body']['feature']['vdefaultValues'], 'to_date_vdefault')
         # self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
 
-        table_event_geom = "ve_ui_event_x_" + geom_type
+        table_event_geom = "v_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
         self.tbl_event_cf.doubleClicked.connect(self.open_visit_event)
         self.set_columns_config(self.tbl_event_cf, table_event_geom)
