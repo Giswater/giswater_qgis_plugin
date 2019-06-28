@@ -137,9 +137,9 @@ class ReplaceNodeMapTool(ParentMapTool):
             sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work "
                    "WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
+            current_date = self.manage_dates(self.current_date)
             if row:
                 builtdate = self.manage_dates(row[0])
-                current_date = self.manage_dates(self.current_date)
                 if builtdate != 'null' and builtdate:
                     self.enddate_aux = builtdate.date()
                 else:
