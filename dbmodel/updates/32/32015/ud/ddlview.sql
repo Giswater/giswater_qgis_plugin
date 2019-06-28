@@ -179,6 +179,9 @@ CREATE OR REPLACE VIEW v_edit_gully AS
      LEFT JOIN gully_type ON gully.gully_type::text = gully_type.id::text;
   
 
+-- View: v_edit_link
+
+-- DROP VIEW v_edit_link;
 
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
@@ -203,16 +206,23 @@ CREATE OR REPLACE VIEW v_edit_link AS
     link.state,
     st_length2d(link.the_geom) AS gis_length,
     link.userdefined_geom,
-    case when link_geom IS NULL THEN link.the_geom ELSE link_geom END AS the_geom
-from link 
-LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
-join v_edit_connec ON link.feature_id=connec_id
-join arc USING (arc_id)
-JOIN sector ON sector.sector_id::text = v_edit_connec.sector_id::text
-JOIN dma ON dma.dma_id::text = v_edit_connec.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
-left join plan_psector_x_connec USING (arc_id, connec_id)
+        CASE
+            WHEN plan_psector_x_connec.link_geom IS NULL THEN link.the_geom
+            ELSE plan_psector_x_connec.link_geom
+        END AS the_geom,
+        CASE
+            WHEN plan_psector_x_connec.link_geom IS NULL THEN false
+            ELSE true
+        END AS ispsectorgeom
+   FROM link
+     LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
+     JOIN v_edit_connec ON link.feature_id::text = v_edit_connec.connec_id::text
+     JOIN arc USING (arc_id)
+     JOIN sector ON sector.sector_id::text = v_edit_connec.sector_id::text
+     JOIN dma ON dma.dma_id::text = v_edit_connec.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
+     LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
 UNION
-SELECT link.link_id,
+ SELECT link.link_id,
     link.feature_type,
     link.feature_id,
     sector.macrosector_id,
@@ -234,14 +244,22 @@ SELECT link.link_id,
     link.state,
     st_length2d(link.the_geom) AS gis_length,
     link.userdefined_geom,
-case when link_geom IS NULL THEN link.the_geom ELSE link_geom END 
-from link 
-LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
-join v_edit_gully ON link.feature_id=gully_id
-join arc USING (arc_id)
-JOIN sector ON sector.sector_id::text = v_edit_gully.sector_id::text
-JOIN dma ON dma.dma_id::text = v_edit_gully.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
-left join plan_psector_x_gully USING (arc_id, gully_id);
+        CASE
+            WHEN plan_psector_x_gully.link_geom IS NULL THEN link.the_geom
+            ELSE plan_psector_x_gully.link_geom
+        END AS the_geom,
+        CASE
+            WHEN plan_psector_x_gully.link_geom IS NULL THEN false
+            ELSE true
+        END AS ispsectorgeom
+   FROM link
+     LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
+     JOIN v_edit_gully ON link.feature_id::text = v_edit_gully.gully_id::text
+     JOIN arc USING (arc_id)
+     JOIN sector ON sector.sector_id::text = v_edit_gully.sector_id::text
+     JOIN dma ON dma.dma_id::text = v_edit_gully.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
+     LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id);
+
 
 
 

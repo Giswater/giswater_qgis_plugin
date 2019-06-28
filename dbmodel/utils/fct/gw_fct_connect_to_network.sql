@@ -75,17 +75,17 @@ BEGIN
 			-- get arc_id (if feature does not have) using buffer  
 			IF v_connect.arc_id IS NULL AND v_link.exit_id IS NULL THEN
 				WITH index_query AS(
-				SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state=1 ORDER BY the_geom <-> v_connect.the_geom LIMIT 10)
+				SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state>0 ORDER BY the_geom <-> v_connect.the_geom LIMIT 10)
 				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;
 				
 			ELSIF v_connect.arc_id IS NULL AND v_link.exit_id IS NOT NULL THEN
 				WITH index_query AS(
-				SELECT ST_Distance(the_geom, v_exit.the_geom) as distance, arc_id FROM v_edit_arc WHERE state=1 ORDER BY the_geom <-> v_exit.the_geom LIMIT 10)
+				SELECT ST_Distance(the_geom, v_exit.the_geom) as distance, arc_id FROM v_edit_arc WHERE state>0 ORDER BY the_geom <-> v_exit.the_geom LIMIT 10)
 				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;			
 			END IF;
 			
 			-- get v_edit_arc information
-			SELECT * INTO v_arc FROM v_edit_arc WHERE state=1 AND arc_id = v_connect.arc_id;
+			SELECT * INTO v_arc FROM v_edit_arc WHERE arc_id = v_connect.arc_id;
 
 			-- compute link
 			IF v_arc.the_geom IS NOT NULL THEN

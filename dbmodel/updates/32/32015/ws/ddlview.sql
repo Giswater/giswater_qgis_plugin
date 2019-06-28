@@ -112,11 +112,8 @@ CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS
 
 
 
-
-drop view v_edit_link;
 CREATE OR REPLACE VIEW v_edit_link AS 
-SELECT 
-link.link_id,
+ SELECT link.link_id,
     link.feature_type,
     link.feature_id,
     link.exit_type,
@@ -125,12 +122,12 @@ link.link_id,
             WHEN link.feature_type::text = 'CONNEC'::text THEN v_edit_connec.sector_id
             ELSE vnode.sector_id
         END AS sector_id,
-    sector.macrosector_id,
+	    sector.macrosector_id,
         CASE
             WHEN link.feature_type::text = 'CONNEC'::text THEN v_edit_connec.dma_id
             ELSE vnode.dma_id
         END AS dma_id,
-    dma.macrodma_id,
+	    dma.macrodma_id,
         CASE
             WHEN link.feature_type::text = 'CONNEC'::text THEN v_edit_connec.expl_id
             ELSE vnode.expl_id
@@ -138,15 +135,22 @@ link.link_id,
     link.state,
     st_length2d(link.the_geom) AS gis_length,
     link.userdefined_geom,
-case when plan_psector_x_connec.link_geom IS NULL THEN link.the_geom ELSE plan_psector_x_connec.link_geom END AS the_geom
-from link 
-LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
-join v_edit_connec ON link.feature_id=connec_id
-join arc USING (arc_id)
-JOIN sector ON sector.sector_id::text = v_edit_connec.sector_id::text
-JOIN dma ON dma.dma_id::text = v_edit_connec.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
-left join plan_psector_x_connec USING (arc_id, connec_id);
-
+        CASE
+            WHEN plan_psector_x_connec.link_geom IS NULL THEN link.the_geom
+            ELSE plan_psector_x_connec.link_geom
+        END AS the_geom,
+        CASE
+            WHEN plan_psector_x_connec.link_geom IS NULL THEN false
+            ELSE true
+        END AS ispsectorgeom
+   FROM link
+     LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
+     JOIN v_edit_connec ON link.feature_id::text = v_edit_connec.connec_id::text
+     JOIN arc USING (arc_id)
+     JOIN sector ON sector.sector_id::text = v_edit_connec.sector_id::text
+     JOIN dma ON dma.dma_id::text = v_edit_connec.dma_id::text OR dma.dma_id::text = vnode.dma_id::text
+     LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id);
+	 
 
 
 CREATE OR REPLACE VIEW v_edit_vnode AS 

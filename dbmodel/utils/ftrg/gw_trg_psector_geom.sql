@@ -11,9 +11,9 @@ $BODY$
 
 DECLARE 
     
-polygon_aux geometry;
+polygon_aux public.geometry;
 epsg_val integer;
-collect_aux geometry;
+collect_aux public.geometry;
 x1 double precision;
 y1 double precision;
 x2 double precision;
