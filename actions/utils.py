@@ -295,14 +295,10 @@ class Utils(ParentAction):
                 sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
                 values = "VALUES("+str(csv2pgcat_id_aux)+", "
                 for x in range(0, len(row)):
-                    if "''" not in row[x]:
                         sql += "csv" + str(x + 1) + ", "
-                        value = "'" + row[x].strip().replace("\n", "") + "', "
+                        value = "$$" + row[x].strip().replace("\n", "") + "$$, "
                         value = str(value.decode(str(_unicode)))
-                        values += value.replace("''", "null")
-                    else:
-                        sql += "csv" + str(x + 1) + ", "
-                        values = "VALUES(null, "
+                        values += value.replace("$$$$", "null")
                 sql = sql[:-2] + ") "
                 values = values[:-2] + ");\n"
                 sql += values

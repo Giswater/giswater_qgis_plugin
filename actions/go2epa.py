@@ -568,7 +568,7 @@ class Go2Epa(ApiParent):
 
         # Get widgets values
         self.result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
-        prev_net_geom = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
+        net_geom = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
         export_inp = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         export_subcatch = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
         self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
@@ -577,12 +577,12 @@ class Go2Epa(ApiParent):
         import_result = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
         is_recursive = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent)
 
+        # Check for sector selector
         if export_inp:
             sql = ("SELECT sector_id FROM " + self.schema_name + ".inp_selector_sector LIMIT 1")
             row = self.controller.get_row(sql, commit=True)
             if row is None:
                 msg = "You need to select some sector"
-                # self.controller.show_info_box(text=msg, title="Info")
                 msg_box = QMessageBox()
                 msg_box.setIcon(3)
                 msg_box.setWindowTitle("Warning")
@@ -590,56 +590,65 @@ class Go2Epa(ApiParent):
                 msg_box.exec_()
                 return
 
+        # Set file to execute
         if self.project_type in 'ws':
             opener = self.plugin_dir + "/epa/ws_epanet20012.exe"
-            epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", " + str(
-                is_recursive) + ")"
         elif self.project_type in 'ud':
             opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
-            epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", " + str(
-                export_subcatch) + ", " + str(is_recursive) + ")"
 
-        # export_function = "gw_fct_utils_csv2pg_export_epa_inp('" + str(self.result_name) + "')"
         self.show_widgets(True)
-        self.iterations = 1
-        self.counter = 0
+
+        counter = 0
+        force_tab = False
+        extras = '"recursive":"off"'
         if is_recursive:
-            extras = '"status":"1"'
-            extras += ', "result_id":"' + str(self.result_name) + '"'
-            body = self.create_body(extras=extras)
+            extras = '"recursive":"start"'
+        extras += ', "resultId":"' + str(self.result_name) + '"'
+        extras += ', "useNetworkGeom":"' + str(net_geom) + '"'
+        extras += ', "dumpSubcatch":"' + str(export_subcatch) + '"'
+        body = self.create_body(extras=extras)
+
+        # Start process
+        _continue = True
+        while _continue:
+            if self.imports_canceled:
+                break
+
             sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
-            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, "0/" + str(row[0]))
-            self.iterations = int(str(row[0]))
+            if not row or row[0] is None:
+                self.controller.show_warning("NOT ROW FOR: " + sql)
+                message = "Export failed"
+                self.controller.show_info_box(message)
+                return
 
-        print("{}:{}".format(self.counter, self.iterations))
-        while self.counter < self.iterations:
+            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, str(counter)+"/" + str(complet_result[0]['steps']))
+            counter += 1
+            print("{}:{}:{}".format(counter, complet_result[0]['steps'], str(complet_result[0]['continue'])))
+            _continue = False
             common_msg = ""
             message = None
+            if str(complet_result[0]['continue']).lower() == 'true':
+                _continue = True
+
+            if not _continue:
+                force_tab = True
+
             # Export to inp file
             if export_inp is True:
-                # Call function gw_fct_pg2epa
-                sql = ("SELECT " + self.schema_name + "." + epa_function_call + "::text")
-                row = self.controller.get_row(sql, log_sql=True, commit=True)
-                if not row or row[0] is None:
-                    self.controller.show_warning("NOT ROW FOR: " + sql)
-                    message = "Export failed"
-                    self.controller.show_info_box(message)
-                    return
-                else:
-                    complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-                    if complet_result[0]['status'] == "Accepted":
-                        qtabwidget = self.dlg_go2epa.mainTab
-                        qtextedit = self.dlg_go2epa.txt_infolog
-                        self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'])
-                    message = complet_result[0]['message']['text']
+                if complet_result[0]['status'] == "Accepted":
+                    qtabwidget = self.dlg_go2epa.mainTab
+                    qtextedit = self.dlg_go2epa.txt_infolog
+                    self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'], force_tab, False)
+                message = complet_result[0]['message']['text']
 
                 # Get values from temp_csv2pg and insert into INP file
-                sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13,"
-                       " csv14, csv15, csv16, csv17, csv18, csv19, csv20, csv21, csv22, csv23, csv24, csv25 "
-                       " FROM " + self.schema_name + ".temp_csv2pg "
-                       " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
-                rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+                sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, "
+                       "csv14, csv15, csv16, csv17, csv18, csv19, csv20, csv21, csv22, csv23, csv24, csv25 "
+                       "FROM " + self.schema_name + ".temp_csv2pg "
+                       "WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
+                rows = self.controller.get_rows(sql, commit=True)
 
                 if rows is None:
                     self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -685,30 +694,32 @@ class Go2Epa(ApiParent):
                     # Importing file to temporal table
                     self.insert_rpt_into_db(self.file_rpt)
 
-                    # Call function gw_fct_utils_csv2pg_export_epa_inp to put in order data from temp table to result tables
-                    # sql = ("SELECT " + self.schema_name + "." + "gw_fct_utils_csv2pg_import_epa_rpt('" + str(
-                    #     self.result_name) + "')")
-                   # row = self.controller.get_row(sql, log_sql=True, commit=True)
-                    if self.project_type == 'ws':
-                        function_name = 'gw_fct_utils_csv2pg_import_epanet_rpt'
-                    elif self.project_type == 'ud':
-                        function_name = 'gw_fct_utils_csv2pg_import_swmm_rpt'
-                    extras = '"parameters":{"resultId":"'+str(self.result_name)+'"}'
+                    # Call function gw_fct_rpt2pg_recursive
+                    function_name = 'gw_fct_rpt2pg_recursive'
+                    extras = '"recursive":"disabled"'
+                    if is_recursive and _continue:
+                        extras = '"recursive":"enabled"'
+                    extras += ', "resultId":"' + str(self.result_name) + '"'
+                    extras += ', "currentStep":"' + str(counter) + '"'
+                    extras += ', "continue":"' + str(_continue) + '"'
                     body = self.create_body(extras=extras)
                     sql = ("SELECT " + self.schema_name + "." + function_name + "($${" + body + "}$$)::text")
-                    row = self.controller.get_row(sql, log_sql=True, commit=True)
+                    row = self.controller.get_row(sql, commit=True)
                     if not row or row[0] is None:
                         self.controller.show_warning("NOT ROW FOR: " + sql)
                         message = "Import failed"
                         self.controller.show_info_box(message)
                         return
                     else:
-                        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-                        if complet_result[0]['status'] == "Accepted":
-                            qtabwidget = self.dlg_go2epa.mainTab
-                            qtextedit = self.dlg_go2epa.txt_infolog
-                            self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit,  complet_result[0]['body']['data'])
-                        message = complet_result[0]['message']['text']
+                        rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+                        if 'status' in rpt_result[0]:
+                            if rpt_result[0]['status'] == "Accepted":
+                                qtabwidget = self.dlg_go2epa.mainTab
+                                qtextedit = self.dlg_go2epa.txt_infolog
+                                if 'body' in rpt_result[0]:
+                                    if 'data' in rpt_result[0]['body']:
+                                        self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit,  rpt_result[0]['body']['data'], force_tab, False)
+                        message = rpt_result[0]['message']['text']
 
                     # final message
                     common_msg += "Import RPT finished."
@@ -716,30 +727,12 @@ class Go2Epa(ApiParent):
                     msg = "Can't export rpt, File not found"
                     self.controller.show_warning(msg, parameter=self.file_rpt)
 
-            self.counter += 1
-            print("{}:{}".format(self.counter, self.iterations))
-            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter,
-                                         str(self.counter) + "/" + str(self.iterations))
-
-        if is_recursive:
-            extras = '"status":"0"'
+            # Create new body for next iteration
+            extras = '"recursive":"ongoing"'
+            extras += ', "resultId":"' + str(self.result_name) + '"'
+            extras += ', "useNetworkGeom":"' + str(net_geom) + '"'
+            extras += ', "dumpSubcatch":"' + str(export_subcatch) + '"'
             body = self.create_body(extras=extras)
-            sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if not row:
-                self.controller.show_warning("NOT ROW FOR: " + sql)
-                message = "Import failed"
-                self.controller.show_info_box(message)
-                return
-            else:
-                complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-                if complet_result[0]['status'] == "Accepted":
-                    qtabwidget = self.dlg_go2epa.mainTab
-                    qtextedit = self.dlg_go2epa.txt_infolog
-                    self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'])
-                message = complet_result[0]['message']['text']
-                if message is not None:
-                    self.controller.show_info_box(message)
 
         if common_msg != "" and self.imports_canceled is False:
             self.controller.show_info(common_msg)

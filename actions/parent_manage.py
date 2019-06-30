@@ -214,6 +214,7 @@ class ParentManage(ParentAction, object):
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + table_relation + ""
                " WHERE " + table_object + "_id = '" + str(object_id) + "'")
+
         rows = self.controller.get_rows(sql, log_info=False)
         if rows:
             for row in rows:
@@ -764,7 +765,6 @@ class ParentManage(ParentAction, object):
 
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
-
         self.disconnect_signal_selection_changed()
         field_id = geom_type + "_id"
 
@@ -879,7 +879,9 @@ class ParentManage(ParentAction, object):
                 self.ids.append(str(feature_id))
 
         # Set expression filter with features in the list
+
         expr_filter = "\"" + field_id + "\" IN ("
+
         for i in range(len(self.ids)):
             expr_filter += "'" + str(self.ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
@@ -888,7 +890,6 @@ class ParentManage(ParentAction, object):
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
             return
-
         # Select features with previous filter
         # Build a list of feature id's and select them
         for layer in self.layers[self.geom_type]:
@@ -906,6 +907,7 @@ class ParentManage(ParentAction, object):
             self.apply_lazy_init(table_object)            
 
         # Update list
+
         self.list_ids[self.geom_type] = self.ids
         self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
@@ -913,17 +915,19 @@ class ParentManage(ParentAction, object):
 
     def insert_feature_to_plan(self, dialog, geom_type):
         """ Insert features_id to table plan_@geom_type_x_psector"""
-
+        print(str("insert_feature_to_plan"))
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
             sql = ("SELECT " + geom_type + "_id"
                    " FROM " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
                    " WHERE " + geom_type + "_id = '" + str(self.ids[i]) + "' AND psector_id = '" + str(value) + "'")
-
+            print(str(sql))
             row = self.controller.get_row(sql)
+            print(str(row))
             if not row:
                 sql = ("INSERT INTO " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
+                print(str(sql))
                 self.controller.execute_sql(sql)
             self.reload_qtable(dialog, geom_type, self.plan_om)
 

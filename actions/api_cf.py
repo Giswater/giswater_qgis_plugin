@@ -375,7 +375,7 @@ class ApiCF(ApiParent):
             self.iface.setActiveLayer(self.layer)
         else:
             self.controller.show_message("Layer not found: " + self.table_parent, 2)
-            return False
+            return False, self.dlg_cf
 
         # Remove unused tabs
         tabs_to_show = []
@@ -699,9 +699,13 @@ class ApiCF(ApiParent):
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                    elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                    elif type(widget) is QPushButton:
+                        if not field['iseditable']:
+                            widget.setEnabled(field['iseditable'])
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
 
 
         self.new_feature_id = None
@@ -843,6 +847,9 @@ class ApiCF(ApiParent):
 
 
     def fill_child(self, dialog, widget):
+        """ Find QComboBox child and populate it
+        :param widget: QComboBox parent
+        """
         combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
 
@@ -870,6 +877,9 @@ class ApiCF(ApiParent):
 
 
     def show_actions(self, tab_name):
+        """ Hide all actions and show actions for the corresponding tab
+        :param tab_name: corresponding tab
+        """
         actions_list = self.dlg_cf.findChildren(QAction)
         for action in actions_list:
             action.setVisible(False)
@@ -935,7 +945,7 @@ class ApiCF(ApiParent):
     def fill_tab_element(self):
         """ Fill tab 'Element' """
 
-        table_element = "ve_ui_element_x_" + self.geom_type
+        table_element = "v_ui_element_x_" + self.geom_type
         self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
         self.set_columns_config(self.tbl_element, table_element)
 
@@ -953,7 +963,7 @@ class ApiCF(ApiParent):
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))
-        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "ve_ui_element"))
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
         btn_new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
 
         # Set model of selected widget
@@ -1018,7 +1028,7 @@ class ApiCF(ApiParent):
 
         # If object not exist perform an INSERT
         else:
-            sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
+            sql = ("INSERT INTO " + self.schema_name + "." + tablename + " "
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
             self.controller.execute_sql(sql, log_sql=False)
@@ -1084,7 +1094,7 @@ class ApiCF(ApiParent):
             return
 
         utils_giswater.setWidgetText(dialog, "element_id", elem.element_id)
-        self.add_object(self.tbl_element, "element", "ve_ui_element")
+        self.add_object(self.tbl_element, "element", "v_ui_element")
 
         self.tbl_element.model().select()
 
@@ -1129,6 +1139,7 @@ class ApiCF(ApiParent):
             # Manage signal 'doubleClicked'
             self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))
 
+
     def fill_tab_relations(self):
         """ Fill tab 'Relations' """
 
@@ -1136,6 +1147,7 @@ class ApiCF(ApiParent):
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         self.set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
+
 
     def open_relation(self, field_id):
         """ Open feature form of selected element """
@@ -1153,8 +1165,6 @@ class ApiCF(ApiParent):
             field_object_id = "feature_id"
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
         sys_type = self.tbl_relations.model().record(row).value("sys_type")
-
-
 
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
@@ -1327,7 +1337,7 @@ class ApiCF(ApiParent):
         # self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['body']['feature']['vdefaultValues'], 'to_date_vdefault')
         # self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
 
-        table_event_geom = "ve_ui_event_x_" + geom_type
+        table_event_geom = "v_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
         self.tbl_event_cf.doubleClicked.connect(self.open_visit_event)
         self.set_columns_config(self.tbl_event_cf, table_event_geom)
@@ -1390,16 +1400,17 @@ class ApiCF(ApiParent):
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY id")
         rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
+        if rows:
+            rows.append(['', ''])
+            utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
         sql = ("SELECT DISTINCT(parameter_type), parameter_type FROM " + self.schema_name + "." + table_name_event_id + ""
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY parameter_type")
         rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
-
+        if rows:
+            rows.append(['', ''])
+            utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
 
         # Get selected dates
         date_from = self.date_event_from.date()

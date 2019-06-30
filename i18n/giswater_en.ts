@@ -82,6 +82,10 @@
         <translation>Lot manager</translation>
     </message>
     <message>
+        <source>76_text</source>
+        <translation>Lot filter</translation>
+    </message>
+    <message>
         <source>81_text</source>
         <translation>New psector</translation>
     </message>

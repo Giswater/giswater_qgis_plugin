@@ -72,6 +72,12 @@ class ManageNewPsector(ParentManage):
         self.reset_layers()
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        if self.project_type.upper() == 'UD':
+            self.layers['gully'] = self.controller.get_group_layers('gully')
+        else:
+            utils_giswater.remove_tab_by_tabName(self.dlg_plan_psector.tab_feature, 'Gully')
+
         self.update = False  # if false: insert; if true: update
 
         # Remove all previous selections
@@ -154,6 +160,11 @@ class ManageNewPsector(ParentManage):
         self.qtbl_arc.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.qtbl_node = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_node")
         self.qtbl_node.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_connec = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_connec")
+        self.qtbl_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
+        if self.project_type.upper() == 'UD':
+            self.qtbl_gully = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_gully")
+            self.qtbl_gully.setSelectionBehavior(QAbstractItemView.SelectRows)
         all_rows = self.dlg_plan_psector.findChild(QTableView, "all_rows")
         all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         selected_rows = self.dlg_plan_psector.findChild(QTableView, "selected_rows")
@@ -182,12 +193,16 @@ class ManageNewPsector(ParentManage):
             row = self.controller.get_row(sql)
             if row:
                 self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
-            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc",
-                            set_edit_triggers=QTableView.DoubleClicked)
+            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc",set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc")
-            self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node",
-                            set_edit_triggers=QTableView.DoubleClicked)
+            self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node",set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node")
+            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.plan_om + "_psector_x_connec",set_edit_triggers=QTableView.DoubleClicked)
+            self.set_table_columns(self.dlg_plan_psector, self.qtbl_connec, self.plan_om + "_psector_x_connec")
+            if self.project_type.upper() == 'UD':
+                self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully",
+                                set_edit_triggers=QTableView.DoubleClicked)
+                self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully")
             sql = ("SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
                    "observ, atlas_id, scale, rotation, active "
                    "FROM " + self.schema_name + "." + self.plan_om + "_psector "
@@ -230,6 +245,15 @@ class ManageNewPsector(ParentManage):
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
+
+            expr = " psector_id = " + str(psector_id)
+            self.qtbl_connec.model().setFilter(expr)
+            self.qtbl_connec.model().select()
+            if self.project_type.upper() == 'UD':
+                expr = " psector_id = " + str(psector_id)
+                self.qtbl_gully.model().setFilter(expr)
+                self.qtbl_gully.model().select()
+
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
             psector_id_aux = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
@@ -266,13 +290,14 @@ class ManageNewPsector(ParentManage):
 
                 # Get boundingBox(QgsRectangle) from selected feature
                 feature = layer.selectedFeatures()[0]
-                psector_rec = feature.geometry().boundingBox()
-                # Do zoom when QgsRectangles don't intersect
-                if not canvas_rec.intersects(psector_rec):
-                    self.zoom_to_selected_features(layer)
-                if psector_rec.width() < (canvas_width * 10)/100 or psector_rec.height() < (canvas_height * 10)/100:
-                    self.zoom_to_selected_features(layer)
-                layer.removeSelection()
+                if feature.geometry() is not None:
+                    psector_rec = feature.geometry().boundingBox()
+                    # Do zoom when QgsRectangles don't intersect
+                    if not canvas_rec.intersects(psector_rec):
+                        self.zoom_to_selected_features(layer)
+                    if psector_rec.width() < (canvas_width * 10)/100 or psector_rec.height() < (canvas_height * 10)/100:
+                        self.zoom_to_selected_features(layer)
+                    layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
@@ -365,6 +390,10 @@ class ManageNewPsector(ParentManage):
         self.controller.execute_sql(sql)
         self.reload_qtable(self.dlg_plan_psector, 'arc', self.plan_om)
         self.reload_qtable(self.dlg_plan_psector, 'node', self.plan_om)
+        self.reload_qtable(self.dlg_plan_psector, 'connec', self.plan_om)
+        if self.project_type.upper() == 'UD':
+            self.reload_qtable(self.dlg_plan_psector, 'gully', self.plan_om)
+
         sql = ("UPDATE " + self.schema_name + ".plan_psector "
                "SET enable_all = '" + str(value) + "' "
                "WHERE psector_id = '" + str(psector_id) + "'")
@@ -751,6 +780,7 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_psector_selector(self, tablename, field, value):
+        print(str("insert_psector_selector"))
         sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (" + field + ", cur_user)"
                " VALUES ('" + str(value) + "', current_user)")
         self.controller.execute_sql(sql)
@@ -831,7 +861,7 @@ class ManageNewPsector(ParentManage):
 
 
     def reload_states_selector(self):
-        
+        print(str("reload_states_selector"))
         self.delete_psector_selector('selector_state')
         for x in range(0, len(self.all_states)):
             sql = ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
@@ -848,6 +878,9 @@ class ManageNewPsector(ParentManage):
         self.remove_selection(True)
         self.reset_model_psector("arc")
         self.reset_model_psector("node")
+        self.reset_model_psector("connec")
+        if self.project_type.upper() == 'UD':
+            self.reset_model_psector("gully")
         self.reset_model_psector("other")
         self.close_dialog(self.dlg_plan_psector)
         self.hide_generic_layers()
@@ -877,7 +910,7 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_or_update_new_psector(self, tablename, close_dlg=False):
-
+        print(str("insert_or_update_new_psector"))
         psector_name = utils_giswater.getWidgetText(self.dlg_plan_psector, "name", return_string_null=False)
         if psector_name == "":
             message = "Mandatory field is missing. Please, set a value"
@@ -1034,7 +1067,7 @@ class ManageNewPsector(ParentManage):
             :param query_left:
             :param field_id:
         """
-
+        print(str("rows_selector"))
         selected_list = tbl_all_rows.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
@@ -1200,7 +1233,7 @@ class ManageNewPsector(ParentManage):
 
     def document_insert(self):
         """ Insert a docmet related to the current visit """
-
+        print(str("document_insert"))
         doc_id = self.doc_id.text()
         psector_id = self.psector_id.text()
         if not doc_id:

@@ -15,8 +15,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-from builtins import object
-
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker
 from qgis.core import QgsProject, QgsPoint, QgsFeatureRequest
@@ -34,20 +32,36 @@ class SnappingConfigManager(object):
         self.previous_snapping = None
         self.controller = None
         self.is_valid = None
+        self.initialized = False
+        self.snapping_config = None
+        self.snapper = None
 
-        # Snapper
-        self.snapping_config = self.get_snapping_options()
-        self.snapper = self.get_snapper()
-        proj = QgsProject.instance()
-        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
 
-        # Set default vertex marker
-        color = QColor(255, 100, 255)
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setColor(color)
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)
+    def init_snapping_config(self):
+        """ Initial snapping configuration """
+
+        # To avoid exception when reloading plugin
+        try:
+            # Snapper
+            self.snapping_config = self.get_snapping_options()
+            self.snapper = self.get_snapper()
+            QgsProject.instance().writeEntry('Digitizing', 'SnappingMode', 'advanced')
+
+            # Set default vertex marker
+            color = QColor(255, 100, 255)
+            self.vertex_marker = QgsVertexMarker(self.canvas)
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+            self.vertex_marker.setColor(color)
+            self.vertex_marker.setIconSize(15)
+            self.vertex_marker.setPenWidth(3)
+
+            self.initialized = True
+        except Exception as e:
+            self.controller.log_info(str(e))
+
+
+    def set_controller(self, controller):
+        self.controller = controller
 
 
     def set_snapping_layers(self):
@@ -78,6 +92,9 @@ class SnappingConfigManager(object):
 
     def store_snapping_options(self):
         """ Store the project user snapping configuration """
+
+        if not self.initialized:
+            self.init_snapping_config()
 
         # Get an array containing the snapping options for all the layers
         self.previous_snapping = self.get_snapping_options()
@@ -202,7 +219,7 @@ class SnappingConfigManager(object):
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
-        self.is_valid = result is not None
+        self.is_valid = len(result) > 0
         return result
 
 
@@ -216,11 +233,11 @@ class SnappingConfigManager(object):
         if vertex_marker:
             if result:
                 # Get the point and add marker on it
-                point = QgsPoint(result.point())
+                point = QgsPoint(result[0].snappedVertex)
                 vertex_marker.setCenter(point)
                 vertex_marker.show()
 
-        self.is_valid = result is not None
+        self.is_valid = len(result) > 0
         return result
 
 
@@ -301,7 +318,7 @@ class SnappingConfigManager(object):
             if select_feature:
                 self.select_snapped_feature(result, feature_id)
         except:
-            pass
+            self.controller.log_info(str(e))
         finally:
             return snapped_feat
 

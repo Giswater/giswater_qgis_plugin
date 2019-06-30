@@ -458,29 +458,17 @@ class GwToolBox(ApiParent):
         qtextedit = dialog.txt_infolog
         for k, v in list(data.items()):
             if str(k) == "info":
-                #TODO sustituir este codigo por la funcion:
                 self.populate_info_text(dialog, qtabwidget, qtextedit, data)
-                # text = ""
-                # for x in data['info']['values']:
-                #     if x['message'] is not None:
-                #         text += str(x['message']) + "\n"
-                #         cahange_tab = True
-                #     else:
-                #         text += "\n"
-                # dialog.txt_infolog.setText(text + "\n")
-                # if cahange_tab:
-                #     dialog.mainTab.setCurrentIndex(1)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:
                     counter = len(data[k]['values'])
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(str(geometry_type) + "?crs=epsg:" + str(srid), function_name, 'memory')
+                    self.populate_vlayer(v_layer, data, k, counter)
 
-                    self.populate_vlayer(dialog, v_layer, data, k, counter)
 
-
-    def populate_vlayer(self, dialog, virtual_layer, data, layer_type, counter):
+    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
 
         prov = virtual_layer.dataProvider()
 
