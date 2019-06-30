@@ -23,7 +23,7 @@ from qgis.PyQt.QtCore import QTimer, QPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 import utils_giswater
-from giswater.init.parent_init import ParentDialog
+from giswater.parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):

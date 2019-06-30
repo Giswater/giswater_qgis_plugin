@@ -18,7 +18,6 @@ else:
     import configparser
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsMapToPixel
-from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
 from qgis.PyQt.QtCore import QSettings, Qt, QUrl, QDate, QDateTime
@@ -76,7 +75,7 @@ class ParentDialog(QDialog):
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.isfile(setting_file):
             message = "Config file not found at: " + setting_file
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 20)  
+            self.iface.messageBar().pushMessage("", message, 1, 20)
             self.close_dialog()
             return
             
@@ -108,73 +107,11 @@ class ParentDialog(QDialog):
         # Get schema_name and DAO object                
         self.schema_name = self.controller.schema_name  
         self.project_type = self.controller.get_project_type()
-        
-        self.btn_save_custom_fields = None
-        
+
         # If not logged, then close dialog
         if not self.controller.logged:           
             self.dialog.parent().setVisible(False)  
             self.close_dialog(self.dialog)
-        
-        # Manage filters only when updating the feature
-        if self.id and self.id.upper() != 'NULL':               
-            self.init_filters(self.dialog)
-            expl_id = self.dialog.findChild(QComboBox, 'expl_id')
-            dma_id = self.dialog.findChild(QComboBox, 'dma_id')
-            state = self.dialog.findChild(QComboBox, 'state')
-            state_type = self.dialog.findChild(QComboBox, 'state_type')
-            self.filter_dma(self.dialog, expl_id, dma_id)
-            self.filter_state_type(self.dialog, state, state_type)
-        else:
-            point = self.canvas.mouseLastXY()
-            point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), point.x(), point.y())
-            table_name = self.controller.get_layer_source_table_name(self.layer)
-            if table_name not in self.feature_cat:
-                return
-
-            id_table = self.feature_cat[table_name].id
-            sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('" + str(id_table) + "', '"+str(point[0])+"', '"+str(point[1])+"')")
-            row = self.controller.get_row(sql, log_sql=True)
-            if not row:
-                return
-            values = row[0]
-
-            # if 'feature_id' in values:
-            #     utils_giswater.setWidgetText(self.dialog, self.geom_type + "_id", str(values['feature_id']))
-            if 'value' in values['inventory']:
-                utils_giswater.setChecked(self.dialog, 'inventory', values['inventory']['value'])
-            if 'value' in values['publish']:
-                utils_giswater.setChecked(self.dialog, 'publish', values['publish']['value'])
-            if 'value' in values['uncertain']:
-                utils_giswater.setChecked(self.dialog, 'uncertain', values['uncertain']['value'])
-            if 'name' in values['muni_id']:
-                utils_giswater.setWidgetText(self.dialog, 'muni_id', values['muni_id']['name'])
-            if 'name' in values['sector_id']:
-                utils_giswater.setWidgetText(self.dialog, 'sector_id', values['sector_id']['name'])
-            if 'name' in values['expl_id']:
-                utils_giswater.setWidgetText(self.dialog, 'expl_id', values['expl_id']['name'])
-            if 'name' in values['dma_id']:
-                utils_giswater.setWidgetText(self.dialog, 'dma_id', values['dma_id']['name'])
-            if 'name' in values['state']:
-                utils_giswater.setWidgetText(self.dialog, 'state', values['state']['name'])
-            if 'name' in values['state_type']:
-                utils_giswater.setWidgetText(self.dialog, 'state_type', values['state_type']['name'])
-            if 'descript' in values['presszone']:
-                utils_giswater.setWidgetText(self.dialog, 'presszonecat_id', values['presszone']['descript'])
-            if 'id' in values['cat_id']:
-                widget_list = ['nodecat_id', 'arccat_id', 'conneccat_id', 'gratecat_id']
-                for w in widget_list:
-                    widget = self.dialog.findChild(QWidget, w)
-                    if widget:
-                        utils_giswater.setWidgetText(self.dialog, widget, values['cat_id']['id'])
-                        break
-            if 'id' in values['type']:
-                widget_list = ['node_type', 'arc_type', 'connec_type', 'gully_type']
-                for w in widget_list:
-                    widget = self.dialog.findChild(QWidget, w)
-                    if widget:
-                        utils_giswater.setWidgetText(self.dialog, widget, values['type']['id'])
-                        break
 
 
     def set_signals(self):
