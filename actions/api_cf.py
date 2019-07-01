@@ -701,15 +701,16 @@ class ApiCF(ApiParent):
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                     elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
                         widget.setEnabled(enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                     elif type(widget) is QPushButton:
+                        # Manage the clickability of the buttons according to the configuration
+                        # in the table config_api_form_fields simultaneously with the edition,
+                        # but giving preference to the configuration
                         if not field['iseditable']:
                             widget.setEnabled(field['iseditable'])
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-
 
         self.new_feature_id = None
         self.close_dialog(dialog)
+
 
     def enable_all(self, dialog, result):
 
@@ -1291,13 +1292,16 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
     def fill_tab_hydrometer_values(self):
 
-        table_hydro_value = "ve_ui_hydroval_x_connec"
+        table_hydro_value = "v_ui_hydroval_x_connec"
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
         # Populate combo filter hydrometer value
         sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
-               " FROM " + self.schema_name + ".ve_ui_hydroval_x_connec ORDER BY cat_period_id")
+               " FROM " + self.schema_name + ".v_ui_hydroval_x_connec ORDER BY cat_period_id")
 
-        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
+        if not rows:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
         rows.append(['', ''])
         utils_giswater.set_item_data(cmb_cat_period_id_filter, rows)
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
@@ -1669,7 +1673,7 @@ class ApiCF(ApiParent):
 
             # Get path of selected document
             sql = ("SELECT path"
-                   " FROM " + self.schema_name + ".ve_ui_doc"
+                   " FROM " + self.schema_name + ".v_ui_doc"
                    " WHERE id = '" + str(rows[0][0]) + "'")
             row = self.controller.get_row(sql, commit=True)
             if not row:
@@ -1719,7 +1723,7 @@ class ApiCF(ApiParent):
         selected_document = self.tbl_list_doc.currentItem().text()
 
         # Get path of selected document
-        sql = ("SELECT path FROM " + self.schema_name + ".ve_ui_doc"
+        sql = ("SELECT path FROM " + self.schema_name + ".v_ui_doc"
                " WHERE id = '" + str(selected_document) + "'")
         row = self.controller.get_row(sql, commit=True)
         if not row:
@@ -1778,7 +1782,7 @@ class ApiCF(ApiParent):
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget))
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))
-        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "ve_ui_doc"))
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_doc"))
         btn_doc_new.clicked.connect(partial(self.manage_new_document, dialog, None, self.feature))
 
         # Fill ComboBox doc_type
@@ -1875,7 +1879,7 @@ class ApiCF(ApiParent):
             return
 
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
-        self.add_object(self.tbl_document, "doc", "ve_ui_doc")
+        self.add_object(self.tbl_document, "doc", "v_ui_doc")
 
 
     """ FUNCTIONS RELATED WITH TAB RPT """
