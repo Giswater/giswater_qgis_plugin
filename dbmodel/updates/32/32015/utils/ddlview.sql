@@ -163,3 +163,13 @@ CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
      JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
   ORDER BY ext_rtc_hydrometer_x_data.id;
+  
+CREATE OR REPLACE VIEW v_ui_doc AS
+SELECT doc.id,
+   doc.doc_type,
+   doc.path,
+   doc.observ,
+   doc.date,
+   doc.user_name,
+   doc.tstamp
+  FROM doc;
