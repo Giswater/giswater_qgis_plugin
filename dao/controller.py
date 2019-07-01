@@ -1285,16 +1285,6 @@ class DaoController(object):
         return layers
 
 
-    def set_path_from_qfiledialog(self, qtextedit, path):
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            if path:
-                qtextedit.setText(path)
-        else:
-            if path[0]:
-                qtextedit.setText(path[0])
-
-
     def get_restriction(self):
 
         # Get project variable 'project_role'
