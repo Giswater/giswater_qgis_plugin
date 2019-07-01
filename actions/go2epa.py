@@ -427,7 +427,8 @@ class Go2Epa(ApiParent):
         else:
             self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
 
-        self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_inp, self.file_inp)
+        utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
+
 
 
     def go2epa_select_file_rpt(self):
