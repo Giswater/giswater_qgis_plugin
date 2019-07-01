@@ -262,7 +262,7 @@ class ApiCF(ApiParent):
         # When info is nothing
         if 'results' in row[0]:
             if row[0]['results'] == 0:
-                self.controller.show_message(row[0]['message']['text'], 2)
+                self.controller.show_message(row[0]['message']['text'], 1)
                 return False, None
         # When insert feature failed
         if row[0]['status'] == "Failed":
@@ -527,7 +527,6 @@ class ApiCF(ApiParent):
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
-        #self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_cf.show()
         return self.complet_result, self.dlg_cf
 
@@ -537,9 +536,12 @@ class ApiCF(ApiParent):
         """ start or stop the edition based on your current status"""
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
-        if action_is_checked:
-
-            self.accept(self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json)
+        # If the json is empty, we simply activate/deactivate the editing
+        # else if editing is active, deactivate edition and save changes
+        if self.my_json == '' or str(self.my_json) == '{}':
+            return
+        elif action_is_checked:
+            self.accept(self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json, close_dialog=False)
 
 
     def roll_back(self):
@@ -719,7 +721,6 @@ class ApiCF(ApiParent):
                             widget.setEnabled(field['iseditable'])
 
         self.new_feature_id = None
-        self.close_dialog(dialog)
 
 
     def enable_all(self, dialog, result):
