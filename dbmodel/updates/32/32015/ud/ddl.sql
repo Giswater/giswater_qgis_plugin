@@ -48,3 +48,6 @@ CREATE TABLE plan_psector_x_gully(
 
 
 ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_node_id_fkey;
+
+ALTER TABLE vnode ADD COLUMN top_elev numeric(12,3);
+

@@ -177,10 +177,11 @@ CREATE OR REPLACE VIEW v_edit_link AS
      LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id);
 	 
 
-
+DROP VIEW v_edit_vnode;
 CREATE OR REPLACE VIEW v_edit_vnode AS 
  SELECT vnode.vnode_id,
     vnode.vnode_type,
+	vnode.elev,
     vnode.sector_id,
     vnode.dma_id,
     vnode.state,

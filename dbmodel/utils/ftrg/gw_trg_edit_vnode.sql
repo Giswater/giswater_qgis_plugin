@@ -13,13 +13,13 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_vnode()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-
-    vnode_seq int8;
-	expl_id_int integer;
+	v_projectytpe text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	
+	SELECT wsoftware INTO v_projectytpe FROM version LIMIT 1;
 
 -- INSERT
 	IF TG_OP = 'INSERT' THEN
@@ -32,6 +32,13 @@ BEGIN
 		UPDATE vnode
 		SET vnode_id=NEW.vnode_id, vnode_type=NEW.vnode_type, sector_id=NEW.sector_id, state=NEW.state, annotation=NEW.annotation, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 		WHERE vnode_id=NEW.vnode_id;
+		
+		IF v_projectytpe='WS' THEN
+				UPDATE vnode SET elev=NEW.elev WHERE vnode_id=NEW.vnode_id;
+		ELSE
+				UPDATE vnode SET top_elev=NEW.top_elev WHERE vnode_id=NEW.vnode_id;
+		END IF; 
+	
 
 		RETURN NEW;
 -- DELETE
