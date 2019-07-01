@@ -198,11 +198,6 @@ class ApiParent(ParentAction):
                 layer.removeSelection()
 
 
-    def start_editing(self):
-        """ start or stop the edition based on your current status"""
-
-        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-
 
     def get_feature_by_id(self, layer, id, field_id):
 

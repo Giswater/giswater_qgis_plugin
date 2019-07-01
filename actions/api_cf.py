@@ -532,6 +532,16 @@ class ApiCF(ApiParent):
         return self.complet_result, self.dlg_cf
 
 
+    def start_editing(self):
+
+        """ start or stop the edition based on your current status"""
+        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+        action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
+        if action_is_checked:
+
+            self.accept(self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json)
+
+
     def roll_back(self):
         """ discard changes in current layer"""
         self.iface.actionRollbackEdits().trigger()
