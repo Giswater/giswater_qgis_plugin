@@ -43,11 +43,10 @@ class Go2EpaOptions(ApiParent):
         body = self.create_body(form=form)
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
-        # TODO controllar si row tiene algo
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list, False)
@@ -77,7 +76,7 @@ class Go2EpaOptions(ApiParent):
         extras = '"fields":' + my_json + ''
         body = self.create_body(form=form, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_setconfig($${" + body + "}$$)")
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql, log_sql=True, commit=True)
         message = "Values has been updated"
         self.controller.show_info(message)
         # Close dialog
@@ -98,7 +97,7 @@ class Go2EpaOptions(ApiParent):
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('epaoptions" + "', '', '', '" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child)

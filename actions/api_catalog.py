@@ -36,7 +36,8 @@ class ApiCatalog(ApiParent):
         form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
         body = self.create_body(form)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        print("ROW -> :" + str(row) )
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return

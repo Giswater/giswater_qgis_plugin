@@ -665,7 +665,7 @@ class ApiCF(ApiParent):
             extras = '"fields":' + my_json + ''
             body = self.create_body(feature=feature, extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_setfields($${" + body + "}$$)")
-        row = self.controller.execute_returning(sql, log_sql=True)
+        row = self.controller.execute_returning(sql, log_sql=True, commit=True)
 
         if not row:
             msg = "Fail in: {0}".format(sql)

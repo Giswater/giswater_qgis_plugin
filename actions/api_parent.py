@@ -682,7 +682,7 @@ class ApiParent(ParentAction):
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_gettypeahead($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False

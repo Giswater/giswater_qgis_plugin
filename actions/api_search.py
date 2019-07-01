@@ -268,7 +268,7 @@ class ApiSearch(ApiParent):
             extras_search_add += '"' + line_edit.property('column_id') + '":{"text":"' + value + '"}'
             body = self.create_body(form=form_search, extras=extras_search)
             sql = ("SELECT " + self.schema_name + ".gw_api_setsearch($${" +body + "}$$)")
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
             if row:
                 self.result_data = row[0]
 
@@ -299,7 +299,7 @@ class ApiSearch(ApiParent):
             extras_search_add += ', "' + line_edit_add.property('column_id') + '":{"text":"' + value + '"}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
             sql = ("SELECT " + self.schema_name + ".gw_api_setsearch_add($${" + body + "}$$)")
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
             if row:
                 self.result_data = row[0]
                 if row is not None:
@@ -351,7 +351,7 @@ class ApiSearch(ApiParent):
         feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
         body = self.create_body(feature=feature)
         sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return

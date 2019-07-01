@@ -57,7 +57,7 @@ class ApiManageComposer(ApiParent):
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getprint($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
             return False
@@ -348,7 +348,7 @@ class ApiManageComposer(ApiParent):
         data = '"data":' + str(my_json)
         body = "" + client + form + feature + data
         sql = ("SELECT " + self.schema_name + ".gw_api_setprint($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
             return False
