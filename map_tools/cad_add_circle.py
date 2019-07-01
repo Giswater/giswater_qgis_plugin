@@ -4,21 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint
-else:
-    from qgis.core import  QgsPointXY
-
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
@@ -33,7 +22,7 @@ class CadAddCircle(ParentMapTool):
 
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
-        # Call ParentMapTool constructor
+
         super(CadAddCircle, self).__init__(iface, settings, action, index_action)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
@@ -42,6 +31,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def init_create_circle_form(self, point):
+
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
         self.load_settings(self.dlg_create_circle)
@@ -69,10 +59,7 @@ class CadAddCircle(ParentMapTool):
             self.close_dialog(self.dlg_create_circle)
             if self.delete_prev:
                 selection = self.layer_circle.getFeatures()
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    self.layer_circle.setSelectedFeatures([f.id() for f in selection])
-                else:
-                    self.layer_circle.select([f.id() for f in selection])
+                self.layer_circle.selectByIds([f.id() for f in selection])
                 if self.layer_circle.selectedFeatureCount() > 0:
                     features = self.layer_circle.selectedFeatures()
                     for feature in features:
@@ -83,7 +70,7 @@ class CadAddCircle(ParentMapTool):
                 if Qgis.QGIS_VERSION_INT < 29900:
                     feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
                 else:
-                      feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
+                    feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
                 provider = self.layer_circle.dataProvider()
                 provider.addFeatures([feature])
 
@@ -120,68 +107,36 @@ class CadAddCircle(ParentMapTool):
 
     def canvasMoveEvent(self, event):
 
-        # Hide highlight
+        # Hide marker and get coordinates
         self.vertex_marker.hide()
-
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        try:
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        if Qgis.QGIS_VERSION_INT < 29900:
-            if self.snap_to_selected_layer:
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
-            else:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
-            # That's the snapped features
-            if result:
-                point = QgsPoint(result[0].snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+        if self.snap_to_selected_layer:
+            result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            # TODO 3.x if self.snap_to_selected_layer:
-            result = self.snapper.snapToMap(event_point)  # @UnusedVariable
-            # That's the snapped features
-            if result:
-                # Get the point and add marker on it
-                point = QgsPointXY(result.point())
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+            result = self.snapper_manager.snap_to_background_layers(event_point)
+
+        # Add marker
+        self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
 
         if event.button() == Qt.LeftButton:
 
-            # Get the click
+            # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
+            event_point = self.snapper_manager.get_event_point(event)
 
-            try:
-                event_point = QPoint(x, y)
-            except(TypeError, KeyError):
-                self.iface.actionPan().trigger()
-                return
+            # Create point with snap reference
+            result = self.snapper_manager.snap_to_background_layers(event_point)
+            point = self.snapper_manager.get_snapped_point(result)
 
-            if Qgis.QGIS_VERSION_INT < 29900:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-                # Create point with snap reference
-                if result:
-                    point = QgsPoint(result[0].snappedVertex)
-                # Create point with mouse cursor reference
-                else:
-                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-            else:
-                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
-                # Create point with snap reference
-                point = QgsPointXY(result.point())
-                if point.x() == 0 and point.y() == 0:
-                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+            # Create point with mouse cursor reference
+            if point is None:
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
             self.init_create_circle_form(point)
 
@@ -197,6 +152,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def activate(self):
+
         # Check button
         self.action().setChecked(True)
 
@@ -216,13 +172,14 @@ class CadAddCircle(ParentMapTool):
 
         self.layer_circle = self.controller.get_layer_by_tablename('v_edit_cad_auxcircle', True)
         if self.layer_circle is None:
-            self.show_warning("Layer not found", parameter=self.layer_circle)
+            self.controller.show_warning("Layer not found", parameter=self.layer_circle)
             return
+
         self.iface.setActiveLayer(self.layer_circle)
 
         # Check for default base layer
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             self.snap_to_selected_layer = True

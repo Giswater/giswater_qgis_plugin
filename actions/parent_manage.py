@@ -17,12 +17,12 @@ else:
     from builtins import str
     from builtins import range
 
-from qgis.core import QgsFeatureRequest, QgsPoint
+from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QPoint, QDate
+from qgis.PyQt.QtCore import Qt, QPoint, QDate, QDateTime
 
 from functools import partial
 
@@ -48,6 +48,7 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
         self.remove_ids = True
+
 
     def reset_lists(self):
         """ Reset list of selected records """
@@ -186,8 +187,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
             utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
-            builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
-            dialog.builtdate.setDate(builtdate)
+            utils_giswater.setWidgetText(dialog, "builtdate", row['builtdate'])
             utils_giswater.setWidgetText(dialog, "workcat_id", row['workcat_id'])
             utils_giswater.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
             utils_giswater.setWidgetText(dialog, "comment", row['comment'])
@@ -214,6 +214,7 @@ class ParentManage(ParentAction, object):
         sql = ("SELECT " + geom_type + "_id"
                " FROM " + self.schema_name + "." + table_relation + ""
                " WHERE " + table_object + "_id = '" + str(object_id) + "'")
+
         rows = self.controller.get_rows(sql, log_info=False)
         if rows:
             for row in rows:
@@ -264,7 +265,6 @@ class ParentManage(ParentAction, object):
                 self.reset_model(dialog, table_object, "gully")
 
             return
-
 
         # Fill input widgets with data of the @row
         self.fill_widgets(dialog, table_object, row)
@@ -324,6 +324,7 @@ class ParentManage(ParentAction, object):
 
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
+
         active_layer = self.iface.activeLayer()
         if active_layer is None:
             active_layer = self.controller.get_layer_by_tablename('version')
@@ -347,25 +348,17 @@ class ParentManage(ParentAction, object):
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
 
-    def mouse_move(self, p):
+    def mouse_move(self, point):
 
+        # Hide marker and get coordinates
         self.snapped_point = None
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
-            # Check feature
-            for snapped_point in result:
-                self.snapped_point = QgsPoint(snapped_point.snappedVertex)
-                self.vertex_marker.setCenter(self.snapped_point)
-                self.vertex_marker.show()
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 
@@ -379,6 +372,7 @@ class ParentManage(ParentAction, object):
         else:
             self.x = point.x()
             self.y = point.y()
+
         message = "Geometry has been added!"
         self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
@@ -389,22 +383,18 @@ class ParentManage(ParentAction, object):
 
 
     def get_values_from_form(self, dialog):
+
         self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
 
 
-    def tab_feature_changed(self, dialog, table_object, feature_id=None):
+    def tab_feature_changed(self, dialog, table_object):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
 
         self.get_values_from_form(dialog)
-        if dialog.tab_feature.currentIndex() == 3:
-            dialog.btn_snapping.setEnabled(False)
-        else:
-            dialog.btn_snapping.setEnabled(True)
-
         tab_position = dialog.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"   
@@ -413,8 +403,6 @@ class ParentManage(ParentAction, object):
         elif tab_position == 2:
             self.geom_type = "connec"
         elif tab_position == 3:
-            self.geom_type = "element"
-        elif tab_position == 4:
             self.geom_type = "gully"
 
         self.hide_generic_layers()                  
@@ -461,6 +449,7 @@ class ParentManage(ParentAction, object):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
         """
+
         if not widget:
             return
 
@@ -608,6 +597,7 @@ class ParentManage(ParentAction, object):
     def apply_lazy_init(self, widget):
         """Apply the init function related to the model. It's necessary
         a lazy init because model is changed everytime is loaded."""
+
         if self.lazy_widget is None:
             return
         if widget != self.lazy_widget:
@@ -619,6 +609,7 @@ class ParentManage(ParentAction, object):
         """set the init_function where all necessary events are set.
         This is necessary to allow a lazy setup of the events because set_table_events
         can create a table with a None model loosing any event connection."""
+
         # TODO: create a dictionary with key:widged.objectName value:initFuction
         # to allow multiple lazy initialization
         self.lazy_widget = widget
@@ -774,7 +765,6 @@ class ParentManage(ParentAction, object):
 
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
-
         self.disconnect_signal_selection_changed()
         field_id = geom_type + "_id"
 
@@ -846,22 +836,14 @@ class ParentManage(ParentAction, object):
     def enable_feature_type(self, dialog):
 
         feature_type = dialog.findChild(QComboBox, 'feature_type')
-        assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
-        visit_class = dialog.findChild(QComboBox, 'cmb_visit_class')
         table = dialog.findChild(QTableView, 'tbl_relation')
         if feature_type is not None and table is not None:
             if len(self.ids) > 0:
                 feature_type.setEnabled(False)
-                if assigned_to is not None:
-                    assigned_to.setEnabled(False)
-                if assigned_to is not None:
-                    visit_class.setEnabled(False)
             else:
                 feature_type.setEnabled(True)
-                if assigned_to is not None:
-                    assigned_to.setEnabled(True)
-                if assigned_to is not None:
-                    visit_class.setEnabled(True)
+
+
 
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
@@ -897,7 +879,9 @@ class ParentManage(ParentAction, object):
                 self.ids.append(str(feature_id))
 
         # Set expression filter with features in the list
+
         expr_filter = "\"" + field_id + "\" IN ("
+
         for i in range(len(self.ids)):
             expr_filter += "'" + str(self.ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
@@ -906,7 +890,6 @@ class ParentManage(ParentAction, object):
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
             return
-
         # Select features with previous filter
         # Build a list of feature id's and select them
         for layer in self.layers[self.geom_type]:
@@ -924,6 +907,7 @@ class ParentManage(ParentAction, object):
             self.apply_lazy_init(table_object)            
 
         # Update list
+
         self.list_ids[self.geom_type] = self.ids
         self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
@@ -931,17 +915,19 @@ class ParentManage(ParentAction, object):
 
     def insert_feature_to_plan(self, dialog, geom_type):
         """ Insert features_id to table plan_@geom_type_x_psector"""
-
+        print(str("insert_feature_to_plan"))
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
             sql = ("SELECT " + geom_type + "_id"
                    " FROM " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
                    " WHERE " + geom_type + "_id = '" + str(self.ids[i]) + "' AND psector_id = '" + str(value) + "'")
-
+            print(str(sql))
             row = self.controller.get_row(sql)
+            print(str(row))
             if not row:
                 sql = ("INSERT INTO " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
+                print(str(sql))
                 self.controller.execute_sql(sql)
             self.reload_qtable(dialog, geom_type, self.plan_om)
 
@@ -972,8 +958,10 @@ class ParentManage(ParentAction, object):
 
     def fill_table_object(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -1081,6 +1069,7 @@ class ParentManage(ParentAction, object):
         elif "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)
 
+
     def set_selectionbehavior(self, dialog):
         
         # Get objects of type: QTableView
@@ -1139,8 +1128,12 @@ class ParentManage(ParentAction, object):
                 continue
 
             widget = getattr(dialog, field_name)
-            if type(widget) in [QDateEdit, QDateTimeEdit]:
-                widget.setDateTime(value if value else QDate.currentDate() )
+            if type(widget) == QDateEdit:
+                widget.setDate(value if value else QDate.currentDate())
+            elif type(widget) == QDateTimeEdit:
+                widget.setDateTime(value if value else QDateTime.currentDateTime())
+
+
             if type(widget) in [QLineEdit, QTextEdit]:
                 if value:
                     widget.setText(value)

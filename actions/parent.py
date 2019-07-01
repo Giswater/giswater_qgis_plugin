@@ -26,15 +26,14 @@ else:
     from builtins import object
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QSettings
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction
+from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
-
 import sys
-
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -49,7 +48,6 @@ class ParentAction(object):
         """ Class constructor """
 
         # Initialize instance attributes
-        self.giswater_version = "3.1"
         self.iface = iface
         self.canvas = self.iface.mapCanvas()        
         self.settings = settings
@@ -58,240 +56,48 @@ class ParentAction(object):
         self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name
         self.project_type = None
-        self.file_gsw = None
-        self.gsw_settings = None        
-          
-        # Get files to execute giswater jar (only in Windows)
-        if 'nt' in sys.builtin_module_names: 
-            self.plugin_version = self.get_plugin_version()
-            self.java_exe = self.get_java_exe()              
-            (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
-    
+        self.plugin_version = self.get_plugin_version()
+
     
     def set_controller(self, controller):
         """ Set controller class """
         
         self.controller = controller
         self.schema_name = self.controller.schema_name       
-        
-    
-    def get_plugin_version(self):
-        """ Get plugin version from metadata.txt file """
-               
-        # Check if metadata file exists    
-        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
-        if not os.path.exists(metadata_file):
-            message = "Metadata file not found" + metadata_file
-            self.controller.show_warning(message, parameter=metadata_file)
-            return None
-          
-        metadata = configparser.ConfigParser()
-        metadata.read(metadata_file)
-        plugin_version = metadata.get('general', 'version')
-        if plugin_version is None:
-            message = "Plugin version not found"
-            self.controller.show_warning(message)
-        
-        return plugin_version
-               
-       
-    def get_giswater_jar(self):
-        """ Get executable Giswater file and build version from windows registry """
-             
-        reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\Giswater\\"+self.giswater_version
-        reg_name = "InstallFolder"
-        giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if giswater_folder is None:
-            message = "Cannot get giswater folder from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return (None, None)
-            
-        # Check if giswater folder exists
-        if not os.path.exists(giswater_folder):
-            message = "Giswater folder not found"
-            self.controller.log_info(message, parameter=giswater_folder)
-            return (None, None)           
-            
-        # Check if giswater executable file file exists
-        giswater_file_path = giswater_folder+"\giswater.jar"
-        if not os.path.exists(giswater_file_path):
-            message = "Giswater executable file not found"
-            self.controller.log_info(message, parameter=giswater_file_path)
-            return (None, None) 
 
-        # Get giswater major version
-        reg_name = "MajorVersion"
-        major_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if major_version is None:
-            message = "Cannot get giswater major version from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)    
 
-        # Get giswater minor version
-        reg_name = "MinorVersion"
-        minor_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if minor_version is None:
-            message = "Cannot get giswater minor version from windows registry" + reg_path
-            self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)  
-                        
-        # Get giswater build version
-        reg_name = "BuildVersion"
-        build_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if build_version is None:
-            message = "Cannot get giswater build version from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)        
-        
-        giswater_build_version = major_version + '.' + minor_version + '.' + build_version
-        
-        return (giswater_file_path, giswater_build_version)
-    
-           
-    def get_java_exe(self):
-        """ Get executable Java file from windows registry """
-
-        reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\JavaSoft\\Java Runtime Environment"
-        reg_name = "CurrentVersion"
-        java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        
-        # Check if java version exists (64 bits)
-        if java_version is None:
-            reg_path = "SOFTWARE\\Wow6432Node\\JavaSoft\\Java Runtime Environment" 
-            java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)   
-            # Check if java version exists (32 bits)            
-            if java_version is None:
-                message = "Cannot get current Java version from windows registry"
-                self.controller.log_info(message, parameter=reg_path)
-                return None
-      
-        # Get java folder
-        reg_path+= "\\"+java_version
-        reg_name = "JavaHome"
-        java_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if java_folder is None:
-            message = "Cannot get Java folder from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return None         
-
-        # Check if java folder exists
-        if not os.path.exists(java_folder):
-            message = "Java folder not found"
-            self.controller.log_info(message, parameter=java_folder)
-            return None  
-
-        # Check if java executable file exists
-        java_exe = java_folder+"/bin/java.exe"
-        if not os.path.exists(java_exe):
-            message = "Java executable file not found"
-            self.controller.log_info(message, parameter=java_exe)
-            return None  
-                
-        return java_exe
-                        
-
-    def execute_giswater(self, parameter):
-        """ Executes giswater with selected parameter """
-
-        if self.giswater_file_path is None or self.java_exe is None:
-            return               
-        
-        # Save database connection parameters into GSW file
-        self.save_database_parameters()        
-        
-        # Check if gsw file exists. If not giswater will open with the last .gsw file
-        if self.file_gsw is None:
-            self.file_gsw = ""        
-        if self.file_gsw:
-            if self.file_gsw != "" and not os.path.exists(self.file_gsw):
-                message = "GSW file not found"
-                self.controller.show_info(message, parameter=self.file_gsw)
-                self.file_gsw = ""   
-        
-        # Start program     
-        aux = '"' + self.giswater_file_path + '"'
-        if self.file_gsw != "":
-            aux+= ' "' + self.file_gsw + '"'
-            program = [self.java_exe, "-jar", self.giswater_file_path, self.file_gsw, parameter]
-        else:
-            program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
-
-        self.controller.start_program(program)               
-        
-        # Compare Java and Plugin versions
-        if self.plugin_version != self.giswater_build_version:
-            msg = ("Giswater and plugin versions are different. "
-                   "Giswater version: " + self.giswater_build_version + ""
-                   " - Plugin version: " + self.plugin_version)
-            self.controller.show_info(msg, 10)
-        # Show information message    
-        else:
-            message = "Executing..."
-            self.controller.show_info(message, parameter=aux)
-        
-
-    def set_java_settings(self, show_warning=True):
-                        
-        # Get giswater properties file
-        users_home = os.path.expanduser("~")
-        filename = "giswater_" + self.giswater_version + ".properties"
-        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename    
-        if not os.path.exists(java_properties_path):
-            message = "Giswater properties file not found"
-            if show_warning:
-                self.controller.show_warning(message, parameter=str(java_properties_path))
-            return False
-                        
-        self.java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        self.java_settings.setIniCodec(sys.getfilesystemencoding())        
-        self.file_gsw = utils_giswater.get_settings_value(self.java_settings, 'FILE_GSW')   
-                
-            
-    def set_gsw_settings(self):
-                  
-        if not self.file_gsw:                   
-            self.set_java_settings(False)
-            
-        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)        
-                    
-
-    def save_database_parameters(self):
-        """ Save database connection parameters into GSW file """
-        
-        if self.gsw_settings is None:
-            self.set_gsw_settings()
-        
-        # Get layer version
-        layer = self.controller.get_layer_by_tablename('version')
-        if not layer:
-            return
-
-        # Get database connection paramaters and save them into GSW file
-        layer_source = self.controller.get_layer_source_from_credentials()
-        if layer_source is None:
-            return
-                
-        self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
-        self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
-        self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
-        self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
-        self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
-        
-        
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
         
         if widget is not None:           
             url = utils_giswater.getWidgetText(dialog, widget)
             if url == 'null':
-                url = 'www.giswater.org'
+                url = 'http://www.giswater.org'
         else:
-            url = 'www.giswater.org'
+            url = 'http://www.giswater.org'
                      
-        webbrowser.open(url)    
-        
+        webbrowser.open(url)
+
+
+    def get_plugin_version(self):
+        """ Get plugin version from metadata.txt file """
+
+        # Check if metadata file exists
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
+        if not os.path.exists(metadata_file):
+            message = "Metadata file not found"
+            self.controller.show_warning(message, parameter=metadata_file)
+            return None
+
+        metadata = configparser.ConfigParser()
+        metadata.read(metadata_file)
+        plugin_version = metadata.get('general', 'version')
+        if plugin_version is None:
+            message = "Plugin version not found"
+            self.controller.show_warning(message)
+
+        return plugin_version
+
 
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
@@ -308,7 +114,11 @@ class ParentAction(object):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)        
         message = "Select file"
-        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
+        if Qgis.QGIS_VERSION_INT < 29900:
+            folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
+        else:
+            folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
+
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
                 
@@ -409,8 +219,8 @@ class ParentAction(object):
         
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
-                           index=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-                                  25, 26, 27, 28, 29, 30]):
+                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3]):
         
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
@@ -422,18 +232,20 @@ class ParentAction(object):
         query_left += " WHERE cur_user = current_user)"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
-        self.hide_colums(tbl_all_rows, index)
+        self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
 
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+
         query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + tableleft
         query_right += " JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+
         query_right += " WHERE cur_user = current_user"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
-        self.hide_colums(tbl_selected_rows, [1, 2, 3])
+        self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
@@ -542,7 +354,7 @@ class ParentAction(object):
         widget.setModel(self.model)
 
 
-    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit, expr_filter=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
@@ -562,6 +374,8 @@ class ParentAction(object):
 
         # Attach model to table view
         widget.setModel(self.model)
+        if expr_filter:
+            widget.model().setFilter(expr_filter)
 
 
     def fill_table_by_query(self, qtable, query):
@@ -569,6 +383,7 @@ class ParentAction(object):
         :param qtable: QTableView to show
         :param query: query to set model
         """
+
         model = QSqlQueryModel()
         model.setQuery(query)
         qtable.setModel(model)
@@ -612,8 +427,9 @@ class ParentAction(object):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)      
-            return (False, expr)
-        return (True, expr)               
+            return False, expr
+
+        return True, expr
         
 
     def refresh_map_canvas(self, restore_cursor=False):
@@ -650,7 +466,7 @@ class ParentAction(object):
         return cursor        
                     
                 
-    def set_table_columns(self, dialog, widget, table_name):
+    def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(dialog, widget)
@@ -678,12 +494,16 @@ class ParentAction(object):
                 widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
-        # widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
+        if isQStandardItemModel:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+        else:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+
+        return widget
 
 
     def connect_signal_selection_changed(self, option):
@@ -718,8 +538,6 @@ class ParentAction(object):
         utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 
 
-
-
     def multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
@@ -752,8 +570,12 @@ class ParentAction(object):
             self.controller.execute_sql(sql)
             widget.model().select()
 
+
     def select_features_by_expr(self, layer, expr):
         """ Select features of @layer applying @expr """
+
+        if not layer:
+            return
 
         if expr is None:
             layer.removeSelection()
@@ -765,6 +587,7 @@ class ParentAction(object):
                 layer.selectByIds(id_list)
             else:
                 layer.removeSelection()
+
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
@@ -826,7 +649,7 @@ class ParentAction(object):
 
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
-        # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
+
         rect = QgsRectangle(float(x1)-margin, float(y1)-margin, float(x2)+margin, float(y2)+margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
@@ -860,6 +683,7 @@ class ParentAction(object):
 
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist """
+
         layer = None
         for lyr in list(QgsProject.instance().mapLayers().values()):
             if lyr.name() == layer_name:
@@ -867,6 +691,7 @@ class ParentAction(object):
                 break
         if layer is not None:
             QgsProject.instance().removeMapLayer(layer)
+            self.delete_layer_from_toc(layer_name)
 
 
     def get_snapper(self):
@@ -875,8 +700,141 @@ class ParentAction(object):
         if Qgis.QGIS_VERSION_INT < 29900:
             snapper = QgsMapCanvasSnapper(self.canvas)
         else:
-            # TODO: 3.x
-            snapper = QgsMapCanvas.snappingUtils()
+            snapper = QgsMapCanvas.snappingUtils(self.canvas)
 
         return snapper
+
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras is not None:
+            data += ', ' + extras
+        data += '}'
+        body = "" + client + form + feature + data
+
+        return body
+
+
+    def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
+        cahange_tab=False
+        text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
+        if reset_text:
+            text = ""
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    if force_tab:
+                        cahange_tab = True
+                else:
+                    text += "\n"
+
+        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
+        if cahange_tab:
+            qtabwidget.setCurrentIndex(1)
+
+
+    def get_composers_list(self):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            active_composers = self.iface.activeComposers()
+        else:
+            layour_manager = QgsProject.instance().layoutManager().layouts()
+            active_composers = [layout for layout in layour_manager]
+
+        return active_composers
+
+
+    def get_composer_name(self, composer):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            composer_name = composer.composerWindow().windowTitle()
+        else:
+            composer_name = composer.name()
+
+        return composer_name
+
+
+    def get_composer_index(self, name):
+
+        index = 0
+        composers = self.get_composers_list()
+        for comp_view in composers:
+            composer_name = self.get_composer_name(comp_view)
+            if composer_name == name:
+                break
+            index += 1
+
+        return index
+
+
+    def get_all_actions(self):
+
+        self.controller.log_info(str("TEST"))
+        actions_list = self.iface.mainWindow().findChildren(QAction)
+        for action in actions_list:
+           self.controller.log_info(str(action.objectName()))
+           action.triggered.connect(partial(self.show_action_name, action))
+
+
+    def show_action_name(self, action):
+        self.controller.log_info(str(action.objectName()))
+
+
+    def set_restriction(self, dialog, widget_to_ignore, restriction):
+        """
+        Set all widget enabled(False) or readOnly(True) except those on the tuple
+        :param dialog:
+        :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
+        :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
+        :return:
+        """
+
+        role = self.controller.get_restriction()
+        if role in restriction:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                if widget.objectName() in widget_to_ignore:
+                    continue
+                # Set editable/readonly
+                if type(widget) in (QLineEdit, QDoubleSpinBox, QTextEdit):
+                    widget.setReadOnly(True)
+                    widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
+                    widget.setEnabled(False)
+
+
+    def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
+
+        sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
+               " FROM {}.{}".format(self.schema_name, table_name))
+        row = self.controller.get_row(sql, log_sql=False)
+        if row:
+            if row[0]:
+                widget_from.setDate(row[0])
+            else:
+                current_date = QDate.currentDate()
+                widget_from.setDate(current_date)
+            if row[1]:
+                widget_to.setDate(row[1])
+            else:
+                current_date = QDate.currentDate()
+                widget_to.setDate(current_date)
+
+
+    def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
+
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + "." + table_name + ""
+               " WHERE typevalue = '" + typevalue + "'"
+               " ORDER BY " + order_by + "")
+        rows = self.controller.get_rows(sql, commit=True)
+        return rows
 

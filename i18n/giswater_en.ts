@@ -82,6 +82,10 @@
         <translation>Lot manager</translation>
     </message>
     <message>
+        <source>76_text</source>
+        <translation>Lot filter</translation>
+    </message>
+    <message>
         <source>81_text</source>
         <translation>New psector</translation>
     </message>
@@ -151,7 +155,7 @@
     </message> 
     <message>
         <source>44_text</source>
-        <translation>Replace node</translation>
+        <translation>Replace feature</translation>
     </message>
     <message>
         <source>98_text</source>
@@ -163,7 +167,7 @@
     </message>
     <message>
         <source>72_text</source>
-        <translation>Add point using relative coordinates</translation>
+        <translation>Insert point</translation>
     </message>	
     <message>
         <source>23_text</source>
@@ -217,8 +221,23 @@
         <source>83_text</source>
         <translation>Import CSV</translation>
     </message>
-	
-    
+    <message>
+        <source>58_text</source>
+        <translation>Fasprint</translation>
+    </message>
+    <message>
+        <source>196_text</source>
+        <translation>Sector Selector</translation>
+    </message>
+    <message>
+        <source>206_text</source>
+        <translation>Toolbox</translation>
+    </message>
+    <message>
+        <source>37_text</source>
+        <translation>Identify feature</translation>
+    </message>
+
 	<message>
         <source>Select the node and move to desired location</source>
         <translation>Select the node and move to desired location</translation>
@@ -263,7 +282,7 @@
     
     <message>
         <source>searchplus</source>
-        <translation>Searchplus</translation>
+        <translation>Search</translation>
     </message>
 
     <message>

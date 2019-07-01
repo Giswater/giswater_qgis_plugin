@@ -16,17 +16,14 @@
  ***************************************************************************/
 
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QCursor
-from qgis.core import QgsPoint, QgsFeatureRequest
-from qgis.PyQt.QtCore import QPoint, Qt, QDate
+from qgis.PyQt.QtCore import Qt
 
 from map_tools.parent import ParentMapTool
-
 from giswater.actions.manage_visit import ManageVisit
+
 
 class OpenVisit(ParentMapTool):
     """ Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
@@ -53,23 +50,16 @@ class OpenVisit(ParentMapTool):
             self.cancel_map_tool()
             return
 
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
-        snapped_feat = None
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not self.snapper_manager.result_is_valid():
+            return
 
-        # That's the snapped features
-        if result:
-            # Get the first feature
-            snapped_feat = result[0]
-            point = QgsPoint(snapped_feat.snappedVertex)  # @UnusedVariable
-            snapped_feat = next(
-                snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
-
+        # Get snapped feature
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
         if snapped_feat:
             visit_id = snapped_feat.attribute('id')
             manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -77,6 +67,7 @@ class OpenVisit(ParentMapTool):
 
 
     def activate(self):
+
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
@@ -87,7 +78,7 @@ class OpenVisit(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set active layer to 'v_edit_om_visit'
         self.layer_visit = self.controller.get_layer_by_tablename("v_edit_om_visit")
@@ -107,7 +98,9 @@ class OpenVisit(ParentMapTool):
             message = "Select visit to open"
             self.controller.show_info(message)
 
+
     def deactivate(self):
+
         # Call parent method
         ParentMapTool.deactivate(self)
         if self.current_layer is not None:

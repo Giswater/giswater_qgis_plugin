@@ -15,20 +15,11 @@
  *                                                                         *
  ***************************************************************************/
 """
-from builtins import object
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.gui import QgsMapCanvasSnapper
-else:
-    from qgis.gui import QgsMapCanvas
-
-from qgis.core import QgsProject
+from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker
+from qgis.core import QgsProject, QgsPoint, QgsFeatureRequest
+from qgis.PyQt.QtCore import QPoint
+from qgis.PyQt.QtGui import QColor
 
 
 class SnappingConfigManager(object):
@@ -38,35 +29,59 @@ class SnappingConfigManager(object):
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
-        self.layer_arc = None
-        self.layer_connec = None
-        self.layer_node = None
         self.previous_snapping = None
         self.controller = None
+        self.is_valid = None
+        self.initialized = False
+        self.snapping_config = None
+        self.snapper = None
 
-        # Snapper
+
+    def init_snapping_config(self):
+        """ Initial snapping configuration """
+
+        # To avoid exception when reloading plugin
         try:
+            # Snapper
+            self.snapping_config = self.get_snapping_options()
             self.snapper = self.get_snapper()
-            proj = QgsProject.instance()
-            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
-        except:
-            pass
+            QgsProject.instance().writeEntry('Digitizing', 'SnappingMode', 'advanced')
+
+            # Set default vertex marker
+            color = QColor(255, 100, 255)
+            self.vertex_marker = QgsVertexMarker(self.canvas)
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+            self.vertex_marker.setColor(color)
+            self.vertex_marker.setIconSize(15)
+            self.vertex_marker.setPenWidth(3)
+
+            self.initialized = True
+        except Exception as e:
+            self.controller.log_info(str(e))
 
 
-    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
-        self.layer_arc_man = layer_arc_man
-        self.layer_connec_man = layer_connec_man
-        self.layer_node_man = layer_node_man
-        self.layer_gully_man = layer_gully_man
+    def set_controller(self, controller):
+        self.controller = controller
+
+
+    def set_snapping_layers(self):
+        """ Set main snapping layers """
+
+        self.layer_arc = self.controller.get_layer_by_tablename('v_edit_arc')
+        self.layer_connec = self.controller.get_layer_by_tablename('v_edit_connec')
+        self.layer_gully = self.controller.get_layer_by_tablename('v_edit_gully')
+        self.layer_node = self.controller.get_layer_by_tablename('v_edit_node')
 
 
     def get_snapping_options(self):
-        """ Function that collects all the snapping options and put it in an array """
+        """ Function that collects all the snapping options """
+
+        if self.controller is None:
+            return None
 
         snapping_layers_options = []
         layers = self.controller.get_layers()
         for layer in layers:
-
             options = QgsProject.instance().snapSettingsForLayer(layer.id())
             snapping_layers_options.append(
                 {'layerid': layer.id(), 'enabled': options[1], 'snapType': options[2], 'unitType': options[3],
@@ -77,18 +92,33 @@ class SnappingConfigManager(object):
 
     def store_snapping_options(self):
         """ Store the project user snapping configuration """
+
+        if not self.initialized:
+            self.init_snapping_config()
+
         # Get an array containing the snapping options for all the layers
         self.previous_snapping = self.get_snapping_options()
 
 
-    def clear_snapping(self, snapping_mode=0):
-        """ Removing snap """
+    def enable_snapping(self, enable=False, snapping_mode=0):
+        """ Enable/Disable snapping of all layers """
 
         QgsProject.instance().blockSignals(True)
+
         layers = self.controller.get_layers()
         # Loop through all the layers in the project
         for layer in layers:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, snapping_mode, 0, 1, False)
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), enable, snapping_mode, 0, 1, False)
+
+        QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snapSettingsChanged.emit()
+
+
+    def snap_to_arc(self):
+        """ Set snapping to 'arc' """
+
+        QgsProject.instance().blockSignals(True)
+        self.snap_to_layer(self.layer_arc, snapping_type=2)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -97,8 +127,7 @@ class SnappingConfigManager(object):
         """ Set snapping to 'node' """
 
         QgsProject.instance().blockSignals(True)
-        for layer in self.layer_node_man:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
+        self.snap_to_layer(self.layer_node)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -107,34 +136,33 @@ class SnappingConfigManager(object):
         """ Set snapping to 'connec' and 'gully' """
 
         QgsProject.instance().blockSignals(True)
-        for layer in self.layer_connec_man:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
-        if self.layer_gully_man:
-            for layer in self.layer_gully_man:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+        self.snap_to_layer(self.layer_connec)
+        self.snap_to_layer(self.layer_gully)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
 
-    def snap_to_layer(self, layer):
+    def snap_to_layer(self, layer, enabled=True, snapping_type=0, unit_type=2, tolerance=1.0):
         """ Set snapping to @layer """
 
         if layer is None:
             return
 
-        QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+        QgsProject.instance().setSnapSettingsForLayer(layer.id(), enabled, snapping_type, unit_type, tolerance, False)
 
 
     def apply_snapping_options(self, snappings_options):
-        """ Function that restores the previous snapping """
+        """ Function that applies selected snapping configuration """
+
+        if snappings_options:
+            return
 
         QgsProject.instance().blockSignals(True)
 
-        if snappings_options:
-            for snp_opt in snappings_options:
-                QgsProject.instance().setSnapSettingsForLayer(snp_opt['layerid'], int(snp_opt['enabled']),
-                                                              int(snp_opt['snapType']), int(snp_opt['unitType']),
-                                                              float(snp_opt['tolerance']), int(snp_opt['avoidInt']))
+        for snp_opt in snappings_options:
+            QgsProject.instance().setSnapSettingsForLayer(snp_opt['layerid'], int(snp_opt['enabled']),
+                                                          int(snp_opt['snapType']), int(snp_opt['unitType']),
+                                                          float(snp_opt['tolerance']), int(snp_opt['avoidInt']))
 
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
@@ -142,37 +170,169 @@ class SnappingConfigManager(object):
 
     def recover_snapping_options(self):
         """ Function to restore user configuration """
+
         self.apply_snapping_options(self.previous_snapping)
+
+
+    def check_arc_group(self, snapped_layer):
+        """ Check if snapped layer is in the arc group """
+
+        return snapped_layer == self.layer_arc
 
 
     def check_node_group(self, snapped_layer):
         """ Check if snapped layer is in the node group """
-        if snapped_layer in self.layer_node_man:
-            return 1
+
+        return snapped_layer == self.layer_node
 
 
     def check_connec_group(self, snapped_layer):
         """ Check if snapped layer is in the connec group """
-        if snapped_layer in self.layer_connec_man:
-            return 1
+
+        return snapped_layer == self.layer_connec
 
 
     def check_gully_group(self, snapped_layer):
         """ Check if snapped layer is in the gully group """
-        if self.layer_gully_man:
-            if snapped_layer in self.layer_gully_man:
-                return 1
+
+        return snapped_layer == self.layer_gully
 
 
     def get_snapper(self):
         """ Return snapper """
 
+        snapper = QgsMapCanvasSnapper(self.canvas)
+        return snapper
+
+
+    def snap_to_current_layer(self, event_point, vertex_marker=None):
+
+        self.is_valid = False
+        if event_point is None:
+            return None, None
+
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+        if vertex_marker:
+            if result:
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                vertex_marker.setCenter(point)
+                vertex_marker.show()
+
+        self.is_valid = len(result) > 0
+        return result
+
+
+    def snap_to_background_layers(self, event_point, vertex_marker=None):
+
+        self.is_valid = False
+        if event_point is None:
+            return None, None
+
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+        if vertex_marker:
+            if result:
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                vertex_marker.setCenter(point)
+                vertex_marker.show()
+
+        self.is_valid = len(result) > 0
+        return result
+
+
+    def add_marker(self, result, vertex_marker=None, icon_type=None):
+
+        if result is None:
+            return None
+
+        if vertex_marker is None:
+            vertex_marker = self.vertex_marker
+
+        point = QgsPoint(result[0].snappedVertex)
+        if icon_type:
+            vertex_marker.setIconType(icon_type)
+        vertex_marker.setCenter(point)
+        vertex_marker.show()
+
+        return point
+
+
+    def get_event_point(self, event=None, point=None):
+        """ Get point """
+
+        event_point = None
         try:
-            snapper = None
-            if Qgis.QGIS_VERSION_INT < 29900:
-                snapper = QgsMapCanvasSnapper(self.canvas)
-        except Exception:
+            if event:
+                x = event.pos().x()
+                y = event.pos().y()
+            if point:
+                map_point = self.canvas.getCoordinateTransform().transform(point)
+                x = map_point.x()
+                y = map_point.y()
+            event_point = QPoint(x, y)
+        except:
             pass
         finally:
-            return snapper
+            return event_point
+
+
+    def get_snapped_layer(self, result):
+
+        layer = None
+        if result:
+            layer = result[0].layer
+
+        return layer
+
+
+    def get_snapped_point(self, result):
+
+        point = None
+        if result:
+            point = QgsPoint(result[0].snappedVertex)
+
+        return point
+
+
+    def get_snapped_feature_id(self, result):
+
+        feature_id = None
+        if result:
+            feature_id = result[0].snappedAtGeometry
+
+        return feature_id
+
+
+    def get_snapped_feature(self, result, select_feature=False):
+
+        if not result:
+            return None
+
+        snapped_feat = None
+        try:
+            layer = result[0].layer
+            feature_id = result[0].snappedAtGeometry
+            feature_request = QgsFeatureRequest().setFilterFid(feature_id)
+            snapped_feat = next(layer.getFeatures(feature_request))
+            if select_feature:
+                self.select_snapped_feature(result, feature_id)
+        except:
+            self.controller.log_info(str(e))
+        finally:
+            return snapped_feat
+
+
+    def select_snapped_feature(self, result, feature_id):
+
+        if not result:
+            return
+
+        layer = result[0].layer()
+        layer.select([feature_id])
+
+
+    def result_is_valid(self):
+
+        return self.is_valid
 

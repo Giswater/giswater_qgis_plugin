@@ -12,9 +12,8 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
+    pass
 else:
-    from qgis.PyQt.QtCore import QStringListModel
     from builtins import str
     from builtins import range
 
@@ -23,7 +22,9 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
+import json
 import operator
+from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
@@ -264,11 +265,11 @@ class Master(ParentAction):
                 self.controller.show_warning(message, parameter='plan_result_cat')
                 return
 
-            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.result_name, row['result_id'])
+            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.result_id, row['result_id'])
             dlg_estimate_result_new.cmb_result_type.setCurrentIndex(index)
             utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.prices_coefficient, row['network_price_coeff'])
             utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.observ, row['descript'])
-            dlg_estimate_result_new.result_name.setEnabled(False)
+            dlg_estimate_result_new.result_id.setEnabled(False)
             dlg_estimate_result_new.cmb_result_type.setEnabled(False)
             dlg_estimate_result_new.prices_coefficient.setEnabled(False)
             dlg_estimate_result_new.observ.setEnabled(False)
@@ -306,14 +307,14 @@ class Master(ParentAction):
         """ Execute function 'gw_fct_plan_estimate_result' """
 
         # Get values from form
-        result_name = utils_giswater.getWidgetText(dialog, "result_name")
+        result_id = utils_giswater.getWidgetText(dialog, "result_id")
         combo = utils_giswater.getWidget(dialog, "cmb_result_type")
         elem = combo.itemData(combo.currentIndex())
         result_type = str(elem[0])
         coefficient = utils_giswater.getWidgetText(dialog, "prices_coefficient")
         observ = utils_giswater.getWidgetText(dialog, "observ")
 
-        if result_name == 'null':
+        if result_id == 'null':
             message = "Please, introduce a result name"
             self.controller.show_warning(message)
             return
@@ -321,39 +322,30 @@ class Master(ParentAction):
             message = "Please, introduce a coefficient value"
             self.controller.show_warning(message)  
             return          
-        
-        # Check data executing function 'gw_fct_epa_audit_check_data'
-        sql = "SELECT " + self.schema_name + ".gw_fct_plan_audit_check_data(" + str(result_type) + ");"
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            return
-        
-        if row[0] > 0:
-            msg = ("It is not possible to execute the economic result."
-                   "There are errors on your project. Review it!")
-            if result_type == 1:
-                fprocesscat_id = 15
-            else:
-                fprocesscat_id = 16
-            sql_details = ("SELECT table_id, column_id, error_message"
-                           " FROM audit_check_data"
-                           " WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND enabled is false")
-            inf_text = "For more details execute query:\n" + sql_details
-            title = "Execute epa model"
-            self.controller.show_info_box(msg, title, inf_text, parameter=row[0])
-            return
-        
-        # Execute function 'gw_fct_plan_result'
-        sql = ("SELECT " + self.schema_name + ".gw_fct_plan_result('"
-               + result_name + "', " + result_type + ", '" + coefficient + "', '" + observ + "');")
-        status = self.controller.execute_sql(sql)
-        if status:
-            message = "Values has been updated"
-            self.controller.show_info(message)
 
+        extras = '"parameters":{"coefficient":' + str(coefficient) + ', "description":"' + str(observ) +   \
+                 '", "resultType":"' + str(result_type) + '", "resultId":"' + str(result_id) + '"}'
+        extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
+        body = self.create_body(extras=extras)
+        sql = ("SELECT " + self.schema_name + ".gw_fct_plan_result($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_warning("NOT ROW FOR: " + sql)
+            message = "Import failed"
+            self.controller.show_info_box(message)
+            return
+        else:
+            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+            if complet_result[0]['status'] == "Accepted":
+                qtabwidget = dialog.mainTab
+                qtextedit = dialog.txt_infolog
+                self.populate_info_text(dialog, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+            message = complet_result[0]['message']['text']
+            if message is not None:
+                self.controller.show_info_box(message)
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
-        self.close_dialog(dialog)
+
 
 
     def master_estimate_result_selector(self):

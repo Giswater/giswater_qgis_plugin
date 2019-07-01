@@ -16,8 +16,6 @@
  ***************************************************************************/
 
 """
-from __future__ import absolute_import
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -25,14 +23,15 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsMapLayerRegistry as QgsProject
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
-    from qgis.core import QgsWkbTypes
+    from qgis.core import QgsWkbTypes, QgsProject
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsPoint, QgsExpression
+from qgis.core import QgsExpression
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
-from qgis.PyQt.QtCore import Qt, QPoint
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
 
 import os
@@ -52,50 +51,39 @@ class ParentMapTool(QgsMapTool):
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))
         self.index_action = index_action
         self.layer_arc = None        
-        self.layer_connec = None        
-        self.layer_node = None   
-        
-        self.layer_arc_man = None        
-        self.layer_connec_man = None        
-        self.layer_node_man = None
-        self.layer_gully_man = None 
-            
+        self.layer_connec = None
+        self.layer_gully = None
+        self.layer_node = None
         self.schema_name = None        
         self.controller = None        
-        self.dao = None 
+        self.dao = None
+        self.snapper_manager = None
         
         # Call superclass constructor and set current action        
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 
-        # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper = self.snapper_manager.get_snapper()
-        
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.CrossCursor)
 
         # Get default cursor
-        self.std_cursor = self.parent().cursor()    
-        
+        self.std_cursor = self.parent().cursor()
+
         # Set default vertex marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)  
-                 
+        self.vertex_marker.setPenWidth(3)
+
         # Set default rubber band
         color_selection = QColor(254, 178, 76, 63)
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
-        else:
-            self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(self.canvas, 2)
         self.rubber_band.setColor(color)
-        self.rubber_band.setFillColor(color_selection)           
-        self.rubber_band.setWidth(1)           
+        self.rubber_band.setFillColor(color_selection)
+        self.rubber_band.setWidth(1)
         self.reset()
         
         self.force_active_layer = True
@@ -117,32 +105,28 @@ class ParentMapTool(QgsMapTool):
             cursor = QCursor(Qt.ArrowCursor)  
                 
         return cursor
-     
-
-    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
-        """ Sets layers involved in Map Tools functions
-            Sets Snapper Manager """
-        self.layer_arc_man = layer_arc_man
-        self.layer_connec_man = layer_connec_man
-        self.layer_node_man = layer_node_man
-        self.layer_gully_man = layer_gully_man
-        self.snapper_manager.set_layers(layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man)
 
 
     def set_controller(self, controller):
+
         self.controller = controller
         self.schema_name = controller.schema_name
-        self.plugin_dir = self.controller.plugin_dir 
+        self.plugin_dir = self.controller.plugin_dir
+        if self.snapper_manager is None:
+            self.snapper_manager = SnappingConfigManager(self.iface)
         self.snapper_manager.controller = controller
         
         
     def deactivate(self):
-        
+
         # Uncheck button
         self.action().setChecked(False)
 
         # Restore previous snapping
         self.snapper_manager.recover_snapping_options()
+
+        # Enable snapping
+        self.snapper_manager.enable_snapping(True)
 
         # Recover cursor
         self.canvas.setCursor(self.std_cursor)
@@ -171,14 +155,23 @@ class ParentMapTool(QgsMapTool):
             pass
 
 
-    def reset_rubber_band(self):
+    def reset_rubber_band(self, geom_type="polygon"):
 
         try:
-            # Graphic elements
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.rubber_band.reset(Qgis.Polygon)
-            else:
-                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+
+            if geom_type == "polygon":
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    geom_type = Qgis.Polygon
+                else:
+                    geom_type = QgsWkbTypes.PolygonGeometry
+            elif geom_type == "line":
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    geom_type = Qgis.Line
+                else:
+                    geom_type = QgsWkbTypes.LineString
+
+            self.rubber_band.reset(geom_type)
+
         except:
             pass
 
@@ -307,36 +300,75 @@ class ParentMapTool(QgsMapTool):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)      
-            return (False, expr)
-        return (True, expr)
-    
+            return False, expr
+
+        return True, expr
+
+
+    def get_composers_list(self):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            active_composers = self.iface.activeComposers()
+        else:
+            layour_manager = QgsProject.instance().layoutManager().layouts()
+            active_composers = [layout for layout in layour_manager]
+
+        return active_composers
+
+
+    def get_composer_name(self, composer):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            composer_name = composer.composerWindow().windowTitle()
+        else:
+            composer_name = composer.name()
+
+        return composer_name
+
+
+    def get_composer_index(self, name):
+
+        index = 0
+        composers = self.get_composers_list()
+        for comp_view in composers:
+            composer_name = self.get_composer_name(comp_view)
+            if composer_name == name:
+                break
+            index += 1
+
+        return index
+
         
     def canvasMoveEvent(self, event):
-        
+
         # Make sure active layer is always 'v_edit_node'
         cur_layer = self.iface.activeLayer()
         if cur_layer != self.layer_node and self.force_active_layer:
-            self.iface.setActiveLayer(self.layer_node) 
-          
-        # Hide highlight
+            self.iface.setActiveLayer(self.layer_node)
+
+        # Hide highlight and get coordinates
         self.vertex_marker.hide()
-  
-        try:
-            # Get current mouse coordinates
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-  
-        # That's the snapped features
-        if result:          
-            # Get the point and add marker on it
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()           
-                             
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras:
+            data += ', ' + extras
+        data += '}'
+        body = "" + client + form + feature + data
+
+        return body
+

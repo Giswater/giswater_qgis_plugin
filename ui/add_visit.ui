@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>545</width>
-    <height>500</height>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -433,32 +433,42 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <layout class="QHBoxLayout" name="horizontalLayout_15">
             <item>
-             <widget class="QCheckBox" name="is_done">
-              <property name="layoutDirection">
-               <enum>Qt::RightToLeft</enum>
+             <widget class="QLabel" name="label_2">
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>16777215</height>
+               </size>
               </property>
               <property name="text">
-               <string>Is done:</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
+               <string>Status:</string>
               </property>
              </widget>
             </item>
             <item>
-             <spacer name="horizontalSpacer">
+             <spacer name="horizontalSpacer_8">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>49</width>
                 <height>20</height>
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QComboBox" name="status">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

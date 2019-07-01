@@ -29,7 +29,6 @@ class PgDao(object):
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
         except psycopg2.DatabaseError as e:
-            # fix_print_with_import
             print('{pg_dao} Error %s' % e)
             self.last_error = e            
             status = False
@@ -71,6 +70,19 @@ class PgDao(object):
         if self.password is not None:
             self.conn_string += " password="+self.password
         
+        
+    def mogrify(self, sql, params):
+        """ Return a query string after arguments binding """
+
+        query = sql
+        try:
+            query = self.cursor.mogrify(sql, params)
+        except Exception as e:
+            self.last_error = e
+            print(str(e))
+        finally:
+            return query
+
         
     def get_rows(self, sql, commit=False):
         """ Get multiple rows from selected query """
@@ -115,7 +127,7 @@ class PgDao(object):
         try:
             name = self.cursor.description[index][0]
         except Exception as e:
-            # fix_print_with_import
+            self.last_error = e
             print("get_column_name: {0}".format(e))        
         finally:
             return name
@@ -128,7 +140,7 @@ class PgDao(object):
         try:
             total = len(self.cursor.description)
         except Exception as e:
-            # fix_print_with_import
+            self.last_error = e
             print("get_columns_length: {0}".format(e))        
         finally:
             return total
@@ -152,7 +164,7 @@ class PgDao(object):
             return status 
 
 
-    def execute_returning(self, sql, autocommit=True):
+    def execute_returning(self, sql, commit=True):
         """ Execute selected query and return RETURNING field """
 
         self.last_error = None
@@ -160,7 +172,7 @@ class PgDao(object):
         try:
             self.cursor.execute(sql)
             value = self.cursor.fetchone()
-            if autocommit:
+            if commit:
                 self.commit()
         except Exception as e:
             self.last_error = e
@@ -184,58 +196,6 @@ class PgDao(object):
         self.conn.rollback()
         
         
-    def check_schema(self, schemaname):
-        """ Check if selected schema exists """
-
-        exists = True
-        schemaname = schemaname.replace('"', '')        
-        sql = "SELECT nspname FROM pg_namespace WHERE nspname = '" + schemaname + "'";
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists    
-    
-    
-    def check_table(self, schemaname, tablename):
-        """ Check if selected table exists in selected schema """
-
-        exists = True
-        schemaname = schemaname.replace('"', '')         
-        sql = ("SELECT * FROM pg_tables"
-               " WHERE schemaname = '" + schemaname + "' AND tablename = '" + tablename + "'")
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists         
-    
-    
-    def check_view(self, schemaname, viewname):
-        """ Check if selected view exists in selected schema """
-
-        exists = True
-        schemaname = schemaname.replace('"', '') 
-        sql = ("SELECT * FROM pg_views"
-               " WHERE schemaname = '"+schemaname+"' AND viewname = '" + viewname + "'")
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists                    
-    
-    
-    def check_column(self, schemaname, tablename, columname):
-        """ Check if @columname exists table @schemaname.@tablename """
-
-        exists = True
-        schemaname = schemaname.replace('"', '') 
-        sql = ("SELECT * FROM information_schema.columns"
-               " WHERE table_schema = '" + schemaname + "' AND table_name = '" + tablename + "'"
-               " AND column_name = '" + columname + "'")    
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists                    
-
-
     def copy_expert(self, sql, csv_file):
         """ Dumps contents of the query to selected CSV file """
 
@@ -246,15 +206,3 @@ class PgDao(object):
             return e   
         
         
-    def get_srid(self, schema_name, table_name):
-        """ Find SRID of selected schema """
-        
-        srid = None
-        schema_name = schema_name.replace('"', '')        
-        sql = "SELECT Find_SRID('"+schema_name+"', '"+table_name+"', 'the_geom');"
-        row = self.get_row(sql)
-        if row:
-            srid = row[0]   
-            
-        return srid        
-

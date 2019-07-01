@@ -13,14 +13,17 @@ except ImportError:
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
     from qgis.PyQt.QtGui import QStringListModel
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from qgis.core import QgsLayout
     from builtins import next
     from builtins import range
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime
+from qgis.PyQt.QtCore import Qt, QDate, QTime
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -41,7 +44,7 @@ from giswater.ui_manager import Mincut_add_connec
 from giswater.ui_manager import MincutComposer
 
 
-class MincutParent(ParentAction, MultipleSelection):
+class MincutParent(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
@@ -60,6 +63,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.hydro_list = []
         self.deleted_list = []
         self.connec_list = []
+
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
         self.current_state = None
@@ -70,9 +74,9 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Serialize data of table 'anl_mincut_cat_state' """
         
         self.states = {}
-        sql = ("SELECT id, name"
-               " FROM " + self.schema_name + ".anl_mincut_cat_state"
-               " ORDER BY id;")
+        sql = ("SELECT id, name "
+               "FROM " + self.schema_name + ".anl_mincut_cat_state "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return
@@ -87,10 +91,14 @@ class MincutParent(ParentAction, MultipleSelection):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
         self.connec_list = []
         self.hydro_list = []
         self.deleted_list = []
+
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+
         # Refresh canvas, remove all old selections
         self.remove_selection()      
 
@@ -129,23 +137,23 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
         # Fill ComboBox type
-        sql = ("SELECT id"
-               " FROM " + self.schema_name + ".anl_mincut_cat_type"
-               " ORDER BY id;")
+        sql = ("SELECT id, descript "
+               "FROM " + self.schema_name + ".anl_mincut_cat_type "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_mincut, "type", rows, False)
+        utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
-        sql = ("SELECT id"
-               " FROM " + self.schema_name + ".anl_mincut_cat_cause"
-               " ORDER BY id;")
+        sql = ("SELECT id, descript "
+               "FROM " + self.schema_name + ".anl_mincut_cat_cause "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_mincut, "cause", rows, False)
+        utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
 
         # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT id, name"
-               " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY name;")
+        sql = ("SELECT id, name "
+               "FROM " + self.schema_name + ".cat_users "
+               "ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
         utils_giswater.fillComboBox(self.dlg_mincut, "exec_user", rows, False)
@@ -196,13 +204,13 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def set_id_val(self):
+
         # Show future id of mincut
         result_mincut_id = 1
-        sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+        sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM " + self.schema_name + ".anl_mincut_result_cat), true)")
         row = self.controller.get_row(sql, log_sql=True)
-
         if row:
-            if row[0] is not None:
+            if row[0]:
                 if self.is_new:
                     result_mincut_id = str(int(row[0])+1)
 
@@ -211,6 +219,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mg_mincut(self):
         """ Button 26: New Mincut """
+
         self.is_new = True
         self.init_mincut_form()
         self.action = "mg_mincut"
@@ -309,18 +318,18 @@ class MincutParent(ParentAction, MultipleSelection):
         # Manage address
         self.adress_init_config(self.dlg_fin)
         municipality_current = str(self.dlg_mincut.address_exploitation.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_exploitation, str(municipality_current))
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_exploitation, municipality_current)
         address_postal_code_current = str(self.dlg_mincut.address_postal_code.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_postal_code, str(address_postal_code_current))
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_postal_code, address_postal_code_current)
         address_street_current = str(self.dlg_mincut.address_street.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_street, str(address_street_current))
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_street, address_street_current)
         address_number_current = str(self.dlg_mincut.address_number.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_number, str(address_number_current))
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_number, address_number_current)
 
         # Fill ComboBox exec_user
-        sql = ("SELECT name"
-               " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY name;")
+        sql = ("SELECT name "
+               "FROM " + self.schema_name + ".cat_users "
+               "ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_fin, "exec_user", rows, False)
         assigned_to = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
@@ -370,8 +379,8 @@ class MincutParent(ParentAction, MultipleSelection):
         address_street = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_street)
         address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_number)
 
-        mincut_result_type = self.dlg_mincut.type.currentText()
-        anl_cause = self.dlg_mincut.cause.currentText()
+        mincut_result_type = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
+        anl_cause = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
         work_order = self.work_order.text()
 
         anl_descript = utils_giswater.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
@@ -423,15 +432,15 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Check if id exist in table 'anl_mincut_result_cat'
         result_mincut_id = self.result_mincut_id.text()        
-        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat" 
-               " WHERE id = '" + str(result_mincut_id) + "';")        
+        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat " 
+               "WHERE id = '" + str(result_mincut_id) + "';")
         rows = self.controller.get_rows(sql)
         
         # If not found Insert just its 'id'
         sql = ""
         if not rows:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id)"
-                   " VALUES ('" + str(result_mincut_id) + "');\n")
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
+                   "VALUES ('" + str(result_mincut_id) + "');\n")
 
         # Update all the fields
         sql += ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
@@ -475,8 +484,8 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Update table 'anl_mincut_result_selector'
         sql += ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
-                " (current_user, " + str(result_mincut_id) + ");")
+                "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES "
+                "(current_user, " + str(result_mincut_id) + ");")
         
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec != "":
@@ -485,7 +494,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if self.sql_hydro != "":
             sql += self.sql_hydro
                             
-        status = self.controller.execute_sql(sql, log_error=True, log_sql=False)
+        status = self.controller.execute_sql(sql, log_error=True)
         if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
@@ -500,30 +509,28 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT mincut_state, mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat "
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
-        answer = False
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()
                 result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
                 sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
-                row = self.controller.get_row(sql, log_sql=False, commit=True)
-
+                row = self.controller.get_row(sql, commit=True)
                 if row:
-                    if row[0] is not None:
-                            message = "Mincut done, but has conflict and overlaps with "
-                            answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
-                            if answer:
-                                sql = ("SELECT * FROM "+ self.schema_name + ".selector_audit"
-                                       " WHERE fprocesscat_id='31' AND cur_user=current_user")
-                                row = self.controller.get_row(sql, log_sql=False)
-                                if not row:
-                                    sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
-                                           " VALUES('31', current_user)")
-                                    self.controller.execute_sql(sql, log_sql=False)
-                                views = 'v_anl_arc, v_anl_node, v_anl_connec'
-                                message = "To see the conflicts load the views"
-                                self.controller.show_info_box(message, "See layers", parameter=views)
-                                self.dlg_mincut.close()
+                    if row[0]:
+                        message = "Mincut done, but has conflict and overlaps with "
+                        answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
+                        if answer:
+                            sql = ("SELECT * FROM " + self.schema_name + ".selector_audit"
+                                   " WHERE fprocesscat_id='31' AND cur_user=current_user")
+                            row = self.controller.get_row(sql, log_sql=False)
+                            if not row:
+                                sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
+                                       " VALUES('31', current_user)")
+                                self.controller.execute_sql(sql, log_sql=False)
+                            views = 'v_anl_arc, v_anl_node, v_anl_connec'
+                            message = "To see the conflicts load the views"
+                            self.controller.show_info_box(message, "See layers", parameter=views)
+                            self.dlg_mincut.close()
                     else:
                         self.dlg_mincut.closeMainWin = True
                         self.dlg_mincut.mincutCanceled = False
@@ -537,6 +544,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg_mincut.closeMainWin = True
             self.dlg_mincut.mincutCanceled = False
             self.dlg_mincut.close()
+
         self.iface.actionPan().trigger()
 
 
@@ -1320,40 +1328,31 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
-        
-        snapper = self.get_snapper()
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-        snapping_position = QgsPoint(point.x(), point.y())
+
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
-        if not result:
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if not self.snapper_manager.result_is_valid():
             return
 
         # Check feature
-        for snap_point in result:
+        elem_type = None
+        layer = self.snapper_manager.get_snapped_layer(result)
+        if layer == self.layer_node:
+            elem_type = 'node'
+        elif layer == self.layer_arc:
+            elem_type = 'arc'
 
-            elem_type = None
-            if snap_point.layer == self.layer_node:            
-                elem_type = 'node'
-            elif snap_point.layer == self.layer_arc:
-                elem_type = 'arc'
-
-            if elem_type:
-                # Get the point. Leave selection
-                point = QgsPoint(snap_point.snappedVertex)
-                snapp_feature = next(snap_point.layer.getFeatures(
-                    QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                element_id = snapp_feature.attribute(elem_type + '_id')
-                snap_point.layer.select([snap_point.snappedAtGeometry])
-                self.auto_mincut_execute(element_id, elem_type, snapping_position)
-                self.set_visible_mincut_layers()
-                break   
+        if elem_type:
+            # Get the point. Leave selection
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            feature_id = self.snapper_manager.get_feature_id(result)
+            element_id = snapped_feat.attribute(elem_type + '_id')
+            layer.select([feature_id])
+            self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
+            self.set_visible_mincut_layers()
 
 
     def set_visible_mincut_layers(self, zoom=False):
@@ -1385,19 +1384,15 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
-        snapper = self.get_snapper()
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
-        
-        real_snapping_position = QgsPoint(point.x(), point.y())
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
+
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(real_snapping_position.x()) + ", "
-               + str(real_snapping_position.y()) + ")," + str(srid) + ")"
+               " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(point.x()) + ", "
+               + str(point.y()) + ")," + str(srid) + ")"
                " WHERE id = '" + result_mincut_id_text + "'")
         status = self.controller.execute_sql(sql)
         if status:
@@ -1405,56 +1400,34 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.show_info(message)
 
         # Snapping
-        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+        result = self.snapper_manager.snap_to_background_layers(event_point)
+        if not self.snapper_manager.result_is_valid():
+            return
 
-        # That's the snapped point
-        if result:
+        node_exist = False
+        layer = self.snapper_manager.get_snapped_layer(result)
+        # Check feature
+        if layer == self.layer_node:
+            node_exist = True
+            self.snapper_manager.get_snapped_feature(result, True)
 
-            # Check feature
-            for snap_point in result:
+        if not node_exist:
+            layers_arc = self.controller.get_group_layers('arc')
+            self.layernames_arc = []
+            for layer in layers_arc:
+                self.layernames_arc.append(layer.name())
 
-                element_type = snap_point.layer.name()
-
-                if snap_point.layer == self.layer_node:  
-                    feat_type = 'node'
-
-                    # Get the point
-                    point = QgsPoint(snap_point.snappedVertex)
-                    snapp_feature = next(snap_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-
-                    # Leave selection
-                    snap_point.layer.select([snap_point.snappedAtGeometry])
-
-                    break
-                
-            else:
-                node_exist = '0'
-
-            if node_exist == '0':
-                layers_arc = self.controller.get_group_layers('arc')
-                self.layernames_arc = []
-                for layer in layers_arc:
-                    self.layernames_arc.append(layer.name())
-                for snap_point in result:
-                    element_type = snap_point.layer.name()
-                    if element_type in self.layernames_arc:
-                        # Get the point
-                        point = QgsPoint(snap_point.snappedVertex)
-                        snapp_feature = next(snap_point.layer.getFeatures(
-                            QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                        # Leave selection
-                        snap_point.layer.select([snap_point.snappedAtGeometry])
-                        break
+            element_type = layer.name()
+            if element_type in self.layernames_arc:
+                self.snapper_manager.get_snapped_feature(result, True)
 
 
-    def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
+    def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
-
 
         srid = self.controller.plugin_settings_value('srid')
 
-        if self.is_new == True:
+        if self.is_new:
             self.set_id_val()
             self.is_new = False
 
@@ -1475,6 +1448,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
+
         complet_result = row[0]
 
         if 'mincutOverlap' in complet_result:
@@ -1484,6 +1458,7 @@ class MincutParent(ParentAction, MultipleSelection):
             else:
                 message = "Mincut done successfully"
                 self.controller.show_info(message)
+
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['geometry']
             polygon = polygon[9:len(polygon)-2]
@@ -1494,8 +1469,8 @@ class MincutParent(ParentAction, MultipleSelection):
             
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                    " SET mincut_class = 1, "
-                   " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", "
-                   + str(snapping_position.y()) + "), " + str(srid) + "),"
+                   " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_x) + ", "
+                   + str(snapping_y) + "), " + str(srid) + "),"
                    " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
                    " anl_feature_id = '" + str(elem_id) + "'"
                    " WHERE id = '" + str(real_mincut_id) + "'")
@@ -1535,7 +1510,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
@@ -1560,88 +1534,62 @@ class MincutParent(ParentAction, MultipleSelection):
             self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
 
 
-    def mouse_move_valve(self, p):
+    def mouse_move_valve(self, point):
 
+        # Get clicked point
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            for snapped_point in result:
-                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
-                if viewname == 'v_anl_mincut_result_valve':
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    break
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == 'v_anl_mincut_result_valve':
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def mouse_move_node_arc(self, p):
-       
-        viewname = "v_edit_arc"     
-        self.layer_arc = self.controller.get_layer_by_tablename(viewname, log_info=True)
+    def mouse_move_node_arc(self, point):
+
         if not self.layer_arc:
             return
         
         # Set active layer
-        layername = self.layer_arc.name()
         self.iface.setActiveLayer(self.layer_arc)
 
+        # Get clicked point
         self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            for snapped_point in result:              
-                if snapped_point.layer.name() == layername:
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
-                    break
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == 'v_edit_arc':
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
         """ Custom mincut snapping function """
 
-        snapper = self.get_snapper()
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
+        # Get clicked point
+        event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        (retval, result) = snapper.snapToCurrentLayer(event_point, 2)   # @UnusedVariable
-
-        # That's the snapped point
-        if result:
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
             # Check feature
-            for snapped_point in result:
-                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
-                if viewname == 'v_anl_mincut_result_valve':
-                    # Get the point. Leave selection
-                    snapp_feat = next(snapped_point.layer.getFeatures(
-                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
-                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
-                    element_id = snapp_feat.attribute('node_id')
-                    self.custom_mincut_execute(element_id)
-                    self.set_visible_mincut_layers()                    
-                    break
+            layer = self.snapper_manager.get_snapped_layer(result)
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == 'v_anl_mincut_result_valve':
+                # Get the point. Leave selection
+                snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
+                element_id = snapped_feat.attribute('node_id')
+                self.custom_mincut_execute(element_id)
+                self.set_visible_mincut_layers()
 
 
     def custom_mincut_execute(self, elem_id):
@@ -1685,6 +1633,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def load_mincut(self, result_mincut_id):
         """ Load selected mincut """
+
         self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
@@ -1702,8 +1651,8 @@ class MincutParent(ParentAction, MultipleSelection):
             return
               
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.type, row['mincut_type'])
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.cause, row['anl_cause'])
+        utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
+        utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, row['state_name'])
         
         # Manage location
@@ -1979,7 +1928,6 @@ class MincutParent(ParentAction, MultipleSelection):
         # Get features
         layer = self.layers[layername]
         records = [(-1, '', '')]
-        # TODO 3.x
         if Qgis.QGIS_VERSION_INT < 29900:
             idx_field_code = layer.fieldNameIndex(self.params[field_code])
             idx_field_name = layer.fieldNameIndex(self.params[field_name])
@@ -2063,7 +2011,6 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Set filter expression
         layer = self.layers['portal_layer']
-        # TODO 3.x
         if Qgis.QGIS_VERSION_INT < 29900:
             idx_field_code = layer.fieldNameIndex(field_code)
             idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
@@ -2192,8 +2139,13 @@ class MincutParent(ParentAction, MultipleSelection):
             message = "Param portal_field_postal not found"
             self.controller.show_warning(message)
             return
+
         # Get project variable 'expl_id'
-        expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
+        if Qgis.QGIS_VERSION_INT < 29900:
+            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
+        else:
+            expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable(str(self.street_field_expl[0]))
+
         if expl_id:
             # Set SQL to get 'expl_name'
             sql = ("SELECT " + self.params['expl_field_name'] + ""
@@ -2264,9 +2216,8 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_comp = MincutComposer()
         self.load_settings(self.dlg_comp)
 
-        # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        template_folder = plugin_path + os.sep + "templates"
+        # Fill ComboBox cbx_template with templates *.qpt from ...system_variables/composers_path
+        template_folder = self.settings.value('system_variables/composers_path')
         template_files = os.listdir(template_folder)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
         self.dlg_comp.cbx_template.clear()
@@ -2286,72 +2237,108 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def set_template(self):
+
         template = self.dlg_comp.cbx_template.currentText()
         self.template = template[:-4]
 
 
     def open_composer(self):
-        
+
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            self.controller.show_warning(str(message))
+            self.controller.show_warning(message)
+            return
+
+        # Check if template file exists
+        template_path = self.settings.value('system_variables/composers_path/' + os.sep + str(self.template) + '.qpt')
+        if not os.path.exists(template_path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=template_path)
             return
 
         # Check if composer exist
-        index = 0
-        composers = self.iface.activeComposers()
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
+        composers = self.get_composers_list()
+        index = self.get_composer_index(str(self.template))
 
-        if index == num_comp:
+        # Composer not found
+        if index == len(composers):
+
             # Create new composer with template selected in combobox(self.template)
-            plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-            template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            # TODO 3.x
-            if Qgis.QGIS_VERSION_INT < 29900:
-                template_file = file(template_path, 'rt')
-            else:
-                template_file = open(template_path, 'rt')
+            template_file = open(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()
             document.setContent(template_content)
-            comp_view = self.iface.createNewComposer(str(self.template))
-            comp_view.composition().loadFromTemplate(document)
-            
-        index = 0
-        composers = self.iface.activeComposers()
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
-            
-        comp_view = self.iface.activeComposers()[index]
-        comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
-        composition = comp_view.composition()
-        comp_view.composerWindow().show()
 
-        # Refresh map, zoom map to extent
-        map_item = composition.getComposerItemById('Mapa')
-        map_item.setMapCanvas(self.canvas)
-        map_item.zoomToExtent(self.canvas.extent())
+            # TODO: Test it!
+            if Qgis.QGIS_VERSION_INT < 29900:
+                comp_view = self.iface.createNewComposer(str(self.template))
+                comp_view.composition().loadFromTemplate(document)
+            else:
+                project = QgsProject.instance()
+                comp_view = QgsLayout(project)
+                comp_view.loadFromTemplate(document)
+                layout_manager = project.layoutManager()
+                layout_manager.addLayout(comp_view)
+
+        else:
+            comp_view = composers[index]
+
+        # Manage mincut layout
+        self.manage_mincut_layout(comp_view)
+
+
+    def manage_mincut_layout(self, layout):
+        """ Manage mincut layout """
+
+        if layout is None:
+            self.controller.log_warning("Layout not found")
+            return
 
         title = self.dlg_comp.title.text()
-        profile_title = composition.getComposerItemById('title')
-        profile_title.setText(str(title))
-
-        composition.setAtlasMode(QgsComposition.PreviewAtlas)
         rotation = float(self.dlg_comp.rotation.text())
-        map_item.setMapRotation(rotation)
 
-        composition.refreshItems()
-        composition.update()
+        if Qgis.QGIS_VERSION_INT < 29900:
 
-        
+            # Show layout
+            main_window = layout.composerWindow()
+            main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
+            main_window.show()
+
+            # Zoom map to extent, rotation, title
+            composition = layout.composition()
+            map_item = composition.getComposerItemById('Mapa')
+            map_item.setMapCanvas(self.canvas)
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+            profile_title = composition.getComposerItemById('title')
+            profile_title.setText(str(title))
+
+            # Preview Atlas and refresh items
+            composition.setAtlasMode(QgsComposition.PreviewAtlas)
+            composition.refreshItems()
+            composition.update()
+
+        # TODO: Test it!
+        else:
+
+            # Show layout
+            self.iface.openLayoutDesigner(layout)
+
+            # Zoom map to extent, rotation, title
+            map_item = layout.itemById('Mapa')
+            #map_item.setMapCanvas(self.canvas)
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+            profile_title = layout.itemById('title')
+            profile_title.setText(str(title))
+
+            # Refresh items
+            layout.refresh()
+            layout.updateBounds()
+
+
     def enable_widgets(self, state):
         """ Enable/Disable widget depending @state """
         

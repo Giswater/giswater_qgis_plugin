@@ -16,12 +16,8 @@
  ***************************************************************************/
 
 """
-from builtins import str
-from builtins import next
-
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest
-from qgis.PyQt.QtCore import QPoint, Qt, QDate
+from qgis.PyQt.QtCore import Qt, QDate
 
 import utils_giswater
 from functools import partial
@@ -43,6 +39,7 @@ class DeleteNodeMapTool(ParentMapTool):
     """ QgsMapTools inherited event functions """
                 
     def keyPressEvent(self, event):
+
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             return
@@ -54,21 +51,14 @@ class DeleteNodeMapTool(ParentMapTool):
             self.cancel_map_tool()
             return
 
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
-        snapped_feat = None
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-            
-        # That's the snapped features
-        if result:
-            # Get the first feature
-            snapped_feat = result[0]
-            point = QgsPoint(snapped_feat.snappedVertex)   #@UnusedVariable
-            snapped_feat = next(snapped_feat.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_feat.snappedAtGeometry)))
+        snapped_feat = None
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
@@ -105,11 +95,12 @@ class DeleteNodeMapTool(ParentMapTool):
             message = "Database function not found"
             self.controller.show_warning(message, parameter=function_name)
             return
+
         sql = ("SELECT " + self.schema_name + "." + function_name + "('"
                + str(self.node_id) + "','" + str(workcat_id_end) + "','" + str(enddate_str) + "');")
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
-            message = "Node deleted successfully"
+            message = "Arc sucessfully fusioned. Node have been downgraded to state=0"
             self.controller.show_info(message)
 
             # Refresh map canvas
@@ -130,7 +121,7 @@ class DeleteNodeMapTool(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")

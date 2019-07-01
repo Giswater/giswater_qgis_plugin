@@ -23,29 +23,16 @@ else:
     
 from qgis.gui import QgsDateTimeEdit
 
-from qgis.PyQt.QtCore import QSortFilterProxyModel, QDate, QDateTime, QTime, Qt
-from qgis.PyQt.QtGui import QPixmap, QDoubleValidator
+from qgis.PyQt.QtCore import QSortFilterProxyModel, QDate, QDateTime, QTime, Qt, QRegExp
+from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton
 
 from functools import partial
 import os
-import sys
 import operator
-if 'nt' in sys.builtin_module_names:
-    import winreg
 
-
-def setDialog(p_dialog):
-    global _dialog
-    _dialog = p_dialog
-
-
-def dialog():
-    if '_dialog' in globals():
-        return _dialog
-    else:
-        return None
+from actions.HyperLinkLabel import HyperLinkLabel
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
@@ -90,19 +77,13 @@ def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=
         widget.addItem(str(elem))
 
 
-def fillWidgets(rows, index_widget=0, index_text=1):
-
-    if rows:
-        for row in rows:
-            setWidgetText(str(row[index_widget]), str(row[index_text]))
-
-
 def getText(dialog, widget, return_string_null=True):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
-        if type(widget) is QLineEdit:
+        if type(widget) is QLineEdit or type(widget) is QPushButton or type(widget) is QLabel \
+                or type(widget) is HyperLinkLabel:
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
@@ -140,7 +121,7 @@ def setText(dialog, widget, text):
         widget.setValue(float(value))
 
 
-def getCalendarDate(dialog, widget, date_format = "yyyy/MM/dd", datetime_format = "yyyy/MM/dd hh:mm:ss"):
+def getCalendarDate(dialog, widget, date_format="yyyy/MM/dd", datetime_format="yyyy/MM/dd hh:mm:ss"):
 
     date = None
     if type(widget) is str or type(widget) is str:
@@ -151,9 +132,9 @@ def getCalendarDate(dialog, widget, date_format = "yyyy/MM/dd", datetime_format 
         date = widget.date().toString(date_format)
     elif type(widget) is QDateTimeEdit:
         date = widget.dateTime().toString(datetime_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy':
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd'):
         date = widget.dateTime().toString(date_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss':
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss'):
         date = widget.dateTime().toString(datetime_format)
 
     return date
@@ -166,7 +147,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
     if not widget:
         return
     if type(widget) is QDateEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
+        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd')):
         if date is None:
             if default_current_date:
                 date = QDate.currentDate()
@@ -174,7 +155,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
                 date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss')):
         if date is None:
             date = QDateTime.currentDateTime()
         widget.setDateTime(date)
@@ -218,7 +199,8 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         return None
 
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is HyperLinkLabel \
+            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton:
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)
@@ -328,11 +310,6 @@ def setImage(dialog, widget,cat_shape):
         widget.show()
 
 
-# def setRow(p_row):
-#     global _row
-#     _row = p_row
-
-
 def fillWidget(dialog, widget, row):
 
     if type(widget) is str or type(widget) is str:
@@ -353,45 +330,9 @@ def fillWidget(dialog, widget, row):
         widget.setText("")
 
 
-def get_reg(reg_hkey, reg_path, reg_name):
-
-    if 'nt' in sys.builtin_module_names:
-        reg_root = None
-        if reg_hkey == "HKEY_LOCAL_MACHINE":
-            reg_root = winreg.HKEY_LOCAL_MACHINE
-        elif reg_hkey == "HKEY_CURRENT_USER":
-            reg_root = winreg.HKEY_CURRENT_USER
-
-        if reg_root is not None:
-            try:
-                registry_key = winreg.OpenKey(reg_root, reg_path)
-                value, regtype = winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
-                winreg.CloseKey(registry_key)
-                return value
-            except WindowsError:
-                return None
-    else:
-        return None
-
-
-def get_settings_value(settings, parameter):
-    """ Function that fix problem with network units in Windows """
-
-    file_aux = ""
-    try:
-        file_aux = settings.value(parameter)
-        if file_aux is not None:
-            unit = file_aux[:1]
-            if unit != '\\' and file_aux[1] != ':':
-                path = file_aux[1:]
-                file_aux = unit+":"+path
-    except IndexError:
-        pass
-    return file_aux
-
-
 def set_table_selection_behavior(dialog, widget):
     """ Set selection behavior of @widget """
+
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if not widget:
@@ -435,16 +376,20 @@ def set_model_by_list(string_list, widget, proxy_model):
     widget.setCompleter(completer)
 
 
-def get_item_data(dialog, widget, index=0):
+def get_item_data(dialog, widget, index=0, add_quote=False):
     """ Get item data of current index of the @widget """
 
     code = -1
+    if add_quote:
+        code = ''
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
         if type(widget) is QComboBox:
             current_index = widget.currentIndex()     
             elem = widget.itemData(current_index)
+            if index == -1:
+                return elem
             code = elem[index]            
 
     return code
@@ -459,14 +404,22 @@ def set_combo_itemData(combo, value, item1):
         elem = combo.itemData(i)
         if value == str(elem[item1]):
             combo.setCurrentIndex(i)
+            return True
+    return False
 
 
-def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True):
-    """ Populate @combo with list @rows and show field @index_to_show """
+def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1):
+    """ Populate @combo with list @rows and show field @index_to_show
+    :param sort_by: sort combo by this element (column)
+    """
     
     records = []
     if rows is None:
         return
+
+    if sort_by > len(rows[0])-1:
+        sort_by = 1
+
     for row in rows:
         elem = []
         for x in range(0, len(row)):
@@ -477,12 +430,47 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     if combo_clear:
         combo.clear()
     records_sorted = records
-    if sort_combo:
-        records_sorted = sorted(records, key=operator.itemgetter(1))
 
-    for record in records_sorted:
-        combo.addItem(record[index_to_show], record)
-        combo.blockSignals(False)
+    try:
+        if sort_combo:
+            records_sorted = sorted(records, key=operator.itemgetter(sort_by))
+    except:
+        pass
+    finally:
+        for record in records_sorted:
+            combo.addItem(record[index_to_show], record)
+            combo.blockSignals(False)
+
+
+def set_combo_item_unselectable_by_id(qcombo, list_id=[]):
+    """ Make items of QComboBox visibles but not selectable"""
+    for x in range(0, qcombo.count()):
+        if x in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, 0, Qt.UserRole - 1)
+
+
+def set_combo_item_selectable_by_id(qcombo, list_id=[]):
+    """ Make items of QComboBox selectable """
+    for x in range(0, qcombo.count()):
+        if x in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, (1 | 32), Qt.UserRole - 1)
+
+
+def set_combo_item_select_unselectable(qcombo, list_id=[], column=0, opt=0):
+    """ Make items of QComboBox visibles but not selectable
+        :param qcombo: QComboBox widget to manage
+        :param list_id: list of strings to manage ex. ['1','3','...'] or ['word1', 'word3','...']
+        :param column: column where to look up the values in the list
+        :param opt: 0 to set item not selectable
+        :param opt: (1 | 32 ) to set item selectable
+    """
+    for x in range(0, qcombo.count()):
+        elem = qcombo.itemData(x)
+        if str(elem[column]) in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, opt, Qt.UserRole - 1)
 
 
 def remove_tab_by_tabName(tab_widget, tab_name):
@@ -494,13 +482,15 @@ def remove_tab_by_tabName(tab_widget, tab_name):
             break
 
 
-def double_validator(widget, min=0, max=999999, decimals=3, notation=QDoubleValidator().StandardNotation):
-    validator = QDoubleValidator(min, max, decimals)
+def double_validator(widget, min_=0, max_=999999, decimals=3, notation=QDoubleValidator().StandardNotation):
+
+    validator = QDoubleValidator(min_, max_, decimals)
     validator.setNotation(notation)
     widget.setValidator(validator)
 
 
 def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
+
     widget_list = dialog.findChildren(QWidget)
     for widget in widget_list:
         if str(widget.objectName()) not in ignore_widgets:
@@ -512,22 +502,78 @@ def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
                 else:
                     widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                          " color: rgb(100, 100, 100)}")
-            elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+            elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit, QTableView):
                 widget.setEnabled(enable)
 
 
 def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
     """ Set QTableView configurations """
+
     widget.setSelectionBehavior(selection)
     widget.setEditTriggers(edit_triggers)
 
 
 def get_col_index_by_col_name(qtable, column_name):
     """ Return column index searching by column name """
+
     column_index = False
     for x in range(0, qtable.model().columnCount()):
         if qtable.model().headerData(x, Qt.Horizontal) == column_name:
             column_index = x
             break
     return column_index
+
+
+def set_regexp_date_validator(widget, button=None, regex_type=1):
+    """ Set QRegExpression in order to validate QLineEdit(widget) field type date.
+    Also allow to enable or disable a QPushButton(button), like typical accept button
+    @Type=1 (yyy-mm-dd), @Type=2 (dd-mm-yyyy)
+    """
+    placeholder = "yyyy-mm-dd"
+    if regex_type == 1:
+        widget.setPlaceholderText("yyyy-mm-dd")
+        placeholder = "yyyy-mm-dd"
+        reg_exp = QRegExp("(((\d{4})([-])(0[13578]|10|12)([-])(0[1-9]|[12][0-9]|3[01]))|"
+                          "((\d{4})([-])(0[469]|11)([-])([0][1-9]|[12][0-9]|30))|"
+                          "((\d{4})([-])(02)([-])(0[1-9]|1[0-9]|2[0-8]))|"
+                          "(([02468][048]00)([-])(02)([-])(29))|"
+                          "(([13579][26]00)([-])(02)([-])(29))|"
+                          "(([0-9][0-9][0][48])([-])(02)([-])(29))|"
+                          "(([0-9][0-9][2468][048])([-])(02)([-])(29))|"
+                          "(([0-9][0-9][13579][26])([-])(02)([-])(29)))")
+    elif regex_type == 2:
+        widget.setPlaceholderText("dd-mm-yyyy")
+        placeholder = "dd-mm-yyyy"
+        reg_exp = QRegExp("(((0[1-9]|[12][0-9]|3[01])([-])(0[13578]|10|12)([-])(\d{4}))|"
+                          "(([0][1-9]|[12][0-9]|30)([-])(0[469]|11)([-])(\d{4}))|"
+                          "((0[1-9]|1[0-9]|2[0-8])([-])(02)([-])(\d{4}))|"
+                          "((29)(-)(02)([-])([02468][048]00))|"
+                          "((29)([-])(02)([-])([13579][26]00))|"
+                          "((29)([-])(02)([-])([0-9][0-9][0][48]))|"
+                          "((29)([-])(02)([-])([0-9][0-9][2468][048]))|"
+                          "((29)([-])(02)([-])([0-9][0-9][13579][26])))")
+
+    widget.setValidator(QRegExpValidator(reg_exp))
+    widget.textChanged.connect(partial(eval_regex, widget, reg_exp, button, placeholder))
+
+
+def eval_regex(widget, reg_exp, button, placeholder, text):
+
+    is_valid = False
+    if reg_exp.exactMatch(text) is True:
+        widget.setStyleSheet("border: 1px solid gray")
+        is_valid = True
+    elif str(text) == '':
+        widget.setStyleSheet("border: 1px solid gray")
+        widget.setPlaceholderText(placeholder)
+        is_valid = True
+    elif reg_exp.exactMatch(text) is False:
+        widget.setStyleSheet("border: 1px solid red")
+        is_valid = False
+
+    if button is not None and type(button) == QPushButton:
+        if is_valid is False:
+            button.setEnabled(False)
+        else:
+            button.setEnabled(True)
 

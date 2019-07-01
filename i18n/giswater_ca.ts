@@ -83,6 +83,10 @@
         <translation>Gestor de lots</translation>
     </message>
     <message>
+        <source>76_text</source>
+        <translation>Filtre de lots</translation>
+    </message>
+    <message>
         <source>81_text</source>
         <translation>Nou sector de planificació OM</translation>
     </message>
@@ -152,7 +156,7 @@
     </message> 
     <message>
         <source>44_text</source>
-        <translation>Reemplaçar node</translation>
+        <translation>Reemplaçar objecte</translation>
     </message>
     <message>
         <source>98_text</source>
@@ -164,7 +168,7 @@
     </message>
     <message>
         <source>72_text</source>
-        <translation>Afegir punt utilitzant coordenades relatives</translation>
+        <translation>Insertar punt</translation>
     </message>
     <message>
         <source>23_text</source>
@@ -213,14 +217,30 @@
     <message>
         <source>99_text</source>
         <translation>Configuració</translation>
-        <translation>Configuració</translation>
     </message>
     <message>
         <source>83_text</source>
         <translation>Importar CSV</translation>
     </message>
-	
-    
+	<message>
+        <source>58_text</source>
+        <translation>Fasprint</translation>
+    </message>
+    <message>
+        <source>196_text</source>
+        <translation>Selector de sectors</translation>
+    </message>
+    <message>
+        <source>206_text</source>
+        <translation>Caixa d'eines</translation>
+    </message>
+    <message>
+        <source>37_text</source>
+        <translation>Identificar objecte</translation>
+    </message>
+
+
+
 	<message>
         <source>Select the node and move to desired location</source>
         <translation>Select the node and move to desired location</translation>
@@ -265,7 +285,7 @@
     
     <message>
         <source>searchplus</source>
-        <translation>Searchplus</translation>
+        <translation>Search</translation>
     </message>
     <message>
         <source>tab_network</source>

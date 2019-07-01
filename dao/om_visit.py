@@ -30,7 +30,7 @@ class OmVisit(Table):
     expl_id = GenericDescriptor(None)
     the_geom = GenericDescriptor(None)
     descript = GenericDescriptor(None)
-    is_done = GenericDescriptor(None)
+    status = GenericDescriptor(None)
 
     def __init__(self, controller):
         """ Class constructor """

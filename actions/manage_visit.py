@@ -86,13 +86,13 @@ class ManageVisit(ParentManage, QObject):
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
+        self.layers['arc'] = self.controller.get_group_layers('arc', True)
+        self.layers['node'] = self.controller.get_group_layers('node', True)
+        self.layers['connec'] = self.controller.get_group_layers('connec', True)
+        self.layers['element'] = self.controller.get_group_layers('element', True)
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = self.controller.get_group_layers('gully', True)
           
         # Reset geometry  
         self.x = None
@@ -363,7 +363,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.ext_code = self.ext_code.text()
         self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
         self.current_visit.descript = utils_giswater.getWidgetText(self.dlg_add_visit, 'descript', False, False)
-        self.current_visit.is_done = utils_giswater.isChecked(self.dlg_add_visit, 'is_done')
+        self.current_visit.status = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.status, 0)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
             
@@ -657,9 +657,9 @@ class ManageVisit(ParentManage, QObject):
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
-            sql = ("SELECT value"
-                " FROM " + self.schema_name + ".config_param_user"
-                " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+            sql = ("SELECT value "
+                   "FROM " + self.schema_name + ".config_param_user "
+                   "WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user ")
             row = self.controller.get_row(sql, commit=self.autocommit)
             if row:
                 # if int then look for default row ans set it
@@ -684,6 +684,17 @@ class ManageVisit(ParentManage, QObject):
                        " ORDER BY name")
                 row = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
+
+        # Fill ComboBox status
+        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        if rows:
+            utils_giswater.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
+            if visit_id is not None:
+                sql = ("SELECT status "
+                       "FROM " + self.schema_name + ".om_visit "
+                       "WHERE id ='" + str(visit_id) + "' ")
+                status = self.controller.get_row(sql)
+                utils_giswater.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
 
         # Relations tab
         # fill feature_type
@@ -903,7 +914,7 @@ class ManageVisit(ParentManage, QObject):
             # set fixed values
             self.dlg_event.value.setText(_value)
             self.dlg_event.position_value.setText(str(position_value))
-            utils_giswater.setWidgetText(self.dlg_event, text, text)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
@@ -924,7 +935,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event.geom1.setText(str(geom1))
             self.dlg_event.geom2.setText(str(geom2))
             self.dlg_event.geom3.setText(str(geom3))
-            utils_giswater.setWidgetText(self.dlg_event, text, text)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
@@ -935,7 +946,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
             self.dlg_event.value.setText(_value)
-            utils_giswater.setWidgetText(self.dlg_event, text, text)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
 
         # because of multiple view disable add picture and view gallery
         self.dlg_event.btn_add_picture.setEnabled(False)

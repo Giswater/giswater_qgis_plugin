@@ -4,20 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QDate, QRegExp
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
 
-import csv
 import json
-import os
-
+import utils_giswater
 from collections import OrderedDict
 from functools import partial
-
-import utils_giswater
 
 from giswater.actions.api_parent import ApiParent
 from giswater.ui_manager import ApiEpaOptions
@@ -27,9 +20,10 @@ class Go2EpaOptions(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'go2epa' """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.epa_options_json = {}
         self.epa_options_list = []
+
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -38,23 +32,21 @@ class Go2EpaOptions(ApiParent):
     def go2epa_options(self):
         """ Button 23: Open form to set INP, RPT and project """
 
+        # Clear list
+        self.epa_options_list = []
+        
         # Create dialog
         self.dlg_options = ApiEpaOptions()
         self.load_settings(self.dlg_options)
-
-        # reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]")  # to days:hours:minutes:seconds (dd:23:59:%9)
-        # reg_exp = QRegExp("[\\d]+:[0-5][0-9]:[0-5][0-9]")  # to hours:minutes:seconds (999:59:59)
-        # self.dlg_options.line_1.setValidator(QRegExpValidator(reg_exp))
 
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
-        # TODO controllar si row tiene algo
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list, False)
@@ -63,10 +55,17 @@ class Go2EpaOptions(ApiParent):
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
                 grbox.setVisible(False)
+            else:
+                gridlist = grbox.findChildren(QGridLayout)
+                for grl in gridlist:
+                    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                    grl.addItem(spacer)
 
-
+        # Event on change from combo parent
+        self.get_event_combo_parent('fields', complet_result[0]['body']['form']['formTabs'])
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
         self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
+
         self.dlg_options.show()
 
 
@@ -77,8 +76,35 @@ class Go2EpaOptions(ApiParent):
         extras = '"fields":' + my_json + ''
         body = self.create_body(form=form, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_setconfig($${" + body + "}$$)")
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql, log_sql=True, commit=True)
         message = "Values has been updated"
         self.controller.show_info(message)
         # Close dialog
         self.close_dialog(self.dlg_options)
+
+
+    def get_event_combo_parent(self, fields, row):
+
+        if fields == 'fields':
+            for field in row[0]["fields"]:
+                if field['isparent']:
+                    widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
+                    widget.currentIndexChanged.connect(partial(self.fill_child, widget))
+
+
+    def fill_child(self, widget):
+
+        combo_parent = widget.objectName()
+        combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('epaoptions" + "', '', '', '" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        for combo_child in row[0]['fields']:
+            if combo_child is not None:
+                self.populate_child(combo_child)
+
+
+    def populate_child(self, combo_child):
+
+        child = self.dlg_options.findChild(QComboBox, str(combo_child['widgetname']))
+        if child:
+            self.populate_combo(child, combo_child)

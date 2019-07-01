@@ -1,13 +1,20 @@
+"""
+This file is part of Giswater 3.1
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapToPixel
+from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
+
+from functools import partial
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui_manager import Cad_add_point
-from functools import partial
 
 
 class CadAddPoint(ParentMapTool):
@@ -16,7 +23,6 @@ class CadAddPoint(ParentMapTool):
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
         super(CadAddPoint, self).__init__(iface, settings, action, index_action)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_point = False
@@ -51,6 +57,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def get_values(self, point_1, point_2):
+
         self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
                                                   self.dlg_create_point.rb_left.isChecked())
         self.dist_x = self.dlg_create_point.dist_x.text()
@@ -91,6 +98,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def cancel(self):
+
         self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
                                                   self.dlg_create_point.rb_left.isChecked())
 
@@ -115,52 +123,40 @@ class CadAddPoint(ParentMapTool):
 
     def canvasMoveEvent(self, event):
 
-        # Hide highlight
+        # Hide highlight and get coordinates
         self.vertex_marker.hide()
-
-        # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        try:
-            event_point = QPoint(x, y)
-        except(TypeError, KeyError):
-            self.iface.actionPan().trigger()
-            return
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         if self.snap_to_selected_layer:
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+            result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+            result = self.snapper_manager.snap_to_background_layers(event_point)
 
-        # That's the snapped features
-        if result:
+        if self.snapper_manager.result_is_valid():
             # Get the point and add marker on it
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
 
         if event.button() == Qt.LeftButton:
 
-            # Get the click
+            # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
-            try:
-                event_point = QPoint(x, y)
-            except(TypeError, KeyError):
-                self.iface.actionPan().trigger()
-                return
+            event_point = self.snapper_manager.get_event_point(event)
 
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
             # Create point with snap reference
-            if result:
-                point = QgsPoint(result[0].snappedVertex)
+            result = self.snapper_manager.snap_to_background_layers(event_point)
+            point = None
+            if self.snapper_manager.result_is_valid():
+                point = self.snapper_manager.get_snapped_point(result)
+
             # Create point with mouse cursor reference
-            else:
+            if point is None:
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+
             if self.point_1 is None:
                 self.point_1 = point
             else:
@@ -207,7 +203,7 @@ class CadAddPoint(ParentMapTool):
 
         # Check for default base layer
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             self.snap_to_selected_layer = True
@@ -218,7 +214,7 @@ class CadAddPoint(ParentMapTool):
             self.vdefault_layer = self.iface.activeLayer()
 
         # Set snapping
-        self.snapper_manager.snap_to_layer(self.vdefault_layer)
+        #self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):
@@ -229,5 +225,4 @@ class CadAddPoint(ParentMapTool):
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
-        
         

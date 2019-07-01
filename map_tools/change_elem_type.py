@@ -4,11 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import next
-
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.core import QgsFeatureRequest
+from qgis.PyQt.QtCore import Qt
 
 from functools import partial
 
@@ -375,28 +373,21 @@ class ChangeElemType(ParentMapTool):
             return
 
         # Get the click
-        x = event.pos().x()
-        y = event.pos().y()
-        event_point = QPoint(x, y)
-        snapped_feat = None
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  #@UnusedVariable
-            
-        if result:
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
             # Get the point
-            point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-            snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-            self.node_id = snapped_feat.attribute('node_id')           
-                  
-            # Change node type
-            self.change_elem_type(snapped_feat)
-
-
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            if snapped_feat:
+                self.node_id = snapped_feat.attribute('node_id')
+                # Change node type
+                self.change_elem_type(snapped_feat)
 
 
     def activate(self):
-        
+
         # Check button
         self.action().setChecked(True)     
 
@@ -404,7 +395,7 @@ class ChangeElemType(ParentMapTool):
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.clear_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
@@ -420,7 +411,6 @@ class ChangeElemType(ParentMapTool):
 
 
     def deactivate(self):
-
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)
 

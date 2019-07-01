@@ -83,6 +83,10 @@
         <translation>Gestor de lotes</translation>
     </message>
     <message>
+        <source>76_text</source>
+        <translation>Filtro de lotes</translation>
+    </message>
+    <message>
         <source>01_text</source>
         <translation>Insertar nodo, connect (WS) / Insertar nodo, connect, gully (UD)</translation>
     </message>      
@@ -152,7 +156,7 @@
     </message> 
     <message>
         <source>44_text</source>
-        <translation>Reemplazar nodo</translation>
+        <translation>Reemplazar objeto</translation>
     </message>
     <message>
         <source>98_text</source>
@@ -164,7 +168,7 @@
     </message>
     <message>
         <source>72_text</source>
-        <translation>Agregar punto usando coordenadas relativas</translation>
+        <translation>Insertar punto</translation>
     </message>
     <message>
         <source>23_text</source>
@@ -218,7 +222,23 @@
         <source>83_text</source>
         <translation>Importar CSV</translation>
     </message>
-	
+    <message>
+        <source>58_text</source>
+        <translation>Fasprint</translation>
+    </message>
+    <message>
+        <source>196_text</source>
+        <translation>Selector de sectores</translation>
+    </message>
+    <message>
+        <source>206_text</source>
+        <translation>Caja de herramientas</translation>
+    </message>
+    <message>
+        <source>37_text</source>
+        <translation>Identificar objeto</translation>
+    </message>
+
     
 	<message>
         <source>Select the node and move to desired location</source>
@@ -264,7 +284,7 @@
     
     <message>
         <source>searchplus</source>
-        <translation>Searchplus</translation>
+        <translation>Search</translation>
     </message>
     <message>
         <source>tab_network</source>
