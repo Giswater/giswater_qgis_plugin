@@ -293,34 +293,62 @@ DROP VIEW v_edit_vnode;
 CREATE OR REPLACE VIEW v_edit_vnode AS 
  SELECT vnode.vnode_id,
     vnode.vnode_type,
-	vnode.top_elev,
+    vnode.top_elev,
     vnode.sector_id,
     vnode.dma_id,
     vnode.state,
     vnode.annotation,
-    case when vnode_geom IS NULL THEN vnode.the_geom ELSE vnode_geom END AS the_geom, 
+        CASE
+            WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
+            ELSE plan_psector_x_connec.vnode_geom
+        END AS the_geom,
     vnode.expl_id
-   FROM vnode 
-   JOIN v_edit_link ON exit_id::integer=vnode_id AND exit_type='VNODE'
-   join v_edit_connec ON v_edit_link.feature_id=connec_id
-   join arc USING (arc_id)
-   left join plan_psector_x_connec USING (arc_id, connec_id)
-   UNION
+   FROM vnode
+     JOIN v_edit_link ON v_edit_link.exit_id::integer = vnode.vnode_id AND v_edit_link.exit_type::text = 'VNODE'::text
+     JOIN v_edit_connec ON v_edit_link.feature_id::text = v_edit_connec.connec_id::text
+     JOIN arc USING (arc_id)
+     LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
+UNION
  SELECT vnode.vnode_id,
     vnode.vnode_type,
-	vnode.top_elev,
+    vnode.top_elev,
     vnode.sector_id,
     vnode.dma_id,
     vnode.state,
     vnode.annotation,
-    case when vnode_geom IS NULL THEN vnode.the_geom ELSE vnode_geom END, 
+        CASE
+            WHEN plan_psector_x_gully.vnode_geom IS NULL THEN vnode.the_geom
+            ELSE plan_psector_x_gully.vnode_geom
+        END AS the_geom,
     vnode.expl_id
-   FROM vnode 
-   JOIN v_edit_link ON exit_id::integer=vnode_id AND exit_type='VNODE'
-   join v_edit_gully ON v_edit_link.feature_id=gully_id
-   join arc USING (arc_id)
-   left join plan_psector_x_gully USING (arc_id, gully_id) ;
-   
+   FROM vnode
+     JOIN v_edit_link ON v_edit_link.exit_id::integer = vnode.vnode_id AND v_edit_link.exit_type::text = 'VNODE'::text
+     JOIN v_edit_gully ON v_edit_link.feature_id::text = v_edit_gully.gully_id::text
+     JOIN arc USING (arc_id)
+     LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id);
+	 
+	 
+CREATE VIEW v_arc_x_vnode AS
+SELECT vnode_id, arc_id, a.feature_type, feature_id, 
+(length*locate)::numeric(12,3) AS vnode_position,
+(top_elev1 - locate*(top_elev1-top_elev2))::numeric (12,3) as vnode_topelev,
+(sys_y1 - locate*(sys_y1-sys_y2))::numeric (12,3) as vnode_ymax,
+(sys_elev1 - locate*(sys_elev1-sys_elev2))::numeric (12,3) as vnode_elev
+FROM (
+SELECT vnode_id, arc_id, a.feature_type, feature_id,
+st_length(v_edit_arc.the_geom) as length,
+st_linelocatepoint (v_edit_arc.the_geom , v_edit_vnode.the_geom)::numeric(12,3) as locate,
+sys_elev1,
+sys_elev2,
+sys_y1,
+sys_y2,
+sys_elev1 + sys_y1 AS top_elev1,
+sys_elev2 + sys_y2 AS top_elev2
+from v_edit_arc , v_edit_vnode 
+JOIN v_edit_link a ON vnode_id=exit_id::integer
+where st_dwithin ( v_edit_arc.the_geom, v_edit_vnode.the_geom, 0.01) 
+) a
+order by 2,6 desc
    
   
  CREATE OR REPLACE VIEW v_edit_subcatchment AS 
