@@ -230,7 +230,8 @@ class ParentAction(object):
         query_left += "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft
         query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
-
+        query_left += " AND  "+field_id_left+" != -1"
+        
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
