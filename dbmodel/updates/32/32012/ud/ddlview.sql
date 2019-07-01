@@ -452,3 +452,52 @@ CREATE OR REPLACE VIEW ve_gully AS
      LEFT JOIN sector ON gully.sector_id = sector.sector_id
      LEFT JOIN gully_type ON gully.gully_type::text = gully_type.id::text;
 
+
+-----------------------
+-- polygon views
+-----------------------
+
+DROP VIEW IF EXISTS ve_pol_chamber;
+CREATE OR REPLACE VIEW ve_pol_chamber AS 
+ SELECT man_chamber.pol_id,
+    v_node.node_id,
+    polygon.the_geom
+   FROM v_node
+     JOIN man_chamber ON man_chamber.node_id::text = v_node.node_id::text
+     JOIN polygon ON polygon.pol_id::text = man_chamber.pol_id::text;
+
+DROP VIEW IF EXISTS ve_pol_gully;
+CREATE OR REPLACE VIEW ve_pol_gully AS 
+ SELECT gully.pol_id,
+    gully.gully_id,
+    polygon.the_geom
+   FROM gully
+     JOIN v_state_gully ON gully.gully_id::text = v_state_gully.gully_id::text
+     JOIN polygon ON polygon.pol_id::text = gully.pol_id::text;
+
+DROP VIEW IF EXISTS ve_pol_netgully;
+CREATE OR REPLACE VIEW ve_pol_netgully AS 
+ SELECT man_netgully.pol_id,
+    v_node.node_id,
+    polygon.the_geom
+   FROM v_node
+     JOIN man_netgully ON man_netgully.node_id::text = v_node.node_id::text
+     JOIN polygon ON polygon.pol_id::text = man_netgully.pol_id::text;
+
+DROP VIEW IF EXISTS ve_pol_storage;
+CREATE OR REPLACE VIEW ve_pol_storage AS 
+ SELECT man_storage.pol_id,
+    v_node.node_id,
+    polygon.the_geom
+   FROM v_node
+     JOIN man_storage ON man_storage.node_id::text = v_node.node_id::text
+     JOIN polygon ON polygon.pol_id::text = man_storage.pol_id::text;
+
+DROP VIEW IF EXISTS ve_pol_wwtp;
+CREATE OR REPLACE VIEW ve_pol_wwtp AS 
+ SELECT man_wwtp.pol_id,
+    v_node.node_id,
+    polygon.the_geom
+   FROM v_node
+     JOIN man_wwtp ON man_wwtp.node_id::text = v_node.node_id::text
+     JOIN polygon ON polygon.pol_id::text = man_wwtp.pol_id::text;

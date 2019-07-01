@@ -290,6 +290,41 @@ CREATE OR REPLACE VIEW ve_connec AS
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
      LEFT JOIN sector ON connec.sector_id = sector.sector_id;
 
+-----------------------
+-- polygon views
+-----------------------
+
+DROP VIEW IF EXISTS ve_pol_tank CASCADE;
+CREATE OR REPLACE VIEW ve_pol_tank AS 
+SELECT 
+man_tank.pol_id,
+v_node.node_id,
+polygon.the_geom
+FROM v_node
+    JOIN man_tank ON man_tank.node_id = v_node.node_id
+    JOIN polygon ON polygon.pol_id=man_tank.pol_id;
+    
+DROP VIEW IF EXISTS ve_pol_register CASCADE;
+CREATE OR REPLACE VIEW ve_pol_register AS 
+SELECT 
+man_register.pol_id,
+v_node.node_id,
+polygon.the_geom
+FROM v_node
+    JOIN man_register ON v_node.node_id = man_register.node_id
+    JOIN polygon ON polygon.pol_id = man_register.pol_id;
+
+
+DROP VIEW IF EXISTS ve_pol_fountain CASCADE;
+CREATE OR REPLACE VIEW ve_pol_fountain AS 
+SELECT 
+man_fountain.pol_id,
+connec.connec_id,
+polygon.the_geom
+FROM connec
+    JOIN man_fountain ON man_fountain.connec_id = connec.connec_id
+    JOIN polygon ON polygon.pol_id=man_fountain.pol_id;
+
 
 --old views with new fields
 DROP VIEW IF EXISTS v_anl_connec;
