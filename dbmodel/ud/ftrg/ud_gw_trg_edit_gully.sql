@@ -58,7 +58,9 @@ BEGIN
 
 	-- get values
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	v_doublegeometry = (SELECT value FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	v_doublegeometry = (SELECT value->>'status' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	v_unitsfactor = (SELECT value->>'unitsFactor' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+
 	v_srid = (SELECT epsg FROM version limit 1);
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
@@ -251,7 +253,7 @@ BEGIN
 		IF v_doublegeometry THEN
 
 			-- get grate dimensions
-			v_unitsfactor = 0.01;
+			v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
 			v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
 			v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
 
