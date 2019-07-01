@@ -348,7 +348,7 @@ from v_edit_arc , v_edit_vnode
 JOIN v_edit_link a ON vnode_id=exit_id::integer
 where st_dwithin ( v_edit_arc.the_geom, v_edit_vnode.the_geom, 0.01) 
 ) a
-order by 2,6 desc
+order by 2,6 desc;
    
   
  CREATE OR REPLACE VIEW v_edit_subcatchment AS 

@@ -66,6 +66,6 @@ UPDATE config_api_list SET query_text = 'SELECT DISTINCT ON (a.id) a.id AS sys_i
 
 UPDATE config_api_form_fields SET layout_order = 6 WHERE id = 30040;
 UPDATE config_api_form_fields SET layout_order = 7 WHERE id = 30050;
-INSERT INTO config_api_form_fields VALUES(30045, 'lot', 'lot','visitclass_id', 1, 5, TRUE, 'string', 'combo', 'Classe visita:', NULL, NULL, NULL, NULL, NULL, FALSE, NULL, TRUE, NULL, 'SELECT id, idval FROM om_visit_class WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)
+INSERT INTO config_api_form_fields VALUES(30045, 'lot', 'lot','visitclass_id', 1, 5, TRUE, 'string', 'combo', 'Classe visita:', NULL, NULL, NULL, NULL, NULL, FALSE, NULL, TRUE, NULL, 'SELECT id, idval FROM om_visit_class WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-
+UPDATE config_api_form_fields SET dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue=''listlimit''' WHERE id='102718';

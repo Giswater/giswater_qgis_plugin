@@ -41,5 +41,3 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2722, 'gw_api_getnodefrominterpolate', 'ud', 'function', 'Function to interpolate nodes', 'role_edit', false, false, false);
 
 UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_man_addfields_value_control';
-
-UPDATE config_api_form_fields SET dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue=''listlimit''' WHERE id='102718';
