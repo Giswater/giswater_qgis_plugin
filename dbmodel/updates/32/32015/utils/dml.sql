@@ -11,7 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='price_simple';
 
 
-
 UPDATE sys_csv2pg_cat SET readheader=false, orderby=1 WHERE id=1;
 UPDATE sys_csv2pg_cat SET readheader=false, orderby=1 WHERE id=1;
 UPDATE sys_csv2pg_cat SET readheader=false, orderby=2 WHERE id=3;
@@ -34,6 +33,12 @@ VALUES (2716, 'gw_fct_admin_manage_child_views', 'utils', 'function', 'Create ve
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2718, 'gw_trg_edit_foreignkey', 'utils', 'trigger', 'Trigger to manage foreign keys with not possibility to create an automatic db fk', 'role_edit',false,false,false);
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2720, 'gw_trg_node_interpolate', 'ud', 'function', 'Function to interpolate nodes', 'role_edit',false,false,false);
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2722, 'gw_api_getnodefrominterpolate', 'ud', 'function', 'Function to interpolate nodes', 'role_edit', false, false, false);
 
 UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_man_addfields_value_control';
 
