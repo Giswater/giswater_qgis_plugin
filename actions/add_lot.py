@@ -1401,8 +1401,7 @@ class AddNewLot(ParentManage):
             csv_path = QFileDialog.getSaveFileName(None, message, "", '*.csv')
         else:
             csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
-
-        self.controller.set_path_from_qfiledialog(dialog.txt_path, csv_path)
+        utils_giswater.setWidgetText(dialog, dialog.txt_path, csv_path)
 
 
     def export_model_to_csv(self, dialog, qtable, columns=(''), date_format='yyyy-MM-dd'):

@@ -449,7 +449,7 @@ class Go2Epa(ApiParent):
         else:
             self.file_rpt, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
 
-        self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_rpt, self.file_rpt)
+        utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 
     def insert_into_inp(self, folder_path=None, all_rows=None):

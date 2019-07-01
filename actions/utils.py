@@ -60,7 +60,7 @@ class Utils(ParentAction):
         roles = self.controller.get_rolenames()
         temp_tablename = 'temp_csv2pg'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, functionname, isheader', 'sys_csv2pg_cat', roles)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, functionname, readheader', 'sys_csv2pg_cat', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -85,7 +85,7 @@ class Utils(ParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         # Open dialog
-        self.open_dialog(self.dlg_csv, maximize_button=False)
+        self.open_dialog(self.dlg_csv)
 
 
     def get_function_name(self):
@@ -246,7 +246,7 @@ class Utils(ParentAction):
                     csvfile.close()
                     del csvfile
         except Exception as e:
-            self.controller.show_warning("ESCEPTION: " + str(e))
+            self.controller.show_warning("EXCEPTION: " + str(e))
 
         self.save_settings_values()
         if insert_status is False:
@@ -286,10 +286,10 @@ class Utils(ParentAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter)
         csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
-        isheader = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 4)
+        readheader = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 4)
         for row in reader:
-            if isheader is False:
-                isheader = True
+            if readheader is False:
+                readheader = True
                 continue
             if len(row) > 0:
                 sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
@@ -297,7 +297,10 @@ class Utils(ParentAction):
                 for x in range(0, len(row)):
                         sql += "csv" + str(x + 1) + ", "
                         value = "$$" + row[x].strip().replace("\n", "") + "$$, "
-                        value = str(value.decode(str(_unicode)))
+                        if Qgis.QGIS_VERSION_INT < 29900:
+                            value = str(value.decode(str(_unicode)))
+                        else:
+                            value = str(value)
                         values += value.replace("$$$$", "null")
                 sql = sql[:-2] + ") "
                 values = values[:-2] + ");\n"
@@ -331,7 +334,16 @@ class Utils(ParentAction):
             message = "You do not have permission to execute this application"
             self.dlg_csv.lbl_info.setText(self.controller.tr(message))
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
-            self.dlg_csv.setEnabled(False)
+
+            self.dlg_csv.cmb_import_type.setEnabled(False)
+            self.dlg_csv.txt_import.setEnabled(False)
+            self.dlg_csv.txt_file_csv.setEnabled(False)
+            self.dlg_csv.cmb_unicode_list.setEnabled(False)
+            self.dlg_csv.rb_comma.setEnabled(False)
+            self.dlg_csv.rb_semicolon.setEnabled(False)
+            self.dlg_csv.btn_file_csv.setEnabled(False)
+            self.dlg_csv.tbl_csv.setEnabled(False)
+            self.dlg_csv.btn_accept.setEnabled(False)
             return
 
 
@@ -356,8 +368,8 @@ class Utils(ParentAction):
             file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
         else:
             file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+        utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 
-        self.controller.set_path_from_qfiledialog(self.dlg_csv.txt_file_csv, file_csv)
         self.save_settings_values()
         self.preview_csv(self.dlg_csv)
 
