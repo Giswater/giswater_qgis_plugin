@@ -36,3 +36,5 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2718, 'gw_trg_edit_foreignkey', 'utils', 'trigger', 'Trigger to manage foreign keys with not possibility to create an automatic db fk', 'role_edit',false,false,false);
 
 UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_man_addfields_value_control';
+
+UPDATE config_api_form_fields SET dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue=''listlimit''' WHERE id='102718';
