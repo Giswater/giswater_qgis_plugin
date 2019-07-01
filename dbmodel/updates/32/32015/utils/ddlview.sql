@@ -143,3 +143,23 @@ CREATE OR REPLACE VIEW v_ui_event_x_connec AS
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_node.node_id;
+
+
+--01/07/2019
+CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS 
+ SELECT ext_rtc_hydrometer_x_data.id,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.cat_hydrometer_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+  ORDER BY ext_rtc_hydrometer_x_data.id;

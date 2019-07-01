@@ -49,4 +49,8 @@ CREATE TRIGGER gw_trg_edit_foreignkey AFTER UPDATE OF connec_id OR DELETE ON con
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('connec_id');
 
 
+--01/07/2019
+CREATE TRIGGER gw_trg_edit_rtc_hydro_data INSTEAD OF UPDATE ON v_ui_hydroval_x_connec
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_hydroval_connec();
+
 
