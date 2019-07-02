@@ -330,7 +330,10 @@ UNION
 	 
 CREATE VIEW v_arc_x_vnode AS
 SELECT vnode_id, arc_id, a.feature_type, feature_id, 
-(length*locate)::numeric(12,3) AS vnode_position,
+node_1,
+node_2,
+(length*locate)::numeric(12,3) AS vnode_distfromnode1,
+(length*(1-locate))::numeric(12,3) AS vnode_distfromnode2,
 (top_elev1 - locate*(top_elev1-top_elev2))::numeric (12,3) as vnode_topelev,
 (sys_y1 - locate*(sys_y1-sys_y2))::numeric (12,3) as vnode_ymax,
 (sys_elev1 - locate*(sys_elev1-sys_elev2))::numeric (12,3) as vnode_elev
@@ -338,6 +341,8 @@ FROM (
 SELECT vnode_id, arc_id, a.feature_type, feature_id,
 st_length(v_edit_arc.the_geom) as length,
 st_linelocatepoint (v_edit_arc.the_geom , v_edit_vnode.the_geom)::numeric(12,3) as locate,
+node_1,
+node_2,
 sys_elev1,
 sys_elev2,
 sys_y1,

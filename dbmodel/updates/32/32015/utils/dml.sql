@@ -37,7 +37,4 @@ VALUES (2718, 'gw_trg_edit_foreignkey', 'utils', 'trigger', 'Trigger to manage f
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2720, 'gw_trg_node_interpolate', 'ud', 'function', 'Function to interpolate nodes', 'role_edit',false,false,false);
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2722, 'gw_api_getnodefrominterpolate', 'ud', 'function', 'Function to interpolate nodes', 'role_edit', false, false, false);
-
 UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_man_addfields_value_control';
