@@ -429,9 +429,10 @@ ELSIF tab_arg = 'address' THEN
     text_arg := concat('%', edit1->>'text' ,'%');
 
     EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT $1 display_name, $2 AS sys_table_id , $3 AS sys_id, $2 AS sys_idname FROM ' || quote_ident(v_workcat_layer) || '
-        WHERE workcat_id ILIKE $4 LIMIT 10 )a')
-        USING v_workcat_display_field, quote_literal(v_workcat_layer), v_workcat_id_field, text_arg
+        FROM (SELECT ' || quote_ident(v_workcat_display_field) || ' as display_name, $1 AS sys_table_id , '|| quote_ident(v_workcat_display_field) ||
+        ' AS sys_id, $2 AS sys_idname FROM ' || quote_ident(v_workcat_layer) ||
+        ' WHERE workcat_id ILIKE $3 LIMIT 10 )a')
+        USING v_workcat_layer, v_workcat_id_field, text_arg
         INTO response_json;
 
 
