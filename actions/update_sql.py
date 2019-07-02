@@ -1665,7 +1665,7 @@ class UpdateSQL(ApiParent):
 
 
     def filter_srid_changed(self):
-
+        # return
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''
@@ -1680,12 +1680,18 @@ class UpdateSQL(ApiParent):
 
 
     def set_info_project(self):
+        # self.project_data_language = 'EN'
+        # return
+
+        # Set default lenaguage EN
+        self.project_data_language = 'EN'
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         if schema_name is None:
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
         else:
             sql = "SELECT giswater FROM " + schema_name + ".version order by id desc LIMIT 1"
             row = self.controller.get_row(sql)
@@ -1695,6 +1701,7 @@ class UpdateSQL(ApiParent):
             row = self.controller.get_row(sql)
             if row:
                 self.project_data_language = str(row[0])
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -1826,6 +1833,7 @@ class UpdateSQL(ApiParent):
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # return comentar
         sql = ("SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as " + '"SRID"' + ", "
                "substr(split_part(srtext, ',', 1), 9) as " + '"Description"' + " "
                "FROM public.spatial_ref_sys "
@@ -1834,7 +1842,7 @@ class UpdateSQL(ApiParent):
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
-
+        # return esto
         self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
 
         for porject_type in self.project_types:
@@ -2246,6 +2254,11 @@ class UpdateSQL(ApiParent):
     def update_manage_ui(self, parent=False):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        if schema_name is None:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            return
+        else:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
         if str(self.project_data_schema_version).replace('.','') < str(self.version_metadata).replace('.', ''):
@@ -2255,7 +2268,7 @@ class UpdateSQL(ApiParent):
             return
 
         else:
-
+            # return
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
 
@@ -2329,8 +2342,14 @@ class UpdateSQL(ApiParent):
 
 
     def manage_update_field(self, form_name):
-
+        # return
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if schema_name is None:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            return
+        else:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Get child layer
         sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
@@ -2344,8 +2363,14 @@ class UpdateSQL(ApiParent):
 
 
     def manage_delete_field(self, form_name):
-
+        # return
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if schema_name is None:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            return
+        else:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Get child layer
         sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
@@ -2479,10 +2504,16 @@ class UpdateSQL(ApiParent):
 
 
     def filter_typeahead(self, schema_name, form_name, widget, completer, model):
-
+        # return
         filter = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
         if filter == 'null':
             filter = ''
+
+        if schema_name is None:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            return
+        else:
+            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Get child layer
         sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")

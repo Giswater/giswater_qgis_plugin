@@ -482,6 +482,15 @@ def remove_tab_by_tabName(tab_widget, tab_name):
             break
 
 
+def enable_disable_tab_by_tabName(tab_widget, tab_name, action):
+    """ Look in @tab_widget for a tab with @tab_name and remove it """
+
+    for x in range(0, tab_widget.count()):
+        if tab_widget.widget(x).objectName() == tab_name:
+            tab_widget.setTabEnabled(x, action)
+            break
+
+
 def double_validator(widget, min_=0, max_=999999, decimals=3, notation=QDoubleValidator().StandardNotation):
 
     validator = QDoubleValidator(min_, max_, decimals)
