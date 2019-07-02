@@ -231,6 +231,12 @@ class UpdateSQL(ApiParent):
 
         self.dlg_readsql.show()
 
+        super_users = self.settings.value('system_variables/super_users')
+        self.super_users = []
+        for super_user in super_users:
+            print(str(super_user))
+            self.super_users.append(str(super_user))
+
         if connection_status is False:
             self.controller.show_message("Connection Failed. Please, check connection parameters", 1)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
@@ -241,7 +247,7 @@ class UpdateSQL(ApiParent):
 
         else:
             role_admin = self.controller.check_role_user("role_admin", self.username)
-            if not role_admin and self.username != 'postgres' and self.username != 'gisadmin':
+            if not role_admin and self.username not in self.super_users:
                 msg = "You don't have permissions to administrate project schemas on this connection"
                 self.controller.show_message(msg, 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
@@ -1114,12 +1120,13 @@ class UpdateSQL(ApiParent):
         extras += '"epsg":' + str(self.filter_srid_value).replace('"', '')
         if new_project is True:
             if str(self.title) != 'null':
-                extras += ', ' + '"title":"' + str(self.title) + '"'
+                extras += ', ' + '"title":"' + str(self.title) + '",'
             if str(self.author) != 'null':
-                extras += ', ' + '"author":"' + str(self.author) + '"'
+                extras += ', ' + '"author":"' + str(self.author) + '",'
             if str(self.date) != 'null':
-                extras += ', ' + '"date":"' + str(self.date) + '"'
-
+                extras += ', ' + '"date":"' + str(self.date) + '",'
+        extras += '"superUsers":' + str(self.super_users).replace("'",'"') + ''
+        print(str(self.super_users).replace("'",'"'))
         self.schema_name = schema_name
 
         # Get current locale
@@ -1133,7 +1140,7 @@ class UpdateSQL(ApiParent):
         data = '"data":{' + extras + '}'
         body = "" + client + data
         sql = ("SELECT " + self.schema_name + ".gw_fct_admin_schema_lastprocess($${" + body + "}$$)::text")
-        status = self.controller.execute_sql(sql, commit=False)
+        status = self.controller.execute_sql(sql, log_sql=True,commit=False)
         if status is False:
             self.error_count = self.error_count + 1
 
@@ -1510,7 +1517,7 @@ class UpdateSQL(ApiParent):
         if self.logged:
             self.username = self.get_user_connection(self.get_last_connection())
             role_admin = self.controller.check_role_user("role_admin", self.username)
-            if not role_admin and self.username != 'postgres' and self.username != 'gisadmin':
+            if not role_admin and self.username not in self.super_users:
                 self.controller.show_message("Connection Failed. You dont have permisions for this connection.", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
