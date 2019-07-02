@@ -16,7 +16,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"}, 
 "data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", 
-		"epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000"}}$$)
+		"epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"},
@@ -38,6 +38,7 @@ DECLARE
 	v_author text;
 	v_date text;
 	v_schema_info json;
+	v_superusers text;
 
 BEGIN 
 	-- search path
@@ -52,6 +53,7 @@ BEGIN
 	v_title := (p_data ->> 'data')::json->> 'title';
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
+	v_superusers := (p_data ->> 'data')::json->> 'superUsers';
 
 
 	-- last proccess
@@ -60,6 +62,8 @@ BEGIN
 		--untill 3.2.004 is not possible
 		--PERFORM gw_fct_admin_schema_dropdeprecated_rel();	
 		
+		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
+		VALUES ('admin_superusers', v_superusers ,'json','system', 'Basic information about superusers for this schema','utils', 'Schema manager:', false);
 
 		-- inserting version table
 		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg);	
@@ -69,6 +73,7 @@ BEGIN
 		v_title := COALESCE(v_title, '');
 		v_author := COALESCE(v_author, '');
 		v_date := COALESCE(v_date, '');
+
 		v_schema_info = '{"title":"'||v_title||'","author":"'||v_author||'","date":"'||v_date||'"}';
 		
 		-- inserting on config_param_system table

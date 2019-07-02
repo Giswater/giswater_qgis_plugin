@@ -38,3 +38,7 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2720, 'gw_trg_node_interpolate', 'ud', 'function', 'Function to interpolate nodes', 'role_edit',false,false,false);
 
 UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_man_addfields_value_control';
+
+UPDATE audit_cat_error SET error_message = 'You don''t have permissions to manage with psector', 
+		hint_message = 'Please check if your profile has role_master in order to manage with plan issues' WHERE id=1080;
+UPDATE audit_cat_error SET hint_message = 'You need to have at least one psector created to add planified elements' id=1081;
