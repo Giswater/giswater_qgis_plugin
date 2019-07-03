@@ -25,7 +25,7 @@ from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
-from qgis.PyQt.QtWidgets import QTableView, QPushButton
+from qgis.PyQt.QtWidgets import QTableView, QPushButton, QTextEdit
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import json
@@ -606,6 +606,21 @@ class ApiParent(ParentAction):
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget))
         return widget
 
+    def add_textarea(self, field):
+        """ Add widgets QTextEdit type """
+        widget = QTextEdit()
+        widget.setObjectName(field['widgetname'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
+        if 'value' in field:
+            widget.setText(field['value'])
+        if 'iseditable' in field:
+            widget.setReadOnly(not field['iseditable'])
+            if not field['iseditable']:
+                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
+                                     " color: rgb(100, 100, 100)}")
+        return widget
+
 
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
@@ -1093,7 +1108,7 @@ class ApiParent(ParentAction):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-            if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+            if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
                 completer = QCompleter()
                 widget = self.add_lineedit(field)
                 widget = self.set_widget_size(widget, field)
@@ -1107,6 +1122,8 @@ class ApiParent(ParentAction):
                 widget = self.set_auto_update_dateedit(field, dialog, widget)
             elif field['widgettype'] == 'hyperlink':
                 widget = self.add_hyperlink(dialog, field)
+            elif field['widgettype'] == 'textarea':
+                widget = self.add_textarea(field)
             # elif field['widgettype'] == 'typeahead':
             #     completer = QCompleter()
             #     widget = self.add_comboline(dialog, field, completer)

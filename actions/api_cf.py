@@ -602,7 +602,6 @@ class ApiCF(ApiParent):
         elif field['widgettype'] == 'vspacer':
             widget = self.add_verical_spacer()
         elif field['widgettype'] == 'textarea':
-            # TODO this make an error because def add_textarea don't exit at the moment
             widget = self.add_textarea(field)
         elif field['widgettype'] in ('spinbox', 'doubleSpinbox'):
             widget = self.add_spinbox(field)
