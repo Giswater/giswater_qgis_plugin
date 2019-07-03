@@ -716,7 +716,7 @@ class ApiCF(ApiParent):
                     elif type(widget) is QPushButton:
                         # Manage the clickability of the buttons according to the configuration
                         # in the table config_api_form_fields simultaneously with the edition,
-                        # but giving preference to the configuration
+                        # but giving preference to the configuration when iseditable is True
                         if not field['iseditable']:
                             widget.setEnabled(field['iseditable'])
 
