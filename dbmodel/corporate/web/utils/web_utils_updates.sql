@@ -36,7 +36,7 @@ UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id=
 UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id='F32' and name='scale';
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript)  
-VALUES ('api_search_samplepoint', '{"sys_table_id":"samplepoint", "sys_id_field":"id", "sys_search_field":"code", "alias":"Punt de mostreig", "cat_field":"lab_code", "orderby":"7"}', 'text', 'api_search_network', NULL)
+VALUES ('api_search_samplepoint', '{"sys_table_id":"samplepoint", "sys_id_field":"sample_id", "sys_search_field":"code", "alias":"Punt de mostreig", "cat_field":"lab_code", "orderby":"7"}', 'text', 'api_search_network', NULL)
 ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
