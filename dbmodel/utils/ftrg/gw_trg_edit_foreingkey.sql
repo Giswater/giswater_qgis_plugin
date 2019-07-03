@@ -17,6 +17,7 @@ v_featurefield varchar;
 v_featurenew varchar;
 v_featureold varchar;
 v_projecttype text;
+v_count integer;
     
 BEGIN
     
