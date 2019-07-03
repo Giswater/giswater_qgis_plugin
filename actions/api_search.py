@@ -446,6 +446,8 @@ class ApiSearch(ApiParent):
                "  (SELECT expl_id FROM " + self.schema_name + ".selector_expl "
                "   WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
+        if not rows:
+            return
 
         if len(rows) > 0:
             for row in rows:
@@ -661,7 +663,7 @@ class ApiSearch(ApiParent):
             sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             rows = self.controller.get_rows(sql)
             if not rows:
-                pass
+                return
 
             if extension is not None:
                 widget_name = "lbl_total_" + str(feature.lower()) + str(extension)
