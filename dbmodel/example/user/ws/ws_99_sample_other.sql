@@ -92,34 +92,6 @@ UPDATE cat_presszone SET id='6' WHERE id='Low-Expl_02';
 
 
 
-SELECT setval('SCHEMA_NAME.man_addfields_parameter_id_seq', (SELECT max(id) FROM man_addfields_parameter), true);
-INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-widgettype_id, orderby, active, iseditable) 
-VALUES ('minsector_id', 'PIPE', true, 'integer', NULL, NULL, '{"fprocesscat_id":"34"}', 'as', 'QTextEdit',1 , true, false);
-
-INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-widgettype_id,orderby, active, iseditable) 
-VALUES ('minsector_id', 'JUNCTION', true, 'integer', NULL, NULL, '{"fprocesscat_id":"34"}', 'AS', 'QTextEdit', 1 , true, false);
-
-INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-widgettype_id,orderby, active, iseditable)
-VALUES ('dqa_id', 'PIPE', true, 'integer', NULL, NULL, '{"fprocesscat_id":"44"}', 'as', 'QTextEdit', 2 , true, false);
-
-INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label,
-widgettype_id,orderby, active, iseditable)
-VALUES ('dqa_id', 'JUNCTION', true, 'integer', NULL, NULL, '{"fprocesscat_id":"44"}', 'AS', 'QTextEdit', 2 , true, false);
-
-INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label,
-widgettype_id,orderby, active, iseditable) 
-VALUES ('staticpressure', 'PIPE', true, 'integer', NULL, NULL, '{"fprocesscat_id":"47"}', 'as', 'QTextEdit', 3 , true, false);
-
-INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label,
-widgettype_id,orderby, active, iseditable) 
-VALUES ('staticpressure', 'JUNCTION', true, 'integer', NULL, NULL, '{"fprocesscat_id":"47"}', 'AS', 'QTextEdit', 3 , true, false);
-
-
-
-
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 
