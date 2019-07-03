@@ -5,20 +5,23 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_om_visit_multievent()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_om_visit_multievent()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    visit_table varchar;
+    visit_class integer;
     v_sql varchar;
     v_parameters record;
     v_new_value_param text;
     v_query_text text;
+    visit_table text;
     
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    visit_table:= TG_ARGV[0];
+    visit_class:= TG_ARGV[0];
+
+    visit_table=(SELECT lower(feature_type) FROM om_visit_class WHERE id=visit_class);
 
 
     IF TG_OP = 'INSERT' THEN
@@ -33,9 +36,9 @@ BEGIN
 	END IF;
 	 
 
-        INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id, lot_id, status) 
+        INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
         VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
-        NEW.is_done, NEW.class_id, NEW.suspendendcat_id, NEW.lot_id, NEW.status);
+        NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
 
 
 	IF visit_table IS NULL THEN
@@ -47,7 +50,7 @@ BEGIN
 	v_query_text='	SELECT * FROM om_visit_parameter 
 			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
 			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-			WHERE om_visit_parameter.feature_type = upper('||quote_literal(visit_table)||') AND om_visit_class.ismultievent is true';
+			WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
 	END IF;
 
 	FOR v_parameters IN EXECUTE  v_query_text
@@ -85,7 +88,7 @@ BEGIN
     
             UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, 
             webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
-            suspendendcat_id=NEW.suspendendcat_id, lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
+            lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
 
             IF visit_table IS NULL THEN
 		v_query_text=' SELECT * FROM om_visit_parameter 
@@ -96,7 +99,7 @@ BEGIN
 		v_query_text='	SELECT * FROM om_visit_parameter 
 				JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
 				JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-				WHERE om_visit_parameter.feature_type = upper('||quote_literal(visit_table)||') AND om_visit_class.ismultievent is true';
+				WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
 	    END IF;
 
             FOR v_parameters IN EXECUTE v_query_text 
@@ -124,4 +127,5 @@ BEGIN
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
+  COST 100;
 
