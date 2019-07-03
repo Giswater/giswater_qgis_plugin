@@ -21,14 +21,30 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"nodeparent", "dataType":"json"}}$$);
 
 
+CREATE TABLE macrodqa(
+  macrodqa_id serial NOT NULL,
+  name character varying(50) NOT NULL,
+  expl_id integer NOT NULL,
+  descript text,
+  undelete boolean,
+  the_geom geometry(MultiPolygon,SRID_VALUE),
+  CONSTRAINT macrodqa_pkey PRIMARY KEY (macrodqa_id),
+  CONSTRAINT macrodqa_expl_id_fkey FOREIGN KEY (expl_id)
+      REFERENCES ws_sample.exploitation (expl_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT macrodqa_exploitation_id_fkey FOREIGN KEY (expl_id)
+      REFERENCES ws_sample.exploitation (expl_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
 CREATE TABLE dqa (
  dqa_id serial PRIMARY KEY,
  name character varying(30),
  expl_id integer,
- macroqma_id integer,
+ macrodqa_id integer,
  descript text,
  undelete boolean,
- the_geom geometry(MultiPolygon,25831),
+ the_geom geometry(MultiPolygon,SRID_VALUE),
  pattern_id character varying(16),
  nodeparent json,
  link text);
