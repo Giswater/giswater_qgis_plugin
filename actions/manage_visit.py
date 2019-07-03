@@ -89,13 +89,13 @@ class ManageVisit(ParentManage, QObject):
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc', True)
-        self.layers['node'] = self.controller.get_group_layers('node', True)
-        self.layers['connec'] = self.controller.get_group_layers('connec', True)
-        self.layers['element'] = self.controller.get_group_layers('element', True)
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
-            self.layers['gully'] = self.controller.get_group_layers('gully', True)
+            self.layers['gully'] = self.controller.get_group_layers('gully')
           
         # Reset geometry  
         self.x = None
@@ -881,7 +881,7 @@ class ManageVisit(ParentManage, QObject):
                 subprocess.call([opener, path])
         else:
             webbrowser.open(path)
-        print(path)
+
 
 
     def populate_tbl_docs_x_event(self, event_id=0):
@@ -890,7 +890,7 @@ class ManageVisit(ParentManage, QObject):
         model = QStandardItemModel()
         self.dlg_event.tbl_docs_x_event.setModel(model)
         self.dlg_event.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
-        self.dlg_event.tbl_docs_x_event.horizontalHeader().setResizeMode(3)
+        self.dlg_event.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
         # Get columns name and set headers of model with that
         columns_name = self.controller.get_columns_list('om_visit_event_photo')
         headers = []

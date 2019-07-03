@@ -21,7 +21,7 @@ else:
     import urllib.parse as parse
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon
+from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
@@ -1481,6 +1481,7 @@ class ApiCF(ApiParent):
         utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
         utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
         utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
+        self.populate_tbl_docs_x_event()
 
         # Set all QLineEdit readOnly(True)
 
@@ -1493,8 +1494,63 @@ class ApiCF(ApiParent):
             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                  " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
+        self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
 
         self.dlg_event_full.open()
+
+
+    def populate_tbl_docs_x_event(self):
+
+        # Create and set model
+        model = QStandardItemModel()
+        self.dlg_event_full.tbl_docs_x_event.setModel(model)
+        self.dlg_event_full.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
+        self.dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
+        # Get columns name and set headers of model with that
+        columns_name = self.controller.get_columns_list('om_visit_event_photo')
+        headers = []
+        for x in columns_name:
+            headers.append(x[0])
+        headers = ['value', 'filetype', 'fextension']
+        model.setHorizontalHeaderLabels(headers)
+
+        # Get values in order to populate model
+
+        sql = ("SELECT value, filetype, fextension FROM " + self.schema_name + ".om_visit_event_photo "
+               "WHERE visit_id='" + str(self.event_id) + "' AND event_id='" + str(self.visit_id) + "'")
+        rows = self.controller.get_rows(sql)
+        if rows is None:
+            return
+
+        for row in rows:
+            item = []
+            for value in row:
+                if value is not None:
+                    if type(value) != unicode:
+                        item.append(QStandardItem(str(value)))
+                    else:
+                        item.append(QStandardItem(value))
+                else:
+                    item.append(QStandardItem(None))
+            if len(row) > 0:
+                model.appendRow(item)
+
+
+    def open_file(self):
+        # Get row index
+        index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value_id')
+        path = index.sibling(index.row(), column_index).data()
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
 
 
     def tbl_event_clicked(self, table_name):
