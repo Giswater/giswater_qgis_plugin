@@ -124,7 +124,10 @@ DECLARE
 	v_parentfields text;
 	v_status text ='Accepted';
 	v_nodefrominterpolate json;
-   
+    v_top double precision;
+    v_elev double precision;
+    v_ymax double precision;
+
 BEGIN
 
 --  Get,check and set parameteres
