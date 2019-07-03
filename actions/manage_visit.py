@@ -18,7 +18,8 @@ else:
     from builtins import range
 
 from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject
-from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView
 from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os
 import sys
