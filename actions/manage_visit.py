@@ -1070,7 +1070,7 @@ class ManageVisit(ParentManage, QObject):
             if _value not in ('NULL', None):
                 utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
             if text not in ('NULL', None):
-                utils_giswater.setWidge
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
 
             # Manage QTableView docx_x_event
         utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
