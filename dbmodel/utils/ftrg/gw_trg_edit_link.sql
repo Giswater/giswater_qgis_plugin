@@ -260,13 +260,13 @@ BEGIN
 				WHERE link_id=NEW.link_id;
 				
 				-- update psector tables
-				IF v_projectype = 'UD'
+				IF v_projectype = 'UD' THEN
 					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom FROM v_edit_gully 
-					WHERE plan_psector_x_gully.gully_id=NEW.feature_id, plan_psector_x_gully.arc_id=v_edit_gully.arc_id;
+					WHERE plan_psector_x_gully.gully_id=NEW.feature_id AND plan_psector_x_gully.arc_id=v_edit_gully.arc_id;
 				END IF;
 	
 				UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom FROM v_edit_connec 
-				WHERE plan_psector_x_connec.connec_id=NEW.feature_id, plan_psector_x_connec.arc_id=v_edit_connec.arc_id;
+				WHERE plan_psector_x_connec.connec_id=NEW.feature_id AND plan_psector_x_connec.arc_id=v_edit_connec.arc_id;
 				
 			ELSE
 				UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type, the_geom=NEW.the_geom 
