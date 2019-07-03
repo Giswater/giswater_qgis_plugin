@@ -1302,11 +1302,11 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
     def fill_tab_hydrometer_values(self):
 
-        table_hydro_value = "ve_ui_hydroval_x_connec"
+        table_hydro_value = "v_ui_hydroval_x_connec"
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
         # Populate combo filter hydrometer value
         sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
-               " FROM " + self.schema_name + ".ve_ui_hydroval_x_connec ORDER BY cat_period_id")
+               " FROM " + self.schema_name + "." + str(table_hydro_value) + " ORDER BY cat_period_id")
 
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
