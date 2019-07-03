@@ -49,5 +49,5 @@ CREATE TABLE plan_psector_x_gully(
 
 ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_node_id_fkey;
 
-ALTER TABLE vnode ADD COLUMN top_elev numeric(12,3);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"vnode", "column":"top_elev", "dataType":"numeric(12,3)"}}$$);
 
