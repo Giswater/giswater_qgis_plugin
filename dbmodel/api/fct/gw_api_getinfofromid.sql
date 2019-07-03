@@ -123,10 +123,7 @@ DECLARE
 	v_role text;
 	v_parentfields text;
 	v_status text ='Accepted';
-	v_nodefrominterpolate json;
-    v_top double precision;
-    v_elev double precision;
-    v_ymax double precision;
+
 
 BEGIN
 
@@ -145,7 +142,6 @@ BEGIN
 	v_editable := (p_data ->> 'form')::json->> 'editable';
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
-	v_nodefrominterpolate = (p_data ->> 'data')::json->> 'nodeFromInterpolate';
 
 	if v_toolbar is NULL THEN
 		v_toolbar := 'basic';
@@ -536,21 +532,6 @@ BEGIN
     END IF;
 	
 	
-	--    Node from interpolate
-    ----------------------------
-    IF v_nodefrominterpolate IS NOT NULL THEN
-		
-		-- getting values from interpolation
-		v_top  := v_nodefrominterpolate::json->>'top_elev';
-		v_elev := v_nodefrominterpolate::json->>'elev';
-		v_ymax := v_nodefrominterpolate::json->>'ymax';
-
-		-- setting values on form
-		--TODO
-		
-	END IF;
-	
-		
 	-- message for null
 	IF v_tablename IS NULL THEN
 		v_message='{"priority":0, "text":"No feature founded on that point", "results":0}';

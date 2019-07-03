@@ -155,16 +155,17 @@ BEGIN
 			IF v_projectype='UD' then
 				-- Update connec or gully arc_id
 				IF v_gully1.gully_id IS NOT NULL  THEN
-					UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_arc.arc_id, featurecat_id=v_arc.arc_type
+					UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id
 					WHERE gully_id=v_gully1.gully_id;
 					
 				ELSIF v_connec1.connec_id IS NOT NULL THEN
-					UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_arc.arc_id, featurecat_id=v_arc.arc_type
+					UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id
 					WHERE connec_id=v_connec1.connec_id;
 				END IF;	
 			ELSE 
 				UPDATE connec SET arc_id=v_arc.arc_id WHERE connec_id=v_connec1.connec_id;
-				UPDATE connec SET feature_id=v_node.node_id, featurecat_id=v_node.nodetype_id WHERE connec_id=v_connec1.connec_id;
+				UPDATE connec SET feature_id=v_arc.node_id, featurecat_id=v_arc.nodetype_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, presszonecat_id = v_arc.presszonecat_id,
+				dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id WHERE connec_id=v_connec1.connec_id;
 			END IF;
 	
 			NEW.exit_type='VNODE';
@@ -188,12 +189,13 @@ BEGIN
 					WHERE gully_id=v_gully1.gully_id;
 	
 				ELSIF v_connec1.connec_id IS NOT NULL AND v_projectype='UD' THEN
-					UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type
+					UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type, dma_id=v_node.dma_id, sector_id=v_node.sector_id
 					WHERE connec_id=v_connec1.connec_id;				
 				END IF;
 			ELSE
 				UPDATE connec SET arc_id=v_arc.arc_id WHERE connec_id=v_connec1.connec_id;
-				UPDATE connec SET feature_id=v_node.node_id, featurecat_id=v_node.nodetype_id WHERE connec_id=v_connec1.connec_id;
+				UPDATE connec SET feature_id=v_node.node_id, featurecat_id=v_node.nodetype_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, presszonecat_id = v_node.presszonecat_id,
+				dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id WHERE connec_id=v_connec1.connec_id;
 			END IF;
 			
 			NEW.exit_type='NODE';
@@ -206,14 +208,15 @@ BEGIN
 			SELECT arc_id INTO v_arc.arc_id FROM connec WHERE connec_id=v_connec2.connec_id;
 	
 			IF v_projectype='UD' then
-				UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type
+				UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id
 				WHERE gully_id=v_gully1.gully_id;
 	
-				UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type
+				UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id
 				WHERE connec_id=v_connec1.connec_id;
 			ELSE 
 				UPDATE connec SET arc_id=v_arc.arc_id WHERE connec_id=v_connec1.connec_id;
-				UPDATE connec SET feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connectype_id WHERE connec_id=v_connec1.connec_id;
+				UPDATE connec SET feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connectype_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, 
+				presszonecat_id = v_connec2.presszonecat_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id WHERE connec_id=v_connec1.connec_id;
 			END IF;
 	
 			NEW.exit_type='CONNEC';
@@ -227,10 +230,10 @@ BEGIN
 				-- update arc values
 				SELECT arc_id INTO v_arc.arc_id FROM gully WHERE gully_id=v_gully2.gully_id;
 	
-				UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type 
+				UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
 				WHERE connec_id=v_connec1.connec_id;
 	
-				UPDATE gully SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type 
+				UPDATE gully SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
 				WHERE gully_id=v_gully1.gully_id;
 					
 				NEW.exit_type='GULLY';
@@ -260,13 +263,13 @@ BEGIN
 				WHERE link_id=NEW.link_id;
 				
 				-- update psector tables
-				IF v_projectype = 'UD'
+				IF v_projectype = 'UD' THEN
 					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom FROM v_edit_gully 
-					WHERE plan_psector_x_gully.gully_id=NEW.feature_id, plan_psector_x_gully.arc_id=v_edit_gully.arc_id;
+					WHERE plan_psector_x_gully.gully_id=NEW.feature_id AND plan_psector_x_gully.arc_id=v_edit_gully.arc_id;
 				END IF;
 	
 				UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom FROM v_edit_connec 
-				WHERE plan_psector_x_connec.connec_id=NEW.feature_id, plan_psector_x_connec.arc_id=v_edit_connec.arc_id;
+				WHERE plan_psector_x_connec.connec_id=NEW.feature_id AND plan_psector_x_connec.arc_id=v_edit_connec.arc_id;
 				
 			ELSE
 				UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type, the_geom=NEW.the_geom 
@@ -280,9 +283,11 @@ BEGIN
 		
 			UPDATE connec SET state_type = (SELECT ((value::json->>'connec')::json->>'state_type')::int2 
 			FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=v_connec1.connec_id;
-	
-			UPDATE gully SET state_type = (SELECT ((value::json->>'gully')::json->>'state_type')::int2 
-			FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE gully_id=v_gully1.gully_id;
+
+			IF v_projectype = 'UD' THEN
+				UPDATE gully SET state_type = (SELECT ((value::json->>'gully')::json->>'state_type')::int2 
+				FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE gully_id=v_gully1.gully_id;
+			END IF;
 		END IF;
 	
 		RETURN NEW;

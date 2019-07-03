@@ -85,6 +85,9 @@ DECLARE
 	v_shape text;
 	v_matcat_id text;
 	v_catalogtype varchar;
+	v_min double precision;
+	v_max double precision;
+	v_widgetcontrols json;
 	
 BEGIN
 
@@ -320,7 +323,6 @@ BEGIN
 		END IF;
 
 		
-		
 	-- getting values on insert from feature
 	ELSIF p_tg_op ='UPDATE' THEN	
 		EXECUTE 'SELECT (row_to_json(a)) FROM 
@@ -331,7 +333,6 @@ BEGIN
 	END IF;
 
 	
-	
 	-- setting values
 	FOREACH aux_json IN ARRAY v_fields_array 
         LOOP          
@@ -339,6 +340,7 @@ BEGIN
 		
 		-- setting the values
 		IF p_tg_op='INSERT' THEN 
+		
 			-- special values
 			IF (aux_json->>'column_id') = quote_ident(v_idname) THEN
 				field_value = v_id;
@@ -356,6 +358,21 @@ BEGIN
 				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.type)||'_type WHERE id = $1'
 					INTO field_value
 					USING v_catfeature.system_id;
+
+			-- special values for consistency on depth values for node-arc on ud projects
+			ELSIF (aux_json->>'column_id') = 'y1' THEN
+				v_min = (SELECT geom1 FROM cat_arc WHERE id=(SELECT arccat_id FROM arc WHERE arc_id=p_id));
+				v_max = (SELECT ymax FROM node WHERE node_id=(SELECT node_1 FROM arc WHERE arc_id=p_id));
+				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
+			ELSIF (aux_json->>'column_id') = 'y2' THEN
+				v_min = (SELECT geom1 FROM cat_arc WHERE id=(SELECT arccat_id FROM arc WHERE arc_id=p_id));
+				v_max = (SELECT ymax FROM node WHERE node_id=(SELECT node_1 FROM arc WHERE arc_id=p_id));
+				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
+			ELSIF (aux_json->>'column_id') = 'ymax' THEN
+				v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=p_id UNION SELECT y2 FROM arc WHERE node_2=p_id)a);
+				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":999}';
+
+					
 			-- mapzones values
 			ELSIF (aux_json->>'column_id') = 'sector_id' THEN
 				field_value = v_sector_id;
@@ -369,6 +386,7 @@ BEGIN
 				field_value = v_expl_id;
 			ELSIF (aux_json->>'column_id') = 'muni_id' THEN
 				field_value = v_muni_id;
+				
 			-- catalog values
 			ELSIF (aux_json->>'column_id')='cat_dnom' THEN
 				field_value = v_dnom;
@@ -382,6 +400,7 @@ BEGIN
 				field_value = v_shape;
 			ELSIF (aux_json->>'column_id')='matcat_id' THEN	
 				field_value = v_matcat_id;
+				
 			-- rest of vaules
 			ELSE
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id');
@@ -391,8 +410,30 @@ BEGIN
 				
 		ELSIF  p_tg_op ='UPDATE' THEN 
 				
-				field_value := (v_values_array->>(aux_json->>'column_id'));
+			field_value := (v_values_array->>(aux_json->>'column_id'));
 		END IF;
+
+		-- setting special characteristics for insert also for update
+		IF p_tg_op='INSERT' OR p_tg_op='UPDATE' THEN 
+
+			-- special values for consistency on depth values for node-arc on ud projects
+			IF (aux_json->>'column_id') = 'y1' THEN
+				v_min = (SELECT geom1 FROM cat_arc WHERE id=(SELECT arccat_id FROM arc WHERE arc_id=p_id));
+				v_max = (SELECT ymax FROM node WHERE node_id=(SELECT node_1 FROM arc WHERE arc_id=p_id));
+				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
+				
+			ELSIF (aux_json->>'column_id') = 'y2' THEN
+				v_min = (SELECT geom1 FROM cat_arc WHERE id=(SELECT arccat_id FROM arc WHERE arc_id=p_id));
+				v_max = (SELECT ymax FROM node WHERE node_id=(SELECT node_1 FROM arc WHERE arc_id=p_id));
+				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
+				
+			ELSIF (aux_json->>'column_id') = 'ymax' THEN
+				v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=p_id UNION SELECT y2 FROM arc WHERE node_2=p_id)a);
+				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":999}';
+			END IF;
+
+		END IF;
+		
 		
 		-- setting the array
 		IF (aux_json->>'widgettype')='combo' THEN 

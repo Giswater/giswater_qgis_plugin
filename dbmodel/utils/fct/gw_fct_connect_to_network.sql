@@ -40,6 +40,7 @@ DECLARE
 	point_aux public.geometry;
 	aux_geom public.geometry;
 	v_node_proximity double precision;
+	v_projecttype text;
 
 BEGIN
 
@@ -48,6 +49,9 @@ BEGIN
 
     SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
     IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
+
+    -- select project type
+    SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 
     -- Main loop
     IF connec_array IS NOT NULL THEN
@@ -150,7 +154,12 @@ BEGIN
 
 		-- Update feaute arc_id and state_type
 		IF feature_type_aux ='CONNEC' THEN          
-			UPDATE connec SET arc_id=v_connect.arc_id WHERE connec_id = connect_id_aux;
+			UPDATE connec SET arc_id=v_connect.arc_id, dma_id=v_connect.dma_id, sector_id=v_connect.sector_id WHERE connec_id = connect_id_aux;
+
+			-- update specific fields for ws projects
+			IF v_projecttype = 'WS' THEN
+				UPDATE connec SET dqa_id=v_connect.dqa_id, minsector_id=v_connect.minsector_id WHERE connec_id = connect_id_aux;
+			END IF;
 			
 			-- Update state_type if edit_connect_update_statetype is TRUE
 			IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
@@ -158,7 +167,7 @@ BEGIN
 				FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=connect_id_aux;
 			END IF;
 		ELSIF feature_type_aux ='GULLY' THEN 
-			UPDATE gully SET arc_id=v_connect.arc_id  WHERE gully_id = connect_id_aux;
+			UPDATE gully SET arc_id=v_connect.arc_id, dma_id=v_connect.dma_id, sector_id=v_connect.sector_id  WHERE gully_id = connect_id_aux;
 
 			-- Update state_type if edit_connect_update_statetype is TRUE
 			IF (SELECT ((value::json->>'gully')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
