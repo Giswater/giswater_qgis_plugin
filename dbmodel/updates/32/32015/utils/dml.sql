@@ -41,4 +41,6 @@ UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_man_
 
 UPDATE audit_cat_error SET error_message = 'You don''t have permissions to manage with psector', 
 		hint_message = 'Please check if your profile has role_master in order to manage with plan issues' WHERE id=1080;
+		
 UPDATE audit_cat_error SET hint_message = 'You need to have at least one psector created to add planified elements' WHERE id=1081;
+

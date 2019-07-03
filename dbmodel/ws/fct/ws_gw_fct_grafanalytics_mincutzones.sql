@@ -89,19 +89,19 @@ BEGIN
 		
 		-- insert results into audit table
 		INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-		SELECT 49, v_arc, concat('"minsector":"',v_arc,'","node_id":"',node_id,'"') FROM anl_mincut_result_node WHERE result_id=-1;
+		SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","node_id":"',node_id,'"') FROM anl_mincut_result_node WHERE result_id=-1;
 
 		INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-		SELECT 49, v_arc, concat('"minsector":"',v_arc,'","arc_id":"',arc_id,'"') FROM anl_mincut_result_arc WHERE result_id=-1;
+		SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","arc_id":"',arc_id,'"') FROM anl_mincut_result_arc WHERE result_id=-1;
 		
 		INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-		SELECT 49, v_arc, concat('"minsector":"',v_arc,'","connec_id":"',connec_id,'"') FROM anl_mincut_result_connec WHERE result_id=-1;
+		SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","connec_id":"',connec_id,'"') FROM anl_mincut_result_connec WHERE result_id=-1;
 
 		INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-		SELECT 49, v_arc, concat('"minsector":"',v_arc,'","valve_id":"',node_id,'"') FROM anl_mincut_result_valve WHERE result_id=-1;
+		SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","valve_id":"',node_id,'"') FROM anl_mincut_result_valve WHERE result_id=-1;
 		
 		INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-		SELECT 49, v_arc, concat('"minsector":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM anl_mincut_result_hydrometer WHERE result_id=-1;
+		SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM anl_mincut_result_hydrometer WHERE result_id=-1;
 
 	END LOOP;
 	

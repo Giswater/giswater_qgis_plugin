@@ -8,4 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/05/27
-ALTER TABLE config_api_form_fields ADD COLUMN editability json;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_fields", "column":"editability", "dataType":"json"}}$$);
+
+-- 2019/07/02
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_fields", "column":"widgetcontrols", "dataType":"json"}}$$);

@@ -14,8 +14,8 @@ $BODY$
 /*
 delete from anl_graf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"grafClass":"MSECTOR", "upsertFeatureAttrib":"TRUE", "exploitation":"[1]"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"grafClass":"MSECTOR", "arc":"2002", "upsertFeatureAttrib":"TRUE" }}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"grafClass":"MINSECTOR", "upsertFeatureAttrib":"TRUE", "exploitation":"[1]"}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"grafClass":"MINSECTOR", "arc":"2002", "upsertFeatureAttrib":"TRUE" }}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.anl_graf
