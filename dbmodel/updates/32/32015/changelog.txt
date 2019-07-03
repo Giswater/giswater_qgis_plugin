@@ -3,3 +3,4 @@
 - Add connec / gully / subcatchment / link-vnode on psector strategy
 - Change price_compost strategy
 - Create gw_fct_admin_manage_child_views to create ve_* custom views (2716)
+- Bug fix on v_plan_node definition
