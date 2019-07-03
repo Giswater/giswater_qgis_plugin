@@ -69,7 +69,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 function_name = "gw_fct_flow_exit"
                 
             elem_id = self.snapped_feat.attribute('node_id')
-            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(elem_id) + "');"
+            sql = "SELECT " + function_name + "('" + str(elem_id) + "');"
             result = self.controller.execute_sql(sql)
             if result:
                 # Get 'arc' and 'node' list and select them
@@ -92,7 +92,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             tablename = "anl_flow_" + elem_type
             where = " WHERE context = 'Flow exit'"
             
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        sql = "SELECT * FROM " + tablename
         sql = sql + where
         sql += " ORDER BY " + elem_type + "_id"
         rows = self.controller.get_rows(sql)

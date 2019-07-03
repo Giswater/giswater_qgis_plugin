@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -166,7 +166,7 @@ class Dimensions(ParentDialog):
                 fieldname = "connec_depth"
 
             sql = ("SELECT " + fieldname + " "
-                   "FROM " + self.schema_name + "." + feat_type + " "
+                   "FROM " + feat_type + " "
                    "WHERE " + feat_type + "_id = '" + element_id + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -180,7 +180,7 @@ class Dimensions(ParentDialog):
     def create_map_tips(self):
         """ Create MapTips on the map """
         
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'dim_tooltip'")
         row = self.controller.get_row(sql)
         if not row or row[0].lower() != 'true':

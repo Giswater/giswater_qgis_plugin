@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -146,7 +146,7 @@ class ParentDialog(QDialog):
         # Close dialog
         if close_dialog:
             self.close_dialog()
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE parameter = 'cf_keep_opened_edition' AND cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
         if row:
@@ -295,8 +295,8 @@ class ParentDialog(QDialog):
 
     def filter_streets(self, dialog, muni_id, street):
 
-        sql = ("SELECT name FROM "+ self.schema_name + ".ext_streetaxis"
-               " WHERE muni_id = (SELECT muni_id FROM " + self.schema_name + ".ext_municipality "
+        sql = ("SELECT name FROM ext_streetaxis"
+               " WHERE muni_id = (SELECT muni_id FROM ext_municipality "
                " WHERE name = '" + utils_giswater.getWidgetText(dialog, muni_id) + "')")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -309,8 +309,8 @@ class ParentDialog(QDialog):
     def filter_dma(self, dialog, exploitation, dma):
         """ Populate QCombobox @dma according to selected @exploitation """
         
-        sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
-               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
+        sql = ("SELECT t1.name FROM dma AS t1"
+               " INNER JOIN exploitation AS t2 ON t1.expl_id = t2.expl_id "
                " WHERE t2.name = '" + str(utils_giswater.getWidgetText(dialog, exploitation)) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -323,8 +323,8 @@ class ParentDialog(QDialog):
     def filter_presszonecat_id(self, dialog, exploitation, presszonecat_id):
         """ Populate QCombobox @presszonecat_id according to selected @exploitation """
 
-        sql = ("SELECT t1.descript FROM " + self.schema_name + ".cat_presszone AS t1"
-               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
+        sql = ("SELECT t1.descript FROM cat_presszone AS t1"
+               " INNER JOIN exploitation AS t2 ON t1.expl_id = t2.expl_id "
                " WHERE t2.name = '" + str(utils_giswater.getWidgetText(dialog, exploitation)) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -337,8 +337,8 @@ class ParentDialog(QDialog):
     def filter_state_type(self, dialog, state, state_type):
         """ Populate QCombobox @state_type according to selected @state """
         
-        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
-               " INNER JOIN " + self.schema_name + ".value_state AS t2 ON t1.state=t2.id "
+        sql = ("SELECT t1.name FROM value_state_type AS t1"
+               " INNER JOIN value_state AS t2 ON t1.state=t2.id "
                " WHERE t2.name ='" + str(utils_giswater.getWidgetText(dialog, state)) + "'")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -351,11 +351,11 @@ class ParentDialog(QDialog):
     def update_filters(self, table_name, field_id, geom_type, widget, feature_id):
         """ @widget is the field to SET """
         
-        sql = ("SELECT " + str(field_id) + " FROM " + self.schema_name + "." + str(table_name) + " "
+        sql = ("SELECT " + str(field_id) + " FROM " + str(table_name) + " "
                " WHERE name = '" + str(utils_giswater.getWidgetText(self.dialog, widget)) + "'")
         row = self.controller.get_row(sql)
         if row:
-            sql = ("UPDATE " + self.schema_name + "." + str(geom_type) + " "
+            sql = ("UPDATE " + str(geom_type) + " "
                    " SET " + widget + " = '" + str(row[0]) + "'"
                    " WHERE " + str(geom_type) + "_id = '" + str(feature_id) + "'")
             self.controller.execute_sql(sql)

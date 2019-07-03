@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -474,7 +474,7 @@ class Giswater(QObject):
         # Value: Object of the class SysFeatureCat
 
         self.feature_cat = {}
-        sql = ("SELECT * FROM " + self.schema_name + ".cat_feature "
+        sql = ("SELECT * FROM cat_feature "
                "WHERE active is True")
         rows = self.controller.get_rows(sql)
 
@@ -930,7 +930,7 @@ class Giswater(QObject):
         self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
 
-        sql = ("DELETE FROM " + self.schema_name + ".audit_check_project"
+        sql = ("DELETE FROM audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
         sql = ""

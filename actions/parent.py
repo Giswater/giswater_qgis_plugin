@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -814,7 +814,7 @@ class ParentAction(object):
     def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
 
         sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
-               " FROM {}.{}".format(self.schema_name, table_name))
+               " FROM {}".format(table_name))
         row = self.controller.get_row(sql, log_sql=False)
         if row:
             if row[0]:
@@ -832,7 +832,7 @@ class ParentAction(object):
     def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
 
         sql = ("SELECT id, idval"
-               " FROM " + self.schema_name + "." + table_name + ""
+               " FROM " + table_name + ""
                " WHERE typevalue = '" + typevalue + "'"
                " ORDER BY " + order_by + "")
         rows = self.controller.get_rows(sql, commit=True)

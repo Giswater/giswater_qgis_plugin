@@ -35,7 +35,7 @@ class ApiCatalog(ApiParent):
 
         form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
         body = self.create_body(form)
-        sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         print("ROW -> :" + str(row) )
         if not row:
@@ -97,7 +97,7 @@ class ApiCatalog(ApiParent):
         form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
         extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pnom":"'+str(pn_value)+'", "dnom":"'+str(dn_value)+'"}'
         body = self.create_body(form=form, extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
@@ -113,7 +113,7 @@ class ApiCatalog(ApiParent):
         form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
         extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'"}'
         body = self.create_body(form=form, extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
@@ -138,7 +138,7 @@ class ApiCatalog(ApiParent):
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_catalog, widget)
         # TODO cambiar por gw_api_getchilds
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('catalog" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','"+str(geom_type)+"')")
+        sql = ("SELECT gw_api_get_combochilds('catalog" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','"+str(geom_type)+"')")
         row = self.controller.get_row(sql, log_sql=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
@@ -158,7 +158,7 @@ class ApiCatalog(ApiParent):
         pn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_pn)
         dn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_dn)
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_catalog_id('"+str(metcat_value)+"','"+str(pn_value)+"','"+str(dn_value)+"','"+str(geom_type)+"',9)")
+        sql = ("SELECT gw_api_get_catalog_id('"+str(metcat_value)+"','"+str(pn_value)+"','"+str(dn_value)+"','"+str(geom_type)+"',9)")
         row = self.controller.get_row(sql, log_sql=True)
         self.populate_combo(widget_id, row[0]['catalog_id'][0])
 

@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -267,7 +267,7 @@ class DaoController(object):
             return       
 
         sql = ("SELECT error_message "
-               "FROM " + self.schema_name + ".audit_cat_error "
+               "FROM audit_cat_error "
                "WHERE id = " + str(log_code_id))
         result = self.dao.get_row(sql)  
         if result:
@@ -526,7 +526,7 @@ class DaoController(object):
         # Check if we have to perform an INSERT or an UPDATE
         if unique_value != 'current_user':
             unique_value = "'" + unique_value + "'"
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
+        sql = ("SELECT * FROM " + tablename + ""
                " WHERE " + str(unique_field) + " = " + unique_value) 
         row = self.get_row(sql, commit=commit)
         
@@ -546,7 +546,7 @@ class DaoController(object):
         # Perform an INSERT
         if not row:
             # Set SQL for INSERT               
-            sql = " INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
+            sql = " INSERT INTO " + tablename + "(" + unique_field + ", "
             sql += sql_fields[:-2] + ") VALUES ("   
               
             # Manage value 'current_user'   
@@ -557,7 +557,7 @@ class DaoController(object):
         # Perform an UPDATE
         else: 
             # Set SQL for UPDATE
-            sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+            sql = ("UPDATE " + tablename + ""
                    " SET (" + sql_fields[:-2] + ") = (" + sql_values[:-2] + ")" 
                    " WHERE " + unique_field + " = " + unique_value)         
         sql = sql.replace("''","'")
@@ -588,7 +588,7 @@ class DaoController(object):
             return True
          
         # Set SQL for INSERT               
-        sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
+        sql = "INSERT INTO " + tablename + "(" + unique_field + ", "
         
         # Iterate over fields
         sql_fields = "" 
@@ -637,7 +637,7 @@ class DaoController(object):
             self.show_warning("Function not found in database", parameter=function_name)
             return None
 
-        sql = "SELECT " + self.schema_name + "." + function_name + "($${" + body + "}$$)"
+        sql = "SELECT " + function_name + "($${" + body + "}$$)"
         if format_return:
             sql += format_return
         row = self.get_row(sql, log_sql=True)
@@ -655,15 +655,15 @@ class DaoController(object):
             return                  
         
         sql = ("SELECT audit_function_actions.id, error_message, log_level, show_user"
-               " FROM " + self.schema_name + ".audit_function_actions"
-               " INNER JOIN " + self.schema_name + ".audit_cat_error"
+               " FROM audit_function_actions"
+               " INNER JOIN audit_cat_error"
                " ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
                " WHERE audit_cat_error.id != 0 AND debug_info is null"
                " ORDER BY audit_function_actions.id DESC LIMIT 1")
         result = self.dao.get_row(sql, commit)
         if result:
             if result['log_level'] <= 2:
-                sql = ("UPDATE " + self.schema_name + ".audit_function_actions"
+                sql = ("UPDATE audit_function_actions"
                        " SET debug_info = 'showed'"
                        " WHERE id = " + str(result['id']))
                 self.dao.execute_sql(sql, commit)
@@ -994,7 +994,7 @@ class DaoController(object):
         exists = self.check_table(tablename)
         if exists:
             sql = ("SELECT giswater "
-                   "FROM " + self.schema_name + "." + tablename + " "
+                   "FROM " + tablename + " "
                    "ORDER BY id DESC LIMIT 1")
             row = self.get_row(sql)
             if row:
@@ -1078,7 +1078,7 @@ class DaoController(object):
         
         list_items = []        
         sql = ("SELECT parent_layer "
-               "FROM " + self.schema_name + ".cat_feature "
+               "FROM cat_feature "
                "WHERE upper(feature_type) = '" + geom_type.upper() + "'")
         rows = self.get_rows(sql, log_sql=True)
         if rows:
@@ -1094,9 +1094,9 @@ class DaoController(object):
 
         list_items = []
         sql = ("SELECT tablename FROM "
-               "(SELECT tablename, 1 as c FROM " + self.schema_name + ".sys_feature_cat"
+               "(SELECT tablename, 1 as c FROM sys_feature_cat"
                " WHERE type = '" + geom_type.upper() + "'"
-               " UNION SELECT parentlayer, 0 FROM " + self.schema_name + ".sys_feature_type"
+               " UNION SELECT parentlayer, 0 FROM sys_feature_type"
                " WHERE id='" + geom_type.upper() + "') as t "
                " ORDER BY c")
         rows = self.get_rows(sql, log_sql=True)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -254,7 +254,7 @@ class ManageVisit(ParentManage, QObject):
         """ Update geometry field """
 
         srid = self.controller.plugin_settings_value('srid')
-        sql = ("UPDATE " + str(self.schema_name) + ".om_visit"
+        sql = ("UPDATE om_visit"
                " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
                " WHERE id = " + str(self.current_visit.id))
         self.controller.execute_sql(sql, log_sql=True)
@@ -477,7 +477,7 @@ class ManageVisit(ParentManage, QObject):
         """set parameter_id combo basing on current selections."""
         dialog.parameter_id.clear()
         sql = ("SELECT id, descript"
-               " FROM " + self.schema_name + ".om_visit_parameter"
+               " FROM om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
         sql += " ORDER BY id"
@@ -649,7 +649,7 @@ class ManageVisit(ParentManage, QObject):
         # Fill ComboBox visitcat_id
         # save result in self.visitcat_ids to get id depending on selected combo
         sql = ("SELECT id, name"
-               " FROM " + self.schema_name + ".om_visit_cat"
+               " FROM om_visit_cat"
                " WHERE active is true"
                " ORDER BY name")
         self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
@@ -658,7 +658,7 @@ class ManageVisit(ParentManage, QObject):
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
             sql = ("SELECT value "
-                   "FROM " + self.schema_name + ".config_param_user "
+                   "FROM config_param_user "
                    "WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user ")
             row = self.controller.get_row(sql, commit=self.autocommit)
             if row:
@@ -675,11 +675,11 @@ class ManageVisit(ParentManage, QObject):
                     pass
             elif visit_id is not None:
                 sql = ("SELECT visitcat_id"
-                       " FROM " + self.schema_name + ".om_visit"
+                       " FROM om_visit"
                        " WHERE id ='" + str(visit_id) + "' ")
                 id_visitcat = self.controller.get_row(sql)
                 sql = ("SELECT id, name"
-                       " FROM " + self.schema_name + ".om_visit_cat"
+                       " FROM om_visit_cat"
                        " WHERE active is true AND id ='"+str(id_visitcat[0])+"' "
                        " ORDER BY name")
                 row = self.controller.get_row(sql)
@@ -691,7 +691,7 @@ class ManageVisit(ParentManage, QObject):
             utils_giswater.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             if visit_id is not None:
                 sql = ("SELECT status "
-                       "FROM " + self.schema_name + ".om_visit "
+                       "FROM om_visit "
                        "WHERE id ='" + str(visit_id) + "' ")
                 status = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
@@ -699,7 +699,7 @@ class ManageVisit(ParentManage, QObject):
         # Relations tab
         # fill feature_type
         sql = ("SELECT id"
-               " FROM " + self.schema_name + ".sys_feature_type"
+               " FROM sys_feature_type"
                " WHERE net_category = 1"
                " ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
@@ -708,14 +708,14 @@ class ManageVisit(ParentManage, QObject):
         # Event tab
         # Fill ComboBox parameter_type_id
         sql = ("SELECT id"
-               " FROM " + self.schema_name + ".om_visit_parameter_type"
+               " FROM om_visit_parameter_type"
                " ORDER BY id")
         parameter_type_ids = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_visit, "parameter_type_id", parameter_type_ids, allow_nulls=False)
 
         # now get default value to be show in parameter_type_id
         sql = ("SELECT value"
-               " FROM " + self.schema_name + ".config_param_user"
+               " FROM config_param_user"
                " WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
@@ -739,7 +739,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.visit_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
+        sql = "SELECT DISTINCT(id) FROM om_visit"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
@@ -754,7 +754,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.doc_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_document"
+        sql = "SELECT DISTINCT(id) FROM v_ui_document"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
@@ -789,7 +789,7 @@ class ManageVisit(ParentManage, QObject):
 
         # get form asociated
         sql = ("SELECT form_type"
-               " FROM " + self.schema_name + ".om_visit_parameter"
+               " FROM om_visit_parameter"
                " WHERE id = '" + str(parameter_id) + "'")
         row = self.controller.get_row(sql, commit=False)
         form_type = str(row[0])
@@ -1079,7 +1079,7 @@ class ManageVisit(ParentManage, QObject):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, ','.join(selected_id))
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
+            sql = ("DELETE FROM doc_x_visit"
                    " WHERE id IN ({})".format(','.join(selected_id)))
             status = self.controller.execute_sql(sql)
             if not status:
@@ -1107,7 +1107,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # Insert into new table
-        sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
+        sql = ("INSERT INTO doc_x_visit (doc_id, visit_id)"
                " VALUES ('" + str(doc_id) + "', " + str(visit_id) + ")")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
@@ -1127,7 +1127,7 @@ class ManageVisit(ParentManage, QObject):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)

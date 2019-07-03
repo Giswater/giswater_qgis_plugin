@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -55,7 +55,7 @@ class ChangeElemType(ParentMapTool):
             self.node_type_text = node_type
 
         sql = ("SELECT DISTINCT(matcat_id) as matcat_id "
-               " FROM " + self.schema_name + ".cat_" + geom_type)
+               " FROM cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY matcat_id"
@@ -63,7 +63,7 @@ class ChangeElemType(ParentMapTool):
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.matcat_id, rows)
 
         sql = ("SELECT DISTINCT(" + self.field2 + ")"
-               " FROM " + self.schema_name + ".cat_" + geom_type)
+               " FROM cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY " + self.field2
@@ -93,7 +93,7 @@ class ChangeElemType(ParentMapTool):
         # Set SQL query
         sql_where = ""
         sql = ("SELECT DISTINCT(" + self.field2 + ")"
-               " FROM " + self.schema_name + ".cat_" + geom_type)
+               " FROM cat_" + geom_type)
 
         # Build SQL filter
         if mats != "null":
@@ -128,7 +128,7 @@ class ChangeElemType(ParentMapTool):
             sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + self.field3 + ")) as " + self.field3
         else:
             sql = "SELECT DISTINCT(" + self.field3 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql += " FROM cat_" + geom_type
 
         # Build SQL filter
         if wsoftware == 'ws' and self.node_type_text is not None:
@@ -168,7 +168,7 @@ class ChangeElemType(ParentMapTool):
         # Set SQL query
         sql_where = ""
         sql = ("SELECT DISTINCT(id) as id"
-               " FROM " + self.schema_name + ".cat_" + geom_type)
+               " FROM cat_" + geom_type)
 
         if wsoftware == 'ws' and self.node_type_text is not None:
             sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
@@ -220,7 +220,7 @@ class ChangeElemType(ParentMapTool):
                 # Fill 3rd combo_box-catalog_id
                 utils_giswater.setWidgetEnabled(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, True)
                 sql = ("SELECT DISTINCT(id)"
-                       " FROM " + self.schema_name + ".cat_node"
+                       " FROM cat_node"
                        " WHERE nodetype_id = '" + str(node_node_type_new) + "'")
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, rows)
@@ -237,35 +237,35 @@ class ChangeElemType(ParentMapTool):
         if node_node_type_new != "null":
                     
             if (node_nodecat_id != "null" and project_type == 'ws') or (project_type == 'ud'):
-                sql = ("SELECT man_table FROM " + self.schema_name + ".node_type"
+                sql = ("SELECT man_table FROM node_type"
                        " WHERE id = '" + old_node_type + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
                 # Delete from current table 
-                sql = ("DELETE FROM " + self.schema_name + "." + row[0] + ""
+                sql = ("DELETE FROM " + row[0] + ""
                        " WHERE node_id = '" + str(self.node_id) + "'")
                 self.controller.execute_sql(sql)
 
-                sql = ("SELECT man_table FROM " + self.schema_name + ".node_type"
+                sql = ("SELECT man_table FROM node_type"
                        " WHERE id = '" + node_node_type_new + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
                 # Insert into new table
-                sql = ("INSERT INTO " + self.schema_name + "." + row[0] + "(node_id)"
+                sql = ("INSERT INTO " + row[0] + "(node_id)"
                        " VALUES ('" + str(self.node_id) + "')")
                 self.controller.execute_sql(sql)
 
                 # Update field 'nodecat_id'
-                sql = ("UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
+                sql = ("UPDATE node SET nodecat_id = '" + node_nodecat_id + "'"
                        " WHERE node_id = '" + str(self.node_id) + "'")
                 self.controller.execute_sql(sql)
 
                 if project_type == 'ud':
-                    sql = ("UPDATE " + self.schema_name + ".node SET node_type = '" + node_node_type_new + "'"
+                    sql = ("UPDATE node SET node_type = '" + node_node_type_new + "'"
                         " WHERE node_id = '" + str(self.node_id) + "'")
                     self.controller.execute_sql(sql)
                     
@@ -320,7 +320,7 @@ class ChangeElemType(ParentMapTool):
             node_type = feature.attribute('nodetype_id')
         if project_type == 'ud':
             node_type = feature.attribute('node_type')
-            sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
+            sql = "SELECT DISTINCT(id) FROM cat_node ORDER BY id"
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_nodecat_id", rows, allow_nulls=False)
  
@@ -331,7 +331,7 @@ class ChangeElemType(ParentMapTool):
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
         
         # Fill 1st combo boxes-new system node type
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM node_type ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
