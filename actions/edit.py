@@ -73,7 +73,7 @@ class Edit(ParentAction):
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat, new_feature_id=feature_id, layer_new_feature=self.layer, tab_type='data', new_feature=feature)
 
-        self.layer.setFeatureFormSuppress(self.suppres_form)
+        self.layer.editFormConfig().setSuppress(self.suppres_form)
 
         if not result:
             self.layer.deleteFeature(feature.id())
