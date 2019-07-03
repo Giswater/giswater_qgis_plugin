@@ -113,7 +113,9 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.dlg_nodereplace.workcat_id_end.currentIndexChanged.connect(self.update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
+        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type "
+               "WHERE active is True "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_nodereplace, "node_node_type_new", rows)
 
