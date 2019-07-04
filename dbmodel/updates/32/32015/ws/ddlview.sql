@@ -78,7 +78,7 @@ CREATE OR REPLACE VIEW v_arc AS
 	arc.minsector_id,
 	arc.dqa_id,
 	dqa.macrodqa_id,
-	arc.staticpressure.
+	arc.staticpressure,
 	cat_arc.label
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
@@ -151,7 +151,7 @@ CREATE OR REPLACE VIEW v_edit_arc AS
 	v_arc.dqa_id,
 	v_arc.macrodqa_id,
 	v_arc.staticpressure
-   FROM v_arc
+   FROM v_arc;
 	 
 	 
 CREATE OR REPLACE VIEW v_node AS 
@@ -290,7 +290,32 @@ CREATE OR REPLACE VIEW v_edit_node AS
 	v_node.dqa_id,
 	v_node.macrodqa_id,
 	v_node.staticpressure
-   FROM v_node
+   FROM v_node;
+
+
+CREATE OR REPLACE VIEW v_state_connec AS 
+(
+         SELECT connec.connec_id::varchar(16), arc_id
+           FROM selector_state,
+            selector_expl,
+            connec
+          WHERE connec.state = selector_state.state_id AND connec.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+        EXCEPT
+         SELECT plan_psector_x_connec.connec_id::varchar(16), plan_psector_x_connec.arc_id
+           FROM selector_psector,
+            selector_expl,
+            plan_psector_x_connec
+             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
+) UNION
+ SELECT plan_psector_x_connec.connec_id::varchar(16), plan_psector_x_connec.arc_id
+   FROM selector_psector,
+    selector_expl,
+    plan_psector_x_connec
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+  
 
 CREATE OR REPLACE VIEW v_edit_connec AS 
  SELECT connec.connec_id,
@@ -363,98 +388,6 @@ CREATE OR REPLACE VIEW v_edit_connec AS
      LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id;
 	 
-
-CREATE OR REPLACE VIEW v_state_connec AS 
-(
-         SELECT connec.connec_id::varchar(16), arc_id
-           FROM selector_state,
-            selector_expl,
-            connec
-          WHERE connec.state = selector_state.state_id AND connec.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
-        EXCEPT
-         SELECT plan_psector_x_connec.connec_id::varchar(16), plan_psector_x_connec.arc_id
-           FROM selector_psector,
-            selector_expl,
-            plan_psector_x_connec
-             JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
-          WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 0 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
-) UNION
- SELECT plan_psector_x_connec.connec_id::varchar(16), plan_psector_x_connec.arc_id
-   FROM selector_psector,
-    selector_expl,
-    plan_psector_x_connec
-     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_connec.psector_id
-  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_connec.state = 1 AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
-
-  
-
-
-CREATE OR REPLACE VIEW v_edit_connec AS 
- SELECT connec.connec_id,
-    connec.code,
-    connec.elevation,
-    connec.depth,
-    cat_connec.connectype_id,
-    connec_type.type AS sys_type,
-    connec.connecat_id,
-    connec.sector_id,
-    sector.macrosector_id,
-    connec.customer_code,
-    cat_connec.matcat_id AS cat_matcat_id,
-    cat_connec.pnom AS cat_pnom,
-    cat_connec.dnom AS cat_dnom,
-    connec.connec_length,
-    connec.state,
-    connec.state_type,
-    connec.annotation,
-    connec.observ,
-    connec.comment,
-    cat_connec.label,
-    connec.dma_id,
-    connec.presszonecat_id,
-    connec.soilcat_id,
-    connec.function_type,
-    connec.category_type,
-    connec.fluid_type,
-    connec.location_type,
-    connec.workcat_id,
-    connec.workcat_id_end,
-    connec.buildercat_id,
-    connec.builtdate,
-    connec.enddate,
-    connec.ownercat_id,
-    connec.muni_id,
-    connec.postcode,
-    connec.streetaxis_id,
-    connec.postnumber,
-    connec.postcomplement,
-    connec.streetaxis2_id,
-    connec.postnumber2,
-    connec.postcomplement2,
-    connec.descript,
-    v_state_connec.arc_id,
-    cat_connec.svg,
-    connec.rotation,
-    concat(connec_type.link_path, connec.link) AS link,
-    connec.verified,
-    connec.the_geom,
-    connec.undelete,
-    connec.label_x,
-    connec.label_y,
-    connec.label_rotation,
-    connec.publish,
-    connec.inventory,
-    dma.macrodma_id,
-    connec.expl_id,
-    connec.num_value
-   FROM connec
-     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
-     JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
-     JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
-     LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN dma ON connec.dma_id = dma.dma_id
-     LEFT JOIN sector ON connec.sector_id = sector.sector_id;
-
 
      
 CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS 

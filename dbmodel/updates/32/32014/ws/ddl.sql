@@ -22,19 +22,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "colu
 
 
 CREATE TABLE macrodqa(
-  macrodqa_id serial NOT NULL,
+  macrodqa_id serial PRIMARY KEY,
   name character varying(50) NOT NULL,
   expl_id integer NOT NULL,
   descript text,
   undelete boolean,
-  the_geom geometry(MultiPolygon,SRID_VALUE),
-  CONSTRAINT macrodqa_pkey PRIMARY KEY (macrodqa_id),
-  CONSTRAINT macrodqa_expl_id_fkey FOREIGN KEY (expl_id)
-      REFERENCES ws_sample.exploitation (expl_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT,
-  CONSTRAINT macrodqa_exploitation_id_fkey FOREIGN KEY (expl_id)
-      REFERENCES ws_sample.exploitation (expl_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT;
+  the_geom geometry(MultiPolygon,SRID_VALUE));
 
 
 CREATE TABLE dqa (
