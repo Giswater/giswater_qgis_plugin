@@ -40,8 +40,12 @@ class Edit(ParentAction):
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
-            self.suppres_form = self.layer.editFormConfig().suppress()
-            self.layer.editFormConfig().setSuppress(1)
+            if Qgis.QGIS_VERSION_INT < 29900:
+                self.suppres_form = self.layer.featureFormSuppress()
+                self.layer.setFeatureFormSuppress(1)
+            else:
+                self.suppres_form = self.layer.editFormConfig().suppress()
+                self.layer.editFormConfig().setSuppress(1)
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -72,8 +76,11 @@ class Edit(ParentAction):
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat, new_feature_id=feature_id, layer_new_feature=self.layer, tab_type='data', new_feature=feature)
-
-        self.layer.editFormConfig().setSuppress(self.suppres_form)
+        print(result)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            self.layer.setFeatureFormSuppress(self.suppres_form)
+        else:
+            self.layer.editFormConfig().setSuppress(self.suppres_form)
 
         if not result:
             self.layer.deleteFeature(feature.id())
