@@ -93,9 +93,20 @@ BEGIN
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
 	
 	END IF;
+
+	-- Get real_enddate value from lot
+	EXECUTE 'SELECT real_enddate FROM om_visit_lot WHERE id = ' || quote_literal(v_id) ||'' INTO v_real_enddate;
+
+	-- If new status is not executed, delete if exists real_enddate
+	IF v_status != '5' AND v_real_enddate IS NOT NULL THEN
+		UPDATE om_visit_lot SET real_enddate = NULL WHERE id=v_id::INTEGER;
+	END IF;
+
+	-- IF new status is executed, set real_enddate with current date
+	IF v_status = '5' THEN
+		UPDATE om_visit_lot SET real_enddate = NOW() WHERE id=v_id::INTEGER;
+	END IF;
 	
-	
-		
 
 	raise notice 'RETURN => %','SELECT SCHEMA_NAME.gw_api_getlot('|| p_data || ')';
 	

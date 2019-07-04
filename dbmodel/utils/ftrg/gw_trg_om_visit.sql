@@ -44,7 +44,7 @@ BEGIN
  
 			-- get if its first visit of lot to set it with status (ON GOING)
 			IF (SELECT count (*) FROM om_visit WHERE lot_id=NEW.lot_id) = 1 THEN
-				UPDATE om_visit_lot SET status = 4 WHERE id=NEW.lot_id;
+				UPDATE om_visit_lot SET status = 4, real_startdate = NOW() WHERE id=NEW.lot_id;
 			END IF;
 
 			IF NEW.status <> 4 THEN 
