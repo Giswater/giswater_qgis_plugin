@@ -1110,6 +1110,8 @@ class AddNewLot(ParentManage):
         # Manage visits
         table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         model_rows = self.read_standaritemmodel(self.dlg_lot.tbl_visit)
+        if not model_rows:
+            return True
         sql = ""
         for item in model_rows:
             keys = " "
