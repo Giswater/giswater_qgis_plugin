@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-INSERT INTO plan_typevalue ('psector_status', 0, 'EJECUTADO', 'Psector done');
-INSERT INTO plan_typevalue ('psector_status', 1, 'EN CURSO', 'Psector on course');
-INSERT INTO plan_typevalue ('psector_status', 2, 'PLANIFICADO', 'Psector planned');
-INSERT INTO plan_typevalue ('psector_status', 3, 'CANCELADO', 'Psector canceled');
+INSERT INTO plan_typevalue VALUES ('psector_status', 0, 'EJECUTADO', 'Psector done');
+INSERT INTO plan_typevalue VALUES ('psector_status', 1, 'EN CURSO', 'Psector on course');
+INSERT INTO plan_typevalue VALUES ('psector_status', 2, 'PLANIFICADO', 'Psector planned');
+INSERT INTO plan_typevalue VALUES ('psector_status', 3, 'CANCELADO', 'Psector canceled');
