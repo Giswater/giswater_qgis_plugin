@@ -46,9 +46,9 @@ BEGIN
 
 	-- Geometry column
 	IF v_x2 IS NULL THEN
-		v_input_geometry:= ST_SetSRID(ST_MakePoint(v_x1, v_y1),(SELECT ST_srid (the_geom) FROM sector limit 1));
+		v_input_geometry:= ST_SetSRID(ST_MakePoint(v_x1, v_y1),(SELECT ST_srid (the_geom) FROM sector WHERE sector_id >= 0 limit 1));
 	ELSIF v_x2 IS NOT NULL THEN
-		v_input_geometry:= ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)),(SELECT ST_srid (the_geom) FROM sector limit 1));
+		v_input_geometry:= ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)),(SELECT ST_srid (the_geom) FROM sector WHERE sector_id >= 0 limit 1));
 	END IF;
 	
 	-- Call gw_api_getinfofromid
