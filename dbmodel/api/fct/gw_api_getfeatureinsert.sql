@@ -30,11 +30,15 @@ DECLARE
     v_y1 double precision;
     v_x2 double precision;
     v_y2 double precision;
+	v_epsg integer;
 
 BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-
+	
+	-- Get srid
+	v_epsg = (SELECT epsg FROM version LIMIT 1);
+	
 	-- getting input data 
 	v_device := ((p_data ->>'client')::json->>'device')::integer;
 	v_infotype :=  ((p_data ->>'client')::json->>'infoType')::integer;
@@ -46,9 +50,9 @@ BEGIN
 
 	-- Geometry column
 	IF v_x2 IS NULL THEN
-		v_input_geometry:= ST_SetSRID(ST_MakePoint(v_x1, v_y1),(SELECT ST_srid (the_geom) FROM sector WHERE sector_id >= 0 limit 1));
+		v_input_geometry:= ST_SetSRID(ST_MakePoint(v_x1, v_y1),v_epsg);
 	ELSIF v_x2 IS NOT NULL THEN
-		v_input_geometry:= ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)),(SELECT ST_srid (the_geom) FROM sector WHERE sector_id >= 0 limit 1));
+		v_input_geometry:= ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)), v_epsg);
 	END IF;
 	
 	-- Call gw_api_getinfofromid
