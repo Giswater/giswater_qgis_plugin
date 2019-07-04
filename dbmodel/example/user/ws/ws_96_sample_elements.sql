@@ -11179,67 +11179,25 @@ INSERT INTO man_wjoin VALUES ('114448', NULL, NULL);
 
 INSERT INTO man_wtp VALUES (18);
 
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (3, 'bpregister_param_1', 'BYPASS-REGISTER', false, 'text', 255, NULL, NULL, 'Bpregister param_1', 'QComboBox', NULL, NULL, 
-    'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=3', NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (4, 'bpregister_param_2', 'BYPASS-REGISTER', false, 'date', NULL, NULL, NULL, 'Bpregister param_2', 'QDateEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (5, 'valregister_param_1', 'VALVE-REGISTER', false, 'integer', NULL, NULL, NULL, 'Valregister param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label,
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (6, 'valregister_param_2', 'VALVE-REGISTER', false, 'text', 255, NULL, NULL, 'Valregister param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (11, 'outfallvalve_param_1', 'OUTFALL-VALVE', false, 'text', NULL, NULL, NULL, 'Outvalve param_1', 'QComboBox', NULL, NULL, 
-    'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=11', NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (12, 'outfallvalve_param_2', 'OUTFALL-VALVE', false, 'boolean', NULL, NULL, NULL, 'Outvalve param_2', 'QCheckBox', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (22, 'shtvalve_param_1', 'SHUTOFF-VALVE', false, 'text', 255, NULL, NULL, 'Shtvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (23, 'shtvalve_param_2', 'SHUTOFF-VALVE', false, 'text', 255, NULL, NULL, 'Shtvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (24, 'greenvalve_param_1', 'GREEN-VALVE', false, 'boolean', NULL, NULL, NULL, 'Gvalve param_1', 'QCheckBox', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (25, 'greenvalve_param_2', 'GREEN-VALVE', false, 'text', 255, NULL, NULL, 'Gvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (26, 'airvalve_param_1', 'AIR-VALVE', false, 'text', 255, NULL, NULL, 'Airvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (27, 'airvalve_param_2', 'AIR-VALVE', false, 'text', 255, NULL, NULL, 'Airvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (28, 'ctrlregister_param_1', 'CONTROL-REGISTER', false, 'date', NULL, NULL, NULL, 'Ctregister param_1', 'QDateEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (29, 'ctrlregister_param_2', 'CONTROL-REGISTER', false, 'integer', NULL, NULL, NULL, 'Ctegister param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (35, 'prbkvalve_param_1', 'PR-BREAK.VALVE', false, 'text', 255, NULL, NULL, 'Prbreakvalve param_1', 'QComboBox', NULL, NULL, 
-    'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=35', NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (36, 'prbkvalve_param_2', 'PR-BREAK.VALVE', false, 'integer', NULL, NULL, NULL, 'Prbreakvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (47, 'checkvalve_param_1', 'CHECK-VALVE', false, 'integer', NULL, NULL, NULL, 'Chkvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (48, 'checkvalve_param_2', 'CHECK-VALVE', false, 'text', 255, NULL, NULL, 'Chkvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter (id, param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, default_value, form_label, 
-    widgettype_id, dv_table, dv_key_column, dv_value_column, sql_text, orderby, active, iseditable) 
-VALUES (50, 'pipe_param_1', 'PIPE', false, 'text', 150, NULL, NULL, 'Pipe param_1', 'QTextEdit', NULL, NULL, NULL, NULL, NULL, false, true);
-
+INSERT INTO man_addfields_parameter VALUES (11, 'outfallvalve_param_1', 'OUTFALL-VALVE', false, 'text', NULL, NULL, NULL, 'Outvalve param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=11', NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (12, 'outfallvalve_param_2', 'OUTFALL-VALVE', false, 'boolean', NULL, NULL, NULL, 'Outvalve param_2', 'QCheckBox', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (22, 'shtvalve_param_1', 'SHUTOFF-VALVE', false, 'text', 255, NULL, NULL, 'Shtvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (23, 'shtvalve_param_2', 'SHUTOFF-VALVE', false, 'text', 255, NULL, NULL, 'Shtvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (24, 'greenvalve_param_1', 'GREEN-VALVE', false, 'boolean', NULL, NULL, NULL, 'Gvalve param_1', 'QCheckBox', NULL, NULL, NULL, NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (25, 'greenvalve_param_2', 'GREEN-VALVE', false, 'text', 255, NULL, NULL, 'Gvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (26, 'airvalve_param_1', 'AIR-VALVE', false, 'text', 255, NULL, NULL, 'Airvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (27, 'airvalve_param_2', 'AIR-VALVE', false, 'text', 255, NULL, NULL, 'Airvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (47, 'checkvalve_param_1', 'CHECK-VALVE', false, 'integer', NULL, NULL, NULL, 'Chkvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (48, 'checkvalve_param_2', 'CHECK-VALVE', false, 'text', 255, NULL, NULL, 'Chkvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (50, 'pipe_param_1', 'PIPE', false, 'text', 150, NULL, NULL, 'Pipe param_1', 'QTextEdit', NULL, NULL, NULL, NULL, NULL, false, true);
+INSERT INTO man_addfields_parameter VALUES (3, 'pressmeter_param_1', 'PRESSURE-METER', false, 'text', 255, NULL, NULL, 'Pressmeter_param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=3', NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (4, 'pressmeter_param_2', 'PRESSURE-METER', false, 'date', NULL, NULL, NULL, 'Pressmeter_param_2', 'QDateEdit', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (5, 'filter_param_1', 'FILTER', false, 'integer', NULL, NULL, NULL, 'Filter_param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (6, 'filter_param_2', 'FILTER', false, 'text', 255, NULL, NULL, 'Filter_param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (29, 'tank_param_2', 'TANK', false, 'integer', NULL, NULL, NULL, 'Tank_param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
+INSERT INTO man_addfields_parameter VALUES (28, 'tank_param_1', 'TANK', false, 'date', NULL, NULL, NULL, 'Tank_param_1', 'QDateEdit', NULL, NULL, NULL, NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (35, 'hydrant_param_1', 'HYDRANT', false, 'text', 255, NULL, NULL, 'Hydrant_param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=35', NULL, 1, true, true);
+INSERT INTO man_addfields_parameter VALUES (36, 'hydrant_param_2', 'HYDRANT', false, 'integer', NULL, NULL, NULL, 'Hydrant_param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
 
 
 

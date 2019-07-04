@@ -208,3 +208,10 @@ INSERT INTO man_type_function VALUES (1, 'Standard Function', 'NODE');
 INSERT INTO man_type_function VALUES (2, 'Standard Function', 'ARC');
 INSERT INTO man_type_function VALUES (3, 'Standard Function', 'CONNEC');
 INSERT INTO man_type_function VALUES (4, 'Standard Function', 'ELEMENT');
+
+
+-- ----------------------------
+--Desactivate cat_features
+-- ----------------------------
+UPDATE cat_feature SET active=false WHERE id not in (select nodetype_id from cat_node) AND type='node';
+UPDATE cat_feature SET active=false WHERE id not in (select connectype_id from cat_connec) AND type='connec';
