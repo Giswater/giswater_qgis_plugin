@@ -256,8 +256,12 @@ BEGIN
 		
 		ELSIF TG_OP = 'UPDATE' THEN 
 				
-			IF NEW.ispsectorgeom THEN
+			IF st_equals (NEW.the_geom, (SELECT the_geom FROM link WHERE link_id=NEW.link_id) THEN -- if geometry comes from link table
 				
+				UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type, the_geom=NEW.the_geom 
+				WHERE link_id=NEW.link_id;				
+				
+			ELSE -- if geometry comes from psector_plan tables then 
 				-- update link
 				UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type 
 				WHERE link_id=NEW.link_id;
@@ -270,10 +274,6 @@ BEGIN
 	
 				UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom FROM v_edit_connec 
 				WHERE plan_psector_x_connec.connec_id=NEW.feature_id AND plan_psector_x_connec.arc_id=v_edit_connec.arc_id;
-				
-			ELSE
-				UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type, the_geom=NEW.the_geom 
-				WHERE link_id=NEW.link_id;
 			END IF;
 		
 		END IF;

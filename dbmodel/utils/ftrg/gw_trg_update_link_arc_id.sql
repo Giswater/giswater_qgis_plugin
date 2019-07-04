@@ -13,10 +13,7 @@ DECLARE
 
 	v_exittype text;
 	v_link record;
-	v_minsector integer;
-	v_dqa integer;
-	v_minsector_val text;
-	v_dqa_val text;
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -27,33 +24,23 @@ BEGIN
 	FOR v_link IN SELECT * FROM link WHERE (exit_type='CONNEC' AND exit_id=OLD.connec_id)
 		LOOP
 
-			-- get man_addfields_parameters for minsector & dqa
-			SELECT id INTO v_minsector FROM man_addfields_parameter WHERE param_name='minsector_id';
-			SELECT id INTO v_dqa FROM man_addfields_parameter WHERE param_name='dqa_id';
-
 			IF v_link.feature_type='CONNEC' THEN
 
-				-- update connec
-				UPDATE connec SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE connec_id=v_link.feature_id;
-				
+				-- update connec, mandatory to use v_edit_connec because it's identified and managed when arc_id comes from plan psector tables
+				UPDATE v_edit_connec SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE connec_id=v_link.feature_id;
+								
 				IF v_projecttype = 'WS' THEN
 
 					-- update presszone
-					UPDATE connec SET presszonecat_id=NEW.presszonecat_id WHERE connec_id=v_link.feature_id;
-		
-					-- update dqa, minsector
-					SELECT value INTO v_minsector_val FROM man_addfields_value WHERE parameter_id=v_minsector AND feature_id=NEW.connec_id;
-					SELECT value INTO v_dqa_val FROM man_addfields_value WHERE parameter_id=v_dqa AND feature_id=NEW.connec_id;
-				
-					UPDATE man_addfields_value SET value=v_minsector_val WHERE parameter_id=v_minsector AND feature_id=v_link.feature_id;
-					UPDATE man_addfields_value SET value=v_dqa_val WHERE parameter_id=v_dqa AND feature_id=v_link.feature_id;
+					UPDATE v_edit_connec SET presszonecat_id=NEW.presszonecat_id, dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id WHERE connec_id=v_link.feature_id;
+	
 				END IF;
 
 			
 			ELSIF v_link.feature_type='GULLY' THEN
  		
-				UPDATE gully SET arc_id=NEW.arc_id WHERE gully_id=v_link.feature_id;
-				UPDATE man_addfields_value SET dqa, minsector
+				-- update gully, mandatory to use v_edit_gully because it's identified and managed when arc_id comes from plan psector tables
+				UPDATE v_edit_gully SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE gully_id=v_link.feature_id;
 				
 			END IF;
 		END LOOP;
@@ -63,11 +50,11 @@ BEGIN
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 			
-				UPDATE v_edit_connec SET arc_id=NEW.arc_id WHERE connec_id=v_link.feature_id;
+				UPDATE v_edit_connec SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE connec_id=v_link.feature_id;
 			
 			ELSIF v_link.feature_type='GULLY' THEN
 		
-				UPDATE v_edit_gully SET arc_id=NEW.arc_id WHERE gully_id=v_link.feature_id;
+				UPDATE v_edit_gully SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE gully_id=v_link.feature_id;
 			END IF;
 		END LOOP;
 		

@@ -452,11 +452,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
         CASE
             WHEN plan_psector_x_connec.link_geom IS NULL THEN link.the_geom
             ELSE plan_psector_x_connec.link_geom
-        END AS the_geom,
-        CASE
-            WHEN plan_psector_x_connec.link_geom IS NULL THEN false
-            ELSE true
-        END AS ispsectorgeom
+        END AS the_geom
    FROM link
      LEFT JOIN vnode ON link.feature_id::text = vnode.vnode_id::text AND link.feature_type::text = 'VNODE'::text
      JOIN v_edit_connec ON link.feature_id::text = v_edit_connec.connec_id::text
