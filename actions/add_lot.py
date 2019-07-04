@@ -72,7 +72,7 @@ class AddNewLot(ParentManage):
 
         # Add 'gully' for 'UD' projects
         if self.controller.get_project_type() == 'ud':
-            self.layers['gully'] = self.controller.get_layer_by_tablename('v_edit_gully')
+            self.layers['gully'] = [self.controller.get_layer_by_tablename('v_edit_gully')]
 
         self.dlg_lot = AddLot()
         self.load_settings(self.dlg_lot)
@@ -1198,7 +1198,7 @@ class AddNewLot(ParentManage):
 
         self.select_features_by_ids(feature_type, expr)
         # self.iface.actionZoomToSelected().trigger()
-        self.iface.actionZoomActualSize ().trigger()
+        self.iface.actionZoomActualSize().trigger()
 
         layer = self.iface.activeLayer()
         features = layer.selectedFeatures()
