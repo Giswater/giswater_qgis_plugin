@@ -237,7 +237,7 @@ class AddNewLot(ParentManage):
         for x in range(0, model.rowCount()):
             index = qtable.model().index(x, self.cmb_position)
             cmb = qtable.indexWidget(index)
-            utils_giswater.set_combo_itemData(cmb, '2', 0)
+            utils_giswater.set_combo_itemData(cmb, '5', 0)
 
 
     def manage_team(self):
@@ -1082,7 +1082,7 @@ class AddNewLot(ParentManage):
 
         # Manage relations
         sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
-               "WHERE lot_id = '"  +str(lot_id) + "'; \n")
+               "WHERE lot_id = '" + str(lot_id) + "'; \n")
         model_rows = self.read_standaritemmodel(self.tbl_relation)
 
         # Save relations
@@ -1109,9 +1109,8 @@ class AddNewLot(ParentManage):
 
         # Manage visits
         table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
-        sql = ("DELETE FROM " + self.schema_name + "." + str(table_name) + " "
-               "WHERE lot_id = ' " +str(lot_id) + "'; \n")
         model_rows = self.read_standaritemmodel(self.dlg_lot.tbl_visit)
+        sql = ""
         for item in model_rows:
             keys = " "
             values = " "
@@ -1124,9 +1123,10 @@ class AddNewLot(ParentManage):
                         values += "$$" + value + "$$, "
             keys = keys[:-2]
             values = values[:-2]
-            sql += ("INSERT INTO " + self.schema_name + "." + str(table_name) + " " "("+keys+") "
-                    "VALUES (" + values + "); \n")
-        status = self.controller.execute_sql(sql)
+            sql += ("UPDATE " + self.schema_name + "." + str(table_name) + " "
+                    "SET("+keys+")=(" + values + ") "
+                    "WHERE lot_id = ' " + str(lot_id) + "'; \n")
+        status = self.controller.execute_sql(sql, log_sql=True)
         return status
 
 
