@@ -151,7 +151,7 @@ class Dimensions(ParentDialog):
 
             # Get the point
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            feature_id = self.snapper_manager.get_feature_id(result)
+            feature_id = self.snapper_manager.get_snapped_feature_id(result)
             element_id = snapped_feat.attribute(feat_type + '_id')
 
             # Leave selection

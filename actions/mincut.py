@@ -1348,7 +1348,7 @@ class MincutParent(ParentAction):
         if elem_type:
             # Get the point. Leave selection
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            feature_id = self.snapper_manager.get_feature_id(result)
+            feature_id = self.snapper_manager.get_snapped_feature_id(result)
             element_id = snapped_feat.attribute(elem_type + '_id')
             layer.select([feature_id])
             self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
