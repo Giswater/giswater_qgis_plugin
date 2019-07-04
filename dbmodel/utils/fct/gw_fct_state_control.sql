@@ -195,7 +195,7 @@ BEGIN
 		IF state_aux=2 THEN
 		
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
-			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers') THEN
+			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
 				PERFORM audit_function(1080,2130);
 			END IF;
 
@@ -216,7 +216,7 @@ BEGIN
 		
 			-- check user's role
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
-			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers') THEN
+			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
 				PERFORM audit_function(1080,2130);
 			END IF;
 
@@ -234,7 +234,7 @@ BEGIN
 
 			-- check user's role
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
-			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers') THEN
+			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
 				PERFORM audit_function(1080,2130);
 			END IF;
 
