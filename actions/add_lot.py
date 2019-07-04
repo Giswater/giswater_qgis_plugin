@@ -173,6 +173,7 @@ class AddNewLot(ParentManage):
             self.update_id_list()
             self.set_dates()
             self.reload_table_visit()
+            self.manage_cmb_status()
 
         # Enable or disable QWidgets
         self.dlg_lot.txt_ot_type.setReadOnly(True)
@@ -199,7 +200,10 @@ class AddNewLot(ParentManage):
         all_index = ['1', '2', '3', '4', '5', '6', '7']
         utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, all_index, 0, (1 | 32))
         self.dlg_lot.btn_validate_all.setEnabled(True)
-        self.dlg_lot.tbl_visit.setEnabled(True)
+
+        combo_list = self.dlg_lot.tbl_visit.findChildren(QComboBox)
+        for combo in combo_list:
+            combo.setEnabled(True)
         self.dlg_lot.btn_delete_visit.setEnabled(True)
 
         # Disable options of QComboBox according combo selection
@@ -210,7 +214,8 @@ class AddNewLot(ParentManage):
         elif value in [6]:
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['1', '2', '3', '4', '7'], 0)
             self.dlg_lot.btn_validate_all.setEnabled(False)
-            self.dlg_lot.tbl_visit.setEnabled(False)
+            for combo in combo_list:
+                combo.setEnabled(False)
             self.dlg_lot.btn_delete_visit.setEnabled(False)
         self.disbale_actions(value)
 
@@ -420,8 +425,7 @@ class AddNewLot(ParentManage):
     def delete_visit(self, qtable):
         selected_list = qtable.selectionModel().selectedRows()
         feature_type = utils_giswater.get_item_data(None, self.dlg_lot.cmb_visit_class, 2).lower()
-        self.controller.log_info(str(selected_list))
-        self.controller.log_info(str(feature_type))
+
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
