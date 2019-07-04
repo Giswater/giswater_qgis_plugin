@@ -12,7 +12,3 @@ INSERT INTO plan_typevalue ('psector_status', 0, 'EXECUTED', 'Psector done');
 INSERT INTO plan_typevalue ('psector_status', 1, 'ONGOING', 'Psector on course');
 INSERT INTO plan_typevalue ('psector_status', 2, 'PLANNED', 'Psector planned');
 INSERT INTO plan_typevalue ('psector_status', 3, 'CANCELED', 'Psector canceled');
-
-
-INSERT INTO cat_feature VALUES ('CLORINATHOR', 'NETELEMENT', 'NODE');
-INSERT INTO node_type  VALUES ('CLORINATHOR', 'NETELEMENT', 'SHORTPIPE', 'man_netelement', 'inp_shortpipe', true, true, 2, true, 'Element to reclorate water', NULL, true, 'DQA');
