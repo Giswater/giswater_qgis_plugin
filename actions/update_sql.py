@@ -165,7 +165,9 @@ class UpdateSQL(ApiParent):
             list_connections.append(elem)
 
         s.endGroup()
-        utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+        print(str(list_connections))
+        if str(list_connections) != '[]':
+            utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
 
         # Declare all file variables
         self.file_pattern_tablect = "tablect"
@@ -220,6 +222,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
+        self.dlg_readsql.btn_create_view.clicked.connect(partial(self.create_child_view))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -2286,6 +2289,31 @@ class UpdateSQL(ApiParent):
             sql = ("SELECT DISTINCT(id), id FROM " + str(schema_name) + ".cat_feature")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
+            utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
+
+
+    def create_child_view(self):
+        """ Create child view """
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        form_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_name_view)
+
+        # Create body
+        feature = '"catFeature":"' + form_name + '"'
+        extras = '"multi_create":' + str(utils_giswater.isChecked(self.dlg_readsql,self.dlg_readsql.chk_multi_create)).lower() + ''
+        body = self.create_body(feature=feature, extras=extras)
+        body = body.replace('""', 'null')
+
+        # Execute query
+        sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_child_views($${" + body + "}$$)::text")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        if status:
+            msg = "Created child view successfully."
+            self.controller.show_info_box(msg, "Info")
+        else:
+            msg = "Some error ocurred when create child view."
+            self.controller.show_info_box(msg, "Info")
+            return
 
 
     def open_manage_field(self, action):
