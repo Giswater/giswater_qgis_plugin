@@ -9,65 +9,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- config api values
 -----------------------
 
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CHAMBER', 've_node_chamber');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('WEIR', 've_node_weir');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('PUMP-STATION', 've_node_pumpstation');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('REGISTER', 've_node_register');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CHANGE', 've_node_change');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('VNODE', 've_node_vnode');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('JUNCTION', 've_node_junction');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('HIGHPOINT', 've_node_highpoint');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CIRC-MANHOLE', 've_node_circmanhole');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('RECT-MANHOLE', 've_node_rectmanhole');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('NETELEMENT', 've_node_netelement');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('NETGULLY', 've_node_netgully');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('SANDBOX', 've_node_sandbox');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('OUTFALL', 've_node_outfall');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('OWERFLOW-STORAGE', 've_node_overflowstorage');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('SEWER-STORAGE', 've_node_sewerstorage');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('VALVE', 've_node_valve');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('JUMP', 've_node_jump');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('WWTP', 've_node_wwtp');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('PUMP-PIPE', 've_arc_pumppipe');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CONDUIT', 've_arc_conduit');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('SIPHON', 've_arc_siphon');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('VARC', 've_arc_varc');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('WACCEL', 've_arc_waccel');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CONNEC', 've_connec');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('GULLY', 've_gully');
-INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('PGULLY', 've_gully');
-
-
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (1, 've_node_chamber', 100, 've_node_chamber');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (2, 've_node_weir', 100, 've_node_weir');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (3, 've_node_pumpstation', 100, 've_node_pumpstation');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (4, 've_node_register', 100, 've_node_register');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (5, 've_node_change', 100, 've_node_change');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (6, 've_node_vnode', 100, 've_node_vnode');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (7, 've_node_junction', 100, 've_node_junction');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (8, 've_node_highpoint', 100, 've_node_highpoint');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (9, 've_node_circmanhole', 100, 've_node_circmanhole');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (10, 've_node_rectmanhole', 100, 've_node_rectmanhole');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (11, 've_node_netelement', 100, 've_node_netelement');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (12, 've_node_netgully', 100, 've_node_netgully');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (13, 've_node_sandbox', 100, 've_node_sandbox');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (14, 've_node_outfall', 100, 've_node_outfall');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (15, 've_node_overflowstorage', 100, 've_node_overflowstorage');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (16, 've_node_sewerstorage', 100, 've_node_sewerstorage');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (17, 've_node_valve', 100, 've_node_valve');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (18, 've_node_jump', 100, 've_node_jump');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (19, 've_node_wwtp', 100, 've_node_wwtp');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (20, 've_arc_pumppipe', 100, 've_arc_pumppipe');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (21, 've_arc_conduit', 100, 've_arc_conduit');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (22, 've_arc_siphon', 100, 've_arc_siphon');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (23, 've_arc_varc', 100, 've_arc_varc');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (24, 've_arc_waccel', 100, 've_arc_waccel');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (25, 've_connec', 100, 've_connec');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (26, 've_gully', 100, 've_gully');
-INSERT INTO config_api_tableinfo_x_infotype (id, tableinfo_id, infotype_id, tableinfotype_id) VALUES (27, 've_gully', 100, 've_gully');
-
-
-
 INSERT INTO config_api_form VALUES (70, 've_gully', 'ud', '[{"actionName":"actionEdit"},{"actionName":"actionCopyPaste"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionRotation"},{"actionName":"actionZoomIn"},{"actionName":"actionZoomOut"},{"actionName":"actionCentered"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]', '{"activeLayer":"ve_gully", "visibleLayer":[]}');
 
 
@@ -76,3 +17,8 @@ INSERT INTO config_api_form_tabs VALUES (610,'ve_gully','tab_elements','Elem','E
 INSERT INTO config_api_form_tabs VALUES (620,'ve_gully','tab_visit','Visit','Visit','role_basic','visit',NULL,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"actionEdit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"actionZoomIn", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"actionZoomOut", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"actionCentered", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"actionLink", "disabled":false}]');
 INSERT INTO config_api_form_tabs VALUES (630,'ve_gully','tab_documents','Doc','Doc','role_basic','doc',NULL,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"actionEdit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"actionZoomIn", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"actionZoomOut", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"actionCentered", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"actionLink", "disabled":false}]');
 
+INSERT INTO config_api_layer VALUES ('v_edit_arc', true, 'vp_basic_arc', false, NULL, 'custom feature', 'Arc', 2, NULL, NULL, 'vp_epa_arc');
+INSERT INTO config_api_layer VALUES ('v_edit_connec', true, 'vp_basic_connec', false, NULL, 'custom feature', 'Connec', 3, NULL, NULL, NULL);
+INSERT INTO config_api_layer VALUES ('v_edit_cad_auxpoint', true, 'v_edit_cad_auxpoint_parent', true, NULL, 'GENERIC', 'Basic Info', 5, NULL, NULL, NULL);
+INSERT INTO config_api_layer VALUES ('v_edit_node', true, 'vp_basic_node', false, NULL, 'custom feature', 'Node', 1, NULL, NULL, 'vp_epa_node');
+INSERT INTO config_api_layer VALUES ('v_edit_gully', true, 'vp_basic_gully', false, NULL, 'custom feature', 'Gully', 4, NULL, NULL, NULL);
