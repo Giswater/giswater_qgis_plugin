@@ -1066,9 +1066,13 @@ class AddNewLot(ParentManage):
 
         if self.is_new_lot is True:
             sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
-                   " VALUES (" + values + ") RETURNING id")
+                   " VALUES (" + values + ") RETURNING id;")
             row = self.controller.execute_returning(sql, commit=True)
             lot_id = row[0]
+            sql = ("INSERT INTO " + self.schema_name + ".selector_lot "
+                   "(lot_id, cur_user) VALUES(" + str(lot_id) + ", current_user);")
+            self.controller.execute_sql(sql)
+            self.refresh_map_canvas()
         else:
             lot_id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
             sql = ("UPDATE " + self.schema_name + ".om_visit_lot "
