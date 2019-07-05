@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>527</height>
+    <width>359</width>
+    <height>521</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -247,107 +247,98 @@
     <rect>
      <x>12</x>
      <y>345</y>
-     <width>334</width>
-     <height>156</height>
+     <width>336</width>
+     <height>166</height>
     </rect>
    </property>
    <property name="title">
     <string>Composer</string>
    </property>
-   <widget class="QComboBox" name="cbx_template">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>75</x>
-      <y>24</y>
-      <width>247</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>27</y>
-      <width>61</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Template</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_export_pdf">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>183</x>
-      <y>120</y>
-      <width>139</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Open composer</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="title">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>75</x>
-      <y>55</y>
-      <width>246</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>47</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Title:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>47</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Rotation:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="rotation">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>75</x>
-      <y>85</y>
-      <width>246</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="3" column="4" colspan="2">
+     <widget class="QSpinBox" name="scale_horizontal">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="4" colspan="2">
+     <widget class="QSpinBox" name="scale_vertical">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3">
+     <widget class="QLabel" name="label_9">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>SH:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>SV:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="5">
+     <widget class="QLineEdit" name="title">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" colspan="5">
+     <widget class="QComboBox" name="cbx_template">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Title:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Rotation:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Template</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="rotation">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3" rowspan="2" colspan="3">
+     <widget class="QPushButton" name="btn_export_pdf">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Open composer</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QPushButton" name="btn_add_additional_point">
    <property name="enabled">
@@ -399,7 +390,6 @@
   <tabstop>cbx_template</tabstop>
   <tabstop>title</tabstop>
   <tabstop>rotation</tabstop>
-  <tabstop>btn_export_pdf</tabstop>
   <tabstop>tbl_list_arc</tabstop>
  </tabstops>
  <resources/>
