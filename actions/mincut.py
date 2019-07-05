@@ -1685,10 +1685,10 @@ class MincutParent(ParentAction):
         if self.current_state == '0':
             self.dlg_mincut.work_order.setDisabled(False)
             # Group Location
-            self.dlg_mincut.address_exploitation.setDisabled(self.search_plus_disabled)
-            self.dlg_mincut.address_postal_code.setDisabled(self.search_plus_disabled)
-            self.dlg_mincut.address_street.setDisabled(self.search_plus_disabled)
-            self.dlg_mincut.address_number.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_exploitation.setDisabled(False)
+            self.dlg_mincut.address_postal_code.setDisabled(False)
+            self.dlg_mincut.address_street.setDisabled(False)
+            self.dlg_mincut.address_number.setDisabled(False)
             # Group Details
             self.dlg_mincut.type.setDisabled(False)
             self.dlg_mincut.cause.setDisabled(False)
@@ -2114,8 +2114,6 @@ class MincutParent(ParentAction):
     def adress_init_config(self, dialog):
         """ Populate the interface with values get from layers """
 
-        self.search_plus_disabled = True
-        
         # Get parameters of 'searchplus' from table 'config_param_system' 
         if not self.searchplus_get_parameters():
             return 
@@ -2170,7 +2168,6 @@ class MincutParent(ParentAction):
         dialog.address_street.currentIndexChanged.connect(
             partial(self.address_get_numbers, dialog, dialog.address_street, self.params['portal_field_code'], True))
         dialog.address_number.activated.connect(partial(self.address_zoom_portal, dialog))
-        self.search_plus_disabled = False
 
 
     def address_zoom_portal(self, dialog):
@@ -2350,10 +2347,10 @@ class MincutParent(ParentAction):
             
             self.dlg_mincut.work_order.setDisabled(False)
             # Group Location
-            self.dlg_mincut.address_exploitation.setDisabled(self.search_plus_disabled)
-            self.dlg_mincut.address_postal_code.setDisabled(self.search_plus_disabled)
-            self.dlg_mincut.address_street.setDisabled(self.search_plus_disabled)
-            self.dlg_mincut.address_number.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_exploitation.setDisabled(False)
+            self.dlg_mincut.address_postal_code.setDisabled(False)
+            self.dlg_mincut.address_street.setDisabled(False)
+            self.dlg_mincut.address_number.setDisabled(False)
             # Group Details
             self.dlg_mincut.type.setDisabled(False)
             self.dlg_mincut.cause.setDisabled(False)
