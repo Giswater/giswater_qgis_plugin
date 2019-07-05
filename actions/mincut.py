@@ -1972,7 +1972,10 @@ class MincutParent(ParentAction):
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
             if value_code is not None and geom is not None:
-                elem = [value_code, value_name, geom.exportToWkt()]
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    elem = [value_code, value_name, geom.exportToWkt()]
+                else:
+                    elem = [value_code, value_name, geom.asWkt()]
             else:
                 elem = [value_code, value_name, None]
             records.append(elem)
