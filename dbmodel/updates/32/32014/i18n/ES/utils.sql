@@ -12,3 +12,8 @@ INSERT INTO plan_typevalue VALUES ('psector_status', 0, 'EJECUTADO', 'Psector do
 INSERT INTO plan_typevalue VALUES ('psector_status', 1, 'EN CURSO', 'Psector on course');
 INSERT INTO plan_typevalue VALUES ('psector_status', 2, 'PLANIFICADO', 'Psector planned');
 INSERT INTO plan_typevalue VALUES ('psector_status', 3, 'CANCELADO', 'Psector canceled');
+
+INSERT INTO om_typevalue VALUES ('visit_cat_status', 1, 'Iniciada');
+INSERT INTO om_typevalue VALUES ('visit_cat_status', 2, 'Stand-by');
+INSERT INTO om_typevalue VALUES ('visit_cat_status', 3, 'Cancelada');
+INSERT INTO om_typevalue VALUES ('visit_cat_status', 4, 'Acabada');
