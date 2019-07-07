@@ -284,12 +284,13 @@ class ReplaceNodeMapTool(ParentMapTool):
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
-                function_name = "gw_fct_feature_replace"
-                sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
-                new_feature_id = self.controller.get_row(sql, log_sql=True, commit=True)
-                if new_feature_id:
-                    message = "Feature replaced successfully"
-                    self.controller.show_info(message)
+            function_name = "gw_fct_feature_replace"
+            sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
+            new_feature_id = self.controller.get_row(sql, log_sql=True, commit=True)
+            self.controller.log_info(new_feature_id[0])
+            if new_feature_id:
+                message = "Feature replaced successfully"
+                self.controller.show_info(message)
             else:
                 message = "Error replacing feature"
                 self.controller.show_warning(message)
@@ -303,24 +304,27 @@ class ReplaceNodeMapTool(ParentMapTool):
             sql = ("DELETE FROM " + self.schema_name + ".selector_state "
                    "WHERE state_id = 1 AND cur_user = '" + str(current_user) + "';"
                    "\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user) "
-                       "VALUES (1, '" + str(current_user) + "');")
-                self.controller.execute_sql(sql)
+                   "VALUES (1, '" + str(current_user) + "');")
+            self.controller.execute_sql(sql)
 
-                if feature_type == 'node':
+            if self.feature_type == 'node' and node_node_type_new != "null" and node_nodecat_id != "null":
+                # Get id of new generated node
+                sql = "SELECT node_id FROM v_edit_node ORDER BY node_id::int4 DESC LIMIT 1"
+                row = self.controller.get_row(sql)
+                if row:
                     # Update field 'nodecat_id'
                     sql = ("UPDATE " + self.schema_name + ".v_edit_node "
                            "SET nodecat_id = '" + str(node_nodecat_id) + "' "
-                           "WHERE node_id = '" + str(new_feature_id[0]) + "'")
-                    self.controller.execute_sql(sql)
-
+                           "WHERE node_id = '" + str(row[0]) + "'")
+                    self.controller.execute_sql(sql, log_sql=True)
                     if project_type == 'ud':
                         sql = ("UPDATE " + self.schema_name + ".v_edit_node "
                                "SET node_type = '" + str(node_node_type_new) + "' "
-                               "WHERE node_id = '" + str(new_feature_id[0]) + "'")
-                        self.controller.execute_sql(sql)
+                               "WHERE node_id = '" + str(row[0]) + "'")
+                        self.controller.execute_sql(sql, log_sql=True)
 
-                    message = "Values has been updated"
-                    self.controller.show_info(message)
+                message = "Values has been updated"
+                self.controller.show_info(message)
 
             # Refresh canvas
             self.refresh_map_canvas()
