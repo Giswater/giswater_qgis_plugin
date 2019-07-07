@@ -33,7 +33,7 @@ from ui_manager import NewWorkcat
 
 
 class ReplaceNodeMapTool(ParentMapTool):
-    """ Button 44: User select one node. Execute SQL function: 'gw_fct_node_replace' """
+    """ Button 44: User select one feature. Execute SQL function: 'gw_fct_feature_replace' """
 
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
@@ -97,27 +97,28 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
-        # Get nodetype_id from current node
-        project_type = self.controller.get_project_type()
-        if project_type == 'ws':
-            node_type = feature.attribute('nodetype_id')
-        if project_type == 'ud':
-            node_type = feature.attribute('node_type')
-            sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
+        if self.feature_type == 'node':
+            # Get nodetype_id from current node
+            project_type = self.controller.get_project_type()
+            if project_type == 'ws':
+                node_type = feature.attribute('nodetype_id')
+            if project_type == 'ud':
+                node_type = feature.attribute('node_type')
+                sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
+                rows = self.controller.get_rows(sql)
+                utils_giswater.fillComboBox(self.dlg_nodereplace, "node_nodecat_id", rows, allow_nulls=False)
+
+            self.dlg_nodereplace.node_node_type.setText(node_type)
+            self.dlg_nodereplace.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
+            self.dlg_nodereplace.btn_catalog.clicked.connect(partial(self.open_catalog_form, project_type, 'node'))
+            self.dlg_nodereplace.workcat_id_end.currentIndexChanged.connect(self.update_date)
+
+            # Fill 1st combo boxes-new system node type
+            sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type "
+                   "WHERE active is True "
+                   "ORDER BY id")
             rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(self.dlg_nodereplace, "node_nodecat_id", rows, allow_nulls=False)
-
-        self.dlg_nodereplace.node_node_type.setText(node_type)
-        self.dlg_nodereplace.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
-        self.dlg_nodereplace.btn_catalog.clicked.connect(partial(self.open_catalog_form, project_type, 'node'))
-        self.dlg_nodereplace.workcat_id_end.currentIndexChanged.connect(self.update_date)
-
-        # Fill 1st combo boxes-new system node type
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type "
-               "WHERE active is True "
-               "ORDER BY id")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_nodereplace, "node_node_type_new", rows)
+            utils_giswater.fillComboBox(self.dlg_nodereplace, "node_node_type_new", rows)
 
         self.dlg_nodereplace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_nodereplace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_nodereplace))
@@ -265,46 +266,43 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
-        feature_type = 'node'
         project_type = self.controller.get_project_type()
         node_node_type_new = utils_giswater.getWidgetText(dialog, dialog.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(dialog, dialog.node_nodecat_id)
 
-        if node_node_type_new != "null" and node_nodecat_id != "null":
-            
-            # Ask question before executing
-            message = "Are you sure you want to replace selected node with a new one?"
-            answer = self.controller.ask_question(message, "Replace node")
-            if answer:
+        # Ask question before executing
+        message = "Are you sure you want to replace selected feature with a new one?"
+        answer = self.controller.ask_question(message, "Replace feature")
+        if answer:
 
-                # Get function input parameters
-                feature = '"type":"' + str(feature_type) + '"'
-                extras = '"old_feature_id":"' + str(self.node_id) + '"'
-                extras += ', "workcat_id_end":"' + str(self.workcat_id_end_aux) + '"'
-                extras += ', "enddate":"' + str(self.enddate_aux) + '"'
-                extras += ', "keep_elements":"' + str(utils_giswater.isChecked(dialog, "keep_elements")) + '"'
-                body = self.create_body(feature=feature, extras=extras)
+            # Get function input parameters
+            feature = '"type":"' + str(self.feature_type) + '"'
+            extras = '"old_feature_id":"' + str(self.feature_id) + '"'
+            extras += ', "workcat_id_end":"' + str(self.workcat_id_end_aux) + '"'
+            extras += ', "enddate":"' + str(self.enddate_aux) + '"'
+            extras += ', "keep_elements":"' + str(utils_giswater.isChecked(dialog, "keep_elements")) + '"'
+            body = self.create_body(feature=feature, extras=extras)
 
-                # Execute SQL function and show result to the user
+            # Execute SQL function and show result to the user
                 function_name = "gw_fct_feature_replace"
                 sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
                 new_feature_id = self.controller.get_row(sql, log_sql=True, commit=True)
                 if new_feature_id:
                     message = "Feature replaced successfully"
                     self.controller.show_info(message)
-                else:
-                    message = "Error replacing feature"
-                    self.controller.show_warning(message)
-                    self.deactivate()
-                    self.set_action_pan()
-                    self.close_dialog(dialog, set_action_pan=False)
-                    return
+            else:
+                message = "Error replacing feature"
+                self.controller.show_warning(message)
+                self.deactivate()
+                self.set_action_pan()
+                self.close_dialog(dialog, set_action_pan=False)
+                return
 
-                # Force user to manage with state = 1 features
-                current_user = self.controller.get_project_user()
-                sql = ("DELETE FROM " + self.schema_name + ".selector_state "
-                       "WHERE state_id = 1 AND cur_user = '" + str(current_user) + "';"
-                       "\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user) "
+            # Force user to manage with state = 1 features
+            current_user = self.controller.get_project_user()
+            sql = ("DELETE FROM " + self.schema_name + ".selector_state "
+                   "WHERE state_id = 1 AND cur_user = '" + str(current_user) + "';"
+                   "\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user) "
                        "VALUES (1, '" + str(current_user) + "');")
                 self.controller.execute_sql(sql)
 
@@ -324,8 +322,8 @@ class ReplaceNodeMapTool(ParentMapTool):
                     message = "Values has been updated"
                     self.controller.show_info(message)
 
-                # Refresh canvas
-                self.refresh_map_canvas()
+            # Refresh canvas
+            self.refresh_map_canvas()
 
             # Deactivate map tool
             self.deactivate()
@@ -354,8 +352,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         if self.snapper_manager.result_is_valid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
-            # TODO: Enable for v_edit_*
-            if tablename and 'v_edit_node' in tablename:
+            if tablename and 'v_edit' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
@@ -375,12 +372,16 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Get snapped feature
         snapped_feat = self.snapper_manager.get_snapped_feature(result)
         if snapped_feat:
-            # Get 'node_id'
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
-            # TODO: Enable for v_edit_*
-            if tablename and 'v_edit_node' in tablename:
-                self.node_id = snapped_feat.attribute('node_id')
+            if tablename and 'v_edit' in tablename:
+                if tablename == 'v_edit_node':
+                    self.feature_type = 'node'
+                elif tablename == 'v_edit_connec':
+                    self.feature_type = 'connec'
+                elif tablename == 'v_edit_gully':
+                    self.feature_type = 'gully'
+                self.feature_id = snapped_feat.attribute(self.feature_type + '_id')
                 self.init_replace_node_form(snapped_feat)
 
 
