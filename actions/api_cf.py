@@ -177,12 +177,14 @@ class ApiCF(ApiParent):
 
     def set_active_layer(self, action, tab_type):
         """ Set active selected layer """
+
         parent_menu = action.associatedWidgets()[0]
         layer = self.controller.get_layer_by_layername(parent_menu.title())
-        table_name = self.controller.get_layer_source(layer)
-        self.iface.setActiveLayer(layer)
-        complet_result, dialog = self.open_form(table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type)
-        self.draw(complet_result)
+        if layer:
+            table_name = self.controller.get_layer_source(layer)
+            self.iface.setActiveLayer(layer)
+            complet_result, dialog = self.open_form(table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type)
+            self.draw(complet_result)
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, layer_new_feature=None, tab_type=None, new_feature=None):

@@ -748,11 +748,12 @@ class DaoController(object):
         
     def get_layer_by_layername(self, layername, log_info=False):
         """ Get layer with selected @layername (the one specified in the TOC) """
-        
+
         layer = QgsProject.instance().mapLayersByName(layername)
-        if layer:         
+        if layer:
             layer = layer[0] 
-        elif layer is None and log_info:
+        elif not layer and log_info:
+            layer = None
             self.log_info("Layer not found", parameter=layername)        
             
         return layer     
