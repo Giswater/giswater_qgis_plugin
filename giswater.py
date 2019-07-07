@@ -50,7 +50,7 @@ from .map_tools.dimensioning import Dimensioning
 from .map_tools.draw_profiles import DrawProfiles
 from .map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from .map_tools.move_node import MoveNodeMapTool
-from .map_tools.replace_node import ReplaceNodeMapTool
+from .map_tools.replace_feature import ReplaceFeatureMapTool
 from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
@@ -343,7 +343,7 @@ class Giswater(QObject):
         elif int(index_action) == 43:
             map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
         elif int(index_action) == 44:
-            map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
+            map_tool = ReplaceFeatureMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 56:
             map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 57:

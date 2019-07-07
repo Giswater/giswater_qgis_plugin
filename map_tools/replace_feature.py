@@ -32,13 +32,13 @@ from ui_manager import NodeReplace
 from ui_manager import NewWorkcat
 
 
-class ReplaceNodeMapTool(ParentMapTool):
+class ReplaceFeatureMapTool(ParentMapTool):
     """ Button 44: User select one feature. Execute SQL function: 'gw_fct_feature_replace' """
 
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
 
-        super(ReplaceNodeMapTool, self).__init__(iface, settings, action, index_action)
+        super(ReplaceFeatureMapTool, self).__init__(iface, settings, action, index_action)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
 
 
