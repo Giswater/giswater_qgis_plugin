@@ -659,10 +659,7 @@ class ApiCF(ApiParent):
 
             self.layer_new_feature.updateFeature(self.new_feature)
             self.layer_new_feature.commitChanges()
-
-            geom = self.new_feature.geometry()
-            the_geom = geom.asWkb().encode('hex').upper()
-            _json['the_geom'] = the_geom
+   
             my_json = json.dumps(_json)
             feature = '"featureType":"'+self.feature_type+'", '
             feature += '"tableName":"' + p_table_id + '", '
