@@ -8,25 +8,23 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- om_visit
-ALTER TABLE om_visit ADD column lot_id integer;
-ALTER TABLE om_visit ADD COLUMN class_id integer;
-ALTER TABLE om_visit ADD COLUMN status integer;
-
-
-ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
-
-ALTER TABLE om_visit ALTER COLUMN startdate SET DEFAULT ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone;
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"lot_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"class_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"status", "dataType":"integer"}}$$);
 
 -- om_visit_event_photo
-ALTER TABLE om_visit_event_photo ADD COLUMN hash text;
-ALTER TABLE om_visit_event_photo ADD COLUMN filetype text;
-ALTER TABLE om_visit_event_photo ADD COLUMN xcoord double precision;
-ALTER TABLE om_visit_event_photo ADD COLUMN ycoord double precision;
-ALTER TABLE om_visit_event_photo ADD COLUMN fextension varchar(16);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_event_photo", "column":"hash", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_event_photo", "column":"filetype", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_event_photo", "column":"xcoord", "dataType":"double precision"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_event_photo", "column":"ycoord", "dataType":"double precision"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_event_photo", "column":"fextension", "dataType":"varchar(16)"}}$$);
 
 
-ALTER TABLE om_visit_parameter ADD COLUMN short_descript varchar(30);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_parameter", "column":"short_descript", "dataType":"varchar(30)"}}$$);
+
+
+ALTER TABLE om_visit ALTER COLUMN startdate SET DEFAULT ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone;
+ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
 
 
 DROP TABLE selector_date;

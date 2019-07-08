@@ -79,7 +79,8 @@ CREATE OR REPLACE VIEW v_arc AS
 	arc.dqa_id,
 	dqa.macrodqa_id,
 	arc.staticpressure,
-	cat_arc.label
+	cat_arc.label,
+    cat_arc.arctype_id as arc_type
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
      JOIN v_state_arc ON arc.arc_id::text = v_state_arc.arc_id::text
@@ -150,7 +151,8 @@ CREATE OR REPLACE VIEW v_edit_arc AS
 	v_arc.minsector_id,
 	v_arc.dqa_id,
 	v_arc.macrodqa_id,
-	v_arc.staticpressure
+	v_arc.staticpressure,
+    v_arc.arc_type
    FROM v_arc;
 	 
 	 
@@ -216,7 +218,8 @@ CREATE OR REPLACE VIEW v_node AS
 	node.dqa_id,
 	dqa.macrodqa_id,
 	node.staticpressure,
-	cat_node.label
+	cat_node.label,
+    cat_node.nodetype_id AS node_type
    FROM node
      JOIN v_state_node ON v_state_node.node_id::text = node.node_id::text
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
@@ -289,7 +292,8 @@ CREATE OR REPLACE VIEW v_edit_node AS
 	v_node.minsector_id,
 	v_node.dqa_id,
 	v_node.macrodqa_id,
-	v_node.staticpressure
+	v_node.staticpressure,
+    v_node.node_type
    FROM v_node;
 
 
@@ -378,8 +382,9 @@ CREATE OR REPLACE VIEW v_edit_connec AS
 	connec.minsector_id,
 	connec.dqa_id,
 	dqa.macrodqa_id,
-	connec.staticpressure
-   FROM connec
+	connec.staticpressure,
+    cat_connec.connectype_id AS connec_type
+	FROM connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
      JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text     
