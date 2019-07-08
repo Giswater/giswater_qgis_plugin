@@ -389,23 +389,6 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 self.init_replace_feature_form(snapped_feat)
 
 
-    def open_custom_form(self, layer, node_id):
-        """ Open custom form from selected @layer and @node_id """
-                                
-        # Get feature with selected node_id
-        expr_filter = "node_id = "
-        expr_filter += "'" + str(node_id[0]) + "'"
-        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
-        if not is_valid:
-            return     
-  
-        # Get a featureIterator from this expression:     
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i for i in it]
-        if id_list:
-            self.iface.openFeatureForm(layer, id_list[0])
-
-
     def activate(self):
 
         # Check button
