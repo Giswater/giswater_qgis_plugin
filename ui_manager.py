@@ -396,8 +396,8 @@ class NewWorkcat(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
-FORM_CLASS = get_ui_class('node_replace.ui')
-class NodeReplace(QDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('feature_replace.ui')
+class FeatureReplace(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
