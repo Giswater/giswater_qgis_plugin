@@ -927,7 +927,11 @@ class ManageVisit(ParentManage, QObject):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         file_types = "Documents (*.doc);; Image (*.jpg *.png);; Pdf (*.pdf);; Video (*.mp4)"
-        new_files = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            new_files = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
+        else:
+            new_files, filter_ = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
+
         sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
         f_types = self.controller.get_rows(sql)
         if new_files:
@@ -935,6 +939,9 @@ class ManageVisit(ParentManage, QObject):
                 item = []
                 if _file not in self.files_added:
                     fextension = _file[-3:]
+                    # Fake the extension as the default parameter in prevention of not having the
+                    # om_visit_filetype_x_extension table configured
+                    file_type = fextension
                     for _types in f_types:
                         if _types[1] == fextension:
                             file_type = _types[0]
