@@ -536,7 +536,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Appropiate</string>
+      <string>Appropriate</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="depth">
