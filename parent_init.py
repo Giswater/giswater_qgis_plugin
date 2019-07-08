@@ -1159,8 +1159,8 @@ class ParentDialog(QDialog):
         # Get values in order to populate model
 
         sql = ("SELECT value, filetype, fextension FROM " + self.schema_name + ".om_visit_event_photo "
-               "WHERE visit_id='" + str(self.event_id) + "' AND event_id='" + str(self.visit_id) + "'")
-        rows = self.controller.get_rows(sql)
+               "WHERE visit_id='" + str(self.visit_id) + "' AND event_id='" + str(self.event_id) + "'")
+        rows = self.controller.get_rows(sql, log_sql=True)
         if rows is None:
             return
 
