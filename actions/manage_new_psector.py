@@ -1085,19 +1085,19 @@ class ManageNewPsector(ParentManage):
             values = ""
             psector_id = utils_giswater.getWidgetText(dialog, 'psector_id')
             values += "'" + str(psector_id) + "', "
-            if tbl_all_rows.model().record(row).value('unit') is not None:
+            if tbl_all_rows.model().record(row).value('unit') not in  (None, 'null', 'NULL'):
                 values += "'" + str(tbl_all_rows.model().record(row).value('unit')) + "', "
             else:
                 values += 'null, '
-            if tbl_all_rows.model().record(row).value('id') is not None:
+            if tbl_all_rows.model().record(row).value('id') not in  (None, 'null', 'NULL'):
                 values += "'" + str(tbl_all_rows.model().record(row).value('id')) + "', "
             else:
                 values += 'null, '
-            if tbl_all_rows.model().record(row).value('description') is not None:
+            if tbl_all_rows.model().record(row).value('description') not in  (None, 'null', 'NULL'):
                 values += "'" + str(tbl_all_rows.model().record(row).value('description')) + "', "
             else:
                 values += 'null, '
-            if tbl_all_rows.model().record(row).value('price') is not None:
+            if tbl_all_rows.model().record(row).value('price') not in  (None, 'null', 'NULL'):
                 values += "'" + str(tbl_all_rows.model().record(row).value('price')) + "', "
             else:
                 values += 'null, '
