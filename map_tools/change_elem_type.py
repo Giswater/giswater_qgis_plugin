@@ -11,6 +11,7 @@ from qgis.PyQt.QtCore import Qt
 from functools import partial
 
 import utils_giswater
+from actions.api_catalog import ApiCatalog
 from ui_manager import ChangeNodeType
 from ui_manager import UDcatalog
 from ui_manager import WScatalog
@@ -83,7 +84,14 @@ class ChangeElemType(ParentMapTool):
         self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
         self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.open_dialog(self.dlg_cat)
-           
+
+    def open_catalog(self, tab_type, feature_type):
+        # Get feature_type
+        feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type,self.dlg_chg_node_type.node_node_type_new)
+        print("TEST 1111")
+        print(str(feature_type))
+        self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog.api_catalog(self.dlg_chg_node_type,'node_nodecat_id', 'node', feature_type)
 
     def fill_filter2(self, wsoftware, geom_type):
 
@@ -209,7 +217,7 @@ class ChangeElemType(ParentMapTool):
         
         if index == -1:
             return
-        
+
         # Get selected value from 2nd combobox
         node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, "node_node_type_new")
         
@@ -233,10 +241,10 @@ class ChangeElemType(ParentMapTool):
         old_node_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type)
         node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
-
+        layer = False
         if node_node_type_new != "null":
                     
-            if (node_nodecat_id != "null" and project_type == 'ws') or (project_type == 'ud'):
+            if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (project_type == 'ud'):
                 sql = ("SELECT man_table FROM " + self.schema_name + ".node_type"
                        " WHERE id = '" + old_node_type + "'")
                 row = self.controller.get_row(sql)
@@ -314,7 +322,7 @@ class ChangeElemType(ParentMapTool):
         self.dlg_chg_node_type = ChangeNodeType()
         self.load_settings(self.dlg_chg_node_type)
 
-        # Get nodetype_id from current node         
+        # Get nodetype_id from current node
         project_type = self.controller.get_project_type()         
         if project_type == 'ws':
             node_type = feature.attribute('nodetype_id')
@@ -326,7 +334,7 @@ class ChangeElemType(ParentMapTool):
  
         self.dlg_chg_node_type.node_node_type.setText(node_type)
         self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
-        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog_form, project_type, 'node'))
+        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog, 'data', ''))
         self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
         

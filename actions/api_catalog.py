@@ -31,13 +31,14 @@ class ApiCatalog(ApiParent):
         self.project_type = project_type
 
 
-    def api_catalog(self, previous_dialog, widget_name, geom_type):
-
-        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
-        body = self.create_body(form)
+    def api_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
+        form_name = 'upsert_catalog_' + geom_type + ''
+        form = '"formName":"' + form_name + '", "tabName":"data", "editable":"TRUE"'
+        feature = '"feature_type":"' + feature_type + '"'
+        body = self.create_body(form, feature)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-        print("ROW -> :" + str(row) )
+
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
@@ -75,18 +76,18 @@ class ApiCatalog(ApiParent):
         id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Call get_api_catalog first time
-        self.get_api_catalog(matcat_id, pnom, dnom, id)
+        self.get_api_catalog(matcat_id, pnom, dnom, id, feature_type, geom_type)
 
         # Set Listeners
-        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pnom, dnom))
-        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id))
-        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id))
+        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
+        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
+        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
 
         # Open form
         self.dlg_catalog.show()
 
 
-    def get_api_catalog(self, matcat_id, pnom, dnom, id):
+    def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
 
         # id = self.dlg_catalog.findChild(QComboBox, 'id')
 
@@ -94,9 +95,11 @@ class ApiCatalog(ApiParent):
         pn_value = utils_giswater.get_item_data(self.dlg_catalog, pnom)
         dn_value = utils_giswater.get_item_data(self.dlg_catalog, dnom)
 
-        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
+        form_name = 'upsert_catalog_' + geom_type + ''
+        form = '"formName":"' + form_name + '", "tabName":"data", "editable":"TRUE"'
+        feature = '"feature_type":"' + feature_type + '"'
         extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pnom":"'+str(pn_value)+'", "dnom":"'+str(dn_value)+'"}'
-        body = self.create_body(form=form, extras=extras)
+        body = self.create_body(form=form, feature=feature, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -106,13 +109,15 @@ class ApiCatalog(ApiParent):
                 self.populate_combo(id,field)
 
 
-    def populate_pn_dn(self, matcat_id, pnom, dnom):
+    def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
 
         matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
 
-        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
+        form_name = 'upsert_catalog_' + geom_type + ''
+        form = '"formName":"' + form_name + '", "tabName":"data", "editable":"TRUE"'
+        feature = '"feature_type":"' + feature_type + '"'
         extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'"}'
-        body = self.create_body(form=form, extras=extras)
+        body = self.create_body(form=form, feature=feature, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]

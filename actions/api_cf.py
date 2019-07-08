@@ -452,6 +452,11 @@ class ApiCF(ApiParent):
         # Get field id name
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
 
+        # Get feature_type
+        sql = ("SELECT system_id FROM " + self.schema_name + ".cat_feature WHERE child_layer = '" + self.tablename + "'")
+        feature_type = self.controller.get_row(sql, log_sql=True, commit=True)
+
+
         self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
@@ -505,7 +510,7 @@ class ApiCF(ApiParent):
 
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(self.start_editing)
-        action_catalog.triggered.connect(partial(self.open_catalog, tab_type))
+        action_catalog.triggered.connect(partial(self.open_catalog, tab_type, feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
 
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
@@ -881,9 +886,10 @@ class ApiCF(ApiParent):
             self.populate_combo(child, combo_child)
 
 
-    def open_catalog(self, tab_type):
+    def open_catalog(self, tab_type, feature_type):
+        print(str(self.geom_type))
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type)
+        self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type, feature_type[0])
 
 
     def show_actions(self, tab_name):

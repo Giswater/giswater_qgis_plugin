@@ -39,22 +39,6 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="node_nodecat_id">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>165</x>
-     <y>90</y>
-     <width>166</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="frame">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_catalog_id">
    <property name="geometry">
     <rect>
@@ -181,11 +165,23 @@
     <string>...</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="node_nodecat_id">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>165</x>
+     <y>90</y>
+     <width>166</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>node_node_type</tabstop>
   <tabstop>node_node_type_new</tabstop>
-  <tabstop>node_nodecat_id</tabstop>
   <tabstop>btn_catalog</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
