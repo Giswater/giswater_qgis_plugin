@@ -1136,6 +1136,7 @@ class ParentDialog(QDialog):
         self.populate_tbl_docs_x_event()
 
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
+        utils_giswater.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
 
         self.dlg_event_full.open()
@@ -1180,8 +1181,9 @@ class ParentDialog(QDialog):
 
     def open_file(self):
         # Get row index
-        index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
-        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value_id')
+        index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
+
         path = index.sibling(index.row(), column_index).data()
         # Check if file exist
         if os.path.exists(path):

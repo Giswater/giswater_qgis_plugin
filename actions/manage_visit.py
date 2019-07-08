@@ -839,7 +839,7 @@ class ManageVisit(ParentManage, QObject):
     def open_file(self):
         # Get row index
         index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
-        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value_id')
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value')
         path = index.sibling(index.row(), column_index).data()
         # Check if file exist
         if os.path.exists(path):
