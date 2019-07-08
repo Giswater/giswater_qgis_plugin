@@ -202,7 +202,7 @@
     <widget class="QCheckBox" name="chk_composer">
      <property name="geometry">
       <rect>
-       <x>12</x>
+       <x>0</x>
        <y>-6</y>
        <width>22</width>
        <height>28</height>
@@ -256,6 +256,19 @@
      </property>
      <property name="margin">
       <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lbl_composer_disabled">
+     <property name="geometry">
+      <rect>
+       <x>115</x>
+       <y>-1</y>
+       <width>236</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>

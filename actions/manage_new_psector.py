@@ -466,11 +466,33 @@ class ManageNewPsector(ParentManage):
                 index = index + 1
         else:
             layout_manager = QgsProject.instance().layoutManager()
-            layouts = layout_manager.layouts()    # QgsPrintLayout
+            layouts = layout_manager.layouts()  # QgsPrintLayout
             for layout in layouts:
                 elem = [index, layout.name()]
                 records.append(elem)
                 index = index + 1
+        if records in ([], None):
+            # If no composer configurated, disable composer pdf file widgets
+            self.dlg_psector_rapport.chk_composer.setEnabled(False)
+            self.dlg_psector_rapport.chk_composer.setChecked(False)
+            self.dlg_psector_rapport.cmb_templates.setEnabled(False)
+            self.dlg_psector_rapport.txt_composer_path.setEnabled(False)
+            self.dlg_psector_rapport.lbl_composer_disabled.setText('No composers defined.')
+            self.dlg_psector_rapport.lbl_composer_disabled.setStyleSheet('color: red')
+            return
+        else:
+            # If composer configurated, enable composer pdf file widgets
+            self.dlg_psector_rapport.chk_composer.setEnabled(True)
+            self.dlg_psector_rapport.cmb_templates.setEnabled(True)
+            self.dlg_psector_rapport.txt_composer_path.setEnabled(True)
+            self.dlg_psector_rapport.lbl_composer_disabled.setText('')
+            utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
+
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               "WHERE parameter = 'composer_" + self.plan_om + "_vdefault' AND cur_user= current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 0)
 
         utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
@@ -565,10 +587,6 @@ class ManageNewPsector(ParentManage):
 
             # Get layout manager object
             layout_manager = QgsProject.instance().layoutManager()
-
-            # Show layout names
-            # for layout in layout_manager.printLayouts():
-            #     print(layout.name())
 
             # Get our layout
             layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
@@ -780,7 +798,6 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_psector_selector(self, tablename, field, value):
-        print(str("insert_psector_selector"))
         sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (" + field + ", cur_user)"
                " VALUES ('" + str(value) + "', current_user)")
         self.controller.execute_sql(sql)
@@ -861,7 +878,6 @@ class ManageNewPsector(ParentManage):
 
 
     def reload_states_selector(self):
-        print(str("reload_states_selector"))
         self.delete_psector_selector('selector_state')
         for x in range(0, len(self.all_states)):
             sql = ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
@@ -910,7 +926,6 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_or_update_new_psector(self, tablename, close_dlg=False):
-        print(str("insert_or_update_new_psector"))
         psector_name = utils_giswater.getWidgetText(self.dlg_plan_psector, "name", return_string_null=False)
         if psector_name == "":
             message = "Mandatory field is missing. Please, set a value"
@@ -1067,7 +1082,6 @@ class ManageNewPsector(ParentManage):
             :param query_left:
             :param field_id:
         """
-        print(str("rows_selector"))
         selected_list = tbl_all_rows.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
@@ -1108,7 +1122,7 @@ class ManageNewPsector(ParentManage):
                    " WHERE " + id_des + " = '" + str(expl_id[i]) + "'"
                    " AND psector_id = '"+psector_id+"'")
 
-            row = self.controller.get_row(sql, log_info=True)
+            row = self.controller.get_row(sql, commit=True)
             if row is not None:
                 # if exist - show warning
                 message = "Id already selected"
@@ -1233,7 +1247,6 @@ class ManageNewPsector(ParentManage):
 
     def document_insert(self):
         """ Insert a docmet related to the current visit """
-        print(str("document_insert"))
         doc_id = self.doc_id.text()
         psector_id = self.psector_id.text()
         if not doc_id:
