@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_api_getcatalog($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"},
-"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "id":"2001"},
+"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "id":"2001", "feature_type":"PIPE"},
 "data":{"fields":{"matcat_id":"PVC", "pnom":"16", "dnom":"160"}}}$$)
 */
 
@@ -40,6 +40,7 @@ DECLARE
 	v_value text;
 	text text;
 	v_matcat text;
+	v_feature_type text;
 
 BEGIN
 -- 	Set search path to local schema
@@ -53,13 +54,14 @@ BEGIN
 	v_device := ((p_data ->>'client')::json->>'device')::text;
 	v_formname :=  ((p_data ->>'form')::json->>'formName')::text;
 	v_tabname :=  ((p_data ->>'form')::json->>'tabName')::text;
+	v_feature_type :=  (((p_data ->>'feature')::json->>'feature_type')::text);
 	v_matcat :=  ((((p_data ->>'data')::json->>'fields')::json)->>'matcat_id');
 
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
 
 -- 	Calling function to build form fields
-	SELECT gw_api_get_formfields(v_formname, 'catalog', v_tabname, null, null, null, null, 'INSERT',v_matcat, v_device)
+	SELECT gw_api_get_formfields(v_formname, 'catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device)
 		INTO fields_array;
 
 --	Setting the catalog 'id' value  (hard coded for catalogs, fixed objective field as id on 4th position
