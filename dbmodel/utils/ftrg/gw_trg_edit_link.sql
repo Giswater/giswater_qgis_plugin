@@ -164,8 +164,8 @@ BEGIN
 				END IF;	
 			ELSE 
 				UPDATE connec SET arc_id=v_arc.arc_id WHERE connec_id=v_connec1.connec_id;
-				UPDATE connec SET feature_id=v_arc.node_id, featurecat_id=v_arc.nodetype_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, presszonecat_id = v_arc.presszonecat_id,
-				dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id WHERE connec_id=v_connec1.connec_id;
+				UPDATE connec SET feature_id=v_arc.arc_id, featurecat_id=v_arc.cat_arctype_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, presszonecat_id = v_arc.presszonecat_id,
+				dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id WHERE connec_id=v_connec1.connec_id;
 			END IF;
 	
 			NEW.exit_type='VNODE';
@@ -256,7 +256,7 @@ BEGIN
 		
 		ELSIF TG_OP = 'UPDATE' THEN 
 				
-			IF st_equals (NEW.the_geom, (SELECT the_geom FROM link WHERE link_id=NEW.link_id) THEN -- if geometry comes from link table
+			IF st_equals (NEW.the_geom, (SELECT the_geom FROM link WHERE link_id=NEW.link_id)) THEN -- if geometry comes from link table
 				
 				UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type, the_geom=NEW.the_geom 
 				WHERE link_id=NEW.link_id;				

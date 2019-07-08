@@ -318,7 +318,7 @@ BEGIN
 
 
 		-- Reconnect arc_id
-		IF (NEW.arc_id != OLD.arc_id OR (OLD.arc_id IS NULL AND NEW.arc_id IS NOT NULL) THEN  -- case when arc_id comes from connec table
+		IF (NEW.arc_id != OLD.arc_id OR (OLD.arc_id IS NULL AND NEW.arc_id IS NOT NULL)) THEN  -- case when arc_id comes from connec table
 			UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.connec_id AND exit_type='VNODE' LIMIT 1)::int8;
@@ -326,7 +326,7 @@ BEGIN
 			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' AND cur_user=current_user LIMIT 1) IS TRUE THEN
 				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
 			END IF;
-		ELSIF (OLD.arc_id != (SELECT arc_id FROM connec WHERE connec_id=NEW.connec_id))  -- case when arc_id comes from plan psector tables
+		ELSIF (OLD.arc_id != (SELECT arc_id FROM connec WHERE connec_id=NEW.connec_id)) THEN -- case when arc_id comes from plan psector tables
 			UPDATE plan_psector_x_connec SET arc_id= NEW.arc_id WHERE connec_id=NEW.connec_id AND arc_id = OLD.arc_id;		
 		END IF;
 
