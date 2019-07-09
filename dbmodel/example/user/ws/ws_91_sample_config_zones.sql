@@ -33,7 +33,7 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_gexp
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vat_vdefault', '21.00', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_type_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_other_vdefault', '4.00', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('presszone_vdefault', 'Medium-Expl_01', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('presszone_vdefault', '3', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('flexunioncat_vdefault', 'FLEXUNION', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('arccat_vdefault', 'FC110-PN10', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('state_vdefault', '1', current_user);
