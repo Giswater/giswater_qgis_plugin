@@ -918,30 +918,35 @@ class ManageVisit(ParentManage, QObject):
 
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
-        file_types = "Documents (*.doc);; Image (*.jpg *.png);; Pdf (*.pdf);; Video (*.mp4)"
-        if Qgis.QGIS_VERSION_INT < 29900:
-            new_files = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
-        else:
-            new_files, filter_ = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
-
+        # Get file types from catalog and populate QFileDialog filter
         sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
-        f_types = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
+        f_types = rows
+        file_types = ""
+        for row in rows:
+            file_types += row[0] + " (*."+row[1]+");;"
+        file_types += "All (*.*)"
+        new_files, filter_ = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
+
+        # Add files to QtableView
         if new_files:
             for _file in new_files:
                 item = []
                 if _file not in self.files_added:
-                    fextension = _file[-3:]
-                    # Fake the extension as the default parameter in prevention of not having the
-                    # om_visit_filetype_x_extension table configured
-                    file_type = fextension
+                    filename, file_extension = os.path.splitext(_file)
+                    file_extension = file_extension.replace('.', '')
+
+                    # Set default file_type = extension, but look for matches with the catalog
+                    file_type = file_extension
                     for _types in f_types:
-                        if _types[1] == fextension:
+                        if _types[1] == file_extension:
                             file_type = _types[0]
                             break
+
                     self.files_added.append(_file)
                     item.append(_file)
                     item.append(file_type)
-                    item.append(fextension)
+                    item.append(file_extension)
                     row = []
                     for value in item:
                         row.append(QStandardItem(str(value)))
@@ -956,29 +961,19 @@ class ManageVisit(ParentManage, QObject):
             f_types = self.controller.get_rows(sql)
             sql = ""
             for path in self.files_added:
-                fextension = path[-3:]
+                filename, file_extension = os.path.splitext(path)
+                # Set default file_type = extension, but look for matches with the catalog
+                file_extension = file_extension.replace('.', '')
+                file_type = file_extension
                 for _types in f_types:
-                    if _types[1] == fextension:
+                    if _types[1] == file_extension:
                         file_type = _types[0]
                         break
                 sql += ("INSERT INTO " + self.schema_name + ".om_visit_event_photo "
                         "(visit_id, event_id, value, filetype, fextension) "
                         " VALUES('" + str(visit_id) + "', '" + str(event_id) + "', '" + str(path) + "', "
-                        "'" + str(file_type) + "', ' " + str(fextension) + "'); \n")
+                        "'" + str(file_type) + "', ' " + str(file_extension) + "'); \n")
             self.controller.execute_sql(sql, log_sql=True)
-
-
-    def show_added_files(self, event_id):
-        visit_id = utils_giswater.getWidgetText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
-        sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo "
-               "WHERE visit_id='" + str(visit_id) + "' AND event_id='" + str(event_id) + "'")
-        self.controller.log_info(str(sql))
-        rows = self.controller.get_rows(sql)
-
-        if not rows:
-            return
-        for row in rows:
-            self.controller.log_info(str(row))
 
 
     def manage_events_changed(self):
