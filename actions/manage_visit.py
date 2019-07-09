@@ -881,6 +881,8 @@ class ManageVisit(ParentManage, QObject):
             item = []
             for value in row:
                 if value is not None:
+                    if value not in self.files_added:
+                        self.files_added.append(str(value))
                     if type(value) != unicode:
                         item.append(QStandardItem(str(value)))
                     else:
@@ -912,6 +914,7 @@ class ManageVisit(ParentManage, QObject):
             for _file in new_files:
                 item = []
                 if _file not in self.files_added:
+                    self.files_added.append(_file)
                     filename, file_extension = os.path.splitext(_file)
                     file_extension = file_extension.replace('.', '')
 
@@ -922,10 +925,9 @@ class ManageVisit(ParentManage, QObject):
                             file_type = _types[0]
                             break
 
-                    self.files_added.append(_file)
                     item.append(_file)
                     item.append(file_type)
-                    item.append(file_extension)  # [-1:] = remove dot from extension
+                    item.append(file_extension)
                     row = []
                     for value in item:
                         row.append(QStandardItem(str(value)))
