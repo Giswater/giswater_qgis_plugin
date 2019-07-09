@@ -17,6 +17,7 @@ DECLARE
 	v_the_geom public.geometry;
 	v_unitarylength float;
 	v_point public.geometry;
+	v_arc_id varchar;
 
 
 BEGIN
@@ -24,7 +25,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- get the geom
-	SELECT node_1, node_2, the_geom INTO v_node_1, v_node_2, v_the_geom FROM arc JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id 
+	SELECT node_1, node_2, the_geom, arc_id INTO v_node_1, v_node_2, v_the_geom, v_arc_id FROM arc JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id 
 	JOIN om_visit_event ON om_visit_x_arc.visit_id=om_visit_event.visit_id WHERE om_visit_event.visit_id=NEW.visit_id;
 
 	RAISE NOTICE 'v_node_1 %, v_node_2 %, v_the_geom %', v_node_1, v_node_2, v_the_geom;
@@ -33,13 +34,13 @@ BEGIN
 	
 		-- control of the position_value againts arc length
 		IF NEW.position_value <0 OR NEW.position_value> ST_length(v_the_geom) THEN
-            RETURN audit_function(3012, 2498,NEW.link_id::text); 
+            RETURN audit_function(3012, 2498,v_arc_id::text); 
 
 		END IF;
 
 		-- control of the position_id againsts arc's node_1 and node_2
 		IF NEW.position_id!=v_node_1 AND NEW.position_id!=v_node_2 THEN
-            RETURN audit_function(3014,2498,NEW.link_id::text); 
+            RETURN audit_function(3014,2498,v_arc_id::text); 
 		ELSIF NEW.position_id=v_node_2 THEN
 			v_the_geom = ST_reverse(v_the_geom);
 		END IF;
