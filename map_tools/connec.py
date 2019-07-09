@@ -27,7 +27,7 @@ from qgis.core import QgsVectorLayer, QgsRectangle
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
 
-from map_tools.parent import ParentMapTool
+from .parent import ParentMapTool
 
 
 class ConnecMapTool(ParentMapTool):

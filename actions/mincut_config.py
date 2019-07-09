@@ -23,11 +23,11 @@ from qgis.PyQt.QtSql import QSqlTableModel
 
 from functools import partial
 
-import utils_giswater
-from giswater.ui_manager import Multirow_selector
-from giswater.ui_manager import Multi_selector
-from giswater.ui_manager import Mincut_edit
-from giswater.actions.parent import ParentAction
+from .. import utils_giswater
+from ..ui_manager import Multirow_selector
+from ..ui_manager import Multi_selector
+from ..ui_manager import Mincut_edit
+from .parent import ParentAction
 
 
 class MincutConfig(ParentAction):

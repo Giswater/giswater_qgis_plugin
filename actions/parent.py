@@ -37,8 +37,8 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
+from .. import utils_giswater
 import os
-import utils_giswater
 import webbrowser
 
 

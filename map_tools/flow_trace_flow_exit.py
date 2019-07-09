@@ -20,7 +20,7 @@
 from qgis.core import QgsFeatureRequest, QgsExpression
 from qgis.PyQt.QtCore import Qt
 
-from map_tools.parent import ParentMapTool
+from .parent import ParentMapTool
 
 
 class FlowTraceFlowExitMapTool(ParentMapTool):

@@ -7,10 +7,10 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-import utils_giswater
-from giswater.ui_manager import Multirow_selector
-from giswater.actions.api_search import ApiSearch
-from giswater.actions.parent import ParentAction
+from .. import utils_giswater
+from ..ui_manager import Multirow_selector
+from .api_search import ApiSearch
+from .parent import ParentAction
 
 
 class Basic(ParentAction):

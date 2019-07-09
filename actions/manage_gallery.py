@@ -30,9 +30,9 @@ import urllib.parse
 from functools import partial
 
 from . import ExtendedQLabel
-from ui_manager import Gallery
-from ui_manager import GalleryZoom
-from actions.parent_manage import ParentManage
+from ..ui_manager import Gallery
+from ..ui_manager import GalleryZoom
+from .parent_manage import ParentManage
 
 
 class ManageGallery(ParentManage):

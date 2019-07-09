@@ -13,13 +13,13 @@ except ImportError:
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
     from qgis.PyQt.QtGui import QStringListModel
-    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsLayout
     from builtins import next
     from builtins import range
-    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
@@ -33,15 +33,15 @@ import os
 import operator
 from functools import partial
 
-import utils_giswater
-from giswater.actions.parent import ParentAction
-from giswater.actions.mincut_config import MincutConfig
-from giswater.actions.multiple_selection import MultipleSelection
-from giswater.ui_manager import Mincut
-from giswater.ui_manager import Mincut_fin
-from giswater.ui_manager import Mincut_add_hydrometer
-from giswater.ui_manager import Mincut_add_connec     
-from giswater.ui_manager import MincutComposer
+from .. import utils_giswater
+from .parent import ParentAction
+from .mincut_config import MincutConfig
+from .multiple_selection import MultipleSelection
+from ..ui_manager import Mincut
+from ..ui_manager import Mincut_fin
+from ..ui_manager import Mincut_add_hydrometer
+from ..ui_manager import Mincut_add_connec
+from ..ui_manager import MincutComposer
 
 
 class MincutParent(ParentAction):

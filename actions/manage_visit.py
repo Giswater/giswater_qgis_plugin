@@ -27,21 +27,21 @@ import subprocess
 import webbrowser
 from functools import partial
 
-import utils_giswater
-from giswater.dao.om_visit_event import OmVisitEvent
-from giswater.dao.om_visit import OmVisit
-from giswater.dao.om_visit_x_arc import OmVisitXArc
-from giswater.dao.om_visit_x_connec import OmVisitXConnec
-from giswater.dao.om_visit_x_node import OmVisitXNode
-from giswater.dao.om_visit_x_gully import OmVisitXGully
-from giswater.dao.om_visit_parameter import OmVisitParameter
-from giswater.ui_manager import AddVisit
-from giswater.ui_manager import EventStandard
-from giswater.ui_manager import EventUDarcStandard
-from giswater.ui_manager import EventUDarcRehabit
-from giswater.ui_manager import VisitManagement
-from giswater.actions.parent_manage import ParentManage
-from giswater.actions.manage_document import ManageDocument
+from .. import utils_giswater
+from ..dao.om_visit_event import OmVisitEvent
+from ..dao.om_visit import OmVisit
+from ..dao.om_visit_x_arc import OmVisitXArc
+from ..dao.om_visit_x_connec import OmVisitXConnec
+from ..dao.om_visit_x_node import OmVisitXNode
+from ..dao.om_visit_x_gully import OmVisitXGully
+from ..dao.om_visit_parameter import OmVisitParameter
+from ..ui_manager import AddVisit
+from ..ui_manager import EventStandard
+from ..ui_manager import EventUDarcStandard
+from ..ui_manager import EventUDarcRehabit
+from ..ui_manager import VisitManagement
+from .parent_manage import ParentManage
+from .manage_document import ManageDocument
 
 
 class ManageVisit(ParentManage, QObject):

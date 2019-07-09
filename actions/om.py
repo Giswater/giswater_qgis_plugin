@@ -22,13 +22,13 @@ from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit, QDateE
 from datetime import datetime
 from functools import partial
 
-import utils_giswater
-from giswater.actions.add_lot import AddNewLot
-from giswater.actions.manage_visit import ManageVisit
-from giswater.actions.manage_new_psector import ManageNewPsector
-from giswater.actions.parent import ParentAction
-from giswater.ui_manager import Psector_management
-from giswater.ui_manager import SelectorDate
+from .. import utils_giswater
+from .add_lot import AddNewLot
+from .manage_visit import ManageVisit
+from .manage_new_psector import ManageNewPsector
+from .parent import ParentAction
+from ..ui_manager import Psector_management
+from ..ui_manager import SelectorDate
 
 
 class Om(ParentAction):

@@ -32,12 +32,12 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_go2epa_options import Go2EpaOptions
-from giswater.actions.api_parent import ApiParent
-from giswater.actions.update_sql import UpdateSQL
-from giswater.ui_manager import FileManager, Multirow_selector, HydrologySelector
-from giswater.ui_manager import EpaResultCompareSelector, EpaResultManager
+from .. import utils_giswater
+from .api_go2epa_options import Go2EpaOptions
+from .api_parent import ApiParent
+from .update_sql import UpdateSQL
+from ..ui_manager import FileManager, Multirow_selector, HydrologySelector
+from ..ui_manager import EpaResultCompareSelector, EpaResultManager
 
 
 class Go2Epa(ApiParent):

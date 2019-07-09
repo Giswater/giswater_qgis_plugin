@@ -17,9 +17,9 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-import utils_giswater
-from map_tools.parent import ParentMapTool
-from ui_manager import Cad_add_circle
+from .. import utils_giswater
+from .parent import ParentMapTool
+from ..ui_manager import Cad_add_circle
 
 
 class CadAddCircle(ParentMapTool):

@@ -9,8 +9,8 @@ from qgis.core import QgsMapToPixel
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor
 
-from map_tools.parent import ParentMapTool
-from giswater.actions.api_cf import ApiCF
+from .parent import ParentMapTool
+from ..actions.api_cf import ApiCF
 
 
 class CadApiInfo(ParentMapTool):

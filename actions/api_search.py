@@ -33,12 +33,12 @@ import sys
 from functools import partial
 from collections import OrderedDict
 
-import utils_giswater
-from giswater.actions.api_cf import ApiCF
-from giswater.actions.manage_new_psector import ManageNewPsector
-from giswater.actions.manage_visit import ManageVisit
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiSearchUi, ApiBasicInfo, ListItems
+from .. import utils_giswater
+from .api_cf import ApiCF
+from .manage_new_psector import ManageNewPsector
+from .manage_visit import ManageVisit
+from .api_parent import ApiParent
+from ..ui_manager import ApiSearchUi, ApiBasicInfo, ListItems
 
 
 class ApiSearch(ApiParent):

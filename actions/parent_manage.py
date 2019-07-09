@@ -26,9 +26,9 @@ from qgis.PyQt.QtCore import Qt, QPoint, QDate, QDateTime
 
 from functools import partial
 
-import utils_giswater
-from giswater.actions.parent import ParentAction
-from giswater.actions.multiple_selection import MultipleSelection
+from .. import utils_giswater
+from .parent import ParentAction
+from .multiple_selection import MultipleSelection
 
 
 class ParentManage(ParentAction, object):

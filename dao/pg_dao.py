@@ -11,7 +11,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from builtins import object
 
-import psycopg2         #@UnusedImport
+import psycopg2
 import psycopg2.extras
 
 

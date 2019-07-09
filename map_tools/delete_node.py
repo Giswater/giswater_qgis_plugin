@@ -19,10 +19,10 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate
 
-import utils_giswater
+from .. import utils_giswater
+from .parent import ParentMapTool
+from ..ui_manager import ArcFusion
 from functools import partial
-from map_tools.parent import ParentMapTool
-from ui_manager import ArcFusion
 
 
 class DeleteNodeMapTool(ParentMapTool):

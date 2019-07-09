@@ -25,8 +25,8 @@ from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils
 import os.path
 from functools import partial
 
-from giswater.dao.pg_dao import PgDao
-from giswater.dao.logger import Logger
+from .pg_dao import PgDao
+from .logger import Logger
 
 
 class DaoController(object):

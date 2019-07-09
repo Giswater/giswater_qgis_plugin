@@ -37,10 +37,10 @@ import matplotlib.pyplot as plt
 import math
 import os
 
-import utils_giswater
+from .. import utils_giswater
 from .parent import ParentMapTool
-from ui_manager import DrawProfile
-from ui_manager import LoadProfiles
+from ..ui_manager import DrawProfile
+from ..ui_manager import LoadProfiles
 
 
 class DrawProfiles(ParentMapTool):

@@ -31,7 +31,7 @@ import os
 import re
 from functools import partial
 
-import utils_giswater
+from .. import utils_giswater
 from .manage_visit import ManageVisit
 from .parent_manage import ParentManage
 from ..ui_manager import AddLot

@@ -13,11 +13,11 @@ except:
 
 from qgis.PyQt.QtCore import QSettings
 
-from giswater.actions.api_cf import ApiCF
-from giswater.actions.manage_element import ManageElement        
-from giswater.actions.manage_document import ManageDocument      
-from giswater.actions.manage_workcat_end import ManageWorkcatEnd      
-from giswater.actions.parent import ParentAction
+from .api_cf import ApiCF
+from .manage_element import ManageElement
+from .manage_document import ManageDocument
+from .manage_workcat_end import ManageWorkcatEnd
+from .parent import ParentAction
 
 
 class Edit(ParentAction):

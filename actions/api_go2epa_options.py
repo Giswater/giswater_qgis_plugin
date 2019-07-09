@@ -8,12 +8,12 @@ or (at your option) any later version.
 from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
 
 import json
-import utils_giswater
 from collections import OrderedDict
 from functools import partial
 
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiEpaOptions
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiEpaOptions
 
 
 class Go2EpaOptions(ApiParent):

@@ -32,7 +32,7 @@ from functools import partial
 import os
 import operator
 
-from actions.HyperLinkLabel import HyperLinkLabel
+from .actions.HyperLinkLabel import HyperLinkLabel
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
