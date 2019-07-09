@@ -70,8 +70,8 @@ BEGIN
         '}')::json;    
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --EXCEPTION WHEN OTHERS THEN 
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
         
 END;
