@@ -484,7 +484,7 @@ class ManageVisit(ParentManage, QObject):
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=True)
 
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
@@ -710,28 +710,19 @@ class ManageVisit(ParentManage, QObject):
 
         # Event tab
         # Fill ComboBox parameter_type_id
-        sql = ("SELECT id"
-               " FROM " + self.schema_name + ".om_visit_parameter_type"
-               " ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox(self.dlg_add_visit, "parameter_type_id", parameter_type_ids, allow_nulls=False)
+        sql = ("SELECT id, id "
+               "FROM " + self.schema_name + ".om_visit_parameter_type "
+               "ORDER BY id")
+        parameter_type_ids = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
         sql = ("SELECT value"
                " FROM " + self.schema_name + ".config_param_user"
                " WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
-        row = self.controller.get_row(sql, commit=self.autocommit)
+        row = self.controller.get_row(sql, commit=True)
         if row:
-            # if int then look for default row ans set it
-            try:
-                parameter_type_id = int(row[0])
-                combo_value = parameter_type_ids[parameter_type_id]
-                combo_index = self.parameter_type_id.findText(combo_value)
-                self.parameter_type_id.setCurrentIndex(combo_index)
-            except TypeError:
-                pass
-            except ValueError:
-                pass
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0])
 
 
     def set_completers(self):
@@ -779,22 +770,22 @@ class ManageVisit(ParentManage, QObject):
 
 
     def event_insert(self):
-        """Add and event basing on form asociated to the selected parameter_id."""
+        """Add and event basing on form associated to the selected parameter_id."""
         
-        # check a paramet3er_id is selected (can be that no value is available)
+        # check a parameter_id is selected (can be that no value is available)
         parameter_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
         parameter_text = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 1)
 
-        if not parameter_id:
+        if not parameter_id or parameter_id == -1:
             message = "You need to select a valid parameter id"
             self.controller.show_info_box(message)
             return
 
-        # get form asociated
+        # get form associated
         sql = ("SELECT form_type"
                " FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE id = '" + str(parameter_id) + "'")
-        row = self.controller.get_row(sql, commit=False)
+        row = self.controller.get_row(sql, commit=True)
         form_type = str(row[0])
 
         if form_type == 'event_ud_arc_standard':
@@ -868,8 +859,9 @@ class ManageVisit(ParentManage, QObject):
 
     def open_file(self):
         # Get row index
-        index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
-        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value_id')
+        index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
+        
         path = index.sibling(index.row(), column_index).data()
         # Check if file exist
         if os.path.exists(path):

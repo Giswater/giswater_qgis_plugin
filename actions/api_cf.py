@@ -1499,7 +1499,7 @@ class ApiCF(ApiParent):
                                  " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
-
+        utils_giswater.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
         self.dlg_event_full.open()
 
 
@@ -1521,8 +1521,8 @@ class ApiCF(ApiParent):
         # Get values in order to populate model
 
         sql = ("SELECT value, filetype, fextension FROM " + self.schema_name + ".om_visit_event_photo "
-               "WHERE visit_id='" + str(self.event_id) + "' AND event_id='" + str(self.visit_id) + "'")
-        rows = self.controller.get_rows(sql)
+               "WHERE visit_id='" + str(self.visit_id) + "' AND event_id='" + str(self.event_id) + "'")
+        rows = self.controller.get_rows(sql, commit=True)
         if rows is None:
             return
 
@@ -1542,8 +1542,9 @@ class ApiCF(ApiParent):
 
     def open_file(self):
         # Get row index
-        index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
-        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value_id')
+        index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
+
         path = index.sibling(index.row(), column_index).data()
         # Check if file exist
         if os.path.exists(path):
