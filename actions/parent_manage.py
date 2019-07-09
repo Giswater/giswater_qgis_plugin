@@ -14,6 +14,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
     from builtins import str
     from builtins import range
 
@@ -48,6 +49,7 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
         self.remove_ids = True
+        self.snapper_manager = None
 
 
     def reset_lists(self):
@@ -349,6 +351,10 @@ class ParentManage(ParentAction, object):
 
 
     def mouse_move(self, point):
+        if self.snapper_manager is None:
+            self.snapper_manager = SnappingConfigManager(self.iface)
+            if self.snapper_manager.controller is None:
+                self.snapper_manager.set_controller(self.controller)
 
         # Hide marker and get coordinates
         self.snapped_point = None
