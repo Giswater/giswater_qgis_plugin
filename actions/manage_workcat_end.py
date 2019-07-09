@@ -107,7 +107,7 @@ class ManageWorkcatEnd(ParentManage):
     def set_edit_arc_downgrade_force(self, value):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT * FROM config_param_user "
                "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
@@ -124,7 +124,7 @@ class ManageWorkcatEnd(ParentManage):
     def fill_fields(self):
         """ Fill dates and combo cat_work """
 
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
@@ -133,11 +133,11 @@ class ManageWorkcatEnd(ParentManage):
             enddate = QDate.currentDate()
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
-        sql = ("SELECT id FROM " + self.controller.schema_name + ".cat_work")
+        sql = ("SELECT id FROM cat_work")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
@@ -150,7 +150,7 @@ class ManageWorkcatEnd(ParentManage):
         workcat_id = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
 
         sql = ("SELECT descript, builtdate "
-               "FROM " + self.controller.schema_name + ".cat_work "
+               "FROM cat_work "
                "WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
         if row:

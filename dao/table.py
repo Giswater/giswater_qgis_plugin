@@ -80,9 +80,8 @@ class Table(object):
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
         fields = [x for x in fields if "__" not in x]
 
-        sql = "SELECT {0} FROM {1}.{2} WHERE {3} = '{4}'".format(
+        sql = "SELECT {0} FROM {1} WHERE {2} = '{3}'".format(
             ", ".join(fields),
-            self.controller().schema_name,
             self.table_name(),
             self.pk(),
             getattr(self, self.pk()))
@@ -137,8 +136,8 @@ class Table(object):
         """Get the next id for the __pk. that will be used for the next insert.
         BEWARE that this call increment the sequence at each call."""
         
-        sql = "SELECT nextval(pg_get_serial_sequence('{}.{}', '{}'))".format(
-            self.controller().schema_name, self.table_name(), self.pk())
+        sql = "SELECT nextval(pg_get_serial_sequence('{}', '{}'))".format(
+            self.table_name(), self.pk())
         row = self.controller().get_row(sql, commit=commit)
         if row:
             return row[0]
@@ -152,8 +151,8 @@ class Table(object):
         # get latest updated sequence ASSUMED a sequence is available!
         # using lastval can generate problems in case of parallel inserts
         # sql = ("SELECT lastval()")
-        sql = "SELECT currval(pg_get_serial_sequence('{}.{}', '{}'))".format(
-            self.controller().schema_name, self.table_name(), self.pk())
+        sql = "SELECT currval(pg_get_serial_sequence('{}', '{}'))".format(
+            self.table_name(), self.pk())
         row = self.controller().get_row(sql, commit=commit)
         if row:
             return row[0]
@@ -166,8 +165,8 @@ class Table(object):
         """Retrive max value of the primary key (if numeric)."""
         
         # doe not use DB nextval function becouse each call it is incremented
-        sql = "SELECT MAX({2}) FROM {0}.{1}".format(
-            self.controller().schema_name, self.table_name(), self.pk())
+        sql = "SELECT MAX({1}) FROM {0}".format(
+            self.table_name(), self.pk())
         row = self.controller().get_row(sql, commit=commit)
         if not row or not row[0]:
             return 0
@@ -178,8 +177,8 @@ class Table(object):
     def pks(self, commit=True):
         """Fetch all pk values."""
         
-        sql = "SELECT {2} FROM {0}.{1} ORDER BY {2}".format(
-            self.controller().schema_name, self.table_name(), self.pk())
+        sql = "SELECT {1} FROM {0} ORDER BY {1}".format(
+            self.table_name(), self.pk())
         rows = self.controller().get_rows(sql, commit=commit)
         return rows
 
@@ -188,7 +187,7 @@ class Table(object):
         """Delete all listed records with specified pks.
         If not ids are specified and not remove all => del current record."""
         
-        sql = "DELETE FROM {0}.{1}".format(self.controller().schema_name, self.table_name())
+        sql = "DELETE FROM {0}".format(self.table_name())
         if not all_records:
             if not where_clause:
                 # if ampty list of ids => get the current id of the record

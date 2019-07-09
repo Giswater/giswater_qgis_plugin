@@ -250,15 +250,15 @@ class Om(ParentAction):
 
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
-        sql = ("SELECT * FROM " + self.controller.schema_name + ".selector_date"
+        sql = ("SELECT * FROM selector_date"
                " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
         if not row :
-            sql = ("INSERT INTO " + self.controller.schema_name + ".selector_date"
+            sql = ("INSERT INTO selector_date"
                    " (from_date, to_date, context, cur_user)"
                    " VALUES('" + from_date + "', '" + to_date + "', 'om_visit', '" + self.current_user + "')")
         else:
-            sql = ("UPDATE " + self.controller.schema_name + ".selector_date"
+            sql = ("UPDATE selector_date"
                    " SET (from_date, to_date) = ('" + from_date + "', '" + to_date + "')"
                    " WHERE cur_user = '" + self.current_user + "'")
 
@@ -289,7 +289,7 @@ class Om(ParentAction):
     def get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
 
-        sql = ("SELECT from_date, to_date FROM " + self.controller.schema_name + ".selector_date"
+        sql = ("SELECT from_date, to_date FROM selector_date"
                " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
         try:

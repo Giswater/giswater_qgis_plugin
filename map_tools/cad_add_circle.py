@@ -178,7 +178,7 @@ class CadAddCircle(ParentMapTool):
         self.iface.setActiveLayer(self.layer_circle)
 
         # Check for default base layer
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+        sql = ("SELECT value FROM config_param_user"
                " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:

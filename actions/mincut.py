@@ -1104,7 +1104,7 @@ class MincutParent(ParentAction):
             (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
             if not is_valid:
                 return expr
-
+        # TODO: schema_name
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -1864,7 +1864,7 @@ class MincutParent(ParentAction):
         """ Get parameters of 'searchplus' from table 'config_param_system' """
 
         self.params = {}
-        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
+        sql = ("SELECT parameter, value FROM config_param_system"
                " WHERE context = 'searchplus' ORDER BY parameter")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -1893,7 +1893,7 @@ class MincutParent(ParentAction):
         expl_id = utils_giswater.get_item_data(dialog, dialog.address_exploitation)
 
         # Get postcodes related with selected 'expl_id'
-        sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
+        sql = "SELECT DISTINCT(postcode) FROM ext_address"
         if expl_id != -1:
             sql += " WHERE " + self.street_field_expl[0] + " = '" + str(expl_id) + "'"
         sql += " ORDER BY postcode"
@@ -2125,7 +2125,7 @@ class MincutParent(ParentAction):
         status = self.address_populate(dialog, dialog.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             return
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+        sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'street_field_expl'")
         self.street_field_expl = self.controller.get_row(sql)
         if not self.street_field_expl:
@@ -2133,7 +2133,7 @@ class MincutParent(ParentAction):
             self.controller.show_warning(message)
             return
 
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+        sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'portal_field_postal'")
         portal_field_postal = self.controller.get_row(sql)
         if not portal_field_postal:
@@ -2150,7 +2150,7 @@ class MincutParent(ParentAction):
         if expl_id:
             # Set SQL to get 'expl_name'
             sql = ("SELECT " + self.params['expl_field_name'] + ""
-                   " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
+                   " FROM " + self.params['expl_layer'] + ""
                    " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
             row = self.controller.get_row(sql, log_sql=False)
             if row:

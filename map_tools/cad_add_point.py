@@ -83,7 +83,7 @@ class CadAddPoint(ParentMapTool):
             row = self.controller.get_row(sql)
             point_2 = row[0]
 
-            sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
+            sql = ("SELECT gw_fct_cad_add_relative_point"
                    "('" + str(point_1) + "', '" + str(point_2) + "', " + str(self.dist_x) + ", "
                    + str(self.dist_y) + ", "+str(self.direction)+", "+str(self.delete_prev)+" )")
             self.controller.execute_sql(sql)
@@ -202,7 +202,7 @@ class CadAddPoint(ParentMapTool):
         self.iface.setActiveLayer(self.layer_points)
 
         # Check for default base layer
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
+        sql = ("SELECT value FROM config_param_user"
                " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:
