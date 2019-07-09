@@ -75,6 +75,7 @@ class ManageVisit(ParentManage, QObject):
         self.expl_id = expl_id
         # Parameter to save all selected files associated to events
         self.files_added = []
+        self.files_all = []
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -793,8 +794,6 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         self.populate_tbl_docs_x_event()
 
-        self.dlg_event.btn_add_file.clicked.connect(self.get_added_files)
-
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_text)
 
@@ -830,7 +829,7 @@ class ManageVisit(ParentManage, QObject):
 
         # save new event
         event.upsert()
-        self.save_files_added(event.visit_id, event.id)
+        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id))
         # update Table
         self.tbl_event.model().select()
         self.manage_events_changed()
@@ -851,7 +850,7 @@ class ManageVisit(ParentManage, QObject):
                 subprocess.call([opener, path])
         else:
             webbrowser.open(path)
-        print(path)
+
 
 
     def populate_tbl_docs_x_event(self, event_id=0):
@@ -879,14 +878,14 @@ class ManageVisit(ParentManage, QObject):
 
         for row in rows:
             item = []
-            for value in row:
-                if value is not None:
-                    if value not in self.files_added:
-                        self.files_added.append(str(value))
-                    if type(value) != unicode:
-                        item.append(QStandardItem(str(value)))
+            if row[0] not in self.files_all:
+                self.files_all.append(str(row[0]))
+            for _file in row:
+                if _file is not None:
+                    if type(_file) != unicode:
+                        item.append(QStandardItem(str(_file)))
                     else:
-                        item.append(QStandardItem(value))
+                        item.append(QStandardItem(_file))
                 else:
                     item.append(QStandardItem(None))
 
@@ -894,9 +893,8 @@ class ManageVisit(ParentManage, QObject):
                 model.appendRow(item)
 
 
-    def get_added_files(self):
+    def get_added_files(self, visit_id, event_id):
         """  Get path files """
-
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
@@ -911,11 +909,12 @@ class ManageVisit(ParentManage, QObject):
 
         # Add files to QtableView
         if new_files:
-            for _file in new_files:
+            for path in new_files:
                 item = []
-                if _file not in self.files_added:
-                    self.files_added.append(_file)
-                    filename, file_extension = os.path.splitext(_file)
+                if path not in self.files_all and path not in self.files_added:
+                    self.files_all.append(path)
+                    self.files_added.append(path)
+                    filename, file_extension = os.path.splitext(path)
                     file_extension = file_extension.replace('.', '')
 
                     # Set default file_type = extension, but look for matches with the catalog
@@ -925,7 +924,7 @@ class ManageVisit(ParentManage, QObject):
                             file_type = _types[0]
                             break
 
-                    item.append(_file)
+                    item.append(path)
                     item.append(file_type)
                     item.append(file_extension)
                     row = []
@@ -934,6 +933,7 @@ class ManageVisit(ParentManage, QObject):
                     if len(row) > 0:
                         self.dlg_event.tbl_docs_x_event.model().appendRow(row)
 
+            self.save_files_added(visit_id, event_id)
 
     def save_files_added(self, visit_id, event_id):
 
