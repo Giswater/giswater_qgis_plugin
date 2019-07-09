@@ -50,3 +50,5 @@ CREATE TABLE plan_psector_x_connec(
       REFERENCES value_state (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"ext_code", "dataType":"varchar(50)"}}$$);
