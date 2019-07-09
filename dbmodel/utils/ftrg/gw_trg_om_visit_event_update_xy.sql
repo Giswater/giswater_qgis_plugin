@@ -25,7 +25,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- get the geom
-	SELECT node_1, node_2, the_geom, arc_id INTO v_node_1, v_node_2, v_the_geom, v_arc_id FROM arc JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id 
+	SELECT arc.node_1, arc.node_2, arc.the_geom, arc.arc_id INTO v_node_1, v_node_2, v_the_geom, v_arc_id FROM arc JOIN om_visit_x_arc ON om_visit_x_arc.arc_id=arc.arc_id 
 	JOIN om_visit_event ON om_visit_x_arc.visit_id=om_visit_event.visit_id WHERE om_visit_event.visit_id=NEW.visit_id;
 
 	RAISE NOTICE 'v_node_1 %, v_node_2 %, v_the_geom %', v_node_1, v_node_2, v_the_geom;
