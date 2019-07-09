@@ -509,7 +509,7 @@ class ApiCF(ApiParent):
             self.layer.editingStopped.connect(partial(self.enable_actions, False))
 
         action_edit.setChecked(self.layer.isEditable())
-        action_edit.triggered.connect(self.start_editing)
+        action_edit.triggered.connect(partial(self.start_editing, self.layer))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
 
@@ -538,9 +538,9 @@ class ApiCF(ApiParent):
         return self.complet_result, self.dlg_cf
 
 
-    def start_editing(self):
-
+    def start_editing(self, layer):
         """ start or stop the edition based on your current status"""
+        self.iface.setActiveLayer(layer)
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
         # If the json is empty, we simply activate/deactivate the editing
