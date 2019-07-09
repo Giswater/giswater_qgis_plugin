@@ -37,6 +37,7 @@ $BODY$
 	v_xcoord numeric;
 	v_ycoord numeric;
 	geom_array public.geometry array;
+	geom_array_vertex public.geometry array;
 	v_data record;
 	id_last text;
 	v_typevalue text;
@@ -448,12 +449,14 @@ BEGIN
 	LOOP
 		--Insert start point, add vertices if exist, add end point
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
-		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
-		LOOP	
-			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),v_epsg);
-			geom_array=array_append(geom_array,v_point_geom);
-		END LOOP;
-
+	
+		SELECT array_agg(ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)order by id) INTO  geom_array_vertex FROM temp_csv2pg 
+		WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source='[VERTICES]' and csv1=v_data.arc_id;
+		
+		IF geom_array_vertex IS NOT NULL THEN
+			geom_array=array_cat(geom_array, geom_array_vertex);
+		END IF;
+		
 		geom_array=array_append(geom_array,(SELECT the_geom FROM node WHERE v_data.node_2=node_id));
 
 		UPDATE arc SET the_geom=ST_MakeLine(geom_array) where arc_id=v_data.arc_id;
