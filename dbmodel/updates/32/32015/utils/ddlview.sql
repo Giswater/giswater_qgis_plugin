@@ -173,3 +173,65 @@ SELECT doc.id,
    doc.user_name,
    doc.tstamp
   FROM doc;
+  
+--09/07/2019
+CREATE OR REPLACE VIEW v_plan_current_psector AS
+ SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.psector_type,
+    plan_psector.descript,
+    plan_psector.priority,
+    a.suma::numeric(14,2) AS total_arc,
+    b.suma::numeric(14,2) AS total_node,
+    c.suma::numeric(14,2) AS total_other,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.sector_id,
+    plan_psector.active,
+    ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+    (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+    (CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pem,
+    gexpenses,
+    ((100::numeric + plan_psector.gexpenses) / 100::numeric)::numeric(14,2) * 
+    ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+    (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+    (CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec,
+    plan_psector.vat,
+    (((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric))::numeric(14,2) * 
+    ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+    (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+    (CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pec_vat,
+    plan_psector.other,
+    (((100::numeric + plan_psector.gexpenses) / 100::numeric) * ((100::numeric + plan_psector.vat) / 100::numeric) * ((100::numeric + plan_psector.other) / 100::numeric))::numeric(14,2) * 
+    ((CASE WHEN a.suma IS NULL THEN 0 ELSE a.suma END)+ 
+    (CASE WHEN b.suma IS NULL THEN 0 ELSE b.suma END)+ 
+    (CASE WHEN c.suma IS NULL THEN 0 ELSE c.suma END))::numeric(14,2) AS pca,
+    plan_psector.the_geom,
+    d.suma AS affec_length,
+    e.suma As plan_length
+   FROM plan_psector
+     JOIN plan_psector_selector ON plan_psector.psector_id = plan_psector_selector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
+            v_plan_psector_x_arc.psector_id
+           FROM v_plan_psector_x_arc
+          GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.total_budget) AS suma,
+            v_plan_psector_x_node.psector_id
+           FROM v_plan_psector_x_node
+          GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
+            v_plan_psector_x_other.psector_id
+           FROM v_plan_psector_x_other
+          GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id     
+     LEFT JOIN ( SELECT sum(st_length2d(arc.the_geom)::numeric(12,2)) AS suma, 
+             psector_id 
+            FROM arc JOIN plan_psector_x_arc USING (arc_id) WHERE plan_psector_x_arc.state=0 
+            GROUP BY plan_psector_x_arc.psector_id) d ON d.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(st_length2d(arc.the_geom)::numeric(12,2)) AS suma, 
+             psector_id 
+            FROM arc JOIN plan_psector_x_arc USING (arc_id) WHERE plan_psector_x_arc.state=1 AND plan_psector_x_arc.doable=TRUE
+            GROUP BY plan_psector_x_arc.psector_id) e ON d.psector_id = plan_psector.psector_id
+  WHERE plan_psector_selector.cur_user = "current_user"()::text;
