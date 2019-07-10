@@ -492,7 +492,7 @@ class ApiSearch(ApiParent):
         file_dialog.setFileMode(QFileDialog.Directory)
 
         msg = "Save as"
-        folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+        folder_path, filter_ = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
