@@ -63,6 +63,7 @@ class AddNewLot(ParentManage):
         self.is_new_lot = is_new
         self.cmb_position = 15  # Variable used to set the position of the QCheckBox in the relations table
 
+        self.srid = self.controller.plugin_settings_value('srid')
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -151,7 +152,6 @@ class AddNewLot(ParentManage):
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
 
-        # TODO pending to make function delete_visit
         self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
         ignore_columns = ('visitcat_id', 'ext_code', 'webclient_id', 'expl_id', 'the_geom', 'is_done', 'status')
         self.dlg_lot.btn_export_visits.clicked.connect(
@@ -723,7 +723,9 @@ class AddNewLot(ParentManage):
                 item.append(1)  # Set status field of the table relation
                 item.append('No visitat')
                 item.append('')
-                item.append(feature.geometry().asWkb().encode('hex').upper())
+                sql = ("SELECT ST_GeomFromText('" + str(feature.geometry().asWkt()) + "', " + str(self.srid) + ")")
+                the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+                item.append(the_geom[0])
                 row = []
                 for value in item:
                     row.append(QStandardItem(str(value)))
