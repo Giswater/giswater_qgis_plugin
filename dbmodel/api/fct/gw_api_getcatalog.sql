@@ -41,6 +41,7 @@ DECLARE
 	text text;
 	v_matcat text;
 	v_feature_type text;
+	v_featurecat_id text;
 
 BEGIN
 -- 	Set search path to local schema
@@ -64,6 +65,16 @@ BEGIN
 	SELECT gw_api_get_formfields(v_formname, 'catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device)
 		INTO fields_array;
 
+	-- Set featuretype_id
+	IF v_formname='upsert_catalog_arc' THEN
+		v_featurecat_id = 'arctype_id';
+	ELSIF v_formname='upsert_catalog_node' THEN
+		v_featurecat_id = 'nodetype_id';
+	ELSIF v_formname='upsert_catalog_connec' THEN
+		v_featurecat_id = 'connectype_id';
+	END IF;
+
+	
 --	Setting the catalog 'id' value  (hard coded for catalogs, fixed objective field as id on 4th position
 	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' OR v_formname='upsert_catalog_grate' THEN
 
@@ -91,7 +102,9 @@ BEGIN
 				IF v_value IS NOT NULL AND v_field != 'id' THEN
 					v_query_result := v_query_result || ' AND '||v_field||'::text = '|| quote_literal(v_value) ||'::text';
 				END IF;
+				
 			END LOOP;
+			v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||'';
 		END IF;
 		raise notice 'v_query_result %', v_query_result;
 
