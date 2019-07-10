@@ -181,6 +181,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="btn_delete_file">
+          <property name="text">
+           <string>Delete file</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -205,22 +212,6 @@
  <connections>
   <connection>
    <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>event_standard</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>event_standard</receiver>
    <slot>reject()</slot>
@@ -231,6 +222,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>event_standard</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
      <y>274</y>
     </hint>
    </hints>
