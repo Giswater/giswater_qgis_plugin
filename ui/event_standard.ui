@@ -181,6 +181,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="btn_delete">
+          <property name="text">
+           <string>Delete file</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>

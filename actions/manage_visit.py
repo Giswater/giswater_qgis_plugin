@@ -916,8 +916,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def get_added_files(self, visit_id, event_id):
-        """  Get path files """
-
+        """  Get path of new files """
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
@@ -956,11 +955,9 @@ class ManageVisit(ParentManage, QObject):
                     if len(row) > 0:
                         self.dlg_event.tbl_docs_x_event.model().appendRow(row)
 
-            self.save_files_added(visit_id, event_id)
-
 
     def save_files_added(self, visit_id, event_id):
-
+        """ Save new files into DataBase """
         if self.files_added:
             sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
             f_types = self.controller.get_rows(sql, commit=True)
@@ -980,6 +977,44 @@ class ManageVisit(ParentManage, QObject):
                         " VALUES('" + str(visit_id) + "', '" + str(event_id) + "', '" + str(path) + "', "
                         "'" + str(file_type) + "', ' " + str(file_extension) + "'); \n")
             self.controller.execute_sql(sql, log_sql=True)
+
+
+    def delete_files(self, qtable, visit_id, event_id):
+        """  Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC"""
+        # Get selected rows
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+
+        list_values = ""
+
+        for x in range(0, len(selected_list)):
+            # Get index of row and row[index]
+            row_index = selected_list[x]
+            row = row_index.row()
+            col_index = utils_giswater.get_col_index_by_col_name(qtable, 'value')
+            value = row_index.sibling(row, col_index).data()
+            if value in self.files_added:
+                self.files_added.remove(value)
+            if value in self.files_all:
+                self.files_all.remove(value)
+            list_values += "'" + str(value) + "',\n"
+        list_values = list_values[:-2]
+
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, list_values)
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + ".om_visit_event_photo "
+                   "WHERE visit_id='" + str(visit_id) + "' "
+                   "AND event_id='" + str(event_id) + "' "
+                   "AND value IN (" + list_values + ")")
+            self.controller.execute_sql(sql, log_sql=True)
+            self.populate_tbl_docs_x_event(event_id)
+        else:
+            return
 
 
     def manage_events_changed(self):
@@ -1072,11 +1107,11 @@ class ManageVisit(ParentManage, QObject):
             if text not in ('NULL', None):
                 utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
 
-            # Manage QTableView docx_x_event
+        # Manage QTableView docx_x_event
         utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
         self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
-        self.dlg_event.btn_add_file.clicked.connect(self.get_added_files)
-
+        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id))
+        self.dlg_event.btn_delete_file.clicked.connect(partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
         self.populate_tbl_docs_x_event(event.id)
 
         # fill widget values if the values are present
