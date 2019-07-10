@@ -534,17 +534,17 @@ class DaoController():
         sql_fields = "" 
         for fieldname in fields:
             sql_fields += fieldname + ", "
-        sql += sql_fields[:-2] + ") VALUES ("   
+        sql += sql_fields[:-2] + ") VALUES ("
           
         # Manage value 'current_user'   
         if unique_value != 'current_user':
-            unique_value = "'" + unique_value + "'" 
+            unique_value = "$$" + unique_value + "$$"
             
         # Iterate over values            
         sql_values = ""
         for value in values:
             if value != 'current_user':
-                sql_values += "'" + value + "', "
+                sql_values += "$$" + value + "$$, "
             else:
                 sql_values += value + ", "
         sql += unique_value + ", " + sql_values[:-2] + ")"         
@@ -556,7 +556,7 @@ class DaoController():
         
         # Execute UPSERT
         self.log_info(sql, stack_level_increase=1)
-        result = self.dao.execute_sql(sql, commit=commit)
+        result = self.dao.execute_sql(sql, commit=commit, log_sql=True)
         self.last_error = self.dao.last_error         
         if not result:
             text = "Undefined error"
