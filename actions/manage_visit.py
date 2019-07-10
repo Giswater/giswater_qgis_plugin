@@ -884,7 +884,7 @@ class ManageVisit(ParentManage, QObject):
         model = QStandardItemModel()
         self.dlg_event.tbl_docs_x_event.setModel(model)
         self.dlg_event.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
-        self.dlg_event.tbl_docs_x_event.horizontalHeader().setResizeMode(3)
+        self.dlg_event.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
         # Get columns name and set headers of model with that
         columns_name = self.controller.get_columns_list('om_visit_event_photo')
         headers = []
@@ -1075,8 +1075,8 @@ class ManageVisit(ParentManage, QObject):
             # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
             # set fixed values
-            self.dlg_event.value.setText(_value)
-            self.dlg_event.position_value.setText(str(position_value))
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
             utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
