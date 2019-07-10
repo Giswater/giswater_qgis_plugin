@@ -1083,7 +1083,7 @@ class AddNewLot(ParentManage):
             self.controller.execute_sql(sql)
 
         self.save_relations(lot, lot_id)
-        status = self.save_visits(lot_id)
+        status = self.save_visits()
         if status:
             self.manage_rejected()
 
@@ -1115,8 +1115,8 @@ class AddNewLot(ParentManage):
         return status
 
 
-    def save_visits(self, lot_id):
-
+    def save_visits(self):
+        status = False
         # Manage visits
         table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         model_rows = self.read_standaritemmodel(self.dlg_lot.tbl_visit)
@@ -1124,21 +1124,24 @@ class AddNewLot(ParentManage):
             return True
         sql = ""
         for item in model_rows:
-            keys = " "
-            values = " "
+            visit_id = None
+            status = None
             for key, value in list(item.items()):
-                if value not in('', None):
-                    keys += ""+key+", "
-                    if type(value) in (int, bool):
-                        values += "$$"+str(value)+"$$, "
-                    else:
-                        values += "$$" + value + "$$, "
-            keys = keys[:-2]
-            values = values[:-2]
-            sql += ("UPDATE " + self.schema_name + "." + str(table_name) + " "
-                    "SET("+keys+")=(" + values + ") "
-                    "WHERE lot_id = ' " + str(lot_id) + "'; \n")
-        status = self.controller.execute_sql(sql, log_sql=True)
+                if key=="visit_id":
+                    visit_id = "" + value + ""
+                if key == "status":
+                    if value not in('', None):
+                        if type(value) in (int, bool):
+                            status = "$$"+str(value)+"$$ "
+                        else:
+                            status = "$$" + value + "$$ "
+
+            if visit_id and status:
+                sql += ("UPDATE " + self.schema_name + "." + str(table_name) + " "
+                        "SET(status)=(" + status + ") "
+                        "WHERE visit_id = '" + str(visit_id) + "'; \n")
+        if sql != "":
+            status = self.controller.execute_sql(sql)
         return status
 
 
