@@ -49,9 +49,15 @@ class ApiCfUi(QMainWindow, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('api_search.ui')
 class ApiSearchUi(QDockWidget, FORM_CLASS):
+    dlg_closed = QtCore.pyqtSignal()
+
     def __init__(self, parent=None):
         super(ApiSearchUi, self).__init__(parent)
         self.setupUi(self)
+
+    def closeEvent(self, event):
+        self.dlg_closed.emit()
+        return super(ApiSearchUi, self).closeEvent(event)
         
 FORM_CLASS = get_ui_class('add_doc.ui')
 class AddDoc(QDialog, FORM_CLASS):

@@ -105,6 +105,7 @@ class ApiSearch(ApiParent):
 
         # Open dialog
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
         self.dlg_search.show()
 
 
