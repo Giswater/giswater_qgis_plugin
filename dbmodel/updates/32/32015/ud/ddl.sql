@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE TABLE om_psector_x_gully(
+CREATE TABLE IF NOT EXISTS om_psector_x_gully(
   id serial NOT NULL,
   gully_id character varying(16),
   arc_id character varying(16),
@@ -24,7 +24,7 @@ CREATE TABLE om_psector_x_gully(
 
 
   
-CREATE TABLE plan_psector_x_gully(
+CREATE TABLE IF NOT EXISTS plan_psector_x_gully(
   id serial NOT NULL,
   gully_id character varying(16) NOT NULL,
   arc_id character varying(16),

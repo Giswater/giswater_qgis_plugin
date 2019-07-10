@@ -108,7 +108,7 @@ subfolder structure of ud/ws/utils folder
 -- Rules to prevent conflits on update files
 --------------------------------------------
 		- For ct and trg use DROP...IF EXISTS......CASCADE
-		- For tables and sequences use CREATE....IF NOT EXISTS
+		- For tables and sequences use CREATE TABLE/SEQUENCE IF NOT EXISTS ....
 		- For views use CREATE OR REPLACE VIEW
 		- For insert on system tables use ON CONFLICT (pk_field) DO NOTHING
 		- For new fields, USE THE FUNCTION gw_fct_admin_manage_fields (see below an example of new field)

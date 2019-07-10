@@ -101,7 +101,7 @@ CREATE TABLE om_visit_lot(
   duration text,
   feature_type text,
   status integer,
-  the_geom public.geometry(POLYGON, SRID_VALUE));
+  the_geom public.geometry(MULTIPOLYGON, SRID_VALUE));
   
    
 

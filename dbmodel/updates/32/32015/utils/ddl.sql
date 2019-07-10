@@ -13,7 +13,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"price_compo
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_csv2pg_cat", "column":"readheader", "dataType":"boolean"}}$$);
 
 
-CREATE TABLE om_psector_x_connec(
+CREATE TABLE IF NOT EXISTS om_psector_x_connec (
   id serial NOT NULL,
   connec_id character varying(16) NOT NULL,
   arc_id character varying(16),
@@ -29,7 +29,7 @@ CREATE TABLE om_psector_x_connec(
 
 
   
-CREATE TABLE plan_psector_x_connec(
+CREATE TABLE IF NOT EXISTS plan_psector_x_connec(
   id serial NOT NULL,
   connec_id character varying(16) NOT NULL,
   arc_id character varying(16),
