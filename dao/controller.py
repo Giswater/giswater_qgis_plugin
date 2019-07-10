@@ -556,7 +556,7 @@ class DaoController():
         
         # Execute UPSERT
         self.log_info(sql, stack_level_increase=1)
-        result = self.dao.execute_sql(sql, commit=commit, log_sql=True)
+        result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
             text = "Undefined error"
