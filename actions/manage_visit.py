@@ -83,10 +83,6 @@ class ManageVisit(ParentManage, QObject):
         # Get expl_id from previus dialog
         self.expl_id = expl_id
 
-        # Parameter to save all selected files associated to events
-        self.files_added = []
-        self.files_all = []
-
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -261,7 +257,7 @@ class ManageVisit(ParentManage, QObject):
         sql = ("UPDATE " + str(self.schema_name) + ".om_visit"
                " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
                " WHERE id = " + str(self.current_visit.id))
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
 
     def manage_rejected(self):
@@ -772,7 +768,11 @@ class ManageVisit(ParentManage, QObject):
 
     def event_insert(self):
         """Add and event basing on form associated to the selected parameter_id."""
-        
+
+        # Parameter to save all selected files associated to events
+        self.files_added = []
+        self.files_all = []
+
         # check a parameter_id is selected (can be that no value is available)
         parameter_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
         parameter_text = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 1)
@@ -817,6 +817,15 @@ class ManageVisit(ParentManage, QObject):
 
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_text)
+        # create an empty Event
+        event = OmVisitEvent(self.controller)
+        event.id = event.max_pk() + 1
+        event.parameter_id = parameter_id
+        event.visit_id = int(self.visit_id.text())
+
+        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id, save=False))
+        self.dlg_event.btn_delete_file.clicked.connect(
+            partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         ret = self.dlg_event.exec_()
@@ -825,12 +834,6 @@ class ManageVisit(ParentManage, QObject):
         if not ret:
             # clicked cancel
             return
-
-        # create an empty Event
-        event = OmVisitEvent(self.controller)
-        event.id = event.max_pk() + 1
-        event.parameter_id = parameter_id
-        event.visit_id = int(self.visit_id.text())
 
         for field_name in event.field_names():
             if not hasattr(self.dlg_event, field_name):
@@ -850,9 +853,7 @@ class ManageVisit(ParentManage, QObject):
 
         # save new event
         event.upsert()
-        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id))
-        self.dlg_event.btn_delete_file.clicked.connect(
-            partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
+        self.save_files_added(event.visit_id, event.id)
         # update Table
         self.tbl_event.model().select()
         self.manage_events_changed()
@@ -917,7 +918,7 @@ class ManageVisit(ParentManage, QObject):
                 model.appendRow(item)
 
 
-    def get_added_files(self, visit_id, event_id):
+    def get_added_files(self, visit_id, event_id, save):
         """  Get path of new files """
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
@@ -956,7 +957,8 @@ class ManageVisit(ParentManage, QObject):
                         row.append(QStandardItem(str(value)))
                     if len(row) > 0:
                         self.dlg_event.tbl_docs_x_event.model().appendRow(row)
-
+            if save:
+                self.save_files_added(visit_id, event_id)
 
     def save_files_added(self, visit_id, event_id):
         """ Save new files into DataBase """
@@ -978,7 +980,7 @@ class ManageVisit(ParentManage, QObject):
                         "(visit_id, event_id, value, filetype, fextension) "
                         " VALUES('" + str(visit_id) + "', '" + str(event_id) + "', '" + str(path) + "', "
                         "'" + str(file_type) + "', ' " + str(file_extension) + "'); \n")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
 
 
     def delete_files(self, qtable, visit_id, event_id):
@@ -1013,7 +1015,7 @@ class ManageVisit(ParentManage, QObject):
                    "WHERE visit_id='" + str(visit_id) + "' "
                    "AND event_id='" + str(event_id) + "' "
                    "AND value IN (" + list_values + ")")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
             self.populate_tbl_docs_x_event(event_id)
         else:
             return
@@ -1028,7 +1030,9 @@ class ManageVisit(ParentManage, QObject):
 
     def event_update(self):
         """Update selected event."""
-        
+        # Parameter to save all selected files associated to events
+        self.files_added = []
+        self.files_all = []
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -1112,7 +1116,7 @@ class ManageVisit(ParentManage, QObject):
         # Manage QTableView docx_x_event
         utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
         self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
-        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id))
+        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id, save=True))
         self.dlg_event.btn_delete_file.clicked.connect(partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
         self.populate_tbl_docs_x_event(event.id)
 
