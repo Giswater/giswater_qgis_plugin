@@ -207,7 +207,7 @@ class ManageVisit(ParentManage, QObject):
         expr_filter = '"{}_id" IN ({})'.format(self.geom_type, self.locked_feature_id)
 
         # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
             return
 
@@ -247,7 +247,7 @@ class ManageVisit(ParentManage, QObject):
         sql = ("UPDATE " + str(self.schema_name) + ".om_visit"
                " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
                " WHERE id = " + str(self.current_visit.id))
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
 
     def manage_rejected(self):
@@ -465,13 +465,14 @@ class ManageVisit(ParentManage, QObject):
 
     def set_parameter_id_combo(self, dialog):
         """set parameter_id combo basing on current selections."""
+
         dialog.parameter_id.clear()
         sql = ("SELECT id, descript"
                " FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
 
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
@@ -604,6 +605,7 @@ class ManageVisit(ParentManage, QObject):
 
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
         """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
+
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
@@ -747,6 +749,7 @@ class ManageVisit(ParentManage, QObject):
 
     def event_insert(self):
         """Add and event basing on form asociated to the selected parameter_id."""
+
         # Parameter to save all selected files associated to events
         self.files_added = []
         self.files_all = []
@@ -813,8 +816,6 @@ class ManageVisit(ParentManage, QObject):
         if not ret:
             # clicked cancel
             return
-
-        print("ADLASKDLASK")
 
         for field_name in event.field_names():
             if not hasattr(self.dlg_event, field_name):
@@ -944,6 +945,7 @@ class ManageVisit(ParentManage, QObject):
 
     def save_files_added(self, visit_id, event_id):
         """ Save new files added into DataBase """
+
         if self.files_added:
             sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
             f_types = self.controller.get_rows(sql, commit=True)
@@ -962,11 +964,12 @@ class ManageVisit(ParentManage, QObject):
                         "(visit_id, event_id, value, filetype, fextension) "
                         " VALUES('" + str(visit_id) + "', '" + str(event_id) + "', '" + str(path) + "', "
                         "'" + str(file_type) + "', ' " + str(file_extension) + "'); \n")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
 
 
     def delete_files(self, qtable, visit_id, event_id):
         """  Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC"""
+
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -997,7 +1000,7 @@ class ManageVisit(ParentManage, QObject):
                    "WHERE visit_id='" + str(visit_id) + "' "
                    "AND event_id='" + str(event_id) + "' "
                    "AND value IN (" + list_values + ")")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
             self.populate_tbl_docs_x_event(event_id)
         else:
             return
