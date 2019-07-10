@@ -35,11 +35,9 @@ class ChangeElemType(ParentMapTool):
     def open_catalog(self, tab_type, feature_type):
         # Get feature_type
         feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type,self.dlg_chg_node_type.node_node_type_new)
-        sql = ("SELECT system_id FROM " + self.schema_name + ".cat_feature WHERE id = '" + feature_type + "'")
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
 
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.catalog.api_catalog(self.dlg_chg_node_type,'node_nodecat_id', 'node', row[0])
+        self.catalog.api_catalog(self.dlg_chg_node_type,'node_nodecat_id', 'node', feature_type)
 
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
