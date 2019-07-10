@@ -598,13 +598,13 @@ class DaoController(object):
           
         # Manage value 'current_user'   
         if unique_value != 'current_user':
-            unique_value = "'" + unique_value + "'" 
+            unique_value = "$$" + unique_value + "$$"
             
         # Iterate over values            
         sql_values = ""
         for value in values:
             if value != 'current_user':
-                sql_values += "'" + value + "', "
+                sql_values += "$$" + value + "$$, "
             else:
                 sql_values += value + ", "
         sql += unique_value + ", " + sql_values[:-2] + ")"         
