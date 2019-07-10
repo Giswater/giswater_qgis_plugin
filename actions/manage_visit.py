@@ -851,6 +851,8 @@ class ManageVisit(ParentManage, QObject):
         # save new event
         event.upsert()
         self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id))
+        self.dlg_event.btn_delete_file.clicked.connect(
+            partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
         # update Table
         self.tbl_event.model().select()
         self.manage_events_changed()
