@@ -723,9 +723,12 @@ class AddNewLot(ParentManage):
                 item.append(1)  # Set status field of the table relation
                 item.append('No visitat')
                 item.append('')
-                sql = ("SELECT ST_GeomFromText('" + str(feature.geometry().asWkt()) + "', " + str(self.srid) + ")")
-                the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
-                item.append(the_geom[0])
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    item.append(feature.geometry().asWkb().encode('hex').upper())
+                else:
+                    sql = ("SELECT ST_GeomFromText('" + str(feature.geometry().asWkt()) + "', " + str(self.srid) + ")")
+                    the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+                    item.append(the_geom[0])
                 row = []
                 for value in item:
                     row.append(QStandardItem(str(value)))
