@@ -387,12 +387,12 @@ class DrawProfiles(ParentMapTool):
 
 
     def snapping_node(self, point):   # @UnusedVariable
-
         # Get clicked point
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
         if self.snapper_manager.result_is_valid():
             # Check feature
             layer = self.snapper_manager.get_snapped_layer(result)
@@ -416,20 +416,7 @@ class DrawProfiles(ParentMapTool):
                     if n > 2:
                         self.start_end_node[1] = str(self.element_id)
                     self.exec_path()
-
-                sys_type = snapped_feat.attribute('sys_type').lower()
-                # Select feature of v_edit_|parent_feature
-                sql = "SELECT parent_layer FROM " + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
-                row = self.controller.get_row(sql, log_sql=True, commit=True)
-                self.layer_feature = self.controller.get_layer_by_tablename(str(row[0]))
-            # else:
-            #     # TODO:: Remove this "else" when snapping works correctly
-            #     snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            #     sys_type = snapped_feat.attribute('sys_type').lower()
-            #     # Select feature of v_edit_|parent_feature
-            #     sql = "SELECT parent_layer FROM " + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
-            #     row = self.controller.get_row(sql, log_sql=True, commit=True)
-            #     self.layer_feature = self.controller.get_layer_by_tablename(str(row[0]))
+                self.layer_feature = self.layer_node
         # widget = clicked button
         # self.widget_start_point | self.widget_end_point : QLabels
         # start_end_node = [0] : node start | start_end_node = [1] : node end
