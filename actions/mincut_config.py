@@ -312,6 +312,7 @@ class MincutConfig(ParentAction):
         self.close_dialog(self.dlg_min_edit)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
+        self.mincut.is_new = False
 
 
     def filter_by_id(self, qtable):
