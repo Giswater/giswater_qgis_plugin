@@ -16,6 +16,8 @@ DECLARE
 v_featuretype varchar;
 v_featurenew varchar;
 v_featureold varchar;
+v_tablename varchar;
+v_fieldname varchar;
     
 BEGIN
     
