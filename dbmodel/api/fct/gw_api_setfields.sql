@@ -113,61 +113,61 @@ BEGIN
             USING v_schemaname, v_tablename, v_idname
             INTO column_type_id;
 
-
-	-- query text, step1
-	v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
-
-	-- query text, step2
-	FOREACH text IN ARRAY v_text 
-	LOOP
-		SELECT v_text [i] into v_jsonfield;
-		v_field:= (SELECT (v_jsonfield ->> 'key')) ;
-		v_value := (SELECT (v_jsonfield ->> 'value')) ;
-		
-		-- Get column type
-		EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
-			USING v_schemaname, v_field
-			INTO v_columntype;
-
-		-- control column_type
-		IF v_columntype IS NULL THEN
-			v_columntype='text';
-		END IF;
-			
-		-- control geometry fields
-		IF v_field ='the_geom' OR v_field ='geom' THEN 
-			v_columntype='geometry';
-		END IF;
-		--IF v_value !='null' OR v_value !='NULL' THEN 
+	IF v_text is not NULL THEN
+		-- query text, step1
+		v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
 	
-			IF v_field='state' THEN
-				PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
-			END IF;
+		-- query text, step2
+		FOREACH text IN ARRAY v_text 
+		LOOP
+			SELECT v_text [i] into v_jsonfield;
+			v_field:= (SELECT (v_jsonfield ->> 'key')) ;
+			v_value := (SELECT (v_jsonfield ->> 'value')) ;
 			
-			IF v_field in ('geom', 'the_geom') THEN			
-				v_value := (SELECT ST_SetSRID((v_value)::geometry, 25831));				
+			-- Get column type
+			EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
+				USING v_schemaname, v_field
+				INTO v_columntype;
+
+			-- control column_type
+			IF v_columntype IS NULL THEN
+				v_columntype='text';
 			END IF;
-			
-			--building the query text
-			IF n=1 THEN
-				v_querytext := concat (v_querytext, quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
-			ELSIF i>1 THEN
-				v_querytext := concat (v_querytext, ' , ',  quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
+				
+			-- control geometry fields
+			IF v_field ='the_geom' OR v_field ='geom' THEN 
+				v_columntype='geometry';
 			END IF;
-			n=n+1;			
-		--END IF;
-		i=i+1;
+			--IF v_value !='null' OR v_value !='NULL' THEN 
+		
+				IF v_field='state' THEN
+					PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
+				END IF;
+				
+				IF v_field in ('geom', 'the_geom') THEN			
+					v_value := (SELECT ST_SetSRID((v_value)::geometry, 25831));				
+				END IF;
+				
+				--building the query text
+				IF n=1 THEN
+					v_querytext := concat (v_querytext, quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
+				ELSIF i>1 THEN
+					v_querytext := concat (v_querytext, ' , ',  quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
+				END IF;
+				n=n+1;			
+			--END IF;
+			i=i+1;
 
-	END LOOP;
+		END LOOP;
 
-	-- query text, final step
-	v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';	
+		-- query text, final step
+		v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';	
 
-	raise notice 'v_querytext %', v_querytext;
+		raise notice 'v_querytext %', v_querytext;
 
-	-- execute query text
-	EXECUTE v_querytext;
-
+		-- execute query text
+		EXECUTE v_querytext;
+	END IF;
 
 --    Return
     RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||'}')::json;    

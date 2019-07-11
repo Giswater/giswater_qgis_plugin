@@ -88,6 +88,7 @@ DECLARE
 	v_min double precision;
 	v_max double precision;
 	v_widgetcontrols json;
+	v_type text;
 	
 BEGIN
 
@@ -344,8 +345,11 @@ BEGIN
 			-- special values
 			IF (aux_json->>'column_id') = quote_ident(v_idname) THEN
 				field_value = v_id;
-			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'_type') THEN
-				field_value = v_catfeature.type;
+			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'_type')  THEN
+				EXECUTE 'SELECT ' || v_catfeature.type || '_type FROM ' || p_table_id ||' LIMIT 1' INTO field_value;	
+				v_type = field_value;
+			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'cat_id') OR (aux_json->>'column_id') = concat(lower(v_catfeature.type),'at_id') THEN
+				EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||' WHERE ' || v_catfeature.type || 'type_id = ''' || v_type || ''' LIMIT 1' INTO field_value;
 			ELSIF (aux_json->>'column_id') = 'code' THEN
 				field_value = v_code;
 			ELSIF (aux_json->>'column_id') = 'node_1' THEN
