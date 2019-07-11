@@ -1123,12 +1123,12 @@ class UpdateSQL(ApiParent):
         extras += '"epsg":' + str(self.filter_srid_value).replace('"', '')
         if new_project is True:
             if str(self.title) != 'null':
-                extras += ', ' + '"title":"' + str(self.title) + '",'
+                extras += ', ' + '"title":"' + str(self.title) + '"'
             if str(self.author) != 'null':
-                extras += ', ' + '"author":"' + str(self.author) + '",'
+                extras += ', ' + '"author":"' + str(self.author) + '"'
             if str(self.date) != 'null':
-                extras += ', ' + '"date":"' + str(self.date) + '",'
-        extras += '"superUsers":' + str(self.super_users).replace("'",'"') + ''
+                extras += ', ' + '"date":"' + str(self.date) + '"'
+        extras += ', "superUsers":' + str(self.super_users).replace("'",'"') + ''
         print(str(self.super_users).replace("'",'"'))
         self.schema_name = schema_name
 
