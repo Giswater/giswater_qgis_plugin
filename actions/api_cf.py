@@ -661,16 +661,21 @@ class ApiCF(ApiParent):
                 if k in (parent_fields):
                     self.new_feature.setAttribute(k, v)
                     _json.pop(k, None)
-
             self.layer_new_feature.updateFeature(self.new_feature)
             self.layer_new_feature.commitChanges()
-   
+
             my_json = json.dumps(_json)
-            feature = '"featureType":"'+self.feature_type+'", '
+
+            if my_json == '' or str(my_json) == '{}':
+                self.close_dialog(dialog)
+                return
+
+            feature = '"featureType":"'+str(self.feature_type)+'", '
             feature += '"tableName":"' + p_table_id + '", '
             feature += '"id":"' + self.new_feature.attribute(id_name) + '"'
             extras = '"fields":' + my_json + ''
             body = self.create_body(feature=feature, extras=extras)
+
             sql = ("SELECT " + self.schema_name + ".gw_api_setfields($${" + body + "}$$)")
         else:
             my_json = json.dumps(_json)
