@@ -1,8 +1,7 @@
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(
-    table_id character varying,
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertform(
+    p_table_id character varying,
     lang character varying,
-    id character varying)
+    p_id character varying)
   RETURNS json AS
 $BODY$
 DECLARE
@@ -43,33 +42,36 @@ BEGIN
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
-	
---  Control of null values
-    IF id='NULL' or id='' THEN id=null;
-    END IF;
 
---  Take form_id 
+
+	IF p_id='NULL' OR p_id='""' OR p_id='null' THEN 
+		p_id=null;
+	END IF;
+
+
+    --  Take form_id 
     EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
         INTO formtodisplay
-        USING table_id; 
+        USING p_table_id; 
+
 
 --  force form refresh
-    IF table_id = any((select value from config_param_system where parameter='api_edit_force_form_refresh')::text[]) THEN
+    IF p_table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_force_form_refresh')::text[]) THEN
     v_force_formrefresh := 'TRUE';
     END IF;
 
 --  force canvas refresh
-    IF table_id = any((select value from config_param_system where parameter='api_edit_force_canvas_refresh')::text[]) THEN
+    IF p_table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_force_canvas_refresh')::text[]) THEN
     v_force_canvasrefresh := 'TRUE';
     END IF;
 
 --  dissable editgeom button
-    IF table_id = any((select value from config_param_system where parameter='api_edit_dsbl_geom_button')::text[]) THEN
+    IF p_table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_dsbl_geom_button')::text[]) THEN
     v_enable_editgeom := 'FALSE';
     END IF;
 
 --  dissable delete button
-    IF table_id = any((select value from config_param_system where parameter='api_edit_dsbl_del_feature')::text[]) THEN
+    IF p_table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_dsbl_del_feature')::text[]) THEN
     v_enable_delfeaeture := 'FALSE';
     END IF;
     
@@ -77,68 +79,70 @@ BEGIN
     IF formtodisplay ISNULL THEN
         formtodisplay := 'F16';
     END IF;
+    
 
-
- --    Get fields
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, label, name, type, "dataType", placeholder, (ROW_NUMBER() OVER(ORDER BY orderby asc)) AS rownum, 
-        dv_table, dv_id_column, dv_name_column FROM config_web_fields WHERE table_id = $1 order by 7) a'
+--    Get fields
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = '||quote_literal(p_table_id)||' order by orderby) a'
         INTO fields_array
-        USING table_id;  
-    fields_array := COALESCE(fields_array, '{}');
+        USING (p_table_id);    
+
+--    Get combo rows
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, name, type, dv_table, dv_id_column, dv_name_column, ROW_NUMBER() OVER() AS rownum 
+        FROM config_web_fields WHERE table_id = $1) a WHERE type = $2'
+    INTO combo_rows
+    USING p_table_id, 'combo';
+    combo_rows := COALESCE(combo_rows, '{}');
+
+
 
 --    Update combos
-    FOREACH aux_json IN ARRAY fields_array
+    FOREACH aux_json IN ARRAY combo_rows
     LOOP
+
+
+--      Get combo id's
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
+        || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
+        INTO combo_json; 
+     
+
+--        Update array
+        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+        IF combo_json IS NOT NULL THEN
+            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->0);
+        ELSE
+            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
+        END IF;
+
+--        Get combo values
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
+        || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
+        INTO combo_json; 
+        combo_json := COALESCE(combo_json, '[]');
     
-	IF (aux_json->>'type')::text='combo' THEN
+--      Update array
+        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
 
-		raise notice 'aux_json %', aux_json;
-
-	--      Get combo id's
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || '::text)) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
-		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
-		INTO combo_json; 
-
-	--        Update array
-		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
-		IF aux_json->>'name' = 'size_id' THEN
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', 1::text);
-		ELSIF combo_json IS NOT NULL THEN
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->0);
-		ELSE
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
-		END IF;
-
-	--        Get combo values
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
-		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
-		INTO combo_json; 
-		combo_json := COALESCE(combo_json, '[]');
-	
-	--      Update array
-		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
-	END IF;
-	
     END LOOP;
 
 
 --    Get existing values for the element
-    IF id IS NOT NULL THEN
+    IF p_id IS NOT NULL THEN
 
 --        Get id column
         EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
             INTO table_pkey
-            USING table_id;
+            USING p_table_id;
 
 --        For views is the first column
         IF table_pkey ISNULL THEN
-            EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND ordinal_position = 1'
+            EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND ordinal_position = 1'
             INTO table_pkey
             USING schemas_array[1];
         END IF;
 
 --        Get column type
-        EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND column_name = $2'
+        EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
             USING schemas_array[1], table_pkey
             INTO column_type;
 
@@ -151,7 +155,7 @@ BEGIN
             array_index := array_index + 1;
 
 --            Get values
-            EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || ')' 
+            EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(p_table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(p_id) || ' AS ' || column_type || ')' 
                 INTO field_value; 
             field_value := COALESCE(field_value, '');
 
@@ -206,4 +210,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
