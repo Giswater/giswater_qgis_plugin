@@ -719,7 +719,7 @@ class ManageVisit(ParentManage, QObject):
                " WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
         if row:
-            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0])
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
 
     def set_completers(self):
