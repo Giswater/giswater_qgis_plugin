@@ -154,7 +154,12 @@ BEGIN
 		IF (aux_json->>'isparent')::boolean IS TRUE OR ((aux_json->>'widgettype') = 'combo' AND (aux_json->>'dv_parent_id') IS NULL) THEN
 
 			-- Define the order by column
-			IF (aux_json->>'dv_orderby_id')::boolean IS TRUE THEN
+			
+			IF ((aux_json->>'column_id') = 'tram_ocupacio_tub' or (aux_json->>'column_id') = 'emb_ocupacio_embornal') AND (aux_json->>'dv_orderby_id')::boolean IS TRUE THEN
+				v_orderby='id::integer';
+			ELSIF ((aux_json->>'column_id') = 'tram_ocupacio_tub' or (aux_json->>'column_id') = 'emb_ocupacio_embornal') AND (aux_json->>'dv_orderby_id')::boolean IS FALSE THEN
+				v_orderby='idval::integer';
+			ELSIF (aux_json->>'dv_orderby_id')::boolean IS TRUE THEN
 				v_orderby='id';
 			ELSE 
 				v_orderby='idval';

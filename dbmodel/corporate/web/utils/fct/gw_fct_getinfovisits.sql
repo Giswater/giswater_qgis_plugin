@@ -69,9 +69,9 @@ BEGIN
     END IF;
 
 --    Add visit_end filter
-   IF visit_end IS NOT NULL THEN
+   /*IF visit_end IS NOT NULL THEN
         query_result := query_result || ' AND visit_end < ' || quote_literal(visit_end);
-    END IF;
+    END IF;*/
 
 --    Query with dates filter
     query_result_dates := query_result;
