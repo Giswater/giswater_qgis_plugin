@@ -41,7 +41,7 @@ BEGIN
 
     -- Starting process
     SELECT * INTO mincut_rec FROM anl_mincut_result_cat WHERE id=result_id_arg;
-	SELECT expl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
+	SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
 	
     -- Loop for all the proposed valves
     FOR rec_valve IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=result_id_arg AND proposed=TRUE
@@ -72,10 +72,9 @@ BEGIN
 				''SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
 				(case when closed=true then -1 else 1 end) as cost,
 				(case when closed=true then -1 else 1 end) as reverse_cost
-				FROM SCHEMA_NAME.v_edit_arc 
-				JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id 
+				FROM SCHEMA_NAME.v_edit_arc
 				LEFT JOIN (
-					SELECT arc_id, true as closed FROM SCHEMA_NAME.v_edit_arc JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+					SELECT arc_id, true as closed FROM SCHEMA_NAME.v_edit_arc
 					WHERE 
 						(node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
 						AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
