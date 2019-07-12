@@ -340,7 +340,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.rotation.setDisabled(False)
         self.dlg_draw_profile.scale_vertical.setDisabled(False)
         self.dlg_draw_profile.scale_horizontal.setDisabled(False)
-
+        self.exec_path()
         self.close_dialog(self.dlg_load)
 
 
@@ -811,17 +811,13 @@ class DrawProfiles(ParentMapTool):
         """ Draw nodes between first and last node """
 
         if node_id == node_12:
-            print(str("Z1 = Z12"))
             z1=z12
         elif node_id == node_11:
-            print(str("Z1 = Z11"))
             z1=z11
 
         if node_id == node_21:
-            print(str("Z2 = Z21"))
             z2=z21
         elif node_id == node_22:
-            print(str("Z2 = Z22"))
             z2=z22
 
         # Get superior points
