@@ -80,3 +80,15 @@ INSERT INTO config_api_form_tabs VALUES(573, 'v_edit_node', 'tab_plan', 'Cost', 
 -- 11/07/2019
 
 UPDATE config_api_form_fields SET column_id = 'connec_type' WHERE column_id = 'connectype_id';
+
+-- 12/07/2019
+
+UPDATE config_api_form_fields SET isparent = True WHERE column_id = 'node_type';
+UPDATE config_api_form_fields SET isparent = True WHERE column_id = 'arctype_id';
+UPDATE config_api_form_fields SET isparent = True WHERE column_id = 'connec_type';
+UPDATE config_api_form_fields SET isparent = True WHERE column_id = 'muni_id';
+
+UPDATE config_api_form_fields SET dv_parent_id = 'node_type' WHERE dv_parent_id = 'nodetype_id';
+UPDATE config_api_form_fields SET dv_parent_id = 'arc_type' WHERE dv_parent_id = 'arctype_id';
+UPDATE config_api_form_fields SET dv_parent_id = 'connec_type' WHERE dv_parent_id = 'connectype_id';
+
