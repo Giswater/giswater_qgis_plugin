@@ -29,6 +29,7 @@ node_2_aux	varchar(16);
 query_text	text;
 v_debug		Boolean;
 v_data		json;
+v_macroexpl integer;
 
 BEGIN
 
@@ -40,17 +41,21 @@ BEGIN
 
     -- Starting process
     SELECT * INTO mincut_rec FROM anl_mincut_result_cat WHERE id=result_id_arg;
-
+	SELECT expl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
+	
     -- Loop for all the proposed valves
     FOR rec_valve IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=result_id_arg AND proposed=TRUE
     LOOP
 		IF v_debug THEN
 			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
 		END IF;
-		FOR rec_tank IN SELECT v_edit_node.node_id, v_edit_node.the_geom FROM anl_mincut_inlet_x_exploitation
+		FOR rec_tank IN 
+		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM anl_mincut_inlet_x_exploitation
 		JOIN v_edit_node ON v_edit_node.node_id=anl_mincut_inlet_x_exploitation.node_id
-		JOIN value_state_type ON state_type=value_state_type.id JOIN node_type ON node_type.id=nodetype_id
-		WHERE (is_operative IS TRUE) AND (anl_mincut_inlet_x_exploitation.expl_id=mincut_rec.expl_id) 
+		JOIN value_state_type ON state_type=value_state_type.id 
+		JOIN node_type ON node_type.id=nodetype_id
+		JOIN exploitation ON exploitation.expl_id=anl_mincut_inlet_x_exploitation.expl_id
+		WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) 
 		AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM anl_mincut_result_node WHERE result_id=result_id_arg)
 		ORDER BY 1
 		LOOP
