@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>node_replace</class>
- <widget class="QDialog" name="node_replace">
+ <class>feature_replace</class>
+ <widget class="QDialog" name="feature_replace">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>439</width>
-    <height>386</height>
+    <height>419</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Replace node</string>
+   <string>Replace feature</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="2">
@@ -193,7 +193,7 @@
          <item>
           <widget class="QGroupBox" name="groupBox_2">
            <property name="title">
-            <string>Node parameters</string>
+            <string>Feature parameters</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="2" column="0">
@@ -236,7 +236,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QComboBox" name="node_nodecat_id">
+               <widget class="QComboBox" name="featurecat_id">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
@@ -275,7 +275,7 @@
             <item row="0" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
-               <widget class="QLabel" name="label_node_type">
+               <widget class="QLabel" name="label_feature_type">
                 <property name="font">
                  <font>
                   <pointsize>8</pointsize>
@@ -288,7 +288,7 @@
                  <enum>QFrame::Raised</enum>
                 </property>
                 <property name="text">
-                 <string>Current node type:</string>
+                 <string>Current feature type:</string>
                 </property>
                 <property name="margin">
                  <number>3</number>
@@ -315,9 +315,9 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLineEdit" name="node_node_type">
+               <widget class="QLineEdit" name="feature_type">
                 <property name="text">
-                 <string>node_type</string>
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -326,7 +326,7 @@
             <item row="1" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
-               <widget class="QLabel" name="label_custom_node_type">
+               <widget class="QLabel" name="label_new_feature_type">
                 <property name="font">
                  <font>
                   <pointsize>8</pointsize>
@@ -339,7 +339,7 @@
                  <enum>QFrame::Raised</enum>
                 </property>
                 <property name="text">
-                 <string>New node type:</string>
+                 <string>New feature type:</string>
                 </property>
                 <property name="margin">
                  <number>3</number>
@@ -363,7 +363,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QComboBox" name="node_node_type_new">
+               <widget class="QComboBox" name="feature_type_new">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
