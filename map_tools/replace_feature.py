@@ -317,9 +317,13 @@ class ReplaceFeatureMapTool(ParentMapTool):
                        "ORDER BY " + self.geom_type + "_id::int4 DESC LIMIT 1")
                 row = self.controller.get_row(sql)
                 if row:
+                    if self.geom_type == 'connec':
+                        field_cat_id = "connecat_id"
+                    else:
+                        field_cat_id = self.geom_type + "cat_id"
                     if self.geom_type != 'gully':
                         sql = ("UPDATE " + self.schema_name + "." + self.geom_view + " "
-                               "SET " + self.geom_type + "cat_id = '" + str(featurecat_id) + "' "
+                               "SET " + field_cat_id + " = '" + str(featurecat_id) + "' "
                                "WHERE " + self.geom_type + "_id = '" + str(row[0]) + "'")
                     self.controller.execute_sql(sql, log_sql=True)
                     if self.project_type == 'ud':
