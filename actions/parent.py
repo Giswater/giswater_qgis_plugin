@@ -16,12 +16,10 @@ if Qgis.QGIS_VERSION_INT < 29900:
     import ConfigParser as configparser
     from qgis.PyQt.QtGui import QStringListModel
     from qgis.core import QgsMapLayerRegistry as QgsProject
-    from qgis.gui import QgsMapCanvasSnapper
 else:
     import configparser
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
-    from qgis.gui import QgsMapCanvas
     from builtins import range
     from builtins import object
 
@@ -692,17 +690,6 @@ class ParentAction(object):
             self.delete_layer_from_toc(layer_name)
 
 
-    def get_snapper(self):
-        """ Return snapper """
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            snapper = QgsMapCanvasSnapper(self.canvas)
-        else:
-            snapper = QgsMapCanvas.snappingUtils(self.canvas)
-
-        return snapper
-
-
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
@@ -721,6 +708,7 @@ class ParentAction(object):
 
 
     def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
+
         cahange_tab=False
         text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
         if reset_text:

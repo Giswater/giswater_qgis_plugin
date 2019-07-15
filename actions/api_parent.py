@@ -334,7 +334,6 @@ class ApiParent(ParentAction):
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
         self.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
         self.emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type))
         self.geom_type = geom_type
@@ -344,6 +343,7 @@ class ApiParent(ParentAction):
         if self.snapper_manager.controller is None:
             self.snapper_manager.set_controller(self.controller)
         self.snapper_manager.store_snapping_options()
+        self.snapper = self.snapper_manager.get_snapper()
 
         # Clear snapping
         self.snapper_manager.enable_snapping()
@@ -1187,7 +1187,7 @@ class ApiParent(ParentAction):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
-        self.snapper = self.get_snapper()
+        self.snapper = self.snapper_manager.get_snapper()
         self.layer_node = self.controller.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)
 
