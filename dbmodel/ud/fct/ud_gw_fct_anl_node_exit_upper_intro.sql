@@ -37,6 +37,7 @@ DECLARE
 	v_sql text;
 	v_querytext text;
 	v_querytextres record;
+	v_i integer;
 	
 BEGIN
 
