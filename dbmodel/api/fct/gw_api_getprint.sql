@@ -70,7 +70,7 @@ BEGIN
 -- Create tabs array
     formTabs := '[';
        
-	SELECT gw_api_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3) INTO v_fields; -- 'SELECT' parameter used on line 190 of gw_api_get_formfields
+	SELECT gw_api_get_formfields( 'printGeneric', 'form', 'data', null, null, null, null, 'SELECT', null, 3) INTO v_fields; -- 'SELECT' parameter used on line 190 of gw_api_get_formfields
 
 	-- setting values
 	FOREACH aux_json IN ARRAY v_fields 
