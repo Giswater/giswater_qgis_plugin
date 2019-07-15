@@ -584,7 +584,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 sql_where += " AND"
             sql_where += " matcat_id = '" + str(mats) + "'"
 
-        if filter2 != "null":
+        if filter2 is not None and filter2 != "null":
             if sql_where == "":
                 sql_where = " WHERE"
             else:
@@ -621,13 +621,16 @@ class ReplaceFeatureMapTool(ParentMapTool):
             else:
                 sql_where += " AND"
             sql_where += " matcat_id = '" + mats + "'"
-        if filter2 != "null":
+
+        if filter2 is not None and filter2 != "null":
+            self.controller.log_info("filter2")
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
             sql_where += " " + self.field2 + " = '" + filter2 + "'"
-        if filter3 != "null":
+
+        if filter3 is not None and filter3 != "null":
             if sql_where == "":
                 sql_where = " WHERE"
             else:
