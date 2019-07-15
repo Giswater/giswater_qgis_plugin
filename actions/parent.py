@@ -709,7 +709,7 @@ class ParentAction(object):
 
     def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
 
-        cahange_tab=False
+        change_tab = False
         text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
         if reset_text:
             text = ""
@@ -718,12 +718,12 @@ class ParentAction(object):
                 if item['message'] is not None:
                     text += str(item['message']) + "\n"
                     if force_tab:
-                        cahange_tab = True
+                        change_tab = True
                 else:
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
-        if cahange_tab:
+        if change_tab:
             qtabwidget.setCurrentIndex(1)
 
 

@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import range
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -20,6 +18,8 @@ else:
 from qgis.PyQt.QtWidgets import QCompleter
 from qgis.PyQt.QtCore import Qt, QDate
 
+import json
+from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
@@ -289,17 +289,18 @@ class ReplaceFeatureMapTool(ParentMapTool):
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
             sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
-            new_feature_id = self.controller.get_row(sql, log_sql=True, commit=True)
-            if new_feature_id:
-                message = "Feature replaced successfully"
-                self.controller.show_info(message)
-            else:
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            if not row:
                 message = "Error replacing feature"
                 self.controller.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
                 self.close_dialog(dialog, set_action_pan=False)
                 return
+
+            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+            message = "Feature replaced successfully"
+            self.controller.show_info(message)
 
             # Force user to manage with state = 1 features
             current_user = self.controller.get_project_user()
@@ -330,14 +331,18 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 message = "Values has been updated"
                 self.controller.show_info(message)
 
+            # Fill tab 'Info log'
+            if complet_result and complet_result[0]['status'] == "Accepted":
+                qtabwidget = self.dlg_replace.info_log
+                qtextedit = self.dlg_replace.txt_infolog
+                self.populate_info_text(self.dlg_replace, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+
             # Refresh canvas
             self.refresh_map_canvas()
 
             # Deactivate map tool
             self.deactivate()
             self.set_action_pan()
-
-        self.close_dialog(dialog, set_action_pan=False)
 
 
     """ QgsMapTools inherited event functions """
@@ -629,3 +634,23 @@ class ReplaceFeatureMapTool(ParentMapTool):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.id, rows)
         
+
+    def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
+
+        change_tab = False
+        text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
+        if reset_text:
+            text = ""
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    if force_tab:
+                        change_tab = True
+                else:
+                    text += "\n"
+
+        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
+        if change_tab:
+            qtabwidget.setCurrentIndex(1)
+
