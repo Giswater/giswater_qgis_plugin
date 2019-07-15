@@ -76,7 +76,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
                "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -85,7 +85,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
                    "WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
             current_date = self.manage_dates(self.current_date)
-            if row:
+            if row and row[0]:
                 builtdate = self.manage_dates(row[0])
                 if builtdate != 'null' and builtdate:
                     self.enddate_aux = builtdate.date()
