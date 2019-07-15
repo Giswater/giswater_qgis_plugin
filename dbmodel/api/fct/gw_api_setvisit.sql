@@ -58,8 +58,7 @@ DECLARE
 	return_event_manager_aux json;
 	v_event_manager json;
 	v_node_id integer;
-	
-
+	v_version varchar;
 
 BEGIN
 
@@ -69,6 +68,9 @@ BEGIN
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO v_apiversion;
+
+    EXECUTE 'SELECT wsoftware FROM version'
+	INTO v_version;
 
 --  get input values
     v_id = ((p_data ->>'feature')::json->>'id')::integer;
@@ -175,8 +177,10 @@ BEGIN
 	-- only applied for arbrat viari (nodes).
 	IF v_status='4' THEN
 	    UPDATE om_visit SET enddate = current_timestamp::timestamp WHERE id = v_id;
+	    IF v_version='TM' THEN
 	    SELECT row_to_json(a) FROM (SELECT gw_fct_om_visit_event_manager(v_id::integer) as "st_astext")a INTO return_event_manager_aux ;
-        END IF;
+    	END IF;
+    END IF;
 
 	--  Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
