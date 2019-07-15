@@ -1999,6 +1999,8 @@ class UpdateSQL(ApiParent):
                 if f:
                     if Qgis.QGIS_VERSION_INT < 29900:
                         f_to_read = str(f.read()).decode(str('utf-8-sig'))
+                    else:
+                        f_to_read = str(f.read())
                     f_to_read = f_to_read + '\n'
                     self.message_update = self.message_update + '\n' + str(f_to_read)
                 else:
