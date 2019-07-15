@@ -139,13 +139,11 @@ class ParentDialog(QDialog):
         status = self.iface.activeLayer().commitChanges()
         if not status:
             self.parse_commit_error_message()
-        elif self.id and self.id.upper() != 'NULL':
-            self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', self.id)
-            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', self.id)
 
         # Close dialog
         if close_dialog:
             self.close_dialog()
+
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
                "WHERE parameter = 'cf_keep_opened_edition' AND cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
@@ -266,110 +264,6 @@ class ParentDialog(QDialog):
                 widget.setIcon(QIcon(icon_path))
             else:
                 self.controller.log_info("File not found", parameter=icon_path)
-
-
-    def init_filters(self, dialog):
-        """ Init Qcombobox filters and fill with all 'items' if no match """
-        
-        exploitation = dialog.findChild(QComboBox, 'expl_id')
-        dma = dialog.findChild(QComboBox, 'dma_id')
-        self.dma_items = [dma.itemText(i) for i in range(dma.count())]
-        exploitation.currentIndexChanged.connect(partial(self.filter_dma, dialog, exploitation, dma))
-        if self.project_type == 'ws':
-            presszonecat_id = dialog.findChild(QComboBox, 'presszonecat_id')
-            self.press_items = [presszonecat_id.itemText(i) for i in range(presszonecat_id.count())]
-            exploitation.currentIndexChanged.connect(partial(self.filter_presszonecat_id, dialog, exploitation, presszonecat_id))
-
-        state = dialog.findChild(QComboBox, 'state')
-        state_type = dialog.findChild(QComboBox, 'state_type')
-        self.state_type_items = [state_type.itemText(i) for i in range(state_type.count())]
-        state.currentIndexChanged.connect(partial(self.filter_state_type, dialog, state, state_type))
-
-        muni_id = dialog.findChild(QComboBox, 'muni_id')
-        street_1 = dialog.findChild(QComboBox, 'streetaxis_id')
-        street_2 = dialog.findChild(QComboBox, 'streetaxis2_id')
-        self.street_items = [street_1.itemText(i) for i in range(street_1.count())]
-        muni_id.currentIndexChanged.connect(partial(self.filter_streets, dialog, muni_id, street_1))
-        muni_id.currentIndexChanged.connect(partial(self.filter_streets, dialog, muni_id, street_2))
-
-
-    def filter_streets(self, dialog, muni_id, street):
-
-        sql = ("SELECT name FROM "+ self.schema_name + ".ext_streetaxis"
-               " WHERE muni_id = (SELECT muni_id FROM " + self.schema_name + ".ext_municipality "
-               " WHERE name = '" + utils_giswater.getWidgetText(dialog, muni_id) + "')")
-        rows = self.controller.get_rows(sql)
-        if rows:
-            list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(dialog, street, list_items)
-        else:
-            utils_giswater.fillComboBoxList(dialog, street, self.street_items)
-
-
-    def filter_dma(self, dialog, exploitation, dma):
-        """ Populate QCombobox @dma according to selected @exploitation """
-        
-        sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
-               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
-               " WHERE t2.name = '" + str(utils_giswater.getWidgetText(dialog, exploitation)) + "'")
-        rows = self.controller.get_rows(sql)
-        if rows:
-            list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(dialog, dma, list_items, allow_nulls=False)
-        else:
-            utils_giswater.fillComboBoxList(dialog, dma, self.dma_items, allow_nulls=False)
-
-
-    def filter_presszonecat_id(self, dialog, exploitation, presszonecat_id):
-        """ Populate QCombobox @presszonecat_id according to selected @exploitation """
-
-        sql = ("SELECT t1.descript FROM " + self.schema_name + ".cat_presszone AS t1"
-               " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
-               " WHERE t2.name = '" + str(utils_giswater.getWidgetText(dialog, exploitation)) + "'")
-        rows = self.controller.get_rows(sql)
-        if rows:
-            list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(dialog, presszonecat_id, list_items, allow_nulls=False)
-        else:
-            utils_giswater.fillComboBoxList(dialog, presszonecat_id, self.press_items, allow_nulls=False)
-
-
-    def filter_state_type(self, dialog, state, state_type):
-        """ Populate QCombobox @state_type according to selected @state """
-        
-        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state_type AS t1"
-               " INNER JOIN " + self.schema_name + ".value_state AS t2 ON t1.state=t2.id "
-               " WHERE t2.name ='" + str(utils_giswater.getWidgetText(dialog, state)) + "'")
-        rows = self.controller.get_rows(sql)
-        if rows:
-            list_items = [rows[i] for i in range(len(rows))]
-            utils_giswater.fillComboBox(dialog, state_type, list_items, allow_nulls=False)
-        else:
-            utils_giswater.fillComboBoxList(dialog, state_type, self.state_type_items, allow_nulls=False)
-     
-     
-    def update_filters(self, table_name, field_id, geom_type, widget, feature_id):
-        """ @widget is the field to SET """
-        
-        sql = ("SELECT " + str(field_id) + " FROM " + self.schema_name + "." + str(table_name) + " "
-               " WHERE name = '" + str(utils_giswater.getWidgetText(self.dialog, widget)) + "'")
-        row = self.controller.get_row(sql)
-        if row:
-            sql = ("UPDATE " + self.schema_name + "." + str(geom_type) + " "
-                   " SET " + widget + " = '" + str(row[0]) + "'"
-                   " WHERE " + str(geom_type) + "_id = '" + str(feature_id) + "'")
-            self.controller.execute_sql(sql)
-
-
-    def get_snapper(self):
-        """ Return snapper """
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            snapper = QgsMapCanvasSnapper(self.canvas)
-        else:
-            snapper = QgsMapCanvas.snappingUtils(self.canvas)
-
-        return snapper
 
 
     def get_value_from_metadata(self, parameter, default_value):
