@@ -33,6 +33,7 @@ DECLARE
 	v_result text;
 	v_visitclass_id text;
 	v_team text;
+	v_real_enddate text;
 
 BEGIN
 
