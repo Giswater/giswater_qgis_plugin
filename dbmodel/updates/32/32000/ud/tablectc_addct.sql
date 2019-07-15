@@ -12,7 +12,7 @@ ALTER TABLE arc_type ADD CONSTRAINT arc_type_epa_table_check CHECK (epa_table IN
 
 ALTER TABLE arc_type ADD CONSTRAINT arc_type_man_table_check CHECK (man_table IN ('man_conduit', 'man_waccel', 'man_varc', 'man_siphon'));
 
-ALTER TABLE node_type ADD CONSTRAINT node_type_epa_table_check CHECK (epa_table IN ('inp_junction', 'inp_divider', 'inp_storage', 'inp_outfall'));
+--ALTER TABLE node_type ADD CONSTRAINT node_type_epa_table_check CHECK (epa_table IN ('inp_junction', 'inp_divider', 'inp_storage', 'inp_outfall', 'null'));
 
 ALTER TABLE node_type ADD CONSTRAINT node_type_man_table_check CHECK (man_table IN ('man_chamber', 'man_junction', 'man_manhole', 'man_netelement', 'man_netgully','man_netinit', 'man_outfall', 'man_storage', 'man_valve', 'man_wjump', 'man_wwtp'));
 
@@ -125,7 +125,7 @@ ALTER TABLE "inp_weir" ADD CONSTRAINT "inp_weir_flap_fkey" FOREIGN KEY ("flap") 
 -- ADD CHECK
 
 ALTER TABLE inp_typevalue_timeseries ADD CONSTRAINT inp_typevalue_timeseries_check CHECK (id IN ('ABSOLUTE','FILE','RELATIVE'));
-ALTER TABLE inp_timser_id ADD CONSTRAINT inp_timser_id_check CHECK (id IN ('T10-5m','T5-5m'));
+--ALTER TABLE inp_timser_id ADD CONSTRAINT inp_timser_id_check CHECK (id IN ('T10-5m','T5-5m'));
 ALTER TABLE inp_value_files_actio ADD CONSTRAINT inp_value_files_actio_check CHECK (id IN ('SAVE','USE'));
 ALTER TABLE inp_typevalue_storage ADD CONSTRAINT inp_typevalue_storage_check CHECK (id IN ('FUNCTIONAL','TABULAR'));
 ALTER TABLE inp_value_weirs ADD CONSTRAINT inp_value_weirs_check CHECK (id IN ('SIDEFLOW','TRANSVERSE','TRAPEZOIDAL','V-NOTCH'));

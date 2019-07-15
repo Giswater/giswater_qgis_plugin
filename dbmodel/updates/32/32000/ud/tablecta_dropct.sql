@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE inp_timser_id DROP CONSTRAINT inp_timser_id_check;
+ALTER TABLE inp_timser_id DROP CONSTRAINT IF EXISTS inp_timser_id_check;
 
 ALTER TABLE arc_type DROP CONSTRAINT IF EXISTS arc_type_epa_table_check;
 ALTER TABLE arc_type DROP CONSTRAINT IF EXISTS arc_type_man_table_check;
