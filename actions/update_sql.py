@@ -35,9 +35,9 @@ import xml.etree.cElementTree as ET
 import utils_giswater
 
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ReadsqlCreateGisProject, ApiImportInp, ManageFields
+from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
+    ReadsqlCreateGisProject, ApiImportInp, ManageFields
 from giswater.actions.create_gis_project import CreateGisProject
-
 
 
 class UpdateSQL(ApiParent):
@@ -55,7 +55,7 @@ class UpdateSQL(ApiParent):
         self.project_type = controller.get_project_type()
 
 
-    def init_sql(self, connection_status=False):
+    def init_sql(self):
         """ Button 100: Execute SQL. Info show info """
 
         # Check if connection is still False
