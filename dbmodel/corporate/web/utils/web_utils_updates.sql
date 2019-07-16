@@ -61,8 +61,6 @@ ON CONFLICT (parameter) DO NOTHING;
 
 
 --3.2.010
-INSERT INTO config_param_system (parameter, value, data_type, context, descript)  
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_web_layer", "column":"is_tiled_add", "dataType":"json"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_web_layer", "column":"observ", "dataType":"text"}}$$);
 
