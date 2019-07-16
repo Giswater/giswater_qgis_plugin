@@ -54,16 +54,19 @@ BEGIN
 					RETURN audit_function(1018,1212);  
 				END IF;
 
-				If v_customfeature IS NOT NULL THEN
+				IF v_customfeature IS NOT NULL THEN
 	 				NEW.arc_type:=v_customfeature;
-	            END IF;
+	 			END IF;
+			END IF;
 
-	            IF (NEW.arc_type IS NULL) AND v_man_table='parent' THEN
-	            	NEW.arc_type:= (SELECT id FROM arc_type LIMIT 1);
-	            	
-	            ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
-	            	NEW.arc_type:= (SELECT id FROM arc_type WHERE arc_type.man_table=v_type_v_man_table LIMIT 1);
-	            END IF;
+			IF v_man_table='parent' THEN
+				IF NEW.arc_type IS NULL THEN 
+					NEW.arc_type:=(SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
+				v_man_table = (SELECT man_table FROM arc_type WHERE id=NEW.arc_type LIMIT 1);
+			
+			ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
+				NEW.arc_type:= (SELECT id FROM arc_type WHERE arc_type.man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 
 			 -- Epa type
@@ -402,15 +405,15 @@ BEGIN
 		END IF;		
 
 		UPDATE arc 
-			SET code=NEW.code, 
+			SET  y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2 , 
 			arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 			buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, 
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,  postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
-			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, 
+			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, 
 			undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end,
-			publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+			code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 			WHERE arc_id=OLD.arc_id;	
 		   
 		IF v_man_table='man_conduit' THEN
