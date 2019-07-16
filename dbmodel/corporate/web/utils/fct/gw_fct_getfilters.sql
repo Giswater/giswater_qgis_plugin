@@ -25,6 +25,7 @@ DECLARE
 	form_json json;
 	formTabs_explotations json;
 	formTabs_networkStates json;
+	formTabs_networkSpecies json;
 	formTabs_hydroStates json;
 	formTabs_lotSelector json;
 	formTabs text;
@@ -216,6 +217,36 @@ BEGIN
 			v_active :=FALSE;
 			
 		END IF;
+	END IF;
+
+-- Tab Species
+        SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabSpecies' ;
+	IF rec_tab.id IS NOT NULL THEN
+
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			SELECT replace(species, '''''''', '''''''''''') AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , false AS disabled
+			FROM SCHEMA_NAME_upgrade.cat_species WHERE id IN (SELECT species_id FROM selector_species WHERE cur_user=' || quote_literal(current_user) || ')
+			UNION
+			SELECT replace(species, '''''''', '''''''''''') AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , false AS disabled
+			FROM SCHEMA_NAME_upgrade.cat_species WHERE id NOT IN (SELECT species_id FROM selector_species WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name)a'
+			INTO formTabs_networkSpecies;	
+
+		-- Add tab name to json
+		formTabs_networkSpecies := ('{"fields":' || formTabs_networkSpecies || '}')::json;
+		formTabs_networkSpecies := gw_fct_json_object_set_key(formTabs_networkSpecies, 'tabName', 'selector_species'::TEXT);
+		formTabs_networkSpecies := gw_fct_json_object_set_key(formTabs_networkSpecies, 'tabLabel', rec_tab.tablabel::TEXT);
+		formTabs_networkSpecies := gw_fct_json_object_set_key(formTabs_networkSpecies, 'tabIdName', 'species_id'::TEXT);
+		formTabs_networkSpecies := gw_fct_json_object_set_key(formTabs_networkSpecies, 'active', v_active);
+
+		-- Create tabs array
+		IF v_firsttab THEN 
+			formTabs := formTabs || ',' || formTabs_networkSpecies::text;
+		ELSE 
+			formTabs := formTabs || formTabs_networkSpecies::text;
+		END IF;
+
+		v_firsttab := TRUE;
+		v_active :=FALSE;
 	END IF;
 
 -- Tab hydrometer state
