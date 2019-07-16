@@ -969,12 +969,17 @@ class Go2Epa(ApiParent):
 
     def populate_time(self, combo_result, combo_time):
         """ Populate combo times """
-
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
-        sql = ("SELECT DISTINCT time, time "
-               "FROM " + self.schema_name + ".rpt_arc "
-               "WHERE result_id ILIKE '" + str(result_id) + "' "
-               "ORDER BY time")
+        if self.project_type == 'ws':
+            sql = ("SELECT DISTINCT time, time "
+                   "FROM " + self.schema_name + ".rpt_arc "
+                   "WHERE result_id ILIKE '" + str(result_id) + "' "
+                   "ORDER BY time")
+        else:
+            sql = ("SELECT DISTINCT resulttime, resulttime "
+                   "FROM " + self.schema_name + ".rpt_arc "
+                   "WHERE result_id ILIKE '" + str(result_id) + "' "
+                   "ORDER BY resulttime")
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
 
