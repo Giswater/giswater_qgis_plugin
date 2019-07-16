@@ -8,6 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO config_web_layer VALUES ('v_edit_connec', true, 'v_web_parent_connec', false, NULL, 'F14', 'Connec', 4, 'link');
-INSERT INTO config_web_layer VALUES ('v_anl_mincut_result_valve', false, NULL, TRUE, NULL, 'F11', 'Mincut Valve', 1, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_connec', true, 'v_web_parent_connec', false, NULL, 'F14', 'Connec', 4, 'link') ON CONFILCT (layer_id) DO NOTHING;
+INSERT INTO config_web_layer VALUES ('v_anl_mincut_result_valve', false, NULL, TRUE, NULL, 'F11', 'Mincut Valve', 1, 'link') ON CONFILCT (layer_id) DO NOTHING;
 

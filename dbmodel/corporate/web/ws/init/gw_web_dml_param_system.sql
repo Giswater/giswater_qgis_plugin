@@ -9,5 +9,5 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- mincut
-INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_mincut_parameters', '{"mincut_valve_layer":"v_anl_mincut_result_valve"}', NULL, NULL, NULL);
-INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_mincut_new_vdef', '{"mincut_state":"0", "mincut_type":"Real", "anl_cause":"Accidental", "assigned_to":"1"}', 'json', 'api_mincut', NULL);
+INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_mincut_parameters', '{"mincut_valve_layer":"v_anl_mincut_result_valve"}', NULL, NULL, NULL) ON CONFILCT (paramter) DO NOTHING;
+INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_mincut_new_vdef', '{"mincut_state":"0", "mincut_type":"Real", "anl_cause":"Accidental", "assigned_to":"1"}', 'json', 'api_mincut', NULL) ON CONFILCT (paramter) DO NOTHING;
