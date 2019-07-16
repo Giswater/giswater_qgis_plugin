@@ -1343,6 +1343,7 @@ class UpdateSQL(ApiParent):
             self.reload_trg(project_type='api')
             self.reload_fct_ftrg(project_type=self.project_type_selected)
             self.reload_fct_ftrg(project_type='api')
+            self.api(False)
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             status = self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
