@@ -20,14 +20,17 @@ from qgis.PyQt.QtWidgets import QLineEdit, QWidget, QComboBox, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QAbstractButton, QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
-from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.core import QgsTask, QgsApplication
+from qgis.gui import QgsDateTimeEdit
 
 import os
 import sys
 import re
 import json
 import subprocess
+from time import sleep
+import random
 from functools import partial
 from collections import OrderedDict
 import xml.etree.cElementTree as ET
@@ -1150,7 +1153,69 @@ class UpdateSQL(ApiParent):
         return status
 
 
-    """ Buttons calling functions """
+    def task_started(self, task, wait_time):
+        """ Dumb test function.
+        to break the task raise an exception
+        to return a successful result return it.
+        This will be passed together with the exception (None in case of success) to the on_finished method
+        """
+
+        self.controller.log_info('Started task {}'.format(task.description()))
+
+        wait_time = wait_time / 100
+        total = 0
+        iterations = 0
+        for i in range(101):
+            sleep(wait_time)
+            task.setProgress(i)
+            total += random.randint(0, 100)
+            iterations += 1
+            # Check if task is canceled to handle it...
+            if task.isCanceled():
+                self.task_stopped(task)
+                return None
+
+            # Example of Raise exception to abort task
+            if random.randint(0, 1000) == 10:
+                raise Exception('Bad value!')
+
+        #return True
+        self.task_completed(None, {'total': total, 'iterations': iterations, 'task': task.description()})
+
+
+    def task_stopped(self, task):
+
+        self.controller.log_info('Task "{name}" was cancelled'.format(name=task.description()))
+
+
+    def task_completed(self, exception, result):
+        """ Called when run is finished.
+        Exception is not None if run raises an exception. Result is the return value of run
+        """
+
+        self.controller.log_info("task_completed")
+
+        if exception is None:
+            if result is None:
+                msg = 'Completed with no exception and no result'
+                self.controller.log_info(msg)
+            else:
+                self.controller.log_info('Task {name} completed\n'
+                    'Total: {total} (with {iterations} '
+                    'iterations)'.format(name=result['task'], total=result['total'],
+                                         iterations=result['iterations']))
+        else:
+            self.controller.log_info("Exception: {}".format(exception))
+            raise exception
+
+
+    def task_example(self):
+
+        self.controller.log_info("task_example")
+        task1 = QgsTask.fromFunction('Create project', self.task_started, on_finished=self.task_completed, wait_time=20)
+        self.controller.log_info("task_example2")
+        QgsApplication.taskManager().addTask(task1)
+
 
     def create_project_data_schema(self):
 
@@ -1870,7 +1935,7 @@ class UpdateSQL(ApiParent):
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
 
         # Set listeners
-        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
+        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.task_example))
         self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
         self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
         self.cmb_create_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_create_project_type))
