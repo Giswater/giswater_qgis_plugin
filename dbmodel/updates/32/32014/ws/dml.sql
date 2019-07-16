@@ -16,11 +16,11 @@ UPDATE node_type SET graf_delimiter = 'DMA' WHERE type=NULL;
 UPDATE node_type SET graf_delimiter = 'SECTOR' WHERE type IN ('TANK', 'WATERWELL', 'WTP', 'SOURCE');
 
 
-INSERT INTO macroexploitation VALUES (-1, 'Undefined marcroexploitation');
-INSERT INTO exploitation VALUES (-1, 'Undefined exploitation',-1);
-INSERT INTO dma VALUES (-1, 'Undefined dma');
-INSERT INTO sector VALUES (-1, 'Undefined sector');
-INSERT INTO cat_presszone VALUES (-1, 'Undefined presszone',-1);
+INSERT INTO macroexploitation VALUES (0, 'Border element');
+INSERT INTO exploitation VALUES (0, 'Border element',0);
+INSERT INTO dma VALUES (0, 'Border element');
+INSERT INTO sector VALUES (0, 'Border element');
+INSERT INTO cat_presszone VALUES (0, 'Border element',0);
 
 INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '1', 'NODES COUPLE CAPACITY', null, '{"functionName":"gw_fct_pg2epa_nodescouplecapacity", "systemParameters":{"storeAllResults":"false", "steps":"5"}, "userParameters":{"demand":{"single":"60"}}}');
 INSERT INTO inp_typevalue VALUES ('inp_recursive_function', '2', 'SINGLE NODE CAPACITY', null, '{"functionName":"gw_fct_pg2epa_singlenodecapacity", "systemParameters":{"storeAllResults":"false", "steps":"999"}, "userParameters":{"demand":{"min":"10", "max":"280", "increase":"1"}}}');
