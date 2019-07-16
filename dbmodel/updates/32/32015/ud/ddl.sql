@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE subcatchment ALTER COLUMN parent_id TYPE character varying(100);
+ALTER TABLE subcatchment ALTER COLUMN node_id TYPE character varying(100);
+
 
 CREATE TABLE IF NOT EXISTS om_psector_x_gully(
   id serial NOT NULL,

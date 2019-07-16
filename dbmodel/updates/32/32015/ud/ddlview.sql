@@ -389,22 +389,19 @@ order by 2,6 desc;
     subcatchment.the_geom,
     subcatchment.parent_id,
     subcatchment.descript
-   FROM inp_selector_sector,
-    inp_selector_hydrology,
-    subcatchment
+   FROM inp_selector_sector,  inp_selector_hydrology, subcatchment
   WHERE subcatchment.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text 
   AND subcatchment.hydrology_id = inp_selector_hydrology.hydrology_id AND inp_selector_hydrology.cur_user = "current_user"()::text;
 
  
- 
- 
+  
 CREATE OR REPLACE VIEW vi_coverages AS 
  SELECT v_edit_subcatchment.subc_id,
     inp_coverage_land_x_subc.landus_id,
     inp_coverage_land_x_subc.percent
    FROM inp_coverage_land_x_subc
      JOIN v_edit_subcatchment ON inp_coverage_land_x_subc.subc_id::text = v_edit_subcatchment.subc_id::text
-	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
 		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
@@ -424,7 +421,7 @@ CREATE OR REPLACE VIEW vi_groundwater AS
     inp_groundwater.h
    FROM v_edit_subcatchment
      JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_subcatchment.subc_id::text
-	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
 		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
@@ -440,7 +437,7 @@ CREATE OR REPLACE VIEW vi_infiltration AS
     NULL::double precision AS other5
    FROM v_edit_subcatchment
      JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
-	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
 		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
@@ -454,7 +451,7 @@ UNION
     NULL::double precision AS other5
    FROM v_edit_subcatchment
      JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
-	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
 		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
@@ -468,7 +465,7 @@ UNION
     v_edit_subcatchment.maxinfil AS other5
    FROM v_edit_subcatchment
      JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
-	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
 		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
@@ -488,8 +485,8 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
     inp_lidusage_subc_x_lidco.rptfile
    FROM v_edit_subcatchment
      JOIN inp_lidusage_subc_x_lidco ON inp_lidusage_subc_x_lidco.subc_id::text = v_edit_subcatchment.subc_id::text
-	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, subc_id
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
 
@@ -501,8 +498,8 @@ CREATE OR REPLACE VIEW vi_loadings AS
     inp_loadings_pol_x_subc.ibuildup
    FROM v_edit_subcatchment
      JOIN inp_loadings_pol_x_subc ON inp_loadings_pol_x_subc.subc_id::text = v_edit_subcatchment.subc_id::text
-	 	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, subc_id 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
 
@@ -518,8 +515,8 @@ CREATE OR REPLACE VIEW vi_loadings AS
     v_edit_subcatchment.routeto,
     v_edit_subcatchment.rted
    FROM v_edit_subcatchment
-   	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+   	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, subc_id 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
 
@@ -530,8 +527,10 @@ CREATE OR REPLACE VIEW vi_loadings AS
  SELECT v_edit_subcatchment.subc_id,
     v_edit_subcatchment.rg_id,
         CASE
-            WHEN v_edit_subcatchment.parent_id IS NULL THEN b.node_id
-            ELSE v_edit_subcatchment.parent_id
+            WHEN v_edit_subcatchment.parent_id IS NULL AND b.node_id IS NOT NULL THEN b.node_id::varchar(16)
+            WHEN v_edit_subcatchment.parent_id IS NULL AND b.node_id IS NULL THEN v_edit_subcatchment.node_id::varchar(16)
+            WHEN v_edit_subcatchment.parent_id IS NOT NULL AND c.parent_id IS NOT NULL THEN c.parent_id::varchar(16)
+			WHEN v_edit_subcatchment.parent_id IS NOT NULL AND c.parent_id IS NULL THEN v_edit_subcatchment.parent_id::varchar(16)
         END AS node_id,
     v_edit_subcatchment.area,
     v_edit_subcatchment.imperv,
@@ -540,12 +539,32 @@ CREATE OR REPLACE VIEW vi_loadings AS
     v_edit_subcatchment.clength,
     v_edit_subcatchment.snow_id
    FROM v_edit_subcatchment
-	 JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, * 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, subc_id 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.parent_id::json) AS parent_array, subc_id 
+			FROM subcatchment where left (parent_id,1)='[' ) c ON v_edit_subcatchment.subc_id=c.parent_array;
 
 
+CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
+ SELECT s1.subc_id,
+        CASE
+            WHEN s1.parent_id IS NULL THEN st_makeline(st_centroid(s1.the_geom), v_node.the_geom)
+            ELSE st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))
+        END AS the_geom
+   FROM v_edit_subcatchment s1
+     LEFT JOIN v_edit_subcatchment s2 ON s2.subc_id::text = s1.parent_id::text
+     JOIN v_node ON v_node.node_id::text = s1.node_id::text;
+
+	 
+CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
+ SELECT subcatchment.subc_id,
+    st_centroid(subcatchment.the_geom) AS the_geom
+   FROM v_edit_subcatchment subcatchment;
+
+			
 --28/06/2019
 CREATE OR REPLACE VIEW v_ui_event_x_gully AS
 SELECT om_visit_event.id AS event_id,
