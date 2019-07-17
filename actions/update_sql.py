@@ -1360,20 +1360,16 @@ class UpdateSQL(ApiParent):
 
         self.set_arrow_cursor()
 
-        # Show message if process executed correctly
-        if self.error_count == 0:
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Create project")
+        if status:
             self.controller.dao.commit()
-            msg = "The project has been created correctly."
-            self.controller.show_info_box(msg, "Info")
             self.close_dialog(self.dlg_readsql_create_project)
             # Referesh data main dialog
             self.event_change_connection()
             self.set_info_project()
         else:
             self.controller.dao.rollback()
-            msg = "Some errors has occurred. Process has not been executed."
-            #self.controller.log_warning(msg, "Info")
-            self.controller.show_info_box(msg, "Info")
             # Reset count error variable to 0
             self.error_count = 0
 
@@ -1404,20 +1400,17 @@ class UpdateSQL(ApiParent):
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.set_arrow_cursor()
 
-        # Show message if process executed correctly
-        if self.error_count == 0:
+        # Show message
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Rename project")
+        if status:
             self.controller.dao.commit()
             self.event_change_connection()
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             if close_dlg_rename:
                 self.close_dialog(self.dlg_readsql_rename)
-            msg = "Rename project has been executed correctly."
-            self.controller.show_info_box(msg, "Info")
-
         else:
             self.controller.dao.rollback()
-            msg = "Some error has occurred while the rename process was running."
-            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1429,16 +1422,12 @@ class UpdateSQL(ApiParent):
         self.api(False)
         self.set_arrow_cursor()
 
-        # Show message if precess execute correctly
-        if self.error_count == 0:
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Update API")
+        if status:
             self.controller.dao.commit()
-            msg = "Api has been updated correctly."
-            self.controller.show_info_box(msg, "Info")
-
         else:
             self.controller.dao.rollback()
-            msg = "Some error has occurred while the api updated process was running."
-            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1458,16 +1447,12 @@ class UpdateSQL(ApiParent):
         self.load_sql(folder_path)
         self.set_arrow_cursor()
 
-        # Show message if precess execute correctly
-        if self.error_count == 0:
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Load custom SQL files")
+        if status:
             self.controller.dao.commit()
-            msg = "The process has been executed correctly."
-            self.controller.show_info_box(msg, "Info")
-
         else:
             self.controller.dao.rollback()
-            msg = "Some error has occurred while the process was running."
-            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1486,18 +1471,13 @@ class UpdateSQL(ApiParent):
         else:
             return
 
-        # Show message if precess execute correctly
-        if self.error_count == 0:
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Update project")
+        if status:
             self.controller.dao.commit()
-            msg = "The update has been executed correctly."
-            self.controller.show_info_box(msg, "Info")
-
-            # Close dialog when process has been execute correctly
             self.close_dialog(self.dlg_readsql_show_info)
         else:
             self.controller.dao.rollback()
-            msg = "Some error has occurred while the update process was running."
-            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1520,15 +1500,12 @@ class UpdateSQL(ApiParent):
         self.set_arrow_cursor()
 
         if update_changelog is False:
-            # Show message if precess execute correctly
-            if self.error_count == 0:
+            status = (self.error_count == 0)
+            self.manage_result_message(status, parameter="Load updates")
+            if status:
                 self.controller.dao.commit()
-                msg = "The update has been executed correctly."
-                self.controller.show_info_box(msg, "Info")
             else:
                 self.controller.dao.rollback()
-                msg = "Some error has occurred while the update process was running."
-                self.controller.show_info_box(msg, "Info")
 
             # Reset count error variable to 0
             self.error_count = 0
@@ -1839,16 +1816,12 @@ class UpdateSQL(ApiParent):
             self.reload_fct_ftrg(self.project_type_selected)
             self.set_arrow_cursor()
 
-        # Show message if precess execute correctly
-        if self.error_count == 0:
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Reload")
+        if status:
             self.controller.dao.commit()
-            msg = "The reload has been executed correctly."
-            self.controller.show_info_box(msg, "Info")
-
         else:
             self.controller.dao.rollback()
-            msg = "Some error has occurred while the reload process was running."
-            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1861,16 +1834,15 @@ class UpdateSQL(ApiParent):
             self.reload_fct_ftrg('api')
             self.set_arrow_cursor()
 
-        # Show message if precess execute correctly
+        # Show message
         if self.error_count == 0:
             self.controller.dao.commit()
-            msg = "The reload has been executed correctly."
-            self.controller.show_info_box(msg, "Info")
-
+            msg = "Process has been executed correctly"
+            self.controller.show_info_box(msg, "Info", parameter="Reload")
         else:
             self.controller.dao.rollback()
-            msg = "Some error has occurred while the reload process was running."
-            self.controller.show_info_box(msg, "Info")
+            msg = "Some error has occurred executing process"
+            self.controller.show_info_box(msg, "Warning", parameter="Reload")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1962,7 +1934,7 @@ class UpdateSQL(ApiParent):
 
         # Open rename if schema is updated
         if str(self.version_metadata) != str(self.project_data_schema_version):
-            msg = "The schema version has to be updated to make rename ."
+            msg = "The schema version has to be updated to make rename"
             self.controller.show_info_box(msg, "Info")
             return
 
@@ -2081,7 +2053,7 @@ class UpdateSQL(ApiParent):
 
         project_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         if project_name is None:
-            msg = "You cant delete a None project. Please, select correct one."
+            msg = "Please, select a project to delete"
             self.controller.show_info_box(msg, "Info")
             return
 
@@ -2091,8 +2063,9 @@ class UpdateSQL(ApiParent):
             sql = ('DROP SCHEMA ' + str(project_name) + ' CASCADE;')
             status = self.controller.execute_sql(sql)
             if status:
-                msg = "The Schema was deleted correctly."
-                self.controller.show_info_box(msg, "Info")
+                msg = "Process finished successfully"
+                self.controller.show_info_box(msg, "Info", parameter="Delete schema")
+
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
 
@@ -2156,7 +2129,7 @@ class UpdateSQL(ApiParent):
         # Get dev config file
         setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
         if not os.path.exists(setting_file):
-            message = "Dev Config file not found"
+            message = "File not found"
             self.controller.show_warning(message, parameter=setting_file)
             return
 
@@ -2235,12 +2208,7 @@ class UpdateSQL(ApiParent):
         # Import xml to database
         sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
-        if status:
-            msg = "Imported data into 'config_api_form_fields' successfully."
-            self.controller.show_info_box(msg, "Info")
-        else:
-            msg = "Some error ocurred when import data into 'config_api_form_fields'."
-            self.controller.show_info_box(msg, "Info")
+        self.manage_result_message(status, parameter="Import data into 'config_api_form_fields'")
 
         # Clear temp_csv2pg
         self.clear_temp_table()
@@ -2268,8 +2236,8 @@ class UpdateSQL(ApiParent):
 
         # Check status
         if status is False:
-            msg = "Error on import/export call."
-            self.controller.show_info_box(msg, "Info")
+            msg = "Process finished with some errors"
+            self.controller.show_info_box(msg, "Warning", parameter="Function import/export")
             return
 
         # Populate UI file
@@ -2374,13 +2342,7 @@ class UpdateSQL(ApiParent):
         # Execute query
         sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_child_views($${" + body + "}$$)::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
-        if status:
-            msg = "Created child view successfully."
-            self.controller.show_info_box(msg, "Info")
-        else:
-            msg = "Some error ocurred when create child view."
-            self.controller.show_info_box(msg, "Info")
-            return
+        self.manage_result_message(status, parameter="Created child view")
 
 
     def open_manage_field(self, action):
@@ -2494,13 +2456,12 @@ class UpdateSQL(ApiParent):
             # Control mandatory widgets
             if utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
                     utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
-
                 msg = "Column_id and Label fields mandatory. Please set correctly value."
                 self.controller.show_info_box(msg, "Info")
                 return
+
             elif str(self.rows_typeahead) != '':
                 if str(utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)) == str(self.rows_typeahead[0]):
-
                     msg = "The column id value is already exists."
                     self.controller.show_info_box(msg, "Info")
                     return
@@ -2537,26 +2498,18 @@ class UpdateSQL(ApiParent):
             # Execute manage add fields function
             sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
             status = self.controller.execute_sql(sql, log_sql=True, commit=True)
-            if status:
-                msg = "Created field into 'config_api_form_fields' successfully."
-                self.controller.show_info_box(msg, "Info")
-            else:
-                msg = "Some error ocurred when create field into 'config_api_form_fields'."
-                self.controller.show_info_box(msg, "Info")
+            self.manage_result_message(status, parameter="Created field into 'config_api_form_fields'")
+            if not status:
                 return
 
         elif action == 'Update':
 
-            if model is not None and model.submitAll():
-                msg = "Update executed successfully."
-                self.controller.show_info_box(msg, "Info")
-            else:
-                msg = "Some failed in update execute. No changes have been made."
-                self.controller.show_info_box(msg, "Info")
+            status = model is not None and model.submitAll()
+            self.manage_result_message(status, parameter="Update")
+            if not status:
                 return
 
         elif action == 'Delete':
-            self.controller.log_info(str("DELETE"))
 
             field_value = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
 
@@ -2567,17 +2520,8 @@ class UpdateSQL(ApiParent):
 
             # Execute manage add fields function
             sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-
             status = self.controller.execute_sql(sql, log_sql=True, commit=True)
-
-
-            if status:
-                msg = "Delete executed successfully."
-                self.controller.show_info_box(msg, "Info")
-            else:
-                msg = "Some error ocurred when try execute delete funcion."
-                self.controller.show_info_box(msg, "Info")
-                return
+            self.manage_result_message(status, parameter="Delete function")
 
         # Close dialog
         self.close_dialog(self.dlg_manage_fields)
@@ -2778,4 +2722,17 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         self.open_dialog(self.dlg_info, maximize_button=False)
+
+
+    def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
+        """ Manage message depending result @status """
+
+        if status:
+            if msg_ok is None:
+                msg_ok = "Process finished successfully"
+            self.controller.show_info_box(msg_ok, "Info", parameter=parameter)
+        else:
+            if msg_error is None:
+                msg_error = "Process finished with some errors"
+            self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
 
