@@ -18,8 +18,8 @@ UPDATE inp_typevalue SET id='FROUDE', idval='FROUDE' WHERE id='FROUD';
 
 
 UPDATE audit_cat_param_user SET id='inp_options_setallraingages',  description ='Set all raingages using unique rainfall from relative timeseries',  
-idval=NULL, label='Use rainfall for all raingages', 'SELECT idval as id, idval FROM inp_timser_id WHERE timser_type=''Rainfall''',vdefault=null, 
-dv_isnullvalue=true, layout_id=10, layout_order=1, layout_name='grl_crm_10'
+idval=NULL, label='Use rainfall for all raingages', dv_querytext='SELECT idval as id, idval FROM inp_timser_id WHERE timser_type=''Rainfall''',vdefault=null, 
+dv_isnullvalue=true, layout_id=10, layout_order=1, layoutname='grl_crm_10'
 WHERE id='inp_options_infiltration';
 
 

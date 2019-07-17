@@ -7,10 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO om_visit_cat VALUES (1, 'prueba num.1','2017-1-1', '2017-3-31', NULL, FALSE);
-INSERT INTO om_visit_cat VALUES (2, 'prueba num.2','2017-4-1', '2017-7-31', NULL, FALSE);
-INSERT INTO om_visit_cat VALUES (3, 'prueba num.3','2017-8-1', '2017-9-30', NULL, TRUE);
-INSERT INTO om_visit_cat VALUES (4, 'prueba num.4','2017-10-1', '2017-12-31', NULL, TRUE);
+INSERT INTO om_visit_cat VALUES (1, 'Test num.1','2017-1-1', '2017-3-31', NULL, FALSE);
+INSERT INTO om_visit_cat VALUES (2, 'Test num.2','2017-4-1', '2017-7-31', NULL, FALSE);
+INSERT INTO om_visit_cat VALUES (3, 'Test num.3','2017-8-1', '2017-9-30', NULL, TRUE);
+INSERT INTO om_visit_cat VALUES (4, 'Test num.4','2017-10-1', '2017-12-31', NULL, TRUE);
 
 
 INSERT INTO om_visit_class VALUES (6, 'Inspection and clean arc', NULL, true, false, true, 'ARC', 'role_om');
@@ -52,38 +52,3 @@ INSERT INTO om_visit_class_x_parameter VALUES (11, 3, 'leak_node');
 INSERT INTO om_visit_class_x_parameter VALUES (12, 4, 'leak_connec');
 INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'comment');
 INSERT INTO om_visit_class_x_parameter VALUES (15, 8, 'incident_type');
-
-
-INSERT INTO om_visit_cat_status VALUES (0, 'Closed', NULL);
-INSERT INTO om_visit_cat_status VALUES (1, 'On going', NULL);
-INSERT INTO om_visit_cat_status VALUES (2, 'Stand by', NULL);
-INSERT INTO om_visit_cat_status VALUES (3, 'Canceled', NULL);
-
-INSERT INTO om_visit_filetype_x_extension VALUES ('Document', 'doc');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Pdf', 'pdf');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'jpg');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'png');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Video', 'mp4');
-
-INSERT INTO sys_combo_values VALUES (1, 1, 'YES', NULL);
-INSERT INTO sys_combo_values VALUES (1, 2, 'NO', NULL);
-INSERT INTO sys_combo_values VALUES (1, 3, 'NOT ALL', NULL);
-INSERT INTO sys_combo_values VALUES (2, 1, 'GOOD', NULL);
-INSERT INTO sys_combo_values VALUES (2, 2, 'SOME', NULL);
-INSERT INTO sys_combo_values VALUES (2, 3, 'BAD', NULL);
-INSERT INTO sys_combo_values VALUES (4, 1, 'BROKEN COVER', NULL);
-INSERT INTO sys_combo_values VALUES (4, 2, 'WATER ON STREET', NULL);
-INSERT INTO sys_combo_values VALUES (4, 3, 'KEYS ON GULLY', NULL);
-INSERT INTO sys_combo_values VALUES (4, 4, 'SMELT', NULL);
-INSERT INTO sys_combo_values VALUES (4, 5, 'COVER NOISE', NULL);
-INSERT INTO sys_combo_values VALUES (4, 6, 'NOISE WITH SMELT', NULL);
-INSERT INTO sys_combo_values VALUES (4, 7, 'NOISE WITH SMELT AND MORE', NULL);
-INSERT INTO sys_combo_values VALUES (4, 8, 'OTHER', NULL);
-INSERT INTO sys_combo_values VALUES (5, 1, 'ON PLANNING', NULL);
-INSERT INTO sys_combo_values VALUES (5, 2, 'PLANNED', NULL);
-INSERT INTO sys_combo_values VALUES (5, 3, 'ASSIGNED', NULL);
-INSERT INTO sys_combo_values VALUES (5, 4, 'ON GOING', NULL);
-INSERT INTO sys_combo_values VALUES (5, 5, 'FINISHED', NULL);
-INSERT INTO sys_combo_values VALUES (5, 6, 'VERIFIED', NULL);
-INSERT INTO sys_combo_values VALUES (5, 7, 'CANCELED', NULL);
-

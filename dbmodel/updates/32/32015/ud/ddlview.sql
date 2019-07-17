@@ -491,6 +491,14 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
 			ON v_edit_subcatchment.subc_id=b.subc_id;
 
  
+CREATE OR REPLACE VIEW vi_gwf AS 
+ SELECT inp_groundwater.subc_id,
+    ('LATERAL'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_lat,
+    ('DEEP'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_deep
+   FROM v_edit_subcatchment
+     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_subcatchment.subc_id::text;
+
+ 
  
 CREATE OR REPLACE VIEW vi_loadings AS 
  SELECT inp_loadings_pol_x_subc.subc_id,
@@ -522,8 +530,7 @@ CREATE OR REPLACE VIEW vi_loadings AS
 
  
  
- drop VIEW vi_subcatchments;
- CREATE OR REPLACE VIEW vi_subcatchments AS 
+CREATE OR REPLACE VIEW vi_subcatchments AS 
  SELECT v_edit_subcatchment.subc_id,
     v_edit_subcatchment.rg_id,
         CASE
@@ -542,10 +549,10 @@ CREATE OR REPLACE VIEW vi_loadings AS
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
 		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, subc_id 
 			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
-			ON v_edit_subcatchment.subc_id=b.subc_id;
-	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id FROM 
+			ON v_edit_subcatchment.subc_id=b.subc_id
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, parent_array as parent_id FROM 
 		   (SELECT json_array_elements_text(subcatchment.parent_id::json) AS parent_array, subc_id 
-			FROM subcatchment where left (parent_id,1)='[' ) c ON v_edit_subcatchment.subc_id=c.parent_array;
+			FROM subcatchment where left (parent_id,1)='[' ) e) c ON v_edit_subcatchment.subc_id=c.parent_id;
 
 
 CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
@@ -560,9 +567,9 @@ CREATE OR REPLACE VIEW v_inp_subcatch2node AS
 
 	 
 CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
- SELECT subcatchment.subc_id,
-    st_centroid(subcatchment.the_geom) AS the_geom
-   FROM v_edit_subcatchment subcatchment;
+ SELECT subc_id,
+    st_centroid(the_geom) AS the_geom
+   FROM v_edit_subcatchment;
 
 			
 --28/06/2019

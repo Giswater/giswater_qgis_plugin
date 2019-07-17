@@ -27,7 +27,7 @@ CREATE OR REPLACE VIEW vi_options AS
     b.value
    FROM audit_cat_param_user a
    JOIN config_param_user b ON a.id = b.parameter::text
-   WHERE (a.layout_name = ANY (ARRAY['grl_general_1'::text, 'grl_general_2'::text, 'grl_hyd_3'::text, 'grl_hyd_4'::text, 'grl_date_13'::text, 'grl_date_14'::text]))
+   WHERE (a.layoutname = ANY (ARRAY['grl_general_1'::text, 'grl_general_2'::text, 'grl_hyd_3'::text, 'grl_hyd_4'::text, 'grl_date_13'::text, 'grl_date_14'::text]))
    AND b.cur_user::name = "current_user"()
    AND a.epaversion::json->>'from'='5.0.022'
    AND b.value IS NOT NULL
