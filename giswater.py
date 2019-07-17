@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -120,7 +120,7 @@ class Giswater(QObject):
         self.iface.newProjectCreated.connect(self.project_new)
 
 
-    def set_info_button(self, connection_status):
+    def set_info_button(self):
 
         self.toolButton = QToolButton()
         self.action_info = self.iface.addToolBarWidget(self.toolButton)
@@ -135,7 +135,7 @@ class Giswater(QObject):
         self.toolButton.setDefaultAction(action)
 
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
-        action.triggered.connect(partial(self.update_sql.init_sql, connection_status))
+        action.triggered.connect(self.update_sql.init_sql)
 
     
     def enable_python_console(self):
@@ -469,10 +469,12 @@ class Giswater(QObject):
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
+
         self.feature_cat = {}
-        sql = ("SELECT * FROM " + self.schema_name + ".cat_feature "
+        sql = ("SELECT * FROM cat_feature "
                "WHERE active is True")
         rows = self.controller.get_rows(sql)
+
         if not rows:
             return False
 
@@ -576,15 +578,16 @@ class Giswater(QObject):
                 self.enable_action(enable, index_action)
 
 
-    def project_new(self, show_warning=True):
+    def project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
         self.unload(False)
-        self.set_info_button(self.connection_status)
+        self.set_info_button()
 
                           
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
+
 
         # Unload plugin before reading opened project
         self.unload(False)
@@ -594,7 +597,7 @@ class Giswater(QObject):
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
         self.connection_status, not_version = self.controller.set_database_connection()
-        self.set_info_button(self.connection_status)
+        self.set_info_button()
         if not self.connection_status or not_version:
             message = self.controller.last_error
             if show_warning:
@@ -619,6 +622,19 @@ class Giswater(QObject):
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
+
+        # Set PostgreSQL parameter 'search_path'
+        self.controller.set_search_path(layer_source['db'], layer_source['schema'])
+        self.controller.log_info("Set search_path")
+        connection_status, not_version = self.controller.set_database_connection()
+        self.set_info_button()
+        if not connection_status or not_version:
+            message = self.controller.last_error
+            if show_warning:
+                if message:
+                    self.controller.show_warning(message, 15)
+                self.controller.log_warning(str(self.controller.layer_source))
+            return
 
         # Check if schema exists
         self.schema_exists = self.controller.check_schema(self.schema_name)
@@ -898,8 +914,8 @@ class Giswater(QObject):
             return
                     
         # Update table 'selector_expl' of current user (delete and insert)
-        sql = ("DELETE FROM " + self.schema_name + ".selector_expl WHERE current_user = cur_user;"
-               "\nINSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+        sql = ("DELETE FROM selector_expl WHERE current_user = cur_user;"
+               "\nINSERT INTO selector_expl (expl_id, cur_user)"
                " VALUES(" + expl_id + ", current_user);")
         self.controller.execute_sql(sql)        
         
@@ -911,7 +927,7 @@ class Giswater(QObject):
         self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
 
-        sql = ("DELETE FROM " + self.schema_name + ".audit_check_project"
+        sql = ("DELETE FROM audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
         sql = ""
@@ -923,7 +939,7 @@ class Giswater(QObject):
                 table_name = layer_source['table']
                 db_name = layer_source['db']
                 host_name = layer_source['host']
-                sql += ("\nINSERT INTO " + self.schema_name + ".audit_check_project"
+                sql += ("\nINSERT INTO audit_check_project"
                         " (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
                         " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1);")
                 
@@ -931,7 +947,7 @@ class Giswater(QObject):
         if not status:
             return False
                 
-        sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1);")
+        sql = ("SELECT gw_fct_audit_check_project(1);")
         row = self.controller.get_row(sql, commit=True)
         if not row:
             return False
@@ -940,7 +956,7 @@ class Giswater(QObject):
             message = "This is not a valid Giswater project. Do you want to view problem details?"
             answer = self.controller.ask_question(message, "Warning!")
             if answer:
-                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                sql = ("SELECT * FROM audit_check_project"
                        " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
                 rows = self.controller.get_rows(sql)
                 if rows:
@@ -962,7 +978,7 @@ class Giswater(QObject):
                 message = "Some layers of your role not found. Do you want to view them?"
                 answer = self.controller.ask_question(message, "Warning")
                 if answer:
-                    sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                    sql = ("SELECT * FROM audit_check_project"
                            " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
                     rows = self.controller.get_rows(sql, log_sql=True)
                     if rows:

@@ -139,7 +139,7 @@ class ApiParent(ParentAction):
         if table_object == "element":
             field_object_id = table_object + "_id"
         sql = ("SELECT DISTINCT(" + field_object_id + ")"
-               " FROM " + self.schema_name + "." + table_object)
+               " FROM " + table_object)
 
         rows = self.controller.get_rows(sql, log_sql=True)
         for i in range(0, len(rows)):
@@ -283,14 +283,14 @@ class ApiParent(ParentAction):
 
         viewname = self.controller.get_layer_source_table_name(self.layer)
         sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
-               " FROM " + self.schema_name + "." + viewname + ""
+               " FROM " + viewname + ""
                " WHERE node_id = '" + self.feature_id + "'")
         row = self.controller.get_row(sql)
         if row:
             existing_point_x = row[0]
             existing_point_y = row[1]
 
-        sql = ("UPDATE " + self.schema_name + ".node"
+        sql = ("UPDATE node"
                " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
                " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
                " WHERE node_id = '" + str(self.feature_id) + "'")
@@ -299,7 +299,7 @@ class ApiParent(ParentAction):
             self.canvas.setMapTool(self.previous_map_tool)
             return
 
-        sql = ("SELECT rotation FROM " + self.schema_name + ".node "
+        sql = ("SELECT rotation FROM node "
                " WHERE node_id='" + str(self.feature_id) + "'")
         row = self.controller.get_row(sql)
         if row:
@@ -334,7 +334,6 @@ class ApiParent(ParentAction):
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
         self.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
         self.emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type))
         self.geom_type = geom_type
@@ -344,6 +343,7 @@ class ApiParent(ParentAction):
         if self.snapper_manager.controller is None:
             self.snapper_manager.set_controller(self.controller)
         self.snapper_manager.store_snapping_options()
+        self.snapper = self.snapper_manager.get_snapper()
 
         # Clear snapping
         self.snapper_manager.enable_snapping()
@@ -507,7 +507,7 @@ class ApiParent(ParentAction):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
@@ -542,7 +542,7 @@ class ApiParent(ParentAction):
         # Set width and alias of visible columns
         columns_to_show = ""
         sql = ("SELECT column_index, width, column_id, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_sql=False)
@@ -691,7 +691,7 @@ class ApiParent(ParentAction):
             extras += ', "parentValue":"' + str(field['selectedId']) + '"'
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettypeahead($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_gettypeahead($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -769,7 +769,7 @@ class ApiParent(ParentAction):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False, commit=True)
@@ -1187,7 +1187,7 @@ class ApiParent(ParentAction):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
-        self.snapper = self.get_snapper()
+        self.snapper = self.snapper_manager.get_snapper()
         self.layer_node = self.controller.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)
 
@@ -1226,7 +1226,7 @@ class ApiParent(ParentAction):
             self.iface.actionPan().trigger()
             self.iface.setActiveLayer(self.layer)
             self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
-            sql = ("SELECT " + self.schema_name + ".gw_fct_node_interpolate('"
+            sql = ("SELECT gw_fct_node_interpolate('"
                    ""+str(self.last_point[0])+"', '"+str(self.last_point[1])+"', '"
                    ""+str(self.node1)+"', '"+self.node2+"')")
             row = self.controller.get_row(sql, log_sql=True)

@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -73,7 +73,7 @@ class MincutConfig(ParentAction):
         
         self.menu_valve.clear()
         node_type = "VALVE"
-        sql = ("SELECT id FROM " + self.schema_name + ".node_type"
+        sql = ("SELECT id FROM node_type"
                " WHERE type = '" + node_type + "' ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -84,7 +84,7 @@ class MincutConfig(ParentAction):
             elem = row[0]
             # If not exist in table _selector_state insert to menu
             # Check if we already have data with selected id
-            sql = "SELECT id FROM " + self.schema_name + "." + table + " WHERE id = '" + elem + "'"
+            sql = "SELECT id FROM " + table + " WHERE id = '" + elem + "'"
             rows = self.controller.get_rows(sql)
             if not rows:
                 self.menu_valve.addAction(elem, partial(self.insert, elem, table))
@@ -94,7 +94,7 @@ class MincutConfig(ParentAction):
         """ On action(select value from menu) execute SQL """
 
         # Insert value into database
-        sql = "INSERT INTO " + self.schema_name + "." + table + " (id) VALUES ('" + id_action + "')"
+        sql = "INSERT INTO " + table + " (id) VALUES ('" + id_action + "')"
         self.controller.execute_sql(sql)
         self.fill_table_config(self.tbl_config, self.schema_name+"."+table)
         self.fill_insert_menu(table)
@@ -142,7 +142,7 @@ class MincutConfig(ParentAction):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+            sql = ("DELETE FROM " + table_name + ""
                    " WHERE id IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
@@ -172,7 +172,7 @@ class MincutConfig(ParentAction):
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_anl_mincut_result_cat "
+        sql = "SELECT DISTINCT(id) FROM v_ui_anl_mincut_result_cat "
         rows = self.controller.get_rows(sql)
         values = []
         if rows:
@@ -227,7 +227,7 @@ class MincutConfig(ParentAction):
         title = "Cancel mincuts"
         answer = self.controller.ask_question(msg, title, inf_text)
         if answer:
-            sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat SET mincut_state = 3 "
+            sql = ("UPDATE anl_mincut_result_cat SET mincut_state = 3 "
                    " WHERE id::text IN ("+list_id+")")
             self.controller.execute_sql(sql, log_sql=False)
             self.tbl_mincut_edit.model().select()
@@ -241,11 +241,11 @@ class MincutConfig(ParentAction):
             self.controller.show_warning(message)
             return
 
-        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;")
+        sql = ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;")
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = self.tbl_mincut_edit.model().record(row).value("id")
-            sql += ("\nINSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) "
+            sql += ("\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) "
                     "  VALUES(current_user, " + str(id_) + ");")
         status = self.controller.execute_sql(sql)
         if not status:
@@ -258,12 +258,12 @@ class MincutConfig(ParentAction):
 
         # Fill ComboBox state
         sql = ("SELECT name"
-               " FROM " + self.schema_name + ".anl_mincut_cat_state"
+               " FROM anl_mincut_cat_state"
                " ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
 
-        sql = ("SELECT expl_id, name FROM " + self.schema_name + ".exploitation ORDER BY name")
+        sql = ("SELECT expl_id, name FROM exploitation ORDER BY name")
         rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
@@ -310,6 +310,7 @@ class MincutConfig(ParentAction):
         self.close_dialog(self.dlg_min_edit)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
+        self.mincut.is_new = False
 
 
     def filter_by_id(self, qtable):
@@ -405,7 +406,7 @@ class MincutConfig(ParentAction):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+            sql = ("DELETE FROM " + table_name + ""
                    " WHERE " + column_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
@@ -432,7 +433,7 @@ class MincutConfig(ParentAction):
     def set_dates(self):
 
         sql = ("SELECT MIN(LEAST(forecast_start, exec_start)), MAX(GREATEST(forecast_end, exec_end))"
-               " FROM {}.{}".format(self.schema_name, 'v_ui_anl_mincut_result_cat'))
+               " FROM {}".format('v_ui_anl_mincut_result_cat'))
         row = self.controller.get_row(sql, log_sql=True)
         if row:
             if row[0]:

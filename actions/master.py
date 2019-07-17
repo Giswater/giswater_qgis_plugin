@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -99,7 +99,7 @@ class Master(ParentAction):
         """ Insert or update values in tables with current_user control """
 
         tablename = "config_param_user"
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + ""
+        sql = ("SELECT * FROM " + tablename + ""
                " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         exist_param = False
@@ -109,21 +109,21 @@ class Master(ParentAction):
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
+                    sql = "UPDATE " + tablename + " SET value = "
                     if widget.objectName() != 'state_vdefault':
                         sql += ("'" + utils_giswater.getWidgetText(dialog, widget) + "'"
                                 " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                     else:
-                        sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
+                        sql += ("(SELECT id FROM value_state"
                                 " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "')"
                                 " WHERE cur_user = current_user AND parameter = 'state_vdefault'")
                 else:
-                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                    sql = 'INSERT INTO ' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(dialog, widget) + "', current_user)"
                     else:
                         sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT id FROM " + self.schema_name + ".value_state"
+                                " (SELECT id FROM value_state"
                                 " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "'), current_user)")
         else:
             for row in rows:
@@ -131,11 +131,11 @@ class Master(ParentAction):
                     exist_param = True
             _date = widget.dateTime().toString('yyyy-MM-dd')
             if exist_param:
-                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                sql = ("UPDATE " + tablename + ""
                        " SET value = '" + str(_date) + "'"
                        " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
             else:
-                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                sql = ("INSERT INTO " + tablename + "(parameter, value, cur_user)"
                        " VALUES ('" + parameter + "', '" + _date + "', current_user);")
         self.controller.execute_sql(sql)
 
@@ -192,16 +192,16 @@ class Master(ParentAction):
         answer = self.controller.ask_question(message, "Delete records", inf_text)
 
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+            sql = ("DELETE FROM " + table_name + ""
                    " WHERE " + column_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
-            sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+            sql = ("SELECT value FROM config_param_user "
                    " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
                    " AND value IN (" + list_id + ")")
             row = self.controller.get_row(sql)
             if row is not None:
-                sql = ("DELETE FROM " + self.schema_name + ".config_param_user "
+                sql = ("DELETE FROM config_param_user "
                        " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
                        " AND value = '" + row[0] + "'")
                 self.controller.execute_sql(sql)
@@ -245,7 +245,7 @@ class Master(ParentAction):
         self.populate_cmb_result_type(dlg_estimate_result_new.cmb_result_type, 'plan_result_type', False)
 
         if result_id != 0 and result_id:         
-            sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+            sql = ("SELECT * FROM " + tablename + " "
                    " WHERE result_id = '" + str(result_id) + "' AND current_user = cur_user")
             row = self.controller.get_row(sql)
             if row is None:
@@ -275,7 +275,7 @@ class Master(ParentAction):
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
 
         sql = ("SELECT id, name"
-                " FROM " + self.schema_name + "." + table_name + ""
+                " FROM " + table_name + ""
                 " ORDER BY name")
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -315,7 +315,7 @@ class Master(ParentAction):
                  '", "resultType":"' + str(result_type) + '", "resultId":"' + str(result_id) + '"}'
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_fct_plan_result($${" + body + "}$$)::text")
+        sql = ("SELECT gw_fct_plan_result($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -347,9 +347,8 @@ class Master(ParentAction):
 
         # Set current value
         table_name = "om_result_cat"
-        sql = ("SELECT name FROM " + self.schema_name + "." + table_name + " "
-               " WHERE cur_user = current_user AND result_type = 1 AND result_id = (SELECT result_id FROM "
-               + self.schema_name + ".plan_result_selector)")
+        sql = ("SELECT name FROM " + table_name + " "
+               " WHERE cur_user = current_user AND result_type = 1 AND result_id = (SELECT result_id FROM plan_result_selector)")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(self.dlg_estimate_result_selector, self.dlg_estimate_result_selector.rpt_selector_result_id, str(row[0]))
@@ -367,7 +366,7 @@ class Master(ParentAction):
 
         table_name = "om_result_cat"
         sql = ("SELECT name, result_id"
-               " FROM " + self.schema_name + "." + table_name + " "
+               " FROM " + table_name + " "
                " WHERE cur_user = current_user"
                " AND result_type = 1"
                " ORDER BY name")
@@ -388,7 +387,7 @@ class Master(ParentAction):
             self.controller.show_warning(message, parameter=table_result)
             return
         
-        sql = ("SELECT result_id FROM " + self.schema_name + "." + table_result + " "
+        sql = ("SELECT result_id FROM " + table_result + " "
                " WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
@@ -404,8 +403,8 @@ class Master(ParentAction):
             return
                 
         result_id = utils_giswater.get_item_data(self.dlg_estimate_result_selector, combo, 1)
-        sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
-               "\nINSERT INTO " + self.schema_name + "." + tablename + " (result_id, cur_user)"
+        sql = ("DELETE FROM " + tablename + " WHERE current_user = cur_user;"
+               "\nINSERT INTO " + tablename + " (result_id, cur_user)"
                " VALUES(" + str(result_id) + ", current_user);")
         status = self.controller.execute_sql(sql)
         if status:

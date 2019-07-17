@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -40,13 +40,13 @@ class ManageGallery(ParentManage):
         self.img_path_list1D = []
 
         # Get all pictures for event_id | visit_id
-        sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
+        sql = ("SELECT value FROM om_visit_event_photo"
                " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'")
         rows = self.controller.get_rows(sql)
         num = len(rows)
 
         # Get doc_absolute_path from config_param_system
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+        sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'doc_absolute_path'")
         row = self.controller.get_row(sql)
         if row[0]:

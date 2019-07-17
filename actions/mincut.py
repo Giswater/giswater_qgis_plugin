@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -73,7 +73,7 @@ class MincutParent(ParentAction):
         
         self.states = {}
         sql = ("SELECT id, name "
-               "FROM " + self.schema_name + ".anl_mincut_cat_state "
+               "FROM anl_mincut_cat_state "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -136,21 +136,21 @@ class MincutParent(ParentAction):
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
-               "FROM " + self.schema_name + ".anl_mincut_cat_type "
+               "FROM anl_mincut_cat_type "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
         sql = ("SELECT id, descript "
-               "FROM " + self.schema_name + ".anl_mincut_cat_cause "
+               "FROM anl_mincut_cat_cause "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
 
         # Fill ComboBox assigned_to and exec_user
         sql = ("SELECT id, name "
-               "FROM " + self.schema_name + ".cat_users "
+               "FROM cat_users "
                "ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
@@ -205,7 +205,7 @@ class MincutParent(ParentAction):
 
         # Show future id of mincut
         result_mincut_id = 1
-        sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM " + self.schema_name + ".anl_mincut_result_cat), true)")
+        sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM anl_mincut_result_cat), true)")
         row = self.controller.get_row(sql, log_sql=True)
         if row:
             if row[0]:
@@ -248,11 +248,11 @@ class MincutParent(ParentAction):
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-            sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
+            sql = ("SELECT id FROM anl_mincut_result_cat"
                    " WHERE id = " + str(result_mincut_id))
             row = self.controller.get_row(sql)
             if row:
-                sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_cat"
+                sql = ("DELETE FROM anl_mincut_result_cat"
                        " WHERE id = " + str(result_mincut_id))
                 self.controller.execute_sql(sql)
                 self.controller.show_info("Mincut canceled!")                   
@@ -326,7 +326,7 @@ class MincutParent(ParentAction):
 
         # Fill ComboBox exec_user
         sql = ("SELECT name "
-               "FROM " + self.schema_name + ".cat_users "
+               "FROM cat_users "
                "ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_fin, "exec_user", rows, False)
@@ -430,18 +430,18 @@ class MincutParent(ParentAction):
 
         # Check if id exist in table 'anl_mincut_result_cat'
         result_mincut_id = self.result_mincut_id.text()        
-        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat " 
+        sql = ("SELECT id FROM anl_mincut_result_cat " 
                "WHERE id = '" + str(result_mincut_id) + "';")
         rows = self.controller.get_rows(sql)
         
         # If not found Insert just its 'id'
         sql = ""
         if not rows:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id) "
+            sql = ("INSERT INTO anl_mincut_result_cat (id) "
                    "VALUES ('" + str(result_mincut_id) + "');\n")
 
         # Update all the fields
-        sql += ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+        sql += ("UPDATE anl_mincut_result_cat"
                 " SET mincut_state = '" + str(mincut_result_state) + "',"
                 " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
                 " anl_tstamp = '" + str(received_date) + "', received_date = '" + str(received_date) + "',"
@@ -481,8 +481,8 @@ class MincutParent(ParentAction):
         sql += " WHERE id = '" + str(result_mincut_id) + "';\n"
         
         # Update table 'anl_mincut_result_selector'
-        sql += ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES "
+        sql += ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
+                "INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES "
                 "(current_user, " + str(result_mincut_id) + ");")
         
         # Check if any 'connec' or 'hydro' associated
@@ -504,25 +504,25 @@ class MincutParent(ParentAction):
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
 
-        sql = ("SELECT mincut_state, mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat "
+        sql = ("SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()
                 result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-                sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
+                sql = ("SELECT gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
                 row = self.controller.get_row(sql, commit=True)
                 if row:
                     if row[0]:
                         message = "Mincut done, but has conflict and overlaps with "
                         answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
                         if answer:
-                            sql = ("SELECT * FROM " + self.schema_name + ".selector_audit"
+                            sql = ("SELECT * FROM selector_audit"
                                    " WHERE fprocesscat_id='31' AND cur_user=current_user")
                             row = self.controller.get_row(sql, log_sql=False)
                             if not row:
-                                sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
+                                sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
                                        " VALUES('31', current_user)")
                                 self.controller.execute_sql(sql, log_sql=False)
                             views = 'v_anl_arc, v_anl_node, v_anl_connec'
@@ -549,8 +549,8 @@ class MincutParent(ParentAction):
     def update_result_selector(self, result_mincut_id, commit=True):    
         """ Update table 'anl_mincut_result_selector' """    
             
-        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;"    
-               "\nINSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"    
+        sql = ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"    
+               "\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"    
                " (current_user, " + str(result_mincut_id) + ");")    
         status = self.controller.execute_sql(sql, commit)    
         if not status:    
@@ -601,11 +601,11 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in anl_mincut_result_cat
-        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
+        sql = ("SELECT id FROM anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id_text) + "';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class) "
+            sql = ("INSERT INTO anl_mincut_result_cat (id, mincut_class) "
                    " VALUES ('" + str(result_mincut_id_text) + "', 2);")
             self.controller.execute_sql(sql)
 
@@ -649,7 +649,7 @@ class MincutParent(ParentAction):
         """ Set autocompleter for 'customer_code' """
         
         # Get list of 'customer_code'
-        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".v_edit_connec"
+        sql = "SELECT DISTINCT(customer_code) FROM v_edit_connec"
         rows = self.controller.get_rows(sql)
         values = []
         if rows:
@@ -762,11 +762,11 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in table 'anl_mincut_result_cat'
-        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
+        sql = ("SELECT id FROM anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id_text) + "';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class)"
+            sql = ("INSERT INTO anl_mincut_result_cat (id, mincut_class)"
                    " VALUES ('" + str(result_mincut_id_text) + "', 3);")
             self.controller.execute_sql(sql)
 
@@ -820,7 +820,7 @@ class MincutParent(ParentAction):
         
         # Get 'hydrometers' related with this 'connec'
         sql = ("SELECT DISTINCT(hydrometer_customer_code)"
-               " FROM " + self.schema_name + ".v_rtc_hydrometer"
+               " FROM v_rtc_hydrometer"
                " WHERE connec_id = '" + str(connec_id) + "'")
         rows = self.controller.get_rows(sql)
         values = []
@@ -850,7 +850,7 @@ class MincutParent(ParentAction):
             return
         
         # Check if hydrometer_id belongs to any 'connec_id'
-        sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".v_rtc_hydrometer"
+        sql = ("SELECT hydrometer_id FROM v_rtc_hydrometer"
                " WHERE hydrometer_customer_code = '" + str(hydrometer_cc) + "'")
         row = self.controller.get_row(sql, log_sql=False)
         if not row:
@@ -903,7 +903,7 @@ class MincutParent(ParentAction):
                     
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_connec, self.result_mincut_id)
-        sql = ("SELECT connec_id FROM " + self.schema_name + ".anl_mincut_result_connec"
+        sql = ("SELECT connec_id FROM anl_mincut_result_connec"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
         if rows:
@@ -934,8 +934,8 @@ class MincutParent(ParentAction):
 
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
-        sql = ("SELECT DISTINCT(connec_id) FROM " + self.schema_name + ".rtc_hydrometer_x_connec AS rtc"
-               " INNER JOIN " + self.schema_name + ".anl_mincut_result_hydrometer AS anl"
+        sql = ("SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
+               " INNER JOIN anl_mincut_result_hydrometer AS anl"
                " ON anl.hydrometer_id = rtc.hydrometer_id"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
@@ -959,7 +959,7 @@ class MincutParent(ParentAction):
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
-        sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
+        sql = ("SELECT hydrometer_id FROM anl_mincut_result_hydrometer"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
 
@@ -1054,7 +1054,7 @@ class MincutParent(ParentAction):
     def get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
                    
-        sql = ("SELECT connec_id FROM " + self.schema_name + ".v_edit_connec"
+        sql = ("SELECT connec_id FROM v_edit_connec"
                " WHERE customer_code = '" + customer_code + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1102,7 +1102,7 @@ class MincutParent(ParentAction):
             (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
             if not is_valid:
                 return expr
-
+        # TODO: schema_name
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -1127,7 +1127,7 @@ class MincutParent(ParentAction):
 
     def reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
-                         
+
         table_name = self.schema_name + ".v_edit_connec"
         widget = self.dlg_connec.tbl_mincut_connec     
         expr = self.set_table_model(widget, table_name, expr_filter)
@@ -1137,6 +1137,7 @@ class MincutParent(ParentAction):
 
     def reload_table_hydro(self, expr_filter=None):
         """ Reload contents of table 'hydro' """
+
         table_name = self.schema_name + ".v_rtc_hydrometer"
         widget = self.dlg_hydro.tbl_hydro  
         expr = self.set_table_model(widget, table_name, expr_filter)
@@ -1261,20 +1262,20 @@ class MincutParent(ParentAction):
         if result_mincut_id == 'null':
             return
 
-        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+        sql = ("DELETE FROM anl_mincut_result_" + str(element) + ""
                " WHERE result_id = " + str(result_mincut_id) + ";\n")
         for element_id in self.connec_list:
-            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+            sql += ("INSERT INTO anl_mincut_result_" + str(element) + ""
                     " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
             # Get hydrometer_id of selected connec
-            sql2 = ("SELECT hydrometer_id FROM " + self.schema_name + ".v_rtc_hydrometer"
+            sql2 = ("SELECT hydrometer_id FROM v_rtc_hydrometer"
                     " WHERE connec_id = '" + str(element_id) + "'")
             rows = self.controller.get_rows(sql2)
             if rows:
                 for row in rows:
                     # Hydrometers associated to selected connec inserted to the table anl_mincut_result_hydrometer
-                    sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer"
+                    sql += ("INSERT INTO anl_mincut_result_hydrometer"
                             " (result_id, hydrometer_id) "
                             " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
 
@@ -1291,10 +1292,10 @@ class MincutParent(ParentAction):
         if result_mincut_id == 'null':
             return
 
-        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+        sql = ("DELETE FROM anl_mincut_result_" + str(element) + ""
                " WHERE result_id = " + str(result_mincut_id) + ";\n")
         for element_id in self.hydro_list:
-            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+            sql += ("INSERT INTO anl_mincut_result_" + str(element) + ""
                     " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
@@ -1388,7 +1389,7 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
-        sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+        sql = ("UPDATE anl_mincut_result_cat"
                " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(point.x()) + ", "
                + str(point.y()) + ")," + str(srid) + ")"
                " WHERE id = '" + result_mincut_id_text + "'")
@@ -1429,7 +1430,7 @@ class MincutParent(ParentAction):
             self.set_id_val()
             self.is_new = False
 
-        sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state)"
+        sql = ("INSERT INTO anl_mincut_result_cat (mincut_state)"
                " VALUES (0) RETURNING id;")
         new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
         real_mincut_id = new_mincut_id[0]
@@ -1439,7 +1440,7 @@ class MincutParent(ParentAction):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
+        sql = ("SELECT gw_fct_mincut('" + str(elem_id) + "',"
                " '" + str(elem_type) + "', '" + str(real_mincut_id) + "');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
@@ -1465,7 +1466,7 @@ class MincutParent(ParentAction):
             x2, y2 = polygon[2].split(' ')
             self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             
-            sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+            sql = ("UPDATE anl_mincut_result_cat"
                    " SET mincut_class = 1, "
                    " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_x) + ", "
                    + str(snapping_y) + "), " + str(srid) + "),"
@@ -1489,8 +1490,8 @@ class MincutParent(ParentAction):
             self.action_mincut_composer.setDisabled(False)
 
             # Update table 'anl_mincut_result_selector'
-            sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                   "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
+            sql = ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
+                   "INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
                    " (current_user, " + str(real_mincut_id) + ");")
             self.controller.execute_sql(sql, log_error=True, log_sql=True)
 
@@ -1599,7 +1600,7 @@ class MincutParent(ParentAction):
         cur_user = self.controller.get_project_user()               
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
+            sql = ("SELECT gw_fct_mincut_valve_unaccess"
                    "('" + str(elem_id) + "', '" + str(result_mincut_id) + "', '" + str(cur_user) + "');")
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
@@ -1637,10 +1638,10 @@ class MincutParent(ParentAction):
         self.result_mincut_id.setText(str(result_mincut_id))
 
         sql = ("SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
-               " FROM " + self.schema_name + ".anl_mincut_result_cat"
-               " INNER JOIN " + self.schema_name + ".anl_mincut_cat_state"
+               " FROM anl_mincut_result_cat"
+               " INNER JOIN anl_mincut_cat_state"
                " ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
-               " INNER JOIN" + self.schema_name + ".cat_users" 
+               " INNER JOINcat_users" 
                " ON cat_users.id = anl_mincut_result_cat.assigned_to"
                " WHERE anl_mincut_result_cat.id = '" + str(result_mincut_id) + "'")
 
@@ -1669,7 +1670,7 @@ class MincutParent(ParentAction):
         self.update_result_selector(result_mincut_id)
         self.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
-        sql = ("SELECT mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat"
+        sql = ("SELECT mincut_class FROM anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
         mincut_class_status = None
@@ -1815,7 +1816,7 @@ class MincutParent(ParentAction):
         
         # Get 'muni_name' from 'muni_id'  
         if row['muni_id'] and row['muni_id'] != -1:
-            sql = ("SELECT name FROM " + self.schema_name + ".ext_municipality"
+            sql = ("SELECT name FROM ext_municipality"
                    " WHERE muni_id = '" + str(row['muni_id']) + "'")
             row_aux = self.controller.get_row(sql)
             if row_aux:                
@@ -1825,7 +1826,7 @@ class MincutParent(ParentAction):
         
         # Get 'street_name' from 'streetaxis_id'  
         if row['streetaxis_id'] and row['streetaxis_id'] != -1:
-            sql = ("SELECT name FROM " + self.schema_name + ".ext_streetaxis"
+            sql = ("SELECT name FROM ext_streetaxis"
                    " WHERE id = '" + str(row['streetaxis_id']) + "'")
             row_aux = self.controller.get_row(sql)
             if row_aux:
@@ -1861,7 +1862,7 @@ class MincutParent(ParentAction):
         """ Get parameters of 'searchplus' from table 'config_param_system' """
 
         self.params = {}
-        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
+        sql = ("SELECT parameter, value FROM config_param_system"
                " WHERE context = 'searchplus' ORDER BY parameter")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -1874,7 +1875,7 @@ class MincutParent(ParentAction):
 
         # Get scale zoom
         self.scale_zoom = 2500
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+        sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'scale_zoom'")
         row = self.controller.get_row(sql)
         if row:
@@ -1890,7 +1891,7 @@ class MincutParent(ParentAction):
         expl_id = utils_giswater.get_item_data(dialog, dialog.address_exploitation)
 
         # Get postcodes related with selected 'expl_id'
-        sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
+        sql = "SELECT DISTINCT(postcode) FROM ext_address"
         if expl_id != -1:
             sql += " WHERE " + self.street_field_expl[0] + " = '" + str(expl_id) + "'"
         sql += " ORDER BY postcode"
@@ -2123,7 +2124,7 @@ class MincutParent(ParentAction):
         status = self.address_populate(dialog, dialog.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             return
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+        sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'street_field_expl'")
         self.street_field_expl = self.controller.get_row(sql)
         if not self.street_field_expl:
@@ -2131,7 +2132,7 @@ class MincutParent(ParentAction):
             self.controller.show_warning(message)
             return
 
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_system"
+        sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'portal_field_postal'")
         portal_field_postal = self.controller.get_row(sql)
         if not portal_field_postal:
@@ -2148,7 +2149,7 @@ class MincutParent(ParentAction):
         if expl_id:
             # Set SQL to get 'expl_name'
             sql = ("SELECT " + self.params['expl_field_name'] + ""
-                   " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
+                   " FROM " + self.params['expl_layer'] + ""
                    " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
             row = self.controller.get_row(sql, log_sql=False)
             if row:

@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -14,12 +14,10 @@ if Qgis.QGIS_VERSION_INT < 29900:
     import ConfigParser as configparser
     from qgis.PyQt.QtGui import QStringListModel
     from qgis.core import QgsMapLayerRegistry as QgsProject
-    from qgis.gui import QgsMapCanvasSnapper
 else:
     import configparser
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
-    from qgis.gui import QgsMapCanvas
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
 from qgis.PyQt.QtCore import Qt, QDate
@@ -222,9 +220,9 @@ class ParentAction(object):
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE " + name + " NOT IN "
-        query_left += "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft
-        query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+        query_left = "SELECT * FROM " + tableleft + " WHERE " + name + " NOT IN "
+        query_left += "(SELECT " + tableleft + "." + name + " FROM " + tableleft
+        query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
         query_left += " AND  "+field_id_left+" > -1"
         
@@ -235,8 +233,10 @@ class ParentAction(object):
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        query_right = "SELECT " + tableleft + "." + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
-        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+
+        query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + tableleft
+        query_right += " JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+
         query_right += " WHERE cur_user = current_user"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
@@ -246,7 +246,7 @@ class ParentAction(object):
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
-        query_delete = "DELETE FROM " + self.schema_name + "." + tableright
+        query_delete = "DELETE FROM " + tableright
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
@@ -309,7 +309,7 @@ class ParentAction(object):
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(" + id_des + ", cur_user)"
-                   " FROM " + self.schema_name + "." + tablename_des + ""
+                   " FROM " + tablename_des + ""
                    " WHERE " + id_des + " = '" + str(expl_id[i]) + "' AND cur_user = current_user")
             row = self.controller.get_row(sql)
 
@@ -318,7 +318,7 @@ class ParentAction(object):
                 message = "Id already selected"
                 self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
-                sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (" + field_id + ", cur_user) "
+                sql = ("INSERT INTO " + tablename_des + " (" + field_id + ", cur_user) "
                        " VALUES (" + str(expl_id[i]) + ", current_user)")
                 self.controller.execute_sql(sql)
 
@@ -366,6 +366,7 @@ class ParentAction(object):
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
+
         # Attach model to table view
         widget.setModel(self.model)
         if expr_filter:
@@ -392,9 +393,9 @@ class ParentAction(object):
         """ Fill the QTableView by filtering through the QLineEdit"""
         
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
-        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE " + name + " NOT IN "
-               "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft + ""
-               " RIGHT JOIN " + self.schema_name + "." + tableright + ""
+        sql = ("SELECT * FROM " + tableleft + " WHERE " + name + " NOT IN "
+               "(SELECT " + tableleft + "." + name + " FROM " + tableleft + ""
+               " RIGHT JOIN " + tableright + ""
                " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
                " WHERE cur_user = current_user) AND LOWER(" + name + "::text) LIKE '%" + query + "%'")
         self.fill_table_by_query(qtable, sql)
@@ -470,7 +471,7 @@ class ParentAction(object):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
@@ -523,8 +524,8 @@ class ParentAction(object):
 
     def set_label_current_psector(self, dialog):
 
-        sql = ("SELECT t1.name FROM " + self.schema_name + ".plan_psector AS t1 "
-               " INNER JOIN " + self.schema_name + ".config_param_user AS t2 ON t1.psector_id::text = t2.value "
+        sql = ("SELECT t1.name FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='psector_vdefault' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if not row:
@@ -559,7 +560,7 @@ class ParentAction(object):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = "DELETE FROM " + self.schema_name + "." + table_name
+            sql = "DELETE FROM " + table_name
             sql += " WHERE " + column_id + " IN (" + list_id + ")"
             self.controller.execute_sql(sql)
             widget.model().select()
@@ -622,7 +623,7 @@ class ParentAction(object):
 
         # Set SQL
         sql = ("SELECT DISTINCT(" + field_search + ")"
-               " FROM " + self.schema_name + "." + tablename + ""
+               " FROM " + tablename + ""
                " ORDER BY " + field_search + "")
         row = self.controller.get_rows(sql)
 
@@ -688,17 +689,6 @@ class ParentAction(object):
             self.delete_layer_from_toc(layer_name)
 
 
-    def get_snapper(self):
-        """ Return snapper """
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            snapper = QgsMapCanvasSnapper(self.canvas)
-        else:
-            snapper = QgsMapCanvas.snappingUtils(self.canvas)
-
-        return snapper
-
-
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
@@ -717,7 +707,8 @@ class ParentAction(object):
 
 
     def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
-        cahange_tab=False
+
+        change_tab = False
         text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
         if reset_text:
             text = ""
@@ -726,12 +717,12 @@ class ParentAction(object):
                 if item['message'] is not None:
                     text += str(item['message']) + "\n"
                     if force_tab:
-                        cahange_tab = True
+                        change_tab = True
                 else:
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
-        if cahange_tab:
+        if change_tab:
             qtabwidget.setCurrentIndex(1)
 
 
@@ -808,7 +799,7 @@ class ParentAction(object):
     def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
 
         sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
-               " FROM {}.{}".format(self.schema_name, table_name))
+               " FROM {}".format(table_name))
         row = self.controller.get_row(sql, log_sql=False)
         if row:
             if row[0]:
@@ -826,7 +817,7 @@ class ParentAction(object):
     def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
 
         sql = ("SELECT id, idval"
-               " FROM " + self.schema_name + "." + table_name + ""
+               " FROM " + table_name + ""
                " WHERE typevalue = '" + typevalue + "'"
                " ORDER BY " + order_by + "")
         rows = self.controller.get_rows(sql, commit=True)

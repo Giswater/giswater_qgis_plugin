@@ -105,6 +105,7 @@ class ApiSearch(ApiParent):
 
         # Open dialog
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
         self.dlg_search.show()
 
 
@@ -267,7 +268,7 @@ class ApiSearch(ApiParent):
             extras_search += '"' + line_edit.property('column_id') + '":{"text":"' + value + '"}'
             extras_search_add += '"' + line_edit.property('column_id') + '":{"text":"' + value + '"}'
             body = self.create_body(form=form_search, extras=extras_search)
-            sql = ("SELECT " + self.schema_name + ".gw_api_setsearch($${" +body + "}$$)")
+            sql = ("SELECT gw_api_setsearch($${" +body + "}$$)")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if row:
                 self.result_data = row[0]
@@ -298,7 +299,7 @@ class ApiSearch(ApiParent):
 
             extras_search_add += ', "' + line_edit_add.property('column_id') + '":{"text":"' + value + '"}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
-            sql = ("SELECT " + self.schema_name + ".gw_api_setsearch_add($${" + body + "}$$)")
+            sql = ("SELECT gw_api_setsearch_add($${" + body + "}$$)")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if row:
                 self.result_data = row[0]
@@ -350,7 +351,7 @@ class ApiSearch(ApiParent):
 
         feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
         body = self.create_body(feature=feature)
-        sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
+        sql = ("SELECT gw_api_getinfofromid($${" + body + "}$$)")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -437,13 +438,13 @@ class ApiSearch(ApiParent):
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
 
         sql = ("SELECT a.expl_id, a.expl_name FROM "
-               "  (SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature "
+               "  (SELECT expl_id, expl_name FROM v_ui_workcat_x_feature "
                "   WHERE workcat_id='" + str(workcat_id) + "' "
-               "   UNION SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature_end "
+               "   UNION SELECT expl_id, expl_name FROM v_ui_workcat_x_feature_end "
                "   WHERE workcat_id='" + str(workcat_id) + "'"
                "   ) AS a "
                " WHERE expl_id NOT IN "
-               "  (SELECT expl_id FROM " + self.schema_name + ".selector_expl "
+               "  (SELECT expl_id FROM selector_expl "
                "   WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -451,7 +452,7 @@ class ApiSearch(ApiParent):
 
         if len(rows) > 0:
             for row in rows:
-                sql = ("INSERT INTO " + self.schema_name + ".selector_expl(expl_id, cur_user) "
+                sql = ("INSERT INTO selector_expl(expl_id, cur_user) "
                        " VALUES('" + str(row[0]) + "', current_user)")
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
@@ -461,16 +462,16 @@ class ApiSearch(ApiParent):
     def update_selector_workcat(self, workcat_id):
         """ Update table selector_workcat """
 
-        sql = ("DELETE FROM " + self.schema_name + ".selector_workcat "
+        sql = ("DELETE FROM selector_workcat "
                " WHERE cur_user = current_user;\n")
-        sql += ("INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
+        sql += ("INSERT INTO selector_workcat(workcat_id, cur_user) "
                 " VALUES('" + workcat_id + "', current_user);\n")
         self.controller.execute_sql(sql)
 
 
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
-        sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
+        sql = ("SELECT state_id FROM selector_state "
                " WHERE cur_user = current_user AND state_id ='" + str(_id) + "'")
         row = self.controller.get_row(sql)
         if row is None:
@@ -492,7 +493,7 @@ class ApiSearch(ApiParent):
         file_dialog.setFileMode(QFileDialog.Directory)
 
         msg = "Save as"
-        folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+        folder_path, filter_ = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
@@ -501,13 +502,13 @@ class ApiSearch(ApiParent):
         """ Force selected state and set qtable enabled = True """
 
         sql = ("SELECT state_id "
-               "FROM " + self.schema_name + ".selector_state"
+               "FROM selector_state"
                "WHERE cur_user = current_user AND state_id = '" + str(state) + "'")
         row = self.controller.get_row(sql)
         if row:
             return
         
-        sql = ("INSERT INTO " + self.schema_name + ".selector_state(state_id, cur_user) "
+        sql = ("INSERT INTO selector_state(state_id, cur_user) "
                "VALUES('" + str(state) + "', current_user)")
         self.controller.execute_sql(sql)
         qtable.setEnabled(True)
@@ -659,7 +660,7 @@ class ApiSearch(ApiParent):
         features = ['NODE', 'CONNEC', 'GULLY', 'ELEMENT', 'ARC']
         for feature in features:
             sql = ("SELECT feature_id "
-                   " FROM " + self.schema_name + "." + str(table_name) + "")
+                   " FROM " + str(table_name) + "")
             sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             rows = self.controller.get_rows(sql)
             if not rows:
@@ -682,7 +683,7 @@ class ApiSearch(ApiParent):
                 for row in rows:
                     arc_id = str(row[0])
                     sql = ("SELECT st_length2d(the_geom)::numeric(12,2) "
-                           " FROM " + self.schema_name + ".arc"
+                           " FROM arc"
                            " WHERE arc_id = '" + arc_id + "'")
                     row = self.controller.get_row(sql)
                     if row:

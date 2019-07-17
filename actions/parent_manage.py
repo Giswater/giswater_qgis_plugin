@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -12,15 +12,17 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QPoint, QDate, QDateTime
+from qgis.PyQt.QtCore import Qt, QDate, QDateTime
 
 from functools import partial
 
@@ -33,7 +35,8 @@ class ParentManage(ParentAction, object):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to keep common functions of classes
-            'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit'."""
+        'ManageDocument', 'ManageElement' and 'ManageVisit' of toolbar 'edit' """
+
         super(ParentManage, self).__init__(iface, settings, controller, plugin_dir)
 
         self.x = ""
@@ -46,6 +49,7 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
         self.remove_ids = True
+        self.snapper_manager = None
 
 
     def reset_lists(self):
@@ -157,7 +161,7 @@ class ParentManage(ParentAction, object):
                     
             state = ""  
             if row['state']:          
-                sql = ("SELECT name FROM " + self.schema_name + ".value_state"
+                sql = ("SELECT name FROM value_state"
                        " WHERE id = '" + str(row['state']) + "'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
@@ -165,14 +169,14 @@ class ParentManage(ParentAction, object):
     
             expl_id = ""
             if row['expl_id']:
-                sql = ("SELECT name FROM " + self.schema_name + ".exploitation"
+                sql = ("SELECT name FROM exploitation"
                        " WHERE expl_id = '" + str(row['expl_id']) + "'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     expl_id = row_aux[0]
 
             utils_giswater.setWidgetText(dialog, "code", row['code'])
-            sql = ("SELECT elementtype_id FROM " + self.schema_name + ".cat_element"
+            sql = ("SELECT elementtype_id FROM cat_element"
                    " WHERE id = '" + str(row['elementcat_id']) + "'")
             row_type = self.controller.get_row(sql)
             if row_type:
@@ -209,10 +213,9 @@ class ParentManage(ParentAction, object):
             self.controller.log_info("Not found: " + str(table_relation))
             return
               
-        sql = ("SELECT " + geom_type + "_id"
-               " FROM " + self.schema_name + "." + table_relation + ""
-               " WHERE " + table_object + "_id = '" + str(object_id) + "'")
-
+        sql = ("SELECT " + geom_type + "_id "
+               "FROM " + table_relation + " "
+               "WHERE " + table_object + "_id = '" + str(object_id) + "'")
         rows = self.controller.get_rows(sql, log_info=False)
         if rows:
             for row in rows:
@@ -236,7 +239,7 @@ class ParentManage(ParentAction, object):
 
         # Check if we already have data with selected object_id
         sql = ("SELECT * " 
-               " FROM " + self.schema_name + "." + str(table_object) + ""
+               " FROM " + str(table_object) + ""
                " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
 
@@ -288,7 +291,7 @@ class ParentManage(ParentAction, object):
         """ Executes query and fill combo box """
 
         sql = ("SELECT " + field_name + ""
-               " FROM " + self.schema_name + "." + table_name + ""
+               " FROM " + table_name + ""
                " ORDER BY " + field_name)
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(dialog, widget, rows)
@@ -299,8 +302,8 @@ class ParentManage(ParentAction, object):
     def set_combo(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
         """ Executes query and set combo box """
         
-        sql = ("SELECT t1." + field_name + " FROM " + self.schema_name + "." + table_name + " as t1"
-               " INNER JOIN " + self.schema_name + ".config_param_user as t2 ON t1." + field_id + "::text = t2.value::text"
+        sql = ("SELECT t1." + field_name + " FROM " + table_name + " as t1"
+               " INNER JOIN config_param_user as t2 ON t1." + field_id + "::text = t2.value::text"
                " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
@@ -310,7 +313,7 @@ class ParentManage(ParentAction, object):
     def set_calendars(self, dialog, widget, table_name, value, parameter):
         """ Executes query and set QDateEdit """
         
-        sql = ("SELECT " + value + " FROM " + self.schema_name + "." + table_name + ""
+        sql = ("SELECT " + value + " FROM " + table_name + ""
                " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
@@ -336,7 +339,11 @@ class ParentManage(ParentAction, object):
         self.vertex_marker.setPenWidth(3)
 
         # Snapper
-        self.snapper = self.get_snapper()
+        if self.snapper_manager is None:
+            self.snapper_manager = SnappingConfigManager(self.iface)
+            self.snapper = self.snapper_manager.get_snapper()
+            if self.snapper_manager.controller is None:
+                self.snapper_manager.set_controller(self.controller)
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()
@@ -428,7 +435,7 @@ class ParentManage(ParentAction, object):
         if table_object == "element":
             field_object_id = table_object + "_id"
         sql = ("SELECT DISTINCT(" + field_object_id + ")"
-               " FROM " + self.schema_name + "." + table_object)
+               " FROM " + table_object)
         row = self.controller.get_rows(sql, commit=self.autocommit)
         for i in range(0, len(row)):
             aux = row[i]
@@ -453,7 +460,7 @@ class ParentManage(ParentAction, object):
 
         # Set SQL
         sql = ("SELECT DISTINCT(" + field_id + ")"
-               " FROM " + self.schema_name + "." + tablename +""
+               " FROM " + tablename +""
                " ORDER BY "+ field_id + "")
         row = self.controller.get_rows(sql)
         for i in range(0, len(row)):
@@ -481,7 +488,7 @@ class ParentManage(ParentAction, object):
         model = QStringListModel()
 
         sql = ("SELECT " + geom_type + "_id"
-               " FROM " + self.schema_name + "." + viewname)
+               " FROM " + viewname)
         row = self.controller.get_rows(sql, commit=self.autocommit)
         if row:
             for i in range(0, len(row)):
@@ -742,17 +749,13 @@ class ParentManage(ParentAction, object):
         self.hide_generic_layers()
         self.disconnect_snapping()   
         self.disconnect_signal_selection_changed()
-        # reset previous dialog in not in single_tool_mode
-        # if hasattr(self, 'single_tool_mode') and not self.single_tool_mode:
-        #     if hasattr(self, 'previous_dialog'):
-
 
 
     def selection_init(self, dialog, table_object, query=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
-                                             parent_manage=self, table_object=table_object, dialog=dialog)
+            parent_manage=self, table_object=table_object, dialog=dialog)
         self.previous_map_tool = self.canvas.mapTool()        
         self.canvas.setMapTool(multiple_selection)              
         self.disconnect_signal_selection_changed()        
@@ -814,7 +817,8 @@ class ParentManage(ParentAction, object):
             self.reload_qtable(dialog, geom_type, self.plan_om)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            self.apply_lazy_init(table_object)            
+            self.apply_lazy_init(table_object)
+
         # Remove selection in generic 'v_edit' layers
         if self.plan_om == 'plan':
             self.remove_selection(False)
@@ -826,8 +830,8 @@ class ParentManage(ParentAction, object):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
-        sql = ("DELETE FROM " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
-               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id = '" + str(value) + "'")
+        sql = ("DELETE FROM " + self.plan_om + "_psector_x_" + geom_type + " "
+               "WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id = '" + str(value) + "'")
         self.controller.execute_sql(sql)
 
 
@@ -840,8 +844,6 @@ class ParentManage(ParentAction, object):
                 feature_type.setEnabled(False)
             else:
                 feature_type.setEnabled(True)
-
-
 
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
@@ -877,9 +879,7 @@ class ParentManage(ParentAction, object):
                 self.ids.append(str(feature_id))
 
         # Set expression filter with features in the list
-
         expr_filter = "\"" + field_id + "\" IN ("
-
         for i in range(len(self.ids)):
             expr_filter += "'" + str(self.ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
@@ -888,6 +888,7 @@ class ParentManage(ParentAction, object):
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
             return
+
         # Select features with previous filter
         # Build a list of feature id's and select them
         for layer in self.layers[self.geom_type]:
@@ -905,27 +906,23 @@ class ParentManage(ParentAction, object):
             self.apply_lazy_init(table_object)            
 
         # Update list
-
         self.list_ids[self.geom_type] = self.ids
         self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
     def insert_feature_to_plan(self, dialog, geom_type):
-        """ Insert features_id to table plan_@geom_type_x_psector"""
-        print(str("insert_feature_to_plan"))
+        """ Insert features_id to table plan_@geom_type_x_psector """
+
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
-            sql = ("SELECT " + geom_type + "_id"
-                   " FROM " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
-                   " WHERE " + geom_type + "_id = '" + str(self.ids[i]) + "' AND psector_id = '" + str(value) + "'")
-            print(str(sql))
+            sql = ("SELECT " + geom_type + "_id "
+                   "FROM " + self.plan_om + "_psector_x_" + geom_type + " "
+                   "WHERE " + geom_type + "_id = '" + str(self.ids[i]) + "' AND psector_id = '" + str(value) + "'")
             row = self.controller.get_row(sql)
-            print(str(row))
             if not row:
-                sql = ("INSERT INTO " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
+                sql = ("INSERT INTO " + self.plan_om + "_psector_x_" + geom_type + ""
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
-                print(str(sql))
                 self.controller.execute_sql(sql)
             self.reload_qtable(dialog, geom_type, self.plan_om)
 
@@ -934,8 +931,8 @@ class ParentManage(ParentAction, object):
         """ Reload QtableView """
         
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
-        sql = ("SELECT * FROM " + self.schema_name + "." + plan_om + "_psector_x_" + geom_type + ""
-               " WHERE psector_id = '" + str(value) + "'")
+        sql = ("SELECT * FROM " + plan_om + "_psector_x_" + geom_type + " "
+               "WHERE psector_id = '" + str(value) + "'")
         qtable = utils_giswater.getWidget(dialog, 'tbl_psector_x_' + geom_type)
         self.fill_table_by_query(qtable, sql)
         self.set_table_columns(dialog, qtable, plan_om + "_psector_x_"+geom_type)
@@ -1022,8 +1019,8 @@ class ParentManage(ParentAction, object):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + "." + table_object + ""
-                   " WHERE " + field_object_id + " IN (" + list_id + ")")
+            sql = ("DELETE FROM " + table_object + " "
+                   "WHERE " + field_object_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql, commit=self.autocommit)
             widget.model().select()
 
@@ -1052,9 +1049,6 @@ class ParentManage(ParentAction, object):
 
         # Close this dialog and open selected object
         dialog.close()
-
-        # set previous dialog
-        # if hasattr(self, 'previous_dialog'):
 
         if table_object == "doc":
             self.manage_document()

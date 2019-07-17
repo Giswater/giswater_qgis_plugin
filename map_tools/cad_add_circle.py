@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -188,7 +188,7 @@ class CadAddCircle(ParentMapTool):
 
         # Check for default base layer
         self.vdefault_layer = None
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:

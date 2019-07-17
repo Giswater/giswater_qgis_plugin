@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -126,7 +126,7 @@ class Om(ParentAction):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = "DELETE FROM "+self.schema_name+"."+table_name
+            sql = "DELETE FROM " + table_name
             sql += " WHERE "+column_id+" IN ("+list_id+")"
             self.controller.execute_sql(sql)
             widget.model().select()
@@ -141,14 +141,14 @@ class Om(ParentAction):
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        sql = "SELECT * FROM " + self.schema_name + ".selector_psector WHERE cur_user = current_user"
+        sql = "SELECT * FROM selector_psector WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql)
         if rows:
-            sql = ("UPDATE " + self.schema_name + ".selector_psector"
+            sql = ("UPDATE selector_psector"
                    " SET psector_id = '" + str(psector_id) + "'"
                    " WHERE cur_user = current_user")
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".selector_psector (psector_id, cur_user)"
+            sql = ("INSERT INTO selector_psector (psector_id, cur_user)"
                    " VALUES ('" + str(psector_id) + "', current_user)")
 
         aux_widget = QLineEdit()
@@ -167,7 +167,7 @@ class Om(ParentAction):
     def insert_or_update_config_param_curuser(self, dialog, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename
+        sql = 'SELECT * FROM ' + tablename
         sql += ' WHERE "cur_user" = current_user'
         rows = self.controller.get_rows(sql)
         exist_param = False
@@ -177,31 +177,31 @@ class Om(ParentAction):
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
-                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                    sql = "UPDATE " + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
                         sql += "'" + utils_giswater.getWidgetText(dialog, widget) + "' WHERE parameter='" + parameter + "'"
                     else:
-                        sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
+                        sql += ("(SELECT id FROM value_state"
                                 " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "')"
                                 " WHERE parameter = 'state_vdefault'")
                 else:
-                    sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                    sql = "INSERT INTO " + tablename + "(parameter, value, cur_user)"
                     if widget.objectName() != 'state_vdefault':
                         sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(dialog, widget) + "', current_user)"
                     else:
                         sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT id FROM " + self.schema_name + ".value_state"
+                                " (SELECT id FROM value_state"
                                 " WHERE name ='" + utils_giswater.getWidgetText(dialog, widget) + "'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
                     exist_param = True
             if exist_param:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                sql = "UPDATE " + tablename + " SET value="
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
             else:
-                sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                sql = "INSERT INTO " + tablename + "(parameter, value, cur_user)"
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
                 
@@ -244,15 +244,15 @@ class Om(ParentAction):
 
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
-        sql = ("SELECT * FROM " + self.controller.schema_name + ".selector_date"
+        sql = ("SELECT * FROM selector_date"
                " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
         if not row :
-            sql = ("INSERT INTO " + self.controller.schema_name + ".selector_date"
+            sql = ("INSERT INTO selector_date"
                    " (from_date, to_date, context, cur_user)"
                    " VALUES('" + from_date + "', '" + to_date + "', 'om_visit', '" + self.current_user + "')")
         else:
-            sql = ("UPDATE " + self.controller.schema_name + ".selector_date"
+            sql = ("UPDATE selector_date"
                    " SET (from_date, to_date) = ('" + from_date + "', '" + to_date + "')"
                    " WHERE cur_user = '" + self.current_user + "'")
 
@@ -283,7 +283,7 @@ class Om(ParentAction):
     def get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
 
-        sql = ("SELECT from_date, to_date FROM " + self.controller.schema_name + ".selector_date"
+        sql = ("SELECT from_date, to_date FROM selector_date"
                " WHERE cur_user = '" + self.current_user + "'")
         row = self.controller.get_row(sql)
         try:

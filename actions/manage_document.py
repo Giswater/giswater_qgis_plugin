@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -116,6 +116,7 @@ class ManageDocument(ParentManage):
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = geom_type + "_id = '" + str(feature_id) + "'"
+
         # Set model of selected widget
         table_name = self.schema_name + ".v_edit_" + geom_type
         self.set_model_to_table(widget, table_name, expr_filter)
@@ -136,20 +137,20 @@ class ManageDocument(ParentManage):
 
         # Check if this document already exists
         sql = ("SELECT DISTINCT(id)"
-               " FROM " + self.schema_name + "." + str(table_object) + ""
+               " FROM " + str(table_object) + ""
                " WHERE id = '" + str(doc_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
         if row is None:
             if doc_id == 'null':
-                sql = ("INSERT INTO " + self.schema_name + ".doc (doc_type, path, observ)"
+                sql = ("INSERT INTO doc (doc_type, path, observ)"
                        " VALUES ('" + doc_type + "', '" + path + "', '" + observ + "') RETURNING id;")
                 new_doc_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
                 sql = ""
                 doc_id = str(new_doc_id[0])
             else:
-                sql = ("INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ)"
+                sql = ("INSERT INTO doc (id, doc_type, path, observ)"
                        " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
 
         # If document exists perform an UPDATE
@@ -158,36 +159,36 @@ class ManageDocument(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE " + self.schema_name + ".doc "
+            sql = ("UPDATE doc "
                    " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
                    " WHERE id = '" + str(doc_id) + "';")
 
         # Manage records in tables @table_object_x_@geom_type
-        sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_node"
+        sql += ("\nDELETE FROM doc_x_node"
                 " WHERE doc_id = '" + str(doc_id) + "';")
-        sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_arc"
+        sql += ("\nDELETE FROM doc_x_arc"
                 " WHERE doc_id = '" + str(doc_id) + "';")
-        sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_connec"
+        sql += ("\nDELETE FROM doc_x_connec"
                 " WHERE doc_id = '" + str(doc_id) + "';")
         if self.project_type == 'ud':        
-            sql += ("\nDELETE FROM " + self.schema_name + ".doc_x_gully"
+            sql += ("\nDELETE FROM doc_x_gully"
                     " WHERE doc_id = '" + str(doc_id) + "';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
-                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_arc (doc_id, arc_id)"
+                sql += ("\nINSERT INTO doc_x_arc (doc_id, arc_id)"
                         " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
-                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_node (doc_id, node_id)"
+                sql += ("\nINSERT INTO doc_x_node (doc_id, node_id)"
                         " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
-                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_connec (doc_id, connec_id)"
+                sql += ("\nINSERT INTO doc_x_connec (doc_id, connec_id)"
                         " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
         if self.project_type == 'ud' and self.list_ids['gully']:
             for feature_id in self.list_ids['gully']:
-                sql += ("\nINSERT INTO " + self.schema_name + ".doc_x_gully (doc_id, gully_id)"
+                sql += ("\nINSERT INTO doc_x_gully (doc_id, gully_id)"
                         " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
 
         status = self.controller.execute_sql(sql)
@@ -198,7 +199,7 @@ class ManageDocument(ParentManage):
         if tablename is None:
             return
         else:
-            sql = ("INSERT INTO " + self.schema_name +".doc_x_"+str(tablename)+"(doc_id, "+str(tablename)+"_id) "
+            sql = ("INSERT INTO doc_x_"+str(tablename)+"(doc_id, "+str(tablename)+"_id) "
                    " VALUES('"+str(doc_id)+"', '"+str(item_id)+"')")
             self.controller.execute_sql(sql)
             expr = "" + str(tablename) + "_id = '" + str(item_id) + "'"
@@ -216,7 +217,7 @@ class ManageDocument(ParentManage):
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
         self.set_completer_object(self.dlg_man, table_object)
-                
+
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)                
         self.set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)

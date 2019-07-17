@@ -146,7 +146,7 @@ class TmManageVisit(TmParentManage, QObject):
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo))
         self.fill_combos()
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                " WHERE parameter = 'visitcat_id' AND cur_user = current_user AND context='arbrat'")
         row = self.controller.get_row(sql)
         if row:
@@ -170,7 +170,7 @@ class TmManageVisit(TmParentManage, QObject):
 
     def set_combos(self, dialog, qcombo, parameter):
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                " WHERE parameter = '"+str(parameter)+"' AND cur_user= current_user AND context='arbrat'")
         row = self.controller.get_row(sql)
         if row:
@@ -199,7 +199,7 @@ class TmManageVisit(TmParentManage, QObject):
         """ Update geometry field """
 
         srid = self.controller.plugin_settings_value('srid')
-        sql = ("UPDATE " + str(self.schema_name) + ".om_visit"
+        sql = ("UPDATE om_visit"
                " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
                " WHERE id = " + str(self.current_visit.id))
         self.controller.execute_sql(sql, log_sql=True)
@@ -273,8 +273,8 @@ class TmManageVisit(TmParentManage, QObject):
             # it will contain all the geometry type allows basing on project type
             geometry_type = self.feature_type.itemText(index).lower()
             table_name = 'om_visit_x_' + geometry_type
-            sql = ("SELECT id FROM {0}.{1} WHERE visit_id = '{2}'".format(
-                self.schema_name, table_name, self.current_visit.id))
+            sql = ("SELECT id FROM {1} WHERE visit_id = '{2}'".format(
+                table_name, self.current_visit.id))
             rows = self.controller.get_rows(sql, commit=self.autocommit)
             if not rows or not rows[0]:
                 continue
@@ -407,7 +407,7 @@ class TmManageVisit(TmParentManage, QObject):
         """ Set parameter_id combo basing on current selections """
 
         sql = ("SELECT id, descript"
-               " FROM " + self.schema_name + ".om_visit_parameter"
+               " FROM om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'"
                " ORDER BY id")
@@ -456,8 +456,8 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         table_name = 'om_visit_x_' + self.geom_type
-        sql = ("SELECT {0}_id FROM {1}.{2} WHERE visit_id = '{3}'".format(
-            self.geom_type, self.schema_name, table_name, int(self.visit_id.text())))
+        sql = ("SELECT {0}_id FROM {1} WHERE visit_id = '{2}'".format(
+            self.geom_type, table_name, int(self.visit_id.text())))
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
@@ -485,7 +485,7 @@ class TmManageVisit(TmParentManage, QObject):
         # Visit tab
         # Fill ComboBox visitcat_id
         # save result in self.visitcat_ids to get id depending on selected combo
-        sql = ("SELECT id, name FROM " + self.schema_name + ".om_visit_cat"
+        sql = ("SELECT id, name FROM om_visit_cat"
                # " WHERE active is true"
                " ORDER BY name")
         self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
@@ -493,7 +493,7 @@ class TmManageVisit(TmParentManage, QObject):
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
-            sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+            sql = ("SELECT value FROM config_param_user"
                    " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
             row = self.controller.get_row(sql, commit=self.autocommit)
             if row:
@@ -515,7 +515,7 @@ class TmManageVisit(TmParentManage, QObject):
 
         # Event tab
         # Fill ComboBox parameter_type_id
-        sql = ("SELECT id FROM " + self.schema_name + ".om_visit_parameter_type"
+        sql = ("SELECT id FROM om_visit_parameter_type"
                " ORDER BY id")
         parameter_type_ids = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, parameter_type_ids, allow_nulls=False)
@@ -529,7 +529,7 @@ class TmManageVisit(TmParentManage, QObject):
         widget.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + "." +str(table_name)
+        sql = "SELECT DISTINCT(id) FROM " +str(table_name)
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
@@ -570,7 +570,7 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         # get form associated
-        sql = ("SELECT form_type FROM " + self.schema_name + ".om_visit_parameter"
+        sql = ("SELECT form_type FROM om_visit_parameter"
                " WHERE id = '" + str(parameter_id) + "'")
         row = self.controller.get_row(sql, commit=False)
         form_type = str(row[0])
@@ -747,7 +747,7 @@ class TmManageVisit(TmParentManage, QObject):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
