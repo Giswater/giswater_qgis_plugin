@@ -225,10 +225,10 @@ BEGIN
 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			SELECT replace(species, '''''''', '''''''''''') AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , false AS disabled
-			FROM SCHEMA_NAME_upgrade.cat_species WHERE id IN (SELECT species_id FROM selector_species WHERE cur_user=' || quote_literal(current_user) || ')
+			FROM SCHEMA_NAME.cat_species WHERE id IN (SELECT species_id FROM selector_species WHERE cur_user=' || quote_literal(current_user) || ')
 			UNION
 			SELECT replace(species, '''''''', '''''''''''') AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , false AS disabled
-			FROM SCHEMA_NAME_upgrade.cat_species WHERE id NOT IN (SELECT species_id FROM selector_species WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name)a'
+			FROM SCHEMA_NAME.cat_species WHERE id NOT IN (SELECT species_id FROM selector_species WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label)a'
 			INTO formTabs_networkSpecies;	
 
 		-- Add tab name to json
