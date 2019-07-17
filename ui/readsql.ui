@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>437</width>
-    <height>781</height>
+    <width>532</width>
+    <height>838</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -254,6 +254,13 @@
          <widget class="QPushButton" name="btn_gis_create">
           <property name="text">
            <string>Create QGIS project file</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QPushButton" name="btn_task_example">
+          <property name="text">
+           <string>Task example</string>
           </property>
          </widget>
         </item>

@@ -143,6 +143,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
             self.project_types = self.settings.value('system_variables/project_types')
+            utils_giswater.setWidgetVisible(self.dlg_readsql, 'btn_task_example', False)
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
 
@@ -168,7 +169,6 @@ class UpdateSQL(ApiParent):
             list_connections.append(elem)
 
         s.endGroup()
-        print(str(list_connections))
         if str(list_connections) != '[]':
             utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
 
@@ -197,6 +197,7 @@ class UpdateSQL(ApiParent):
         self.folderApi = self.sql_dir + os.sep + 'api' + os.sep
 
         # Set Listeners
+        self.dlg_readsql.btn_task_example.clicked.connect(partial(self.task_example))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
@@ -1160,7 +1161,7 @@ class UpdateSQL(ApiParent):
         This will be passed together with the exception (None in case of success) to the on_finished method
         """
 
-        self.controller.log_info('Started task {}'.format(task.description()))
+        self.controller.log_info("Started task '{}'".format(task.description()))
 
         wait_time = wait_time / 100
         total = 0
@@ -1212,8 +1213,7 @@ class UpdateSQL(ApiParent):
     def task_example(self):
 
         self.controller.log_info("task_example")
-        task1 = QgsTask.fromFunction('Create project', self.task_started, on_finished=self.task_completed, wait_time=20)
-        self.controller.log_info("task_example2")
+        task1 = QgsTask.fromFunction('task_example', self.task_started, on_finished=self.task_completed, wait_time=20)
         QgsApplication.taskManager().addTask(task1)
 
 
@@ -1907,7 +1907,7 @@ class UpdateSQL(ApiParent):
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
 
         # Set listeners
-        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.task_example))
+        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
         self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
         self.cmb_create_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_create_project_type))
