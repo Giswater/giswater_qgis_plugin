@@ -691,9 +691,6 @@ class Giswater(QObject):
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
             
-        # Disable for Linux 'go2epa' actions
-        self.manage_actions_linux()           
-        
         # Set objects for map tools classes
         self.manage_map_tools()
 
@@ -864,15 +861,6 @@ class Giswater(QObject):
             map_tool.set_controller(self.controller)
 
 
-    def manage_actions_linux(self):
-        """ Disable for Linux 'go2epa' actions """
-        
-        # Linux: Disable actions related with go2epa and giswater.jar
-        if 'nt' not in sys.builtin_module_names:
-            self.enable_action(False, 23)
-            self.enable_action(False, 25)                          
-                        
-            
     def action_triggered(self, function_name):   
         """ Action with corresponding funcion name has been triggered """
         
