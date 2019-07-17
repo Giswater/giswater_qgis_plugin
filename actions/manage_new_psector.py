@@ -18,8 +18,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsPointXY, QgsLayoutExporter
-    from builtins import str
-    from builtins import range
 
 from qgis.core import QgsRectangle, QgsProject
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter

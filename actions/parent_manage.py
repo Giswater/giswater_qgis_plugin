@@ -14,8 +14,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from builtins import str
-    from builtins import range
 
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker

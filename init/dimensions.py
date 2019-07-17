@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import next
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -19,7 +17,7 @@ else:
 
 from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QTimer, QPoint
+from qgis.PyQt.QtCore import QTimer
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 from .. import utils_giswater

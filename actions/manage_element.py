@@ -5,16 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import str
-
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView

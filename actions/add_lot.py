@@ -16,7 +16,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
-    from builtins import range
 
 from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel

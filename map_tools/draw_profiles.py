@@ -8,12 +8,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-from __future__ import absolute_import
-
-import json
-
-from builtins import range
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -36,6 +30,7 @@ from decimal import Decimal
 import matplotlib.pyplot as plt
 import math
 import os
+import json
 
 from .. import utils_giswater
 from .parent import ParentMapTool

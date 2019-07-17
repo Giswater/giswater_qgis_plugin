@@ -4,13 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
 """ Module with utility functions to interact with dialog and its widgets """
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
-
 try:
     from qgis.core import Qgis
 except ImportError:

@@ -17,8 +17,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsLayout
-    from builtins import next
-    from builtins import range
     from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsExpressionContextUtils, QgsProject, QgsVectorLayer

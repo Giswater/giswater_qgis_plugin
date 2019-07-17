@@ -10,12 +10,6 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import str
-    from builtins import range
-
 from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
 

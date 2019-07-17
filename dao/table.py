@@ -5,9 +5,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from builtins import zip
-from builtins import object
-
 __author__ = 'Luigi Pirelli'
 __date__ = 'January 2018'
 __copyright__ = '(C) 2018, Luigi Pirelli'
@@ -20,8 +17,8 @@ from weakref import WeakKeyDictionary
 
 
 class GenericDescriptor(object):
-    """A descriptor that set getter and setter.
-    class example from: http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb"""
+    """A descriptor that set getter and setter. class example from:
+    http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb"""
 
     def __init__(self, default):
         self.default = default

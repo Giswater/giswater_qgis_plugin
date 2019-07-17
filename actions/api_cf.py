@@ -45,9 +45,7 @@ from .manage_element import ManageElement
 from .manage_visit import ManageVisit
 from .manage_gallery import ManageGallery
 from .api_catalog import ApiCatalog
-from ..ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments
-from ..ui_manager import Sections
-from ..ui_manager import ApiBasicInfo
+from ..ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments, Sections, ApiBasicInfo
 
 
 class ApiCF(ApiParent):

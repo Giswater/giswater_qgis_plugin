@@ -4,19 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import str
-    from builtins import range
-
 from qgis.PyQt.QtWidgets import QDateEdit, QLineEdit, QTableView, QAbstractItemView
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -345,7 +333,6 @@ class Master(ParentAction):
                 self.controller.show_info_box(message)
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
-
 
 
     def master_estimate_result_selector(self):
