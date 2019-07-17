@@ -194,7 +194,7 @@ class TmParentAction(object):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'")
         if project_type is not None:
             sql += (" AND project_type = '" + project_type + "' ")
@@ -230,7 +230,7 @@ class TmParentAction(object):
 
         # Set SQL
         sql = ("SELECT DISTINCT(" + field_search + ")"
-               " FROM " + self.schema_name + "." + tablename + ""
+               " FROM " + tablename + ""
                " ORDER BY " + field_search + "")
         rows = self.controller.get_rows(sql)
         if not rows:

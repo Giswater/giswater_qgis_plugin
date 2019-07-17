@@ -42,7 +42,7 @@ class MoveNodeMapTool(ParentMapTool):
                    
         # Update node geometry
         the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(srid) + ")";
-        sql = ("UPDATE " + self.schema_name + ".node SET the_geom = " + the_geom + ""
+        sql = ("UPDATE node SET the_geom = " + the_geom + ""
                " WHERE node_id = '" + node_id + "'")
         status = self.controller.execute_sql(sql) 
         if status:
@@ -58,7 +58,7 @@ class MoveNodeMapTool(ParentMapTool):
                     self.controller.show_warning(message, parameter=function_name)
                     return
 
-            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+            sql = "SELECT " + function_name + "('" + str(node_id) + "');"
             self.controller.execute_sql(sql, commit=True)
 
         else:

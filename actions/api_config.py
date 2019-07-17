@@ -51,7 +51,7 @@ class ApiConfig(ApiParent):
         body += '"data":{}'
 
         # Get layers under mouse clicked
-        sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_getconfig($${" + body + "}$$)::text")
 
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -411,7 +411,7 @@ class ApiConfig(ApiParent):
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
         # TODO cambiar por gw_api_getchilds
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
+        sql = ("SELECT gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
         row = self.controller.get_row(sql, log_sql=True)
         #TODO::Refactor input and output for function "gw_api_get_combochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
@@ -524,7 +524,7 @@ class ApiConfig(ApiParent):
         body += '"feature":{}, '
         body += '"data":{"fields":'+my_json+'}'
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_setconfig($${" + body + "}$$)")
+        sql = ("SELECT gw_api_setconfig($${" + body + "}$$)")
         self.controller.log_info(str(sql))
         self.controller.execute_sql(sql)
 

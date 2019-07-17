@@ -109,7 +109,7 @@ class TmParentManage(TmParentAction, object):
         model = QStringListModel()
 
         sql = ("SELECT " + geom_type + "_id"
-               " FROM " + self.schema_name + "." + viewname)
+               " FROM " + viewname)
         row = self.controller.get_rows(sql, commit=self.autocommit)
         if row:
             for i in range(0, len(row)):

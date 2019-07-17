@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -268,7 +268,7 @@ class AddNewLot(ParentManage):
         """ Fill ComboBox cmb_assigned_to """
 
         sql = ("SELECT id, idval "
-               "FROM " + self.schema_name + ".cat_team "
+               "FROM cat_team "
                "WHERE active is True "
                "ORDER BY idval")
         rows = self.controller.get_rows(sql, commit=True)
@@ -295,7 +295,7 @@ class AddNewLot(ParentManage):
 
     def get_max_id(self, table_name):
 
-        sql = ("SELECT MAX(id) FROM " + self.schema_name + "." + table_name)
+        sql = ("SELECT MAX(id) FROM " + table_name)
         row = self.controller.get_row(sql, commit=True)
         if row:
             return int(row[0])
@@ -316,11 +316,11 @@ class AddNewLot(ParentManage):
         # Fill ComboBox cmb_ot
         sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
                " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id "
-               " FROM " + self.schema_name + ".ext_workorder "
-               " LEFT JOIN " + self.schema_name + ".om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
+               " FROM ext_workorder "
+               " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
                " WHERE om_visit_lot.serie IS NULL")
         if lot_id:
-            _sql = ("SELECT serie FROM " + self.schema_name + ".om_visit_lot "
+            _sql = ("SELECT serie FROM om_visit_lot "
                     " WHERE id = '"+str(lot_id)+"'")
             ct = self.controller.get_row(_sql, commit=True)
             sql += " OR ext_workorder.serie = '"+str(ct[0])+"'"
@@ -447,7 +447,7 @@ class AddNewLot(ParentManage):
         id_list = id_list[:-2] + ")"
         answer = self.controller.ask_question(message, "Delete records", msg_records)
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + ".om_visit_x_" + str(feature_type) + ""
+            sql = ("DELETE FROM om_visit_x_" + str(feature_type) + ""
                    " WHERE visit_id = '"+str(visit_id)+"' "
                    " AND "+str(feature_type)+"_id IN " + str(id_list) + ";\n")
             self.controller.execute_sql(sql, commit=True)
@@ -507,10 +507,10 @@ class AddNewLot(ParentManage):
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
-               " FROM " + self.schema_name + ".om_visit_class"
-               " INNER JOIN " + self.schema_name + ".om_visit_class_x_wo "
+               " FROM om_visit_class"
+               " INNER JOIN om_visit_class_x_wo "
                " ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
-               " INNER JOIN " + self.schema_name + ".config_api_visit "
+               " INNER JOIN config_api_visit "
                " ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
                " WHERE ismultifeature is False AND feature_type IS NOT null")
         visitclass_ids = self.controller.get_rows(sql, commit=True)
@@ -531,7 +531,7 @@ class AddNewLot(ParentManage):
         # Relations tab
         # fill feature_type
         sql = ("SELECT id, id"
-               " FROM " + self.schema_name + ".sys_feature_type"
+               " FROM sys_feature_type"
                " WHERE net_category = 1"
                " ORDER BY id")
         feature_type = self.controller.get_rows(sql, commit=self.autocommit)
@@ -541,7 +541,7 @@ class AddNewLot(ParentManage):
 
     def get_next_id(self, table_name, pk):
 
-        sql = ("SELECT max("+pk+"::integer) FROM " + self.schema_name + "."+table_name+";")
+        sql = ("SELECT max("+pk+"::integer) FROM "+table_name+";")
         row = self.controller.get_row(sql)
         if not row or not row[0]:
             return 0
@@ -605,7 +605,7 @@ class AddNewLot(ParentManage):
 
     def set_values(self, lot_id):
 
-        sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
+        sql = ("SELECT * FROM om_visit_lot "
                "WHERE id ='"+str(lot_id)+"'")
         lot = self.controller.get_row(sql, commit=True)
         if lot:
@@ -867,7 +867,7 @@ class AddNewLot(ParentManage):
 
         table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         sql = ("SELECT MIN(startdate), MAX(enddate) "
-               "FROM {}.{}".format(self.schema_name, table_name))
+               "FROM {}".format(table_name))
         row = self.controller.get_row(sql)
         if row:
             if row[0]:
@@ -934,7 +934,7 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
 
         # Populate model visit
-        sql = ("SELECT * FROM " + self.schema_name + "." + str(table_name) + ""
+        sql = ("SELECT * FROM " + str(table_name) + ""
                " WHERE lot_id ='" + str(lot_id) + "'"
                " AND " + str(expr_filter)+"")
         rows = self.controller.get_rows(sql, commit=True)
@@ -989,7 +989,7 @@ class AddNewLot(ParentManage):
 
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
-        sql = ("SELECT * FROM " + self.schema_name + ".ve_lot_x_" + str(feature_type) + " "
+        sql = ("SELECT * FROM ve_lot_x_" + str(feature_type) + " "
                "WHERE lot_id ='"+str(lot_id)+"'")
         rows = self.controller.get_rows(sql, commit=True)
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
@@ -1070,8 +1070,8 @@ class AddNewLot(ParentManage):
         update = update[:-2]
 
         if self.is_new_lot is True:
-            sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
-                   " VALUES (" + values + ") RETURNING id;")
+            sql = ("INSERT INTO om_visit_lot("+keys+") "
+                   " VALUES (" + values + ") RETURNING id")
             row = self.controller.execute_returning(sql, commit=True)
             lot_id = row[0]
             sql = ("INSERT INTO " + self.schema_name + ".selector_lot "
@@ -1080,7 +1080,7 @@ class AddNewLot(ParentManage):
             self.refresh_map_canvas()
         else:
             lot_id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
-            sql = ("UPDATE " + self.schema_name + ".om_visit_lot "
+            sql = ("UPDATE om_visit_lot "
                    " SET "+str(update)+""
                    " WHERE id = '" + str(lot_id) + "'; \n")
             self.controller.execute_sql(sql)
@@ -1094,8 +1094,8 @@ class AddNewLot(ParentManage):
     def save_relations(self, lot, lot_id):
 
         # Manage relations
-        sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
-               "WHERE lot_id = '" + str(lot_id) + "'; \n")
+        sql = ("DELETE FROM om_visit_lot_x_"+lot['feature_type'] + " "
+               "WHERE lot_id = '"  +str(lot_id) + "'; \n")
         model_rows = self.read_standaritemmodel(self.tbl_relation)
 
         # Save relations
@@ -1112,19 +1112,21 @@ class AddNewLot(ParentManage):
                             values += "$$" + value + "$$, "
             keys = keys[:-2]
             values = values[:-2]
-            sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
+            sql += ("INSERT INTO om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
                     "VALUES (" + values + "); \n")
         status = self.controller.execute_sql(sql)
         return status
 
 
     def save_visits(self):
-        status = False
+
         # Manage visits
+        status = False
         table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         model_rows = self.read_standaritemmodel(self.dlg_lot.tbl_visit)
         if not model_rows:
             return True
+
         sql = ""
         for item in model_rows:
             visit_id = None
@@ -1140,11 +1142,12 @@ class AddNewLot(ParentManage):
                             status = "$$" + value + "$$ "
 
             if visit_id and status:
-                sql += ("UPDATE " + self.schema_name + "." + str(table_name) + " "
-                        "SET(status)=(" + status + ") "
-                        "WHERE visit_id = '" + str(visit_id) + "'; \n")
+                sql += ("UPDATE " + str(table_name) + " "
+                        "SET (status) = (" + status + ") "
+                        "WHERE visit_id = '" + str(visit_id) + "';\n")
         if sql != "":
             status = self.controller.execute_sql(sql)
+
         return status
 
 
@@ -1156,7 +1159,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.lot_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
+        sql = "SELECT DISTINCT(id) FROM om_visit"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
@@ -1300,12 +1303,12 @@ class AddNewLot(ParentManage):
         if rows:
             rows.insert(0, ['', ''])
             utils_giswater.set_item_data(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
-            
+
         table_object = "v_ui_om_visit_lot"
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
         sql = ('SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
-               ' FROM {}.{}'.format(self.schema_name, table_object))
+               ' FROM {}'.format(table_object))
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             if row[0]:
@@ -1477,7 +1480,7 @@ class AddNewLot(ParentManage):
     def populate_combo_filters(self, combo, table_name, fields="id, idval"):
 
         sql = ("SELECT " + str(fields) + " "
-               "FROM " + self.schema_name + "." + str(table_name) + " "
+               "FROM " + str(table_name) + " "
                "ORDER BY idval")
         rows = self.controller.get_rows(sql, commit=True)
         if rows:
@@ -1497,9 +1500,9 @@ class AddNewLot(ParentManage):
             row = selected_list[x].row()
             _id = qtable.model().record(row).value('id')
             feature_type = qtable.model().record(row).value('feature_type')
-            sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + " "
+            sql = ("DELETE FROM om_visit_lot_x_" + str(feature_type) + " "
                    " WHERE lot_id = '" + str(_id) + "'; \n "
-                   "DELETE FROM " + self.schema_name + ".om_visit_lot "
+                   "DELETE FROM om_visit_lot "
                    " WHERE id ='"+str(_id)+"'")
             self.controller.execute_sql(sql)
         self.filter_lot()
@@ -1522,7 +1525,7 @@ class AddNewLot(ParentManage):
 
         # Close this dialog and open selected object
         dialog.close()
-        sql = ("INSERT INTO " + self.schema_name + ".selector_lot(lot_id, cur_user) "
+        sql = ("INSERT INTO selector_lot(lot_id, cur_user) "
                " VALUES("+str(selected_object_id)+", current_user) "
                " ON CONFLICT DO NOTHING;")
         self.controller.execute_sql(sql)

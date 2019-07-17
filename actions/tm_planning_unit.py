@@ -85,10 +85,10 @@ class TmPlanningUnit(TmParentAction):
 
         utils_giswater.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.DoubleClicked)
 
-        sql = ("SELECT id, name FROM " + self.schema_name + ".cat_campaign")
+        sql = ("SELECT id, name FROM cat_campaign")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_campaign, rows, 1)
-        sql = ("SELECT id, name FROM " + self.schema_name + ".cat_work")
+        sql = ("SELECT id, name FROM cat_work")
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_work, rows, 1)
         self.load_default_values()
@@ -122,7 +122,7 @@ class TmPlanningUnit(TmParentAction):
     def populate_comboline(self, dialog, widget, completer):
 
         _filter = utils_giswater.getWidgetText(dialog, widget)
-        sql = ("SELECT node_id FROM " + self.schema_name + ".v_edit_node "
+        sql = ("SELECT node_id FROM v_edit_node "
                " WHERE node_id ILIKE '%" + str(_filter)+"%'")
         rows = self.controller.get_rows(sql, log_sql=True)
         list_items = [row[0] for row in rows]

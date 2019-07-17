@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -67,27 +67,27 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_replace = FeatureReplace()
         self.load_settings(self.dlg_replace)
 
-        sql = "SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id"
+        sql = "SELECT id FROM cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'workcat_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
             self.dlg_replace.workcat_id_end.setCurrentIndex(workcat_vdefault)
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
-            sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work "
+            sql = ("SELECT builtdate FROM cat_work "
                    "WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
             current_date = self.manage_dates(self.current_date)
@@ -109,7 +109,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         elif self.project_type == 'ud':
             feature_type = feature.attribute(self.feature_type_ud)
             if self.geom_type in ('node', 'connec'):
-                sql = "SELECT DISTINCT(id) FROM " + self.schema_name + "." + self.cat_table + " ORDER BY id"
+                sql = "SELECT DISTINCT(id) FROM " + self.cat_table + " ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
@@ -119,7 +119,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self.update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + "." + self.geom_type + "_type "
+        sql = ("SELECT DISTINCT(id) FROM " + self.geom_type + "_type "
                "WHERE active is True "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
@@ -135,14 +135,14 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def update_date(self):
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
-            sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work "
+            sql = ("SELECT builtdate FROM cat_work "
                    "WHERE id = '" + str(work_id) + "'")
             row = self.controller.get_row(sql)
             current_date = self.manage_dates(self.current_date)
@@ -215,14 +215,14 @@ class ReplaceFeatureMapTool(ParentMapTool):
             else:
                 # Check if this element already exists
                 sql = ("SELECT DISTINCT(id)"
-                       " FROM " + self.schema_name + "." + str(table_object) + ""
+                       " FROM " + str(table_object) + ""
                        " WHERE id = '" + str(cat_work_id) + "'")
                 row = self.controller.get_row(sql, log_info=False, log_sql=True)
                 if row is None:
-                    sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
+                    sql = ("INSERT INTO cat_work (" + fields + ") VALUES (" + values + ")")
                     self.controller.execute_sql(sql, log_sql=True)
 
-                    sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+                    sql = ("SELECT id FROM cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
                         utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
@@ -249,7 +249,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             return
 
         sql = ("SELECT DISTINCT(" + field_id + ") "
-               "FROM " + self.schema_name + "." + tablename + " "
+               "FROM " + tablename + " "
                "ORDER BY "+ field_id + "")
         row = self.controller.get_rows(sql)
         for i in range(0, len(row)):
@@ -288,7 +288,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
-            sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
+            sql = ("SELECT " + str(function_name) + "($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row:
                 message = "Error replacing feature"
@@ -304,9 +304,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Force user to manage with state = 1 features
             current_user = self.controller.get_project_user()
-            sql = ("DELETE FROM " + self.schema_name + ".selector_state "
+            sql = ("DELETE FROM selector_state "
                    "WHERE state_id = 1 AND cur_user = '" + str(current_user) + "';"
-                   "\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user) "
+                   "\nINSERT INTO selector_state (state_id, cur_user) "
                    "VALUES (1, '" + str(current_user) + "');")
             self.controller.execute_sql(sql)
 
@@ -322,12 +322,12 @@ class ReplaceFeatureMapTool(ParentMapTool):
                     else:
                         field_cat_id = self.geom_type + "cat_id"
                     if self.geom_type != 'gully':
-                        sql = ("UPDATE " + self.schema_name + "." + self.geom_view + " "
+                        sql = ("UPDATE " + self.geom_view + " "
                                "SET " + field_cat_id + " = '" + str(featurecat_id) + "' "
                                "WHERE " + self.geom_type + "_id = '" + str(row[0]) + "'")
                     self.controller.execute_sql(sql, log_sql=True)
                     if self.project_type == 'ud':
-                        sql = ("UPDATE " + self.schema_name + "." + self.geom_view + " "
+                        sql = ("UPDATE " + self.geom_view + " "
                                "SET " + self.geom_type + "_type = '" + str(feature_type_new) + "' "
                                "WHERE " + self.geom_type + "_id = '" + str(row[0]) + "'")
                         self.controller.execute_sql(sql, log_sql=True)
@@ -458,11 +458,11 @@ class ReplaceFeatureMapTool(ParentMapTool):
             # Fill 3rd combo_box-catalog_id
             utils_giswater.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = ("SELECT DISTINCT(id) "
-                   "FROM " + self.schema_name + "." + self.cat_table + " "
+                   "FROM " + self.cat_table + " "
                    "WHERE " + self.feature_type_ws + " = '" + str(feature_type_new) + "'")
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
-    
+
 
     def open_catalog_form(self, wsoftware, geom_type):
         """ Set dialog depending water software """
@@ -488,7 +488,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.feature_type_new = feature_type_new
 
         sql = ("SELECT DISTINCT(matcat_id) as matcat_id "
-               "FROM " + self.schema_name + ".cat_" + geom_type)
+               "FROM cat_" + geom_type)
         if wsoftware == 'ws':
             sql += " WHERE " + str(geom_type) + "type_id = '" + str(self.feature_type_new) + "'"
 
@@ -497,7 +497,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.matcat_id, rows)
 
         sql = ("SELECT DISTINCT(" + self.field2 + ") "
-               "FROM " + self.schema_name + ".cat_" + geom_type)
+               "FROM cat_" + geom_type)
         if wsoftware == 'ws':
             sql += " WHERE " + str(geom_type) + "type_id = '" + str(self.feature_type_new) + "'"
 
@@ -536,7 +536,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         # Set SQL query
         sql_where = ""
         sql = ("SELECT DISTINCT(" + self.field2 + ") "
-               "FROM " + self.schema_name + ".cat_" + geom_type)
+               "FROM cat_" + geom_type)
 
         # Build SQL filter
         if mats != "null":
@@ -571,7 +571,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + str(self.field3str) + ")) as " + str(self.field3str)
         else:
             sql = "SELECT DISTINCT(" + self.field3 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + str(geom_type)
+        sql += " FROM cat_" + str(geom_type)
 
         # Build SQL filter
         if wsoftware == 'ws' and self.feature_type_new is not None:
@@ -611,7 +611,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         # Set SQL query
         sql_where = ""
         sql = ("SELECT DISTINCT(id) as id "
-               "FROM " + self.schema_name + ".cat_" + geom_type)
+               "FROM cat_" + geom_type)
 
         if wsoftware == 'ws' and self.feature_type_new is not None:
             sql_where = " WHERE " + geom_type + "type_id = '" + self.feature_type_new + "'"

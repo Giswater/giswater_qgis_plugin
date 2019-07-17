@@ -1101,7 +1101,7 @@ class UpdateSQL(ApiParent):
 
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=False)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
@@ -1148,8 +1148,8 @@ class UpdateSQL(ApiParent):
         client = '"client":{"device":9, "lang":"'+locale+'"}, '
         data = '"data":{' + extras + '}'
         body = "" + client + data
-        sql = ("SELECT " + self.schema_name + ".gw_fct_admin_schema_lastprocess($${" + body + "}$$)::text")
-        status = self.controller.execute_sql(sql, log_sql=True,commit=False)
+        sql = ("SELECT gw_fct_admin_schema_lastprocess($${" + body + "}$$)::text")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=False)
         if status is False:
             self.error_count = self.error_count + 1
 
@@ -2072,7 +2072,7 @@ class UpdateSQL(ApiParent):
             self.dlg_import_inp.progressBar.setFormat("")
 
             body = self.create_body(extras=extras)
-            sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
+            sql = ("SELECT " + str(function_name) + "($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if row:
                 complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
