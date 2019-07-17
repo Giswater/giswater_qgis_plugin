@@ -12,15 +12,14 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint as QgsPointXY
-    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsPointXY
-    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
-from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QTimer
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 
 from .. import utils_giswater
 from ..parent_init import ParentDialog

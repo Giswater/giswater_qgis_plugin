@@ -12,10 +12,10 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
-    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
