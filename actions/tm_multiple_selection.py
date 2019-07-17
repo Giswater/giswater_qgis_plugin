@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -15,12 +14,12 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint as QgsPointXY
     from qgis.gui import QgsMapCanvasSnapper
 else:
-    from qgis.core import QgsWkbTypes, QgsPointXY
+    from qgis.core import QgsPointXY
     from qgis.gui import QgsMapCanvas
 
-from qgis.core import QgsFeatureRequest, QgsRectangle
+from qgis.core import QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand
-from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication
 

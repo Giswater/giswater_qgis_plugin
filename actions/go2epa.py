@@ -16,8 +16,8 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.PyQt.QtCore import QTime, QDate, Qt
-from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
-from qgis.PyQt.QtWidgets import QCompleter, QFileDialog, QMessageBox
+from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
+    QFileDialog, QMessageBox
 
 import csv
 import json
@@ -81,6 +81,7 @@ class Go2Epa(ApiParent):
         self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
+
         if self.project_type == 'ws':
             self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
             tableleft = "cat_dscenario"
@@ -90,7 +91,7 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.btn_hs_ds.clicked.connect(
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
-        if self.project_type == 'ud':
+        elif self.project_type == 'ud':
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
 
@@ -133,7 +134,6 @@ class Go2Epa(ApiParent):
             title = "Activate recursive"
             answer = self.controller.ask_question(msg, title)
             if answer:
-
                 utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
                 utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
                 utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
@@ -158,6 +158,7 @@ class Go2Epa(ApiParent):
 
         file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+
         # Control execute epa software
         if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
             if self.check_inp_chk(file_inp) is False:
@@ -180,6 +181,7 @@ class Go2Epa(ApiParent):
         file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
+
         # Control export INP
         if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             if self.check_inp_chk(file_inp) is False:
@@ -192,9 +194,9 @@ class Go2Epa(ApiParent):
         # Control import result
         if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
             if file_rpt is None:
-                    msg = "Select valid RPT file"
-                    self.controller.show_warning(msg, parameter=str(file_rpt))
-                    return False
+                msg = "Select valid RPT file"
+                self.controller.show_warning(msg, parameter=str(file_rpt))
+                return False
             if not utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
                 if not os.path.exists(file_rpt):
                     msg = "File RPT not found"
@@ -210,15 +212,15 @@ class Go2Epa(ApiParent):
             msg = "This parameter is mandatory. Please, set a value"
             self.controller.show_details(msg, title="Rpt fail", inf_text=None)
             return False
-        else:
-            sql = ("SELECT result_id FROM rpt_cat_result "
-                   " WHERE result_id='" + str(result_name) + "' LIMIT 1")
-            row = self.controller.get_row(sql, commit=True)
-            if row:
-                msg = "Result name already exists, do you want overwrite?"
-                answer = self.controller.ask_question(msg, title="Alert")
-                if not answer:
-                    return False
+
+        sql = ("SELECT result_id FROM rpt_cat_result "
+               "WHERE result_id = '" + str(result_name) + "' LIMIT 1")
+        row = self.controller.get_row(sql, commit=True)
+        if row:
+            msg = "Result name already exists, do you want overwrite?"
+            answer = self.controller.ask_question(msg, title="Alert")
+            if not answer:
+                return False
 
         return True
 
@@ -250,7 +252,6 @@ class Go2Epa(ApiParent):
         value = self.controller.plugin_settings_value('go2epa_chk_RECURSIVE' + cur_user)
         if str(value) == 'true':
             utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, True)
-
         value = self.controller.plugin_settings_value('go2epa_chk_INP' + cur_user)
         if str(value) == 'true':
             utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
@@ -270,25 +271,23 @@ class Go2Epa(ApiParent):
 
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
-                                                  utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name'))
+            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name'))
         self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
-                                                  utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp'))
+            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp'))
         self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
-                                                  utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt'))
-
+            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt'))
         self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
-                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
-
+            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
         self.controller.plugin_settings_set_value('go2epa_chk_RECURSIVE' + cur_user,
-                                          utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent))
+            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent))
         self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
-                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
+            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
         self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
-                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
+            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
         self.controller.plugin_settings_set_value('go2epa_chk_EPA' + cur_user,
-                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
+            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
         self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
-                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
+            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
         
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
@@ -337,7 +336,7 @@ class Go2Epa(ApiParent):
             partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name,
                     self.dlg_hydrology_selector.hydrology))
 
-        sql = ("SELECT DISTINCT(name), hydrology_id FROM cat_hydrology ORDER BY name")
+        sql = "SELECT DISTINCT(name), hydrology_id FROM cat_hydrology ORDER BY name"
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             message = "Any data found in table"
@@ -346,15 +345,15 @@ class Go2Epa(ApiParent):
 
         utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
 
-        sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1"
-               " INNER JOIN inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
-               " WHERE t2.cur_user = current_user")
+        sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1 "
+               "INNER JOIN inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
+               "WHERE t2.cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
-
         if row:
             utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
         else:
             utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
+
         self.update_labels()
         self.dlg_hydrology_selector.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_hydrology_selector.exec_()
@@ -362,17 +361,19 @@ class Go2Epa(ApiParent):
 
     def save_hydrology(self):
 
+        hydrology_id = utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
         sql = ("SELECT cur_user FROM inp_selector_hydrology "
-               " WHERE cur_user = current_user")
+               "WHERE cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
         if row:
             sql = ("UPDATE inp_selector_hydrology "
-                   "SET hydrology_id = " + str(utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)) + ""
-                   " WHERE cur_user = current_user")
+                   "SET hydrology_id = " + str(hydrology_id) + " "
+                   "WHERE cur_user = current_user")
         else:
-            sql = ("INSERT INTO inp_selector_hydrology (hydrology_id, cur_user)"
-                   " VALUES('" + str(utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)) + "', current_user)")
+            sql = ("INSERT INTO inp_selector_hydrology (hydrology_id, cur_user) "
+                   "VALUES('" + str(hydrology_id) + "', current_user)")
         self.controller.execute_sql(sql)
+
         message = "Values has been update"
         self.controller.show_info(message)
         self.close_dialog(self.dlg_hydrology_selector)
@@ -575,7 +576,7 @@ class Go2Epa(ApiParent):
 
         # Check for sector selector
         if export_inp:
-            sql = ("SELECT sector_id FROM inp_selector_sector LIMIT 1")
+            sql = "SELECT sector_id FROM inp_selector_sector LIMIT 1"
             row = self.controller.get_row(sql, commit=True)
             if row is None:
                 msg = "You need to select some sector"
@@ -619,7 +620,8 @@ class Go2Epa(ApiParent):
                 return
 
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, str(counter)+"/" + str(complet_result[0]['steps']))
+            steps = str(counter) + "/" + str(complet_result[0]['steps'])
+            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, steps)
             counter += 1
             print("{}:{}:{}".format(counter, complet_result[0]['steps'], str(complet_result[0]['continue'])))
             _continue = False
@@ -636,7 +638,8 @@ class Go2Epa(ApiParent):
                 if complet_result[0]['status'] == "Accepted":
                     qtabwidget = self.dlg_go2epa.mainTab
                     qtextedit = self.dlg_go2epa.txt_infolog
-                    self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'], force_tab, False)
+                    self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'],
+                                            force_tab, False)
                 message = complet_result[0]['message']['text']
 
                 # Get values from temp_csv2pg and insert into INP file
@@ -734,6 +737,7 @@ class Go2Epa(ApiParent):
             self.controller.show_info(common_msg)
         if message is not None and self.imports_canceled is False:
             self.controller.show_info_box(message)
+
         # Save user values
         self.save_user_values()
 
