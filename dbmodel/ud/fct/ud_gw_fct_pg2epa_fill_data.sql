@@ -9,8 +9,8 @@ This version of Giswater is provided by Giswater Association
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fill_data(varchar);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS $BODY$
 DECLARE
-    
-
+   
+v_rainfall text;
 
 BEGIN
 
@@ -20,7 +20,15 @@ BEGIN
 -- Delete previous results on rpt_inp_node & arc tables
    DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
    DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
+   
+-- set all timeseries of raingage using user's value
+   v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages');
 	
+	IF v_rainfall IS NOT NULL THEN
+		UPDATE raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
+	END IF;
+
+   
 -- Insert on node rpt_inp table
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
