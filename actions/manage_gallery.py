@@ -1,25 +1,10 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import range
-
 from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt
@@ -30,9 +15,9 @@ import urllib.parse
 from functools import partial
 
 from . import ExtendedQLabel
-from ui_manager import Gallery
-from ui_manager import GalleryZoom
-from actions.parent_manage import ParentManage
+from ..ui_manager import Gallery
+from ..ui_manager import GalleryZoom
+from .parent_manage import ParentManage
 
 
 class ManageGallery(ParentManage):
@@ -55,13 +40,13 @@ class ManageGallery(ParentManage):
         self.img_path_list1D = []
 
         # Get all pictures for event_id | visit_id
-        sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo"
+        sql = ("SELECT value FROM om_visit_event_photo"
                " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'")
         rows = self.controller.get_rows(sql)
         num = len(rows)
 
         # Get doc_absolute_path from config_param_system
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
+        sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'doc_absolute_path'")
         row = self.controller.get_row(sql)
         if row[0]:

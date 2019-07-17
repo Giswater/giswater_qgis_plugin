@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -12,10 +12,10 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint as QgsPointXY
-    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsPointXY
-    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand

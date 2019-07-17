@@ -1,16 +1,11 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
 """ Module with utility functions to interact with dialog and its widgets """
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
-
 try:
     from qgis.core import Qgis
 except ImportError:
@@ -32,7 +27,7 @@ from functools import partial
 import os
 import operator
 
-from actions.HyperLinkLabel import HyperLinkLabel
+from .actions.HyperLinkLabel import HyperLinkLabel
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):

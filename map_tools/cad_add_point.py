@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -12,9 +12,9 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-import utils_giswater
-from map_tools.parent import ParentMapTool
-from ui_manager import Cad_add_point
+from .. import utils_giswater
+from .parent import ParentMapTool
+from ..ui_manager import Cad_add_point
 
 
 class CadAddPoint(ParentMapTool):
@@ -83,7 +83,7 @@ class CadAddPoint(ParentMapTool):
             row = self.controller.get_row(sql)
             point_2 = row[0]
 
-            sql = ("SELECT " + self.controller.schema_name + ".gw_fct_cad_add_relative_point"
+            sql = ("SELECT gw_fct_cad_add_relative_point"
                    "('" + str(point_1) + "', '" + str(point_2) + "', " + str(self.dist_x) + ", "
                    + str(self.dist_y) + ", "+str(self.direction)+", "+str(self.delete_prev)+" )")
             self.controller.execute_sql(sql)
@@ -206,7 +206,7 @@ class CadAddPoint(ParentMapTool):
 
         # Check for default base layer
         self.vdefault_layer = None
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:

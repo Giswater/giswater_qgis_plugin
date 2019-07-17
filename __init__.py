@@ -17,8 +17,6 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
-from __future__ import absolute_import
-
 import os
 import sys
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))

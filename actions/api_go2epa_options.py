@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -8,12 +8,12 @@ or (at your option) any later version.
 from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
 
 import json
-import utils_giswater
 from collections import OrderedDict
 from functools import partial
 
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiEpaOptions
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiEpaOptions
 
 
 class Go2EpaOptions(ApiParent):
@@ -42,7 +42,7 @@ class Go2EpaOptions(ApiParent):
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
         # Get layers under mouse clicked
-        sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_getconfig($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -75,7 +75,7 @@ class Go2EpaOptions(ApiParent):
         form = '"formName":"epaoptions"'
         extras = '"fields":' + my_json + ''
         body = self.create_body(form=form, extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_setconfig($${" + body + "}$$)")
+        sql = ("SELECT gw_api_setconfig($${" + body + "}$$)")
         self.controller.execute_sql(sql, log_sql=True, commit=True)
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -96,7 +96,7 @@ class Go2EpaOptions(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('epaoptions" + "', '', '', '" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
+        sql = ("SELECT gw_api_get_combochilds('epaoptions" + "', '', '', '" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:

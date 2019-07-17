@@ -1,13 +1,9 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -18,7 +14,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from builtins import range
 
 from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
@@ -32,12 +27,12 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_go2epa_options import Go2EpaOptions
-from giswater.actions.api_parent import ApiParent
-from giswater.actions.update_sql import UpdateSQL
-from giswater.ui_manager import FileManager, Multirow_selector, HydrologySelector
-from giswater.ui_manager import EpaResultCompareSelector, EpaResultManager
+from .. import utils_giswater
+from .api_go2epa_options import Go2EpaOptions
+from .api_parent import ApiParent
+from .update_sql import UpdateSQL
+from ..ui_manager import FileManager, Multirow_selector, HydrologySelector
+from ..ui_manager import EpaResultCompareSelector, EpaResultManager
 
 
 class Go2Epa(ApiParent):
@@ -216,7 +211,7 @@ class Go2Epa(ApiParent):
             self.controller.show_details(msg, title="Rpt fail", inf_text=None)
             return False
         else:
-            sql = ("SELECT result_id FROM " + self.schema_name + ".rpt_cat_result "
+            sql = ("SELECT result_id FROM rpt_cat_result "
                    " WHERE result_id='" + str(result_name) + "' LIMIT 1")
             row = self.controller.get_row(sql, commit=True)
             if row:
@@ -342,7 +337,7 @@ class Go2Epa(ApiParent):
             partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name,
                     self.dlg_hydrology_selector.hydrology))
 
-        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + ".cat_hydrology ORDER BY name")
+        sql = ("SELECT DISTINCT(name), hydrology_id FROM cat_hydrology ORDER BY name")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             message = "Any data found in table"
@@ -351,8 +346,8 @@ class Go2Epa(ApiParent):
 
         utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
 
-        sql = ("SELECT DISTINCT(t1.name) FROM " + self.schema_name + ".cat_hydrology AS t1"
-               " INNER JOIN " + self.schema_name + ".inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
+        sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1"
+               " INNER JOIN inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
                " WHERE t2.cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
 
@@ -367,15 +362,15 @@ class Go2Epa(ApiParent):
 
     def save_hydrology(self):
 
-        sql = ("SELECT cur_user FROM " + self.schema_name + ".inp_selector_hydrology "
+        sql = ("SELECT cur_user FROM inp_selector_hydrology "
                " WHERE cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
         if row:
-            sql = ("UPDATE " + self.schema_name + ".inp_selector_hydrology "
+            sql = ("UPDATE inp_selector_hydrology "
                    "SET hydrology_id = " + str(utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)) + ""
                    " WHERE cur_user = current_user")
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".inp_selector_hydrology (hydrology_id, cur_user)"
+            sql = ("INSERT INTO inp_selector_hydrology (hydrology_id, cur_user)"
                    " VALUES('" + str(utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)) + "', current_user)")
         self.controller.execute_sql(sql)
         message = "Values has been update"
@@ -386,7 +381,7 @@ class Go2Epa(ApiParent):
     def update_labels(self):
         """ Show text in labels from SELECT """
 
-        sql = ("SELECT infiltration, text FROM " + self.schema_name + ".cat_hydrology"
+        sql = ("SELECT infiltration, text FROM cat_hydrology"
                " WHERE name = '" + str(self.dlg_hydrology_selector.hydrology.currentText()) + "'")
         row = self.controller.get_row(sql, commit=True)
         if row is not None:
@@ -396,7 +391,7 @@ class Go2Epa(ApiParent):
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
 
-        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + self.schema_name + "." + str(tablename) + ""
+        sql = ("SELECT DISTINCT(name), hydrology_id FROM " + str(tablename) + ""
                " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
                " ORDER BY name ")
         rows = self.controller.get_rows(sql, commit=True)
@@ -530,7 +525,7 @@ class Go2Epa(ApiParent):
                         sp_n.append(dirty_list[x])
 
             if len(sp_n) > 0:
-                sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
+                sql += "INSERT INTO temp_csv2pg (csv2pgcat_id, "
                 values = "VALUES(11, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
@@ -580,7 +575,7 @@ class Go2Epa(ApiParent):
 
         # Check for sector selector
         if export_inp:
-            sql = ("SELECT sector_id FROM " + self.schema_name + ".inp_selector_sector LIMIT 1")
+            sql = ("SELECT sector_id FROM inp_selector_sector LIMIT 1")
             row = self.controller.get_row(sql, commit=True)
             if row is None:
                 msg = "You need to select some sector"
@@ -615,7 +610,7 @@ class Go2Epa(ApiParent):
             if self.imports_canceled:
                 break
 
-            sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
+            sql = ("SELECT gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row or row[0] is None:
                 self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -647,7 +642,7 @@ class Go2Epa(ApiParent):
                 # Get values from temp_csv2pg and insert into INP file
                 sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, "
                        "csv14, csv15, csv16, csv17, csv18, csv19, csv20, csv21, csv22, csv23, csv24, csv25 "
-                       "FROM " + self.schema_name + ".temp_csv2pg "
+                       "FROM temp_csv2pg "
                        "WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
                 rows = self.controller.get_rows(sql, commit=True)
 
@@ -688,7 +683,7 @@ class Go2Epa(ApiParent):
                 if os.path.exists(self.file_rpt):
 
                     # delete previous values of user on temp table
-                    sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
+                    sql = ("DELETE FROM temp_csv2pg "
                            "WHERE user_name = current_user AND csv2pgcat_id = 11")
                     self.controller.execute_sql(sql)
 
@@ -704,7 +699,7 @@ class Go2Epa(ApiParent):
                     extras += ', "currentStep":"' + str(counter) + '"'
                     extras += ', "continue":"' + str(_continue) + '"'
                     body = self.create_body(extras=extras)
-                    sql = ("SELECT " + self.schema_name + "." + function_name + "($${" + body + "}$$)::text")
+                    sql = ("SELECT " + function_name + "($${" + body + "}$$)::text")
                     row = self.controller.get_row(sql, commit=True)
                     if not row or row[0] is None:
                         self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -759,7 +754,7 @@ class Go2Epa(ApiParent):
         widget.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = ("SELECT " + field_name + " FROM " + self.schema_name + "." + viewname)
+        sql = ("SELECT " + field_name + " FROM " + viewname)
         rows = self.controller.get_rows(sql, commit=True)
 
         if rows:
@@ -777,7 +772,7 @@ class Go2Epa(ApiParent):
         """ Check if selected @result_id already exists """
 
         result_id = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
-        sql = ("SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result"
+        sql = ("SELECT result_id FROM v_ui_rpt_cat_result"
                " WHERE result_id = '" + str(result_id) + "'")
         row = self.controller.get_row(sql, commit=True)
         if not row:
@@ -790,7 +785,7 @@ class Go2Epa(ApiParent):
     def check_data(self):
         """ Check data executing function 'gw_fct_pg2epa' """
 
-        sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'True');"
+        sql = "SELECT gw_fct_pg2epa('" + str(self.project_name) + "', 'True');"
         row = self.controller.get_row(sql, commit=True)
         if not row:
             return False
@@ -828,7 +823,7 @@ class Go2Epa(ApiParent):
             column_name = rows[i]
             columns.append(str(column_name[0]))
         sql = ("SELECT table_id, column_id, error_message"
-               " FROM " + self.schema_name + "." + tablename + ""
+               " FROM " + tablename + ""
                " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
@@ -876,14 +871,15 @@ class Go2Epa(ApiParent):
 
         # Set values from widgets of type QComboBox
         sql = ("SELECT DISTINCT(result_id), result_id "
-               "FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id")
+               "FROM v_ui_rpt_cat_result ORDER BY result_id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
         if self.project_type == 'ws':
-            sql = ("SELECT DISTINCT time, time FROM " + self.schema_name + ".rpt_arc "
+
+            sql = ("SELECT DISTINCT time, time FROM rpt_arc "
                    "WHERE result_id ILIKE '%%' ORDER BY time")
             rows = self.controller.get_rows(sql, add_empty_row=True)
             utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
@@ -894,17 +890,18 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare))
 
-        if self.project_type == 'ud':
+        elif self.project_type == 'ud':
+
             # Populate GroupBox Selector date
             result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = ("SELECT DISTINCT(resultdate), resultdate FROM " + self.schema_name + ".rpt_arc "
+            sql = ("SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    "WHERE result_id = '" + str(result_id) + "' "
                    "ORDER BY resultdate")
             rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
                 selector_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
-                sql = ("SELECT DISTINCT(resulttime), resulttime FROM " + self.schema_name + ".rpt_arc "
+                sql = ("SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        "WHERE result_id = '" + str(result_id) + "' "
                        "AND resultdate = '" + str(selector_date) + "' "
                        "ORDER BY resulttime")
@@ -914,37 +911,38 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_date))
             self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_date,
-                        self.dlg_go2epa_result.cmb_sel_time))
+                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
+                        self.dlg_go2epa_result.cmb_sel_date, self.dlg_go2epa_result.cmb_sel_time))
 
             # Populate GroupBox Selector compare
-            result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = ("SELECT DISTINCT(resultdate), resultdate  FROM " + self.schema_name + ".rpt_arc "
-                   " WHERE result_id ='" + str(result_id_to_comp) + "'"
-                   " ORDER BY resultdate ")
+            result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result,
+                self.dlg_go2epa_result.rpt_selector_result_id, 0)
+            sql = ("SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
+                   "WHERE result_id = '" + str(result_id_to_comp) + "' "
+                   "ORDER BY resultdate ")
             rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
                 selector_cmp_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
-                sql = ("SELECT DISTINCT(resulttime), resulttime  FROM " + self.schema_name + ".rpt_arc "
-                       " WHERE result_id ='" + str(result_id_to_comp) + "'"
-                       " AND resultdate='" + str(selector_cmp_date) + "'"
-                       " ORDER BY resulttime")
+                sql = ("SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
+                       "WHERE result_id = '" + str(result_id_to_comp) + "' "
+                       "AND resultdate = '" + str(selector_cmp_date) + "' "
+                       "ORDER BY resulttime")
                 rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_com_date))
             self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_com_date,
-                        self.dlg_go2epa_result.cmb_com_time))
+                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
+                        self.dlg_go2epa_result.cmb_com_date, self.dlg_go2epa_result.cmb_com_time))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_result"
+        sql = "SELECT result_id FROM rpt_selector_result"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
-        sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_compare"
+        sql = "SELECT result_id FROM rpt_selector_compare"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
@@ -959,9 +957,9 @@ class Go2Epa(ApiParent):
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
         date = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_date)
         sql = ("SELECT DISTINCT(resulttime), resulttime "
-               "FROM " + self.schema_name + ".rpt_arc "
-               "WHERE result_id ='" + str(result_id) + "' "
-               "AND resultdate='" + str(date) + "' "
+               "FROM rpt_arc "
+               "WHERE result_id = '" + str(result_id) + "' "
+               "AND resultdate = '" + str(date) + "' "
                "ORDER BY resulttime")
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
@@ -971,10 +969,16 @@ class Go2Epa(ApiParent):
         """ Populate combo times """
 
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
-        sql = ("SELECT DISTINCT time, time "
-               "FROM " + self.schema_name + ".rpt_arc "
+        if self.project_type == 'ws':
+            field = "time"
+        else:
+            field = "resulttime"
+
+        sql = ("SELECT DISTINCT " + field + ", " + field + " "
+               "FROM rpt_arc "
                "WHERE result_id ILIKE '" + str(result_id) + "' "
-               "ORDER BY time")
+               "ORDER BY resulttime")
+
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
 
@@ -986,16 +990,14 @@ class Go2Epa(ApiParent):
         user = self.controller.get_project_user()
 
         # Delete previous values
-        sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result WHERE cur_user = '" + user + "';\n"
-               "DELETE FROM " + self.schema_name + ".rpt_selector_compare WHERE cur_user = '" + user + "';\n")
+        sql = ("DELETE FROM rpt_selector_result WHERE cur_user = '" + user + "';\n"
+               "DELETE FROM rpt_selector_compare WHERE cur_user = '" + user + "';\n")
         if self.project_type == 'ws':
-            sql += ("DELETE FROM " + self.schema_name + ".rpt_selector_hourly WHERE cur_user = '" + user + "';\n"
-                    "DELETE FROM " + self.schema_name + ".rpt_selector_hourly_compare "
-                    " WHERE cur_user = '" + user + "';\n")
+            sql += ("DELETE FROM rpt_selector_hourly WHERE cur_user = '" + user + "';\n"
+                    "DELETE FROM rpt_selector_hourly_compare WHERE cur_user = '" + user + "';\n")
         if self.project_type == 'ud':
-            sql += ("DELETE FROM " + self.schema_name + ".rpt_selector_timestep WHERE cur_user = '" + user + "';\n"
-                    "DELETE FROM " + self.schema_name + ".rpt_selector_timestep_compare "
-                    " WHERE cur_user = '" + user + "';\n")
+            sql += ("DELETE FROM rpt_selector_timestep WHERE cur_user = '" + user + "';\n"
+                    "DELETE FROM rpt_selector_timestep_compare WHERE cur_user = '" + user + "';\n")
         self.controller.execute_sql(sql, commit=True)
 
         # Get new values from widgets of type QComboBox
@@ -1012,30 +1014,30 @@ class Go2Epa(ApiParent):
             time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
 
         if rpt_selector_result_id not in (None, -1, ''):
-            sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
+            sql = ("INSERT INTO rpt_selector_result (result_id, cur_user)"
                    " VALUES ('" + str(rpt_selector_result_id) + "', '" + user + "');\n")
             self.controller.execute_sql(sql, commit=True)
         if rpt_selector_compare_id not in (None, -1, ''):
-            sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
+            sql = ("INSERT INTO rpt_selector_compare (result_id, cur_user)"
                    " VALUES ('" + str(rpt_selector_compare_id) + "', '" + user + "');\n")
             self.controller.execute_sql(sql, commit=True)
         if self.project_type == 'ws':
             if time_to_show not in (None, -1, ''):
-                sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly(time, cur_user)"
+                sql = ("INSERT INTO rpt_selector_hourly(time, cur_user)"
                        " VALUES ('" + str(time_to_show) + "', '" + user + "');\n")
                 self.controller.execute_sql(sql, commit=True)
             if time_to_compare not in (None, -1, ''):
-                sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly_compare(time, cur_user)"
+                sql = ("INSERT INTO rpt_selector_hourly_compare(time, cur_user)"
                        " VALUES ('" + str(time_to_compare) + "', '" + user + "');\n")
                 self.controller.execute_sql(sql, commit=True)
 
         if self.project_type == 'ud':
             if date_to_show not in (None, -1, ''):
-                sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_timestep(resultdate, resulttime, cur_user)"
+                sql = ("INSERT INTO rpt_selector_timestep(resultdate, resulttime, cur_user)"
                        " VALUES ('"+str(date_to_show)+"', '" + str(time_to_show) + "', '" + user + "');\n")
                 self.controller.execute_sql(sql, commit=True)
             if date_to_compare not in (None, -1, ''):
-                sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_timestep_compare(resultdate, resulttime, cur_user)"
+                sql = ("INSERT INTO rpt_selector_timestep_compare(resultdate, resulttime, cur_user)"
                        " VALUES ('"+str(date_to_compare)+"', '" + str(time_to_compare) + "', '" + user + "');\n")
                 self.controller.execute_sql(sql, commit=True)
 
@@ -1048,7 +1050,7 @@ class Go2Epa(ApiParent):
     def go2epa_options_get_data(self, tablename, dialog):
         """ Get data from selected table """
 
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        sql = "SELECT * FROM " + tablename
         row = self.controller.get_row(sql, commit=True)
         if not row:
             message = "Any data found in table"
@@ -1115,7 +1117,7 @@ class Go2Epa(ApiParent):
 
     def fill_combo_result_id(self):
 
-        sql = "SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
+        sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
 

@@ -15,8 +15,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-from builtins import object
-
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvas, QgsVertexMarker
 from qgis.core import QgsProject, QgsSnappingUtils, QgsPointLocator, QgsTolerance, QgsPointXY, QgsFeatureRequest

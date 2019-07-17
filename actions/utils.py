@@ -20,13 +20,13 @@ from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_config import ApiConfig
-from giswater.actions.api_manage_composer import ApiManageComposer
-from giswater.actions.gw_toolbox import GwToolBox
-from giswater.actions.parent import ParentAction
-from giswater.actions.manage_visit import ManageVisit
-from giswater.ui_manager import Csv2Pg
+from .. import utils_giswater
+from .api_config import ApiConfig
+from .api_manage_composer import ApiManageComposer
+from .gw_toolbox import GwToolBox
+from .parent import ParentAction
+from .manage_visit import ManageVisit
+from ..ui_manager import Csv2Pg
 
 
 class Utils(ParentAction):
@@ -215,7 +215,7 @@ class Utils(ParentAction):
     def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
         """ Delete records from temp_csv2pg for current user and selected cat """
 
-        sql = ("DELETE FROM " + self.schema_name + "." + temp_tablename + " "
+        sql = ("DELETE FROM " + temp_tablename + " "
                "WHERE csv2pgcat_id = '" + str(csv2pgcat_id_aux) + "' AND user_name = current_user")
         self.controller.execute_sql(sql, log_sql=True)
 
@@ -255,7 +255,7 @@ class Utils(ParentAction):
         extras = '"importParam":"' + label_aux + '"'
         extras += ', "csv2pgCat":"' + str(csv2pgcat_id_aux) + '"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + "." + str(self.func_name) + "($${" + body + "}$$)::text")
+        sql = ("SELECT " + str(self.func_name) + "($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -292,7 +292,7 @@ class Utils(ParentAction):
                 readheader = True
                 continue
             if len(row) > 0:
-                sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
+                sql += "INSERT INTO temp_csv2pg (csv2pgcat_id, "
                 values = "VALUES("+str(csv2pgcat_id_aux)+", "
                 for x in range(0, len(row)):
                         sql += "csv" + str(x + 1) + ", "
@@ -327,7 +327,7 @@ class Utils(ParentAction):
             return
 
         sql = ("SELECT DISTINCT(" + field_id + "), " + fields + ""
-               " FROM " + self.schema_name + "." + table_name + ""
+               " FROM " + table_name + ""
                " WHERE sys_role IN " + roles + " AND formname='importcsv' AND isdeprecated is not True")
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
@@ -378,11 +378,11 @@ class Utils(ParentAction):
         """ Insert @fprocesscat_id for current_user in table 'selector_audit' """
 
         tablename = "selector_audit"
-        sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
+        sql = ("SELECT * FROM " + tablename + " "
                "WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND cur_user = current_user;")
         row = self.controller.get_row(sql)
         if not row:
-            sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user) "
+            sql = ("INSERT INTO " + tablename + " (fprocesscat_id, cur_user) "
                    "VALUES (" + str(fprocesscat_id) + ", current_user);")
         self.controller.execute_sql(sql)
 

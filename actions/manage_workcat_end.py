@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -14,8 +14,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from builtins import str
-    from builtins import range
 
 from qgis.core import QgsExpression, QgsFeatureRequest
 from qgis.PyQt.QtCore import Qt, QDate
@@ -24,10 +22,10 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 
 from functools import partial
 
-import utils_giswater
-from giswater.actions.parent_manage import ParentManage
-from giswater.ui_manager import WorkcatEnd, NewWorkcat
-from giswater.ui_manager import WorkcatEndList
+from .. import utils_giswater
+from .parent_manage import ParentManage
+from ..ui_manager import WorkcatEnd, NewWorkcat
+from ..ui_manager import WorkcatEndList
 
 
 class ManageWorkcatEnd(ParentManage):
@@ -107,16 +105,16 @@ class ManageWorkcatEnd(ParentManage):
     def set_edit_arc_downgrade_force(self, value):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT * FROM config_param_user "
                "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
-            sql = ("UPDATE " + self.schema_name + ".config_param_user "
+            sql = ("UPDATE config_param_user "
                    "SET value = '" + str(value) + "' "
                    "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
             self.controller.execute_sql(sql, log_sql=True)
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
+            sql = ("INSERT INTO config_param_user (parameter, value, cur_user) "
                    "VALUES ('edit_arc_downgrade_force', '" + str(value) + "', current_user)")
             self.controller.execute_sql(sql, commit=self.autocommit)
 
@@ -124,7 +122,7 @@ class ManageWorkcatEnd(ParentManage):
     def fill_fields(self):
         """ Fill dates and combo cat_work """
 
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
@@ -133,11 +131,11 @@ class ManageWorkcatEnd(ParentManage):
             enddate = QDate.currentDate()
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
-        sql = ("SELECT id FROM " + self.controller.schema_name + ".cat_work")
+        sql = ("SELECT id FROM cat_work")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+        sql = ("SELECT value FROM config_param_user "
                "WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
@@ -151,7 +149,7 @@ class ManageWorkcatEnd(ParentManage):
         if not workcat_id:
             return
         sql = ("SELECT descript, builtdate "
-               "FROM " + self.controller.schema_name + ".cat_work "
+               "FROM cat_work "
                "WHERE id = '" + workcat_id + "'")
         row = self.controller.get_row(sql)
         if row:
@@ -192,7 +190,7 @@ class ManageWorkcatEnd(ParentManage):
         ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
         row = None
         if ids_list:
-            sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations "
+            sql = ("SELECT * FROM v_ui_arc_x_relations "
                    "WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
             row = self.controller.get_row(sql)
             ids_list = None
@@ -251,7 +249,7 @@ class ManageWorkcatEnd(ParentManage):
 
         sql = ""
         for id_ in self.selected_list:
-            sql += ("UPDATE " + self.schema_name + "." + tablename + " "
+            sql += ("UPDATE " + tablename + " "
                     "SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "', "
                     "enddate = '" + str(self.enddate) + "' "
                     "WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
@@ -305,7 +303,7 @@ class ManageWorkcatEnd(ParentManage):
 
         # Get sys_feature_cat.id from cat_feature.id
         sql = ("SELECT sys_type"
-               " FROM " + self.schema_name + ".v_edit_arc"
+               " FROM v_edit_arc"
                " WHERE arc_id = '" + arc_id + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -430,7 +428,7 @@ class ManageWorkcatEnd(ParentManage):
         self.disconnect_signal_selection_changed()
         if force_downgrade:
             sql = ("SELECT feature_type, feature_id, log_message "
-                   "FROM " + self.schema_name + ".audit_log_data "
+                   "FROM audit_log_data "
                    "WHERE  fprocesscat_id = '28' AND user_name = current_user")
             rows = self.controller.get_rows(sql, log_sql=False)
             ids_ = ""
@@ -438,7 +436,7 @@ class ManageWorkcatEnd(ParentManage):
                 for row in rows:
                     ids_ += str(row[1]) + ", "
                     state_statetype = str(row['log_message']).split(',')
-                    sql = ("UPDATE " + self.schema_name + "." + str(row[0].lower()) + " "
+                    sql = ("UPDATE " + str(row[0].lower()) + " "
                            "SET state = '" + str(state_statetype[0]) + "', state_type = '" + str(state_statetype[1]) + "' "
                            "WHERE " + str(row[0]) + "_id = '" + str(row[1]) + "';")
                     self.controller.execute_sql(sql)
@@ -448,7 +446,7 @@ class ManageWorkcatEnd(ParentManage):
                 if show_warning and len(ids_) != 0:
                     msg = 'These items could not be downgrade to state 0'
                     self.controller.show_info_box(msg, title="Warning", inf_text=str(ids_))
-                sql = ("DELETE FROM " + self.schema_name + ".audit_log_data "
+                sql = ("DELETE FROM audit_log_data "
                        "WHERE fprocesscat_id ='28' AND user_name = current_user")
                 self.controller.execute_sql(sql)
 
@@ -516,13 +514,13 @@ class ManageWorkcatEnd(ParentManage):
         else:
             # Check if this element already exists
             sql = ("SELECT DISTINCT(id)"
-                   " FROM " + self.schema_name + "." + str(table_object) + ""
+                   " FROM " + str(table_object) + ""
                    " WHERE id = '" + str(cat_work_id) + "'")
             row = self.controller.get_row(sql, log_info=False, log_sql=True)
             if row is None:
-                sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
+                sql = ("INSERT INTO cat_work (" + fields + ") VALUES (" + values + ")")
                 self.controller.execute_sql(sql, log_sql=True)
-                sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+                sql = ("SELECT id FROM cat_work ORDER BY id")
                 rows = self.controller.get_rows(sql)
                 if rows:
                     utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)

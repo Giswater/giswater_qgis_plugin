@@ -1,28 +1,18 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import str
-
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
-import utils_giswater
-from giswater.ui_manager import AddElement                
-from giswater.ui_manager import ElementManagement
-from giswater.actions.parent_manage import ParentManage
+from .. import utils_giswater
+from ..ui_manager import AddElement
+from ..ui_manager import ElementManagement
+from .parent_manage import ParentManage
 
 
 class ManageElement(ParentManage):
@@ -82,14 +72,14 @@ class ManageElement(ParentManage):
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
         # Fill combo boxes
-        sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".cat_element ORDER BY elementtype_id"
+        sql = "SELECT DISTINCT(elementtype_id) FROM cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_add_element, "element_type", rows, False)
         self.populate_combo(self.dlg_add_element, "state", "value_state", "name")
         self.populate_combo(self.dlg_add_element, "expl_id", "exploitation", "name")
 
         sql = ("SELECT location_type"
-               " FROM " + self.schema_name + ".man_type_location"
+               " FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
@@ -162,7 +152,7 @@ class ManageElement(ParentManage):
     def update_location_cmb(self):
 
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
-        sql = ("SELECT location_type FROM " + self.schema_name + ".man_type_location"
+        sql = ("SELECT location_type FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
                " AND (featurecat_id = '"+str(element_type)+"' OR featurecat_id is null)"
                " ORDER BY location_type")
@@ -178,6 +168,7 @@ class ManageElement(ParentManage):
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = geom_type + "_id = '" + str(feature_id) + "'"
+
         # Set model of selected widget
         table_name = self.schema_name + ".v_edit_" + geom_type
         self.set_model_to_table(widget, table_name, expr_filter)
@@ -228,13 +219,13 @@ class ManageElement(ParentManage):
             return  
                     
         # Manage fields state and expl_id
-        sql = ("SELECT id FROM " + self.schema_name + ".value_state"
+        sql = ("SELECT id FROM value_state"
                " WHERE name = '" + state_value + "'")
         row = self.controller.get_row(sql)
         if row:
             state = row[0]
 
-        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation"
+        sql = ("SELECT expl_id FROM exploitation"
                " WHERE name = '" + expl_value + "'")
         row = self.controller.get_row(sql)
         if row:
@@ -245,7 +236,7 @@ class ManageElement(ParentManage):
         
         # Check if this element already exists
         sql = ("SELECT DISTINCT(element_id)"
-               " FROM " + self.schema_name + "." + str(table_object) + ""
+               " FROM " + str(table_object) + ""
                " WHERE element_id = '" + str(element_id) + "'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
 
@@ -253,7 +244,7 @@ class ManageElement(ParentManage):
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
-                sql = ("INSERT INTO " + self.schema_name + ".v_edit_element (elementcat_id,  num_elements, state"
+                sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
@@ -261,7 +252,7 @@ class ManageElement(ParentManage):
                               + str(link) + "', '" + str(undelete) + "'")
 
             else:
-                sql = ("INSERT INTO " + self.schema_name + ".v_edit_element (element_id, , elementcat_id, num_elements, state"
+                sql = ("INSERT INTO v_edit_element (element_id, , elementcat_id, num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code")
 
@@ -323,7 +314,7 @@ class ManageElement(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE " + self.schema_name + ".element"
+            sql = ("UPDATE element"
                    " SET elementcat_id = '" + str(elementcat_id) + "', num_elements = '" + str(num_elements) + "', state = '" + str(state) + "'"
                    ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
                    ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
@@ -367,24 +358,24 @@ class ManageElement(ParentManage):
             sql += " WHERE element_id = '" + str(element_id) + "';"
             
         # Manage records in tables @table_object_x_@geom_type
-        sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_node"
+        sql+= ("\nDELETE FROM element_x_node"
                " WHERE element_id = '" + str(element_id) + "';")
-        sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_arc"
+        sql+= ("\nDELETE FROM element_x_arc"
                " WHERE element_id = '" + str(element_id) + "';")
-        sql+= ("\nDELETE FROM " + self.schema_name + ".element_x_connec"
+        sql+= ("\nDELETE FROM element_x_connec"
                " WHERE element_id = '" + str(element_id) + "';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
-                sql += ("\nINSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id)"
+                sql += ("\nINSERT INTO element_x_arc (element_id, arc_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
-                sql+= ("\nINSERT INTO " + self.schema_name + ".element_x_node (element_id, node_id)"
+                sql+= ("\nINSERT INTO element_x_node (element_id, node_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
-                sql += ("\nINSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id)"
+                sql += ("\nINSERT INTO element_x_connec (element_id, connec_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
                 
         status = self.controller.execute_sql(sql, log_sql=True)
@@ -400,7 +391,7 @@ class ManageElement(ParentManage):
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
         
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_element"
+        sql = ("SELECT DISTINCT(id) FROM cat_element"
                " WHERE elementtype_id = '" + utils_giswater.getWidgetText(self.dlg_add_element, "element_type") + "'"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
@@ -418,7 +409,7 @@ class ManageElement(ParentManage):
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
         self.set_completer_object(self.dlg_man, table_object)
-                
+
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
         self.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)

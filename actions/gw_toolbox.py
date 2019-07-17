@@ -1,13 +1,9 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
 # -*- coding: latin-1 -*-
 try:
     from qgis.core import Qgis
@@ -30,9 +26,9 @@ import json
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiDlgToolbox, ApiFunctionTb
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiDlgToolbox, ApiFunctionTb
 
 
 class GwToolBox(ApiParent):
@@ -65,7 +61,7 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
@@ -83,7 +79,7 @@ class GwToolBox(ApiParent):
 
         extras = '"filterText":"' + text + '"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
@@ -116,7 +112,7 @@ class GwToolBox(ApiParent):
         extras = '"filterText":"' + self.alias_function + '"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
@@ -279,7 +275,7 @@ class GwToolBox(ApiParent):
             extras += '}'
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(feature=feature_field, extras=extras)
-        sql = ("SELECT " + self.schema_name + "."+str(function_name)+"($${" + body + "}$$)::text")
+        sql = ("SELECT "+str(function_name)+"($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("Function : " + str(function_name)+" executed with no result ", 3)
@@ -307,7 +303,7 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setFormat("")
 
-        sql = ("SELECT " + self.schema_name + "." + str(function_name) + "()::text")
+        sql = ("SELECT " + str(function_name) + "()::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row or row[0] is None:

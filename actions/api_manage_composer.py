@@ -26,9 +26,9 @@ import json
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiComposerUi
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiComposerUi
 
 
 class ApiManageComposer(ApiParent):
@@ -56,7 +56,7 @@ class ApiManageComposer(ApiParent):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_getprint($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_getprint($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -347,7 +347,7 @@ class ApiManageComposer(ApiParent):
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "" + client + form + feature + data
-        sql = ("SELECT " + self.schema_name + ".gw_api_setprint($${" + body + "}$$)::text")
+        sql = ("SELECT gw_api_setprint($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)

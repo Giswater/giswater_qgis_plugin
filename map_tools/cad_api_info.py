@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -9,8 +9,8 @@ from qgis.core import QgsMapToPixel
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor
 
-from map_tools.parent import ParentMapTool
-from giswater.actions.api_cf import ApiCF
+from .parent import ParentMapTool
+from ..actions.api_cf import ApiCF
 
 
 class CadApiInfo(ParentMapTool):

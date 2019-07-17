@@ -27,7 +27,7 @@ from qgis.core import QgsVectorLayer, QgsRectangle
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
 
-from map_tools.parent import ParentMapTool
+from .parent import ParentMapTool
 
 
 class ConnecMapTool(ParentMapTool):
@@ -226,7 +226,7 @@ class ConnecMapTool(ParentMapTool):
 
             # Execute function
             function_name = "gw_fct_connect_to_network"
-            sql = ("SELECT " + self.schema_name + "." + function_name + ""
+            sql = ("SELECT " + function_name + ""
                    "('" + list_feature_id + "', '" + geom_type.upper() + "');")
             self.controller.execute_sql(sql, log_sql=True)
             layer.removeSelection()

@@ -24,10 +24,10 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsMapLayerRegistry as QgsProject
-    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+    from .snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsWkbTypes, QgsProject
-    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+    from .snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsExpression
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand

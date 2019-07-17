@@ -1,16 +1,17 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import os
 from functools import partial
 
-import utils_giswater
-from giswater.ui_manager import Multirow_selector
-from giswater.actions.api_search import ApiSearch
-from giswater.actions.parent import ParentAction
+from .. import utils_giswater
+from ..ui_manager import Multirow_selector
+from .api_search import ApiSearch
+from .parent import ParentAction
 
 
 class Basic(ParentAction):
@@ -18,10 +19,14 @@ class Basic(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
 
+
+        self.minor_version = "3.0"
         self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')        
+
         self.logged = False
-        
+
 
     def set_giswater(self, giswater):
         self.giswater = giswater
@@ -78,6 +83,7 @@ class Basic(ParentAction):
 
     def basic_hydrometer_state_selector(self):
         """ Button 51: Hydrometer selector """
+
         # Create the dialog and signals
         self.dlg_hydro_state = Multirow_selector()
         self.load_settings(self.dlg_hydro_state)
@@ -104,8 +110,10 @@ class Basic(ParentAction):
         self.api_search.api_search()
      
     def close_dialog(self, dlg):
+
         ParentAction.close_dialog(self, dlg)
         try:
             self.search_plus.refresh_data()
         except:
             pass
+

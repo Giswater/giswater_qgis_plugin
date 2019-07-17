@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3.1
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -13,11 +13,11 @@ except:
 
 from qgis.PyQt.QtCore import QSettings
 
-from giswater.actions.api_cf import ApiCF
-from giswater.actions.manage_element import ManageElement        
-from giswater.actions.manage_document import ManageDocument      
-from giswater.actions.manage_workcat_end import ManageWorkcatEnd      
-from giswater.actions.parent import ParentAction
+from .api_cf import ApiCF
+from .manage_element import ManageElement
+from .manage_document import ManageDocument
+from .manage_workcat_end import ManageWorkcatEnd
+from .parent import ParentAction
 
 
 class Edit(ParentAction):

@@ -21,8 +21,8 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtCore import Qt
 
-from map_tools.parent import ParentMapTool
-from giswater.actions.manage_visit import ManageVisit
+from .parent import ParentMapTool
+from ..actions.manage_visit import ManageVisit
 
 
 class OpenVisit(ParentMapTool):
