@@ -68,8 +68,7 @@ class ParentDialog(QDialog):
         # Initialize plugin directory
         cur_path = os.path.dirname(__file__)
         self.plugin_dir = os.path.abspath(cur_path)
-        self.plugin_name = os.path.basename(self.plugin_dir).lower()
-        #self.plugin_name = self.get_value_from_metadata('name', 'giswater')
+        self.plugin_name = self.get_value_from_metadata('name', 'giswater')
 
         # Get config file
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')

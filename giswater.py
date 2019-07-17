@@ -73,9 +73,8 @@ class Giswater(QObject):
         self.plugin_toolbars = {}
             
         # Initialize plugin directory
-        self.plugin_dir = os.path.dirname(__file__)    
-        self.plugin_name = os.path.basename(self.plugin_dir).lower()
-        #self.plugin_name = self.get_value_from_metadata('name', 'giswater')
+        self.plugin_dir = os.path.dirname(__file__)
+        self.plugin_name = self.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
         # Initialize svg giswater directory
@@ -88,7 +87,7 @@ class Giswater(QObject):
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
-            message = "Config file not found at: "+setting_file
+            message = "Config file not found at: " + setting_file
             self.iface.messageBar().pushMessage("", message, 1, 20) 
             return  
           
