@@ -35,20 +35,9 @@ INSERT INTO "value_yesno" VALUES ('YES');
 -- ----------------------------
 INSERT INTO om_visit_parameter_type VALUES ('INSPECTION');
 INSERT INTO om_visit_parameter_type VALUES ('REHABIT');
-INSERT INTO om_visit_parameter_type VALUES ('RECONST', '');
-INSERT INTO om_visit_parameter_type VALUES ('OTHER', '');
+INSERT INTO om_visit_parameter_type VALUES ('RECONST');
+INSERT INTO om_visit_parameter_type VALUES ('OTHER');
 
--- Records of event om_visit_parameter table
--- ----------------------------
-INSERT INTO om_visit_parameter VALUES ('RAT1', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Arc repair T1', 'event_ud_arc_rehabit', 'a');
-INSERT INTO om_visit_parameter VALUES ('RAT2', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Arc repair T2', 'event_ud_arc_rehabit', 'b');
-INSERT INTO om_visit_parameter VALUES ('IAT1', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Arc inspection T1', 'event_ud_arc_standard', 'c');
-INSERT INTO om_visit_parameter VALUES ('IAT2', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Arc inspection T2', 'event_ud_arc_standard', 'f');
-INSERT INTO om_visit_parameter VALUES ('ICT1', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Connec inspection T1', 'event_standard', 'd');
-INSERT INTO om_visit_parameter VALUES ('ICT2', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Connec inspection T2', 'event_standard', 'e');
-INSERT INTO om_visit_parameter VALUES ('INT1', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Node inspection T1', 'event_standard', 'f');
-INSERT INTO om_visit_parameter VALUES ('INT2', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Node inspection T2', 'event_standard', 'g');
-INSERT INTO om_visit_parameter VALUES ('INT3', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Node inspection T3', 'event_standard', 'i');
 
 -- Records of doc type table
 -- ----------------------------

@@ -38,18 +38,6 @@ INSERT INTO om_visit_parameter_type VALUES ('DESPERFECTES', '');
 INSERT INTO om_visit_parameter_type VALUES ('RECONSTRUIR', '');
 INSERT INTO om_visit_parameter_type VALUES ('ALTRES', '');
 
--- Records of event om_visit_parameter table
--- ----------------------------
-INSERT INTO om_visit_parameter VALUES ('RAT1', NULL, 'DESPERFECTES', 'ARC', 'TEXT', NULL, 'Reparació del arc parametre 1', 'event_ud_arc_rehabit', 'a');
-INSERT INTO om_visit_parameter VALUES ('RAT2', NULL, 'DESPERFECTES', 'ARC', 'TEXT', NULL, 'Reparació del arc parametre 2', 'event_ud_arc_rehabit', 'b');
-INSERT INTO om_visit_parameter VALUES ('IAT1', NULL, 'INSPECCIO', 'ARC', 'TEXT', NULL, 'Inspeccio del arc parametre 1', 'event_ud_arc_standard', 'c');
-INSERT INTO om_visit_parameter VALUES ('IAT2', NULL, 'INSPECCIO', 'ARC', 'TEXT', NULL, 'Inspeccio del arc parametre 2', 'event_ud_arc_standard', 'f');
-INSERT INTO om_visit_parameter VALUES ('ICT1', NULL, 'INSPECCIO', 'CONNEC', 'TEXT', NULL, 'Inspeccio del connec parametre 1', 'event_standard', 'd');
-INSERT INTO om_visit_parameter VALUES ('ICT2', NULL, 'INSPECCIO', 'CONNEC', 'TEXT', NULL, 'Inspeccio del connec parametre 2', 'event_standard', 'e');
-INSERT INTO om_visit_parameter VALUES ('INT1', NULL, 'INSPECCIO', 'NODE', 'TEXT', NULL, 'Inspeccio del node parametre 1', 'event_standard', 'f');
-INSERT INTO om_visit_parameter VALUES ('INT2', NULL, 'INSPECCIO', 'NODE', 'TEXT', NULL, 'Inspeccio del node parametre 2', 'event_standard', 'g');
-INSERT INTO om_visit_parameter VALUES ('INT3', NULL, 'INSPECCIO', 'NODE', 'TEXT', NULL, 'Inspeccio del node parametre 3', 'event_standard', 'i');
-
 -- Records of doc type table
 -- ----------------------------
 INSERT INTO doc_type VALUES ('AS_BUILT');

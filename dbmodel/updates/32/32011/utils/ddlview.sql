@@ -52,39 +52,6 @@ CREATE OR REPLACE VIEW ve_lot_x_arc AS
 
   
   
-CREATE OR REPLACE VIEW ve_visit_arc_insp AS 
- SELECT om_visit_x_arc.visit_id,
-    om_visit_x_arc.arc_id,
-    om_visit.visitcat_id,
-    om_visit.ext_code,
-    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
-    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
-    om_visit.user_name,
-    om_visit.webclient_id,
-    om_visit.expl_id,
-    om_visit.the_geom,
-    om_visit.descript,
-    om_visit.is_done,
-    om_visit.class_id,
-    om_visit.lot_id,
-    om_visit.status,
-    a.param_1 AS sediments_arc,
-    a.param_2 AS desperfectes_arc,
-    a.param_3 AS neteja_arc
-   FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
-     JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
-     LEFT JOIN ( SELECT ct.visit_id,
-            ct.param_1,
-            ct.param_2,
-            ct.param_3
-           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-			FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-			JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''desperfectes_arc''),(''neteja_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
-  
   
   
 CREATE OR REPLACE VIEW ve_visit_arc_singlevent AS 
@@ -126,43 +93,6 @@ CREATE OR REPLACE VIEW ve_visit_arc_singlevent AS
      JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
      JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
   WHERE om_visit_class.ismultievent = false;
-
-   
-  
-  
-CREATE OR REPLACE VIEW ve_visit_connec_insp AS 
- SELECT om_visit_x_connec.visit_id,
-    om_visit_x_connec.connec_id,
-    om_visit.visitcat_id,
-    om_visit.ext_code,
-    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
-    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
-    om_visit.user_name,
-    om_visit.webclient_id,
-    om_visit.expl_id,
-    om_visit.the_geom,
-    om_visit.descript,
-    om_visit.is_done,
-    om_visit.class_id,
-    om_visit.lot_id,
-    om_visit.status,
-    a.param_1 AS sediments_connec,
-    a.param_2 AS desperfectes_connec,
-    a.param_3 AS neteja_connec
-   FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
-     JOIN om_visit_x_connec ON om_visit.id = om_visit_x_connec.visit_id
-     LEFT JOIN ( SELECT ct.visit_id,
-            ct.param_1,
-            ct.param_2,
-            ct.param_3
-           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-			FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-			JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_connec''),(''desperfectes_connec''),(''neteja_connec'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
-  
   
   
   
@@ -205,42 +135,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_singlevent AS
      JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
   WHERE om_visit_class.ismultievent = false;
   
-  
-  
-CREATE OR REPLACE VIEW ve_visit_node_insp AS 
- SELECT om_visit_x_node.visit_id,
-    om_visit_x_node.node_id,
-    om_visit.visitcat_id,
-    om_visit.ext_code,
-    left (date_trunc('second', startdate)::text, 19) as startdate,
-    left (date_trunc('second', enddate)::text, 19) as enddate,
-    om_visit.user_name,
-    om_visit.webclient_id,
-    om_visit.expl_id,
-    om_visit.the_geom,
-    om_visit.descript,
-    om_visit.is_done,
-    om_visit.class_id,
-    om_visit.lot_id,
-    om_visit.status,
-    a.param_1 AS sediments_node,
-    a.param_2 AS desperfectes_node,
-    a.param_3 AS neteja_node
-   FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
-     JOIN om_visit_x_node ON om_visit.id = om_visit_x_node.visit_id
-     LEFT JOIN ( SELECT ct.visit_id,
-            ct.param_1,
-            ct.param_2,
-            ct.param_3
-           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-			FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-			JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_node''),(''desperfectes_node''),(''neteja_node'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
-  
-  
+   
   
   
 CREATE OR REPLACE VIEW ve_visit_node_singlevent AS 
@@ -282,37 +177,7 @@ CREATE OR REPLACE VIEW ve_visit_node_singlevent AS
      JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
   WHERE om_visit_class.ismultievent = false;
   
-  
-  
-  CREATE OR REPLACE VIEW ve_visit_noinfra AS 
- SELECT om_visit.id AS visit_id,
-    om_visit.visitcat_id,
-    om_visit.ext_code,
-    "left"(date_trunc('second'::text, om_visit.startdate)::text, 19) AS startdate,
-    "left"(date_trunc('second'::text, om_visit.enddate)::text, 19) AS enddate,
-    om_visit.user_name,
-    om_visit.webclient_id,
-    om_visit.expl_id,
-    om_visit.the_geom,
-    om_visit.descript,
-    om_visit.is_done,
-    om_visit.class_id,
-    om_visit.lot_id,
-    om_visit.status,
-    a.param_1 AS tipus_incidencia,
-    a.param_2 AS comentari_incidencia
-   FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
-     LEFT JOIN ( SELECT ct.visit_id,
-            ct.param_1,
-            ct.param_2
-           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-			FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-			JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''tipus_incidencia''),(''comentari_incidencia'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
-  
+   
   
 CREATE OR REPLACE VIEW v_edit_dma AS 
  SELECT dma.dma_id,
