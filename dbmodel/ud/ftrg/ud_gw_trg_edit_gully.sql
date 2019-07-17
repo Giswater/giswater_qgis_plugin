@@ -345,8 +345,8 @@ BEGIN
 			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' AND cur_user=current_user LIMIT 1) IS TRUE THEN
 				PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
 			END IF;
-		ELSIF (OLD.arc_id != (SELECT arc_id FROM connec WHERE connec_id=NEW.connec_id))  -- case when arc_id comes from plan psector tables
-			UPDATE plan_psector_x_gully SET arc_id= NEW.arc_id WHERE gully_id=NEW.connec_id AND arc_id = OLD.arc_id;		
+		ELSIF (OLD.arc_id != (SELECT arc_id FROM gully WHERE gully_id=NEW.gully_id)) THEN -- case when arc_id comes from plan psector tables
+			UPDATE plan_psector_x_gully SET arc_id= NEW.arc_id WHERE gully_id=NEW.gully_id AND arc_id = OLD.arc_id;		
 		END IF;
 		
 		-- State_type
