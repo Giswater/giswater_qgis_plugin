@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>317</width>
-    <height>530</height>
+    <width>541</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -140,21 +140,51 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="text"/>
+       <widget class="QTextEdit" name="text">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Files:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableView" name="tbl_docs_x_event"/>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QPushButton" name="btn_add_picture">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_add_file">
           <property name="text">
-           <string>Add picture</string>
+           <string>Add file</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btn_view_gallery">
+         <widget class="QPushButton" name="btn_delete_file">
           <property name="text">
-           <string>View gallery</string>
+           <string>Delete file</string>
           </property>
          </widget>
         </item>
@@ -175,8 +205,7 @@
  <tabstops>
   <tabstop>parameter_id</tabstop>
   <tabstop>value</tabstop>
-  <tabstop>btn_add_picture</tabstop>
-  <tabstop>btn_view_gallery</tabstop>
+  <tabstop>btn_add_file</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import next
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -14,12 +12,14 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint as QgsPointXY
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsPointXY
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QTimer, QPoint
+from qgis.PyQt.QtCore import QTimer
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 import utils_giswater
@@ -54,19 +54,15 @@ class Dimensions(ParentDialog):
     def init_config_form(self):
         """ Custom form initial configuration """
 
-        # Set snapping
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
 
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
 
+        # Configure button signals
         btn_orientation = self.dialog.findChild(QPushButton, "btn_orientation")
         btn_orientation.clicked.connect(self.orientation)
         self.set_icon(btn_orientation, "133")
@@ -84,8 +80,6 @@ class Dimensions(ParentDialog):
         
     def orientation(self):
         
-        # Disconnect previous snapping
-        self.emit_point.canvasClicked.disconnect(self.click_button_snapping)
         self.emit_point.canvasClicked.connect(self.click_button_orientation)
 
 
@@ -93,7 +87,6 @@ class Dimensions(ParentDialog):
                    
         # Set active layer and set signals
         self.iface.setActiveLayer(self.layer_node)
-        self.emit_point.canvasClicked.disconnect(self.click_button_orientation)
         self.canvas.xyCoordinates.connect(self.mouse_move)
         self.emit_point.canvasClicked.connect(self.click_button_snapping)
 
@@ -101,7 +94,7 @@ class Dimensions(ParentDialog):
     def mouse_move(self, point):
 
         # Hide marker and get coordinates
-        self.vertex_marker.hide()
+        self.snapper_manager.remove_marker()
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
@@ -110,7 +103,7 @@ class Dimensions(ParentDialog):
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node or layer == self.layer_connec:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
+                self.snapper_manager.add_marker(result)
 
         
     def click_button_orientation(self, point):  # @UnusedVariable
@@ -119,9 +112,9 @@ class Dimensions(ParentDialog):
             return   
 
         self.x_symbol = self.dialog.findChild(QLineEdit, "x_symbol")
-        self.x_symbol.setText(str(point.x()))
+        self.x_symbol.setText(str(int(point.x())))
         self.y_symbol = self.dialog.findChild(QLineEdit, "y_symbol")
-        self.y_symbol.setText(str(point.y()))
+        self.y_symbol.setText(str(int(point.y())))
         
 
     def click_button_snapping(self, point, btn):  # @UnusedVariable
@@ -151,7 +144,7 @@ class Dimensions(ParentDialog):
 
             # Get the point
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            feature_id = self.snapper_manager.get_feature_id(result)
+            feature_id = self.snapper_manager.get_snapped_feature_id(result)
             element_id = snapped_feat.attribute(feat_type + '_id')
 
             # Leave selection

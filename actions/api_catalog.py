@@ -31,16 +31,18 @@ class ApiCatalog(ApiParent):
         self.project_type = project_type
 
 
-    def api_catalog(self, previous_dialog, widget_name, geom_type):
+    def api_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
 
-        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
-        body = self.create_body(form)
+        form_name = 'upsert_catalog_' + geom_type + ''
+        form = '"formName":"' + form_name + '", "tabName":"data", "editable":"TRUE"'
+        feature = '"feature_type":"' + feature_type + '"'
+        body = self.create_body(form, feature)
         sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-        print("ROW -> :" + str(row) )
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
+
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         groupBox_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
@@ -52,8 +54,6 @@ class ApiCatalog(ApiParent):
 
         main_layout = self.dlg_catalog.widget.findChild(QGridLayout, 'main_layout')
         result = complet_list[0]['body']['data']
-        # if 'fields' not in result:
-        #     return
         for field in result['fields']:
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
@@ -75,28 +75,28 @@ class ApiCatalog(ApiParent):
         id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Call get_api_catalog first time
-        self.get_api_catalog(matcat_id, pnom, dnom, id)
+        self.get_api_catalog(matcat_id, pnom, dnom, id, feature_type, geom_type)
 
         # Set Listeners
-        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pnom, dnom))
-        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id))
-        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id))
+        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
+        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
+        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
 
         # Open form
         self.dlg_catalog.show()
 
 
-    def get_api_catalog(self, matcat_id, pnom, dnom, id):
-
-        # id = self.dlg_catalog.findChild(QComboBox, 'id')
+    def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
 
         matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
         pn_value = utils_giswater.get_item_data(self.dlg_catalog, pnom)
         dn_value = utils_giswater.get_item_data(self.dlg_catalog, dnom)
 
-        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
+        form_name = 'upsert_catalog_' + geom_type + ''
+        form = '"formName":"' + form_name + '", "tabName":"data", "editable":"TRUE"'
+        feature = '"feature_type":"' + feature_type + '"'
         extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pnom":"'+str(pn_value)+'", "dnom":"'+str(dn_value)+'"}'
-        body = self.create_body(form=form, extras=extras)
+        body = self.create_body(form=form, feature=feature, extras=extras)
         sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -106,13 +106,15 @@ class ApiCatalog(ApiParent):
                 self.populate_combo(id,field)
 
 
-    def populate_pn_dn(self, matcat_id, pnom, dnom):
+    def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
 
         matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
 
-        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
+        form_name = 'upsert_catalog_' + geom_type + ''
+        form = '"formName":"' + form_name + '", "tabName":"data", "editable":"TRUE"'
+        feature = '"feature_type":"' + feature_type + '"'
         extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'"}'
-        body = self.create_body(form=form, extras=extras)
+        body = self.create_body(form=form, feature=feature, extras=extras)
         sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -125,6 +127,7 @@ class ApiCatalog(ApiParent):
 
 
     def get_event_combo_parent(self, fields, row, geom_type):
+
         if fields == 'fields':
             for field in row["fields"]:
                 if field['isparent'] is True:
@@ -201,8 +204,9 @@ class ApiCatalog(ApiParent):
         combolist = []
         if 'comboIds' in field:
             for i in range(0, len(field['comboIds'])):
-                elem = [field['comboIds'][i], field['comboNames'][i]]
-                combolist.append(elem)
+                if field['comboIds'][i] is not None and field['comboNames'][i] is not None:
+                    elem = [field['comboIds'][i], field['comboNames'][i]]
+                    combolist.append(elem)
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo
             for record in records_sorted:

@@ -63,6 +63,7 @@ class AddNewLot(ParentManage):
         self.is_new_lot = is_new
         self.cmb_position = 15  # Variable used to set the position of the QCheckBox in the relations table
 
+        self.srid = self.controller.plugin_settings_value('srid')
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -72,7 +73,7 @@ class AddNewLot(ParentManage):
 
         # Add 'gully' for 'UD' projects
         if self.controller.get_project_type() == 'ud':
-            self.layers['gully'] = self.controller.get_layer_by_tablename('v_edit_gully')
+            self.layers['gully'] = [self.controller.get_layer_by_tablename('v_edit_gully')]
 
         self.dlg_lot = AddLot()
         self.load_settings(self.dlg_lot)
@@ -151,7 +152,6 @@ class AddNewLot(ParentManage):
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
 
-        # TODO pending to make function delete_visit
         self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
         ignore_columns = ('visitcat_id', 'ext_code', 'webclient_id', 'expl_id', 'the_geom', 'is_done', 'status')
         self.dlg_lot.btn_export_visits.clicked.connect(
@@ -173,6 +173,7 @@ class AddNewLot(ParentManage):
             self.update_id_list()
             self.set_dates()
             self.reload_table_visit()
+            self.manage_cmb_status()
 
         # Enable or disable QWidgets
         self.dlg_lot.txt_ot_type.setReadOnly(True)
@@ -199,7 +200,10 @@ class AddNewLot(ParentManage):
         all_index = ['1', '2', '3', '4', '5', '6', '7']
         utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, all_index, 0, (1 | 32))
         self.dlg_lot.btn_validate_all.setEnabled(True)
-        self.dlg_lot.tbl_visit.setEnabled(True)
+
+        combo_list = self.dlg_lot.tbl_visit.findChildren(QComboBox)
+        for combo in combo_list:
+            combo.setEnabled(True)
         self.dlg_lot.btn_delete_visit.setEnabled(True)
 
         # Disable options of QComboBox according combo selection
@@ -210,7 +214,8 @@ class AddNewLot(ParentManage):
         elif value in [6]:
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['1', '2', '3', '4', '7'], 0)
             self.dlg_lot.btn_validate_all.setEnabled(False)
-            self.dlg_lot.tbl_visit.setEnabled(False)
+            for combo in combo_list:
+                combo.setEnabled(False)
             self.dlg_lot.btn_delete_visit.setEnabled(False)
         self.disbale_actions(value)
 
@@ -237,7 +242,7 @@ class AddNewLot(ParentManage):
         for x in range(0, model.rowCount()):
             index = qtable.model().index(x, self.cmb_position)
             cmb = qtable.indexWidget(index)
-            utils_giswater.set_combo_itemData(cmb, '2', 0)
+            utils_giswater.set_combo_itemData(cmb, '5', 0)
 
 
     def manage_team(self):
@@ -420,8 +425,7 @@ class AddNewLot(ParentManage):
     def delete_visit(self, qtable):
         selected_list = qtable.selectionModel().selectedRows()
         feature_type = utils_giswater.get_item_data(None, self.dlg_lot.cmb_visit_class, 2).lower()
-        self.controller.log_info(str(selected_list))
-        self.controller.log_info(str(feature_type))
+
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
@@ -719,7 +723,12 @@ class AddNewLot(ParentManage):
                 item.append(1)  # Set status field of the table relation
                 item.append('No visitat')
                 item.append('')
-                item.append(feature.geometry().asWkb().encode('hex').upper())
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    item.append(feature.geometry().asWkb().encode('hex').upper())
+                else:
+                    sql = ("SELECT ST_GeomFromText('" + str(feature.geometry().asWkt()) + "', " + str(self.srid) + ")")
+                    the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+                    item.append(the_geom[0])
                 row = []
                 for value in item:
                     row.append(QStandardItem(str(value)))
@@ -1065,6 +1074,10 @@ class AddNewLot(ParentManage):
                    " VALUES (" + values + ") RETURNING id")
             row = self.controller.execute_returning(sql, commit=True)
             lot_id = row[0]
+            sql = ("INSERT INTO " + self.schema_name + ".selector_lot "
+                   "(lot_id, cur_user) VALUES(" + str(lot_id) + ", current_user);")
+            self.controller.execute_sql(sql)
+            self.refresh_map_canvas()
         else:
             lot_id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
             sql = ("UPDATE om_visit_lot "
@@ -1073,7 +1086,7 @@ class AddNewLot(ParentManage):
             self.controller.execute_sql(sql)
 
         self.save_relations(lot, lot_id)
-        status = self.save_visits(lot_id)
+        status = self.save_visits()
         if status:
             self.manage_rejected()
 
@@ -1105,28 +1118,36 @@ class AddNewLot(ParentManage):
         return status
 
 
-    def save_visits(self, lot_id):
+    def save_visits(self):
 
         # Manage visits
+        status = False
         table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
-        sql = ("DELETE FROM " + str(table_name) + " "
-               "WHERE lot_id = ' " +str(lot_id) + "'; \n")
         model_rows = self.read_standaritemmodel(self.dlg_lot.tbl_visit)
+        if not model_rows:
+            return True
+
+        sql = ""
         for item in model_rows:
-            keys = " "
-            values = " "
+            visit_id = None
+            status = None
             for key, value in list(item.items()):
-                if value not in('', None):
-                    keys += ""+key+", "
-                    if type(value) in (int, bool):
-                        values += "$$"+str(value)+"$$, "
-                    else:
-                        values += "$$" + value + "$$, "
-            keys = keys[:-2]
-            values = values[:-2]
-            sql += ("INSERT INTO " + str(table_name) + " " "("+keys+") "
-                    "VALUES (" + values + "); \n")
-        status = self.controller.execute_sql(sql)
+                if key=="visit_id":
+                    visit_id = "" + value + ""
+                if key == "status":
+                    if value not in('', None):
+                        if type(value) in (int, bool):
+                            status = "$$"+str(value)+"$$ "
+                        else:
+                            status = "$$" + value + "$$ "
+
+            if visit_id and status:
+                sql += ("UPDATE " + str(table_name) + " "
+                        "SET (status) = (" + status + ") "
+                        "WHERE visit_id = '" + str(visit_id) + "';\n")
+        if sql != "":
+            status = self.controller.execute_sql(sql)
+
         return status
 
 
@@ -1196,7 +1217,7 @@ class AddNewLot(ParentManage):
 
         self.select_features_by_ids(feature_type, expr)
         # self.iface.actionZoomToSelected().trigger()
-        self.iface.actionZoomActualSize ().trigger()
+        self.iface.actionZoomActualSize().trigger()
 
         layer = self.iface.activeLayer()
         features = layer.selectedFeatures()
@@ -1401,8 +1422,7 @@ class AddNewLot(ParentManage):
             csv_path = QFileDialog.getSaveFileName(None, message, "", '*.csv')
         else:
             csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
-
-        self.controller.set_path_from_qfiledialog(dialog.txt_path, csv_path)
+        utils_giswater.setWidgetText(dialog, dialog.txt_path, csv_path)
 
 
     def export_model_to_csv(self, dialog, qtable, columns=(''), date_format='yyyy-MM-dd'):

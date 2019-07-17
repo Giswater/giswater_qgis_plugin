@@ -427,7 +427,8 @@ class Go2Epa(ApiParent):
         else:
             self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
 
-        self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_inp, self.file_inp)
+        utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
+
 
 
     def go2epa_select_file_rpt(self):
@@ -448,7 +449,7 @@ class Go2Epa(ApiParent):
         else:
             self.file_rpt, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
 
-        self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_rpt, self.file_rpt)
+        utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 
     def insert_into_inp(self, folder_path=None, all_rows=None):
@@ -882,6 +883,7 @@ class Go2Epa(ApiParent):
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
         if self.project_type == 'ws':
+
             sql = ("SELECT DISTINCT time, time FROM rpt_arc "
                    "WHERE result_id ILIKE '%%' ORDER BY time")
             rows = self.controller.get_rows(sql, add_empty_row=True)
@@ -893,7 +895,8 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare))
 
-        if self.project_type == 'ud':
+        elif self.project_type == 'ud':
+
             # Populate GroupBox Selector date
             result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = ("SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
@@ -913,30 +916,31 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_date))
             self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_date,
-                        self.dlg_go2epa_result.cmb_sel_time))
+                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
+                        self.dlg_go2epa_result.cmb_sel_date, self.dlg_go2epa_result.cmb_sel_time))
 
             # Populate GroupBox Selector compare
-            result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = ("SELECT DISTINCT(resultdate), resultdate  FROM rpt_arc "
-                   " WHERE result_id ='" + str(result_id_to_comp) + "'"
-                   " ORDER BY resultdate ")
+            result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result,
+                self.dlg_go2epa_result.rpt_selector_result_id, 0)
+            sql = ("SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
+                   "WHERE result_id = '" + str(result_id_to_comp) + "' "
+                   "ORDER BY resultdate ")
             rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
                 selector_cmp_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
-                sql = ("SELECT DISTINCT(resulttime), resulttime  FROM rpt_arc "
-                       " WHERE result_id ='" + str(result_id_to_comp) + "'"
-                       " AND resultdate='" + str(selector_cmp_date) + "'"
-                       " ORDER BY resulttime")
+                sql = ("SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
+                       "WHERE result_id = '" + str(result_id_to_comp) + "' "
+                       "AND resultdate = '" + str(selector_cmp_date) + "' "
+                       "ORDER BY resulttime")
                 rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_com_date))
             self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_com_date,
-                        self.dlg_go2epa_result.cmb_com_time))
+                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
+                        self.dlg_go2epa_result.cmb_com_date, self.dlg_go2epa_result.cmb_com_time))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM rpt_selector_result"
@@ -959,8 +963,8 @@ class Go2Epa(ApiParent):
         date = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_date)
         sql = ("SELECT DISTINCT(resulttime), resulttime "
                "FROM rpt_arc "
-               "WHERE result_id ='" + str(result_id) + "' "
-               "AND resultdate='" + str(date) + "' "
+               "WHERE result_id = '" + str(result_id) + "' "
+               "AND resultdate = '" + str(date) + "' "
                "ORDER BY resulttime")
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
@@ -970,10 +974,16 @@ class Go2Epa(ApiParent):
         """ Populate combo times """
 
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
-        sql = ("SELECT DISTINCT time, time "
+        if self.project_type == 'ws':
+            field = "time"
+        else:
+            field = "resulttime"
+
+        sql = ("SELECT DISTINCT " + field + ", " + field + " "
                "FROM rpt_arc "
                "WHERE result_id ILIKE '" + str(result_id) + "' "
-               "ORDER BY time")
+               "ORDER BY resulttime")
+
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
 
@@ -989,12 +999,10 @@ class Go2Epa(ApiParent):
                "DELETE FROM rpt_selector_compare WHERE cur_user = '" + user + "';\n")
         if self.project_type == 'ws':
             sql += ("DELETE FROM rpt_selector_hourly WHERE cur_user = '" + user + "';\n"
-                    "DELETE FROM rpt_selector_hourly_compare "
-                    " WHERE cur_user = '" + user + "';\n")
+                    "DELETE FROM rpt_selector_hourly_compare WHERE cur_user = '" + user + "';\n")
         if self.project_type == 'ud':
             sql += ("DELETE FROM rpt_selector_timestep WHERE cur_user = '" + user + "';\n"
-                    "DELETE FROM rpt_selector_timestep_compare "
-                    " WHERE cur_user = '" + user + "';\n")
+                    "DELETE FROM rpt_selector_timestep_compare WHERE cur_user = '" + user + "';\n")
         self.controller.execute_sql(sql, commit=True)
 
         # Get new values from widgets of type QComboBox

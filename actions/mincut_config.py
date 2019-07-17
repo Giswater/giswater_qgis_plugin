@@ -312,6 +312,7 @@ class MincutConfig(ParentAction):
         self.close_dialog(self.dlg_min_edit)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
+        self.mincut.is_new = False
 
 
     def filter_by_id(self, qtable):
@@ -355,11 +356,11 @@ class MincutConfig(ParentAction):
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from:')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to:')
         expr += " (id::text ILIKE '%" + id_ + "%'"
-        expr += " OR work_order::text ILIKE '%" + id_ + "%')"
+        expr += " OR work_order::text ILIKE '%" + id_ + "%' OR work_order IS null)"
         expr += " " + dates_filter + ""
         if state != '':
-            expr += " AND state::text ILIKE '%" + state + "%'"
-        expr += " AND expl_id::text ILIKE '%" + str(expl) + "%'"
+            expr += " AND state::text ILIKE '%" + state + "%' OR state IS null"
+        expr += " AND expl_id::text ILIKE '%" + str(expl) + "%' OR expl_id IS null"
 
         # Refresh model with selected filter
         qtable.model().setFilter(expr)

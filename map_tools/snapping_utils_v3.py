@@ -237,6 +237,14 @@ class SnappingConfigManager(object):
         return point
 
 
+    def remove_marker(self, vertex_marker=None):
+
+        if vertex_marker is None:
+            vertex_marker = self.vertex_marker
+
+        vertex_marker.hide()
+
+
     def get_event_point(self, event=None, point=None):
         """ Get point """
 

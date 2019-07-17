@@ -18,7 +18,8 @@ else:
     from builtins import range
 
 from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject
-from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView
 from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os
 import sys
@@ -82,17 +83,16 @@ class ManageVisit(ParentManage, QObject):
         # Get expl_id from previus dialog
         self.expl_id = expl_id
 
-
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc', True)
-        self.layers['node'] = self.controller.get_group_layers('node', True)
-        self.layers['connec'] = self.controller.get_group_layers('connec', True)
-        self.layers['element'] = self.controller.get_group_layers('element', True)
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
-            self.layers['gully'] = self.controller.get_group_layers('gully', True)
+            self.layers['gully'] = self.controller.get_group_layers('gully')
           
         # Reset geometry  
         self.x = None
@@ -257,7 +257,7 @@ class ManageVisit(ParentManage, QObject):
         sql = ("UPDATE om_visit"
                " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
                " WHERE id = " + str(self.current_visit.id))
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
 
     def manage_rejected(self):
@@ -481,7 +481,7 @@ class ManageVisit(ParentManage, QObject):
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, commit=True)
 
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
@@ -707,28 +707,19 @@ class ManageVisit(ParentManage, QObject):
 
         # Event tab
         # Fill ComboBox parameter_type_id
-        sql = ("SELECT id"
-               " FROM om_visit_parameter_type"
-               " ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox(self.dlg_add_visit, "parameter_type_id", parameter_type_ids, allow_nulls=False)
+        sql = ("SELECT id, id "
+               "FROM om_visit_parameter_type "
+               "ORDER BY id")
+        parameter_type_ids = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
-        sql = ("SELECT value"
-               " FROM config_param_user"
-               " WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
-        row = self.controller.get_row(sql, commit=self.autocommit)
+        sql = ("SELECT value "
+               "FROM config_param_user "
+               "WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
+        row = self.controller.get_row(sql, commit=True)
         if row:
-            # if int then look for default row ans set it
-            try:
-                parameter_type_id = int(row[0])
-                combo_value = parameter_type_ids[parameter_type_id]
-                combo_index = self.parameter_type_id.findText(combo_value)
-                self.parameter_type_id.setCurrentIndex(combo_index)
-            except TypeError:
-                pass
-            except ValueError:
-                pass
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
 
     def set_completers(self):
@@ -776,22 +767,26 @@ class ManageVisit(ParentManage, QObject):
 
 
     def event_insert(self):
-        """Add and event basing on form asociated to the selected parameter_id."""
-        
-        # check a paramet3er_id is selected (can be that no value is available)
+        """Add and event basing on form associated to the selected parameter_id."""
+
+        # Parameter to save all selected files associated to events
+        self.files_added = []
+        self.files_all = []
+
+        # check a parameter_id is selected (can be that no value is available)
         parameter_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
         parameter_text = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 1)
 
-        if not parameter_id:
+        if not parameter_id or parameter_id == -1:
             message = "You need to select a valid parameter id"
             self.controller.show_info_box(message)
             return
 
-        # get form asociated
+        # get form associated
         sql = ("SELECT form_type"
                " FROM om_visit_parameter"
                " WHERE id = '" + str(parameter_id) + "'")
-        row = self.controller.get_row(sql, commit=False)
+        row = self.controller.get_row(sql, commit=True)
         form_type = str(row[0])
 
         if form_type == 'event_ud_arc_standard':
@@ -815,12 +810,22 @@ class ManageVisit(ParentManage, QObject):
             self.controller.show_info_box(message, parameter=form_type)
             return
 
-        # because of multiple view disable add picture and view gallery
-        self.dlg_event.btn_add_picture.setEnabled(False)
-        self.dlg_event.btn_view_gallery.setEnabled(False)
+        # Manage QTableView docx_x_event
+        utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
+        self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
+        self.populate_tbl_docs_x_event()
 
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_text)
+        # create an empty Event
+        event = OmVisitEvent(self.controller)
+        event.id = event.max_pk() + 1
+        event.parameter_id = parameter_id
+        event.visit_id = int(self.visit_id.text())
+
+        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id, save=False))
+        self.dlg_event.btn_delete_file.clicked.connect(
+            partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         ret = self.dlg_event.exec_()
@@ -829,12 +834,6 @@ class ManageVisit(ParentManage, QObject):
         if not ret:
             # clicked cancel
             return
-
-        # create an empty Event
-        event = OmVisitEvent(self.controller)
-        event.id = event.max_pk() + 1
-        event.parameter_id = parameter_id
-        event.visit_id = int(self.visit_id.text())
 
         for field_name in event.field_names():
             if not hasattr(self.dlg_event, field_name):
@@ -854,10 +853,172 @@ class ManageVisit(ParentManage, QObject):
 
         # save new event
         event.upsert()
-
+        self.save_files_added(event.visit_id, event.id)
         # update Table
         self.tbl_event.model().select()
         self.manage_events_changed()
+
+
+    def open_file(self):
+        # Get row index
+        index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
+        
+        path = index.sibling(index.row(), column_index).data()
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
+
+
+
+    def populate_tbl_docs_x_event(self, event_id=0):
+
+        # Create and set model
+        model = QStandardItemModel()
+        self.dlg_event.tbl_docs_x_event.setModel(model)
+        self.dlg_event.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
+        self.dlg_event.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
+        # Get columns name and set headers of model with that
+        columns_name = self.controller.get_columns_list('om_visit_event_photo')
+        headers = []
+        for x in columns_name:
+            headers.append(x[0])
+        headers = ['value', 'filetype', 'fextension']
+        model.setHorizontalHeaderLabels(headers)
+
+        # Get values in order to populate model
+        visit_id = utils_giswater.getWidgetText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
+        sql = ("SELECT value, filetype, fextension FROM " + self.schema_name + ".om_visit_event_photo "
+               "WHERE visit_id='" + str(visit_id) + "' AND event_id='" + str(event_id) + "'")
+        rows = self.controller.get_rows(sql)
+        if rows is None:
+            return
+
+        for row in rows:
+            item = []
+            if row[0] not in self.files_all:
+                self.files_all.append(str(row[0]))
+            for _file in row:
+                if _file is not None:
+                    if type(_file) != unicode:
+                        item.append(QStandardItem(str(_file)))
+                    else:
+                        item.append(QStandardItem(_file))
+                else:
+                    item.append(QStandardItem(None))
+
+            if len(row) > 0:
+                model.appendRow(item)
+
+
+    def get_added_files(self, visit_id, event_id, save):
+        """  Get path of new files """
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)
+        # Get file types from catalog and populate QFileDialog filter
+        sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
+        rows = self.controller.get_rows(sql, commit=True)
+        f_types = rows
+        file_types = ""
+        for row in rows:
+            file_types += row[0] + " (*."+row[1]+");;"
+        file_types += "All (*.*)"
+        new_files, filter_ = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
+
+        # Add files to QtableView
+        if new_files:
+            for path in new_files:
+                item = []
+                if path not in self.files_all and path not in self.files_added:
+                    self.files_all.append(path)
+                    self.files_added.append(path)
+                    filename, file_extension = os.path.splitext(path)
+                    file_extension = file_extension.replace('.', '')
+
+                    # Set default file_type = extension, but look for matches with the catalog
+                    file_type = file_extension
+                    for _types in f_types:
+                        if _types[1] == file_extension:
+                            file_type = _types[0]
+                            break
+
+                    item.append(path)
+                    item.append(file_type)
+                    item.append(file_extension)
+                    row = []
+                    for value in item:
+                        row.append(QStandardItem(str(value)))
+                    if len(row) > 0:
+                        self.dlg_event.tbl_docs_x_event.model().appendRow(row)
+            if save:
+                self.save_files_added(visit_id, event_id)
+
+    def save_files_added(self, visit_id, event_id):
+        """ Save new files into DataBase """
+        if self.files_added:
+            sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
+            f_types = self.controller.get_rows(sql, commit=True)
+            sql = ""
+            for path in self.files_added:
+                filename, file_extension = os.path.splitext(path)
+                # Set default file_type = extension, but look for matches with the catalog
+                file_extension = file_extension.replace('.', '')
+                file_type = file_extension
+                for _types in f_types:
+                    if _types[1] == file_extension:
+                        file_type = _types[0]
+                        break
+
+                sql += ("INSERT INTO " + self.schema_name + ".om_visit_event_photo "
+                        "(visit_id, event_id, value, filetype, fextension) "
+                        " VALUES('" + str(visit_id) + "', '" + str(event_id) + "', '" + str(path) + "', "
+                        "'" + str(file_type) + "', ' " + str(file_extension) + "'); \n")
+            self.controller.execute_sql(sql)
+
+
+    def delete_files(self, qtable, visit_id, event_id):
+        """  Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC"""
+        # Get selected rows
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+
+        list_values = ""
+
+        for x in range(0, len(selected_list)):
+            # Get index of row and row[index]
+            row_index = selected_list[x]
+            row = row_index.row()
+            col_index = utils_giswater.get_col_index_by_col_name(qtable, 'value')
+            value = row_index.sibling(row, col_index).data()
+            if value in self.files_added:
+                self.files_added.remove(value)
+            if value in self.files_all:
+                self.files_all.remove(value)
+            list_values += "'" + str(value) + "',\n"
+        list_values = list_values[:-2]
+
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, list_values)
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + ".om_visit_event_photo "
+                   "WHERE visit_id='" + str(visit_id) + "' "
+                   "AND event_id='" + str(event_id) + "' "
+                   "AND value IN (" + list_values + ")")
+            self.controller.execute_sql(sql)
+            self.populate_tbl_docs_x_event(event_id)
+        else:
+            return
 
 
     def manage_events_changed(self):
@@ -869,7 +1030,9 @@ class ManageVisit(ParentManage, QObject):
 
     def event_update(self):
         """Update selected event."""
-        
+        # Parameter to save all selected files associated to events
+        self.files_added = []
+        self.files_all = []
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -912,8 +1075,8 @@ class ManageVisit(ParentManage, QObject):
             # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
             # set fixed values
-            self.dlg_event.value.setText(_value)
-            self.dlg_event.position_value.setText(str(position_value))
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
             utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
@@ -945,12 +1108,17 @@ class ManageVisit(ParentManage, QObject):
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
-            self.dlg_event.value.setText(_value)
-            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+            if _value not in ('NULL', None):
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+            if text not in ('NULL', None):
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
 
-        # because of multiple view disable add picture and view gallery
-        self.dlg_event.btn_add_picture.setEnabled(False)
-        self.dlg_event.btn_view_gallery.setEnabled(False)
+        # Manage QTableView docx_x_event
+        utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
+        self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
+        self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id, save=True))
+        self.dlg_event.btn_delete_file.clicked.connect(partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
+        self.populate_tbl_docs_x_event(event.id)
 
         # fill widget values if the values are present
         for field_name in event.field_names():
@@ -985,6 +1153,7 @@ class ManageVisit(ParentManage, QObject):
 
             # update the record
             event.upsert(commit=self.autocommit)
+        self.save_files_added(event.visit_id, event.id)
 
         # update Table
         self.tbl_event.model().select()
@@ -1008,12 +1177,23 @@ class ManageVisit(ParentManage, QObject):
         # 0 is the column of the pk 0 'id'        
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         selected_id = []
+        list_id = ""
+        any_docs = False
         for index in selected_list:
             selected_id.append(str(index.data()))
-        list_id = ','.join(selected_id)
+            list_id += "Event_id: " + str(index.data()) + ""
+            sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo "
+                   "WHERE event_id='" + str(index.data()) + "'")
+            rows = self.controller.get_rows(sql)
+            if rows:
+                any_docs = True
+                list_id += "(Docs associated)"
+            list_id += "\n"
 
         # ask for deletion
         message = "Are you sure you want to delete these records?"
+        if any_docs:
+            message += "\nSome events have documents:"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, list_id)
         if not answer:

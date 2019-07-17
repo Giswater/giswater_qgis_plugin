@@ -105,6 +105,7 @@ class ApiSearch(ApiParent):
 
         # Open dialog
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
         self.dlg_search.show()
 
 
@@ -446,6 +447,8 @@ class ApiSearch(ApiParent):
                "  (SELECT expl_id FROM selector_expl "
                "   WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
+        if not rows:
+            return
 
         if len(rows) > 0:
             for row in rows:
@@ -490,7 +493,7 @@ class ApiSearch(ApiParent):
         file_dialog.setFileMode(QFileDialog.Directory)
 
         msg = "Save as"
-        folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+        folder_path, filter_ = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
@@ -661,7 +664,7 @@ class ApiSearch(ApiParent):
             sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             rows = self.controller.get_rows(sql)
             if not rows:
-                pass
+                return
 
             if extension is not None:
                 widget_name = "lbl_total_" + str(feature.lower()) + str(extension)

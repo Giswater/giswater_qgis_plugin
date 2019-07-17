@@ -11,6 +11,8 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
+from qgis.PyQt.QtCore import QSettings
+
 from giswater.actions.api_cf import ApiCF
 from giswater.actions.manage_element import ManageElement        
 from giswater.actions.manage_document import ManageDocument      
@@ -40,8 +42,11 @@ class Edit(ParentAction):
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
-            self.suppres_form = self.layer.editFormConfig().suppress()
-            self.layer.editFormConfig().setSuppress(1)
+            # Get user values (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
+            # and set True
+            self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
+            QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
+
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -73,7 +78,9 @@ class Edit(ParentAction):
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat, new_feature_id=feature_id, layer_new_feature=self.layer, tab_type='data', new_feature=feature)
 
-        self.layer.setFeatureFormSuppress(self.suppres_form)
+        # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
+        QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
+
 
         if not result:
             self.layer.deleteFeature(feature.id())

@@ -598,13 +598,13 @@ class DaoController(object):
           
         # Manage value 'current_user'   
         if unique_value != 'current_user':
-            unique_value = "'" + unique_value + "'" 
+            unique_value = "$$" + unique_value + "$$"
             
         # Iterate over values            
         sql_values = ""
         for value in values:
             if value != 'current_user':
-                sql_values += "'" + value + "', "
+                sql_values += "$$" + value + "$$, "
             else:
                 sql_values += value + ", "
         sql += unique_value + ", " + sql_values[:-2] + ")"         
@@ -748,11 +748,12 @@ class DaoController(object):
         
     def get_layer_by_layername(self, layername, log_info=False):
         """ Get layer with selected @layername (the one specified in the TOC) """
-        
+
         layer = QgsProject.instance().mapLayersByName(layername)
-        if layer:         
+        if layer:
             layer = layer[0] 
-        elif layer is None and log_info:
+        elif not layer and log_info:
+            layer = None
             self.log_info("Layer not found", parameter=layername)        
             
         return layer     
@@ -1285,12 +1286,12 @@ class DaoController(object):
         return layers
 
 
-
     def set_search_path(self, dbname, schema_name):
         """ Set parameter search_path for current QGIS project """
 
         sql = ("ALTER DATABASE " + str(dbname) + " SET search_path = " + str(schema_name) + ", public;")
         self.execute_sql(sql, log_sql=True)
+
 
     def set_path_from_qfiledialog(self, qtextedit, path):
 
@@ -1305,7 +1306,6 @@ class DaoController(object):
     def get_restriction(self):
 
         # Get project variable 'project_role'
-        project_role = None
         if Qgis.QGIS_VERSION_INT < 29900:
             project_role = QgsExpressionContextUtils.projectScope().variable('project_role')
         else:

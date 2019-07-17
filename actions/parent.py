@@ -16,12 +16,10 @@ if Qgis.QGIS_VERSION_INT < 29900:
     import ConfigParser as configparser
     from qgis.PyQt.QtGui import QStringListModel
     from qgis.core import QgsMapLayerRegistry as QgsProject
-    from qgis.gui import QgsMapCanvasSnapper
 else:
     import configparser
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
-    from qgis.gui import QgsMapCanvas
     from builtins import range
     from builtins import object
 
@@ -230,7 +228,8 @@ class ParentAction(object):
         query_left += "(SELECT " + tableleft + "." + name + " FROM " + tableleft
         query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
-
+        query_left += " AND  "+field_id_left+" > -1"
+        
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
@@ -694,17 +693,6 @@ class ParentAction(object):
             self.delete_layer_from_toc(layer_name)
 
 
-    def get_snapper(self):
-        """ Return snapper """
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            snapper = QgsMapCanvasSnapper(self.canvas)
-        else:
-            snapper = QgsMapCanvas.snappingUtils(self.canvas)
-
-        return snapper
-
-
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
@@ -723,7 +711,8 @@ class ParentAction(object):
 
 
     def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
-        cahange_tab=False
+
+        change_tab = False
         text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
         if reset_text:
             text = ""
@@ -732,12 +721,12 @@ class ParentAction(object):
                 if item['message'] is not None:
                     text += str(item['message']) + "\n"
                     if force_tab:
-                        cahange_tab = True
+                        change_tab = True
                 else:
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
-        if cahange_tab:
+        if change_tab:
             qtabwidget.setCurrentIndex(1)
 
 

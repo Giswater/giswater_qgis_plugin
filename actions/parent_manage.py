@@ -14,6 +14,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
     from builtins import str
     from builtins import range
 
@@ -22,7 +23,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QPoint, QDate, QDateTime
+from qgis.PyQt.QtCore import Qt, QDate, QDateTime
 
 from functools import partial
 
@@ -48,6 +49,7 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
         self.remove_ids = True
+        self.snapper_manager = None
 
 
     def reset_lists(self):
@@ -338,7 +340,11 @@ class ParentManage(ParentAction, object):
         self.vertex_marker.setPenWidth(3)
 
         # Snapper
-        self.snapper = self.get_snapper()
+        if self.snapper_manager is None:
+            self.snapper_manager = SnappingConfigManager(self.iface)
+            self.snapper = self.snapper_manager.get_snapper()
+            if self.snapper_manager.controller is None:
+                self.snapper_manager.set_controller(self.controller)
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()

@@ -195,22 +195,27 @@ class CadAddPoint(ParentMapTool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_points = self.controller.get_layer_by_tablename('v_edit_cad_auxpoint', True)
+        self.layer_points = self.controller.get_layer_by_tablename('v_edit_cad_auxpoint')
         if self.layer_points is None:
-            self.show_warning("Layer not found", parameter=self.layer_points)
+            self.controller.show_warning("Layer not found", parameter=self.layer_points)
+            self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
             return
+
         self.iface.setActiveLayer(self.layer_points)
 
         # Check for default base layer
-        sql = ("SELECT value FROM config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
+        self.vdefault_layer = None
+        sql = ("SELECT value FROM config_param_user "
+               "WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             self.snap_to_selected_layer = True
-            self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
-            self.iface.setActiveLayer(self.vdefault_layer)
-        else:
-            # Get current layer
+            self.vdefault_layer = self.controller.get_layer_by_layername(row[0], True)
+            if self.vdefault_layer:
+                self.iface.setActiveLayer(self.vdefault_layer)
+
+        if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
 
         # Set snapping

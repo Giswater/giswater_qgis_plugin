@@ -50,7 +50,7 @@ from .map_tools.dimensioning import Dimensioning
 from .map_tools.draw_profiles import DrawProfiles
 from .map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from .map_tools.move_node import MoveNodeMapTool
-from .map_tools.replace_node import ReplaceNodeMapTool
+from .map_tools.replace_feature import ReplaceFeatureMapTool
 from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
@@ -123,7 +123,7 @@ class Giswater(QObject):
         self.iface.newProjectCreated.connect(self.project_new)
 
 
-    def set_info_button(self, connection_status):
+    def set_info_button(self):
 
         self.toolButton = QToolButton()
         self.action_info = self.iface.addToolBarWidget(self.toolButton)
@@ -138,7 +138,7 @@ class Giswater(QObject):
         self.toolButton.setDefaultAction(action)
 
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
-        action.triggered.connect(partial(self.update_sql.init_sql, connection_status))
+        action.triggered.connect(self.update_sql.init_sql)
 
     
     def enable_python_console(self):
@@ -343,7 +343,7 @@ class Giswater(QObject):
         elif int(index_action) == 43:
             map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
         elif int(index_action) == 44:
-            map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
+            map_tool = ReplaceFeatureMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 56:
             map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 57:
@@ -581,11 +581,11 @@ class Giswater(QObject):
                 self.enable_action(enable, index_action)
 
 
-    def project_new(self, show_warning=True):
+    def project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
         self.unload(False)
-        self.set_info_button(self.connection_status)
+        self.set_info_button()
 
                           
     def project_read(self, show_warning=True): 
@@ -600,7 +600,7 @@ class Giswater(QObject):
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
         self.connection_status, not_version = self.controller.set_database_connection()
-        self.set_info_button(self.connection_status)
+        self.set_info_button()
         if not self.connection_status or not_version:
             message = self.controller.last_error
             if show_warning:

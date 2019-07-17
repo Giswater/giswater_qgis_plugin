@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>345</height>
+    <width>297</width>
+    <height>357</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -22,261 +22,148 @@
   <property name="windowTitle">
    <string>Dimensioning</string>
   </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>80</y>
-     <width>266</width>
-     <height>141</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Depth</string>
-   </property>
-   <widget class="QLineEdit" name="depth">
-    <property name="geometry">
-     <rect>
-      <x>115</x>
-      <y>40</y>
-      <width>140</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="feature_id">
-    <property name="geometry">
-     <rect>
-      <x>115</x>
-      <y>70</y>
-      <width>140</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="feature_type">
-    <property name="geometry">
-     <rect>
-      <x>115</x>
-      <y>100</y>
-      <width>140</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_feature_id">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Feature id:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="feature_type_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>96</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Feature type:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_depth">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Custom depth:</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_snapping">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>10</y>
-      <width>25</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>../../../Desktop/new_forms/icons/widgets/129.png</normaloff>../../../Desktop/new_forms/icons/widgets/129.png</iconset>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>25</y>
-     <width>266</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Distance</string>
-   </property>
-   <widget class="QLineEdit" name="distance">
-    <property name="geometry">
-     <rect>
-      <x>115</x>
-      <y>20</y>
-      <width>140</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_distance">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Custom distance:</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>225</y>
-     <width>266</width>
-     <height>106</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Circle symbology</string>
-   </property>
-   <widget class="QLineEdit" name="y_symbol">
-    <property name="geometry">
-     <rect>
-      <x>115</x>
-      <y>70</y>
-      <width>140</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_y_symbol">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Coordinate y:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="x_symbol">
-    <property name="geometry">
-     <rect>
-      <x>115</x>
-      <y>40</y>
-      <width>140</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_x_symbol">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Coordinate x:</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_orientation">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>10</y>
-      <width>25</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>../icons/widgets/133.png</normaloff>../icons/widgets/133.png</iconset>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QLineEdit" name="id">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>5</y>
-     <width>66</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_id">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>5</y>
-     <width>26</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>id:</string>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Distance</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_distance_2">
+          <property name="text">
+           <string>Custom distance:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="distance_2"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Depth</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btn_snapping_3">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>../../../Desktop/new_forms/icons/widgets/129.png</normaloff>../../../Desktop/new_forms/icons/widgets/129.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_depth_3">
+          <property name="text">
+           <string>Custom depth:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="depth_3"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_feature_id_3">
+          <property name="text">
+           <string>Feature id:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="feature_id_3"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="feature_type_6">
+          <property name="text">
+           <string>Feature type:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="feature_type_5"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>Circle symbology</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btn_orientation_2">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>../icons/widgets/133.png</normaloff>../icons/widgets/133.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_x_symbol_2">
+          <property name="text">
+           <string>Coordinate x:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="x_symbol_2">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_y_symbol_2">
+          <property name="text">
+           <string>Coordinate y:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="y_symbol_2">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_id">
+         <property name="text">
+          <string>Id:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="id">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
- <tabstops>
-  <tabstop>id</tabstop>
-  <tabstop>distance</tabstop>
-  <tabstop>btn_snapping</tabstop>
-  <tabstop>depth</tabstop>
-  <tabstop>feature_id</tabstop>
-  <tabstop>feature_type</tabstop>
-  <tabstop>btn_orientation</tabstop>
-  <tabstop>x_symbol</tabstop>
-  <tabstop>y_symbol</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
