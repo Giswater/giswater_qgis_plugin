@@ -9,10 +9,10 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
 from functools import partial
 
-import utils_giswater
-from giswater.ui_manager import AddDoc
-from giswater.ui_manager import DocManagement
-from giswater.actions.parent_manage import ParentManage
+from .. import utils_giswater
+from ..ui_manager import AddDoc
+from ..ui_manager import DocManagement
+from .parent_manage import ParentManage
 
 
 class ManageDocument(ParentManage):

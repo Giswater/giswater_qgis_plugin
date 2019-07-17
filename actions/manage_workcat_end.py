@@ -14,8 +14,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from builtins import str
-    from builtins import range
 
 from qgis.core import QgsExpression, QgsFeatureRequest
 from qgis.PyQt.QtCore import Qt, QDate
@@ -24,10 +22,10 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 
 from functools import partial
 
-import utils_giswater
-from giswater.actions.parent_manage import ParentManage
-from giswater.ui_manager import WorkcatEnd, NewWorkcat
-from giswater.ui_manager import WorkcatEndList
+from .. import utils_giswater
+from .parent_manage import ParentManage
+from ..ui_manager import WorkcatEnd, NewWorkcat
+from ..ui_manager import WorkcatEndList
 
 
 class ManageWorkcatEnd(ParentManage):

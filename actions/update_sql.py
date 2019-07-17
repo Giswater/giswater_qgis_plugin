@@ -32,12 +32,10 @@ from functools import partial
 from collections import OrderedDict
 import xml.etree.cElementTree as ET
 
-import utils_giswater
-
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ApiImportInp, ManageFields
-from giswater.actions.create_gis_project import CreateGisProject
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ReadsqlCreateGisProject, ApiImportInp, ManageFields
+from .create_gis_project import CreateGisProject
 
 
 class UpdateSQL(ApiParent):

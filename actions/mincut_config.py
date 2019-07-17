@@ -14,8 +14,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from builtins import str
-    from builtins import range
 
 from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
@@ -23,11 +21,11 @@ from qgis.PyQt.QtSql import QSqlTableModel
 
 from functools import partial
 
-import utils_giswater
-from giswater.ui_manager import Multirow_selector
-from giswater.ui_manager import Multi_selector
-from giswater.ui_manager import Mincut_edit
-from giswater.actions.parent import ParentAction
+from .. import utils_giswater
+from ..ui_manager import Multirow_selector
+from ..ui_manager import Multi_selector
+from ..ui_manager import Mincut_edit
+from .parent import ParentAction
 
 
 class MincutConfig(ParentAction):

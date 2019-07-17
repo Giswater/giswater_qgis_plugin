@@ -4,10 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -18,7 +14,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from builtins import range
 
 from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
@@ -32,12 +27,12 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_go2epa_options import Go2EpaOptions
-from giswater.actions.api_parent import ApiParent
-from giswater.actions.update_sql import UpdateSQL
-from giswater.ui_manager import FileManager, Multirow_selector, HydrologySelector
-from giswater.ui_manager import EpaResultCompareSelector, EpaResultManager
+from .. import utils_giswater
+from .api_go2epa_options import Go2EpaOptions
+from .api_parent import ApiParent
+from .update_sql import UpdateSQL
+from ..ui_manager import FileManager, Multirow_selector, HydrologySelector
+from ..ui_manager import EpaResultCompareSelector, EpaResultManager
 
 
 class Go2Epa(ApiParent):

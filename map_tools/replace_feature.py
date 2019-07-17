@@ -23,12 +23,12 @@ from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
-import utils_giswater
-from map_tools.parent import ParentMapTool
-from ui_manager import UDcatalog
-from ui_manager import WScatalog
-from ui_manager import FeatureReplace
-from ui_manager import NewWorkcat
+from .. import utils_giswater
+from .parent import ParentMapTool
+from ..ui_manager import UDcatalog
+from ..ui_manager import WScatalog
+from ..ui_manager import FeatureReplace
+from ..ui_manager import NewWorkcat
 
 
 class ReplaceFeatureMapTool(ParentMapTool):

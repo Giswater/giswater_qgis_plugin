@@ -20,13 +20,13 @@ from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_config import ApiConfig
-from giswater.actions.api_manage_composer import ApiManageComposer
-from giswater.actions.gw_toolbox import GwToolBox
-from giswater.actions.parent import ParentAction
-from giswater.actions.manage_visit import ManageVisit
-from giswater.ui_manager import Csv2Pg
+from .. import utils_giswater
+from .api_config import ApiConfig
+from .api_manage_composer import ApiManageComposer
+from .gw_toolbox import GwToolBox
+from .parent import ParentAction
+from .manage_visit import ManageVisit
+from ..ui_manager import Csv2Pg
 
 
 class Utils(ParentAction):

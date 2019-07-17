@@ -38,16 +38,14 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_parent import ApiParent
-from giswater.actions.manage_document import ManageDocument
-from giswater.actions.manage_element import ManageElement
-from giswater.actions.manage_visit import ManageVisit
-from giswater.actions.manage_gallery import ManageGallery
-from giswater.actions.api_catalog import ApiCatalog
-from giswater.ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments
-from giswater.ui_manager import Sections
-from giswater.ui_manager import ApiBasicInfo
+from .. import utils_giswater
+from .api_parent import ApiParent
+from .manage_document import ManageDocument
+from .manage_element import ManageElement
+from .manage_visit import ManageVisit
+from .manage_gallery import ManageGallery
+from .api_catalog import ApiCatalog
+from ..ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments, Sections, ApiBasicInfo
 
 
 class ApiCF(ApiParent):

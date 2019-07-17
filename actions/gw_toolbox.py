@@ -4,10 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
 # -*- coding: latin-1 -*-
 try:
     from qgis.core import Qgis
@@ -30,9 +26,9 @@ import json
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiDlgToolbox, ApiFunctionTb
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiDlgToolbox, ApiFunctionTb
 
 
 class GwToolBox(ApiParent):

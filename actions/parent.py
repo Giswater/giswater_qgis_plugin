@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from future import standard_library
-standard_library.install_aliases()
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -20,8 +18,6 @@ else:
     import configparser
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
-    from builtins import range
-    from builtins import object
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
 from qgis.PyQt.QtCore import Qt, QDate
@@ -35,8 +31,8 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
+from .. import utils_giswater
 import os
-import utils_giswater
 import webbrowser
 
 

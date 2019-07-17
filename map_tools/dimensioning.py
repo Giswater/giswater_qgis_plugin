@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from map_tools.parent import ParentMapTool
+from .parent import ParentMapTool
 
 
 class Dimensioning(ParentMapTool):

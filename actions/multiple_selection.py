@@ -12,10 +12,10 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint as QgsPointXY
-    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsPointXY
-    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand

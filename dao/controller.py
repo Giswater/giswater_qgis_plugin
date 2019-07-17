@@ -9,8 +9,6 @@ try:
     from qgis.core import Qgis
 except ImportError:
     from qgis.core import QGis as Qgis
-    from builtins import range
-    from builtins import object
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
@@ -25,8 +23,8 @@ from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils
 import os.path
 from functools import partial
 
-from giswater.dao.pg_dao import PgDao
-from giswater.dao.logger import Logger
+from .pg_dao import PgDao
+from .logger import Logger
 
 
 class DaoController(object):

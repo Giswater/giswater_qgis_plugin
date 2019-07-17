@@ -13,9 +13,9 @@ import operator
 from functools import partial
 from collections import OrderedDict
 
-import utils_giswater
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiCatalogUi
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiCatalogUi
 
 
 class ApiCatalog(ApiParent):

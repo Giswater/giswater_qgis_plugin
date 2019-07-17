@@ -26,9 +26,9 @@ import json
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiComposerUi
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiComposerUi
 
 
 class ApiManageComposer(ApiParent):

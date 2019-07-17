@@ -4,19 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import str
-    from builtins import range
-
 from qgis.PyQt.QtWidgets import QDateEdit, QLineEdit, QTableView, QAbstractItemView
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -27,14 +15,14 @@ import operator
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.manage_new_psector import ManageNewPsector
-from giswater.ui_manager import Psector_management
-from giswater.ui_manager import EstimateResultNew
-from giswater.ui_manager import EstimateResultSelector
-from giswater.ui_manager import EstimateResultManager
-from giswater.ui_manager import Multirow_selector
-from giswater.actions.parent import ParentAction
+from .. import utils_giswater
+from .manage_new_psector import ManageNewPsector
+from ..ui_manager import Psector_management
+from ..ui_manager import EstimateResultNew
+from ..ui_manager import EstimateResultSelector
+from ..ui_manager import EstimateResultManager
+from ..ui_manager import Multirow_selector
+from .parent import ParentAction
 
 
 class Master(ParentAction):
@@ -345,7 +333,6 @@ class Master(ParentAction):
                 self.controller.show_info_box(message)
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
-
 
 
     def master_estimate_result_selector(self):

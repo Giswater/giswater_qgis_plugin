@@ -14,7 +14,7 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from giswater.dao.table import Table, GenericDescriptor
+from .table import Table, GenericDescriptor
 
 
 class OmVisitXConnec(Table):

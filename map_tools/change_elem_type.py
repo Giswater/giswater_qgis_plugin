@@ -10,9 +10,10 @@ from qgis.PyQt.QtCore import Qt
 
 from functools import partial
 
-import utils_giswater
-from actions.api_catalog import ApiCatalog
-from map_tools.parent import ParentMapTool
+from .. import utils_giswater
+from ..ui_manager import ChangeNodeType
+from ..actions.api_catalog import ApiCatalog
+from .parent import ParentMapTool
 
 
 class ChangeElemType(ParentMapTool):

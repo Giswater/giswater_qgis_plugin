@@ -10,11 +10,6 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from builtins import range
-
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
@@ -24,9 +19,9 @@ import operator
 from collections import OrderedDict
 from functools import partial
 
-import utils_giswater
-from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiConfigUi
+from .. import utils_giswater
+from .api_parent import ApiParent
+from ..ui_manager import ApiConfigUi
 
 
 class ApiConfig(ApiParent):

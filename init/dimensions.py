@@ -22,8 +22,8 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QTimer
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
-import utils_giswater
-from giswater.parent_init import ParentDialog
+from .. import utils_giswater
+from ..parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):

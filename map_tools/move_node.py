@@ -21,7 +21,7 @@ from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 
-from map_tools.parent import ParentMapTool
+from .parent import ParentMapTool
 
 
 class MoveNodeMapTool(ParentMapTool):

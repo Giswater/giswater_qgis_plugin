@@ -18,8 +18,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsPointXY, QgsLayoutExporter
-    from builtins import str
-    from builtins import range
 
 from qgis.core import QgsRectangle, QgsProject
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
@@ -36,12 +34,12 @@ import webbrowser
 import subprocess
 from functools import partial
 
-import utils_giswater
-from giswater.ui_manager import Plan_psector
-from giswater.ui_manager import Psector_rapport
-from giswater.actions.parent_manage import ParentManage
-from giswater.actions.multiple_selection import MultipleSelection
-from giswater.actions.manage_document import ManageDocument
+from .. import utils_giswater
+from ..ui_manager import Plan_psector
+from ..ui_manager import Psector_rapport
+from .parent_manage import ParentManage
+from .multiple_selection import MultipleSelection
+from .manage_document import ManageDocument
 
 
 class ManageNewPsector(ParentManage):
