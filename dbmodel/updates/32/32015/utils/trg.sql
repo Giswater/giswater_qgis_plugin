@@ -35,9 +35,9 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_event('om_visit_event');
 
 -- DROP TRIGGER gw_trg_man_addfields_value_arc_control ON ud_sample.arc;
 
-DROP TRIGGER gw_trg_man_addfields_value_arc_control ON arc;
-DROP TRIGGER gw_trg_man_addfields_value_node_control ON node;
-DROP TRIGGER gw_trg_man_addfields_value_connec_control ON connec;
+DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_arc_control ON arc;
+DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_node_control ON node;
+DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_connec_control ON connec;
 
 CREATE TRIGGER gw_trg_edit_foreignkey AFTER UPDATE OF arc_id OR DELETE ON arc
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('arc_id');

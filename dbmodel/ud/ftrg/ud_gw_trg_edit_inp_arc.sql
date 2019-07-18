@@ -51,7 +51,7 @@ BEGIN
 
 			IF (NEW.custom_y1 <> OLD.custom_y1) OR (NEW.custom_y2 <> OLD.custom_y2) THEN
 				UPDATE arc SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2 WHERE arc_id=NEW.arc_id;
-			END IF:		
+			END IF;	
 		
 			UPDATE arc SET 	arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
 			custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
