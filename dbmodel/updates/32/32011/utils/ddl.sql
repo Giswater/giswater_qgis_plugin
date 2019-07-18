@@ -27,17 +27,6 @@ ALTER TABLE om_visit ALTER COLUMN startdate SET DEFAULT ("left"((date_trunc('sec
 ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
 
 
-DROP TABLE selector_date;
-
-CREATE TABLE selector_date (
-  id serial NOT NULL,
-  from_date timestamp,
-  to_date timestamp,
-  context character varying(30),
-  cur_user text,
-  CONSTRAINT selector_date_pkey PRIMARY KEY (id)
-);
-
 
 CREATE TABLE om_visit_type(
   id serial PRIMARY KEY,
