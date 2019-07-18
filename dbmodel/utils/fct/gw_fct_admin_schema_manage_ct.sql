@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2724
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_ct(p_data json)
   RETURNS json AS
@@ -191,9 +191,12 @@ BEGIN
 
 		-- Disable topocontrol triggers
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
-		ALTER TABLE node DISABLE TRIGGER gw_trg_node_update;
 		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
+		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
+		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_update;
+		ALTER TABLE rtc_hydrometer DISABLE TRIGGER gw_trg_rtc_hydrometer;
+
 			
 		v_return = concat('{"constraints dropped":"',v_36,'","notnull dropped":"',v_37,'"}');	
 		
@@ -201,15 +204,19 @@ BEGIN
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
 		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
+		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
+		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_update;
 
-		v_return = '{"Triggers disabled":"4"}';	
+		v_return = '{"Triggers disabled":"5"}';	
 
 	ELSIF v_action = 'ENABLE TOPO-TRIGGERS' THEN
 		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
 		ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
+		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
+		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_update;
 
-		v_return = '{"Triggers enabled":"4"}';	
+		v_return = '{"Triggers enabled":"5"}';	
 
 	ELSIF v_action = 'ADD' THEN
 
@@ -234,9 +241,11 @@ BEGIN
 
 		-- Enable topocontrol triggers
 		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
-		ALTER TABLE node ENABLE TRIGGER gw_trg_node_update;
 		ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
+		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
+		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_update;
+		ALTER TABLE rtc_hydrometer ENABLE TRIGGER gw_trg_rtc_hydrometer;
 
 
 		v_return = concat('{"constraints reloaded":"',v_36,'","notnull reloaded":"',v_37,'"}');

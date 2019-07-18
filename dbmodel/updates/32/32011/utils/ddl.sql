@@ -36,14 +36,6 @@ CREATE TABLE om_visit_type(
 
 
 
-CREATE TABLE om_visit_typevalue(
-  parameter_id text PRIMARY KEY,
-  id integer NOT NULL,
-  idval text,
-  descript text
-);
-
-
 CREATE TABLE om_visit_class
 ( id serial NOT NULL,
   idval character varying(30),
@@ -133,11 +125,6 @@ CREATE TABLE om_visit_lot_x_arc(
   idval character varying(30),
   descript text);
   
- CREATE TABLE om_visit_cat_type(
-  id serial NOT NULL primary key,
-  idval character varying(30),
-  descript text);
- 
    
   CREATE TABLE om_visit_filetype_x_extension(
   filetype varchar (30),

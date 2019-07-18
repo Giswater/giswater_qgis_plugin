@@ -1,0 +1,68 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 2722
+
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_copy(p_data json)
+  RETURNS void AS
+$BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${
+"client":{"lang":"ES"}, 
+"data":{"fromSchema":"ws3_test", "toSchema":"SCHEMA_NAME"}}$$)
+*/
+
+
+
+DECLARE
+	v_fromschema text;
+	v_toschema text;
+	v_schemaname text;
+	v_tablerecord record;
+	v_query_text text;
+	v_result integer;
+	v_idname text;
+
+BEGIN
+	-- search path
+	SET search_path = "SCHEMA_NAME", public;
+
+	-- get input parameters
+	v_fromschema := (p_data ->> 'data')::json->> 'fromSchema';
+	v_toschema := (p_data ->> 'data')::json->> 'toSchema';
+	
+	
+	--Disable constraints
+	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+
+	-- copy data
+	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS FALSE 
+	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_fromschema AND table_type='BASE TABLE') 
+	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') 
+	LOOP
+
+		-- get primary key
+		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+			INTO v_idname
+			USING v_tablerecord.id;
+
+		-- execute copy from table to table
+		EXECUTE 'INSERT INTO '||v_toschema||'.'||v_tablerecord.id||' SELECT * FROM '||v_fromschema||'.'||v_tablerecord.id||' ON CONFLICT ('||v_idname||') DO NOTHING';
+		
+	END LOOP;
+
+	-- enable constraints
+	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)
+
+		
+RETURN;
+	
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
