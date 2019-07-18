@@ -587,7 +587,6 @@ class Giswater(QObject):
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
-
         # Unload plugin before reading opened project
         self.unload(False)
 
@@ -596,7 +595,6 @@ class Giswater(QObject):
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
         self.connection_status, not_version = self.controller.set_database_connection()
-        self.set_info_button()
         if not self.connection_status or not_version:
             message = self.controller.last_error
             if show_warning:
@@ -604,9 +602,6 @@ class Giswater(QObject):
                     self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
             return
-
-        # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)
 
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
@@ -634,6 +629,9 @@ class Giswater(QObject):
                     self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
             return
+
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)
 
         # Check if schema exists
         self.schema_exists = self.controller.check_schema(self.schema_name)
