@@ -516,3 +516,22 @@ LEFT JOIN man_tank ON man_tank.node_id=v_edit_node.node_id
 LEFT JOIN man_pump ON man_pump.node_id=v_edit_node.node_id
 JOIN cat_node ON cat_node.id::text = v_edit_node.nodecat_id::text
 LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text;
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_junction AS 
+ SELECT DISTINCT ON (node_id) node.node_id,
+    node.elevation,
+    node.depth,
+    node.nodecat_id,
+    node.sector_id,
+    v_node.macrosector_id,
+    node.state,
+    node.annotation,
+    node.the_geom,
+    inp_junction.demand,
+    inp_junction.pattern_id
+   FROM SCHEMA_NAME.node
+     JOIN SCHEMA_NAME.v_node ON v_node.node_id::text = node.node_id::text
+     JOIN SCHEMA_NAME.inp_junction ON inp_junction.node_id::text = node.node_id::text
+     LEFT JOIN SCHEMA_NAME.v_edit_inp_pipe a ON a.node_1=node.node_id
+     LEFT JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
