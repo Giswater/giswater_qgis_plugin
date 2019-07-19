@@ -210,6 +210,23 @@ INSERT INTO om_typevalue VALUES ('incident_type', 3, 'Smells', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', 4, 'Noisy cover', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', 5, 'Others', NULL, NULL);
 
+truncate config_api_visit_x_featuretable;
+INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_arc', 1);
+INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_node', 5);
+INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_arc', 6);
+INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_node', 3);
+INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_connec', 4);
+INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_connec', 2);
+
+truncate config_api_visit;
+INSERT INTO config_api_visit VALUES (2, 'visit_connec_insp', 've_visit_connec_insp');
+INSERT INTO config_api_visit VALUES (1, 'visit_arc_leak', 've_visit_arc_singlevent');
+INSERT INTO config_api_visit VALUES (3, 'visit_node_leak', 've_visit_node_singlevent');
+INSERT INTO config_api_visit VALUES (4, 'visit_connec_leak', 've_visit_connec_singlevent');
+INSERT INTO config_api_visit VALUES (5, 'visit_node_insp', 've_visit_node_insp');
+INSERT INTO config_api_visit VALUES (6, 'visit_arc_insp', 've_visit_arc_insp');
+INSERT INTO config_api_visit VALUES (0, 'visit_class_0', 'om_visit');
+
 
 INSERT INTO config_api_form_fields VALUES (27350, 'visit_connec_insp', 'visit', 'defect_connec', 1, 8, true, 'integer', 'combo', 'Defects:', NULL, NULL, NULL, NULL, NULL, false, NULL, true, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_defect'' ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, NULL);
 INSERT INTO config_api_form_fields VALUES (27360, 'visit_connec_insp', 'visit', 'clean_connec', 1, 9, true, 'integer', 'combo', 'Cleaned:', NULL, NULL, NULL, NULL, NULL, false, NULL, true, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_cleaned'' ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, NULL);
