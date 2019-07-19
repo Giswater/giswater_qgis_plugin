@@ -103,10 +103,7 @@ BEGIN
 
 			RAISE NOTICE 'inserting new event %',id_event ;
 
-			--check if the function was planned before by poblacion
-			IF v_schema = 'TM' THEN
-				PERFORM tm_fct_planned_visit(id_last, 2);
-			END IF;
+
 
 			-- sql parameter (action_type=4)
 			FOR rec_parameter_child IN SELECT * FROM om_visit_parameter_x_parameter WHERE parameter_id1=v_parameter AND action_type=4
@@ -160,6 +157,10 @@ BEGIN
 
 	-- update class visit to multi to simple 
 	UPDATE om_visit SET class_id=v_newclass WHERE om_visit.id=visit_id_aux;
+				--check if the function was planned before by poblacion
+			IF v_schema = 'TM' THEN
+				PERFORM tm_fct_planned_visit(visit_id_aux, 2);
+			END IF;
 	
       ELSE
 				--check if the function was planned before by unit
