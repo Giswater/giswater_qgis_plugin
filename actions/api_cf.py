@@ -238,6 +238,7 @@ class ApiCF(ApiParent):
 
         # IF insert new feature
         if point and feature_cat:
+            self.feature_cat = feature_cat
             self.new_feature_id = new_feature_id
             self.layer_new_feature = layer_new_feature
             self.iface.actionPan().trigger()
@@ -459,6 +460,11 @@ class ApiCF(ApiParent):
         # Get feature type as geom_type (node, arc, connec)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
 
+        if self.geom_type == '[]':
+            sql = "SELECT type FROM cat_feature WHERE  parent_layer = '" + str(self.feature_cat.parent_layer) + "' LIMIT 1"
+            result = self.controller.get_row(sql, log_sql=True, commit=True)
+            self.geom_type = result[0]
+
         # Get field id name
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
 
@@ -654,7 +660,7 @@ class ApiCF(ApiParent):
         # Set image
         img = section_result[0]['body']['data']['shapepng']
         utils_giswater.setImage(dlg_sections, 'lbl_section_image', img+".png")
-        
+
         # Set values into QLineEdits
         for field in section_result[0]['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['column_id'])
@@ -665,7 +671,7 @@ class ApiCF(ApiParent):
         dlg_sections.btn_close.clicked.connect(partial(self.close_dialog, dlg_sections))
         self.open_dialog(dlg_sections, maximize_button=False)
 
-        
+
     def accept(self, dialog, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
 
         if _json == '' or str(_json) == '{}':
@@ -942,6 +948,7 @@ class ApiCF(ApiParent):
     def open_catalog(self, tab_type, feature_type):
 
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+
         self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type, feature_type[0])
 
 

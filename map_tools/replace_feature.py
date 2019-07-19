@@ -568,7 +568,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql = "SELECT " + str(self.field3)
             sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + str(self.field3) + "),'-','', 'g')) as x, " + str(self.field3)
         elif wsoftware == 'ws' and geom_type == 'connec':
-            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + str(self.field3str) + ")) as " + str(self.field3str)
+            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + str(self.field3) + ")) as " + str(self.field3)
         else:
             sql = "SELECT DISTINCT(" + self.field3 + ")"
         sql += " FROM cat_" + str(geom_type)
