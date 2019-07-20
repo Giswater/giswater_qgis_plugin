@@ -50,3 +50,8 @@ UPDATE audit_cat_error SET error_message = 'You don''t have permissions to manag
 		
 UPDATE audit_cat_error SET hint_message = 'You need to have at least one psector created to add planified elements' WHERE id=1081;
 
+
+UPDATE audit_cat_function SET name='gw_fct_pg2epa_main', descript='Main function of go2epa workflow' WHERE id=2646;
+
+INSERT INTO audit_cat_function VALUES (2726, 'gw_fct_rpt2pg_main', 'utils', 'function', NULL, NULL, NULL, 'Main function of pg2epa workflow', 'role_epa', false, false, NULL, false);
+							

@@ -4,21 +4,21 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2322
+--FUNCTION CODE: 2726
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg_recursive(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_recursive(p_data json)  
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg_main(character varying );
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_main(p_data json)  
 RETURNS json AS $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_rpt2pg_recursive($${
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"disabled", "resultId":"test1"}}$$)
+"data":{"iterative":"disabled", "resultId":"test1"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_rpt2pg_recursive($${
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"enabled", "resultId":"test1", "currentStep":"2", "continue":"true"}}$$)
+"data":{"iterative":"enabled", "resultId":"test1", "currentStep":"2", "continue":"true"}}$$)
 */
 
 DECLARE
@@ -33,7 +33,7 @@ DECLARE
 	v_storeallresults boolean;
 	v_return json;
 	v_projecttype text;
-	v_recursive text;
+	v_iterative text;
 	v_continue text;
 BEGIN
 
@@ -43,20 +43,20 @@ BEGIN
 	--  Get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_currentstep =  (p_data->>'data')::json->>'currentStep';
-	v_recursive =  (p_data->>'data')::json->>'recursive';
+	v_iterative =  (p_data->>'data')::json->>'iterative';
 	v_continue =  (p_data->>'data')::json->>'continue';
 
 	
 	-- get variables
 	v_projecttype = (SELECT wsoftware FROM version LIMIT 1);
 
-	-- get if function is on recursive mode
-	IF v_recursive = 'enabled' THEN 
-		--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_recursive' AND cur_user=current_user);
+	-- get if function is on iterative mode
+	IF v_iterative = 'enabled' THEN 
+		--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_iterative' AND cur_user=current_user);
 		v_functionid = '1'; 
-		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
-		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
-		v_storeallresults = (SELECT ((addparam::json->>'systemParameters')::json->>'storeAllResults') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
+		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionid);
+		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = '1');
+		v_storeallresults = (SELECT ((addparam::json->>'systemParameters')::json->>'storeAllResults') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionid);
 	END IF;
 
 	
@@ -70,7 +70,7 @@ BEGIN
 	END IF;
 	
 /*  to do
-	-- storing results into audit_log_data table (in case of recursive fuction is defined with true)
+	-- storing results into audit_log_data table (in case of iterative fuction is defined with true)
 	IF v_storeallresults THEN
 		FOR v_tableid IN SELECT id FROM audit_cat_table WHERE id like 'rpt_'
 		LOOP

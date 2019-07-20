@@ -7,28 +7,28 @@ This version of Giswater is provided by Giswater Association
 -- FUNCTION CODE: 2646  
 -- FPROCESSCAT : 35
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_recursive(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_recursive(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_iterative(p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_iterative(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_iterative($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"start", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_iterative($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"ongoing", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"iterative":"ongoing", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_iterative($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"recursive":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
 */
 
 DECLARE
-v_recursive text;
+v_iterative text;
 v_result text;
 v_id integer;
 v_data json;
@@ -50,25 +50,25 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --  Get input data
-	v_recursive = (p_data->>'data')::json->>'recursive';
+	v_iterative = (p_data->>'data')::json->>'iterative';
 	v_result =  (p_data->>'data')::json->>'resultId';
 	
-	IF v_recursive='off' THEN -- normal call
+	IF v_iterative='off' THEN -- normal call
 			SELECT gw_fct_pg2epa(p_data) INTO v_return;
 			
-	ELSE -- recursive call 
+	ELSE -- iterative call 
 	
-		-- get values of recursive function
+		-- get values of iterative function
 		-- forced values for dev
-		--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_recursive' AND cur_user=current_user);
+		--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_iterative' AND cur_user=current_user);
 		v_functionid = '1'; 
-		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = v_functionid);
-		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_recursive_function' AND id = '1');
+		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionid);
+		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = '1');
 
 		raise notice ' v_functionname % v_steps % ', v_functionname, v_steps;
 
 		-- setting temp_table with any rows any calls using steps number defined on inp_typevalue parameter
-		IF v_recursive='start' THEN
+		IF v_iterative='start' THEN
 
 			-- delete values from tables
 			DELETE FROM temp_table WHERE fprocesscat_id = 35 AND user_name=current_user;
@@ -83,7 +83,7 @@ BEGIN
 				EXIT WHEN v_rownumber = v_steps;						
 			END LOOP;
 		
-		ELSIF v_recursive='ongoing' THEN
+		ELSIF v_iterative='ongoing' THEN
 		
 			DELETE FROM temp_table WHERE id = (SELECT id FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user ORDER BY id asc LIMIT 1);
 											
@@ -95,10 +95,10 @@ BEGIN
 		-- set counter
 		v_currentstep = v_steps - v_count;
 				
-		-- setting v_data to call recursive function
+		-- setting v_data to call iterative function
 		v_data = (SELECT text_column FROM SCHEMA_NAME.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
 		
-		-- call recursive function selected by user
+		-- call iterative function selected by user
 		v_querytext = 'SELECT '||quote_ident(v_functionname)||'('||quote_literal(v_data)||')';
 		EXECUTE v_querytext INTO v_return;
 		
