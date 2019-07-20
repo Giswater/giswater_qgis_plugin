@@ -129,9 +129,9 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_exec.setEnabled(True)
             self.dlg_go2epa.chk_import_result.setEnabled(True)
         elif state == 2:
-            msg = ("You have activated the recursive functionality. It will take a lot of time. Check recursive "
+            msg = ("You have activated the iterative functionality. It will take a lot of time. Check iterative "
                    "function is well configured and your python console is open. Would you like to contiue?")
-            title = "Activate recursive"
+            title = "Activate iterative"
             answer = self.controller.ask_question(msg, title)
             if answer:
                 utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
@@ -572,7 +572,7 @@ class Go2Epa(ApiParent):
         exec_epa = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
         self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         import_result = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
-        is_recursive = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent)
+        is_iterative = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent)
 
         # Check for sector selector
         if export_inp:
@@ -597,9 +597,9 @@ class Go2Epa(ApiParent):
 
         counter = 0
         force_tab = False
-        extras = '"recursive":"off"'
-        if is_recursive:
-            extras = '"recursive":"start"'
+        extras = '"iterative":"off"'
+        if is_iterative:
+            extras = '"iterative":"start"'
         extras += ', "resultId":"' + str(self.result_name) + '"'
         extras += ', "useNetworkGeom":"' + str(net_geom) + '"'
         extras += ', "dumpSubcatch":"' + str(export_subcatch) + '"'
@@ -611,7 +611,7 @@ class Go2Epa(ApiParent):
             if self.imports_canceled:
                 break
 
-            sql = ("SELECT gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
+            sql = ("SELECT gw_fct_pg2epa_main($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row or row[0] is None:
                 self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -693,11 +693,11 @@ class Go2Epa(ApiParent):
                     # Importing file to temporal table
                     self.insert_rpt_into_db(self.file_rpt)
 
-                    # Call function gw_fct_rpt2pg_recursive
-                    function_name = 'gw_fct_rpt2pg_recursive'
-                    extras = '"recursive":"disabled"'
-                    if is_recursive and _continue:
-                        extras = '"recursive":"enabled"'
+                    # Call function gw_fct_rpt2pg_main
+                    function_name = 'gw_fct_rpt2pg_main'
+                    extras = '"iterative":"disabled"'
+                    if is_iterative and _continue:
+                        extras = '"iterative":"enabled"'
                     extras += ', "resultId":"' + str(self.result_name) + '"'
                     extras += ', "currentStep":"' + str(counter) + '"'
                     extras += ', "continue":"' + str(_continue) + '"'
@@ -727,7 +727,7 @@ class Go2Epa(ApiParent):
                     self.controller.show_warning(msg, parameter=self.file_rpt)
 
             # Create new body for next iteration
-            extras = '"recursive":"ongoing"'
+            extras = '"iterative":"ongoing"'
             extras += ', "resultId":"' + str(self.result_name) + '"'
             extras += ', "useNetworkGeom":"' + str(net_geom) + '"'
             extras += ', "dumpSubcatch":"' + str(export_subcatch) + '"'
