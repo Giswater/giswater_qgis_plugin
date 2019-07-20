@@ -10,9 +10,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE dma DROP COLUMN _pattern_id;
 
+ALTER TABLE price_cat_simple RENAME TO _price_cat_simple;
+ALTER TABLE om_visit_value_criticity RENAME TO _om_visit_value_criticity;
+ALTER TABLE dattrib RENAME TO _dattrib;
+ALTER TABLE dattrib_type RENAME TO _dattrib_type;
+
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"price_compost", "column":"pricecat_id", "dataType":"varchar(16)"}}$$);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_csv2pg_cat", "column":"readheader", "dataType":"boolean"}}$$);
 
 

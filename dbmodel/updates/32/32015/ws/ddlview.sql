@@ -80,7 +80,9 @@ CREATE OR REPLACE VIEW v_arc AS
 	dqa.macrodqa_id,
 	arc.staticpressure,
 	cat_arc.label,
-    cat_arc.arctype_id as arc_type
+    cat_arc.arctype_id as arc_type,
+	a.nodetype_id as nodetype_1,
+	b.nodetype_id as nodetype_2
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
      JOIN v_state_arc ON arc.arc_id::text = v_state_arc.arc_id::text
@@ -153,6 +155,8 @@ CREATE OR REPLACE VIEW v_edit_arc AS
 	v_arc.macrodqa_id,
 	v_arc.staticpressure,
     v_arc.arc_type
+	v_arc.nodetype_1,
+	v_arc.nodetype_2
    FROM v_arc;
 	 
 	 
