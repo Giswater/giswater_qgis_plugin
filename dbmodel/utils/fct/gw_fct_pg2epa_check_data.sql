@@ -312,7 +312,31 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message)
 			VALUES (14, v_result_id, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value:', v_nodearc_user::numeric(12,3)));
 		END IF;
-		
+
+		-- vnode over nodarc for case of use vnode treaming arcs on network model
+		SELECT count(vnode_id) INTO count_aux FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
+		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC'
+		AND result_id=v_result_id;
+
+		IF count_aux > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,
+			' vnodes(s) over node2arcs. There will an inconsistgeny in case of use network geometry with vnode treaming arcs. Reduce the nodarc length or check the vnodes affected to redraw it)'));
+			
+			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, state, expl_id, the_geom, result_id, descript)
+			SELECT 14, vnode_id, NULL, 1, rpt_inp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
+			FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
+			WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC'
+			AND result_id=v_result_id;
+			
+			count_global_aux=count_global_aux+count_aux; 
+			count_aux=0;
+				
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (14, v_result_id, 'INFO: Vnodes checked. There are not vnodes over nodarcs');
+		END IF;
+				
 		--WS check and set value default
 				
 		-- Check cat_mat_roughness catalog

@@ -9,5 +9,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO sys_fprocess_cat VALUES (48, 'Pipe leak probability', 'om', '', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (49, 'EPA calibration', 'epa', '', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (50, 'go2epa vnode arc trim', 'epa', '', 'ws');
+
+
+INSERT INTO audit_cat_function VALUES (2728, 'gw_fct_pg2epa_vnodetrimarcs', 'ws', 'function', NULL, NULL, NULL, 'Function to trim arcs on model using vnodes', 'role_epa', false, false, NULL, false);
+
 
 

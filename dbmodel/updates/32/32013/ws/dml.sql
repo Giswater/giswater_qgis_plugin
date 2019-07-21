@@ -14,15 +14,22 @@ INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','1','NODE ESTIMATED');
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','2','CRM PERIOD');
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','3','CRM INTERVAL');
 
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','11','ESTIMATED UNIQUE', null,'{"DemandType":1}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','ESTIMATED DMA', null,'{"DemandType":1}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','13','ESTIMATED NODE', null,'{"DemandType":1}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','21','MIN PERIOD VALUE', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','22','MAX PERIOD VALUE', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','23','HYDRO PERIOD', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','11','UNIQUE ESTIMATED', null,'{"DemandType":1}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','DMA ESTIMATED', null,'{"DemandType":1}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','13','NODE ESTIMATED', null,'{"DemandType":1}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','14','CONNEC ESTIMATED', null,'{"DemandType":1}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','21','NODE MINC PERIOD', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','22','NODE MAXC PERIOD', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','23','NODE PERIOD', null,'{"DemandType":2}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','24','DMA INTERVAL', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','HYDRO-DMA HYBRID',null  ,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','31','HYDRO-DMA INTERVAL', null ,'{"DemandType":3}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','NODE-DMA HYBRID',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','26','CONNEC PERIOD ',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','27','CONNEC-DMA HYBRID ',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','31','NODE INTERVAL', null ,'{"DemandType":3}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','32','CONNEC INTERVAL', null ,'{"DemandType":3}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','33','NODE-DMA INTERVAL', null ,'{"DemandType":3}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','34','CONNEC-DMA INTERVAL', null ,'{"DemandType":3}');
+
 
 UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_rtc_enabled';
 UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_rtc_coefficient';

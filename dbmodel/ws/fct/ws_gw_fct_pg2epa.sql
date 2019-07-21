@@ -19,11 +19,14 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 */
 
 DECLARE
-	v_mandatory_nodarc boolean = false;
+	v_networkmode integer = 1;
 	v_return json;
 	v_input json;
 	v_result text;
 	v_usenetworkgeom boolean;
+	v_onlymandatory_nodarc boolean = false;
+	v_vnode_trimarcs boolean = false;
+	v_response integer;
       
 BEGIN
 
@@ -31,13 +34,18 @@ BEGIN
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
 	
-
+	
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Getting user parameteres
-	v_mandatory_nodarc = (SELECT value FROM config_param_user WHERE parameter='inp_options_nodarc_onlymandatory' AND cur_user=current_user);
-	
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
+
+	-- only mandatory nodarc
+	IF v_networkmode = 1 THEN 
+		v_onlymandatory_nodarc = TRUE;
+	END IF;
+
 	RAISE NOTICE 'Starting pg2epa process.';
 
 	-- Upsert on rpt_cat_table
@@ -58,18 +66,44 @@ BEGIN
 
 	IF v_usenetworkgeom IS FALSE THEN
 		-- Calling for gw_fct_pg2epa_nod2arc function
-		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_mandatory_nodarc);
+		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc);
 			
 		-- Calling for gw_fct_pg2epa_pump_additional function;
 		PERFORM gw_fct_pg2epa_pump_additional(v_result);
+
+		-- Calling for gw_fct_pg2epa_vnodetrimarcs function;
+		IF v_networkmode =  3 THEN
+			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
+			
+			IF v_response > 0 THEN -- when some vnode it's over nodarc valve. This is a important consistency. Need to be solved
+
+				-- manage return message
+				v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"},"saveOnDatabase":true}}')::json;
+				SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+				
+				v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
+				'"message":{"priority":2, "text":"There are errors with vnodes overlapping nodarcs. It is not possible to continue. Check your data"}')::json;
+				RETURN v_return;
+			END IF;
+		END IF;
 		
 	END IF;
 
 	-- set demand and patterns in function of demand type and pattern method choosed
-	PERFORM gw_fct_pg2epa_rtc(v_result);				
+	SELECT gw_fct_pg2epa_rtc(v_result) INTO v_response;	
+
+		IF v_response = 1 THEN -- when it is trying to use connec pattern method without network using vnodes to trim arcs
+				-- manage return message
+				v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"},"saveOnDatabase":true}}')::json;
+				SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+				
+				v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
+				'"message":{"priority":2, "text":"You are trying to use pattern method with connects but your network geometry is not defined with vnodes treaming arcs. Please check pattern method and/or network geometry generator mode"}')::json;
+				RETURN v_return;
+		END IF;
 
 	-- Calling for modify the valve status
-	PERFORM gw_fct_pg2epa_valve_status(v_result, v_mandatory_nodarc);
+	PERFORM gw_fct_pg2epa_valve_status(v_result, v_onlymandatory_nodarc);
 	
 	-- Calling for the export function
 	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(v_result, null);

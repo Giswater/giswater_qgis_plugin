@@ -339,8 +339,8 @@ node_2,
 (sys_elev1 - locate*(sys_elev1-sys_elev2))::numeric (12,3) as vnode_elev
 FROM (
 SELECT vnode_id, arc_id, a.feature_type, feature_id,
-st_length(v_edit_arc.the_geom) as length,
-st_linelocatepoint (v_edit_arc.the_geom , v_edit_vnode.the_geom)::numeric(12,3) as locate,
+st_length(arc.the_geom) as length,
+st_linelocatepoint (arc.the_geom , vnode.the_geom)::numeric(12,3) as locate,
 node_1,
 node_2,
 sys_elev1,
@@ -349,9 +349,10 @@ sys_y1,
 sys_y2,
 sys_elev1 + sys_y1 AS top_elev1,
 sys_elev2 + sys_y2 AS top_elev2
-from v_edit_arc , v_edit_vnode 
+from arc , vnode 
 JOIN v_edit_link a ON vnode_id=exit_id::integer
-where st_dwithin ( v_edit_arc.the_geom, v_edit_vnode.the_geom, 0.01) 
+where st_dwithin ( arc.the_geom, vnode.the_geom, 0.01) 
+and arc.state>0 and vnode.state>0
 ) a
 order by 2,6 desc;
    
