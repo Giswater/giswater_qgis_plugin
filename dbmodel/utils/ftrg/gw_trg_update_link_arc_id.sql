@@ -13,13 +13,15 @@ DECLARE
 
 	v_exittype text;
 	v_link record;
-
+	v_projecttype text;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     v_exittype:= TG_ARGV[0];
 
-	
+		-- get project type
+	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+
 	IF v_exittype='connec' THEN
 	FOR v_link IN SELECT * FROM link WHERE (exit_type='CONNEC' AND exit_id=OLD.connec_id)
 		LOOP
