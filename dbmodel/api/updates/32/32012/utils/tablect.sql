@@ -14,7 +14,7 @@ ALTER TABLE config_api_visit DROP CONSTRAINT IF EXISTS cconfig_api_visit_fkey;
 ALTER TABLE config_api_visit DROP CONSTRAINT IF EXISTS cconfig_api_visit_formname_key;
 
 --ADD CONSTRAINT
---ALTER TABLE config_api_form_fields ADD CONSTRAINT config_api_form_fields_pkey2 UNIQUE(formname, formtype, column_id);
+ALTER TABLE config_api_form_fields ADD CONSTRAINT config_api_form_fields_pkey2 UNIQUE(formname, formtype, column_id);
 
 --ALTER TABLE config_api_visit ADD CONSTRAINT config_api_visit_formname_key UNIQUE(formname);
 --ALTER TABLE config_api_visit  ADD CONSTRAINT config_api_visit_fkey FOREIGN KEY (visitclass_id);
