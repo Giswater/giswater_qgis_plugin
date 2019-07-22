@@ -357,8 +357,8 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 			USING v_schemaname, v_tablename, v_idname
 			INTO v_columntype;
 
-	RAISE NOTICE '--- gw_api_getvisit : Visit parameters: noinfra % isnewvisit: % featuretype: %, feature_id % v_isclasschanged: % visitclass: %,  v_visit: %,  v_status %  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',
-							     v_noinfra, isnewvisit, v_featuretype, v_featureid, v_isclasschanged, v_visitclass, v_id, v_status, v_formname, v_tablename, v_idname, v_columntype, v_device;
+	RAISE NOTICE '--- gw_api_getvisit : Visit parameters: p_visittype % isnewvisit: % featuretype: %, feature_id % v_isclasschanged: % visitclass: %,  v_visit: %,  v_status %  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',
+							     p_visittype, isnewvisit, v_featuretype, v_featureid, v_isclasschanged, v_visitclass, v_id, v_status, v_formname, v_tablename, v_idname, v_columntype, v_device;
 
 	-- upserting data when change from tabData to tabFile
 	IF v_currentactivetab = 'tabData' AND (v_isclasschanged IS FALSE OR v_tab_data IS FALSE) AND v_status > 0 THEN
