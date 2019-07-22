@@ -686,9 +686,8 @@ class ApiParent(ParentAction):
         extras += ', "fieldToSearch":"' + str(field['fieldToSearch']) + '"'
         extras += ', "queryTextFilter":"' + str(field['queryTextFilter']) + '"'
         extras += ', "parentId":"' + str(field['parentId']) + '"'
+        extras += ', "parentValue":"' + str(utils_giswater.getWidgetText(dialog, 'data_' + str(field['parentId']))) + '"'
         extras += ', "textToSearch":"' + str(utils_giswater.getWidgetText(dialog, widget))+'"'
-        if 'parentValue' in field:
-            extras += ', "parentValue":"' + str(field['selectedId']) + '"'
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
         sql = ("SELECT gw_api_gettypeahead($${" + body + "}$$)::text")
