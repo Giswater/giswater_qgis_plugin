@@ -63,7 +63,7 @@ BEGIN
 	v_textosearch := concat('%',v_textosearch,'%');
 
 	-- building query text
-	IF v_parent IS NULL OR v_querytextparent IS NULL OR v_parentvalue IS NULL THEN
+	IF v_parent IS NULL OR v_querytextparent IS NULL OR v_parentvalue IS NULL OR v_querytextparent = '' THEN
 		v_querytext = v_querytext;
 	ELSE
 		v_querytext = concat (v_querytext, v_querytextparent, quote_literal(v_parentvalue)); 
