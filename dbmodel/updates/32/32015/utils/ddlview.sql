@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+DROP VIEW IF EXISTS v_rtc_scada;
+DROP VIEW IF EXISTS v_rtc_scada_data;
+DROP VIEW IF EXISTS v_rtc_scada_value;
+
   
 CREATE OR REPLACE VIEW v_price_compost AS
 SELECT price_compost.id,

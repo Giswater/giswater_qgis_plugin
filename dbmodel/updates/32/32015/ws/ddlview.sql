@@ -156,7 +156,11 @@ CREATE OR REPLACE VIEW v_edit_arc AS
 	v_arc.staticpressure,
     v_arc.arc_type
 	v_arc.nodetype_1,
-	v_arc.nodetype_2
+	v_arc.elevation1,
+    v_arc.depth1,
+    v_arc.nodetype_2,
+	v_arc.elevation2,
+    v_arc.depth2
    FROM v_arc;
 	 
 	 

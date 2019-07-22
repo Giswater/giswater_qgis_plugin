@@ -9,6 +9,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='price_simple';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='om_visit_value_criticity';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='dattrib';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='dattrib_type';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='ext_rtc_scada_x_data';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='ext_rtc_scada_x_value';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='ext_rtc_hydrometer_x_value';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_scada';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_scada_data';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_scada_value';
 
 
 UPDATE sys_csv2pg_cat SET readheader=false, orderby=1 WHERE id=1;
