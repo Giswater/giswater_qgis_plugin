@@ -7,11 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-
-SET search_path = SCHEMA_NAME, public, pg_catalog;
-
-
 CREATE OR REPLACE VIEW v_arc AS 
  SELECT arc.arc_id,
     arc.code,
@@ -154,7 +149,7 @@ CREATE OR REPLACE VIEW v_edit_arc AS
 	v_arc.dqa_id,
 	v_arc.macrodqa_id,
 	v_arc.staticpressure,
-    v_arc.arc_type
+    v_arc.arc_type,
 	v_arc.nodetype_1,
 	v_arc.elevation1,
     v_arc.depth1,
