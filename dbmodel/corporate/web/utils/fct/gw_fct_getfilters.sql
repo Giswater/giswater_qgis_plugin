@@ -249,6 +249,36 @@ BEGIN
 		v_active :=FALSE;
 	END IF;
 
+	-- Tab Campaign
+        SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabCampaign' ;
+	IF rec_tab.id IS NOT NULL THEN
+
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			SELECT replace(name, ''_'','' '' ) AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , false AS disabled
+			FROM cat_campaign WHERE active is TRUE AND id IN (SELECT campaign_id FROM selector_campaign WHERE cur_user=' || quote_literal(current_user) || ')
+			UNION
+			SELECT replace(name, ''_'','' '' ) AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , false AS disabled
+			FROM cat_campaign WHERE active is TRUE AND id NOT IN (SELECT campaign_id FROM selector_campaign WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label)a'
+			INTO formTabs_networkCampaign;	
+
+		-- Add tab name to json
+		formTabs_networkCampaign := ('{"fields":' || formTabs_networkCampaign || '}')::json;
+		formTabs_networkCampaign := gw_fct_json_object_set_key(formTabs_networkCampaign, 'tabName', 'selector_campaign'::TEXT);
+		formTabs_networkCampaign := gw_fct_json_object_set_key(formTabs_networkCampaign, 'tabLabel', rec_tab.tablabel::TEXT);
+		formTabs_networkCampaign := gw_fct_json_object_set_key(formTabs_networkCampaign, 'tabIdName', 'campaign_id'::TEXT);
+		formTabs_networkCampaign := gw_fct_json_object_set_key(formTabs_networkCampaign, 'active', v_active);
+
+		-- Create tabs array
+		IF v_firsttab THEN 
+			formTabs := formTabs || ',' || formTabs_networkCampaign::text;
+		ELSE 
+			formTabs := formTabs || formTabs_networkCampaign::text;
+		END IF;
+
+		v_firsttab := TRUE;
+		v_active :=FALSE;
+	END IF;
+	
 -- Tab hydrometer state
 	SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabHydroState' ;
 	IF rec_tab.id IS NOT NULL THEN
