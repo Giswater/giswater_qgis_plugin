@@ -302,6 +302,10 @@ BEGIN
 			-- Insert existig arc (on service) to the current alternative
 			INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (
 			(SELECT value::smallint FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user), arc_id_aux, 0, FALSE);
+            
+            -- Insert data into traceability table
+			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+			VALUES ('DIVIDE WITH PLANIFIED NODE',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 
 				
 		ELSIF (state_aux=2 AND state_node_arg=2) THEN 
@@ -341,7 +345,7 @@ BEGIN
 						
 			-- Insert data into traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
-			VALUES ('DIVIDE PLANIFIED JARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
+			VALUES ('DIVIDE PLANIFIED ARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 		
 			-- Update elements from old arc to new arcs
 			FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=arc_id_aux  LOOP
