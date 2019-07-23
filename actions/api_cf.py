@@ -220,6 +220,9 @@ class ApiCF(ApiParent):
         else:
             active_layer = self.controller.get_layer_source_table_name(self.iface.activeLayer())
 
+        if active_layer is None:
+            active_layer = ""
+
         # Used by action_interpolate
         last_click = self.canvas.mouseLastXY()
         self.last_point = QgsMapToPixel.toMapCoordinates(
@@ -461,7 +464,11 @@ class ApiCF(ApiParent):
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
 
         if self.geom_type == '[]':
-            sql = "SELECT type FROM cat_feature WHERE  parent_layer = '" + str(self.feature_cat.parent_layer) + "' LIMIT 1"
+            if 'feature_cat' in globals():
+                parent_layer = self.feature_cat.parent_layer
+            else:
+                parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
+            sql = "SELECT type FROM cat_feature WHERE  parent_layer = '" + str(parent_layer) + "' LIMIT 1"
             result = self.controller.get_row(sql, log_sql=True, commit=True)
             self.geom_type = result[0]
 
@@ -1823,7 +1830,7 @@ class ApiCF(ApiParent):
 
             # Get path of selected document
             sql = ("SELECT path"
-                   " FROM ve_ui_doc"
+                   " FROM v_ui_doc"
                    " WHERE id = '" + str(rows[0][0]) + "'")
             row = self.controller.get_row(sql, commit=True)
             if not row:
@@ -1874,7 +1881,7 @@ class ApiCF(ApiParent):
         selected_document = self.tbl_list_doc.currentItem().text()
 
         # Get path of selected document
-        sql = ("SELECT path FROM ve_ui_doc"
+        sql = ("SELECT path FROM v_ui_doc"
                " WHERE id = '" + str(selected_document) + "'")
         row = self.controller.get_row(sql, commit=True)
         if not row:
@@ -1918,9 +1925,9 @@ class ApiCF(ApiParent):
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
 
-        T
         # Set model of selected widget
         self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
+
         # Get widgets
         txt_doc_id = self.dlg_cf.findChild(QLineEdit, "txt_doc_id")
         doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
@@ -1938,7 +1945,7 @@ class ApiCF(ApiParent):
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget))
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))
-        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "ve_ui_doc"))
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_doc"))
         btn_doc_new.clicked.connect(partial(self.manage_new_document, dialog, None, self.feature))
 
         # Fill ComboBox doc_type
@@ -1950,6 +1957,9 @@ class ApiCF(ApiParent):
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"
         self.set_completer_object(dialog, self.table_object)
+
+        # Set filter expresion
+        self.set_filter_table_man(widget)
 
 
     def set_filter_table_man(self, widget):
@@ -1977,7 +1987,7 @@ class ApiCF(ApiParent):
         doc_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
             expr += " AND doc_type ILIKE '%" + str(doc_type_value) + "%'"
-
+        print(str(expr))
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
@@ -2037,7 +2047,7 @@ class ApiCF(ApiParent):
             return
 
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
-        self.add_object(self.tbl_document, "doc", "ve_ui_doc")
+        self.add_object(self.tbl_document, "doc", "v_ui_doc")
 
 
     """ FUNCTIONS RELATED WITH TAB RPT """
@@ -2271,6 +2281,7 @@ class ApiCF(ApiParent):
         self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id)
 
         # Open dialog
+        self.dlg_new_workcat.setWindowTitle("Create workcat")
         self.open_dialog(self.dlg_new_workcat)
 
 

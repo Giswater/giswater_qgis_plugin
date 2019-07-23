@@ -1641,7 +1641,7 @@ class MincutParent(ParentAction):
                " FROM anl_mincut_result_cat"
                " INNER JOIN anl_mincut_cat_state"
                " ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
-               " INNER JOINcat_users" 
+               " INNER JOIN cat_users" 
                " ON cat_users.id = anl_mincut_result_cat.assigned_to"
                " WHERE anl_mincut_result_cat.id = '" + str(result_mincut_id) + "'")
 

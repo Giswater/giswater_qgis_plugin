@@ -120,7 +120,7 @@ class ApiManageComposer(ApiParent):
             if type(item) != QgsLayoutItemLabel or item is None:
                 widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
-                widget.setPlaceholderText("Widget '{}' not found into composer".format(widget.property('column_id')))
+                widget.setPlaceholderText("Widget '{}' not found in the composer".format(widget.property('column_id')))
             elif type(item) == QgsLayoutItemLabel and item is not None:
                 widget.setStyleSheet("border: 1px solid gray")
 
