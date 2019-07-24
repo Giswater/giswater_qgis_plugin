@@ -75,7 +75,7 @@ class ApiSearch(ApiParent):
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
-
+        self.lineedit_list = []
         for tab in complet_list[0]["form"]:
             if first_tab is None:
                 first_tab = tab['tabName']
@@ -85,6 +85,7 @@ class ApiSearch(ApiParent):
             gridlayout = QGridLayout()
             tab_widget.setLayout(gridlayout)
             x = 0
+
             for field in tab['fields']:
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
@@ -93,6 +94,7 @@ class ApiSearch(ApiParent):
                     completer = QCompleter()
                     widget = self.add_lineedit(field)
                     widget = self.set_completer(widget, completer)
+                    self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
 
@@ -325,8 +327,15 @@ class ApiSearch(ApiParent):
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+        widget.currentIndexChanged.connect(partial(self.clear_lineedits))
 
         return widget
+
+    def clear_lineedits(self):
+
+        # Clear all lineedit widgets from search tabs
+        for widget in self.lineedit_list:
+            utils_giswater.setWidgetText(self.dlg_search, widget, '')
 
 
     def populate_combo(self, widget, field, allow_blank=True):
