@@ -49,6 +49,7 @@ DECLARE
     v_srid integer;
     v_newvisit1 int8;
     v_newvisit2 int8;
+    v_psector integer;
 
 	
 BEGIN
@@ -66,6 +67,7 @@ BEGIN
     -- Get parameters from configs table
 	SELECT value::boolean INTO plan_arc_vdivision_dsbl_aux FROM config_param_user WHERE "parameter"='plan_arc_vdivision_dsbl' AND cur_user=current_user; -- deprecated variable	  
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
+	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user;
 
 	-- State control
 	IF state_aux=0 THEN
@@ -300,12 +302,16 @@ BEGIN
 			UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
 		
 			-- Insert existig arc (on service) to the current alternative
-			INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (
-			(SELECT value::smallint FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user), arc_id_aux, 0, FALSE);
+			INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, arc_id_aux, 0, FALSE);
             
-            -- Insert data into traceability table
+			-- Insert data into traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 			VALUES ('DIVIDE WITH PLANIFIED NODE',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
+
+			-- Set addparam (parent/child)
+			UPDATE plan_psector_x_arc SET addparam=gw_fct_json_object_set_key(addparam, 'arcDivide', 'parent') WHERE  psector_id=v_psector AND arc_id=arc_id_aux;
+			UPDATE plan_psector_x_arc SET addparam=gw_fct_json_object_set_key(addparam, 'arcDivide', 'child') WHERE  psector_id=v_psector AND arc_id=rec_aux1.arc_id;
+			UPDATE plan_psector_x_arc SET addparam=gw_fct_json_object_set_key(addparam, 'arcDivide', 'child') WHERE  psector_id=v_psector AND arc_id=rec_aux2.arc_id;
 
 				
 		ELSIF (state_aux=2 AND state_node_arg=2) THEN 

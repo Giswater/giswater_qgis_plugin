@@ -63,4 +63,7 @@ UPDATE audit_cat_error SET hint_message = 'You need to have at least one psector
 UPDATE audit_cat_function SET function_name ='gw_fct_pg2epa_main', descript='Main function of go2epa workflow' WHERE id=2646;
 
 INSERT INTO audit_cat_function VALUES (2726, 'gw_fct_rpt2pg_main', 'utils', 'function', NULL, NULL, NULL, 'Main function of pg2epa workflow', 'role_epa', false, false, NULL, false);
+
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('plan_statetype_reconstruct','4','integer', 'plan', 'Value used to identify reconstruct arcs in order to manage length of planified network') ON CONFLICT (parameter) DO NOTHING;
 							

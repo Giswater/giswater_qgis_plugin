@@ -18,3 +18,6 @@ CREATE TABLE IF NOT EXISTS ext_timeseries (
   sys_id varchar(16),
   tparam json,  -- {"type":"monthly", "seconds":2345, "tsteps":24, "start":"2019-01-01", "end":"2019-01-02", "units":"mca"};
   tvalues json); -- {[1,2,3,4,5,6]};
+  
+  
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"addparam", "dataType":"json"}}$$);
