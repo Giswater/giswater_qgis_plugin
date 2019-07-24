@@ -22,7 +22,7 @@ DECLARE
 	v_demandtype 	text;
 	v_patternmethod text;
 	v_timestep	text;
-	v_networkmode   integer;
+	v_exportnetworkmode   integer;
       
 BEGIN
 
@@ -36,7 +36,7 @@ BEGIN
 	v_demandtype = (SELECT value FROM config_param_user WHERE parameter='inp_options_demandtype' AND cur_user=current_user);
 	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user); 
 	v_timestep = (SELECT value FROM config_param_user WHERE parameter='inp_times_duration' AND cur_user=current_user); 
-	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
+	v_exportnetworkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
@@ -56,6 +56,26 @@ BEGIN
 	
 		IF v_patternmethod = '12' THEN
 			UPDATE rpt_inp_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE rpt_inp_node.node_id=node.node_id AND result_id=result_id_var;
+			
+		ELSIF v_patternmethod = '14' THEN
+		
+			IF v_exportnetworkmode < 3 THEN
+				RETURN 1;
+			END IF;
+	
+			-- update demands & patterns
+			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;		-- demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
+																									-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
+			-- insert into rpt_inp_pattern table values 
+			DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
+			INSERT INTO rpt_inp_pattern_value (
+				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
+			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id ORDER by 3,4
+			UNION
+			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
 		END IF;
 
 	ELSIF v_demandtype = '2' THEN
@@ -72,11 +92,9 @@ BEGIN
 		ELSIF v_patternmethod = '23' THEN  --pattern Blanes model
 
 			-- update demands & patterns
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=a.node_id	-- demand is calculed on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
-				FROM v_rtc_period_node a						  	-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
-				WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
-
-			-- insert into rpt_inp_pattern table values 
+			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;	-- demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
+																								-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
+				-- insert into rpt_inp_pattern table values 
 			DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
 			INSERT INTO rpt_inp_pattern_value (result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9,
 				factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
@@ -93,10 +111,8 @@ BEGIN
 		ELSIF v_patternmethod = '25' THEN -- pattern Manresa + Blanes mixed models
 
 			-- update demands & patterns
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=a.node_id	-- demand is calculed on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
-				FROM v_rtc_period_node a						  	-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
-				WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
-
+			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;	-- demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
+																								-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
 			-- insert into rpt_inp_pattern table values 
 			DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
 			INSERT INTO rpt_inp_pattern_value (
@@ -163,35 +179,40 @@ BEGIN
 
 			WHERE f.idrow=e.idrow and f.dma_id=e.dma_id;
 	
-		
 		ELSIF v_patternmethod = '26' THEN -- pattern Blanes + Gipuzkoako Urak (using vnodes) models
 		
-			IF v_networkmode < 3 THEN
+			IF v_exportnetworkmode < 3 THEN
 				RETURN 1;
 			END IF;
 	
 			-- update demands & patterns
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=a.vnode_id	-- demand is calculed on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
-				FROM v_rtc_period_vnode a						  	-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
-				WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.vnode_id;
-
+			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;		-- demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
+																									-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
 			-- insert into rpt_inp_pattern table values 
 			DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
 			INSERT INTO rpt_inp_pattern_value (
 				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_vnodepattern JOIN vnode ON pattern_id=vnode_id ORDER by 3,4;
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id ORDER by 3,4
+			UNION
+			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
+
+		ELSIF v_patternmethod = '27' THEN 
+		
+			-- TODO: pattern Blanes + Gipuzkoako Urak (using vnodes) + Manresa models
 
 		END IF;
 
-
 	ELSIF v_demandtype = '3' THEN
 
-		-- TODO....
+			IF v_patternmethod = '31' THEN -- TODO
 
+			ELSIF v_patternmethod = '32' THEN -- TODO
+			
+			END IF;
 	END IF;
-	
 	
 RETURN 0;
 END;

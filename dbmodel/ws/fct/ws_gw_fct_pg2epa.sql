@@ -27,6 +27,7 @@ DECLARE
 	v_onlymandatory_nodarc boolean = false;
 	v_vnode_trimarcs boolean = false;
 	v_response integer;
+	v_message text;
       
 BEGIN
 
@@ -42,7 +43,7 @@ BEGIN
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 
 	-- only mandatory nodarc
-	IF v_networkmode = 1 THEN 
+	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
 		v_onlymandatory_nodarc = TRUE;
 	END IF;
 
@@ -63,8 +64,15 @@ BEGIN
 	
 	-- Update demand values filtering by dscenario
 	PERFORM gw_fct_pg2epa_dscenario(v_result);
+	
+	-- first message on user's pannel
+	v_message = concat ('INFO: Network geometry have been used taking another one from previous result. It is suposed network geometry from previous result it is ok');
 
 	IF v_usenetworkgeom IS FALSE THEN
+	
+		-- setting first message on user's pannel
+		v_message = concat ('INFO: The process to check vnodes over nodarcs is disabled because on this export mode arcs will not trimed using vnodes');
+	
 		-- Calling for gw_fct_pg2epa_nod2arc function
 		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc);
 			
@@ -72,19 +80,18 @@ BEGIN
 		PERFORM gw_fct_pg2epa_pump_additional(v_result);
 
 		-- Calling for gw_fct_pg2epa_vnodetrimarcs function;
-		IF v_networkmode =  3 THEN
+		IF v_networkmode = 3 OR v_networkmode = 4 THEN
 			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
 			
-			IF v_response > 0 THEN -- when some vnode it's over nodarc valve. This is a important consistency. Need to be solved
-
-				-- manage return message
-				v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"},"saveOnDatabase":true}}')::json;
-				SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
-				
-				v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
-				'"message":{"priority":2, "text":"There are errors with vnodes overlapping nodarcs. It is not possible to continue. Check your data"}')::json;
-				RETURN v_return;
+			-- setting first message again on user's pannel
+			IF v_response = 0 THEN
+				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
+			
+			ELSE
+				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' v_response, ' nodarc nodes have been renamed using vnode_id');
+			
 			END IF;
+	
 		END IF;
 		
 	END IF;
@@ -93,23 +100,23 @@ BEGIN
 	SELECT gw_fct_pg2epa_rtc(v_result) INTO v_response;	
 
 		IF v_response = 1 THEN -- when it is trying to use connec pattern method without network using vnodes to trim arcs
-				-- manage return message
-				v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"},"saveOnDatabase":true}}')::json;
-				SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+			-- manage return message
+			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"},"saveOnDatabase":true}}')::json;
+			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 				
-				v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
-				'"message":{"priority":2, "text":"You are trying to use pattern method with connects but your network geometry is not defined with vnodes treaming arcs. Please check pattern method and/or network geometry generator mode"}')::json;
-				RETURN v_return;
+			v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
+			'"message":{"priority":2, "text":"You are trying to use pattern method with connects but your network geometry is not defined with vnodes treaming arcs. Please check pattern method and/or network geometry generator mode"}')::json;
+			RETURN v_return;
 		END IF;
 
 	-- Calling for modify the valve status
-	PERFORM gw_fct_pg2epa_valve_status(v_result, v_onlymandatory_nodarc);
+	PERFORM gw_fct_pg2epa_valve_status(v_result);
 	
 	-- Calling for the export function
 	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(v_result, null);
 	
 	-- manage return message
-	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"},"saveOnDatabase":true}}')::json;
+	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"}, "message":"',v_message,'","saveOnDatabase":true}}')::json;
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;

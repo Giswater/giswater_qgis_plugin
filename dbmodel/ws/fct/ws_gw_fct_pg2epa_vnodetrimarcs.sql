@@ -117,12 +117,16 @@ BEGIN
 	--delete old arc on rpt_inp_arc table
 	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT DISTINCT text_column::json->>'arc_id' as arc_id FROM temp_table WHERE fprocesscat_id=50 AND user_name=current_user);
 
-	-- step 2 message to user to repair it for those vnodes over node2arc features
-	EXECUTE 'SELECT count(vnode_id) FROM rpt_inp_arc , vnode 
-		JOIN v_edit_link a ON vnode_id=exit_id::integer
-		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = ''NODE2ARC''
-		AND result_id='||result_id_var
-		INTO v_result;
+	-- step 2: in case of conflict againts vnodes over node2arc features rename closest rpt_inp_nodes using vnode name, in order to don't lose the inlet information that will be setted later
+	FOR v_record IN SELECT vnode_id, vnode.the_geom FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer 
+	WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC' AND result_id=result_id_var
+	LOOP 
+		UPDATE rpt_inp_node SET node_id=v_record.vnode_id WHERE node_id IN 
+			(SELECT node_id FROM rpt_inp_node WHERE st_dwithin(rpt_inp_node.the_geom, v_record.the_geom, 0.5) LIMIT 1);
+		
+		v_result = v_result + 1
+	
+	END LOOP;
 	
 RETURN v_result;
 END;
