@@ -62,3 +62,9 @@ CREATE TABLE IF NOT EXISTS plan_psector_x_connec(
 );
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"ext_code", "dataType":"varchar(50)"}}$$);
+
+
+DROP RULE IF EXISTS insert_plan_psector_x_connec ON connec;
+CREATE OR REPLACE RULE insert_plan_psector_x_connec AS ON INSERT TO connec WHERE NEW.state=2 DO 
+INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable) 
+VALUES (new.connec_id, (SELECT value::integer FROM config_param_user WHERE parameter='psector_vdefault' and cur_user="current_user"()LIMIT 1),1,TRUE);

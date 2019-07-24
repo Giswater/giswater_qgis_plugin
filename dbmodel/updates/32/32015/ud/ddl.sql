@@ -54,3 +54,8 @@ ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_node_id_fkey;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"vnode", "column":"top_elev", "dataType":"numeric(12,3)"}}$$);
 
+
+DROP RULE IF EXISTS insert_plan_psector_x_gully ON gully;
+CREATE OR REPLACE RULE insert_plan_psector_x_gully AS ON INSERT TO gully WHERE NEW.state=2 DO 
+INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable) 
+VALUES (new.gully_id, (SELECT value::integer FROM config_param_user WHERE parameter='psector_vdefault' and cur_user="current_user"()LIMIT 1),1,TRUE);

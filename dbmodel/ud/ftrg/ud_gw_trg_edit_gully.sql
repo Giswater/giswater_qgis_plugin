@@ -369,9 +369,17 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- Looking for state control
+		-- Looking for state control and insert planified gully to default psector
 		IF (NEW.state != OLD.state) THEN   	
 			PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
+			IF NEW.state = 2 AND OLD.state=1 THEN
+				INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable)
+				VALUES (NEW.gully_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
+				= 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+			END IF;
+			IF NEW.state = 1 AND OLD.state=2 THEN
+				DELETE FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id;					
+			END IF;
 		END IF;
 
 		-- rotation
