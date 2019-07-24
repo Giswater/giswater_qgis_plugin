@@ -386,7 +386,11 @@ CREATE OR REPLACE VIEW v_edit_connec AS
 	connec.dqa_id,
 	dqa.macrodqa_id,
 	connec.staticpressure,
-    cat_connec.connectype_id AS connec_type
+    cat_connec.connectype_id AS connec_type,
+	connec.featurecat_id,
+	connec.feature_id,
+	connec.pjoint_type,
+	connec.pjoint_id
 	FROM connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -396,43 +400,6 @@ CREATE OR REPLACE VIEW v_edit_connec AS
      LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id;
 	 
-
-     
-CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS 
- SELECT ext_rtc_hydrometer.id AS hydrometer_id,
-    v_edit_connec.connec_id,
-    rpt_inp_arc.arc_id,
-    rpt_inp_arc.node_1,
-    rpt_inp_arc.node_2,
-    ext_cat_period.id AS period_id,
-    ext_cat_period.period_seconds,
-    c.dma_id,
-    c.effc::numeric(5,4) AS effc,
-    c.minc,
-    c.maxc,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
-            ELSE ext_rtc_hydrometer_x_data.sum
-        END AS m3_total_period,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-        END AS lps_avg,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN rpt_inp_arc ON v_edit_connec.arc_id::text = rpt_inp_arc.arc_id::text
-     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
-  WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
-           FROM config_param_user
-          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text)) AND rpt_inp_arc.result_id::text = ((( SELECT inp_selector_result.result_id
-           FROM inp_selector_result
-          WHERE inp_selector_result.cur_user = "current_user"()::text))::text);
-
-
 
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,

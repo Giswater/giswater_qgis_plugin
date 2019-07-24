@@ -21,7 +21,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"nodeparent", "dataType":"json"}}$$);
 
 
-CREATE TABLE macrodqa(
+CREATE TABLE IF NOT EXISTS macrodqa(
   macrodqa_id serial PRIMARY KEY,
   name character varying(50) NOT NULL,
   expl_id integer NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE macrodqa(
   the_geom geometry(MultiPolygon,SRID_VALUE));
 
 
-CREATE TABLE dqa (
+CREATE TABLE IF NOT EXISTS dqa (
  dqa_id serial PRIMARY KEY,
  name character varying(30),
  expl_id integer,
@@ -43,7 +43,7 @@ CREATE TABLE dqa (
  link text);
  
  
- CREATE TABLE anl_graf (
+ CREATE TABLE IF NOT EXISTS anl_graf (
 id SERIAL primary key,
 grafclass varchar(16),
 arc_id varchar(16),
@@ -53,4 +53,11 @@ water int2,
 flag int2,
 checkf int2,
 user_name text);
+
+CREATE TABLE IF NOT EXISTS inp_connec (
+"connec_id" varchar(16) PRIMARY KEY,
+"demand" numeric(12,6),
+"pattern_id" varchar(16)
+);
+
 

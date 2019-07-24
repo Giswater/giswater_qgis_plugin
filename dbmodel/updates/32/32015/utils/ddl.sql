@@ -10,13 +10,16 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE dma DROP COLUMN _pattern_id;
 
-ALTER TABLE price_cat_simple RENAME TO _price_cat_simple;
+ALTER TABLE price_simple RENAME TO _price_simple;
 ALTER TABLE om_visit_value_criticity RENAME TO _om_visit_value_criticity;
 ALTER TABLE dattrib RENAME TO _dattrib;
 ALTER TABLE dattrib_type RENAME TO _dattrib_type;
 ALTER TABLE ext_rtc_scada_x_data RENAME TO _ext_rtc_scada_x_data;
 ALTER TABLE ext_rtc_scada_x_value RENAME TO _ext_rtc_scada_x_value;
 ALTER TABLE ext_rtc_hydrometer_x_value RENAME TO _ext_rtc_hydrometer_x_value;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"pjoint_type", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"pjoint_id", "dataType":"varchar(16)"}}$$);
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"price_compost", "column":"pricecat_id", "dataType":"varchar(16)"}}$$);

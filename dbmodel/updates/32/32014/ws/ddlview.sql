@@ -164,10 +164,19 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_valve AS
      JOIN SCHEMA_NAME.inp_valve ON node.node_id::text = inp_valve.node_id::text
    JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=node.node_id
      JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
+	 
+	 
 
- CREATE TRIGGER gw_trg_edit_inp_arc_pipe
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.v_edit_inp_pipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_inp_arc('inp_pipe');
-     
+ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_connec AS 
+ SELECT connec.connec_id,
+    elevation,
+    depth,
+    connecat_id,
+    sector_id,
+    connec.state,
+    connec.annotation,
+    connec.the_geom,
+    inp_connec.demand,
+    inp_connec.pattern_id
+   FROM SCHEMA_NAME.connec
+	JOIN inp_connec USING (connec_id);
