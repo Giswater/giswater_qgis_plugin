@@ -71,6 +71,7 @@ class ManageGallery(ParentManage):
         # Inicialization of two-dimensional array
         rows = (self.num_events / 9) + 1
         columns = 9
+        rows = self.num_events
         self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]  # @UnusedVariable
 
         # Convert one-dimensional array to two-dimensional array
@@ -81,7 +82,9 @@ class ManageGallery(ParentManage):
                 self.img_path_list[0][br] = self.img_path_list1D[br]
         else:
             for h in range(0, rows):
-                for r in range(0, columns):
+                for r in range(0, columns-1):
+                    if idx >= columns:
+                        break
                     self.img_path_list[h][r] = self.img_path_list1D[idx]
                     idx = idx + 1
 
