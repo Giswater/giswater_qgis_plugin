@@ -69,8 +69,8 @@ BEGIN
 			END IF;
 				
 		ELSIF v_view='vi_subcatchments' THEN 
-			INSERT INTO subcatchment (subc_id, rg_id, node_id, area, imperv, width, slope, clength, snow_id, sector_id) 
-			VALUES (NEW.subc_id, NEW.rg_id, NEW.node_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, 1);
+			INSERT INTO subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id) 
+			VALUES (NEW.subc_id, NEW.rg_id, NEW.outlet_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, 1);
 			
 			INSERT INTO cat_hydrology (hydrology_id,name, infiltration) SELECT DISTINCT hydrology_id, 'Default scenario','CURVE_NUMBER' FROM subcatchment 
 			WHERE hydrology_id NOT IN (SELECT hydrology_id FROM cat_hydrology);

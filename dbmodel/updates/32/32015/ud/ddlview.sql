@@ -122,7 +122,9 @@ CREATE OR REPLACE VIEW v_edit_connec AS
     connec.uncertain,
     dma.macrodma_id,
     connec.expl_id,
-    connec.num_value
+    connec.num_value,
+	pjoint_type,
+	pjoint_id
    FROM connec
      JOIN v_state_connec ON connec.connec_id::text = v_state_connec.connec_id::text
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
@@ -196,7 +198,9 @@ CREATE OR REPLACE VIEW v_edit_gully AS
     gully.expl_id,
     dma.macrodma_id,
     gully.uncertain,
-    gully.num_value
+    gully.num_value,
+	pjoint_type,
+	pjoint_id
    FROM gully
      JOIN v_state_gully ON gully.gully_id::text = v_state_gully.gully_id::text
      LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
@@ -359,7 +363,7 @@ order by 2,6 desc;
   
  CREATE OR REPLACE VIEW v_edit_subcatchment AS 
  SELECT subcatchment.subc_id,
-    subcatchment.node_id,
+    subcatchment.outlet_id,
     subcatchment.rg_id,
     subcatchment.area,
     subcatchment.imperv,
@@ -388,7 +392,6 @@ order by 2,6 desc;
     subcatchment.sector_id,
     subcatchment.hydrology_id,
     subcatchment.the_geom,
-    subcatchment.parent_id,
     subcatchment.descript
    FROM inp_selector_sector,  inp_selector_hydrology, subcatchment
   WHERE subcatchment.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text 
@@ -535,11 +538,10 @@ CREATE OR REPLACE VIEW vi_subcatchments AS
  SELECT v_edit_subcatchment.subc_id,
     v_edit_subcatchment.rg_id,
         CASE
-            WHEN v_edit_subcatchment.parent_id IS NULL AND b.node_id IS NOT NULL THEN b.node_id::varchar(16)
-            WHEN v_edit_subcatchment.parent_id IS NULL AND b.node_id IS NULL THEN v_edit_subcatchment.node_id::varchar(16)
-            WHEN v_edit_subcatchment.parent_id IS NOT NULL AND c.parent_id IS NOT NULL THEN c.parent_id::varchar(16)
-			WHEN v_edit_subcatchment.parent_id IS NOT NULL AND c.parent_id IS NULL THEN v_edit_subcatchment.parent_id::varchar(16)
-        END AS node_id,
+            WHEN b.outlet_id IS NOT NULL THEN b.outlet_id::varchar(16)
+			WHEN c.outlet_id IS NOT NULL THEN c.outlet_id::varchar(16)
+            ELSE v_edit_subcatchment.outlet_id
+        END AS outlet_id,
     v_edit_subcatchment.area,
     v_edit_subcatchment.imperv,
     v_edit_subcatchment.width,
@@ -547,13 +549,13 @@ CREATE OR REPLACE VIEW vi_subcatchments AS
     v_edit_subcatchment.clength,
     v_edit_subcatchment.snow_id
    FROM v_edit_subcatchment
-	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.node_id::json) AS node_array, subc_id 
-			FROM subcatchment where left (node_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, node_array as outlet_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, subc_id 
+			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
-	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, parent_array as parent_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.parent_id::json) AS parent_array, subc_id 
-			FROM subcatchment where left (parent_id,1)='[' ) e) c ON v_edit_subcatchment.subc_id=c.parent_id;
+	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, parent_array as outlet_id FROM 
+		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS parent_array, subc_id 
+			FROM subcatchment where left (outlet_id,1)='[' ) e) c ON v_edit_subcatchment.subc_id=c.subc_id;
 
 
 CREATE OR REPLACE VIEW v_inp_subcatch2node AS 

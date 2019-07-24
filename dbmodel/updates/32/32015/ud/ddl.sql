@@ -7,8 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE subcatchment ALTER COLUMN parent_id TYPE character varying(100);
 ALTER TABLE subcatchment ALTER COLUMN node_id TYPE character varying(100);
+ALTER TABLE subcatchment ALTER COLUMN node_id RENAME TO outlet_id;
+ALTER TABLE subcatchment ALTER COLUMN parent_id RENAME TO _parent_id;
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"pjoint_type", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"pjoint_id", "dataType":"varchar(16)"}}$$);
 
 
 CREATE TABLE IF NOT EXISTS om_psector_x_gully(
