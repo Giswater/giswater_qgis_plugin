@@ -52,7 +52,9 @@ BEGIN
 	-- getting input data 	
 	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
+	v_message:= ((p_data ->>'data')::json->>'parameters')::json->>'message'::text;
 
+	
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
@@ -79,6 +81,7 @@ BEGIN
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('-------------------------------------------------------'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, v_message));
 	
 	-- UTILS
 	-- Check orphan nodes
