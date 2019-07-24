@@ -130,7 +130,7 @@ FROM selector_psector, plan_psector
     WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 	
 
--- definition updated on 3.2.015
+-- definition updated on 3.2.016
 DROP VIEW IF EXISTS v_plan_current_psector CASCADE;	
 CREATE VIEW "v_plan_current_psector" AS 
 SELECT plan_psector.psector_id,

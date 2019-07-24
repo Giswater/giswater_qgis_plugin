@@ -16,8 +16,9 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_
 
 UPDATE audit_cat_param_user SET id='inp_options_networkmode', 
 	label='Network geometry generator:', datatype ='integer' , widgettype ='combo', 
-	v_querytext = 'SELECT idval as id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_networkmode''',
-	description='Generates the network onfly transformation to epa with 3 options; Faster: Only mandatory nodarc (EPANET valves and pumps); Normal: All nodarcs (GIS shutoff valves); Slower: All nodarcs and in addition treaming all pipes with vnode creating the vnodearcs',
+	dv_querytext = 'SELECT idval as id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_networkmode''',
+	description='Generates the network onfly transformation to epa with 3 options; Faster: Only mandatory 
+    nodarc (EPANET valves and pumps); Normal: All nodarcs (GIS shutoff valves); Slower: All nodarcs and in addition treaming all pipes with vnode creating the vnodearcs'
 	WHERE id = 'inp_options_nodarc_onlymandatory';
 
 	

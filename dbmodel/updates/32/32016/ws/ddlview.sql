@@ -138,7 +138,7 @@ CREATE OR REPLACE VIEW v_rtc_interval_nodepattern AS
 select * from v_rtc_period_nodepattern;
   
 
-  
+ /* 
 CREATE OR REPLACE VIEW v_rtc_period_pjointpattern AS 
 	SELECT row_number() OVER (ORDER BY a.pattern_id, a.idrow) AS id,
 	a.period_id,
@@ -280,7 +280,7 @@ CREATE OR REPLACE VIEW v_rtc_period_pjointpattern AS
              JOIN inp_pattern_value b USING (pattern_id)
           GROUP BY pjoint_id,1)a
 	  GROUP BY a.period_id, a.idrow, a.pattern_id;
-
+*/
 				
 CREATE OR REPLACE VIEW v_inp_pjointpattern AS 
  SELECT row_number() OVER (ORDER BY a.pattern_id, a.idrow) AS id,

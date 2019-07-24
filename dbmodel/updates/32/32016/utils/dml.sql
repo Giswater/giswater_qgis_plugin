@@ -18,7 +18,7 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2725, 'gw_fct_get_feature_relation', 'utils', 'function', 'Function get the informations about all the relations that feature has', 'role_edit',false,false,false);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2726, 'gw_fct_set_delete_feature', 'utils', 'function', 'Delete feature and all relations that it has', 'role_edit',false,false,false);
+VALUES (2736, 'gw_fct_set_delete_feature', 'utils', 'function', 'Delete feature and all relations that it has', 'role_edit',false,false,false);
 
 INSERT INTO audit_cat_function 
 VALUES (2728, 'gw_fct_pg2epa_vnodetrimarcs', 'ws', 'function', NULL, NULL, NULL, 'Function to trim arcs on model using vnodes', 'role_epa', false, false, NULL, false);
@@ -27,7 +27,7 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2732, 'gw_trg_connect_update', 'utils', 'trigger function', 'Manage capabilities after update fields on connect (connec & gullt)', 'role_edit',false,false,false);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2734, 'gw_fct_duplicate_psector', 'utils', 'function', 'Create a copy of existing psector', 'role_plan',false,false,false);
+VALUES (2734, 'gw_fct_duplicate_psector', 'utils', 'function', 'Create a copy of existing psector', 'role_master',false,false,false);
 
-UPDATE audit_cat_function SET deprecated=TRUE where id=2688;
-UPDATE audit_cat_function SET deprecated=TRUE where id=1108;
+UPDATE audit_cat_function SET isdeprecated=TRUE where id=2688;
+UPDATE audit_cat_function SET isdeprecated=TRUE where id=1108;

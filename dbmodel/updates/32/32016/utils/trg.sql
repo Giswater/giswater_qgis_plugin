@@ -8,8 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR UPDATE OR DELETE
-ON SCHEMA_NAME.v_edit_inp_connec FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_inp_connec();
+
 
 DROP TRIGGER gw_trg_connec_update ON connec;
 DROP TRIGGER gw_trg_update_link_arc_id ON connec;
