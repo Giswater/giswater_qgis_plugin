@@ -502,7 +502,7 @@ class ApiSearch(ApiParent):
         """ Force selected state and set qtable enabled = True """
 
         sql = ("SELECT state_id "
-               "FROM selector_state"
+               "FROM selector_state "
                "WHERE cur_user = current_user AND state_id = '" + str(state) + "'")
         row = self.controller.get_row(sql)
         if row:
@@ -642,7 +642,7 @@ class ApiSearch(ApiParent):
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
         complet_result, dialog = self.ApiCF.open_form(table_name=table_name,  feature_id=feature_id, tab_type='data')
         # Get list of all coords in field geometry
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['geometry']['st_astext']))
+        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
 
         points = self.get_points(list_coord)
         self.rubber_polygon.reset()
