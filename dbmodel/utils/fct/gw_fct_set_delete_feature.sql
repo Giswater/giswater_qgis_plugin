@@ -135,6 +135,15 @@ BEGIN
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	-- Control nulls
+	v_version := COALESCE(v_version, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
+
+    RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
+             ',"body":{"message":{"priority":1, "text":'||v_result_info||'}}}')::json;
+
+
 RETURN NULL;
 END;
 $BODY$
