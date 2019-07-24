@@ -163,3 +163,5 @@ INSERT INTO config_api_form_fields VALUES (6, 'dimensioning', 'catalog', 'x_symb
 INSERT INTO config_api_form_fields VALUES (7, 'dimensioning', 'catalog', 'y_symbol', 1, 9, true, 'numeric', 'text', 'y symbol:', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
 INSERT INTO config_api_form_fields VALUES (8, 'dimensioning', 'catalog', 'depth_btn', 1, 3, true, NULL, 'button', 'Circle symbology', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, 'gw_api_get_coordinates', NULL, true, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
 INSERT INTO config_api_form_fields VALUES (9, 'dimensioning', 'catalog', 'symbol_btn', 1, 7, true, NULL, 'button', 'Capture depth', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, 'gw_api_get_depth', NULL, true, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
+
+DELETE FROM config_api_form_tabs WHERE tabname='tab_connections' AND formname='v_edit_connec';
