@@ -30,7 +30,8 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_mantable:= TG_ARGV[0];
 
-	v_link_searchbuffer=0.05;
+	v_link_searchbuffer=0.25; 	-- This variable it is very important because it keeps to prevent connect links to nod2arc elements. 
+								-- Acts in combination of nod2arc variable. Newer nodarc variable must be > 2*v_link_searchbuffer
 
 	-- control of project type
 	SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
@@ -102,6 +103,15 @@ BEGIN
 		SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state=1
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom) LIMIT 1;
 		
+		-- for ws projects control of link related to nodarc
+		IF v_projectype = 'WS' AND v_node IS NOT NULL THEN
+			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION node_id FROM inp_pump) THEN
+				RAISE EXCEPTION 'It is not possible to connect link closer than 0.25 meters from nod2arc features in order to prevent conflits if this node may be a nod2arc. Please check it before continue';
+			END IF;
+		END IF;
+		
+		IF v_node.node_type 
+		
 		-- connec as init point
 		SELECT * INTO v_connec1 FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state=1 
 		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
@@ -151,23 +161,26 @@ BEGIN
 			ELSE
 				v_end_point = v_vnode.the_geom;
 			END IF;
+			
+			-- update connec
+			UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, 
+			sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+			WHERE connec_id=v_connec1.connec_id;
 	
+			-- specific updates for projectytpes
 			IF v_projectype='UD' then
-				-- Update connec or gully arc_id
 				IF v_gully1.gully_id IS NOT NULL  THEN
-					UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id
+					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, 
+					sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
 					WHERE gully_id=v_gully1.gully_id;
-					
-				ELSIF v_connec1.connec_id IS NOT NULL THEN
-					UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id
-					WHERE connec_id=v_connec1.connec_id;
 				END IF;	
-			ELSE 
-				UPDATE connec SET arc_id=v_arc.arc_id WHERE connec_id=v_connec1.connec_id;
-				UPDATE connec SET feature_id=v_arc.arc_id, featurecat_id=v_arc.cat_arctype_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, presszonecat_id = v_arc.presszonecat_id,
-				dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id WHERE connec_id=v_connec1.connec_id;
+				
+			ELSIF v_projectype='WS' THEN
+				UPDATE connec SET presszonecat_id = v_arc.presszonecat_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
+				WHERE connec_id=v_connec1.connec_id;
+				
 			END IF;
-	
+		
 			NEW.exit_type='VNODE';
 			NEW.exit_id=v_node_id;
 			
@@ -182,20 +195,23 @@ BEGIN
 				SELECT * INTO v_arc FROM arc WHERE node_2=v_node.node_id LIMIT 1;
 			END IF;
 			
-			IF v_projectype='UD' then
+			-- update common fields of connec
+			UPDATE connec SET arc_id=v_node.arc_id, feature_id=v_node.node_id, featurecat_id=v_node.node_type, dma_id=v_node.dma_id, 
+			sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
+			WHERE connec_id=v_connec1.connec_id;
+			
+			IF v_projectype='UD' THEN
 				-- Update connec or gully arc_id
 				IF v_gully1.gully_id IS NOT NULL  THEN
-					UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type
-					WHERE gully_id=v_gully1.gully_id;
-	
-				ELSIF v_connec1.connec_id IS NOT NULL AND v_projectype='UD' THEN
-					UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type, dma_id=v_node.dma_id, sector_id=v_node.sector_id
-					WHERE connec_id=v_connec1.connec_id;				
+					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id, dma_id=v_node.dma_id, 
+					sector_id=v_node.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+					WHERE gully_id=v_gully1.gully_id;				
 				END IF;
-			ELSE
-				UPDATE connec SET arc_id=v_arc.arc_id WHERE connec_id=v_connec1.connec_id;
-				UPDATE connec SET feature_id=v_node.node_id, featurecat_id=v_node.nodetype_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, presszonecat_id = v_node.presszonecat_id,
-				dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id WHERE connec_id=v_connec1.connec_id;
+			
+			ELSIF v_projectype='WS' THEN
+				UPDATE connec SET presszonecat_id = v_node.presszonecat_id, dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id
+				WHERE connec_id=v_connec1.connec_id;
+
 			END IF;
 			
 			NEW.exit_type='NODE';
@@ -203,37 +219,36 @@ BEGIN
 			v_end_point = v_node.the_geom;
 	
 		ELSIF v_connec2.connec_id IS NOT NULL THEN
-	
-			-- update arc values
-			SELECT arc_id INTO v_arc.arc_id FROM connec WHERE connec_id=v_connec2.connec_id;
+				
+			-- update common fields of connec (ud / ws)
+			UPDATE connec SET arc_id=v_connec2.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
+			sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type', pjoint_id=v_connec2.pjoint_id
+			WHERE connec_id=v_connec1.connec_id;
 	
 			IF v_projectype='UD' then
-				UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id
+				UPDATE gully SET arc_id=v_connec2.arc_id , feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
+				sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type', pjoint_id=v_connec2.pjoint_id
 				WHERE gully_id=v_gully1.gully_id;
 	
-				UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id
+			ELSIF v_projectype='WS' THEN
+				UPDATE connec SET presszonecat_id = v_connec2.presszonecat_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
-			ELSE 
-				UPDATE connec SET arc_id=v_arc.arc_id WHERE connec_id=v_connec1.connec_id;
-				UPDATE connec SET feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connectype_id, dma_id=v_connec2.dma_id, sector_id=v_connec2.sector_id, 
-				presszonecat_id = v_connec2.presszonecat_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id WHERE connec_id=v_connec1.connec_id;
+				
 			END IF;
 	
 			NEW.exit_type='CONNEC';
 			NEW.exit_id=v_connec2.connec_id;
 			v_end_point = v_connec2.the_geom;
+			
 		END IF;
 	
 		IF v_projectype='UD' THEN
 			IF v_gully2.gully_id IS NOT NULL THEN
-						
-				-- update arc values
-				SELECT arc_id INTO v_arc.arc_id FROM gully WHERE gully_id=v_gully2.gully_id;
-	
-				UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
+							
+				UPDATE connec SET arc_id=v_gully2.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
 				WHERE connec_id=v_connec1.connec_id;
 	
-				UPDATE gully SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
+				UPDATE gully SET arc_id=v_gully2.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
 				WHERE gully_id=v_gully1.gully_id;
 					
 				NEW.exit_type='GULLY';
