@@ -40,9 +40,10 @@ v_querytext		text;
 v_nodearc_real 		float;
 v_nodearc_user 		float;
 v_result_id 		text;
-v_min 				numeric (12,4);
-v_max				numeric (12,4);
-v_headloss			text;
+v_min 			numeric (12,4);
+v_max			numeric (12,4);
+v_headloss		text;
+v_message		text;
 
 BEGIN
 
@@ -81,7 +82,7 @@ BEGIN
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('-------------------------------------------------------'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, v_message));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, v_message);
 	
 	-- UTILS
 	-- Check orphan nodes
