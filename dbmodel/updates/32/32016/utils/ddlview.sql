@@ -229,8 +229,9 @@ WHERE ((pa.state=0 AND pa.doable=FALSE
 AND (pa.addparam->>'arcDivide' != 'parent' OR pa.addparam->>'arcDivide' IS NULL))
 OR (a.state_type = ( SELECT config_param_system.value FROM config_param_system WHERE config_param_system.parameter = 'plan_statetype_reconstruct')::smallint))
 AND  pa.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
-COMMENT ON VIEW v_plan_psector_arc_affect is 'Return the arcs which will be removed by a psector. Arcs divided by a node to generate ficticius won''t count. 
-Arcs with state_type=RECONSTRUCT will be considered because geometry don''t change but old arc are removed. Filtered by psector selector';
+COMMENT ON VIEW v_plan_psector_arc_affect is 'Return the arcs which will be removed by a psector. Arcs divided by a node to generate ficticius will not count. 
+Arcs with state_type=RECONSTRUCT will be considered because geometry do not change but old arc are removed. Be careful with plan_statetype_reconstruct
+variable, it must be configured correctly. Filtered by psector selector';
 
 
 CREATE OR REPLACE VIEW v_plan_psector_arc_current AS 
