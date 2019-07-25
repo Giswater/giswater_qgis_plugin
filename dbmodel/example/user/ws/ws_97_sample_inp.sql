@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+INSERT INTO inp_connec SELECT connec_id FROM connec;
+
 UPDATE inp_cat_mat_roughness SET roughness=0.014;
 
 INSERT INTO inp_curve_id VALUES ('PUMP_01', 'PUMP');
