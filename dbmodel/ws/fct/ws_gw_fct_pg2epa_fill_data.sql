@@ -29,19 +29,18 @@ BEGIN
 -- Insert on node rpt_inp table
 -- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
-	SELECT 
+	SELECT DISTINCT ON (v_node.node_id)
 	result_id_var,
 	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom
 	FROM v_node 
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=v_node.node_id
-		JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=v_node.node_id
+		JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=v_node.node_id OR node_2=v_node.node_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL)) ;
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 	
 
 -- Insert on arc rpt_inp table
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, minorloss)
 	SELECT
 	result_id_var,
 	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
@@ -55,7 +54,8 @@ BEGIN
 	END AS roughness,
 	length,
 	inp_pipe.status,
-	v_arc.the_geom
+	v_arc.the_geom,
+	inp_pipe.minorloss
 	FROM inp_selector_sector, v_arc
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN cat_arc ON v_arc.arccat_id = cat_arc.id

@@ -10,14 +10,16 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs(result_id_var character varying)  RETURNS json AS 
 $BODY$
 
+
 /*
-SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('r1')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('Prueba1')
 */
 
 DECLARE
 
 	v_count integer = 0;
 	v_result integer = 0;
+	v_record record;
       
 BEGIN
 
@@ -61,11 +63,12 @@ BEGIN
 	SELECT 
 		result_id_var,
 		text_column::json->>'vnode_id' as node_id, 
-		text_column::json->>'elevation', 
+		(text_column::json->>'elevation')::numeric(12,3), 
 		(text_column::json->>'elevation')::numeric(12,3) - (text_column::json->>'depth')::numeric(12,3),
 		'VNODE',
 		'VNODE',
 		'JUNCTION',
+		a.sector_id,
 		a.state,
 		a.state_type,
 		null,
@@ -76,23 +79,30 @@ BEGIN
 
 
 	-- new arcs on rpt_inp_arc table
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, the_geom)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, flw_code, minorloss)
 	SELECT
 		result_id_var,
 		concat(arc_id,'P',a.id-min) as arc_id, 
-		node_1,
-		node_2,
+		a.node_1,
+		a.node_2,
 		rpt_inp_arc.arc_type,
 		rpt_inp_arc.arccat_id,
 		rpt_inp_arc.epa_type,
 		rpt_inp_arc.sector_id,
 		rpt_inp_arc.state,
 		rpt_inp_arc.state_type,
-		concat ('From parent arc:', a.arc_id, '-',rpt_inp_arc.annotation),
+		concat ('{"parentArc":"', a.arc_id, '", "annotation":"',rpt_inp_arc.annotation,'"}'),
 		rpt_inp_arc.diameter,
 		rpt_inp_arc.roughness,
-		st_length(ST_LineSubstring(the_geom, locate_1, locate_2)),	
-		ST_LineSubstring(the_geom, locate_1, locate_2) as the_geom
+		st_length(ST_LineSubstring(the_geom, locate_1, locate_2)),
+		rpt_inp_arc.status,
+		CASE 
+			WHEN st_geometrytype(ST_LineSubstring(the_geom, locate_1, locate_2))='ST_LineString' THEN ST_LineSubstring(the_geom, locate_1, locate_2)
+			ELSE null END AS the_geom,
+		CASE 
+			WHEN st_geometrytype(ST_LineSubstring(the_geom, locate_1, locate_2))='ST_Point' THEN ST_LineSubstring(the_geom, locate_1, locate_2)
+			ELSE null END AS the_geom,
+		rpt_inp_arc.minorloss
 		FROM (
 			SELECT a.id, a.text_column::json->>'arc_id' as arc_id, a.text_column::json->>'vnode_id' as node_1, (a.text_column::json->>'locate')::numeric(12,4) as locate_1 ,
 			b.text_column::json->>'vnode_id' as node_2, (b.text_column::json->>'locate')::numeric(12,4) as locate_2
@@ -114,8 +124,8 @@ BEGIN
 		WHERE result_id=result_id_var AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
 		ORDER BY arc_id, a.id;
 	
-	--delete old arc on rpt_inp_arc table
-	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT DISTINCT text_column::json->>'arc_id' as arc_id FROM temp_table WHERE fprocesscat_id=50 AND user_name=current_user);
+	--delete only trimmed arc on rpt_inp_arc table
+	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT annotation::json->>'parentArc' FROM rpt_inp_arc WHERE result_id=result_id_var) AND result_id=result_id_var;
 
 	-- step 2: in case of conflict againts vnodes over node2arc features rename closest rpt_inp_nodes using vnode name, in order to don't lose the inlet information that will be setted later
 	FOR v_record IN SELECT vnode_id, vnode.the_geom FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer 
@@ -124,7 +134,7 @@ BEGIN
 		UPDATE rpt_inp_node SET node_id=v_record.vnode_id WHERE node_id IN 
 			(SELECT node_id FROM rpt_inp_node WHERE st_dwithin(rpt_inp_node.the_geom, v_record.the_geom, 0.5) LIMIT 1);
 		
-		v_result = v_result + 1
+		v_result = v_result + 1;
 	
 	END LOOP;
 	

@@ -15,7 +15,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"status":"start", "resultId":"test1", "useNetworkGeom":"true"}}$$)
+"data":{"status":"start", "resultId":"Prueba1", "useNetworkGeom":"true"}}$$)
 */
 
 DECLARE
@@ -88,7 +88,7 @@ BEGIN
 				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
 			
 			ELSE
-				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' v_response, ' nodarc nodes have been renamed using vnode_id');
+				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , v_response, ' nodarc nodes have been renamed using vnode_id');
 			
 			END IF;
 	

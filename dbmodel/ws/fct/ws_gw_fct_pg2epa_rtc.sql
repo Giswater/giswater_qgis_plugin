@@ -22,7 +22,7 @@ DECLARE
 	v_demandtype 	text;
 	v_patternmethod text;
 	v_timestep	text;
-	v_exportnetworkmode   integer;
+	v_networkmode   integer;
       
 BEGIN
 
@@ -36,7 +36,7 @@ BEGIN
 	v_demandtype = (SELECT value FROM config_param_user WHERE parameter='inp_options_demandtype' AND cur_user=current_user);
 	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user); 
 	v_timestep = (SELECT value FROM config_param_user WHERE parameter='inp_times_duration' AND cur_user=current_user); 
-	v_exportnetworkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
@@ -59,7 +59,7 @@ BEGIN
 			
 		ELSIF v_patternmethod = '14' THEN
 		
-			IF v_exportnetworkmode < 3 THEN
+			IF v_networkmode < 3 THEN
 				RETURN 1;
 			END IF;
 	
@@ -72,7 +72,7 @@ BEGIN
 				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id ORDER by 3,4
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id::text
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
@@ -181,7 +181,7 @@ BEGIN
 	
 		ELSIF v_patternmethod = '26' THEN -- pattern Blanes + Gipuzkoako Urak (using vnodes) models
 		
-			IF v_exportnetworkmode < 3 THEN
+			IF v_networkmode < 3 THEN
 				RETURN 1;
 			END IF;
 	
@@ -194,7 +194,7 @@ BEGIN
 				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id ORDER by 3,4
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id::text
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
