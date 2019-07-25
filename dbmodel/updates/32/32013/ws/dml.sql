@@ -31,35 +31,65 @@ UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_rtc_coeffi
 UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_use_dma_pattern';
 
 
-UPDATE audit_cat_param_user SET label='Estimated unique pattern:', dv_querytext='SELECT pattern_id AS id, pattern_id AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL '
-								,layout_id = 9, layout_order = 1, layoutname='grl_crm_9', dv_parent_id='inp_options_demandtype', dv_isnullvalue=TRUE, editability='{"trueWhenParentIn":[1]}'								
+UPDATE audit_cat_param_user SET label='UNIQUE ESTIMATED pattern:', dv_querytext='SELECT pattern_id AS id, pattern_id AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL '
+								,layout_id = 2, layout_order = 3, layoutname='grl_general_2', dv_isnullvalue=TRUE, 
+								dv_parent_id='inp_options_patternmethod', editability='{"trueWhenParentIn":[1]}'								
 								WHERE id='inp_options_pattern';
-UPDATE audit_cat_param_user SET label='CRM period:',  layout_id = 10, dv_isnullvalue=true, layout_order = 1, layoutname='grl_crm_10',	dv_parent_id='inp_options_demandtype', 
-								editability='{"trueWhenParentIn":[2]}'
-								WHERE id='inp_options_rtc_period_id';
-UPDATE audit_cat_param_user SET label='Dscenario overwrites demand:', layout_id = 2, layout_order = 3, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
-UPDATE audit_cat_param_user SET layout_order = 3 WHERE id='inp_options_demand_multiplier';
 
-UPDATE audit_cat_param_user SET id='inp_other_iterative_main_function', label = 'Main iterative function:', layout_id = 15, layout_order=2, layoutname='grl_inpother_15',
-								dv_querytext='SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function'''
+UPDATE audit_cat_param_user SET label='CRM PERIOD value:',  dv_isnullvalue=true,
+								layout_id = 2, layout_order = 2, layoutname='grl_general_2', 
+								dv_parent_id='inp_options_demandtype', editability='{"trueWhenParentIn":[2]}'
+								WHERE id='inp_options_rtc_period_id';
+
+UPDATE audit_cat_param_user SET label='Headloss formula:', layout_order = 5 WHERE id='inp_options_units';
+
+UPDATE audit_cat_param_user SET layout_order = 5 WHERE id='inp_options_headloss';
+
+UPDATE audit_cat_param_user SET layout_order = 6 WHERE id='inp_options_demand_multiplier';
+								
+UPDATE audit_cat_param_user SET layout_id=17 WHERE formname='epaoptions' AND layout_id=13;
+UPDATE audit_cat_param_user SET layout_id=18 WHERE formname='epaoptions' AND layout_id=14;
+UPDATE audit_cat_param_user SET layout_id=13 WHERE formname='epaoptions' AND layout_id=11;
+UPDATE audit_cat_param_user SET layout_id=14 WHERE formname='epaoptions' AND layout_id=12;
+
+UPDATE audit_cat_param_user SET layout_id=1, layout_order = 4, layoutname='grl_general_1' WHERE id='inp_options_valve_mode';
+UPDATE audit_cat_param_user SET layout_id=2, layout_order = 4, layoutname='grl_general_2',editability='{"trueWhenParentIn":[3]}' WHERE id='inp_options_valve_mode_mincut_result';
+
+UPDATE audit_cat_param_user SET layout_id=3, layout_order = 9, label='MINCUT RESULTS id:', layoutname='grl_hyd_3' WHERE id='inp_options_quality_mode';
+UPDATE audit_cat_param_user SET layout_id=3, layout_order = 10, layoutname='grl_hyd_3' WHERE id='inp_options_tolerance';
+
+UPDATE audit_cat_param_user SET layout_id=4, layout_order = 9, layoutname='grl_hyd_4' WHERE id='inp_options_node_id';
+UPDATE audit_cat_param_user SET layout_id=4, layout_order = 10, layoutname='grl_hyd_4' WHERE id='inp_options_diffusivity';
+
+
+UPDATE audit_cat_param_user SET label='Dscenario overwrites demand:', layout_id = 2, layout_order = 6, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
+
+UPDATE audit_cat_param_user SET id='inp_other_iterative_main_function', label = 'Main iterative function:', 
+								layout_id = 1, layout_order=7, layoutname='grl_general_1', idval=null, isenabled=TRUE, dv_isnullvalue=TRUE
+								dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function'''
 								WHERE id='inp_other_recursive_function';
 							
+				
 INSERT INTO audit_cat_param_user VALUES ('inp_other_iterative_secondary_function', 'epaoptions', 'Enable/disable the posibility to work with selected secondary iterative function', 'role_epa',
-			NULL, 'ITERATIVE', 'Secondary iterative function:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function''', 
-			NULL, false, 16, 2, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, 'NONE', 'grl_inpother_16', NULL, NULL, NULL, NULL, NULL, NULL, false);			
+			NULL, null, 'Secondary iterative function:', 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function''', 
+			NULL, TRUE, 2, 7, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, 'NONE', 'grl_general_2',
+			NULL, NULL, TRUE, TRUE, NULL, NULL, false,'{"from":"2.0.12", "to":null, "language":"english"}');			
 			
 INSERT INTO audit_cat_param_user VALUES ('inp_options_demandtype', 'epaoptions', 'Demand type to use on EPANET simulation', 'role_epa', NULL, NULL, 'Demand type:', 
 			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_demandtype''', NULL, true, 1, 2, 'ws', TRUE, NULL, NULL, NULL, FALSE, NULL, 'combo', true, 
 			NULL, '1', 'grl_general_1', NULL, TRUE, TRUE, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
+						
 INSERT INTO audit_cat_param_user VALUES ('inp_options_patternmethod', 'epaoptions', 'Pattern method used on EPANET simulation', 'role_epa', NULL, NULL, 'Pattern method:', 
-			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_patternmethod''', 'inp_options_demandtype', true, 2, 2, 'ws', FALSE, ' AND addparam->>''DemandType''=', NULL, NULL, FALSE, NULL, 'combo', true, 
-			NULL, '1', 'grl_general_2', NULL, TRUE, TRUE, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
+			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_patternmethod''', 'inp_options_demandtype', true, 1, 3, 'ws', FALSE, ' AND addparam->>''DemandType''=', NULL, NULL, FALSE, NULL, 'combo', true, 
+			NULL, '1', 'grl_general_1', NULL, TRUE, TRUE, TRUE, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
+			
 INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_from', 'epaoptions', 'CRM interval used on EPANET simulation', 'role_epa', NULL, NULL, 'From CRM interval:', 
-			NULL, NULL, FALSE, 9, 2, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,
-			NULL, NULL, 'grl_crm_9', NULL, NULL, NULL, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
+			NULL, NULL, FALSE, 13, 6, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,
+			NULL, NULL, 'grl_date_13', NULL, NULL, NULL, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
+			
 INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_to', 'epaoptions', 'CRM interval used on EPANET simulation', 'role_epa', NULL, NULL, 'To CRM interval:', 
-			NULL, NULL, FALSE, 10, 2, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,
-			NULL, NULL, 'grl_crm_10', NULL, NULL, NULL, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');	
+			NULL, NULL, FALSE, 14, 6, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,
+			NULL, NULL, 'grl_date_14', NULL, NULL, NULL, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');	
 
 UPDATE cat_feature SET active=true, code_autofill=true;
 

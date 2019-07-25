@@ -18,11 +18,11 @@ UPDATE audit_cat_param_user SET id='inp_options_networkmode',
 	label='Network geometry generator:', datatype ='integer' , widgettype ='combo', 
 	dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_networkmode''',
 	description='Generates the network onfly transformation to epa with 3 options; Faster: Only mandatory nodarc (EPANET valves and pumps); Normal: All nodarcs (GIS shutoff valves); Slower: All nodarcs and in addition treaming all pipes with vnode creating the vnodearcs',
-	layout_id=1, layout_order=4, layoutname ='grl_general_1', dv_orderby_id=true, vdefault=1, idval=null
+	layout_id=1, layout_order=1, layoutname ='grl_general_1', dv_orderby_id=true, vdefault=1, idval=null
 	WHERE id = 'inp_options_nodarc_onlymandatory';
 
 UPDATE audit_cat_param_user SET
-	layout_id=2, layout_order=4, layoutname ='grl_general_2', idval=null 
+	layout_id=2, layout_order=1, layoutname ='grl_general_2', idval=null 
 	WHERE id = 'inp_options_nodarc_length';
 	
 UPDATE audit_cat_param_user SET

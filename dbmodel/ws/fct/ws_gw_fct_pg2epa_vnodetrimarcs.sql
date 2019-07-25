@@ -63,8 +63,11 @@ BEGIN
 	SELECT 
 		result_id_var,
 		text_column::json->>'vnode_id' as node_id, 
-		(text_column::json->>'elevation')::numeric(12,3), 
-		(text_column::json->>'elevation')::numeric(12,3) - (text_column::json->>'depth')::numeric(12,3),
+		CASE 
+			WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) -- this elevation it's interpolated elevation againts node1 and node2 of pipe
+			ELSE connec.elevation END,
+		CASE	WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) - (text_column::json->>'depth')::numeric(12,3)-- this elevation it's interpolated elevation againts node1 and node2 of pipe
+			ELSE connec.elevation - connec.depth END,
 		'VNODE',
 		'VNODE',
 		'JUNCTION',
@@ -74,8 +77,10 @@ BEGIN
 		null,
 		ST_LineInterpolatePoint (a.the_geom, (text_column::json->>'locate')::numeric(12,4)) as the_geom
 		FROM temp_table
-		JOIN rpt_inp_arc a ON arc_id=text_column::json->>'arc_id'
-		WHERE result_id=result_id_var AND text_column::json->>'vnode_id' ilike 'VN%';
+		JOIN arc a ON arc_id=text_column::json->>'arc_id'
+		JOIN connec ON concat('VN',pjoint_id)=text_column::json->>'vnode_id'
+		WHERE result_id=result_id_var AND text_column::json->>'vnode_id' ilike 'VN%'
+		AND fprocesscat_id=50 ;
 
 
 	-- new arcs on rpt_inp_arc table
