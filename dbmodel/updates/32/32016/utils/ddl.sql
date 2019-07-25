@@ -21,3 +21,19 @@ CREATE TABLE IF NOT EXISTS ext_timeseries (
   
   
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"addparam", "dataType":"json"}}$$);
+
+CREATE TABLE ext_workorder_class(
+  id character varying(50) PRIMARY KEY NOT NULL,
+  idval character varying(50));
+
+CREATE TABLE ext_workorder_type(
+  id character varying(50) PRIMARY KEY NOT NULL,
+  idval character varying(50),
+  class_id character varying(50));
+  
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"param_options", "dataType":"json"}}$$);
+
+CREATE TABLE ud.om_visit_class_x_wo(
+  id serial PRIMARY KEY NOT NULL,
+  visitclass_id integer,
+  wotype_id character varying(50));
