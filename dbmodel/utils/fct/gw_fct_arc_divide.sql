@@ -303,15 +303,16 @@ BEGIN
 		
 			-- Insert existig arc (on service) to the current alternative
 			INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, arc_id_aux, 0, FALSE);
-            
+			
+   
 			-- Insert data into traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 			VALUES ('DIVIDE WITH PLANIFIED NODE',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 
 			-- Set addparam (parent/child)
-			UPDATE plan_psector_x_arc SET addparam=gw_fct_json_object_set_key(addparam, 'arcDivide', 'parent') WHERE  psector_id=v_psector AND arc_id=arc_id_aux;
-			UPDATE plan_psector_x_arc SET addparam=gw_fct_json_object_set_key(addparam, 'arcDivide', 'child') WHERE  psector_id=v_psector AND arc_id=rec_aux1.arc_id;
-			UPDATE plan_psector_x_arc SET addparam=gw_fct_json_object_set_key(addparam, 'arcDivide', 'child') WHERE  psector_id=v_psector AND arc_id=rec_aux2.arc_id;
+			UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"parent"}' WHERE  psector_id=v_psector AND arc_id=arc_id_aux;
+			UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux1.arc_id;
+			UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux2.arc_id;
 
 				
 		ELSIF (state_aux=2 AND state_node_arg=2) THEN 
