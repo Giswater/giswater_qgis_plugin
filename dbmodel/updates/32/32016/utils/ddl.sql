@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS ext_timeseries (
   id serial PRIMARY KEY,
   operator_id integer,
   period_id integer,
-  timeseries -- imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
+  timeseries text,-- imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
   sysclass varchar(16),
   sys_id varchar(16),
   tparam json,  -- {"type":"monthly", "seconds":2345, "tsteps":24, "start":"2019-01-01", "end":"2019-01-02", "units":"mca"};

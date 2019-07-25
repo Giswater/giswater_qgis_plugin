@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2727
+--FUNCTION CODE: 2734
 
 --DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_duplicate_psector(json);
 
@@ -42,11 +42,14 @@ v_gully_proximity json;
 v_sql text;
 v_connect2network text;
 v_psector_vdefault text;
+v_schemaname text;
 
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
-	
+	-- get input parameters
+	v_schemaname = 'SCHEMA_NAME';
+
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -125,8 +128,8 @@ BEGIN
 	raise notice ' rec_type,%', rec_type;
 
 		EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
-		FROM information_schema.columns where table_name='''||rec_type.parentlayer||''' and table_schema=''SCHEMA_NAME''
-		and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema=''SCHEMA_NAME'') 
+		FROM information_schema.columns where table_name='''||rec_type.parentlayer||''' and table_schema='''||v_schemaname||'''
+		and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema='''||v_schemaname||''') 
 		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'''
 		INTO v_insert_fields;
 			
