@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2716
+--FUNCTION CODE: 2735
 
 --drop function SCHEMA_NAME.gw_fct_admin_manage_child_views(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_config(p_data json)
@@ -44,28 +44,27 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
-
+	
+	-- get input parameters
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_view_name = ((p_data ->>'data')::json->>'view_name')::text;
 	v_feature_type = lower(((p_data ->>'data')::json->>'feature_type')::text);
 
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 	
-	raise notice 'v_feature_type,%',v_feature_type;
-	raise notice 'v_feature_system_id,%',v_feature_system_id;
+	--select list of fields different than id from config_api_form_fields
 	EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 	FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
 	AND column_name!=''id'';'
 	INTO v_config_fields;
 	
+	--select list of fields different than id and formname from config_api_form_fields
 	EXECUTE 'SELECT DISTINCT string_agg(concat(column_name)::text,'' ,'')
 	FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
 	AND column_name!=''id'' AND column_name!=''formname'';'
 	INTO v_insert_fields;
 
-	raise notice 'v_insert_fields,%',v_insert_fields;
-	raise notice 'v_config_fields,%',v_config_fields;
-
+	--insert configuration copied from the parent view config
 	FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname=concat('ve_',v_feature_type))
 	LOOP
 	--raise notice 'rec,%',rec;
@@ -80,14 +79,16 @@ BEGIN
 	FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
 	and column_name!='''||v_feature_type||'_id'' group by column_name, data_type,numeric_precision, numeric_scale';
 				
-	raise notice 'v_man_fields,%',v_man_fields;
 
+	--insert configuration from the man_* tables of the feature type
 	FOR rec IN  EXECUTE v_man_fields LOOP
 	raise notice 'rec,%',rec;
 
+		--capture max layout_id for the view
 		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layout_name=''layout_data_1'';'
 		INTO v_orderby;
 
+		--transform data and widget types
 		IF rec.data_type = 'character varying' THEN
 			v_datatype='string';
 			v_widgettype='text';
@@ -105,25 +106,31 @@ BEGIN
 			v_widgettype='datepickertime';
 		END IF;
 		
+		--insert into config_api_form_fields
 		IF v_datatype='double' THEN
-			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, label, ismandatory,isparent,
+			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, 
+				isenabled, label, ismandatory,isparent,
 			iseditable,isautoupdate,field_length,num_decimals) 
-			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,rec.column_name, false, false,true,false,rec.numeric_precision, rec.numeric_scale);
+			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, 
+				true,rec.column_name, false, false,true,false,rec.numeric_precision, rec.numeric_scale);
 		ELSE
-			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, label, ismandatory,isparent,iseditable,isautoupdate) 
-			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,rec.column_name, false, false,true,false);
+			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, 
+				isenabled, label, ismandatory,isparent,iseditable,isautoupdate) 
+			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, 
+				true,rec.column_name, false, false,true,false);
 		END IF;
 	END LOOP;
 
+	--select all already created addfields
 	v_man_addfields = 'SELECT * FROM man_addfields_parameter WHERE active = TRUE AND (cat_feature_id IS NULL OR cat_feature_id='''||v_cat_feature||''');';
 
+	--insert configuration for the addfields of the feature type
 	FOR rec IN EXECUTE v_man_addfields LOOP
-	
+		--capture max layout_id for the view
 		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layout_name=''layout_data_1'';'
 		INTO v_orderby;
-
-		raise notice 'rec,%',rec;
 		
+		--transform data and widget types
 		IF rec.datatype_id = 'numeric' THEN 
 			v_datatype='double';
 		ELSE
@@ -138,6 +145,7 @@ BEGIN
 			v_widgettype='datepickertime';
 		END IF;
 		
+		--insert into config_api_form_fields
 		IF v_datatype='double' THEN
 			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
 				label, ismandatory,isparent,iseditable,isautoupdate,field_length,num_decimals) 

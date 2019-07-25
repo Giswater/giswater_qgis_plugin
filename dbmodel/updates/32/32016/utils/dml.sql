@@ -29,5 +29,8 @@ VALUES (2732, 'gw_trg_connect_update', 'utils', 'trigger function', 'Manage capa
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2734, 'gw_fct_duplicate_psector', 'utils', 'function', 'Create a copy of existing psector', 'role_master',false,false,false);
 
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2735, 'gw_fct_admin_manage_child_config', 'utils', 'function', 'Create custom form configuration for child views', 'role_master',false,false,false);
+
 UPDATE audit_cat_function SET isdeprecated=TRUE where id=2688;
 UPDATE audit_cat_function SET isdeprecated=TRUE where id=1108;
