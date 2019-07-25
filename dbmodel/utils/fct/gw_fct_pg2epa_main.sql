@@ -7,21 +7,21 @@ This version of Giswater is provided by Giswater Association
 -- FUNCTION CODE: 2646  
 -- FPROCESSCAT : 35
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_iterative(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_iterative(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_main(p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_main(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_iterative($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_iterative($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"ongoing", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_iterative($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
@@ -105,12 +105,11 @@ BEGIN
 		-- call go2epa function
 		SELECT gw_fct_pg2epa(p_data) INTO v_return;
 		
- 
-
-		-- replace message
+ 		-- replace message
 		v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 
 	END IF;
+	
 	--continue (or not)        
 	IF v_count > 1 THEN
 	    -- force true the return to make signal to client that there are more than one pending calls. Return from gw_fct_pg2epa is always false
@@ -123,6 +122,7 @@ BEGIN
 	    -- setting counter
 	    v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
 		END IF;   
+		
 RETURN v_return;
 	
 END;
