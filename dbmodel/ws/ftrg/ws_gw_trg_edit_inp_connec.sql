@@ -23,7 +23,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 		
 		-- The geom
-		IF (ST_equals (NEW.the_geom, OLD.the_geom) IS FALSE THEN
+		IF (ST_equals (NEW.the_geom, OLD.the_geom)) IS FALSE THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
 		END IF;
 
@@ -31,9 +31,14 @@ BEGIN
 		SET demand=NEW.demand, pattern_id=NEW.pattern_id 
 		WHERE connec_id=OLD.connec_id;
      
-        UPDATE connec 
-        SET elevation=NEW.elevation, "depth"=NEW."depth", annotation=NEW.annotation
-        WHERE connec_id=OLD.connec_id;
+        UPDATE connec
+		SET elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, annotation=NEW.annotation
+		WHERE connec_id=OLD.connec_id;
+
+	IF NEW.arc_id != OLD.arc_id THEN
+		UPDATE v_edit_connec SET arc_id=NEW.arc_id
+		WHERE connec_id=OLD.connec_id;
+	END IF;
 
         RETURN NEW;
         
