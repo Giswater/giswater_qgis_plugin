@@ -14,9 +14,16 @@ linkrec Record;
 querystring text;
 connecRecord1 record; 
 connecRecord2 record;
+connecRecord3 record;
 v_projectype text;
 v_move_polgeom boolean = true;
 v_featuretype text;
+gullyRecord1 record;
+gullyRecord2 record;
+gullyRecord3 record;
+v_link record;
+xvar float;
+yvar float;
 
 BEGIN 
 
@@ -80,7 +87,7 @@ BEGIN
 	ELSIF v_featuretype='gully' THEN
 	
 		-- Updating polygon geometry in case of exists it
-		IF v_move_polgeom IS TRUE
+		IF v_move_polgeom IS TRUE THEN
 			IF (OLD.pol_id IS NOT NULL) THEN   
 				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
@@ -104,7 +111,7 @@ BEGIN
 				-- Update link
 				IF (gullyRecord1.gully_id) IS NOT NULL THEN
 					EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
-				ELSIF (gullyRecord2.gully_id IS NOT NULL) OR (gullyRecord3.connec_id IS NOT NULL)
+				ELSIF (gullyRecord2.gully_id IS NOT NULL) OR (gullyRecord3.connec_id IS NOT NULL) THEN
 					EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
 				END IF;
 			END LOOP;

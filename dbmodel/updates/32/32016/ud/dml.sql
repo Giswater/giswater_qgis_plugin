@@ -7,4 +7,4 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE audit_cat_function SET deprecated=TRUE where id=1248;
+UPDATE audit_cat_function SET isdeprecated=TRUE where id=1248;

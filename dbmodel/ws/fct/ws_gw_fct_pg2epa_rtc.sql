@@ -72,7 +72,7 @@ BEGIN
 				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id::text
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text)
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
@@ -136,46 +136,46 @@ BEGIN
 				FROM (select dma_id, period_id, idrow, sum(factor_1) as factor_1, sum(factor_2) as factor_2, sum(factor_3) as factor_3, sum(factor_4) as factor_4, sum(factor_5) as factor_5, sum(factor_6) as factor_6, 
 					sum(factor_7) as factor_7, sum(factor_8) as factor_8, sum(factor_9) as factor_9, sum(factor_10) as factor_10, sum(factor_11) as factor_11, sum(factor_12) as factor_12, 
 					sum(factor_13) as factor_13, sum(factor_14) as factor_14, sum(factor_15) as factor_15, sum(factor_16) as factor_16, sum(factor_17) as factor_17, sum(factor_18) as factor_18
-					from SCHEMA_NAME.v_rtc_period_nodepattern join SCHEMA_NAME.node ON (node_id=pattern_id) group by idrow, period_id, dma_id order by 1,3)a
+					from v_rtc_period_nodepattern join node ON (node_id=pattern_id) group by idrow, period_id, dma_id order by 1,3)a
 				-- d query
 				JOIN (SELECT dma_id, cat_period_id ,  idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
 					factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM  
 					(SELECT ( CASE
-					WHEN b.id = ((SELECT min(sub.id) FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 1 
-					WHEN b.id = ((SELECT min(sub.id)+1 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 2 
-					WHEN b.id = ((SELECT min(sub.id)+2 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 3 
-					WHEN b.id = ((SELECT min(sub.id)+3 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 4
-					WHEN b.id = ((SELECT min(sub.id)+4 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 5 
-					WHEN b.id = ((SELECT min(sub.id)+5 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 6 
-					WHEN b.id = ((SELECT min(sub.id)+6 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 7 				
-					WHEN b.id = ((SELECT min(sub.id)+7 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 8 				
-					WHEN b.id = ((SELECT min(sub.id)+8 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 9 				
-					WHEN b.id = ((SELECT min(sub.id)+9 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 10
-					WHEN b.id = ((SELECT min(sub.id)+10 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 11
-					WHEN b.id = ((SELECT min(sub.id)+11 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 12 
-					WHEN b.id = ((SELECT min(sub.id)+12 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 13 
-					WHEN b.id = ((SELECT min(sub.id)+13 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 14
-					WHEN b.id = ((SELECT min(sub.id)+14 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 15 
-					WHEN b.id = ((SELECT min(sub.id)+15 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 16 
-					WHEN b.id = ((SELECT min(sub.id)+16 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 17 				
-					WHEN b.id = ((SELECT min(sub.id)+17 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 18 				
-					WHEN b.id = ((SELECT min(sub.id)+18 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 19 				
-					WHEN b.id = ((SELECT min(sub.id)+19 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 20 
-					WHEN b.id = ((SELECT min(sub.id)+20 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 21
-					WHEN b.id = ((SELECT min(sub.id)+21 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 22 
-					WHEN b.id = ((SELECT min(sub.id)+22 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 23 
-					WHEN b.id = ((SELECT min(sub.id)+23 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 24
-					WHEN b.id = ((SELECT min(sub.id)+24 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 25 
-					WHEN b.id = ((SELECT min(sub.id)+25 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 26 
-					WHEN b.id = ((SELECT min(sub.id)+26 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 27 				
-					WHEN b.id = ((SELECT min(sub.id)+27 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 28 				
-					WHEN b.id = ((SELECT min(sub.id)+28 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 29 				
-					WHEN b.id = ((SELECT min(sub.id)+29 FROM SCHEMA_NAME.inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 30 	
+					WHEN b.id = ((SELECT min(sub.id) FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 1 
+					WHEN b.id = ((SELECT min(sub.id)+1 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 2 
+					WHEN b.id = ((SELECT min(sub.id)+2 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 3 
+					WHEN b.id = ((SELECT min(sub.id)+3 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 4
+					WHEN b.id = ((SELECT min(sub.id)+4 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 5 
+					WHEN b.id = ((SELECT min(sub.id)+5 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 6 
+					WHEN b.id = ((SELECT min(sub.id)+6 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 7 				
+					WHEN b.id = ((SELECT min(sub.id)+7 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 8 				
+					WHEN b.id = ((SELECT min(sub.id)+8 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 9 				
+					WHEN b.id = ((SELECT min(sub.id)+9 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 10
+					WHEN b.id = ((SELECT min(sub.id)+10 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 11
+					WHEN b.id = ((SELECT min(sub.id)+11 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 12 
+					WHEN b.id = ((SELECT min(sub.id)+12 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 13 
+					WHEN b.id = ((SELECT min(sub.id)+13 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 14
+					WHEN b.id = ((SELECT min(sub.id)+14 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 15 
+					WHEN b.id = ((SELECT min(sub.id)+15 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 16 
+					WHEN b.id = ((SELECT min(sub.id)+16 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 17 				
+					WHEN b.id = ((SELECT min(sub.id)+17 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 18 				
+					WHEN b.id = ((SELECT min(sub.id)+18 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 19 				
+					WHEN b.id = ((SELECT min(sub.id)+19 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 20 
+					WHEN b.id = ((SELECT min(sub.id)+20 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 21
+					WHEN b.id = ((SELECT min(sub.id)+21 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 22 
+					WHEN b.id = ((SELECT min(sub.id)+22 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 23 
+					WHEN b.id = ((SELECT min(sub.id)+23 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 24
+					WHEN b.id = ((SELECT min(sub.id)+24 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 25 
+					WHEN b.id = ((SELECT min(sub.id)+25 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 26 
+					WHEN b.id = ((SELECT min(sub.id)+26 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 27 				
+					WHEN b.id = ((SELECT min(sub.id)+27 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 28 				
+					WHEN b.id = ((SELECT min(sub.id)+28 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 29 				
+					WHEN b.id = ((SELECT min(sub.id)+29 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 30 	
 					END) AS idrow,dma_id,cat_period_id,
 					factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
 					factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-					FROM SCHEMA_NAME.ext_rtc_scada_dma_period 
-					JOIN SCHEMA_NAME.inp_pattern_value b USING (pattern_id)) c order by 1,3) d ON a.dma_id=d.dma_id::integer AND a.idrow=d.idrow) e
+					FROM ext_rtc_scada_dma_period 
+					JOIN inp_pattern_value b USING (pattern_id)) c order by 1,3) d ON a.dma_id=d.dma_id::integer AND a.idrow=d.idrow) e
 
 			WHERE f.idrow=e.idrow and f.dma_id=e.dma_id;
 	
@@ -194,7 +194,7 @@ BEGIN
 				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
-				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=vnode_id::text
+				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text)
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;

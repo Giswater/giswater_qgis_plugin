@@ -33,7 +33,7 @@ CREATE TABLE ext_workorder_type(
   
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"param_options", "dataType":"json"}}$$);
 
-CREATE TABLE ud.om_visit_class_x_wo(
+CREATE TABLE om_visit_class_x_wo(
   id serial PRIMARY KEY NOT NULL,
   visitclass_id integer,
   wotype_id character varying(50));

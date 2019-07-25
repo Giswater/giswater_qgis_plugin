@@ -12,6 +12,5 @@ INSERT INTO selector_expl VALUES (3, 1, current_user);
 INSERT INTO selector_expl VALUES (8, 2, current_user);
 
 INSERT INTO selector_state VALUES (20, 1, current_user);
-INSERT INTO selector_state VALUES (25, 0, current_user);
 
 

@@ -52,7 +52,7 @@ UPDATE audit_cat_param_user SET layout_id=18 WHERE formname='epaoptions' AND lay
 UPDATE audit_cat_param_user SET layout_id=13 WHERE formname='epaoptions' AND layout_id=11;
 UPDATE audit_cat_param_user SET layout_id=14 WHERE formname='epaoptions' AND layout_id=12;
 
-UPDATE audit_cat_param_user SET layout_id=1, layout_order = 4, layoutname='grl_general_1' WHERE id='inp_options_valve_mode';
+UPDATE audit_cat_param_user SET layout_id=1, layout_order = 4, vdefault=1, layoutname='grl_general_1' WHERE id='inp_options_valve_mode';
 UPDATE audit_cat_param_user SET layout_id=2, layout_order = 4, layoutname='grl_general_2',editability='{"trueWhenParentIn":[3]}' WHERE id='inp_options_valve_mode_mincut_result';
 
 UPDATE audit_cat_param_user SET layout_id=3, layout_order = 9, label='MINCUT RESULTS id:', layoutname='grl_hyd_3' WHERE id='inp_options_quality_mode';
@@ -65,11 +65,10 @@ UPDATE audit_cat_param_user SET layout_id=4, layout_order = 10, layoutname='grl_
 UPDATE audit_cat_param_user SET label='Dscenario overwrites demand:', layout_id = 2, layout_order = 6, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
 
 UPDATE audit_cat_param_user SET id='inp_other_iterative_main_function', label = 'Main iterative function:', 
-								layout_id = 1, layout_order=7, layoutname='grl_general_1', idval=null, isenabled=TRUE, dv_isnullvalue=TRUE
+								layout_id = 1, layout_order=7, layoutname='grl_general_1', idval=null, isenabled=TRUE, dv_isnullvalue=TRUE,
 								dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function'''
 								WHERE id='inp_other_recursive_function';
 							
-				
 INSERT INTO audit_cat_param_user VALUES ('inp_other_iterative_secondary_function', 'epaoptions', 'Enable/disable the posibility to work with selected secondary iterative function', 'role_epa',
 			NULL, null, 'Secondary iterative function:', 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function''', 
 			NULL, TRUE, 2, 7, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, 'NONE', 'grl_general_2',

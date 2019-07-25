@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 drop view if exists v_rtc_period_nodepattern cascade;
 create or replace view v_rtc_period_nodepattern as           
 SELECT row_number() over (order by pattern_id, idrow) as id, 
- (select value from SCHEMA_NAME.config_param_user WHERE cur_user=current_user AND parameter='inp_options_rtc_period_id') AS period_id,
+ (select value from config_param_user WHERE cur_user=current_user AND parameter='inp_options_rtc_period_id') AS period_id,
     idrow,
 	pattern_id, 
 	sum(factor_1)::numeric(10,8) as factor_1, sum(factor_2)::numeric(10,8) as factor_2,

@@ -40,7 +40,7 @@ BEGIN
 	(depth1 - locate*(depth1-depth2))::numeric (12,3),	
 	'}')
 	FROM (
-		SELECT distinct on (vnode_id) concat('VN',vnode_id::text) as vnode_id, arc_id, 
+		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, arc_id, 
 		case 	
 			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom)=1 then 0.9900 
 			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom)=0 then 0.0100 
@@ -79,7 +79,7 @@ BEGIN
 		FROM temp_table
 		JOIN arc a ON arc_id=text_column::json->>'arc_id'
 		JOIN connec ON concat('VN',pjoint_id)=text_column::json->>'vnode_id'
-		WHERE result_id=result_id_var AND text_column::json->>'vnode_id' ilike 'VN%'
+		WHERE text_column::json->>'vnode_id' ilike 'VN%' AND user_name=current_user
 		AND fprocesscat_id=50 ;
 
 

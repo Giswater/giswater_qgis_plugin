@@ -15,7 +15,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
