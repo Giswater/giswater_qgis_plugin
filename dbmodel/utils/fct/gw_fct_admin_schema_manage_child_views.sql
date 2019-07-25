@@ -58,7 +58,8 @@ IF v_multi_create IS TRUE THEN
 	--get the system type and system_id of the feature and view name
 	v_feature_type = (SELECT type FROM cat_feature where id=rec.id);
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
-
+	v_cat_feature = rec.id;
+	
 	--create a child view name if doesnt exist
 	IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
 		UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=rec.id;
@@ -180,7 +181,7 @@ raise notice '4/addfields=1,v_man_fields,%',v_man_fields;
 		CONTINUE;
 	END IF;
 
-	EXECUTE 'SELECT ws32_add.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+	EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 	"feature":{"catFeature":"'||v_cat_feature||'"}, 
 	"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 
@@ -301,7 +302,7 @@ RAISE NOTICE 'v_man_fields,%',v_man_fields;
 			END IF;
 			
 		END IF;
-	EXECUTE 'SELECT ws32_add.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+	EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 	"feature":{"catFeature":"'||v_cat_feature||'"}, 
 	"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 

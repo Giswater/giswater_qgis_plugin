@@ -15,8 +15,8 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
-"feature":{"catFeature":"HYDRANT"},
-"data":{"filterFields":{}, "pageInfo":{}, "view_name":"ve_node_hydrant", "feature_type":"node" }}$$);
+"feature":{"catFeature":"SHUTOFF-VALVE"},
+"data":{"filterFields":{}, "pageInfo":{}, "view_name":"ve_node_shutoffvalve", "feature_type":"node" }}$$);
 */
 DECLARE
 v_schemaname text;
@@ -27,6 +27,14 @@ v_project_type text;
 v_version text;
 v_config_fields text;
 rec record;
+v_cat_feature text;
+v_feature_system_id text;
+v_man_fields text;
+v_man_addfields text;
+v_orderby integer;
+v_datatype text;
+v_widgettype text;
+
 BEGIN
 	
 		-- search path
@@ -37,11 +45,14 @@ BEGIN
 
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
-	--v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
+	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_view_name = ((p_data ->>'data')::json->>'view_name')::text;
 	v_feature_type = lower(((p_data ->>'data')::json->>'feature_type')::text);
 
+	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 	
+	raise notice 'v_feature_type,%',v_feature_type;
+	raise notice 'v_feature_system_id,%',v_feature_system_id;
 	EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 	FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
 	AND column_name!=''id'';'
@@ -57,11 +68,90 @@ BEGIN
 
 	FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname=concat('ve_',v_feature_type))
 	LOOP
-	raise notice 'rec,%',rec;
+	--raise notice 'rec,%',rec;
 		EXECUTE 'INSERT INTO config_api_form_fields('||v_config_fields||')
 		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
+
 	END LOOP;
 
+	
+	--select columns from man_* table without repeating the identifier
+	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale
+	FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+	and column_name!='''||v_feature_type||'_id'' group by column_name, data_type,numeric_precision, numeric_scale';
+				
+	raise notice 'v_man_fields,%',v_man_fields;
+
+	FOR rec IN  EXECUTE v_man_fields LOOP
+	raise notice 'rec,%',rec;
+
+		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layout_name=''layout_data_1'';'
+		INTO v_orderby;
+
+		IF rec.data_type = 'character varying' THEN
+			v_datatype='string';
+			v_widgettype='text';
+		ELSIF rec.data_type = 'numeric' THEN
+			v_datatype='double';
+			v_widgettype='text';
+		ELSIF rec.data_type = 'integer' THEN
+			v_datatype='integer';
+			v_widgettype='text';
+		ELSIF rec.data_type = 'boolean' THEN
+			v_datatype='boolean';
+			v_widgettype='check';
+		ELSIF rec.data_type = 'date' THEN
+			v_datatype='date';
+			v_widgettype='datepickertime';
+		END IF;
+		
+		IF v_datatype='double' THEN
+			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, label, ismandatory,isparent,
+			iseditable,isautoupdate,field_length,num_decimals) 
+			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,rec.column_name, false, false,true,false,rec.numeric_precision, rec.numeric_scale);
+		ELSE
+			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, label, ismandatory,isparent,iseditable,isautoupdate) 
+			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,rec.column_name, false, false,true,false);
+		END IF;
+	END LOOP;
+
+	v_man_addfields = 'SELECT * FROM man_addfields_parameter WHERE active = TRUE AND (cat_feature_id IS NULL OR cat_feature_id='''||v_cat_feature||''');';
+
+	FOR rec IN EXECUTE v_man_addfields LOOP
+	
+		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layout_name=''layout_data_1'';'
+		INTO v_orderby;
+
+		raise notice 'rec,%',rec;
+		
+		IF rec.datatype_id = 'numeric' THEN 
+			v_datatype='double';
+		ELSE
+			v_datatype=rec.datatype_id;
+		END IF;
+
+		IF rec.datatype_id = 'character varying' OR rec.datatype_id = 'integer' OR rec.datatype_id = 'numeric' THEN
+			v_widgettype='text';
+		ELSIF rec.datatype_id = 'boolean' THEN
+			v_widgettype='check';
+		ELSIF rec.datatype_id = 'date' THEN
+			v_widgettype='datepickertime';
+		END IF;
+		
+		IF v_datatype='double' THEN
+			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
+				label, ismandatory,isparent,iseditable,isautoupdate,field_length,num_decimals) 
+			VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,
+				rec.form_label, rec.is_mandatory, false,rec.iseditable,false,rec.numeric_precision, rec.numeric_scale);
+		ELSE
+			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
+				label, ismandatory,isparent,iseditable,isautoupdate) 
+			VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,
+				rec.form_label, rec.is_mandatory, false,rec.iseditable,false);
+		END IF;
+		
+	END LOOP;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
