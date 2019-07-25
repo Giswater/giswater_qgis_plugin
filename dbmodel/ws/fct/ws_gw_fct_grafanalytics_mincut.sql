@@ -59,9 +59,10 @@ BEGIN
 	-- set boundary conditions of graf table	
 	IF v_mincutprocess = 'base' THEN
 		UPDATE anl_graf SET flag=2
-		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND unaccess = FALSE AND broken = FALSE AND anl_graf.node_1 = anl_mincut_result_valve.node_id AND user_name=current_user;
+		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))
+		AND anl_graf.node_1 = anl_mincut_result_valve.node_id AND user_name=current_user;
 			
-	ELSIF v_mincutprocess = 'extended' THEN
+	ELSIF v_mincutprocess = 'extended' THEN 
 		UPDATE anl_graf SET flag=2
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE AND anl_graf.node_1 = anl_mincut_result_valve.node_id AND user_name=current_user;
 	END IF;
@@ -85,11 +86,20 @@ BEGIN
 		(SELECT node_1,water FROM anl_graf WHERE grafclass=''MINCUT'' UNION SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
 		GROUP BY node_1, water HAVING water=1) b';
 
-	-- insert node delimiters into table
-	EXECUTE 'INSERT INTO anl_mincut_result_node (result_id, node_id)
-		SELECT '||v_mincutid||', b.node_1 FROM (SELECT node_1 FROM
-		(SELECT node_1,water FROM anl_graf WHERE grafclass=''MINCUT'' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
-		GROUP BY node_1, water HAVING water=1 AND count(node_1)=2) b';
+	-- insert delimiters into table
+	IF v_mincutprocess = 'base' THEN
+		EXECUTE 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE result_id = '||v_mincutid||' AND node_id IN 
+			(SELECT b.node_1 FROM (SELECT node_1 FROM
+			(SELECT node_1,water FROM anl_graf WHERE grafclass=''MINCUT'' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
+			GROUP BY node_1, water HAVING water=1 AND count(node_1)=1) b)';
+			
+	ELSIF v_mincutprocess = 'extended' THEN
+		EXECUTE 'INSERT INTO anl_mincut_result_node (result_id, node_id)
+			SELECT '||v_mincutid||', b.node_1 FROM (SELECT node_1 FROM
+			(SELECT node_1,water FROM anl_graf WHERE grafclass=''MINCUT'' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
+			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2) b';
+	END IF;
+	
 
 RETURN 1;
 END;
