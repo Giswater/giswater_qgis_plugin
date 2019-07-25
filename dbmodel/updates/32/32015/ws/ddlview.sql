@@ -439,7 +439,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
 
 DROP VIEW v_edit_vnode;
 CREATE OR REPLACE VIEW v_edit_vnode AS 
- SELECT vnode.vnode_id,
+ SELECT DISTINCT ON (vnode_id) vnode.vnode_id,
     vnode.vnode_type,
 	vnode.elev,
     vnode.sector_id,

@@ -278,9 +278,9 @@ CREATE OR REPLACE VIEW v_rtc_period_pjointpattern AS
             sum(lps_avg * b.factor_18::double precision) AS factor_18
            FROM v_rtc_period_hydrometer
              JOIN inp_pattern_value b USING (pattern_id)
-          GROUP BY pjoint_id,1)a
+          GROUP BY pjoint_id,1, period_id)a
 	  GROUP BY a.period_id, a.idrow, a.pattern_id;
-*/
+
 				
 CREATE OR REPLACE VIEW v_inp_pjointpattern AS 
  SELECT row_number() OVER (ORDER BY a.pattern_id, a.idrow) AS id,
