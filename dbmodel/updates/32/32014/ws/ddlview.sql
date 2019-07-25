@@ -15,8 +15,8 @@ WHERE (anl_graf.flag = 0 AND nodes_a.node_1 IS NOT NULL) OR anl_graf.flag = 1 AN
 
 
 
-DROP VIEW SCHEMA_NAME.v_edit_inp_pipe;
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_pipe AS 
+DROP VIEW v_edit_inp_pipe;
+CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
  SELECT arc.arc_id,
     arc.node_1,
     arc.node_2,
@@ -31,126 +31,123 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_pipe AS
     inp_pipe.status,
     inp_pipe.custom_roughness,
     inp_pipe.custom_dint
-   FROM SCHEMA_NAME.inp_selector_sector,
-    SCHEMA_NAME.arc
-     JOIN SCHEMA_NAME.v_arc ON v_arc.arc_id::text = arc.arc_id::text
-     JOIN SCHEMA_NAME.inp_pipe ON inp_pipe.arc_id::text = arc.arc_id::text
+   FROM inp_selector_sector,
+    arc
+     JOIN v_arc ON v_arc.arc_id::text = arc.arc_id::text
+     JOIN inp_pipe ON inp_pipe.arc_id::text = arc.arc_id::text
   WHERE arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_junction AS 
- SELECT DISTINCT ON (node_id) node.node_id,
-    node.elevation,
-    node.depth,
-    node.nodecat_id,
-    node.sector_id,
+
+CREATE OR REPLACE VIEW ws_sample.v_edit_inp_junction AS 
+ SELECT DISTINCT ON (node_id) v_node.node_id,
+    elevation,
+    depth,
+    nodecat_id,
+    v_node.sector_id,
     v_node.macrosector_id,
-    node.state,
-    node.annotation,
-    node.the_geom,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
     inp_junction.demand,
     inp_junction.pattern_id
-   FROM SCHEMA_NAME.node
-     JOIN SCHEMA_NAME.v_node ON v_node.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.inp_junction ON inp_junction.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=node.node_id
-     JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
+   FROM ws_sample.v_node
+     JOIN ws_sample.inp_junction USING (node_id)
+     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
+     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
 
-   CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_pump AS 
- SELECT node.node_id,
-    node.elevation,
-    node.depth,
-    node.nodecat_id,
-    node.sector_id,
+
+   CREATE OR REPLACE VIEW v_edit_inp_pump AS 
+ SELECT v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
     v_node.macrosector_id,
-    node.state,
-    node.annotation,
-    node.the_geom,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
     inp_pump.power,
     inp_pump.curve_id,
     inp_pump.speed,
     inp_pump.pattern,
     inp_pump.to_arc,
     inp_pump.status
-   FROM SCHEMA_NAME.node
-     JOIN SCHEMA_NAME.v_node ON v_node.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.inp_pump ON node.node_id::text = inp_pump.node_id::text
-     JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=node.node_id
-     JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
+   FROM ws_sample.v_node
+     JOIN ws_sample.inp_pump USING (node_id)
+     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
+     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
 
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_reservoir AS 
- SELECT node.node_id,
-    node.elevation,
-    node.depth,
-    node.nodecat_id,
-    node.sector_id,
+CREATE OR REPLACE VIEW v_edit_inp_reservoir AS 
+ SELECT v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
     v_node.macrosector_id,
-    node.state,
-    node.annotation,
-    node.the_geom,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
     inp_reservoir.pattern_id
-   FROM SCHEMA_NAME.node
-     JOIN SCHEMA_NAME.v_node ON v_node.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.inp_reservoir ON inp_reservoir.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=node.node_id
-     JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
+   FROM ws_sample.v_node
+     JOIN ws_sample.inp_reservoir USING (node_id)
+     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
+     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_shortpipe AS 
- SELECT node.node_id,
-    node.elevation,
-    node.depth,
-    node.nodecat_id,
-    node.sector_id,
+CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
+ SELECT v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
     v_node.macrosector_id,
-    node.state,
-    node.annotation,
-    node.the_geom,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
     inp_shortpipe.minorloss,
     inp_shortpipe.to_arc,
     inp_shortpipe.status
-   FROM SCHEMA_NAME.node
-     JOIN SCHEMA_NAME.v_node ON v_node.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.inp_shortpipe ON inp_shortpipe.node_id::text = node.node_id::text
-   JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=node.node_id
-     JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
+   FROM ws_sample.v_node
+     JOIN ws_sample.inp_shortpipe USING (node_id)
+     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
+     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_tank AS 
- SELECT node.node_id,
-    node.elevation,
-    node.depth,
-    node.nodecat_id,
-    node.sector_id,
+CREATE OR REPLACE VIEW v_edit_inp_tank AS 
+ SELECT v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
     v_node.macrosector_id,
-    node.state,
-    node.annotation,
-    node.the_geom,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
     inp_tank.initlevel,
     inp_tank.minlevel,
     inp_tank.maxlevel,
     inp_tank.diameter,
     inp_tank.minvol,
     inp_tank.curve_id
-   FROM SCHEMA_NAME.node
-     JOIN SCHEMA_NAME.v_node ON v_node.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.inp_tank ON inp_tank.node_id::text = node.node_id::text
-   JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=node.node_id
-     JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
+   FROM ws_sample.v_node
+     JOIN ws_sample.inp_tank USING (node_id)
+     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
+     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
 
    
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_valve AS 
- SELECT node.node_id,
-    node.elevation,
-    node.depth,
-    node.nodecat_id,
-    node.sector_id,
+CREATE OR REPLACE VIEW v_edit_inp_valve AS 
+ SELECT v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
     v_node.macrosector_id,
-    node.state,
-    node.annotation,
-    node.the_geom,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
     inp_valve.valv_type,
     inp_valve.pressure,
     inp_valve.flow,
@@ -159,15 +156,13 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_valve AS
     inp_valve.minorloss,
     inp_valve.to_arc,
     inp_valve.status
-   FROM SCHEMA_NAME.node
-     JOIN SCHEMA_NAME.v_node ON v_node.node_id::text = node.node_id::text
-     JOIN SCHEMA_NAME.inp_valve ON node.node_id::text = inp_valve.node_id::text
-   JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=node.node_id
-     JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=node.node_id;
-	 
+   FROM ws_sample.v_node
+     JOIN ws_sample.inp_valve USING (node_id)
+     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
+     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
 	 
 
- CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_connec AS 
+ CREATE OR REPLACE VIEW v_edit_inp_connec AS 
  SELECT connec.connec_id,
     elevation,
     depth,
@@ -178,5 +173,5 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_valve AS
     connec.the_geom,
     inp_connec.demand,
     inp_connec.pattern_id
-   FROM SCHEMA_NAME.connec
+   FROM connec
 	JOIN inp_connec USING (connec_id);
