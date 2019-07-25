@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','1','NODE ESTIMATED');
+INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','1','ESTIMATED');
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','2','CRM PERIOD');
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','3','CRM INTERVAL');
 
@@ -37,7 +37,7 @@ UPDATE audit_cat_param_user SET label='Estimated unique pattern:', dv_querytext=
 UPDATE audit_cat_param_user SET label='CRM period:',  layout_id = 10, dv_isnullvalue=true, layout_order = 1, layoutname='grl_crm_10',	dv_parent_id='inp_options_demandtype', 
 								editability='{"trueWhenParentIn":[2]}'
 								WHERE id='inp_options_rtc_period_id';
-UPDATE audit_cat_param_user SET label='Overwrite demands:', layout_id = 2, layout_order = 3, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
+UPDATE audit_cat_param_user SET label='Dscenario overwrites demand:', layout_id = 2, layout_order = 3, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
 UPDATE audit_cat_param_user SET layout_order = 3 WHERE id='inp_options_demand_multiplier';
 
 UPDATE audit_cat_param_user SET id='inp_other_iterative_main_function', label = 'Main iterative function:', layout_id = 15, layout_order=2, layoutname='grl_inpother_15',

@@ -15,7 +15,7 @@ WHERE (anl_graf.flag = 0 AND nodes_a.node_1 IS NOT NULL) OR anl_graf.flag = 1 AN
 
 
 
-DROP VIEW v_edit_inp_pipe;
+DROP VIEW v_edit_inp_pipe CASCADE;
 CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
  SELECT arc.arc_id,
     arc.node_1,
@@ -39,7 +39,7 @@ CREATE OR REPLACE VIEW v_edit_inp_pipe AS
 
 
 
-CREATE OR REPLACE VIEW ws_sample.v_edit_inp_junction AS 
+CREATE OR REPLACE VIEW v_edit_inp_junction AS 
  SELECT DISTINCT ON (node_id) v_node.node_id,
     elevation,
     depth,
@@ -51,10 +51,12 @@ CREATE OR REPLACE VIEW ws_sample.v_edit_inp_junction AS
     v_node.the_geom,
     inp_junction.demand,
     inp_junction.pattern_id
-   FROM ws_sample.v_node
-     JOIN ws_sample.inp_junction USING (node_id)
-     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
-     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
+   FROM inp_selector_sector, v_node
+     JOIN inp_junction USING (node_id)
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+
 
 
    CREATE OR REPLACE VIEW v_edit_inp_pump AS 
@@ -73,10 +75,10 @@ CREATE OR REPLACE VIEW ws_sample.v_edit_inp_junction AS
     inp_pump.pattern,
     inp_pump.to_arc,
     inp_pump.status
-   FROM ws_sample.v_node
-     JOIN ws_sample.inp_pump USING (node_id)
-     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
-     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
+   FROM inp_selector_sector, v_node
+     JOIN inp_pump USING (node_id)
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 
@@ -91,10 +93,11 @@ CREATE OR REPLACE VIEW v_edit_inp_reservoir AS
     v_node.annotation,
     v_node.the_geom,
     inp_reservoir.pattern_id
-   FROM ws_sample.v_node
-     JOIN ws_sample.inp_reservoir USING (node_id)
-     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
-     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
+   FROM inp_selector_sector, v_node
+    JOIN inp_reservoir USING (node_id)
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+     
 
 
 CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
@@ -110,10 +113,10 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
     inp_shortpipe.minorloss,
     inp_shortpipe.to_arc,
     inp_shortpipe.status
-   FROM ws_sample.v_node
-     JOIN ws_sample.inp_shortpipe USING (node_id)
-     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
-     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
+   FROM inp_selector_sector, v_node
+     JOIN inp_shortpipe USING (node_id)
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_tank AS 
@@ -132,10 +135,10 @@ CREATE OR REPLACE VIEW v_edit_inp_tank AS
     inp_tank.diameter,
     inp_tank.minvol,
     inp_tank.curve_id
-   FROM ws_sample.v_node
-     JOIN ws_sample.inp_tank USING (node_id)
-     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
-     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
+   FROM inp_selector_sector, v_node
+     JOIN inp_tank USING (node_id)
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
    
 CREATE OR REPLACE VIEW v_edit_inp_valve AS 
@@ -156,10 +159,10 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
     inp_valve.minorloss,
     inp_valve.to_arc,
     inp_valve.status
-   FROM ws_sample.v_node
-     JOIN ws_sample.inp_valve USING (node_id)
-     JOIN ws_sample.v_edit_inp_pipe a ON a.node_1=v_node.node_id
-     JOIN ws_sample.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
+   FROM inp_selector_sector, v_node
+     JOIN inp_valve USING (node_id)
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 	 
 
  CREATE OR REPLACE VIEW v_edit_inp_connec AS 
@@ -167,11 +170,13 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
     elevation,
     depth,
     connecat_id,
-    sector_id,
+    connec.sector_id,
+    connec.arc_id,
     connec.state,
     connec.annotation,
     connec.the_geom,
     inp_connec.demand,
     inp_connec.pattern_id
-   FROM connec
-	JOIN inp_connec USING (connec_id);
+   FROM inp_selector_sector, connec
+	JOIN inp_connec USING (connec_id)
+	WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text

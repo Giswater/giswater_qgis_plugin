@@ -16,10 +16,21 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_
 
 UPDATE audit_cat_param_user SET id='inp_options_networkmode', 
 	label='Network geometry generator:', datatype ='integer' , widgettype ='combo', 
-	dv_querytext = 'SELECT idval as id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_networkmode''',
-	description='Generates the network onfly transformation to epa with 3 options; Faster: Only mandatory 
-    nodarc (EPANET valves and pumps); Normal: All nodarcs (GIS shutoff valves); Slower: All nodarcs and in addition treaming all pipes with vnode creating the vnodearcs'
+	dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_networkmode''',
+	description='Generates the network onfly transformation to epa with 3 options; Faster: Only mandatory nodarc (EPANET valves and pumps); Normal: All nodarcs (GIS shutoff valves); Slower: All nodarcs and in addition treaming all pipes with vnode creating the vnodearcs',
+	layout_id=1, layout_order=4, layoutname ='grl_general_1', dv_orderby_id=true, vdefault=1, idval=null
 	WHERE id = 'inp_options_nodarc_onlymandatory';
+
+UPDATE audit_cat_param_user SET
+	layout_id=2, layout_order=4, layoutname ='grl_general_2', idval=null 
+	WHERE id = 'inp_options_nodarc_length';
+	
+UPDATE audit_cat_param_user SET
+	dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_opti_valvemode'''
+	WHERE id = 'inp_options_valve_mode';
+	
+
+UPDATE config_param_user SET value = 1 WHERE cur_user=current_user AND parameter ='inp_options_valve_mode';
 
 	
 INSERT INTO audit_cat_table VALUES ('v_rtc_period_nodepattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -29,3 +40,9 @@ INSERT INTO audit_cat_table VALUES ('inp_connec', 'Mincut', 'Catalog of mincut r
 
 
 INSERT INTO audit_cat_function VALUES (2730, 'trg_edit_inp_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'Trigger to edit v_edit_inp_connec view', 'role_epa', false, false, NULL, false);
+
+
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_opti_valvemode';
+INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 1, 'EPA TABLES', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 2, 'INVENTORY VALUES', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 3, 'MINCUT RESULTS', NULL);

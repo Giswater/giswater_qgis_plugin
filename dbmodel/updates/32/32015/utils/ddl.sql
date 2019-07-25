@@ -10,6 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE dma DROP COLUMN _pattern_id;
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"minorloss", "dataType":"numeric(12,6)"}}$$);
+
 ALTER TABLE price_simple RENAME TO _price_simple_;
 ALTER TABLE om_visit_value_criticity RENAME TO _om_visit_value_criticity_;
 ALTER TABLE dattrib RENAME TO _dattrib_;

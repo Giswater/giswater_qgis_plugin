@@ -7,6 +7,36 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+CREATE OR REPLACE VIEW vi_pipes AS 
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.length,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.roughness,
+    CASE WHEN rpt_inp_arc.minorloss IS NULL THEN 0::numeric(12,6) ELSE rpt_inp_arc.minorloss::numeric(12,6) END AS minorloss,
+    inp_typevalue.idval AS status
+   FROM inp_selector_result, rpt_inp_arc
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = rpt_inp_arc.status::text
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.length,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.roughness,
+    CASE WHEN inp_shortpipe.minorloss IS NULL THEN 0::numeric(12,6) ELSE inp_shortpipe.minorloss END AS minorloss,
+    inp_typevalue.idval AS status
+   FROM inp_selector_result,
+    rpt_inp_arc
+     JOIN inp_shortpipe ON rpt_inp_arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_shortpipe.status::text
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+
+
+
 CREATE OR REPLACE VIEW v_arc AS 
  SELECT arc.arc_id,
     arc.code,

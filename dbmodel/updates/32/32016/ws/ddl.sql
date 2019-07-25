@@ -7,4 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+INSERT INTO inp_connec SELECT connec_id FROM connec;
+
 

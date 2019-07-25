@@ -34,3 +34,120 @@ CREATE OR REPLACE VIEW vi_options AS
    UNION
 	SELECT 'INFILTRATION' , infiltration as value from inp_selector_hydrology, cat_hydrology
 	where cur_user=current_user;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_junction AS
+SELECT 
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+elev AS sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,
+state, 
+the_geom,
+annotation, 
+inp_junction.y0, 
+inp_junction.ysur,
+inp_junction.apond
+FROM inp_selector_sector, v_node
+     JOIN inp_junction ON inp_junction.node_id = v_node.node_id
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_divider AS
+SELECT 
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,
+state, 
+annotation, 
+the_geom,
+inp_divider.divider_type, 
+inp_divider.arc_id, 
+inp_divider.curve_id, 
+inp_divider.qmin, 
+inp_divider.ht, 
+inp_divider.cd, 
+inp_divider.y0, 
+inp_divider.ysur, 
+inp_divider.apond
+FROM inp_selector_sector, v_node
+     JOIN inp_divider ON (((v_node.node_id) = (inp_divider.node_id)))
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_outfall AS
+SELECT 
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,
+"state", 
+the_geom,
+annotation, 
+inp_outfall.outfall_type, 
+inp_outfall.stage, 
+inp_outfall.curve_id, 
+inp_outfall.timser_id,
+inp_outfall.gate
+FROM inp_selector_sector, v_node
+     JOIN inp_outfall ON (((v_node.node_id) = (inp_outfall.node_id)))
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_outfall AS
+SELECT 
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,"state", 
+the_geom,
+annotation,
+inp_storage.storage_type, 
+inp_storage.curve_id, 
+inp_storage.a1, 
+inp_storage.a2,
+inp_storage.a0, 
+inp_storage.fevap, 
+inp_storage.sh, 
+inp_storage.hc, 
+inp_storage.imd, 
+inp_storage.y0, 
+inp_storage.ysur,
+inp_storage.apond
+FROM inp_selector_sector, v_node
+     JOIN inp_storage ON (((v_node.node_id) = (inp_storage.node_id)))
+     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
