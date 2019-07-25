@@ -1,3 +1,5 @@
 3.2.016
 ********
 - Add ai capabilities
+- Manage affec, planif and current_length of arcs in psector
+- New function csv2pg_import_omvisitlot
