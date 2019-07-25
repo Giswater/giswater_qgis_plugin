@@ -383,6 +383,12 @@ BEGIN
 					
 			END LOOP;
 			
+			-- in case of divide ficitius arc, new arcs will be ficticius, but we need to set doable false because they are inserted by default as true
+			IF (SELECT state_type FROM arc WHERE arc_id=arc_id_aux) = (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius') THEN
+				UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
+				UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
+			END IF;
+			
 			-- delete old arc
 			DELETE FROM arc WHERE arc_id=arc_id_aux;		
 
