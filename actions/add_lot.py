@@ -17,7 +17,7 @@ else:
     from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
 
-from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt
+from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout
@@ -37,6 +37,7 @@ from ..ui_manager import AddLot
 from ..ui_manager import BasicTable
 from ..ui_manager import LotManagement
 from ..ui_manager import Multirow_selector
+from ..ui_manager import UserManagement
 
 
 class AddNewLot(ParentManage):
@@ -1333,6 +1334,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.tbl_lots.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_manage_user.clicked.connect(partial(self.open_user_manage))
 
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
@@ -1345,6 +1347,91 @@ class AddNewLot(ParentManage):
 
         # Open form
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
+
+
+    def open_user_manage(self):
+
+        self.dlg_user_manage = UserManagement()
+        self.load_settings(self.dlg_user_manage)
+
+        table_object = 'om_visit_lot_x_user'
+        self.dlg_user_manage.tbl_user.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        # Set a model with selected filter. Attach that model to selected table
+        self.fill_table_object(self.dlg_user_manage.tbl_user, self.schema_name + "." + table_object)
+        self.set_table_columns(self.dlg_user_manage, self.dlg_user_manage.tbl_user, table_object)
+
+        # Set filter events
+        self.dlg_user_manage.txt_user_filter.textChanged.connect(self.filter_user)
+
+        # Set listeners
+        self.dlg_user_manage.btn_path.clicked.connect(partial(self.select_path, self.dlg_user_manage))
+        self.dlg_user_manage.btn_accept.clicked.connect(partial(self.manage_accept, self.dlg_user_manage.tbl_user))
+        self.dlg_user_manage.date_event_from.dateChanged.connect(partial(self.filter_user))
+        self.dlg_user_manage.date_event_to.dateChanged.connect(partial(self.filter_user))
+
+        # Get columns to ignore for tab_relations when export csv
+        sql = "SELECT column_id FROM config_client_forms WHERE location_type = 'tbl_user' AND status IS NOT TRUE AND table_id = 'om_visit_lot_x_user'"
+        rows = self.controller.get_rows(sql, commit=True)
+        result_relation = []
+        if rows is not None:
+            for row in rows:
+                result_relation.append(row[0])
+        else:
+            result = ''
+
+        # TODO: Disable columns user_id + team_id
+
+        self.dlg_user_manage.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
+
+        # Open form
+        self.dlg_user_manage.show()
+
+
+    def manage_accept(self, widget):
+
+        model = widget.model()
+        print(str(widget))
+        print(str(model))
+        status = model is not None and model.submitAll()
+        if not status:
+            return
+
+        # Close dialog
+        self.close_dialog(self.dlg_user_manage)
+
+
+    def filter_user(self):
+
+        # Refresh model with selected filter
+        filter = utils_giswater.getWidgetText(self.dlg_user_manage, self.dlg_user_manage.txt_user_filter)
+
+        if filter == 'null':
+            filter = ''
+
+
+        visit_start = self.dlg_user_manage.date_event_from.date()
+        visit_end = self.dlg_user_manage.date_event_to.date()
+
+        if visit_start > visit_end:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
+        # Create interval dates
+        format_low = self.lot_date_format + ' 00:00:00.000'
+        format_high = self.lot_date_format + ' 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            visit_start.toString(format_low), visit_end.toString(format_high))
+
+        expr_filter = ("(starttime BETWEEN {0} OR starttime IS NULL) "
+                       "AND (endtime BETWEEN {0} OR endtime IS NULL)".format(interval))
+
+        expr_filter += " AND user_id LIKE '%" + str(filter) + "%'"
+        print(str(expr_filter))
+
+        self.dlg_user_manage.tbl_user.model().setFilter(expr_filter)
+        self.dlg_user_manage.tbl_user.model().select()
 
 
     def lot_selector(self):
@@ -1446,10 +1533,9 @@ class AddNewLot(ParentManage):
                     value = qtable.model().data(qtable.model().index(r, c))
                     if str(value) == 'NULL':
                         value = ''
-                    elif type(value) == QDate:
+                    elif type(value) == QDate or type(value) == QDateTime:
                         value = value.toString(date_format)
                     row.append(value)
-
             all_rows.append(row)
 
         # Write list into csv file

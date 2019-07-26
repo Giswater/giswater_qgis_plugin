@@ -512,6 +512,13 @@ class UDcatalog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('user_management.ui')
+class UserManagement(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('cf_ud_catalog.ui')
 class CFUDcatalog(QDialog, FORM_CLASS):
     def __init__(self):
