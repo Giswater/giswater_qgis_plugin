@@ -38,6 +38,8 @@ DECLARE
 	v_querytext text;
 	v_querytextres record;
 	v_i integer;
+	v_count text;
+
 	
 BEGIN
 
