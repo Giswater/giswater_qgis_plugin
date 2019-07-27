@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_dscenario (result_id_var character varying)  RETURNS integer AS $BODY$
 
 DECLARE
-     
+    v_demandpriority integer; 
 
 BEGIN
 	--  Search path
@@ -18,11 +18,18 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa for filling demand scenario';
 
-	-- check if overwrite demands
-	IF (SELECT value FROM config_param_user WHERE parameter='inp_options_overwritedemands' AND cur_user=current_user)::boolean THEN
+	v_demandpriority = (SELECT value FROM config_param_user WHERE parameter='inp_options_oveedemands' AND cur_user=current_user);
+	
+	-- 
+	IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
 		UPDATE rpt_inp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
-	ELSE
-		UPDATE rpt_inp_node SET demand=rpt_inp_node.demand+a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
+
+	ELSIF v_demandpriority = 2 THEN -- Ignore Dscenario when base demand exists
+		UPDATE rpt_inp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var AND rpt_inp_node.demand =0;
+
+	ELSIF v_demandpriority = 3 THEN -- Dscenario and base demand are joined
+		UPDATE rpt_inp_node SET demand=demand + a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
+	
 	END IF;
 
 RETURN 1;
