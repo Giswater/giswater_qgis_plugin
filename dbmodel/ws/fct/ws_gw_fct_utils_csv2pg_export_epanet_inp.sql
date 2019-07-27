@@ -24,6 +24,14 @@ DECLARE
 	result_id_aux varchar;
 	title_aux varchar;
 	v_pg2csvcat_id integer=10;
+	v_demandtype 	integer;
+	v_patternmethod	integer;
+	v_networkmode	integer;
+	v_valvemode	integer;
+	v_demandtypeval text;
+	v_patternmethodval 	text;
+	v_valvemodeval 		text;
+	v_networkmodeval	text;
 
 BEGIN
 
@@ -33,17 +41,30 @@ BEGIN
 
 	--Delete previous
 	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_pg2csvcat_id;
-		
+
+	-- get parameters to put on header
 	SELECT result_id INTO result_id_aux FROM inp_selector_result where cur_user=current_user;
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
-		
+	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
+	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
+	SELECT value INTO v_valvemode FROM config_param_user WHERE parameter = 'inp_options_valve_mode' AND cur_user=current_user;
+	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
+	SELECT idval INTO v_demandtypeval FROM inp_typevalue WHERE id=v_demandtype::text AND typevalue ='inp_value_demandtype';
+	SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
+	SELECT idval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
+	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
+
+	--writing the header
 	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES ('[TITLE]',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (';Created by Giswater, the water management open source tool',v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (';INP file created by Giswater, the water management open source tool',v_pg2csvcat_id);
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Project name: ',title_aux, v_pg2csvcat_id);
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Result name: ',p_result_id,v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Network export mode: ', v_networkmodeval, v_pg2csvcat_id ); 
+	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Demand type: ', v_demandtypeval, v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Pattern method: ', v_patternmethodval, v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Valve mode: ', v_valvemodeval, v_pg2csvcat_id); 
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_pg2csvcat_id); 
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';User: ',current_user, v_pg2csvcat_id); 
-
 	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 
 
 	--node
