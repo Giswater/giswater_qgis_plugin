@@ -48,9 +48,9 @@ BEGIN
 
 		ELSIF v_valvemode = 1 THEN -- epa tables
 			UPDATE rpt_inp_arc SET status=a.status 
-				FROM (SELECT rpt_inp_arc.arc_id, status FROM rpt_inp_arc join inp_shortpipe ON node_id=node_1
+				FROM (SELECT rpt_inp_arc.arc_id, inp_shortpipe.status FROM rpt_inp_arc join inp_shortpipe ON node_id=node_1
 					UNION
-					SELECT rpt_inp_arc.arc_id, status from rpt_inp_arc join inp_shortpipe ON node_id=node_2) a 
+					SELECT rpt_inp_arc.arc_id, inp_shortpipe.status from rpt_inp_arc join inp_shortpipe ON node_id=node_2) a 
 				WHERE a.arc_id=rpt_inp_arc.arc_id AND result_id=result_id_var;			
 		END IF;
 	
