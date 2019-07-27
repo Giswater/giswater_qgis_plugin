@@ -57,7 +57,7 @@ inp_junction.ysur,
 inp_junction.apond
 FROM inp_selector_sector, v_node
      JOIN inp_junction ON inp_junction.node_id = v_node.node_id
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
@@ -89,7 +89,7 @@ inp_divider.ysur,
 inp_divider.apond
 FROM inp_selector_sector, v_node
      JOIN inp_divider ON (((v_node.node_id) = (inp_divider.node_id)))
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
@@ -116,7 +116,7 @@ inp_outfall.timser_id,
 inp_outfall.gate
 FROM inp_selector_sector, v_node
      JOIN inp_outfall ON (((v_node.node_id) = (inp_outfall.node_id)))
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
@@ -150,5 +150,5 @@ inp_storage.ysur,
 inp_storage.apond
 FROM inp_selector_sector, v_node
      JOIN inp_storage ON (((v_node.node_id) = (inp_storage.node_id)))
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;

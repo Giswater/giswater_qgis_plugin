@@ -7,6 +7,24 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+CREATE OR REPLACE VIEW ws.vi_parent_connec as
+SELECT ve_connec.*
+FROM ve_connec, inp_selector_sector 
+WHERE ve_connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW ws.vi_parent_hydrometer as
+SELECT v_rtc_hydrometer.*
+FROM v_rtc_hydrometer
+JOIN ve_connec USING (connec_id);
+
+
+CREATE OR REPLACE VIEW ws.vi_parent_dma as
+SELECT DISTINCT ON (dma.dma_id) dma.* 
+FROM dma
+JOIN vi_parent_arc USING (dma_id);
+
+
 CREATE OR REPLACE VIEW v_anl_graf AS
 WITH nodes_a AS (SELECT anl_graf.node_1, anl_graf.node_2 FROM anl_graf WHERE water = 1)
 SELECT grafclass, anl_graf.arc_id, anl_graf.node_1 FROM anl_graf
@@ -53,7 +71,7 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
     inp_junction.pattern_id
    FROM inp_selector_sector, v_node
      JOIN inp_junction USING (node_id)
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
@@ -77,7 +95,7 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
     inp_pump.status
    FROM inp_selector_sector, v_node
      JOIN inp_pump USING (node_id)
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
@@ -95,7 +113,7 @@ CREATE OR REPLACE VIEW v_edit_inp_reservoir AS
     inp_reservoir.pattern_id
    FROM inp_selector_sector, v_node
     JOIN inp_reservoir USING (node_id)
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
      
 
@@ -115,7 +133,7 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
     inp_shortpipe.status
    FROM inp_selector_sector, v_node
      JOIN inp_shortpipe USING (node_id)
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
@@ -137,7 +155,7 @@ CREATE OR REPLACE VIEW v_edit_inp_tank AS
     inp_tank.curve_id
    FROM inp_selector_sector, v_node
      JOIN inp_tank USING (node_id)
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
    
@@ -161,7 +179,7 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
     inp_valve.status
    FROM inp_selector_sector, v_node
      JOIN inp_valve USING (node_id)
-     JOIN v_edit_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 	 
 
