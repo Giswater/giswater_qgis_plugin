@@ -12,7 +12,7 @@ $BODY$
 
 
 /*
-SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('Prueba1')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('p1')
 */
 
 DECLARE
@@ -36,9 +36,7 @@ BEGIN
 	INSERT INTO temp_table (fprocesscat_id, text_column)
 	SELECT  50, concat('{"arc_id":"',arc_id,'", "vnode_id":"' ,vnode_id, '", "locate":', locate,', "elevation":',
 	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
-	', "depth":',
-	(depth1 - locate*(depth1-depth2))::numeric (12,3),	
-	'}')
+	', "depth":',(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3), '}')::json
 	FROM (
 		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, arc_id, 
 		case 	
@@ -114,6 +112,7 @@ BEGIN
 			FROM temp_table a
 			JOIN temp_table b ON a.id=b.id-1
 			WHERE a.fprocesscat_id=50 AND a.user_name=current_user
+			AND b.fprocesscat_id=50
 			AND a.text_column::json->>'arc_id' = b.text_column::json->>'arc_id'
 			ORDER BY a.id) a
 		JOIN (SELECT min(id), arc_id
@@ -122,7 +121,8 @@ BEGIN
 				b.text_column::json->>'vnode_id' as node_2, (b.text_column::json->>'locate')::numeric(12,4) as locate_2
 				FROM temp_table a
 				JOIN temp_table b ON a.id=b.id-1
-				WHERE a.fprocesscat_id=50 AND a.user_name=current_user
+				WHERE a.fprocesscat_id=50 AND a.user_name=current_user 	
+				AND b.fprocesscat_id=50
 				AND a.text_column::json->>'arc_id' = b.text_column::json->>'arc_id'
 				ORDER BY a.id) a group by arc_id) b USING (arc_id)
 		JOIN rpt_inp_arc USING (arc_id)
