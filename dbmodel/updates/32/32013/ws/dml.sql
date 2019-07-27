@@ -19,9 +19,9 @@ INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','14','CONNEC ESTIMAT
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','21','NODE MINC PERIOD', null,'{"DemandType":2}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','22','NODE MAXC PERIOD', null,'{"DemandType":2}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','23','NODE PERIOD', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','24','DMA INTERVAL', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','NODE-DMA HYBRID',null  ,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','26','CONNEC PERIOD ',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','24','DMA PERIOD', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','NODE-DMA PERIOD',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','26','CONNEC PERIOD',null  ,'{"DemandType":2}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','31','NODE-DMA INTERVAL', null ,'{"DemandType":3}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','32','CONNEC-DMA INTERVAL', null ,'{"DemandType":3}');
 
@@ -37,7 +37,7 @@ UPDATE audit_cat_param_user SET label='UNIQUE ESTIMATED pattern:', dv_querytext=
 								WHERE id='inp_options_pattern';
 
 UPDATE audit_cat_param_user SET label='CRM PERIOD value:',  dv_isnullvalue=true,
-								layout_id = 2, layout_order = 2, layoutname='grl_general_2', 
+								layout_id = 2, layout_order = 2, layoutname='grl_general_2', idval=null,
 								dv_parent_id='inp_options_demandtype', editability='{"trueWhenParentIn":[2]}'
 								WHERE id='inp_options_rtc_period_id';
 
@@ -52,7 +52,7 @@ UPDATE audit_cat_param_user SET layout_id=18 WHERE formname='epaoptions' AND lay
 UPDATE audit_cat_param_user SET layout_id=13 WHERE formname='epaoptions' AND layout_id=11;
 UPDATE audit_cat_param_user SET layout_id=14 WHERE formname='epaoptions' AND layout_id=12;
 
-UPDATE audit_cat_param_user SET layout_id=1, layout_order = 4, vdefault=1, layoutname='grl_general_1' WHERE id='inp_options_valve_mode';
+UPDATE audit_cat_param_user SET layout_id=1, layout_order = 4, vdefault=1, layoutname='grl_general_1', idval=null WHERE id='inp_options_valve_mode';
 UPDATE audit_cat_param_user SET layout_id=2, layout_order = 4, layoutname='grl_general_2',editability='{"trueWhenParentIn":[3]}' WHERE id='inp_options_valve_mode_mincut_result';
 
 UPDATE audit_cat_param_user SET layout_id=3, layout_order = 9, label='MINCUT RESULTS id:', layoutname='grl_hyd_3' WHERE id='inp_options_quality_mode';

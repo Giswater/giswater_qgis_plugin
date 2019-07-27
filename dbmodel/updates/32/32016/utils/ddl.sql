@@ -13,12 +13,23 @@ CREATE TABLE IF NOT EXISTS ext_timeseries (
   id serial PRIMARY KEY,
   operator_id integer,
   period_id integer,
-  timeseries text,-- imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
+  timeseries text,
   sysclass varchar(16),
   sys_id varchar(16),
-  tparam json,  -- {"type":"monthly", "seconds":2345, "tsteps":24, "start":"2019-01-01", "end":"2019-01-02", "units":"mca"};
-  tvalues json); -- {[1,2,3,4,5,6]};
-  
+  tparam json,  
+  tvalues json); 
+ 
+COMMENT ON TABLE ext_timeseries IS 
+'INSTRUCIONS TO WORK WITH THIS TABLE:
+operator, to indetify different operators
+period_id, to identify the period
+periodparam, {"type":"monthly", "seconds":2345, "tsteps":24, "start":"2019-01-01", "end":"2019-01-02", "units":"mca"};
+timsercat_id, imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
+sysclass, expl_id, muni_id, arc_id, node_id, dma_id, sector_id, dqa_id
+sys_id, id 
+pvalues json, {[1,2,3,4,5,6]}';
+
+ 
   
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"addparam", "dataType":"json"}}$$);
 

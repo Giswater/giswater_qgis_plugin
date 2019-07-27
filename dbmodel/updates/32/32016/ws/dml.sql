@@ -8,10 +8,14 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 1, 'BASIC', NULL);
-INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 2, 'SHUTOFF-VALVES', NULL);
-INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 3, 'TRIMED-ARCS', NULL);
-INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 4, 'SHUTOFF-VALVES & TRIMED ARCS', NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 1, 'BASIC (ONLY MANDATORY NODARC)', NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 2, 'ADVANCED (ALL NODARC)', NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 3, 'BASIC & TRIMED-ARCS', NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 4, 'ADVANCED & TRIMED-ARCS', NULL);
+
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_dscenario_priority', 1, 'Dscenario overwrites bdemand', NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_dscenario_priority', 2, 'Ignore Dscenario when bdemand', NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_dscenario_priority', 3, 'Dscenario and bdemand joined', NULL);
 
 
 UPDATE audit_cat_param_user SET id='inp_options_networkmode', 
@@ -21,6 +25,13 @@ UPDATE audit_cat_param_user SET id='inp_options_networkmode',
 	layout_id=1, layout_order=1, layoutname ='grl_general_1', dv_orderby_id=true, vdefault=1, idval=null
 	WHERE id = 'inp_options_nodarc_onlymandatory';
 
+UPDATE audit_cat_param_user SET  id='inp_options_dscenario_priority', 
+	label='Demand scenario priority:', datatype ='integer' , widgettype ='combo', 
+	dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue = ''inp_options_dscenario_priority''',
+	description='Dscenario priority', vdefault=1, idval=null
+	WHERE id = 'inp_options_overwritedemands';
+	
+	
 UPDATE audit_cat_param_user SET
 	layout_id=2, layout_order=1, layoutname ='grl_general_2', idval=null 
 	WHERE id = 'inp_options_nodarc_length';

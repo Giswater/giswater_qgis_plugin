@@ -18,6 +18,10 @@ UPDATE audit_cat_table SET isdeprecated=true WHERE id='ext_rtc_hydrometer_x_valu
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_scada';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_scada_data';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_scada_value';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='config';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='config_api_cat_widgettype';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='config_api_cat_formtemplate';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='config_api_cat_datatype';
 
 
 UPDATE sys_csv2pg_cat SET readheader=false, orderby=1 WHERE id=1;

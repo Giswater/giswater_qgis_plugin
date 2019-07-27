@@ -8,6 +8,14 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+CREATE OR REPLACE VIEW vi_coordinates AS 
+ SELECT rpt_inp_node.node_id,
+    st_x(rpt_inp_node.the_geom)::numeric(16,3) AS xcoord,
+    st_y(rpt_inp_node.the_geom)::numeric(16,3) AS ycoord
+   FROM rpt_inp_node, inp_selector_result a
+   WHERE a.result_id=rpt_inp_node.result_id AND cur_user=current_user;
+   
+
 CREATE OR REPLACE VIEW vi_pipes AS 
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
