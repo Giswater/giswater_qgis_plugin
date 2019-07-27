@@ -12,11 +12,16 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_copy(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${
-"client":{"lang":"ES"}, 
-"data":{"fromSchema":"ws3_test", "toSchema":"SCHEMA_NAME"}}$$)
-*/
 
+DISABLE CONSTRAINTS:
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+
+EXECUTE:
+SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${"client":{"lang":"CA"}, "data":{"fromSchema":"ws_sample", "toSchema":"ws"}}$$)
+
+ENABLE CONSTRAINTS:
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)
+*/
 
 
 DECLARE
@@ -36,14 +41,10 @@ BEGIN
 	v_fromschema := (p_data ->> 'data')::json->> 'fromSchema';
 	v_toschema := (p_data ->> 'data')::json->> 'toSchema';
 	
-	
-	--Disable constraints
-	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
-
 	-- copy data
 	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS FALSE 
 	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_fromschema AND table_type='BASE TABLE') 
-	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') 
+	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') AND id NOT IN('price_value_unit')
 	LOOP
 
 		-- get primary key
@@ -52,13 +53,12 @@ BEGIN
 			USING v_tablerecord.id;
 
 		-- execute copy from table to table
-		EXECUTE 'INSERT INTO '||v_toschema||'.'||v_tablerecord.id||' SELECT * FROM '||v_fromschema||'.'||v_tablerecord.id||' ON CONFLICT ('||v_idname||') DO NOTHING';
+		EXECUTE 'INSERT INTO '||v_toschema||'.'||v_tablerecord.id||' SELECT * FROM '||v_fromschema||'.'||v_tablerecord.id||' 
+			WHERE '||v_idname||' NOT IN (SELECT '||v_idname||' FROM '||v_toschema||'.'||v_tablerecord.id||')';
+
+		RAISE NOTICE ' COPYING DATA FROM/TO TABLE: %', v_tablerecord.id;
 		
 	END LOOP;
-
-	-- enable constraints
-	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)
-
 		
 RETURN;
 	
