@@ -6,11 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
 ALTER TABLE inp_pattern ADD COLUMN pattern_type character varying(16);
-ALTER TABLE inp_pattern ADD COLUMN tstep_number integer;
-ALTER TABLE inp_pattern ADD COLUMN tstep_seconds integer;
-ALTER TABLE inp_pattern ADD COLUMN parameters json;
+ALTER TABLE inp_pattern ADD COLUMN tscode text;
+ALTER TABLE inp_pattern ADD COLUMN tsparameters json;
+
 
 CREATE TABLE rpt_inp_pattern_value
 ( id serial PRIMARY KEY,

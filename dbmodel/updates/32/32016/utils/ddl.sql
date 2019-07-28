@@ -7,30 +7,37 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-
 CREATE TABLE IF NOT EXISTS ext_timeseries (
   id serial PRIMARY KEY,
+  code text,
   operator_id integer,
-  period_id integer,
-  timeseries text,
-  sysclass varchar(16),
-  sys_id varchar(16),
-  tparam json,  
-  tvalues json); 
+  catalog_id text,
+  element json,
+  param json,  
+  period json,
+  timestep json,
+  val double precision[],
+  descript text); 
  
 COMMENT ON TABLE ext_timeseries IS 
 'INSTRUCIONS TO WORK WITH THIS TABLE:
-operator, to indetify different operators
-period_id, to identify the period
-periodparam, {"type":"monthly", "seconds":2345, "tsteps":24, "start":"2019-01-01", "end":"2019-01-02", "units":"mca"};
-timsercat_id, imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
-sysclass, expl_id, muni_id, arc_id, node_id, dma_id, sector_id, dqa_id
-sys_id, id 
-pvalues json, {[1,2,3,4,5,6]}';
+code: external code or internal identifier....
+operator_id, to indetify different operators
+catalog_id, imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
+element, {"type":"exploitation", 
+	    "id":[1,2,3,4]} -- expl_id, muni_id, arc_id, node_id, dma_id, sector_id, dqa_id
+param, {"isUnitary":false, it means if sumatory of all values of ts is 1 (true) or not
+	"units":"BAR"  in case of no units put any value you want (adimensional, nounits...). WARNING: use CMH or LPS in case of VOLUME patterns for EPANET
+ 	"epa":{"projectType":"WS", "class":"pattern", "id":"test1", "type":"UNITARY", "dmaRtcParameters":{"dmaId":"", "periodId":""} 
+		If this timeseries is used for EPA, please fill this projectType and PatterType. Use ''UNITARY'', for sum of values = 1 or ''VOLUME'', when are real volume values
+			If pattern is related to dma x rtc period please fill dmaRtcParameters parameters
+	"source":{"type":"flowmeter", "id":"V2323", "import":{"type":"file", "id":"test.csv"}},
+period {"type":"monthly", "id":201903", "start":"2019-01-01", "end":"2019-01-02"} 
+timestep {"units":"minute", "value":"15", "number":2345}};
+val, {1,2,3,4,5,6}
+descript text';
 
- 
-  
+   
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector_x_arc", "column":"addparam", "dataType":"json"}}$$);
 
 CREATE TABLE ext_workorder_class(
