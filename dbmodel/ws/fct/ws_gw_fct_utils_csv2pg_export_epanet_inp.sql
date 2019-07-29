@@ -51,7 +51,7 @@ BEGIN
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 	SELECT idval INTO v_demandtypeval FROM inp_typevalue WHERE id=v_demandtype::text AND typevalue ='inp_value_demandtype';
 	SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
-	SELECT idval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
+	SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
 	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
 
 	--writing the header
@@ -59,7 +59,7 @@ BEGIN
 	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (';INP file created by Giswater, the water management open source tool',v_pg2csvcat_id);
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Project name: ',title_aux, v_pg2csvcat_id);
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Result name: ',p_result_id,v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Network export mode: ', v_networkmodeval, v_pg2csvcat_id ); 
+	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Export mode: ', v_networkmodeval, v_pg2csvcat_id ); 
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Demand type: ', v_demandtypeval, v_pg2csvcat_id); 
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Pattern method: ', v_patternmethodval, v_pg2csvcat_id); 
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Valve mode: ', v_valvemodeval, v_pg2csvcat_id); 
@@ -80,8 +80,10 @@ BEGIN
 			num_column = 2;
 		ELSE 
 			INSERT INTO temp_csv2pg (csv2pgcat_id,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13) 
-			SELECT v_pg2csvcat_id,rpad(concat(';',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20),rpad(c13,20)
-			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
+			SELECT v_pg2csvcat_id,rpad(concat(';',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),
+			rpad(c11,20),rpad(c12,20),rpad(c13,20)
+			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||
+			rec_table.tablename||'''::text') 
 			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text);
 
 			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
@@ -101,9 +103,11 @@ BEGIN
 
 		-- insert values
 		CASE WHEN rec_table.tablename='vi_options' and (SELECT value FROM vi_options WHERE parameter='hydraulics') is null THEN
-			EXECUTE 'INSERT INTO temp_csv2pg SELECT nextval(''temp_csv2pg_id_seq''::regclass),'||v_pg2csvcat_id||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||' WHERE parameter!=''hydraulics'';';
+			EXECUTE 'INSERT INTO temp_csv2pg SELECT nextval(''temp_csv2pg_id_seq''::regclass),'||v_pg2csvcat_id||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
+			rec_table.tablename||' WHERE parameter!=''hydraulics'';';
 		ELSE
-			EXECUTE 'INSERT INTO temp_csv2pg SELECT nextval(''temp_csv2pg_id_seq''::regclass),'||v_pg2csvcat_id||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||';';
+			EXECUTE 'INSERT INTO temp_csv2pg SELECT nextval(''temp_csv2pg_id_seq''::regclass),'||v_pg2csvcat_id||',current_user,'''||rec_table.tablename::text||''',*  FROM '||
+			rec_table.tablename||';';
 		END CASE;
   
 		--add formating - spaces
@@ -119,8 +123,8 @@ BEGIN
 
 	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18 ,csv19 FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) 
-		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
+		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18 ,csv19 
+		FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
 

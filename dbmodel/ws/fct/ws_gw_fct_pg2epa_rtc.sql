@@ -96,17 +96,26 @@ BEGIN
 			UPDATE rpt_inp_node SET demand=(lps_min::float*v_epaunits)::numeric(12,8), pattern_id=NULL 
 			FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 			
-		ELSIF v_patternmethod = 22 THEN		-- NODE MINC PERIOD
+		ELSIF v_patternmethod = 22 THEN		-- NODE MAXC PERIOD
 			UPDATE rpt_inp_node SET demand=(lps_max::float*v_epaunits)::numeric(12,8), pattern_id=NULL 
 			FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 
-			
-		ELSIF v_patternmethod = 23 THEN  	-- NODE PERIOD
-							-- pattern Blanes model
-							-- demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
-							-- patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
+		ELSIF v_patternmethod = 23 THEN  	-- DMA PERIOD (Vilablareix model)
+							-- Demand is real demand (l/s). Need units factor and DMAxPERIOD efficiency
+							-- Patterns is estimated unitary pattern for dma applied to each node of that dma.
+			UPDATE rpt_inp_node SET demand=((lps_avg*v_epaunits)/d.effc)::numeric(12,8), pattern_id = d.pattern_id
+						FROM v_rtc_period_node n 
+						JOIN ext_rtc_scada_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
+						WHERE n.node_id=rpt_inp_node.node_id AND result_id=result_id_var;		
 
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;	
+		ELSIF v_patternmethod = 24 THEN  	-- NODE PERIOD (Blanes model)
+							-- Demand is calculated on pattern. Need units factor and DMAxPERIOD efficiency
+							-- Patterns are sumatory(demand*pattern) of all hydrometers for each node and are expressed on l/s. It's mandatory to convert values
+
+			UPDATE rpt_inp_node SET demand=(1*v_epaunits/d.effc)::numeric(12,8), pattern_id=n.node_id
+						FROM v_rtc_period_node n 
+						JOIN ext_rtc_scada_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
+						WHERE n.node_id=rpt_inp_node.node_id AND result_id=result_id_var;		
 
 			DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
 			INSERT INTO rpt_inp_pattern_value (result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9,
@@ -114,11 +123,11 @@ BEGIN
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9,
 				factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
 				 FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id ORDER by 3,4;
-				 
+		
 	
-		ELSIF v_patternmethod = 24 THEN 	-- DMA PERIOD
-							-- pattern Manresa model, demands are normalized (total node / total dma). Patterns are real flow from scada
-							-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
+		ELSIF v_patternmethod = 25 THEN 	-- DMA INTERVAL (Manresa model)
+							-- Demand is weight factor on dma and are normalized (total node / total dma). 
+							-- Patterns is the same for the whole dma and it's real flow from scada. Values are expressed on l/s. It's mandatory to convert values
 			UPDATE rpt_inp_node SET demand=(a.m3_total_period*v_epaunits/c.m3_total_period)::numeric(12,8), pattern_id=b.pattern_id 
 				FROM v_rtc_period_node a									     		
 				JOIN ext_rtc_scada_dma_period b ON a.dma_id=b.dma_id AND a.period_id=b.cat_period_id
@@ -126,10 +135,11 @@ BEGIN
 				WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 				
 
-		ELSIF v_patternmethod = 25 THEN 	-- DMA-NODE PERIOD
-							-- pattern Manresa + Blanes mixed models
-							-- demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
-							-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
+		ELSIF v_patternmethod = 26 THEN 	-- NODE PERIOD - DMA INTERVAL (Manresa + Blanes mixed model)
+							-- Demand is calculated on pattern. Only need units factor.
+							-- Patterns are sumatory(demand*pattern) of all hydrometers for each node and are expressed on l/s. 
+							-- It's mandatory to convert values
+							-- The dma pattern it's used to calibrate 
 			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;
 																								
 			-- insert into rpt_inp_pattern table values 
@@ -202,10 +212,10 @@ BEGIN
 
 			WHERE f.idrow=e.idrow and f.dma_id=e.dma_id;
 	
-		ELSIF v_patternmethod = 26 THEN 	-- CONNEC PERIOD
-							-- demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
-							-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
-							-- pattern Blanes + Gipuzkoako Urak (using vnodes) models
+		ELSIF v_patternmethod = 27 THEN 	-- CONNEC PERIOD (Guipuzkoako urak model)
+							-- Demand is calculated on pattern. Only need units factor. 
+							-- Patterns are sumatory(demand*pattern) of all hydrometers for each pjoint (VNODE or NODE) are expressed on l/s. 
+							-- It's mandatory to convert values
 			IF v_networkmode < 3 THEN
 				RETURN 1;
 			END IF;
@@ -226,7 +236,7 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
 
-		ELSIF v_patternmethod = 27 THEN 
+		ELSIF v_patternmethod = 28 THEN
 		
 			-- TODO: pattern Blanes + Gipuzkoako Urak (using vnodes) + Manresa models
 
