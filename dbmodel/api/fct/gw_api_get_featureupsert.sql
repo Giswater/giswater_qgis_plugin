@@ -312,8 +312,8 @@ BEGIN
 				INTO v_pnom, v_dnom, v_matcat_id;
 				
 		ELSIF v_project_type ='UD' THEN 
-			IF v_catfeature.type ='GULLY' THEN
-				EXECUTE 'SELECT matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
+			IF v_catfeature.type ='gully' THEN
+				EXECUTE 'SELECT matcat_id FROM cat_grate WHERE id=$1'
 					USING v_catalog
 					INTO v_matcat_id;
 			ELSE
@@ -349,7 +349,11 @@ BEGIN
 				EXECUTE 'SELECT ' || v_catfeature.type || '_type FROM ' || p_table_id ||' LIMIT 1' INTO field_value;	
 				v_type = field_value;
 			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'cat_id') OR (aux_json->>'column_id') = concat(lower(v_catfeature.type),'at_id') THEN
-				EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||' WHERE ' || v_catfeature.type || 'type_id = ''' || v_type || ''' LIMIT 1' INTO field_value;
+				IF v_project_type ='UD' THEN
+					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||'  LIMIT 1' INTO field_value;
+				ELSE
+					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||' WHERE ' || v_catfeature.type || 'type_id = ''' || v_type || ''' LIMIT 1' INTO field_value;
+				END IF;
 			ELSIF (aux_json->>'column_id') = 'code' THEN
 				field_value = v_code;
 			ELSIF (aux_json->>'column_id') = 'node_1' THEN

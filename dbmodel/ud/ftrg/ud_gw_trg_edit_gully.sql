@@ -58,8 +58,8 @@ BEGIN
 
 	-- get values
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	v_doublegeometry = (SELECT value->>'status' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
-	v_unitsfactor = (SELECT value->>'unitsFactor' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	v_doublegeometry = (SELECT value::json->>'status' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	v_unitsfactor = (SELECT value::json->>'unitsFactor' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
 
 	v_srid = (SELECT epsg FROM version limit 1);
 	
