@@ -55,3 +55,18 @@ CREATE TABLE om_visit_class_x_wo(
   id serial PRIMARY KEY NOT NULL,
   visitclass_id integer,
   wotype_id character varying(50));
+  
+CREATE TABLE ext_workorder(
+	class_id integer PRIMARY KEY,
+	class_name character varying(50),
+	exercice integer,
+	serie character varying(10),
+	number integer,
+	startdate date,
+	address character varying(50),
+	wotype_id character varying(50),
+	visitclass_id integer,
+	cost numeric,
+	ct text
+);
+	

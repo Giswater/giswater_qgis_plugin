@@ -58,10 +58,11 @@ CREATE TABLE om_visit_class_x_parameter (
 
 
 CREATE TABLE om_visit_lot(
-  id serial NOT NULL primary key,
-  idval character varying(30),
+  id serial NOT NULL PRIMARY KEY,
   startdate date DEFAULT now(),
   enddate date,
+  real_startdate date,
+  real_enddate date,
   visitclass_id integer,
   descript text,
   active boolean DEFAULT true,
@@ -69,7 +70,14 @@ CREATE TABLE om_visit_lot(
   duration text,
   feature_type text,
   status integer,
-  the_geom public.geometry(MULTIPOLYGON, SRID_VALUE));
+  the_geom public.geometry(MULTIPOLYGON, SRID_VALUE),
+  rotation numeric(8,4),
+  class_id character varying(5),
+  exercice integer,
+  serie character varying(10),
+  "number" integer,
+  adreca text
+);
   
    
 

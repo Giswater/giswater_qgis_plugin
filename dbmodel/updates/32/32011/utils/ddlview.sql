@@ -8,22 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-create OR REPLACE view v_ui_om_lot AS
-select * FROM om_visit_lot;
-
-
-CREATE OR REPLACE VIEW ve_lot_x_arc AS 
- SELECT arc.arc_id,
-    om_visit_lot_x_arc.lot_id,
-    om_visit_lot_x_arc.status,
-    arc.the_geom
-    FROM selector_lot, om_visit_lot
-     JOIN om_visit_lot_x_arc ON lot_id=id
-     JOIN arc ON arc.arc_id=om_visit_lot_x_arc.arc_id
-     WHERE selector_lot.lot_id = om_visit_lot.id AND cur_user=current_user;
-
-	 
-
  
 CREATE OR REPLACE VIEW v_visit_lot_user_manager AS 
  SELECT om_visit_lot_x_user.id,
@@ -36,23 +20,7 @@ CREATE OR REPLACE VIEW v_visit_lot_user_manager AS
   WHERE om_visit_lot_x_user.user_id::name = "current_user"()
   ORDER BY om_visit_lot_x_user.id DESC
  LIMIT 1;
-
-
-  
-CREATE OR REPLACE VIEW ve_lot_x_arc AS 
- SELECT arc.arc_id,
-    om_visit_lot_x_arc.lot_id,
-    om_visit_lot_x_arc.status,
-    arc.the_geom
-   FROM selector_lot,
-    om_visit_lot
-     JOIN om_visit_lot_x_arc ON om_visit_lot_x_arc.lot_id = om_visit_lot.id
-     JOIN arc ON arc.arc_id::text = om_visit_lot_x_arc.arc_id::text
-  WHERE selector_lot.lot_id = om_visit_lot.id AND selector_lot.cur_user = "current_user"()::text;
-
-  
-  
-  
+ 
   
 CREATE OR REPLACE VIEW ve_visit_arc_singlevent AS 
  SELECT om_visit_x_arc.visit_id,

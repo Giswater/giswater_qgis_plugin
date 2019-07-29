@@ -16,3 +16,11 @@ DROP TRIGGER gw_trg_update_link_arc_id ON connec;
 CREATE TRIGGER gw_trg_connect_update AFTER UPDATE OF arc_id, pjoint_id, pjoint_type, the_geom
 ON SCHEMA_NAME.connec FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_update_link_arc_id('connec');
 
+CREATE TRIGGER gw_trg_om_lot_x_arc_geom AFTER INSERT OR UPDATE OR DELETE
+ON om_visit_lot_x_arc FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('lot');
+
+CREATE TRIGGER gw_trg_om_lot_x_node_geom AFTER INSERT OR UPDATE OR DELETE
+ON om_visit_lot_x_node FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('lot');
+
+CREATE TRIGGER gw_trg_om_lot_x_connec_geom AFTER INSERT OR UPDATE OR DELETE
+ON om_visit_lot_x_connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('lot');
