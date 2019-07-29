@@ -5,17 +5,25 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 2698
+--FPROCESSCAT = 55 (single demand)
+--FPROCESSCAT = 56 (double demand)
+--FPROCESSCAT = 57 (not double demand but single demand)
+--FPROCESSCAT = 58 (coupled demand)
+
+
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nodescouplecapacity(p_data json)  
 RETURNS json AS 
 $BODY$
 
+
 /*
 EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_nodescouplecapacity($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
-"data":{"step":0, "resultId":"test1"}$$)
+"data":{"parameters":{"step":1, "resultId":"test1"}}}$$)
+
 
 PREVIOUS
 - ResultId must exists on database with as well calibrated as posible
@@ -24,7 +32,6 @@ PREVIOUS
 	- enabling recursive mode setting variable on giswater.config plugin file
 	- configuring the defined function to be called (gw_fct_pg2epa_hydrant) on the config_param_user variable (inp_options_other_recursvive)
 	
-
 GENERAL ISSUES
 - This function must be called 5 times
 - It's supposed unlimited number of patterns
@@ -49,66 +56,162 @@ DECLARE
 	v_step integer;
 	v_text text;
 	v_return text;
+	v_result text;
+	v_totalnodes integer;
+	v_rownode int8;
+	v_rowtemp int8;
+	v_rid integer;
+	v_node text;
+	v_count integer = 0;
+	v_field text;
+	v_value double precision;
+	v_querytext text;
+	v_epaunits	double precision;
+	v_lpsdemand	double precision;
+	v_mcaminpress 	double precision;
+
       
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-/*
+
 	-- Getting user parameteres
 	-- get input data
-	v_step := (((p_data ->>'data')::json->>'parameters')::json->>'step')::boolean;
+	v_step := (((p_data ->>'data')::json->>'parameters')::json->>'step');
 	v_result := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 
-	
+	-- design values (hard coded)
+	v_lpsdemand = 16.6;
+	v_mcaminpress = 1.5;
+
+	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
+		INTO v_epaunits;
+
 	RAISE NOTICE 'Starting pg2epa hydrant analysis process.';
 
-	IF v_step=0 THEN
+/*
+	IF v_step=1 THEN -- single hydrant (55)
+
+		DELETE FROM temp_table WHERE fprocesscat_id=55 AND user_name=current_user;
+		DELETE FROM anl_node WHERE fprocesscat_id=55 AND cur_user=current_user;
+		DELETE FROM rpt_inp_pattern_value WHERE result_id=v_result AND user_name=current_user;
+
+		-- set inp_options_skipdemandpattern to TRUE
+		UPDATE config_param_user SET value=TRUE WHERE parameter='inp_options_skipdemandpattern' AND cur_user=current_user;
 	
-			-- Identifying x0 nodes (dint>73.6)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
-			SELECT 90, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5
-			UNION 
-			SELECT 90, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5;
+		-- Identifying x0 nodes (dint>73.6)
+		INSERT INTO anl_node (fprocesscat_id, node_id)
+		SELECT 55, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5
+		UNION 
+		SELECT 55, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5;
+		
+		-- TODO: check connected graf
+
+		-- update demands
+		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
+		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user);
+
+		-- create patterns
+		v_totalnodes =  (SELECT count(*) FROM anl_node WHERE fprocesscat_id = 55 and cur_user= current_user);
+		v_rownode =  (SELECT id FROM anl_node WHERE fprocesscat_id = 55 and cur_user= current_user order by id LIMIT 1);
+
+		RAISE NOTICE ' %', v_totalnodes;
+
+		-- loop to create the pattern (any patterns as any nodes)
+		FOR v_x IN v_rownode..(v_rownode+v_totalnodes) LOOP
+			INSERT INTO temp_table (fprocesscat_id, text_column)
+			SELECT 55, array_agg(CASE WHEN id=v_x THEN 1 ELSE 0 END) FROM anl_node WHERE fprocesscat_id = 55;
+		END LOOP;
+
+		v_rowtemp = (SELECT id FROM temp_table WHERE fprocesscat_id = 55 and user_name= current_user order by id LIMIT 1);
+
+		-- loop to insert patterns created into rpt_inp_pattern_value
+		FOR v_z IN v_rowtemp..(v_rowtemp+v_totalnodes) LOOP
+
+			RAISE NOTICE 'v_z % ',v_z;
+			v_count = 0;
 			
-			-- TODO: check connected graf
-			
-			SET demand=60 else 0, pattern  WHERE (90)
-			CREATE patterns
+			-- get node_id
+			v_node = (SELECT node_id FROM anl_node WHERE fprocesscat_id = 55 and cur_user= current_user AND id=v_rownode);
+			v_rownode = v_rownode +1;
 	
-	
-	ELSIF v_step=1 THEN
-			
-			-- Identifying x1 nodes (single hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
-			SELECT 91, node_id FROM result_node WHERE pressure>1,5 and result_id=v_result;
+			EXIT WHEN v_node IS NULL;
 						
-			SET demand=120 else 0 WHERE (91);
-			DELETE not used patterns;
+			FOR v_x IN 1..v_totalnodes/19 LOOP
+
+				--RAISE NOTICE 'v_x % ',v_x;
+
+				-- inserting row
+				INSERT INTO rpt_inp_pattern_value (result_id, pattern_id) VALUES (v_result, v_node) RETURNING id INTO v_rid;
+			
+				FOR v_y IN 1..18 LOOP
+
+					--RAISE NOTICE ' v_y % ', v_y;
+			
+					v_count = v_count +1;
+					
+					-- updating row column by column
+					v_field = concat('factor_',v_y);
+					v_value = (SELECT val[v_count] FROM (SELECT text_column::integer[] as val FROM temp_table WHERE user_name=current_user AND fprocesscat_id=55 AND id=v_z)a);
+			
+					v_querytext = 'UPDATE rpt_inp_pattern_value SET '||quote_ident(v_field)||'='||v_value||' WHERE id='||(v_rid);
+
+					EXIT WHEN v_value IS NULL;
+
+					--RAISE NOTICE 'v_querytext % v_count % v_field % v_value % ', v_querytext, v_count, v_field, v_value;
+					
+					EXECUTE v_querytext;
+				END LOOP;
+
+				EXIT WHEN v_value IS NULL;
+								
+			END LOOP;
+			
+		END LOOP;
+		
+	ELSIF v_step=2 THEN-- Identifying x2 nodes (double hydrant - 56)
+
+		-- insert into anl_node only that nodes with positive result
+		DELETE FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id)
+		SELECT 56, node_id FROM rpt_node WHERE press > v_mcaminpress and result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user ) group by 2;
+
+		-- update demands
+		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
+		UPDATE rpt_inp_node SET demand=2*v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user);
+
+		-- delete not used patterns
+		DELETE FROM rpt_inp_pattern_value WHERE pattern_id NOT IN (SELECT anl_node FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user) AND user_name=current_user AND result_id=v_result;
 
 			
-	ELSIF v_step=2 THEN
-	
-			-- Identifying x2 nodes (double hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
-			SELECT 92, node_id FROM result_node WHERE pressure>1,5 and result_id=v_result;
-			
-			-- Identifying x3 nodes (single but not double hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
-			SELECT 93, node_id FROM result_node WHERE pressure<1,5 and result_id=v_result;
-			
-			SET demand=60 else 0 , pattern = same two/two WHERE (93)
-			
-			DELETE not used patterns;
+	ELSIF v_step=3 THEN -- identify single but not double hydrant - 57
+
+		DELETE FROM anl_node WHERE fprocesscat_id=57 AND cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id)
+		SELECT 57, node_id FROM rpt_node WHERE press < v_mcaminpress and result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user ) group by 2;
+
+		-- update demands
+		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
+
+		-- TODO: pattern must be assigned coupled (dos a dos)
+		UPDATE rpt_inp_node SET demand=16,666*v_epaunits, pattern_id=arc_id WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user);
+		
+		-- delete not used patterns
+		DELETE FROM rpt_inp_pattern_value WHERE pattern_id NOT IN (SELECT anl_node FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user) AND user_name=current_user AND result_id=v_result;
+
 								
-	ELSIF v_step=3 THEN
-	
-			-- Identifying x4 nodes (coupled hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
-			SELECT 94, node_id FROM result_node WHERE pressure>1,5 and result_id=v_result;
+	ELSIF v_step=4 THEN -- Identifying x4 nodes (coupled hydrant - 58)
+
+		-- insert into anl_node only that nodes with positive result
+		DELETE FROM anl_node WHERE fprocesscat_id=58 AND cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id)
+		SELECT 58, node_id FROM rpt_node WHERE press > v_mcaminpress and result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user ) group by 2;
+
+		-- delete all patterns
+		DELETE FROM rpt_inp_pattern_value WHERE user_name=current_user AND result_id=v_result;
 			
-			
-	ELSIF v_step=4 THEN
+	ELSIF v_step=5 THEN
 			
 			-- upsert dattrib values (node)
 			INSERT INTO dattrib
@@ -130,15 +233,20 @@ BEGIN
 			SELECT 6, node_id, 'NODE', 'H4', FROM v_edit_node
 			WHERE node_id NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
 			ON CONFLICT DO UPDATE set idval='H4';
+
+			-- restore skip demand pattern
+			UPDATE config_param_user SET value=FALSE WHERE parameter='inp_options_skipdemandpattern' AND cur_user=current_user;
 		
 		
 			-- upsert dattrib values (arc)
 			-- TODO
-			
+
 	END IF;
+
+*/
 	
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Hydrant analysis done succesfully"}')::json;
-	*/
+
 RETURN v_return;
 	
 END;
