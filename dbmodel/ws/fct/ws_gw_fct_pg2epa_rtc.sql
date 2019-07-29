@@ -46,7 +46,7 @@ BEGIN
 		UPDATE config_param_user SET value=null WHERE parameter='inp_options_pattern' and cur_user=current_user;
 	END IF;
 
-	RAISE NOTICE ' % %', v_demandtype, v_patternmethod;
+	RAISE NOTICE ' DEMAND TYPE: % PATTERN METHOD: %', v_demandtype, v_patternmethod;
 
 	-- starting pattern methods
 	IF v_demandtype = 1 THEN
