@@ -111,10 +111,11 @@ BEGIN
 		END IF;
 	
 		-- Update demand values filtering by dscenario
-		PERFORM gw_fct_pg2epa_dscenario(v_result);
-
+		PERFORM gw_fct_pg2epa_dscenario(v_result);	
 	END IF;
 
+	--PERFORM gw_fct_pg2epa_nodescouplecapacity($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"step":1, "resultId":"p2"}}}$$);
+	
 	-- Calling for modify the valve status
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
 
