@@ -18,8 +18,8 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa for filling demand scenario';
 
-	v_demandpriority = (SELECT value FROM config_param_user WHERE parameter='inp_options_oveedemands' AND cur_user=current_user);
-	
+	v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_demandpriority' AND cur_user=current_user);
+
 	-- 
 	IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
 		UPDATE rpt_inp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
