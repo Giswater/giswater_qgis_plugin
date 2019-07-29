@@ -469,4 +469,16 @@ CREATE OR REPLACE VIEW ve_lot_x_connec AS
      LEFT JOIN om_typevalue ON om_typevalue.id = om_visit_lot_x_connec.status AND om_typevalue.typevalue = 'lot_x_feature_status'::text
   WHERE om_visit_lot.id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
   
-  
+DROP VIEW IF EXISTS v_visit_lot_user_manager;
+CREATE OR REPLACE VIEW v_visit_lot_user AS 
+ SELECT om_visit_lot_x_user.id,
+    om_visit_lot_x_user.user_id,
+    om_visit_lot_x_user.team_id,
+    om_visit_lot_x_user.lot_id,
+    om_visit_lot_x_user.starttime,
+    om_visit_lot_x_user.endtime,
+    now()::date AS date
+   FROM om_visit_lot_x_user
+  WHERE om_visit_lot_x_user.user_id::name = "current_user"()
+  ORDER BY om_visit_lot_x_user.id DESC
+ LIMIT 1;
