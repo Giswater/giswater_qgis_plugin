@@ -70,3 +70,4 @@ CREATE TABLE ext_workorder(
 	ct text
 );
 	
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"publish", "dataType":"boolean"}}$$);
