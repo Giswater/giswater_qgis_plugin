@@ -12,3 +12,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_
 
 -- 2019/07/02
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_fields", "column":"widgetcontrols", "dataType":"json"}}$$);
+
+
+ALTER TABLE config_api_cat_widgettype RENAME TO _config_api_cat_widgettype_;
+ALTER TABLE config_api_cat_formtemplate RENAME TO _config_api_cat_formtemplate_;
+ALTER TABLE config_api_cat_datatype RENAME TO _config_api_cat_datatype_;

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE sys_csv2pg_cat SET functionname='gw_fct_utils_csv2pg_import_timeseries', name='Import timeseries', namei18n='Import timeseries', sys_role='role_edit'
+UPDATE sys_csv2pg_cat SET functionname='gw_fct_utils_csv2pg_import_timeseries', name='Import timeseries', name_i18n='Import timeseries', sys_role='role_edit'
 WHERE functionname='gw_fct_utils_csv2pg_import_patterns';
 
 INSERT INTO sys_fprocess_cat VALUES (48, 'Pipe leak probability', 'om', '', 'ws');

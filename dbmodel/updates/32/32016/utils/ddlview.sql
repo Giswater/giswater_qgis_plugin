@@ -7,16 +7,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE OR REPLACE VIEW v_rtc_period_dma AS 
- SELECT v_rtc_period_hydrometer.dma_id::integer,
-    v_rtc_period_hydrometer.period_id,
-    sum(v_rtc_period_hydrometer.m3_total_period) AS m3_total_period,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM v_rtc_period_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = v_rtc_period_hydrometer.hydrometer_id::bigint
-  GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id, ext_rtc_hydrometer_x_data.pattern_id;
-
-
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
  SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
@@ -65,7 +55,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
      LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
      WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text
-     AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = "current_user"()::text
+     AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
@@ -172,6 +162,15 @@ ext_rtc_hydrometer.id AS hydrometer_id,
           AND rpt_inp_node.result_id::text = ((( SELECT inp_selector_result.result_id FROM inp_selector_result WHERE inp_selector_result.cur_user = "current_user"()::text))::text);
        
  
+CREATE OR REPLACE VIEW v_rtc_period_dma AS 
+ SELECT v_rtc_period_hydrometer.dma_id::integer,
+    v_rtc_period_hydrometer.period_id,
+    sum(v_rtc_period_hydrometer.m3_total_period) AS m3_total_period,
+    ext_rtc_hydrometer_x_data.pattern_id
+   FROM v_rtc_period_hydrometer
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = v_rtc_period_hydrometer.hydrometer_id::bigint
+  GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id, ext_rtc_hydrometer_x_data.pattern_id;
+  
 drop view if exists v_rtc_period_dma;
 CREATE OR REPLACE VIEW v_rtc_period_dma AS 
  SELECT v_rtc_period_hydrometer.dma_id, 

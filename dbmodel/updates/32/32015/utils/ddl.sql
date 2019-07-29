@@ -20,9 +20,7 @@ ALTER TABLE ext_rtc_scada_x_data RENAME TO _ext_rtc_scada_x_data_;
 ALTER TABLE ext_rtc_scada_x_value RENAME TO _ext_rtc_scada_x_value_;
 ALTER TABLE ext_rtc_hydrometer_x_value RENAME TO _ext_rtc_hydrometer_x_value_;
 ALTER TABLE config RENAME TO _config_;
-ALTER TABLE config_api_cat_widgettype RENAME TO _config_api_cat_widgettype_;
-ALTER TABLE config_api_cat_formtemplate RENAME TO _config_api_cat_formtemplate_;
-ALTER TABLE config_api_cat_datatype RENAME TO _config_api_cat_datatype_;
+
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"pjoint_type", "dataType":"varchar(16)"}}$$);
