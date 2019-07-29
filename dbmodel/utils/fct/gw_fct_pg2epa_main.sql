@@ -32,22 +32,28 @@ v_iterative text;
 v_result text;
 v_id integer;
 v_data json;
-v_functionid text;
-v_functionname text;
+v_functionidmain text;
+v_functionnamemain text;
+v_stepsmain integer;
+v_functionidsec text;
+v_functionnamesec text;
+v_stepssec integer;
 v_steps integer;
 v_currentstep integer;
 v_storeallresults boolean;
 v_tableid text;
 v_return json;
-v_rownumber integer = 0;
+v_main integer = 0;
+v_sec integer = 0;
 v_count integer;
 v_querytext text;
+v_i integer = 0;
 
 
 BEGIN
 
 --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws", public;
 
 --  Get input data
 	v_iterative = (p_data->>'data')::json->>'iterative';
@@ -59,13 +65,17 @@ BEGIN
 	ELSE -- iterative call 
 	
 		-- get values of iterative function
-		-- forced values for dev
-		--v_functionid = (SELECT (value::json->>'id') FROM config_param_user WHERE parameter='inp_options_iterative' AND cur_user=current_user);
-		v_functionid = '1'; 
-		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionid);
-		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = '1');
+		v_functionidmain = (SELECT value FROM config_param_user WHERE parameter='inp_options_iterative_main_function' AND cur_user=current_user);
+		v_functionidsec = (SELECT value FROM config_param_user WHERE parameter='inp_options_iterative_secondary_function' AND cur_user=current_user);
+		
+		v_functionnamemain = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidmain);
+		v_functionnamesec = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidsec);
 
-		raise notice ' v_functionname % v_steps % ', v_functionname, v_steps;
+		v_stepsmain = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidmain);
+		v_stepssec = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidsec);
+
+		raise notice ' MAIN v_functionnamemain % v_stepsmain % ', v_functionnamemain, v_stepsmain;
+		raise notice ' SEC: v_functionnamesec % v_stepssec % ', v_functionnamesec, v_stepssec;
 
 		-- setting temp_table with any rows any calls using steps number defined on inp_typevalue parameter
 		IF v_iterative='start' THEN
@@ -76,11 +86,27 @@ BEGIN
 
 			-- inserting process rows
 			LOOP 
-				raise notice ' loop %', v_rownumber;
-				
-				v_rownumber = v_rownumber + 1;
-				INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35, concat('{"data":{"step":"',v_rownumber,'", "resultId":"',v_result,'"}}'));
-				EXIT WHEN v_rownumber = v_steps;						
+				EXIT WHEN v_stepsmain IS NULL;	
+				raise notice ' v_main %', v_main;	
+
+				v_sec = 0;				
+				v_main = v_main + 1;
+				INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35, 
+				concat('{"data":{"functionName":"'||v_functionnamemain||'","step":"',v_main,'", "resultId":"',v_result,'"}}'));
+				EXIT WHEN v_main = v_stepsmain;	
+
+				LOOP
+					EXIT WHEN v_stepssec IS NULL;						
+					
+					raise notice ' v_sec %', v_sec;	
+					v_sec = v_sec + 1;
+					v_steps = v_steps + 1;
+
+					INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35, 
+					concat('{"data":{"functionName":"'||v_functionnamesec||'","step":"',v_sec,'", "resultId":"',v_result,'"}}'));
+					EXIT WHEN v_sec = v_stepssec;											
+				END LOOP;
+									
 			END LOOP;
 		
 		ELSIF v_iterative='ongoing' THEN
@@ -96,10 +122,12 @@ BEGIN
 		v_currentstep = v_steps - v_count;
 				
 		-- setting v_data to call iterative function
-		v_data = (SELECT text_column FROM SCHEMA_NAME.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
-		
+		v_data = (SELECT text_column FROM ws.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
+
+		raise notice 'v_data %', v_data;
+	
 		-- call iterative function selected by user
-		v_querytext = 'SELECT '||quote_ident(v_functionname)||'('||quote_literal(v_data)||')';
+		v_querytext = 'SELECT '||quote_ident(v_functionnamemain)||'('||quote_literal(v_data)||')';
 		EXECUTE v_querytext INTO v_return;
 		
 		-- call go2epa function
