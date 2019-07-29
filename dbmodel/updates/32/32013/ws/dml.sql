@@ -65,14 +65,14 @@ UPDATE audit_cat_param_user SET layout_id=4, layout_order = 10, layoutname='grl_
 
 UPDATE audit_cat_param_user SET label='Dscenario overwrites demand:', layout_id = 2, layout_order = 6, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
 
-UPDATE audit_cat_param_user SET id='inp_other_iterative_main_function', label = 'Main iterative function:', 
-								layout_id = 1, layout_order=7, layoutname='grl_general_1', idval=null, isenabled=TRUE, dv_isnullvalue=TRUE,
+UPDATE audit_cat_param_user SET id='inp_options_iterative_main_function', label = 'Main iterative function:', 
+								layout_id = 1, layout_order=7, layoutname='grl_general_1', idval=null, isenabled=TRUE, dv_isnullvalue=TRUE, ismandatory=true,
 								dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function'''
 								WHERE id='inp_other_recursive_function';
 							
-INSERT INTO audit_cat_param_user VALUES ('inp_other_iterative_secondary_function', 'epaoptions', 'Enable/disable the posibility to work with selected secondary iterative function', 'role_epa',
+INSERT INTO audit_cat_param_user VALUES ('inp_options_iterative_secondary_function', 'epaoptions', 'Enable/disable the posibility to work with selected secondary iterative function', 'role_epa',
 			NULL, null, 'Secondary iterative function:', 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function''', 
-			NULL, TRUE, 2, 7, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, 'NONE', 'grl_general_2',
+			NULL, TRUE, 2, 7, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', TRUE, NULL, 'NONE', 'grl_general_2',
 			NULL, NULL, TRUE, TRUE, NULL, NULL, false,'{"from":"2.0.12", "to":null, "language":"english"}');			
 			
 INSERT INTO audit_cat_param_user VALUES ('inp_options_demandtype', 'epaoptions', 'Demand type to use on EPANET simulation', 'role_epa', NULL, NULL, 'Demand type:', 
