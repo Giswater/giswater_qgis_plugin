@@ -18,12 +18,13 @@ INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','13','NODE ESTIMATED
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','14','CONNEC ESTIMATED', null,'{"DemandType":1}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','21','NODE MINC PERIOD', null,'{"DemandType":2}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','22','NODE MAXC PERIOD', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','23','NODE PERIOD', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','24','DMA PERIOD', null,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','NODE-DMA PERIOD',null  ,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','26','CONNEC PERIOD',null  ,'{"DemandType":2}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','31','NODE-DMA INTERVAL', null ,'{"DemandType":3}');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','32','CONNEC-DMA INTERVAL', null ,'{"DemandType":3}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','23','DMA PERIOD', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','24','NODE PERIOD', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','DMA INTERVAL', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','26','NODE PERIOD-DMA INTERVAL',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','27','CONNEC PERIOD',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','31','DMA-NODE INTERVAL', null ,'{"DemandType":3}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','32','DMA-CONNEC INTERVAL', null ,'{"DemandType":3}');
 
 
 UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_rtc_enabled';
@@ -41,9 +42,9 @@ UPDATE audit_cat_param_user SET label='CRM PERIOD value:',  dv_isnullvalue=true,
 								dv_parent_id='inp_options_demandtype', editability='{"trueWhenParentIn":[2]}'
 								WHERE id='inp_options_rtc_period_id';
 
-UPDATE audit_cat_param_user SET label='Headloss formula:', layout_order = 5 WHERE id='inp_options_units';
+UPDATE audit_cat_param_user SET layout_order = 5 WHERE id='inp_options_units';
 
-UPDATE audit_cat_param_user SET layout_order = 5 WHERE id='inp_options_headloss';
+UPDATE audit_cat_param_user SET label='Headloss formula:', layout_order = 5 WHERE id='inp_options_headloss';
 
 UPDATE audit_cat_param_user SET layout_order = 6 WHERE id='inp_options_demand_multiplier';
 								

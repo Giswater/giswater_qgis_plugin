@@ -191,6 +191,9 @@ BEGIN
 				
 				EXECUTE v_querytext;
 			END LOOP;
+
+			EXIT WHEN v_value IS NULL;
+
 		END LOOP;
 
 		-- if it is dmaRtc pattern

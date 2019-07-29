@@ -17,6 +17,10 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_dscenario_priority', 2, 'Ignore Dscenario when bdemand', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_dscenario_priority', 3, 'Dscenario and bdemand joined', NULL);
 
+INSERT INTO audit_cat_param_user VALUES ('inp_options_skipdemandpattern', 'epaoptions', 'Skip update demands and patterns when EPANET is used. Only for iterative model', 'role_epa', NULL, NULL, NULL, 
+			NULL, NULL, true, NULL, NULL, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'boolean', 'check', true, 
+			NULL, 'FALSE', NULL, NULL, TRUE, TRUE, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
+				
 
 UPDATE audit_cat_param_user SET id='inp_options_networkmode', 
 	label='Network geometry generator:', datatype ='integer' , widgettype ='combo', 
