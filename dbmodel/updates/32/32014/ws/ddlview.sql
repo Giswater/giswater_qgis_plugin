@@ -7,19 +7,19 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE OR REPLACE VIEW ws.vi_parent_connec as
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_connec as
 SELECT ve_connec.*
 FROM ve_connec, inp_selector_sector 
 WHERE ve_connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW ws.vi_parent_hydrometer as
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_hydrometer as
 SELECT v_rtc_hydrometer.*
 FROM v_rtc_hydrometer
 JOIN ve_connec USING (connec_id);
 
 
-CREATE OR REPLACE VIEW ws.vi_parent_dma as
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_dma as
 SELECT DISTINCT ON (dma.dma_id) dma.* 
 FROM dma
 JOIN vi_parent_arc USING (dma_id);
@@ -197,4 +197,4 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
     inp_connec.pattern_id
    FROM inp_selector_sector, connec
 	JOIN inp_connec USING (connec_id)
-	WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text
+	WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
