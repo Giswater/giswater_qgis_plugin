@@ -6,16 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
-/*
-DROP VIEW IF EXISTS v_rtc_period_dma;
-CREATE OR REPLACE VIEW v_rtc_period_dma AS 
- SELECT v_rtc_period_hydrometer.dma_id::integer,
-    v_rtc_period_hydrometer.period_id,
-    sum(v_rtc_period_hydrometer.m3_total_period) AS m3_total_period
-   FROM v_rtc_period_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = v_rtc_period_hydrometer.hydrometer_id::bigint
-  GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id;
-*/
+
 
 DROP VIEW IF EXISTS v_rtc_scada;
 DROP VIEW IF EXISTS v_rtc_scada_data;

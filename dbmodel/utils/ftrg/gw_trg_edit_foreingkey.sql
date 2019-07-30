@@ -44,10 +44,6 @@ BEGIN
 			v_featureold:= OLD.gully_id;
 		END IF;
 		
-		-- subcatchments
-		IF v_projecttype = 'UD' THEN
-			EXECUTE ' UPDATE subcatchment SET node_id = '||quote_literal(v_featurenew)||' WHERE node_id = '||quote_literal(v_featureold);	
-		END IF;
 
 		-- man_addfields_value
     	UPDATE man_addfields_value SET feature_id=v_featurenew  WHERE feature_id=v_featureold;
@@ -65,21 +61,7 @@ BEGIN
 			v_featureold:= OLD.gully_id;
 		END IF;
     
-		DELETE FROM man_addfields_value WHERE feature_id=v_featureold;	
-		
-		IF v_projecttype = 'UD' THEN
-			
-			-- subcatchments
-			EXECUTE 'SELECT count(node_id) FROM subcatchment WHERE '||quote_ident(v_featurefield)||' = '||quote_literal(v_featureold)
-			INTO v_count;
-			
-			IF v_count > 0  THEN
-				RAISE EXCEPTION 'THERE ARE subcatchment linked to that node. Impossible to delete it';
-			END IF;
-			
-			-- man_addfields_value
-			UPDATE man_addfields_value SET feature_id=v_featurenew  WHERE feature_id=v_featureold;	
-		END IF;
+		DELETE FROM man_addfields_value WHERE feature_id=v_featureold;			
 
     END IF;
 

@@ -174,7 +174,7 @@ ext_rtc_hydrometer.id AS hydrometer_id,
           WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text)) 
           AND rpt_inp_node.result_id::text = ((( SELECT inp_selector_result.result_id FROM inp_selector_result WHERE inp_selector_result.cur_user = "current_user"()::text))::text);
        
- 
+drop view if exists v_rtc_period_dma;
 CREATE OR REPLACE VIEW v_rtc_period_dma AS 
  SELECT v_rtc_period_hydrometer.dma_id::integer,
     v_rtc_period_hydrometer.period_id,
@@ -183,16 +183,6 @@ CREATE OR REPLACE VIEW v_rtc_period_dma AS
    FROM v_rtc_period_hydrometer
      JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = v_rtc_period_hydrometer.hydrometer_id::bigint
   GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id, ext_rtc_hydrometer_x_data.pattern_id;
-  
-drop view if exists v_rtc_period_dma;
-CREATE OR REPLACE VIEW v_rtc_period_dma AS 
- SELECT v_rtc_period_hydrometer.dma_id, 
-    period_id, 
-    sum(v_rtc_period_hydrometer.m3_total_period) AS m3_total_period
-    FROM v_rtc_period_hydrometer
-   JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::int8= v_rtc_period_hydrometer.hydrometer_id::int8
-  GROUP BY v_rtc_period_hydrometer.dma_id,period_id;
-  
 
 CREATE OR REPLACE VIEW v_rtc_period_node AS 
  SELECT v_rtc_period_hydrometer.node_1 AS node_id,
