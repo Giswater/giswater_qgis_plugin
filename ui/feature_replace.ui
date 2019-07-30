@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
-    <height>419</height>
+    <width>499</width>
+    <height>386</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -71,7 +71,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>35</width>
+                  <width>49</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -137,7 +137,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>48</width>
+                  <width>63</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -229,7 +229,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>53</width>
+                  <width>66</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -384,6 +384,12 @@
              <layout class="QHBoxLayout" name="horizontalLayout_8">
               <item>
                <widget class="QLabel" name="label_keep_elements">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
                   <pointsize>8</pointsize>
@@ -408,6 +414,22 @@
                  <number>3</number>
                 </property>
                </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>34</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
               <item>
                <widget class="QCheckBox" name="keep_elements">
