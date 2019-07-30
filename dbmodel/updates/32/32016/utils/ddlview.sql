@@ -417,7 +417,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_lot AS
   
 DROP VIEW IF EXISTS ve_lot_x_arc;
 CREATE OR REPLACE VIEW ve_lot_x_arc AS 
- SELECT row_number() OVER (ORDER BY arc.arc_id) AS rid,
+ SELECT row_number() OVER (ORDER BY om_visit_lot_x_arc.lot_id, arc.arc_id) AS rid,
     arc.arc_id,
     lower(arc.feature_type::text) AS feature_type,
     arc.code,
@@ -436,7 +436,7 @@ CREATE OR REPLACE VIEW ve_lot_x_arc AS
 
 DROP VIEW IF EXISTS ve_lot_x_node;
 CREATE OR REPLACE VIEW ve_lot_x_node AS 
- SELECT row_number() OVER (ORDER BY node.node_id) AS rid,
+ SELECT row_number() OVER (ORDER BY om_visit_lot_x_node.lot_id, node.node_id) AS rid,
     node.node_id,
     lower(node.feature_type::text) AS feature_type,
     node.code,
@@ -455,7 +455,7 @@ CREATE OR REPLACE VIEW ve_lot_x_node AS
 
 DROP VIEW IF EXISTS ve_lot_x_connec;
 CREATE OR REPLACE VIEW ve_lot_x_connec AS 
- SELECT row_number() OVER (ORDER BY connec.connec_id) AS rid,
+ SELECT row_number() OVER (ORDER BY om_visit_lot_x_connec.lot_id, connec.connec_id) AS rid,
     connec.connec_id,
     lower(connec.feature_type::text) AS feature_type,
     connec.code,

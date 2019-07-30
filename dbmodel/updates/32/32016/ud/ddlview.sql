@@ -8,7 +8,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP VIEW IF EXISTS ve_lot_x_gully;
 CREATE OR REPLACE VIEW ve_lot_x_gully AS 
- SELECT row_number() OVER (ORDER BY gully.gully_id) AS rid,
+ SELECT row_number() OVER (ORDER BY ORDER BY om_visit_lot_x_gully.lot_id, gully.gully_id) AS rid,
     gully.gully_id,
     lower(gully.feature_type::text) AS feature_type,
     gully.code,
