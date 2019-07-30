@@ -7,6 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+UPDATE sys_csv2pg_config SET target='{"Node Results:", "MINIMUM Node"}' WHERE tablename = 'rpt_node';
+UPDATE sys_csv2pg_config SET target='{"MINIMUM Link", "Link Results:"}' WHERE tablename = 'rpt_arc';
+UPDATE sys_csv2pg_config SET target='{"Pump Factor"}' WHERE tablename = 'rpt_energy_usage';
+UPDATE sys_csv2pg_config SET target='{"Hydraulic Status:"}' WHERE tablename = 'rpt_hydraulic_status';
+UPDATE sys_csv2pg_config SET target='{"Input Data"}' WHERE tablename = 'rpt_cat_result';
 
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 1, 'BASIC (ONLY MANDATORY NODARC)', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_options_networkmode', 2, 'ADVANCED (ALL NODARC)', NULL);

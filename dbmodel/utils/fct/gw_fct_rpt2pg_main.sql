@@ -30,7 +30,6 @@ DECLARE
 	v_functionname text;
 	v_steps integer;
 	v_currentstep integer;
-	v_storeallresults boolean;
 	v_return json;
 	v_projecttype text;
 	v_iterative text;
@@ -56,35 +55,27 @@ BEGIN
 		v_functionid = '1'; 
 		v_functionname = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionid);
 		v_steps = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = '1');
-		v_storeallresults = (SELECT ((addparam::json->>'systemParameters')::json->>'storeAllResults') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionid);
+		
 	END IF;
 
-	
 	-- call rpt2pg function
 	IF v_projecttype = 'WS' THEN
-		SELECT gw_fct_utils_csv2pg_import_epanet_rpt(p_data) INTO v_result;
+		PERFORM gw_fct_utils_csv2pg_import_epanet_rpt(p_data);
 	
 	ELSIF v_projecttype = 'UD' THEN
-		SELECT gw_fct_utils_csv2pg_import_swmm_rpt(p_data) INTO v_result;	
+		PERFORM gw_fct_utils_csv2pg_import_swmm_rpt(p_data);
 	
 	END IF;
 	
-/*  to do
-	-- storing results into audit_log_data table (in case of iterative fuction is defined with true)
-	IF v_storeallresults THEN
-		FOR v_tableid IN SELECT id FROM audit_cat_table WHERE id like 'rpt_'
-		LOOP
-		
-			EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, log_message)
-					SELECT 35, concat (''"resultId":"'''||v_result||'''", "step":"'','||v_currentstep||'''", 
-					"table":"'','||quote_ident(id)||'''", "values":{'',row_to_json(a),''}'')
-					FROM ( SELECT * FROM '||quote_ident(id)||' WHERE result_id = v_result)';
-		END LOOP;
-	END IF;	
-
-	-- enhance report message.
-	showing step by step to user what is happening...	
-*/
+	-- TO MOVE FROM HERE TO UPPER POSITION
+	--------------------------------------------------------------------------------------------------
+	FOR v_tableid IN SELECT id FROM audit_cat_table WHERE id IN ('rpt_node', 'rpt_arc')
+	LOOP
+		EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, feature_type, log_message)
+			 SELECT 35, '||quote_literal(v_tableid)||',
+			 row_to_json(a) FROM ( SELECT * FROM '||quote_ident(v_tableid)||' WHERE result_id = '||quote_literal(v_result)||')a';
+	END LOOP;
+	-------------------------------------------------------------------------------------------------
 
 	-- return message
 	v_return = '{"message":{"priority":0, "text":"Rpt import done succesfully"}}';

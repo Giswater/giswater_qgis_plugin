@@ -16,16 +16,16 @@ INSERT INTO inp_curve_id VALUES ('PUMP_02', 'PUMP');
 INSERT INTO inp_curve VALUES (1, 'PUMP_02', 3.3000, 15.0000);
 INSERT INTO inp_curve VALUES (2, 'PUMP_01', 5.0000, 35.0000);
 
-INSERT INTO inp_pattern VALUES ('pattern_01','Supossed pattern from literature', 'UNITARY', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('pattern_02','Supossed pattern from literature', 'UNITARY', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('pattern_03','Supossed pattern from literature', 'UNITARY', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('pattern_hydrant','Supossed pattern from literature', 'UNITARY', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('dma02_period05', NULL, 'VOLUME', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('dma02_period06', NULL, 'VOLUME', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('dma02_period07', NULL, 'VOLUME', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('dma03_period05', NULL, 'VOLUME', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('dma03_period06', NULL, 'VOLUME', null , '{"steps":24}');
-INSERT INTO inp_pattern VALUES ('dma03_period07', NULL, 'VOLUME', null , '{"steps":24}');
+INSERT INTO inp_pattern VALUES ('pattern_01','Supossed pattern from literature', 'UNITARY', null , null);
+INSERT INTO inp_pattern VALUES ('pattern_02','Supossed pattern from literature', 'UNITARY', null , null);
+INSERT INTO inp_pattern VALUES ('pattern_03','Supossed pattern from literature', 'UNITARY', null , null);
+INSERT INTO inp_pattern VALUES ('pattern_hydrant','Supossed pattern from literature', 'UNITARY', null , null);
+INSERT INTO inp_pattern VALUES ('dma02_period05', NULL, 'VOLUME', null , null);
+INSERT INTO inp_pattern VALUES ('dma02_period06', NULL, 'VOLUME', null , null);
+INSERT INTO inp_pattern VALUES ('dma02_period07', NULL, 'VOLUME', null , null);
+INSERT INTO inp_pattern VALUES ('dma03_period05', NULL, 'VOLUME', null , null);
+INSERT INTO inp_pattern VALUES ('dma03_period06', NULL, 'VOLUME', null , null);
+INSERT INTO inp_pattern VALUES ('dma03_period07', NULL, 'VOLUME', null , null);
 
 
 INSERT INTO inp_pattern_value VALUES (1, 'pattern_01', 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000);

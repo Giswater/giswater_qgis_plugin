@@ -22,7 +22,7 @@ EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_nodescouplecapacity($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
-"data":{"parameters":{"step":1, "resultId":"test1"}}}$$)
+"data":{"parameters":{"step":1, "resultId":"p2"}}}$$)
 
 
 PREVIOUS
@@ -53,27 +53,32 @@ Rest of arcs are clasified as NON HYDRANT (H4) arcs
 */
 
 DECLARE
-	v_step integer;
-	v_text text;
-	v_return text;
-	v_result text;
-	v_totalnodes integer;
-	v_rownode int8;
-	v_rowtemp int8;
-	v_rid integer;
-	v_node text;
-	v_count integer = 0;
-	v_field text;
-	v_value double precision;
-	v_querytext text;
+	v_step 		integer;
+	v_text 		text;
+	v_return 	text;
+	v_result 	text;
+	v_totalnodes 	integer;
+	v_rownode 	int8;
+	v_rowtemp 	int8;
+	v_rid 		integer;
+	v_node 		text;
+	v_count 	integer = 0;
+	v_field 	text;
+	v_value 	double precision;
+	v_querytext 	text;
+	v_units 	text;
 	v_epaunits	double precision;
 	v_lpsdemand	double precision;
 	v_mcaminpress 	double precision;
 	v_mindiameter 	double precision;
+	v_tsepnumber 	integer;
+	v		integer[];
+	v_1		integer;
+	v_2		integer;
+	v_record	record;
+	v_steps 	integer;
 
-      
 BEGIN
-
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -82,16 +87,25 @@ BEGIN
 	v_step := (((p_data ->>'data')::json->>'parameters')::json->>'step');
 	v_result := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 
-	v_lpsdemand = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'lpsDemand') FROM config_param_user WHERE parameter = 'inp_iterative_param');
-	v_mcaminpress = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'mcaMinPress' FROM config_param_user WHERE parameter = 'inp_iterative_param');
-	v_mindiameter = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'minDiameter' FROM config_param_user WHERE parameter = 'inp_iterative_param');
-	
+	v_lpsdemand = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'lpsDemand' FROM config_param_user WHERE parameter = 'inp_iterative_parameters');
+	v_mcaminpress = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'mcaMinPress' FROM config_param_user WHERE parameter = 'inp_iterative_parameters');
+	v_mindiameter = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'minDiameter' FROM config_param_user WHERE parameter = 'inp_iterative_parameters');
+
+	v_units = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_units');
+
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
 
+	raise notice 'minPress: % lpsdemand: % minDiameter: % units: % conversionUnitsFactor: %',v_mcaminpress, v_lpsdemand, v_mindiameter, v_units, v_epaunits;
+
 	RAISE NOTICE 'Starting pg2epa hydrant analysis process.';
 
-/*
+	-- set epa times
+	UPDATE config_param_user SET value=1 WHERE parameter='inp_times_pattern_timestep' AND cur_user=current_user;
+	UPDATE config_param_user SET value=1 WHERE parameter='inp_times_report_timestep' AND cur_user=current_user;
+	UPDATE config_param_user SET value='MINIMUM' WHERE parameter='inp_times_statistic' AND cur_user=current_user;
+
+	
 	IF v_step=1 THEN -- single hydrant (55)
 
 		DELETE FROM temp_table WHERE fprocesscat_id=55 AND user_name=current_user;
@@ -106,23 +120,26 @@ BEGIN
 		SELECT 55, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter
 		UNION 
 		SELECT 55, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter;
-		
+
+		-- set epa times
+		v_tsepnumber = (SELECT count(*) FROM anl_node WHERE fprocesscat_id=55 AND  cur_user=current_user);
+		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
+
 		-- TODO: check connected graf
 
 		-- update demands
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
-		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user);
+		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits, pattern_id=node_id 
+		WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user);
 
 		-- create patterns
 		v_totalnodes =  (SELECT count(*) FROM anl_node WHERE fprocesscat_id = 55 and cur_user= current_user);
 		v_rownode =  (SELECT id FROM anl_node WHERE fprocesscat_id = 55 and cur_user= current_user order by id LIMIT 1);
 
-		RAISE NOTICE ' %', v_totalnodes;
-
 		-- loop to create the pattern (any patterns as any nodes)
 		FOR v_x IN v_rownode..(v_rownode+v_totalnodes) LOOP
 			INSERT INTO temp_table (fprocesscat_id, text_column)
-			SELECT 55, array_agg(CASE WHEN id=v_x THEN 1 ELSE 0 END) FROM anl_node WHERE fprocesscat_id = 55;
+			SELECT 55, array_agg(CASE WHEN id=v_x THEN 1 ELSE 0 END) FROM anl_node WHERE fprocesscat_id = 55 AND cur_user=current_user;
 		END LOOP;
 
 		v_rowtemp = (SELECT id FROM temp_table WHERE fprocesscat_id = 55 and user_name= current_user order by id LIMIT 1);
@@ -130,7 +147,6 @@ BEGIN
 		-- loop to insert patterns created into rpt_inp_pattern_value
 		FOR v_z IN v_rowtemp..(v_rowtemp+v_totalnodes) LOOP
 
-			RAISE NOTICE 'v_z % ',v_z;
 			v_count = 0;
 			
 			-- get node_id
@@ -139,33 +155,19 @@ BEGIN
 	
 			EXIT WHEN v_node IS NULL;
 						
-			FOR v_x IN 1..v_totalnodes/19 LOOP
+			FOR v_x IN 1..v_totalnodes/17 LOOP
 
-				--RAISE NOTICE 'v_x % ',v_x;
-
+				SELECT array_agg(col) INTO v::integer[] FROM (SELECT unnest(text_column::integer[]) as col 
+				FROM temp_table WHERE user_name=current_user AND fprocesscat_id=55 AND id=v_z LIMIT 18 offset v_count)a;
+				
 				-- inserting row
-				INSERT INTO rpt_inp_pattern_value (result_id, pattern_id) VALUES (v_result, v_node) RETURNING id INTO v_rid;
-			
-				FOR v_y IN 1..18 LOOP
-
-					--RAISE NOTICE ' v_y % ', v_y;
-			
-					v_count = v_count +1;
+				INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6,
+				factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+				VALUES (v_result, v_node, v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17],	v[18]);
 					
-					-- updating row column by column
-					v_field = concat('factor_',v_y);
-					v_value = (SELECT val[v_count] FROM (SELECT text_column::integer[] as val FROM temp_table WHERE user_name=current_user AND fprocesscat_id=55 AND id=v_z)a);
-			
-					v_querytext = 'UPDATE rpt_inp_pattern_value SET '||quote_ident(v_field)||'='||v_value||' WHERE id='||(v_rid);
-
-					EXIT WHEN v_value IS NULL;
-
-					--RAISE NOTICE 'v_querytext % v_count % v_field % v_value % ', v_querytext, v_count, v_field, v_value;
+				v_count = v_count + 18;
 					
-					EXECUTE v_querytext;
-				END LOOP;
-
-				EXIT WHEN v_value IS NULL;
+				EXIT WHEN v[18] IS NULL;
 								
 			END LOOP;
 			
@@ -176,75 +178,128 @@ BEGIN
 		-- insert into anl_node only that nodes with positive result
 		DELETE FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 56, node_id FROM rpt_node WHERE press > v_mcaminpress and result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user ) group by 2;
+		SELECT 56, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
+		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user ) group by 2;
 
 		-- update demands
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
-		UPDATE rpt_inp_node SET demand=2*v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user);
+		UPDATE rpt_inp_node SET demand=2*v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN 
+		(SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user);
 
 		-- delete not used patterns
-		DELETE FROM rpt_inp_pattern_value WHERE pattern_id NOT IN (SELECT anl_node FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user) AND user_name=current_user AND result_id=v_result;
+		DELETE FROM rpt_inp_pattern_value WHERE pattern_id NOT IN (SELECT node_id FROM anl_node 
+		WHERE fprocesscat_id=56 AND cur_user=current_user) AND user_name=current_user AND result_id=v_result;
 
+		-- set epa times
+		v_tsepnumber = (SELECT count(*) FROM anl_node WHERE fprocesscat_id=56 AND  cur_user=current_user);
+		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
 			
 	ELSIF v_step=3 THEN -- identify single but not double hydrant - 57
 
+	/*
+		SELECT * FROM anl_node WHERE fprocesscat_id=56;
+		SELECT * FROM audit_log_data WHERE fprocesscat_id = 35 and feature_type='rpt_node'
+		SELECT * FROM rpt_arc WHERE result_id='p2';
+
+		SELECT 56, node_id FROM rpt_node WHERE press < 15 and result_id='p2' AND node_id IN 
+		(SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user) group by 2;
+	*/
+
 		DELETE FROM anl_node WHERE fprocesscat_id=57 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 57, node_id FROM rpt_node WHERE press < v_mcaminpress and result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user ) group by 2;
+		SELECT 57, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float < 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
+		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user ) group by 2;
 
-		-- update demands
+		-- reset demands
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
 
-		-- TODO: pattern must be assigned coupled (dos a dos)
-		UPDATE rpt_inp_node SET demand=16,666*v_epaunits, pattern_id=arc_id WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user);
-		
-		-- delete not used patterns
-		DELETE FROM rpt_inp_pattern_value WHERE pattern_id NOT IN (SELECT anl_node FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user) AND user_name=current_user AND result_id=v_result;
+		-- update demands
+		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits WHERE result_id=v_result AND node_id IN 
+		(SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user);
 
+		-- delete patterns
+		DELETE FROM rpt_inp_pattern_value WHERE user_name=current_user AND result_id=v_result;
+
+		-- create pattern using the number of patterns according of nodes and the timestep of patterns according of arcs
+
+		-- getting timesteps
+		INSERT INTO anl_arc (fprocesscat_id, arc_id, descript)
+		SELECT 57, arc_id, concat ('{"tstep":',row_number() over (order by arc_id),', "node_1":"', node_1,'", "node_2":"',node_2,'"}') FROM (
+		SELECT DISTINCT ON (arc.arc_id) arc.arc_id, node_1, node_2 FROM arc JOIN anl_node ON node_id=node_1 or node_id=node_2 WHERE fprocesscat_id=57 AND cur_user=current_user AND node_id 
+		IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user))a;
+
+		-- getting patterns
+		DELETE FROM temp_table WHERE fprocesscat_id = 57 AND user_name=current_user;
+		INSERT INTO temp_table (fprocesscat_id, addparam, text_column)
+		SELECT DISTINCT ON (node_id) 57, concat('{"node_id":"',node_id,'"}')::json, val FROM (
+		SELECT array_agg(0)as val FROM anl_arc a WHERE a.fprocesscat_id = 57 AND a.cur_user=current_user
+		) b, anl_node n JOIN arc ON node_id=node_1 OR node_id=node_2
+		WHERE n.fprocesscat_id = 56 AND n.cur_user=current_user;
+
+		v_totalnodes =  (SELECT count(*) FROM temp_table WHERE fprocesscat_id = 57 and user_name= current_user);
+
+		--loop for the whole patterns
+		FOR v_record IN SELECT * FROM temp_table WHERE fprocesscat_id = 57 and user_name= current_user
+		LOOP
+
+			v_count = 0;
+			
+			-- get node_id (pattern_id)
+			v_node = (v_record.addparam->>'node_id');
+
+			-- getting pattern values
+			SELECT array_agg(col) INTO v::integer[] FROM (SELECT unnest(v_record.text_column::integer[]) as col FROM temp_table WHERE user_name=current_user AND fprocesscat_id=57 AND id=v_record.id) a;
+
+			-- getting and setting tsteps with = 1
+			FOR v_steps IN SELECT (descript::json->'tstep') FROM anl_arc WHERE fprocesscat_id=57 AND cur_user=current_user 
+			AND ((descript::json->'node_1')::text=concat('"',v_node,'"') OR (descript::json->'node_2')::text=concat('"',v_node,'"'))
+			LOOP
+				raise notice ' steps %', v_steps;
+				v[v_steps] = 1;
+								
+			END LOOP;
+
+			-- inserting on rpt_inp_pattern_value table
+			FOR v_x IN 1..v_totalnodes/17 LOOP
+
+				INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6,
+				factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+				VALUES (v_result, v_node, v[v_count+1], v[v_count+2], v[v_count+3], v[v_count+4], v[v_count+5], v[v_count+6], v[v_count+7], v[v_count+8], 
+				v[v_count+9], v[v_count+10], v[v_count+11], v[v_count+12], v[v_count+13], v[v_count+14], v[v_count+15], v[v_count+16], v[v_count+17], v[v_count+18]);
+
+				EXIT WHEN v[v_count+18] IS NULL;				
+				
+				v_count = v_count + 18;
+				
+			END LOOP;
+			
+		END LOOP;
+
+		-- set epa times
+		v_tsepnumber = (SELECT count(*) FROM anl_arc WHERE fprocesscat_id=57 AND  cur_user=current_user);
+		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
 								
 	ELSIF v_step=4 THEN -- Identifying x4 nodes (coupled hydrant - 58)
 
 		-- insert into anl_node only that nodes with positive result
 		DELETE FROM anl_node WHERE fprocesscat_id=58 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 58, node_id FROM rpt_node WHERE press > v_mcaminpress and result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user ) group by 2;
+		SELECT 58, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
+		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user ) group by 2;
 
 		-- delete all patterns
 		DELETE FROM rpt_inp_pattern_value WHERE user_name=current_user AND result_id=v_result;
+
+		-- restore epavalues
+		--TODO
 			
 	ELSIF v_step=5 THEN
-			
-			-- upsert dattrib values (node)
-			INSERT INTO dattrib
-			SELECT 6, node_id, 'NODE', 'H1' FROM anl_node
-			WHERE fprocesscat_id=92
-			ON CONFLICT DO UPDATE set idval='H1';
-			
-			INSERT INTO dattrib
-			SELECT 6, node_id, 'NODE', 'H2' FROM anl_node
-			WHERE fprocesscat_id=94 AND NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
-			ON CONFLICT DO UPDATE set idval='H2';
-			
-			INSERT INTO dattrib
-			SELECT 6, node_id, 'NODE', 'H3' FROM anl_node
-			WHERE fprocesscat_id=91 AND NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
-			ON CONFLICT DO UPDATE set idval='H3';
-			
-			INSERT INTO dattrib
-			SELECT 6, node_id, 'NODE', 'H4', FROM v_edit_node
-			WHERE node_id NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
-			ON CONFLICT DO UPDATE set idval='H4';
-
-			-- restore skip demand pattern
-			UPDATE config_param_user SET value=FALSE WHERE parameter='inp_options_skipdemandpattern' AND cur_user=current_user;
-		
-		
-			-- upsert dattrib values (arc)
-			-- TODO
 
 	END IF;
 
-*/
+	-- delete results from previous simulation table
+	DELETE FROM audit_log_data where fprocesscat_id = 35 and user_name=current_user;
+
 	
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Hydrant analysis done succesfully"}')::json;
 

@@ -97,6 +97,7 @@ DECLARE
 	v_tsprojecttype text;
 	v_querytext text;
 	v_count integer = 0;
+	v double precision[];
 BEGIN
 
 	--  Search path
@@ -114,7 +115,7 @@ BEGIN
 	-- insert into ext_timeseries table
 	INSERT INTO ext_timeseries (code, operator_id, catalog_id, element, param, period, timestep, val)
 	SELECT code, operator::integer, catalog_id, element::json, param::json, period::json, timestep::json, val
-		FROM crosstab('SELECT csv2pgcat_id,csv1, csv2 FROM temp_csv2pg'::text, ' VALUES (''code''),(''operator''),(''catalog_id''),(''element''),(''param''),(''period''),(''timestep'')'::text) 
+		FROM crosstab('SELECT csv2pgcat_id,csv1, csv2 FROM temp_csv2pg WHERE csv2pgcat_id=17'::text, ' VALUES (''code''),(''operator''),(''catalog_id''),(''element''),(''param''),(''period''),(''timestep'')'::text) 
 				ct(id integer, code text, operator text, catalog_id text, element text, param text, period text, timestep text) 
 		JOIN (select 17 as id , (array_agg(value))::float[] as val from (
 			SELECT id, 2 as row, csv2 as value FROM temp_csv2pg WHERE csv1='val' AND csv2 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
@@ -147,7 +148,9 @@ BEGIN
 			SELECT id, 29, csv29 FROM temp_csv2pg WHERE csv1='val' AND csv29 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
 			SELECT id, 30, csv30 FROM temp_csv2pg WHERE csv1='val' AND csv30 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
 			SELECT id, 31, csv31 FROM temp_csv2pg WHERE csv1='val' AND csv31 IS NOT NULL
-			ORDER BY 1,2)a)b USING (id) RETURNING id INTO v_id;
+			ORDER BY 1,2) a ) b USING (id) 
+			RETURNING id INTO v_id;
+
 
 	-- insert into epanet inp_pattern tables (if it needs)
 	v_tsprojecttype = (SELECT (param->>'epa')::json->>'projectType' FROM ext_timeseries WHERE id=v_id);
@@ -178,22 +181,18 @@ BEGIN
 		FOR v_x IN 1..100 LOOP
 
 			-- inserting row
-			INSERT INTO inp_pattern_value (pattern_id) VALUES (v_pattern) RETURNING id INTO v_rid;
-			
-			FOR v_y IN 1..18 LOOP
-				v_count = v_count +1;
-				-- updating row column by column
-				v_field = concat('factor_',v_y);
-				v_value = (SELECT val[v_count] FROM (SELECT val FROM ext_timeseries WHERE id=v_id)a);
-				v_querytext = 'UPDATE inp_pattern_value SET '||quote_ident(v_field)||'='||v_value||' WHERE id='||(v_rid);
-
-				EXIT WHEN v_value IS NULL;
+			SELECT array_agg(col) INTO v::float[] FROM (SELECT unnest(val::float[]) as col FROM ext_timeseries where id=v_id LIMIT 18 offset v_count)a;
+			raise notice ' % ', v;
 				
-				EXECUTE v_querytext;
-			END LOOP;
-
-			EXIT WHEN v_value IS NULL;
-
+			-- inserting row
+			INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6,
+			factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+			VALUES (v_pattern, v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17], v[18]);
+					
+			v_count = v_count + 18;
+				
+			EXIT WHEN v[18] IS NULL;
+								
 		END LOOP;
 
 		-- if it is dmaRtc pattern
