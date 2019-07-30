@@ -187,4 +187,3 @@ SELECT doc.id,
    doc.tstamp
   FROM doc;
   
-

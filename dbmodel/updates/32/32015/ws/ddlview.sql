@@ -738,3 +738,5 @@ CREATE OR REPLACE VIEW ve_connec AS
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
      LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id;
+
+

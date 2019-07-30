@@ -10,3 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR UPDATE OR DELETE
 ON SCHEMA_NAME.v_edit_inp_connec FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_inp_connec();
+
+
+CREATE TRIGGER gw_trg_edit_inp_arc_pipe INSTEAD OF INSERT OR UPDATE OR DELETE
+ON SCHEMA_NAME.v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_inp_arc('inp_pipe');   
