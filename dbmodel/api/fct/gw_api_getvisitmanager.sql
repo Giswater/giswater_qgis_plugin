@@ -107,8 +107,16 @@ DECLARE
 	v_filterfeature json;
 	v_isfeaturemanager boolean;
 	v_isusermanager boolean;
-	v_disable_widget_name text;
+	v_disable_widget_name text[];
+	v_record record;
+	v_child_result json;
+	v_combo_json json[];
 	v_result record;
+	v_result1 text;
+	combo_json json;
+	v_childs_result json;
+	v_current_user text;
+
 
 BEGIN
 
@@ -124,7 +132,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-	p_data = REPLACE (p_data::text, '''''', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -207,9 +215,6 @@ BEGIN
 		RAISE NOTICE '--- UPSERT USER MANAGER CALLING gw_api_setvisitmnager WITH MESSAGE: % ---', v_message;
 	END IF;
 
-	-- Check if exist some other workday opened, and close
-	EXECUTE 'SELECT user_id, endtime FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_result;
-
 	--  Create tabs array	
 	v_formtabs := '[';
        
@@ -219,12 +224,13 @@ BEGIN
 		
 			IF v_activedatatab THEN
 
+				-- Check if exist some other workday opened, and close
+				EXECUTE 'SELECT user_id, endtime FROM (SELECT * FROM ud.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_record;
 				
-				
-				IF v_result.user_id IS NOT NULL AND v_result.endtime IS NULL THEN
-					v_disable_widget_name = 'data_startbutton';
+				IF v_record.endtime IS NULL AND v_record.user_id IS NOT NULL THEN
+					v_disable_widget_name = '{data_startbutton}';
 				ELSE
-					v_disable_widget_name = 'data_endbutton';
+					v_disable_widget_name = '{data_endbutton, data_updatebutton}';
 				END IF;
 
 				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
@@ -234,20 +240,61 @@ BEGIN
 					(SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_user_id, v_columntype)
 					INTO v_values
 					USING current_user;
+
+				
+				
 				-- setting values
 				FOREACH aux_json IN ARRAY v_fields 
-				LOOP          
+				LOOP     
+
 					array_index := array_index + 1;
 					v_fieldvalue := (v_values->>(aux_json->>'column_id'));
-
-					IF (aux_json->>'widgetname') = v_disable_widget_name THEN
+					
+					IF (aux_json->>'widgetname') = v_disable_widget_name[1] OR (aux_json->>'widgetname') = v_disable_widget_name[2] THEN
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', True);
 					END IF;
+
+					-- geting current user if exists
+					IF (aux_json->>'column_id')='user_id' AND v_team is NULL THEN
+						v_current_user = aux_json->>'selectedId';
+						IF v_current_user IS NOT NULL THEN
+							EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = ''' || v_current_user || ''' ORDER BY id DESC LIMIT 1' INTO v_team;
+						END IF;
+						
+					END IF;
+					
 					IF (aux_json->>'widgettype')='combo' THEN 
+					
+						IF v_team IS NULL THEN
+							
+						END IF;
+						
 						IF (aux_json->>'column_id')='team_id' AND v_team IS NOT NULL THEN 
+						
 							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_team, ''));
-						ELSIF (aux_json->>'column_id')='lot_id' AND v_lot IS NOT NULL THEN
-							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_lot, ''));
+							
+						ELSIF (aux_json->>'column_id')='lot_id' AND v_team IS NOT NULL THEN
+							
+							EXECUTE ('SELECT gw_api_getchilds($${
+							"client":{"device":3, "infoType":100, "lang":"ES"},
+							"form":{},
+							"feature":{"tableName":"visitManager"},
+							"data":{"comboParent":"team_id", "comboId":' || v_team || '}}$$)') INTO v_child_result;
+
+							-- Convert getchilds result, useing array_to_json
+							select array_to_json(array_agg((value))) FROM (select * from json_array_elements_text(((((v_child_result->>'body')::json->>'data')::json->>0)::json->>'comboIds')::json)) a INTO v_childs_result;
+							
+							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'comboIds', v_childs_result);
+							select array_to_json(array_agg((value))) FROM (select * from json_array_elements_text(((((v_child_result->>'body')::json->>'data')::json->>0)::json->>'comboNames')::json)) a INTO v_childs_result;
+
+							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'comboNames', v_childs_result);
+
+							IF v_lot IS NULL THEN
+								v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
+							ELSE
+								v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_lot, ''));
+
+							END IF;
 						ELSE
 							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 						END IF;
@@ -274,51 +321,50 @@ BEGIN
 	
 			-- Active lots tab
 			------------------
-			IF v_result.user_id IS NOT NULL AND v_result.endtime IS NULL THEN
+			   IF v_activelotstab THEN
 
-				IF v_activelotstab THEN
-
-					-- setting table feature
-					v_feature := '{"tableName":"om_visit_lot"}';		
-					
-					-- setting feature
-					p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
-
-					--refactor tabNames
-					p_data := replace (p_data::text, 'tabFeature', 'feature');
-					
-					RAISE NOTICE '--- CALLING gw_api_getlist ON LOTS TAB USING p_data: % ---', p_data;
-					SELECT gw_api_getlist (p_data) INTO v_fields_json;
-					-- getting pageinfo and list values
-					v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
-					v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
-					
-					v_fields_json := COALESCE(v_fields_json, '{}');
-				END IF;
-
-				-- building
-				SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' and device = v_device LIMIT 1;
-
-				IF v_tab IS NULL THEN 
-					SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' LIMIT 1;			
-				END IF;
+				-- setting table feature
+				v_feature := '{"tableName":"om_visit_lot"}';		
 				
-				v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
-				'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activelotstab);
-				
+				-- setting feature
+				p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
 
-				v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
-				v_formtabs := v_formtabs || ',' || v_tabaux::text;
+				--refactor tabNames
+				p_data := replace (p_data::text, 'tabFeature', 'feature');
+				
+				RAISE NOTICE '--- CALLING gw_api_getlist ON LOTS TAB USING p_data: % ---', p_data;
+				SELECT gw_api_getlist (p_data) INTO v_fields_json;
+
+				-- getting pageinfo and list values
+				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
+				v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
+				
+				v_fields_json := COALESCE(v_fields_json, '{}');
+				
 			END IF;
+
+			-- building
+			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' and device = v_device LIMIT 1;
+
+			IF v_tab IS NULL THEN 
+				SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' LIMIT 1;			
+			END IF;
+
+			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
+			'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activelotstab);
+			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+			v_formtabs := v_formtabs || ',' || v_tabaux::text;
 
 		END IF;
 				
 		-- Done visits tab
 		------------------
 		IF v_activedonetab THEN
+		
 			IF v_isfeaturemanager THEN
 				v_featuretype = NULL;
-			END IF;
+			END IF; 
+			
 			IF v_featuretype IS NULL THEN
 				-- setting table feature	
 				v_feature := '{"tableName":"om_visit"}';
@@ -380,8 +426,8 @@ BEGIN
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		IF v_isusermanager THEN
 			v_formtabs := v_formtabs || ',' || v_tabaux::text;
-		/*ELSIF v_isfeaturemanager THEN 
-			v_formtabs := v_formtabs || v_tabaux::text;*/
+		ELSIF v_isfeaturemanager THEN 
+			v_formtabs := v_formtabs || v_tabaux::text;
 		END IF;
 	
 		--closing tabs array
@@ -390,8 +436,8 @@ BEGIN
 		-- header form
 		IF v_isusermanager THEN
 			v_formheader :=concat('VISIT MANAGER - ',UPPER(current_user));	
-		/*ELSIF v_isfeaturemanager THEN 
-			v_formheader :=concat('VISIT MANAGER - ', v_featureid);	*/
+		ELSIF v_isfeaturemanager THEN 
+			v_formheader :=concat('VISIT MANAGER - ', v_featureid);	
 		END IF;
 	
 		-- actions and layermanager
