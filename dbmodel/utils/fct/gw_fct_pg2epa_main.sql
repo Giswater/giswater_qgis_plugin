@@ -65,8 +65,8 @@ BEGIN
 	ELSE -- iterative call 
 	
 		-- get values of iterative function
-		v_functionidmain = (SELECT value FROM config_param_user WHERE parameter='inp_options_iterative_main_function' AND cur_user=current_user);
-		v_functionidsec = (SELECT value FROM config_param_user WHERE parameter='inp_options_iterative_secondary_function' AND cur_user=current_user);
+		v_functionidmain = (SELECT value FROM config_param_user WHERE parameter='inp_iterative_main_function' AND cur_user=current_user);
+		v_functionidsec = (SELECT value FROM config_param_user WHERE parameter='inp_iterative_secondary_function' AND cur_user=current_user);
 		
 		v_functionnamemain = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidmain);
 		v_functionnamesec = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidsec);

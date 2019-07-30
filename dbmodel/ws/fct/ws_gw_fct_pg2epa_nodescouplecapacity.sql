@@ -69,6 +69,7 @@ DECLARE
 	v_epaunits	double precision;
 	v_lpsdemand	double precision;
 	v_mcaminpress 	double precision;
+	v_mindiameter 	double precision;
 
       
 BEGIN
@@ -81,10 +82,10 @@ BEGIN
 	v_step := (((p_data ->>'data')::json->>'parameters')::json->>'step');
 	v_result := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 
-	-- design values (hard coded)
-	v_lpsdemand = 16.6;
-	v_mcaminpress = 1.5;
-
+	v_lpsdemand = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'lpsDemand') FROM config_param_user WHERE parameter = 'inp_iterative_param');
+	v_mcaminpress = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'mcaMinPress' FROM config_param_user WHERE parameter = 'inp_iterative_param');
+	v_mindiameter = (SELECT (value::json->>'nodesCoupleCapacity')::json->>'minDiameter' FROM config_param_user WHERE parameter = 'inp_iterative_param');
+	
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
 
@@ -102,9 +103,9 @@ BEGIN
 	
 		-- Identifying x0 nodes (dint>73.6)
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 55, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5
+		SELECT 55, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter
 		UNION 
-		SELECT 55, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5;
+		SELECT 55, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter;
 		
 		-- TODO: check connected graf
 
