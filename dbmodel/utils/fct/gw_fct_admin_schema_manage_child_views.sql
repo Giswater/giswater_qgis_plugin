@@ -181,10 +181,12 @@ raise notice '4/addfields=1,v_man_fields,%',v_man_fields;
 		CONTINUE;
 	END IF;
 
-	EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
-	"feature":{"catFeature":"'||v_cat_feature||'"}, 
-	"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
-
+	IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
+		EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+		"feature":{"catFeature":"'||v_cat_feature||'"}, 
+		"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+	END IF;
+	
 	END LOOP;
 ELSE
 
@@ -302,10 +304,12 @@ RAISE NOTICE 'v_man_fields,%',v_man_fields;
 			END IF;
 			
 		END IF;
-	EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
-	"feature":{"catFeature":"'||v_cat_feature||'"}, 
-	"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 
+	IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
+		EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+		"feature":{"catFeature":"'||v_cat_feature||'"}, 
+		"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+	END IF;
 	--create trigger on view 
 	EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
 

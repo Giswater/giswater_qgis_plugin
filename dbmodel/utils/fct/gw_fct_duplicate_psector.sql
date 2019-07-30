@@ -136,26 +136,26 @@ BEGIN
 		FOR rec IN EXECUTE 'SELECT * FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1' LOOP
 		raise notice ' rec,%', rec;
 		
-		IF rec_type.id='ARC' THEN
-			v_field_id=rec.arc_id;
-		ELSIF rec_type.id='NODE' THEN
-			v_field_id=rec.node_id;
-		ELSIF rec_type.id='CONNEC' THEN
-			v_field_id=rec.connec_id;
-		ELSIF rec_type.id='GULLY' THEN
-			v_field_id=rec.connec_id;
-		END IF;
+			IF rec_type.id='ARC' THEN
+				v_field_id=rec.arc_id;
+			ELSIF rec_type.id='NODE' THEN
+				v_field_id=rec.node_id;
+			ELSIF rec_type.id='CONNEC' THEN
+				v_field_id=rec.connec_id;
+			ELSIF rec_type.id='GULLY' THEN
+				v_field_id=rec.connec_id;
+			END IF;
 
-		raise notice ' v_field_id,%', v_field_id;
-		
-		EXECUTE 'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
-		WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
-		
-		
-		v_sql :=  'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
-		WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
+			raise notice ' v_field_id,%', v_field_id;
+			
+			EXECUTE 'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
+			WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
+			
+			
+			v_sql :=  'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
+			WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
 
-		raise notice ' v_sql,%', v_sql;
+			raise notice ' v_sql,%', v_sql;
 				
 		END LOOP;
 	END LOOP;

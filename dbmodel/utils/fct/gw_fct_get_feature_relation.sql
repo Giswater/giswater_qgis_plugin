@@ -108,13 +108,13 @@ BEGIN
 
 
 
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcos relacionados con el featue -> ',v_connect_arc ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodos relacionados con el featue -> ',v_connect_node ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs relacionados con el featue -> ',v_connect_connec ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gully relacionados con el featue -> ',v_connect_gully ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements relacionados con el featue -> ',v_element ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents relacionados con el featue -> ',v_doc ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits relacionados con el featue -> ',v_visit ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the featue -> ',v_connect_arc ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the featue -> ',v_connect_node ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the featue -> ',v_connect_connec ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the featue -> ',v_connect_gully ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the featue -> ',v_element ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the featue -> ',v_doc ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the featue -> ',v_visit ));
 
 
 v_connect_node := COALESCE(v_connect_node, '[]');  
