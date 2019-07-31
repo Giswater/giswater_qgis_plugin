@@ -7,23 +7,56 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit(
-    p_visittype text,
-    p_data json)
+--DROP FUNCTION IF EXISTS ws_sample32.gw_api_get_visit(text, p_data json);
+CREATE OR REPLACE FUNCTION ws_sample32.gw_api_get_visit_new( p_visittype integer,  p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
+-- GET FORMS FOR WORK OFFLINE
+
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
-"data":{"isOffline":"true", "relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT ws_sample32.gw_api_get_visit('1', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"true", "relatedFeature":{"type":"node", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
-"data":{"isOffline":"true","relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT ws_sample32.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"true","relatedFeature":{"type":"node", "tableName":"ve_node},"fields":{},"pageInfo":null}}$$)
 
+-- no infra first call
+SELECT ws_sample32.gw_api_get_visit('2', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"true","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
+
+-- modificacions de codi (a totes online i offline)
+- sempre tab files
+- la classe de visita es mira pel tableName no pel type
+-- Els valors per defecte de classe de visita per usuari seran (només aplica a les visites online):
+	visit_unspected_tablename_vdef
+	visit_planned_tablename_vdef
+	visit_unspected_vdef
+-- Cal setejar quan inserta
+-- Cal recuperar quan es peticiona una nova visita
+
+
+-- RETURNING OFFLINE:
+-- proposed visit_id = sempre NULL
+
+
+
+GET ONLINE FORMS
+
+-- unexpected first call
+SELECT ws_sample32.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"false", "relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
+
+-- planned first call
+SELECT ws_sample32.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"false","relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
+
+-- no infra first call
+SELECT ws_sample32.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"false","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 	
 MAIN ISSUES
@@ -101,7 +134,7 @@ DECLARE
 	v_queryinfra text ;
 	v_parameter text;
 	v_ismultievent boolean;
-	v_inputtablename text;
+	v_featuretablename text;
 	v_inputformname text;
 	v_isclasschanged boolean = true;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
 	v_visitduration text; 	-- to fix the duration of visit. Important because if visit is active on feature, existing visit is showed
@@ -123,8 +156,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := 'SCHEMA_NAME';
+	SET search_path = "ws_sample32", public;
+	v_schemaname := 'ws_sample32';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -151,9 +184,11 @@ BEGIN
 	v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
-	v_inputtablename = ((p_data ->>'feature')::json->>'tableName');
+	v_featuretablename = ((p_data ->>'relatedFeature')::json->>'tableName');
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
+
+	
 
 	--v_offline = 'true';
 
@@ -172,63 +207,44 @@ BEGIN
 	--  get visitclass
 	IF v_visitclass IS NULL THEN
 		
-		-- infraestructure visit
-		IF v_featuretype IS NOT NULL THEN
-		
-			--new visit
-			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
+		--new visit
+		IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
 
-				
-				IF p_visittype='planned' THEN
-				
-					IF v_offline THEN
-						-- in case offline project client get value from system (feature has one vdefault planned visitclass defined on om_visit_class table	)
-						-- TODO
-						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type = UPPER(v_featuretype) AND param_options->>'offlineDefault' = 'true')::integer;
-				
+			-- get vdefault visitclass
+			IF v_offline THEN
+				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
+				v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
+			ELSE
+				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
+				IF p_visittype=1 THEN
+					v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_planned_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
+				ELSIF  p_visittype=2 THEN
+
+					IF v_featuretablename IS NOT NULL THEN
+						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_unspected_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
 					ELSE
-						-- in case of online project client get value from config_param_user (feature has one vdefault visitclas defined for user
-						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;	
-					
-					END IF;
+						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_noinfra_vdef') AND cur_user=current_user)::integer;	
 
-					IF v_visitclass IS NULL THEN
-						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
+						-- manage null case (user has not vdefault for noinfra visits)
+						IF v_visitclass IS NULL THEN 
+							v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename LIMIT 1)::integer;				
+						END IF;
+										
 					END IF;
-					
-				ELSE
-					IF v_offline THEN
-						-- in case offline project client get value from system (feature has one vdefault unexpected visitclass defined on om_visit_class table	)
-						-- TODO vdefault unexpected
-						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type = UPPER(v_featuretype) AND param_options->>'offlineDefault' = 'true')::integer;
-					END IF;
-
-					IF v_visitclass IS NULL THEN
-						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type = upper(v_featuretype) AND visit_type=2 LIMIT 1);	
-					END IF;
-
 				END IF;
+
+				-- manage null case (user has not vdefault for infra)
+				IF v_visitclass IS NULL THEN
+					v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename LIMIT 1)::integer;			
+				END IF;
+				
+			END IF;				
 							
-			-- existing visit
-			ELSE 
-				v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);
-				IF v_visitclass IS NULL THEN
-					v_visitclass := 0;
-				END IF;
-			END IF;
-			
-		-- no infraestructure visit (only for unexpected visits)
+		-- existing visit
 		ELSE 
-			--new visit
-			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
-				v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type IS NULL AND visit_type=2 LIMIT 1);
-			
-			-- existing visit
-			ELSE 
-				v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);
-				IF v_visitclass IS NULL THEN
-					v_visitclass := 0;
-				END IF;
+			v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);
+			IF v_visitclass IS NULL THEN
+				v_visitclass := 0;
 			END IF;
 		END IF;
 	END IF;
@@ -497,7 +513,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 						
 					END IF;
 					
-					-- disable visit type if project is offline
+					-- disable visitclass if project is offline
 					IF (aux_json->>'column_id') = 'class_id' AND v_offline = 'true' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
 					END IF;
