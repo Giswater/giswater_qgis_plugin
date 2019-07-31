@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 
---DROP FUNCTION IF EXISTS ws_sample32.gw_api_get_visit(text, p_data json);
-CREATE OR REPLACE FUNCTION ws_sample32.gw_api_get_visit_new( p_visittype integer,  p_data json)
+--DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(text, p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit_new( p_visittype integer,  p_data json)
   RETURNS json AS
 $BODY$
 
@@ -17,15 +17,15 @@ $BODY$
 -- GET FORMS FOR WORK OFFLINE
 
 -- unexpected first call
-SELECT ws_sample32.gw_api_get_visit('1', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_api_get_visit('1', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"true", "relatedFeature":{"type":"node", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT ws_sample32.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":"node", "tableName":"ve_node},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT ws_sample32.gw_api_get_visit('2', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_api_get_visit('2', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 -- modificacions de codi (a totes online i offline)
@@ -47,15 +47,15 @@ SELECT ws_sample32.gw_api_get_visit('2', $${"client":{"device":3,"infoType":100,
 GET ONLINE FORMS
 
 -- unexpected first call
-SELECT ws_sample32.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"false", "relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT ws_sample32.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT ws_sample32.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 	
@@ -156,8 +156,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample32", public;
-	v_schemaname := 'ws_sample32';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

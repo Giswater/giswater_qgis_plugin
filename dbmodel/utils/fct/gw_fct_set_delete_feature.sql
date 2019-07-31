@@ -15,20 +15,17 @@ RETURNS json AS
 SELECT SCHEMA_NAME.gw_fct_set_delete_feature($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},"feature":{"type":"NODE"},
-"data":{"feature_id":"42"},
-"relation":{"node":["1022","1086"],"arc":[],"connec":["3175"],"gully":[],"element":["1897","32"],"visit":["523"]}}$$);
+"data":{"feature_id":"42"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_set_delete_feature($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},"feature":{"type":"CONNEC"},
-"data":{"feature_id":"3244"},
-"relation":{"node":["1022","1086"],"arc":[],"connec":["3175"],"gully":[],"element":["1897","32"],"visit":["523"]}}$$);
+"data":{"feature_id":"3244"}}$$);
 
 
 SELECT SCHEMA_NAME.gw_fct_set_delete_feature($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{},"feature":{"type":"ARC"},"data":{"feature_id":"2002"},
-"relation":{"node":[],"arc":["2096"],"connec":[],"gully":[],"element":["522"],"visit":["21"],"document":["Demo document 1"]}}$$);
+"form":{},"feature":{"type":"ARC"},"data":{"feature_id":"2002"}}$$);
 */
 
 $BODY$
