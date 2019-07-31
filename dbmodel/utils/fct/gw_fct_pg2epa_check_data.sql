@@ -497,7 +497,7 @@ BEGIN
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, 'INFO: Roughness catalog checked. No mandadoty values missed');
+			VALUES (14, v_result_id, 'INFO: Roughness catalog checked. No mandatory values missed');
 		END IF;
 		
 		-- check roughness inconsistency in function of headloss formula used
@@ -539,7 +539,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: Tanks checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: Tanks checked. No mandatory values missed');
 			END IF;	
 		
 		
@@ -555,7 +555,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: Valve status checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: Valve status checked. No mandatory values missed');
 			END IF;
 		
 
@@ -569,7 +569,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: PBC-PRV-PSV valves checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: PBC-PRV-PSV valves checked. No mandatory values missed');
 			END IF;				
 	
 		SELECT count(*) INTO v_count FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
@@ -582,7 +582,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: GPV valves checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: GPV valves checked. No mandatory values missed');
 			END IF;	
 
 		SELECT count(*) INTO v_count FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
@@ -594,7 +594,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: TCV valves checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: TCV valves checked. No mandatory values missed');
 			END IF;				
 
 		SELECT count(*) INTO v_count FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
@@ -606,7 +606,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: FCV valves checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: FCV valves checked. No mandatory values missed');
 			END IF;				
 					
 		-- pumps
@@ -619,7 +619,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: Pumps checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: Pumps checked. No mandatory values missed');
 			END IF;	
 		
 		SELECT count(*) INTO v_count FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
@@ -632,7 +632,7 @@ BEGIN
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, 'INFO: Additional pumps checked. No mandadoty values missed');
+				VALUES (14, v_result_id, 'INFO: Additional pumps checked. No mandatory values missed');
 			END IF;	
 	END IF;
 	
