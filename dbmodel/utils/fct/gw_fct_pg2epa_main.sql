@@ -53,14 +53,14 @@ v_i integer = 0;
 BEGIN
 
 --  Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  Get input data
 	v_iterative = (p_data->>'data')::json->>'iterative';
 	v_result =  (p_data->>'data')::json->>'resultId';
 	
 	IF v_iterative='off' THEN -- normal call
-			SELECT gw_fct_pg2epa(p_data) INTO v_return;
+			SELECT gw_fct_pg2epa(p_data::json) INTO v_return;
 			
 	ELSE -- iterative call 
 	
@@ -122,7 +122,7 @@ BEGIN
 		v_currentstep = v_steps - v_count;
 				
 		-- setting v_data to call iterative function
-		v_data = (SELECT text_column FROM ws.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
+		v_data = (SELECT text_column FROM SCHEMA_NAME.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
 
 		raise notice 'v_data %', v_data;
 	
