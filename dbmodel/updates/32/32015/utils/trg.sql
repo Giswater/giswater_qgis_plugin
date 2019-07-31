@@ -13,7 +13,7 @@ CREATE TRIGGER gw_trg_om_psector_x_connec AFTER INSERT OR UPDATE OR DELETE ON om
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('om');
   
   
-CREATE TRIGGER gw_trg_plan_psector_x_connec AFTER INSERT OR UPDATE OF connec_id, arc_id ON plan_psector_x_connec 
+CREATE TRIGGER gw_trg_plan_psector_x_connec BEFORE INSERT OR UPDATE OF connec_id, arc_id ON plan_psector_x_connec 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_x_connec();
 
   
