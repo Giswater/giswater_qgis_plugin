@@ -71,39 +71,39 @@ BEGIN
 
 	IF v_feature_type='arc' THEN
 	--check connec& gully related to arc
-		SELECT array_to_json(array_agg(feature_id)) INTO v_connect_connec FROM v_ui_arc_x_relations 
+		SELECT string_agg(feature_id,',') INTO v_connect_connec FROM v_ui_arc_x_relations 
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
 
-		SELECT array_to_json(array_agg(feature_id)) INTO v_connect_gully FROM v_ui_arc_x_relations 
+		SELECT string_agg(feature_id,',') INTO v_connect_gully FROM v_ui_arc_x_relations 
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='GULLY' AND  arc_id = v_feature_id;
 	
 	--check final nodes related to arc
-		SELECT array_to_json(array[node_1, node_2]) INTO v_connect_node FROM v_ui_arc_x_node WHERE arc_id = v_feature_id;
+		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_ui_arc_x_node WHERE arc_id = v_feature_id;
 		
 	ELSIF v_feature_type='node' THEN
 	--check nodes childs related to node
-		SELECT array_to_json(array_agg(child_id)) INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
+		SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
 	--check arcs related to node
-		SELECT array_to_json(array_agg(arc_id)) INTO v_connect_arc FROM v_ui_arc_x_node WHERE (node_1 = v_feature_id OR node_2 = v_feature_id);
+		SELECT string_agg(arc_id,',') INTO v_connect_arc FROM v_ui_arc_x_node WHERE (node_1 = v_feature_id OR node_2 = v_feature_id);
 		
 	ELSIF v_feature_type='connec' OR v_feature_type='gully' THEN
-		EXECUTE 'SELECT array_to_json(array[feature_id]) FROM link where exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text'
+		EXECUTE 'SELECT string_agg(feature_id,'','') FROM link where exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text'
 		INTO v_connect_connec;
-		EXECUTE 'SELECT array_to_json(array[feature_id]) FROM link where exit_type=''GULLY''  AND  exit_id = '''||v_feature_id||'''::text'
+		EXECUTE 'SELECT string_agg(feature_id,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '''||v_feature_id||'''::text'
 		INTO v_connect_gully;
 	END IF;
 	
 	
 	--check elements related to feature
-	EXECUTE 'SELECT array_to_json(array[element_id]) FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+	EXECUTE 'SELECT string_agg(element_id,'','') FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_element;
 
 	--check visits related to feature
-	EXECUTE 'SELECT array_to_json(array[visit_id::text]) FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+	EXECUTE 'SELECT string_agg(visit_id::text,'','') FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_visit;
 
 	--check visits related to feature
-	EXECUTE 'SELECT array_to_json(array[doc_id::text]) FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
+	EXECUTE 'SELECT string_agg(doc_id,'','') FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_doc;
 
 
@@ -111,7 +111,9 @@ BEGIN
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the featue -> ',v_connect_arc ));
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the featue -> ',v_connect_node ));
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the featue -> ',v_connect_connec ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the featue -> ',v_connect_gully ));
+IF v_project_type = 'UD' THEN 
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the featue -> ',v_connect_gully ));
+END IF;
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the featue -> ',v_element ));
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the featue -> ',v_doc ));
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the featue -> ',v_visit ));
@@ -126,7 +128,8 @@ v_visit := COALESCE(v_visit, '[]');
 v_doc := COALESCE(v_doc, '[]');  
 
 SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=49) row; 
+FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=51) row; 
+
 
 v_result := COALESCE(v_result, '{}'); 
 v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -135,22 +138,19 @@ v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
+raise notice 'v_result,%',v_result;
+raise notice 'v_result_info,%',v_result_info;
+
     RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
              ',"body":{"message":{"priority":1, "text":'||v_result_info||'}'||
 			',"form":{}'||
 			',"feature":'||(p_data ->>'feature')||
 			',"data":'||(p_data ->>'data')||
-			',"relation":{"node":'|| v_connect_node ||',"arc":'|| v_connect_arc ||',"connec":'|| v_connect_connec ||',"gully":'|| v_connect_gully ||
-			',"element":'|| v_element ||',"visit":'|| v_visit ||',"document":'|| v_doc ||'}'||'}'
+			',"relation":{"node":"'|| v_connect_node ||'","arc":"'|| v_connect_arc ||'","connec":"'|| v_connect_connec ||'","gully":"'|| v_connect_gully ||
+			'","element":"'|| v_element ||'","visit":"'|| v_visit ||'","document":"'|| v_doc ||'"}'||'}'
 	    '}')::json;
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-
-
-
-
