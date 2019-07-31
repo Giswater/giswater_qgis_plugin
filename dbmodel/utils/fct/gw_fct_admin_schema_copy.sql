@@ -17,7 +17,7 @@ DISABLE CONSTRAINTS:
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
 EXECUTE:
-SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${"client":{"lang":"CA"}, "data":{"fromSchema":"ws_sample", "toSchema":"ws"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${"client":{"lang":"CA"}, "data":{"fromSchema":"SCHEMA_NAME", "toSchema":"ws"}}$$)
 
 ENABLE CONSTRAINTS:
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)

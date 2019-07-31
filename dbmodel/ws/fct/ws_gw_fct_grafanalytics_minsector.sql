@@ -14,8 +14,8 @@ $BODY$
 /*
 delete from anl_graf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"grafClass":"MINSECTOR", "upsertFeatureAttrib":"TRUE", "exploitation":"[1]"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"grafClass":"MINSECTOR", "arc":"2002", "upsertFeatureAttrib":"TRUE" }}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"exploitation":"[1,2]", "upsertFeature":"TRUE"}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"arc":"2002", "upsertFeature":"TRUE" }}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.anl_graf
@@ -27,7 +27,7 @@ SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=c
 DECLARE
 affected_rows numeric;
 cont1 integer default 0;
-v_class text;
+v_class text = 'MINSECTOR';
 v_feature record;
 v_expl json;
 v_data json;
@@ -39,6 +39,7 @@ v_featuretype text;
 v_featureid integer;
 v_querytext text;
 v_upsertattributes boolean;
+v_arc text;
 
 BEGIN
 
@@ -46,10 +47,9 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	-- get variables
-	v_class = (SELECT (p_data::json->>'data')::json->>'grafClass');
 	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
 	v_arcid = (SELECT (p_data::json->>'data')::json->>'arc');
-	v_upsertattributes = (SELECT (p_data::json->>'data')::json->>'upsertFeatureAttrib');
+	v_upsertattributes = (SELECT (p_data::json->>'data')::json->>'upsertFeature');
 	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
 
 	-- set variables
@@ -91,50 +91,63 @@ BEGIN
 
 		-- reset water flag
 		UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
-		
+
+		------------------
+		-- starting engine
+		-- when arc_id is provided as a parameter
 		IF v_arcid IS NULL THEN
-			SELECT * INTO v_feature FROM (SELECT arc_id, max(checkf) as checkf FROM anl_graf WHERE grafclass=v_class GROUP by arc_id) a 
+			SELECT a.arc_id INTO v_arc FROM (SELECT arc_id, max(checkf) as checkf FROM anl_graf WHERE grafclass=v_class GROUP by arc_id) a 
 			JOIN v_edit_arc b ON a.arc_id=b.arc_id WHERE checkf=0 LIMIT 1;
-			EXIT WHEN v_feature.arc_id IS NULL;
-			v_featureid = v_feature.arc_id;			
-		ELSIF v_arcid IS NOT NULL THEN
-			v_featureid = v_arcid;
-			cont1 = -1;
 		END IF;
 
-		--call engine function
-		v_data = '{"grafClass":"'||v_class||'", "'|| quote_ident(v_featuretype) ||'":"'|| (v_featureid) ||'"}';
-		PERFORM gw_fct_grafanalytics_engine(v_data);
+		EXIT WHEN v_arc IS NULL;
+				
+		-- set the starting element
+		v_querytext = 'UPDATE anl_graf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||' AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
+		RAISE NOTICE '%', v_querytext;
+			
+		EXECUTE v_querytext;
+
+		-- inundation process
+		LOOP	
+			cont1 = cont1+1;
+			UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
+			GET DIAGNOSTICS affected_rows =row_count;
+			EXIT WHEN affected_rows = 0;
+			EXIT WHEN cont1 = 100;
+		END LOOP;
+		
+		-- finish engine
+		----------------
 		
 		-- insert arc results into audit table
 		EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			SELECT '||v_fprocesscat||', cat_arctype_id, a.arc_id, '||(v_featureid)||' 
+			SELECT '||v_fprocesscat||', cat_arctype_id, a.arc_id, '||(v_arc)||' 
 			FROM (SELECT arc_id, max(water) as water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' 
 			AND water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
 	
 		-- insert node results into audit table
 		EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			SELECT '||v_fprocesscat||', nodetype_id, b.node_id, '||(v_featureid)||' FROM (SELECT node_1 as node_id FROM
+			SELECT '||v_fprocesscat||', nodetype_id, b.node_id, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' UNION SELECT node_2,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||')a
 			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c USING(node_id)';
 
 		-- insert node delimiters into audit table
 		EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			SELECT '||v_fprocesscat||', nodetype_id, b.node_id, -1 FROM (SELECT node_1 as node_id FROM
+			SELECT '||v_fprocesscat||', nodetype_id, b.node_id, 0 FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||')a
-			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node USING(node_id)';
+			GROUP BY node_1, water HAVING water=1 AND count(node_1)=1)b JOIN v_edit_node USING(node_id)';
+
+		-- delete duplicate delimiter
+		DELETE FROM audit_log_data WHERE feature_id IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=34 AND log_message = '0') AND fprocesscat_id=34 AND log_message::integer > 0;
+		
 	END LOOP;
 	
 	IF v_upsertattributes THEN 
-
-		FOR v_addparam IN SELECT * FROM man_addfields_parameter WHERE (default_value::json->>'fprocesscat_id')=v_fprocesscat::text
-		LOOP
-			--upsert fields
-			DELETE FROM man_addfields_value WHERE feature_id IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat) AND parameter_id = v_addparam.id;
-			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) 
-			SELECT feature_id, v_addparam.id, log_message FROM audit_log_data WHERE feature_type=v_addparam.cat_feature_id AND fprocesscat_id=v_fprocesscat
-			ON CONFLICT DO NOTHING;
-		END LOOP;
+		-- due URN concept whe can update massively feature from audit_log_data without check if is arc/node/connec.....
+		UPDATE arc SET minsector_id = log_message::integer FROM audit_log_data a WHERE fprocesscat_id=34 AND a.feature_id=arc_id;
+		UPDATE node SET minsector_id = log_message::integer FROM audit_log_data a WHERE fprocesscat_id=34 AND a.feature_id=node_id;
+		UPDATE connec SET minsector_id = log_message::integer FROM audit_log_data a WHERE fprocesscat_id=34 AND a.feature_id=connec_id;
 	END IF;
 
 RETURN cont1;

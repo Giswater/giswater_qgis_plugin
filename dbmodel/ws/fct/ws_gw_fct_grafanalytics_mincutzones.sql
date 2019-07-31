@@ -19,7 +19,7 @@ SELECT * from SCHEMA_NAME.arc where arc_id='2205'
 
 TO EXECUTE
 -- for any exploitation you want
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"grafClass":"MINCUTZONES", "exploitation": "[1]"}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"exploitation": "[1]"}}');
 
 29 & 49 fprocesscat are relationed
 29 it is one row for mincut to resume data for each minsector
@@ -46,7 +46,6 @@ BEGIN
 
 	-- get variables
 	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
-	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
 
 	INSERT INTO anl_mincut_result_cat VALUES (-1) ON CONFLICT (id) DO nothing;
 
@@ -66,7 +65,7 @@ BEGIN
 	END IF;
 
 	--call previous minsector function
-	v_data = '{"data":{"grafClass":"MSECTOR", "upsertFeatureAttrib":"TRUE", "exploitation":"'||v_expl||'"}}';
+	v_data = '{"data":{"upsertFeatureAttrib":"TRUE", "exploitation":"'||v_expl||'"}}';
 	RAISE NOTICE 'v_data %', v_data;
 	PERFORM gw_fct_grafanalytics_minsector(v_data);
 	

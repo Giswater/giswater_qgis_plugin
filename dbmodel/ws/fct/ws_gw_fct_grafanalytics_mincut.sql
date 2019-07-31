@@ -14,19 +14,23 @@ $BODY$
 /*
 TO EXECUTE
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":-1, "process":"base"}}}')
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"grafClass":"MINCUT", "arc":"2001", "parameters":{"id":-1, "process":"extended"}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "parameters":{"id":-1, "process":"base"}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "parameters":{"id":-1, "process":"extended"}}}')
 
 */
 
 
 DECLARE
-v_class text;
+v_class text = 'MINCUT';
 v_feature record;
 v_data json;
 v_arcid text;
 v_mincutid integer;
 v_mincutprocess text;
+v_arc text;
+v_querytext text;
+affected_rows numeric;
+cont1 integer default 0;
 
 BEGIN
 
@@ -34,9 +38,8 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	-- get variables
-	v_class = (SELECT (p_data::json->>'data')::json->>'grafClass');
 	v_mincutprocess = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'process');
-	v_arcid = (SELECT (p_data::json->>'data')::json->>'arc');
+	v_arc = (SELECT (p_data::json->>'data')::json->>'arc');
 	v_mincutid = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'id');
 
 	-- reset graf & audit_log tables
@@ -70,10 +73,29 @@ BEGIN
 	-- reset water flag
 	UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
 	
-	--call engine function
-	v_data = '{"grafClass":"'||v_class||'", "arc":"'|| v_arcid ||'"}';
-	RAISE NOTICE 'v_data % ' , v_data ;
-	PERFORM gw_fct_grafanalytics_engine(v_data);
+	------------------
+	-- starting engine
+				
+	-- set the starting element
+	v_querytext = 'UPDATE anl_graf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||' AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
+
+	
+	RAISE NOTICE '% %', v_arc, v_class;
+			
+	EXECUTE v_querytext;
+
+	-- inundation process
+	LOOP	
+		cont1 = cont1+1;
+		UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
+		GET DIAGNOSTICS affected_rows =row_count;
+		EXIT WHEN affected_rows = 0;
+		EXIT WHEN cont1 = 100;
+
+		raise notice 'cont1 %',cont1 ;
+	END LOOP;
+	-- finish engine
+	----------------
 	
 	-- insert arc results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_arc (result_id, arc_id)

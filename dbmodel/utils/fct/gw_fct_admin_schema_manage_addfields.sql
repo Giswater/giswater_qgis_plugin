@@ -15,8 +15,8 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
-"data":{"action":"CREATE", "field":"source_3", "datatype":"text", "widgettype":"QLineEdit", "label":"source_3","isMandatory":"False",
-"fieldLength":"50", "numDecimals" :null, "defaultValue":null, "orderby":"2", "active":"True"}}$$);
+"data":{"action":"CREATE", "multi_create":"true", "parameters":{"column_id":"source_3", "datatype":"text", "widgettype":"QLineEdit", "label":"source_3","ismandatory":"False",
+"fieldLength":"50", "numDecimals" :null, "defaultValue":null, "orderby":"2", "active":"True"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "client":{"lang":"ES"}, 
@@ -109,7 +109,7 @@ BEGIN
 	v_iseditable = (((p_data ->>'data')::json->>'parameters')::json ->>'iseditable')::text;
 
 -- get input parameters - config_api_form_fields
-	v_formtype = (((p_data ->>'data')::json->>'parameters')::json ->>'formtype')::text;
+	v_formtype = 'feature';
 	v_placeholder = (((p_data ->>'data')::json->>'parameters')::json->>'placeholder')::text;
 	v_tooltip = (((p_data ->>'data')::json->>'parameters')::json ->>'tooltip')::text;
 	v_typeahead = (((p_data ->>'data')::json->>'parameters')::json ->>'typeahead')::json;

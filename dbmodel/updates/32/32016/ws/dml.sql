@@ -7,6 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
+"data":{"action":"CREATE", "field":"source_3", "datatype":"text", "widgettype":"QLineEdit", "label":"source_3","isMandatory":"False",
+"fieldLength":"50", "numDecimals" :null, "defaultValue":null, "orderby":"2", "active":"True"}}$$);
+
+
 UPDATE sys_csv2pg_config SET target='{"Node Results:", "MINIMUM Node"}' WHERE tablename = 'rpt_node';
 UPDATE sys_csv2pg_config SET target='{"MINIMUM Link", "Link Results:"}' WHERE tablename = 'rpt_arc';
 UPDATE sys_csv2pg_config SET target='{"Pump Factor"}' WHERE tablename = 'rpt_energy_usage';
@@ -60,6 +65,8 @@ INSERT INTO audit_cat_table VALUES ('inp_connec', 'Mincut', 'Catalog of mincut r
 
 
 INSERT INTO audit_cat_function VALUES (2730, 'trg_edit_inp_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'Trigger to edit v_edit_inp_connec view', 'role_epa', false, false, NULL, false);
+
+INSERT INTO audit_cat_function VALUES (2732, 'gw_fct_admin_manage_addfields_all', 'utils', 'function', NULL, NULL, NULL, 'Function that makes a loop on cat_feature to create addfield for all features, used in combination with gw_fct_admin_manage_addfields', 'role_admin', false, false, NULL, false);
 
 
 DELETE FROM inp_typevalue WHERE typevalue='inp_value_opti_valvemode';

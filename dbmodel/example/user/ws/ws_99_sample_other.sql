@@ -7,6 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- bug fix. Exists node with 2001 (impossible con garantie the consistency of URN. Exists also one arc)
+UPDATE node SET node_id='111111' WHERE node_id='2001';
+UPDATE inp_shortpipe SET to_arc='2092' WHERE node_id='1080';
+UPDATE inp_shortpipe SET to_arc=null WHERE node_id='114254';
+
+
 INSERT INTO cat_users VALUES (1,'user1');
 INSERT INTO cat_users VALUES (2,'user2');
 INSERT INTO cat_users VALUES (3,'user3');
