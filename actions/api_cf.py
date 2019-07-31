@@ -1263,7 +1263,15 @@ class ApiCF(ApiParent):
 
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
+
+        if table_name is None:
+            table_name = 'v_edit_' + sys_type.lower()
+
+        if feature_id is None:
+            feature_id = selected_object_id
+
         layer = self.controller.get_layer_by_tablename(table_name, log_info=True)
+
         if not layer:
             message = "Layer not found"
             self.controller.show_message(message, parameter=table_name)

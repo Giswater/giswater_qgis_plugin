@@ -457,6 +457,7 @@ class DrawProfiles(ParentMapTool):
         # Function self.draw_nodes(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, index)
 
         for i in range(1, self.n - 1):
+
             self.draw_nodes(self.memory[i][0], self.memory[i][1], self.memory[i][2], self.memory[i][6],
                             self.memory[i-1][3], self.memory[i-1][4], self.memory[i-1][5], self.memory[i-1][16], self.memory[i-1][17],
                             self.memory[i][3], self.memory[i][4], self.memory[i][5], self.memory[i][16], self.memory[i][17], self.memory[i][15],i)
@@ -570,8 +571,8 @@ class DrawProfiles(ParentMapTool):
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
             sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code "
-                   "FROM v_edit_node"
-                   "WHERE node_id = '" + str(node_id) + "'")
+                   " FROM v_edit_node "
+                   " WHERE node_id = '" + str(node_id) + "'")
                 # query for nodes
                 # SELECT elevation AS top_elev, depth AS ymax, top_elev-depth AS sys_elev, nodecat_id, code"
 
@@ -720,6 +721,10 @@ class DrawProfiles(ParentMapTool):
         # Save last points for first node
         self.slast = [s3x, s3y]
         self.ilast = [i3x, i3y]
+
+        # Save last points for first node
+        self.slast2 = [s3x, s3y]
+        self.ilast2 = [i3x, i3y]
 
 
     def draw_fix_table(self, start_point):
@@ -878,6 +883,7 @@ class DrawProfiles(ParentMapTool):
         # Save last points before the last node
         self.slast = [s5x, s5y]
         self.ilast = [i5x, i5y]
+
 
         # Save last points for draw ground
         self.slast2 = [s3x, s3y]

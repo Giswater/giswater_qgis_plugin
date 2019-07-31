@@ -70,8 +70,14 @@ class ApiCatalog(ApiParent):
         main_layout.addItem(verticalSpacer1)
 
         matcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
-        pnom = self.dlg_catalog.findChild(QComboBox, 'pnom')
-        dnom = self.dlg_catalog.findChild(QComboBox, 'dnom')
+
+        if self.controller.get_project_type() == 'ws':
+            pnom = self.dlg_catalog.findChild(QComboBox, 'pnom')
+            dnom = self.dlg_catalog.findChild(QComboBox, 'dnom')
+        elif self.controller.get_project_type() == 'ud':
+            pnom = self.dlg_catalog.findChild(QComboBox, 'shape')
+            dnom = self.dlg_catalog.findChild(QComboBox, 'geom1')
+
         id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Call get_api_catalog first time
@@ -95,7 +101,11 @@ class ApiCatalog(ApiParent):
         form_name = 'upsert_catalog_' + geom_type + ''
         form = '"formName":"' + form_name + '", "tabName":"data", "editable":"TRUE"'
         feature = '"feature_type":"' + feature_type + '"'
-        extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pnom":"'+str(pn_value)+'", "dnom":"'+str(dn_value)+'"}'
+        if self.controller.get_project_type() == 'ws':
+            extras = '"fields":{"matcat_id":"' + str(matcat_id_value) + '", "pnom":"' + str(pn_value) + '", "dnom":"' + str(dn_value) + '"}'
+        elif self.controller.get_project_type() == 'ud':
+            extras = '"fields":{"matcat_id":"' + str(matcat_id_value) + '", "shape":"' + str(pn_value) + '", "geom1":"' + str(dn_value) + '"}'
+
         body = self.create_body(form=form, feature=feature, extras=extras)
         sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
@@ -124,7 +134,10 @@ class ApiCatalog(ApiParent):
                 self.populate_combo(pnom,field)
             elif field['column_id'] == 'dnom':
                 self.populate_combo(dnom,field)
-
+            elif field['column_id'] == 'shape':
+                self.populate_combo(pnom, field)
+            elif field['column_id'] == 'geom1':
+                self.populate_combo(dnom,field)
 
     def get_event_combo_parent(self, fields, row, geom_type):
 
