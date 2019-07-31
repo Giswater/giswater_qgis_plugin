@@ -343,6 +343,7 @@ UPDATE audit_cat_param_user SET  label='Soil catalog:',formname='config',  dv_qu
 -- 2019/03/05
 
 -- INSERTS
+ALTER TABLE config_param_system DROP CONSTRAINT IF EXISTS config_param_system_parameter_unique;
 ALTER TABLE config_param_system ADD CONSTRAINT config_param_system_parameter_unique UNIQUE (parameter);
 
 
