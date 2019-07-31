@@ -100,13 +100,28 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa hydrant analysis process.';
 
+	IF v_step='1' THEN -- save inp user's values
+
+		INSERT INTO config_param_user (value, parameter) VALUES ('temp_inp_times_pattern_timestep', 
+		(SELECT value FROM config_param_user WHERE parameter='inp_times_pattern_timestep' AND cur_user=current_user)) ON CONFLICT DO NOTHING;
+		INSERT INTO config_param_user (value, parameter) VALUES ('temp_inp_times_report_timestep', 
+		(SELECT value config_param_user WHERE parameter='inp_times_report_timestep' AND cur_user=current_user)) ON CONFLICT DO NOTHING;
+		INSERT INTO config_param_user (value, parameter) VALUES ('temp_inp_times_statistic', 
+		(SELECT value config_param_user WHERE parameter='inp_times_statistic' AND cur_user=current_user)) ON CONFLICT DO NOTHING;
+		INSERT INTO config_param_user (value, parameter) VALUES ('temp_inp_options_skipdemandpattern', 
+		(SELECT value config_param_user WHERE parameter='inp_options_skipdemandpattern' AND cur_user=current_user)) ON CONFLICT DO NOTHING;
+		INSERT INTO config_param_user (value, parameter) VALUES ('temp_inp_times_duration', 
+		(SELECT value config_param_user WHERE parameter='inp_times_duration' AND cur_user=current_user)) ON CONFLICT DO NOTHING;	
+
+	END IF;
+
 	-- set epa times
 	UPDATE config_param_user SET value=1 WHERE parameter='inp_times_pattern_timestep' AND cur_user=current_user;
 	UPDATE config_param_user SET value=1 WHERE parameter='inp_times_report_timestep' AND cur_user=current_user;
 	UPDATE config_param_user SET value='MINIMUM' WHERE parameter='inp_times_statistic' AND cur_user=current_user;
 
 	
-	IF v_step=1 THEN -- single hydrant (55)
+	IF v_step='1' THEN -- single hydrant (55)
 
 		DELETE FROM temp_table WHERE fprocesscat_id=55 AND user_name=current_user;
 		DELETE FROM anl_node WHERE fprocesscat_id=55 AND cur_user=current_user;
@@ -173,7 +188,7 @@ BEGIN
 			
 		END LOOP;
 		
-	ELSIF v_step=2 THEN-- Identifying x2 nodes (double hydrant - 56)
+	ELSIF v_step='2' THEN-- Identifying x2 nodes (double hydrant - 56)
 
 		-- insert into anl_node only that nodes with positive result
 		DELETE FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user;
@@ -194,16 +209,7 @@ BEGIN
 		v_tsepnumber = (SELECT count(*) FROM anl_node WHERE fprocesscat_id=56 AND  cur_user=current_user);
 		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
 			
-	ELSIF v_step=3 THEN -- identify single but not double hydrant - 57
-
-	/*
-		SELECT * FROM anl_node WHERE fprocesscat_id=56;
-		SELECT * FROM audit_log_data WHERE fprocesscat_id = 35 and feature_type='rpt_node'
-		SELECT * FROM rpt_arc WHERE result_id='p2';
-
-		SELECT 56, node_id FROM rpt_node WHERE press < 15 and result_id='p2' AND node_id IN 
-		(SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user) group by 2;
-	*/
+	ELSIF v_step='3' THEN -- identify single but not double hydrant - 57
 
 		DELETE FROM anl_node WHERE fprocesscat_id=57 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
@@ -214,7 +220,7 @@ BEGIN
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
 
 		-- update demands
-		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits WHERE result_id=v_result AND node_id IN 
+		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN 
 		(SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user);
 
 		-- delete patterns
@@ -223,10 +229,11 @@ BEGIN
 		-- create pattern using the number of patterns according of nodes and the timestep of patterns according of arcs
 
 		-- getting timesteps
+		DELETE FROM anl_arc WHERE fprocesscat_id=57 AND cur_user=current_user;
 		INSERT INTO anl_arc (fprocesscat_id, arc_id, descript)
 		SELECT 57, arc_id, concat ('{"tstep":',row_number() over (order by arc_id),', "node_1":"', node_1,'", "node_2":"',node_2,'"}') FROM (
 		SELECT DISTINCT ON (arc.arc_id) arc.arc_id, node_1, node_2 FROM arc JOIN anl_node ON node_id=node_1 or node_id=node_2 WHERE fprocesscat_id=57 AND cur_user=current_user AND node_id 
-		IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user))a;
+		IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user))a;
 
 		-- getting patterns
 		DELETE FROM temp_table WHERE fprocesscat_id = 57 AND user_name=current_user;
@@ -234,7 +241,7 @@ BEGIN
 		SELECT DISTINCT ON (node_id) 57, concat('{"node_id":"',node_id,'"}')::json, val FROM (
 		SELECT array_agg(0)as val FROM anl_arc a WHERE a.fprocesscat_id = 57 AND a.cur_user=current_user
 		) b, anl_node n JOIN arc ON node_id=node_1 OR node_id=node_2
-		WHERE n.fprocesscat_id = 56 AND n.cur_user=current_user;
+		WHERE n.fprocesscat_id = 57 AND n.cur_user=current_user;
 
 		v_totalnodes =  (SELECT count(*) FROM temp_table WHERE fprocesscat_id = 57 and user_name= current_user);
 
@@ -270,37 +277,43 @@ BEGIN
 				EXIT WHEN v[v_count+18] IS NULL;				
 				
 				v_count = v_count + 18;
-				
 			END LOOP;
-			
 		END LOOP;
 
 		-- set epa times
 		v_tsepnumber = (SELECT count(*) FROM anl_arc WHERE fprocesscat_id=57 AND  cur_user=current_user);
 		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
 								
-	ELSIF v_step=4 THEN -- Identifying x4 nodes (coupled hydrant - 58)
+	ELSIF v_step='last' THEN -- positive results for (coupled hydrant - 58)
 
 		-- insert into anl_node only that nodes with positive result
 		DELETE FROM anl_node WHERE fprocesscat_id=58 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 58, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
-		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user ) group by 2;
-
+		SELECT 58, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user;
+		
 		-- delete all patterns
 		DELETE FROM rpt_inp_pattern_value WHERE user_name=current_user AND result_id=v_result;
 
-		-- restore epavalues
-		--TODO
-			
-	ELSIF v_step=5 THEN
+		-- restore user's epavalues	
+		UPDATE config_param_user SET value= (SELECT value FROM config_param_user WHERE parameter='temp_inp_times_pattern_timestep' AND cur_user=current_user)
+ 		WHERE parameter='inp_times_pattern_timestep' AND cur_user=current_user;
+		UPDATE config_param_user SET value= (SELECT value FROM config_param_user WHERE parameter='temp_inp_times_report_timestep' AND cur_user=current_user)
+		WHERE parameter='inp_times_report_timestep' AND cur_user=current_user;
+		UPDATE config_param_user SET value= (SELECT value FROM config_param_user WHERE parameter='temp_inp_times_statistic' AND cur_user=current_user)
+		WHERE parameter='inp_times_statistic' AND cur_user=current_user;
+		UPDATE config_param_user SET value= (SELECT value FROM config_param_user WHERE parameter='temp_inp_options_skipdemandpattern' AND cur_user=current_user)
+		WHERE parameter='inp_options_skipdemandpattern' AND cur_user=current_user;
+		UPDATE config_param_user SET value= (SELECT value FROM config_param_user WHERE parameter='temp_inp_times_duration' AND cur_user=current_user)
+		WHERE parameter='inp_times_duration' AND cur_user=current_user;				
 
+		DELETE FROM config_param_user WHERE parameter='temp_inp_times_pattern_timestep' AND cur_user=current_user;
+		DELETE FROM config_param_user WHERE parameter='temp_inp_times_report_timestep' AND cur_user=current_user;
+		DELETE FROM config_param_user WHERE parameter='temp_inp_times_statistic' AND cur_user=current_user;
+		DELETE FROM config_param_user WHERE parameter='temp_inp_options_skipdemandpattern' AND cur_user=current_user;
+		DELETE FROM config_param_user WHERE parameter='temp_inp_times_duration' AND cur_user=current_user;
+		
 	END IF;
 
-	-- delete results from previous simulation table
-	DELETE FROM audit_log_data where fprocesscat_id = 35 and user_name=current_user;
-
-	
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Hydrant analysis done succesfully"}')::json;
 
 RETURN v_return;

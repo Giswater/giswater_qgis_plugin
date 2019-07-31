@@ -122,9 +122,9 @@ BEGIN
 		v_currentstep = v_steps - v_count;
 				
 		-- setting v_data to call iterative function
-		v_data = (SELECT text_column FROM SCHEMA_NAME.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
+		v_data = (SELECT text_column FROM ws.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
 
-		raise notice 'v_data %', v_data;
+		raise notice 'v_data % % v_functionnamemain', v_data, v_functionnamemain;
 	
 		-- call iterative function selected by user
 		v_querytext = 'SELECT '||quote_ident(v_functionnamemain)||'('||quote_literal(v_data)||')';

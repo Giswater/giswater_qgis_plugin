@@ -114,9 +114,9 @@ BEGIN
 		PERFORM gw_fct_pg2epa_dscenario(v_result);	
 	END IF;
 
-	-- TO MOVE FROM HERE TO UPPER POSITION
+	-- REMOVE FROM HERE
 	-------------------------------------------------------
-	PERFORM gw_fct_pg2epa_nodescouplecapacity($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"step":2, "resultId":"p2"}}}$$);
+	PERFORM gw_fct_pg2epa_nodescouplecapacity($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"step":4, "resultId":"p2"}}}$$);
 	-------------------------------------------------------
 	
 	-- Calling for modify the valve status
