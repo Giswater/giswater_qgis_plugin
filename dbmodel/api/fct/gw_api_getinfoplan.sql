@@ -77,7 +77,12 @@ BEGIN
 	LOOP
 		IF (aux_json->>'widtget_context') = 'resumen' AND (aux_json->>'column_id')  = 'initial_cost' THEN 
 
-			v_cost := (SELECT concat((sum(cost)::numeric(12,2)),' €') FROM v_ui_plan_arc_cost WHERE arc_id = (p_data ->>'feature')::json->>'id');
+			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
+			      v_cost := (SELECT concat((sum(cost)::numeric(12,2)),' €') FROM v_ui_plan_arc_cost WHERE arc_id = (p_data ->>'feature')::json->>'id');
+			ELSIF ((p_data ->>'feature')::json->>'featureType')::text='node' THEN
+				v_cost := (SELECT concat((sum(cost)::numeric(12,2)),' €') FROM v_ui_plan_node_cost WHERE node_id = (p_data ->>'feature')::json->>'id');
+			END IF;
+			
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_cost::TEXT);
 			--RAISE NOTICE 'fields_array(orderby) %', fields_array[(aux_json->>'orderby')::INT];
 
