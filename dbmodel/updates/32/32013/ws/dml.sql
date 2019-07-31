@@ -65,27 +65,19 @@ UPDATE audit_cat_param_user SET layout_id=4, layout_order = 10, layoutname='grl_
 
 UPDATE audit_cat_param_user SET label='Dscenario overwrites demand:', layout_id = 2, layout_order = 6, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
 
-DELETE FROM audit_cat_param_user WHERE id='inp_recursive_function'; -- delete parameter never used
-
-INSERT INTO audit_cat_param_user VALUES ('inp_iterative_infolabel'
-			NULL, TRUE, 15, 1, 'ws', false, NULL, NULL, NULL, false, 'string', 'textarea', TRUE, NULL, 'Info to fill the iterative parameters',
-			'grl_inpother_15',NULL, NULL, TRUE, TRUE, NULL, NULL, false,'{"from":"2.0.12", "to":null, "language":"english"}');			
-
-UPDATE audit_cat_param_user SET id='inp_iterative_main_function', label = 'Main iterative function:', 
-								layout_id = 15, layout_order=2, layoutname='grl_inpother_15', idval=null, isenabled=TRUE, dv_isnullvalue=TRUE, ismandatory=true,
-								dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function'''
+UPDATE audit_cat_param_user SET id='inp_iterative_main_function', label = 'Iterative function:', 
+								layout_id = 15, layout_order=1, layoutname='grl_inpother_15', idval=null, isenabled=TRUE, dv_isnullvalue=TRUE, ismandatory=true,
+								dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function''',
+								epaversion='{"from":"2.0.12", "to":null, "language":"english"}'
 								WHERE id='inp_other_recursive_function';
-								
-INSERT INTO audit_cat_param_user VALUES ('inp_iterative_secondary_function', 'epaoptions', 'Enable/disable the posibility to work with selected secondary iterative function', 'role_epa',
-			NULL, null, 'Secondary iterative function:', 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function''', 
-			NULL, TRUE, 15, 3, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', TRUE, NULL, NULL, 'grl_inpother_15',
-			NULL, NULL, TRUE, TRUE, NULL, NULL, false,'{"from":"2.0.12", "to":null, "language":"english"}');			
 
+DELETE FROM audit_cat_param_user WHERE id='inp_recursive_function'; -- delete parameter never used
+								
 INSERT INTO audit_cat_param_user VALUES ('inp_iterative_parameters', 'epaoptions', 'Parameters to work with iterative functions', 'role_epa',
 			NULL, null, 'Iterative parameters:', NULL, 
-			NULL, TRUE, 15, 4, 'ws', false, NULL, NULL, NULL, false, 'string', 'textarea', TRUE, NULL, '{"nodesCoupleCapacity":{"lpsDemand":16.6, "mcaMinPress":1.5, "minDiameter":75.6}}',
-			'grl_inpother_15',NULL, NULL, TRUE, TRUE, NULL, NULL, false,'{"from":"2.0.12", "to":null, "language":"english"}');			
-			
+			NULL, TRUE, 16, 1, 'ws', false, NULL, NULL, NULL, false, 'string', 'text', TRUE, NULL, '{"nodesCoupleCapacity":{"lpsDemand":16.6, "mcaMinPress":15, "minDiameter":75.6}}',
+			'grl_inpother_16',NULL, NULL, TRUE, TRUE, NULL, NULL, false,'{"from":"2.0.12", "to":null, "language":"english"}');			
+									
 INSERT INTO audit_cat_param_user VALUES ('inp_options_demandtype', 'epaoptions', 'Demand type to use on EPANET simulation', 'role_epa', NULL, NULL, 'Demand type:', 
 			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_demandtype''', NULL, true, 1, 2, 'ws', TRUE, NULL, NULL, NULL, FALSE, NULL, 'combo', true, 
 			NULL, '1', 'grl_general_1', NULL, TRUE, TRUE, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
