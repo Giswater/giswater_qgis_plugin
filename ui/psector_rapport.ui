@@ -6,277 +6,364 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>468</width>
-    <height>421</height>
+    <width>479</width>
+    <height>304</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Psector rapport</string>
   </property>
-  <widget class="QPushButton" name="btn_ok">
-   <property name="geometry">
-    <rect>
-     <x>298</x>
-     <y>384</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Create</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_cancel">
-   <property name="geometry">
-    <rect>
-     <x>378</x>
-     <y>384</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>5</y>
-     <width>436</width>
-     <height>367</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Rapport</string>
-   </property>
-   <widget class="QLabel" name="label_shape">
-    <property name="geometry">
-     <rect>
-      <x>51</x>
-      <y>292</y>
-      <width>115</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Detail csv file:</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_geom1">
-    <property name="geometry">
-     <rect>
-      <x>51</x>
-      <y>318</y>
-      <width>121</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>Prices list csv file:</string>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="chk_csv_detail">
-    <property name="geometry">
-     <rect>
-      <x>27</x>
-      <y>291</y>
-      <width>22</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="txt_csv_detail_path">
-    <property name="geometry">
-     <rect>
-      <x>177</x>
-      <y>294</y>
-      <width>241</width>
-      <height>18</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="txt_csv_path">
-    <property name="geometry">
-     <rect>
-      <x>177</x>
-      <y>321</y>
-      <width>241</width>
-      <height>18</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="chk_csv">
-    <property name="geometry">
-     <rect>
-      <x>27</x>
-      <y>321</y>
-      <width>22</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="txt_path">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>36</y>
-      <width>388</width>
-      <height>94</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_path">
-    <property name="geometry">
-     <rect>
-      <x>369</x>
-      <y>141</y>
-      <width>49</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_2">
-    <property name="geometry">
-     <rect>
-      <x>12</x>
-      <y>171</y>
-      <width>412</width>
-      <height>106</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>      Composer pdf file:</string>
-    </property>
-    <widget class="QComboBox" name="cmb_templates">
-     <property name="geometry">
-      <rect>
-       <x>165</x>
-       <y>30</y>
-       <width>238</width>
-       <height>22</height>
-      </rect>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0" colspan="3">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Rapport</string>
      </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="0" colspan="2">
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QCheckBox" name="chk_composer">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Composer pdf file</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>28</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="lbl_composer_disabled">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>22</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_shape_2">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="text">
+              <string>Template:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="margin">
+              <number>3</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>84</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cmb_templates">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>173</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="txt_composer_path"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>10</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chk_csv_detail">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_shape">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="text">
+           <string>Detail csv file:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="margin">
+           <number>3</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>65</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txt_csv_detail_path"/>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>10</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chk_csv">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_geom1">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="text">
+           <string>Prices list csv file:</string>
+          </property>
+          <property name="margin">
+           <number>3</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>43</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txt_csv_path"/>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLineEdit" name="txt_path"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_path">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>30</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
-    <widget class="QCheckBox" name="chk_composer">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>-6</y>
-       <width>22</width>
-       <height>28</height>
-      </rect>
+   </item>
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="iconSize">
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
+       <width>254</width>
        <height>20</height>
       </size>
      </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_composer_path">
-     <property name="geometry">
-      <rect>
-       <x>165</x>
-       <y>66</y>
-       <width>238</width>
-       <height>18</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_shape_2">
-     <property name="geometry">
-      <rect>
-       <x>48</x>
-       <y>30</y>
-       <width>91</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn_ok">
      <property name="text">
-      <string>Template:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
+      <string>Create</string>
      </property>
     </widget>
-    <widget class="QLabel" name="lbl_composer_disabled">
-     <property name="geometry">
-      <rect>
-       <x>115</x>
-       <y>-1</y>
-       <width>236</width>
-       <height>15</height>
-      </rect>
-     </property>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="btn_cancel">
      <property name="text">
-      <string/>
+      <string>Cancel</string>
      </property>
     </widget>
-   </widget>
-  </widget>
+   </item>
+  </layout>
  </widget>
  <tabstops>
-  <tabstop>btn_path</tabstop>
-  <tabstop>chk_composer</tabstop>
   <tabstop>cmb_templates</tabstop>
   <tabstop>txt_composer_path</tabstop>
   <tabstop>chk_csv_detail</tabstop>
@@ -285,7 +372,6 @@
   <tabstop>txt_csv_path</tabstop>
   <tabstop>btn_ok</tabstop>
   <tabstop>btn_cancel</tabstop>
-  <tabstop>txt_path</tabstop>
  </tabstops>
  <resources/>
  <connections/>
