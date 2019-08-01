@@ -191,6 +191,13 @@ class Csv2Pg(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('delete_feature.ui')
+class DelFeature(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('doc_management.ui')
 class DocManagement(QDialog, FORM_CLASS):
     def __init__(self):
@@ -200,6 +207,12 @@ class DocManagement(QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('draw_profile.ui')
 class DrawProfile(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('duplicate_psector.ui')
+class DupPsector(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)

@@ -183,7 +183,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (1, 2, 33, 34, 66, 67, 68):
+            elif int(index_action) in (1, 2, 33, 34, 66, 67, 68, 69):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -191,7 +191,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
-            elif int(index_action) in (45, 46, 47, 38, 49, 50):
+            elif int(index_action) in (45, 46, 47, 38, 49, 50, 51):
                 callback_function = getattr(self.master, function_name)
                 action.triggered.connect(callback_function)
             # Utils toolbar actions
@@ -302,7 +302,7 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        list_actions = (23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 86, 64, 65, 66, 67, 68,
+        list_actions = (23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 51, 58, 86, 64, 65, 66, 67, 68, 69,
                         74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305)
 
         if int(index_action) in list_actions:
@@ -396,7 +396,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)                           
         
         toolbar_id = "edit"
-        list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '39', '34', '66', '33', '67']
+        list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '39', '34', '66', '33', '67', '69']
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "cad"
@@ -408,7 +408,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)    
         
         toolbar_id = "master"
-        list_actions = ['45', '46', '47', '38', '49', '50']               
+        list_actions = ['45', '46', '47', '38', '49', '50', '51']
         self.manage_toolbar(toolbar_id, list_actions)
             
         # Manage action group of every toolbar

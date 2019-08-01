@@ -23,6 +23,7 @@ from ..ui_manager import EstimateResultSelector
 from ..ui_manager import EstimateResultManager
 from ..ui_manager import Multirow_selector
 from .parent import ParentAction
+from .duplicate_psector import DuplicatePsector
 
 
 class Master(ParentAction):
@@ -32,6 +33,7 @@ class Master(ParentAction):
         self.config_dict = {}
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
+        self.duplicate_psector = DuplicatePsector(iface, settings, controller, plugin_dir)
 
 
     def set_project_type(self, project_type):
@@ -478,4 +480,8 @@ class Master(ParentAction):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
         
         self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
-            
+
+
+    def psector_duplicate(self):
+        """" Button 51: Duplicate psector """
+        self.duplicate_psector.manage_duplicate_psector()

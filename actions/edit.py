@@ -17,6 +17,7 @@ from .api_cf import ApiCF
 from .manage_element import ManageElement
 from .manage_document import ManageDocument
 from .manage_workcat_end import ManageWorkcatEnd
+from .delete_feature import DeleteFeature
 from .parent import ParentAction
 
 
@@ -29,6 +30,7 @@ class Edit(ParentAction):
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
         self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
+        self.delete_feature = DeleteFeature(iface, settings, controller, plugin_dir)
         self.suppres_form = None
 
 
@@ -122,3 +124,7 @@ class Edit(ParentAction):
         """ Button 68: Edit end feature """
         self.manage_workcat_end.manage_workcat_end()
 
+
+    def del_feature(self):
+        """" Button 69: Delete Feature """
+        self.delete_feature.manage_delete_feature()
