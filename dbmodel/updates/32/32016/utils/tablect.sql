@@ -40,3 +40,5 @@ REFERENCES ext_workorder_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE REST
 ALTER TABLE ext_workorder ADD CONSTRAINT ext_workorder_visitclass_id_fkey FOREIGN KEY (visitclass_id)
 REFERENCES om_visit_class (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_customer_code_key CASCADE;
