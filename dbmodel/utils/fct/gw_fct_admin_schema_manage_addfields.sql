@@ -14,20 +14,21 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
-"data":{"action":"CREATE", "multi_create":"true", "parameters":{"column_id":"source_3", "datatype":"text", "widgettype":"QLineEdit", "label":"source_3","ismandatory":"False",
-"fieldLength":"50", "numDecimals" :null, "defaultValue":null, "orderby":"2", "active":"True"}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
-"client":{"lang":"ES"}, 
-"feature":{"catFeature":"SOURCE"},
-"data":{"action":"UPDATE", "field":"source_3", "datatype":"numeric", "widgettype":"QLineEdit", "label":"source_3","isMandatory":"False",
-"fieldLength":"50", "numDecimals" :null, "defaultValue":"446", "active":"True" }}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pump_test", "datatype":"string", "widgettype":"text", "label":"pump_test","ismandatory":"False",
+"fieldLength":"50", "numDecimals" :null, "defaultValue":null, "orderby":"3", "active":"True"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "client":{"lang":"ES"}, 
 "feature":{"catFeature":"PUMP"},
-"data":{"action":"DELETE", "field":"source_3"}}$$)
+"data":{"action":"UPDATE","multi_create":"false", "parameters":{"column_id":"pump_test", "datatype":"string", "widgettype":"combo", "label":"pump_test2","ismandatory":"False",
+"fieldLength":"50", "numDecimals" :null, "defaultValue":null, "orderby":"4", "active":"True"}}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
+"client":{"lang":"ES"}, 
+"feature":{"catFeature":"PUMP"},
+"data":{"action":"DELETE", "multi_create":"true", "parameters":{"column_id":"pump_test"}}}$$)
 */
 
 
@@ -37,12 +38,12 @@ DECLARE
 	v_viewname text;
 	v_definition text;
 	v_ismandatory boolean;
-	v_datatype text;
+	v_config_datatype text;
 	v_field_length integer;
 	v_num_decimals integer;
 	v_default_value text;
 	v_label text;
-	v_widgettype text;
+	v_add_widgettype text;
 	v_config_widgettype text;
 	v_param_name text;
 	v_feature_type text;
@@ -58,7 +59,8 @@ DECLARE
 	v_man_fields text;
 	rec record;
 	v_iseditable boolean;
-
+	v_add_datatype text;
+	
 	v_formtype text;
 	v_placeholder text;
 	v_tooltip text;
@@ -97,12 +99,12 @@ BEGIN
 	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'column_id')::text; 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_ismandatory = (((p_data ->>'data')::json->>'parameters')::json->>'ismandatory')::text;
-	v_datatype = (((p_data ->>'data')::json->>'parameters')::json->>'datatype')::text;
+	v_config_datatype = (((p_data ->>'data')::json->>'parameters')::json->>'datatype')::text;
 	v_field_length = (((p_data ->>'data')::json->>'parameters')::json->>'field_length')::text;
 	v_num_decimals = (((p_data ->>'data')::json->>'parameters')::json->>'num_decimals')::text;
 	v_default_value = (((p_data ->>'data')::json->>'parameters')::json->>'defaultValue')::text;
 	v_label = (((p_data ->>'data')::json->>'parameters')::json->>'label')::text;
-	v_widgettype = (((p_data ->>'data')::json->>'parameters')::json->>'widgettype')::text;
+	v_config_widgettype = (((p_data ->>'data')::json->>'parameters')::json->>'widgettype')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'active')::text;
 	v_orderby = (((p_data ->>'data')::json->>'parameters')::json->>'orderby')::text;
@@ -133,24 +135,27 @@ BEGIN
 
 
 	--Assign config widget types 
-	IF v_widgettype = 'QComboBox' THEN
-		v_config_widgettype = 'combo';
-	ELSIF v_widgettype = 'QCheckBox' THEN
-		v_config_widgettype = 'check';
-	ELSIF v_widgettype='QDateTimeEdit' THEN
-		v_config_widgettype = 'datepickertime';
-	ELSIF v_widgettype='QDoubleSpinBox' or v_widgettype='QSpinBox' THEN
-		v_config_widgettype = 'doubleSpinbox';
-	ELSIF v_widgettype = 'QTextEdit' THEN
-		v_config_widgettype = 'textarea';
+	IF v_config_widgettype = 'combo' THEN
+		v_add_widgettype = 'QComboBox';
+	ELSIF v_config_widgettype = 'check' THEN
+		v_add_widgettype = 'QCheckBox';
+	ELSIF v_config_widgettype = 'datepickertime' THEN
+		v_add_widgettype='QDateTimeEdit';
+	ELSIF v_config_widgettype = 'doubleSpinbox' THEN
+		v_add_widgettype='QDoubleSpinBox';
+	ELSIF v_config_widgettype = 'textarea' THEN
+		v_add_widgettype = 'QTextEdit';
 	ELSE 
-		v_config_widgettype = 'text';
+		v_add_widgettype='QLineEdit';
 	END IF;
 
+	IF v_config_datatype='string' THEN
+		v_add_datatype = 'text';
+	END IF;
 raise notice 'v_multi_create,%',v_multi_create;
 
 IF v_multi_create IS TRUE THEN
-
+	
 	IF v_action='UPDATE' THEN
 		v_update_old_datatype = (SELECT datatype_id FROM man_addfields_parameter WHERE param_name=v_param_name);
 	END IF;
@@ -216,15 +221,16 @@ IF v_multi_create IS TRUE THEN
 	RAISE NOTICE 'v_orderby,%',v_orderby;
 		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, 
 		default_value, form_label, widgettype_id, active, orderby, iseditable)
-		VALUES (v_param_name, NULL, v_ismandatory, v_datatype, v_field_length, v_num_decimals, 
-		v_default_value, v_label, v_widgettype, v_active, v_orderby, v_iseditable);
+		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
+		v_default_value, v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
 	
 		raise notice '2/INSERT ADD';
 
 	ELSIF v_action = 'UPDATE' THEN
-		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_datatype,
-		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_widgettype,
+		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_add_widgettype,
 		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals, iseditable=v_iseditable WHERE param_name=v_param_name;
+
 
 	ELSIF v_action = 'DELETE' THEN
 
@@ -245,7 +251,7 @@ IF v_multi_create IS TRUE THEN
 		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
 		isautoupdate, isreload, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
-		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_datatype, v_config_widgettype,
+		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
 		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_isreload, 'layout_data_1',
 		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
@@ -294,7 +300,7 @@ raise notice '4/';
 			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
 			WHERE cat_feature_id='''''||rec.id||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_config_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id
 			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
 
@@ -308,7 +314,7 @@ raise notice '4/';
 			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
 			WHERE cat_feature_id='''''||rec.id||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_config_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
 
@@ -325,7 +331,7 @@ raise notice '4/';
 			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
 			WHERE cat_feature_id='''''||rec.id||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_config_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
 		
@@ -343,8 +349,8 @@ raise notice '4/';
 			SELECT ve_'||v_feature_type||'.*
 			FROM '||v_schemaname||'.ve_'||v_feature_type||'
 			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
+			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id 
+			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';	
 
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
 			
@@ -355,7 +361,7 @@ raise notice '4/';
 			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
 
 		ELSE
-			
+		
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
 			SELECT ve_'||v_feature_type||'.*,
@@ -398,20 +404,21 @@ raise notice '4/';
 
 	IF v_action='DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''';';
-
-	ELSIF v_action='UPDATE' THEN 
-		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_datatype,
-		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_widgettype ,
-		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals WHERE param_name=v_param_name;
+		EXECUTE 'DELETE FROM man_addfields_parameter WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
 	
-	raise notice '2/update ADD,%',v_datatype;		
+	ELSIF v_action='UPDATE' THEN 
+		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_add_widgettype ,
+		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals WHERE param_name=v_param_name;
+		
+	raise notice '2/update ADD,%',v_config_datatype;		
 	END IF;
 
 --SIMPLE ADDFIELDS
 ELSE
 
 	--check if field order will overlap the existing field	
-	IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature) THEN
+	IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature AND param_name!=v_param_name) THEN
 		PERFORM audit_function(2690,3016);
 	END IF;
 
@@ -452,8 +459,8 @@ ELSE
 	IF v_action = 'CREATE' THEN
 		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, 
 		default_value, form_label, widgettype_id, active, orderby)
-		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_datatype, v_field_length, v_num_decimals, 
-		v_default_value, v_label, v_widgettype, v_active, v_orderby);
+		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
+		v_default_value, v_label, v_add_widgettype, v_active, v_orderby);
 	
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
 		AND layout_name = ''layout_data_1'';'
@@ -466,16 +473,25 @@ ELSE
 		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
 		isautoupdate, isreload, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
-		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_datatype, v_config_widgettype,
+		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
 		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_isreload, 'layout_data_1',
 		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
 
 	ELSIF v_action = 'UPDATE' THEN
-		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_datatype,
-		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_widgettype ,
+		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_add_widgettype ,
 		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
-			
+	
+		UPDATE config_api_form_fields SET isenabled=v_isenabled,datatype=v_config_datatype,
+		widgettype=v_config_widgettype, label=v_label,field_length=v_field_length, num_decimals=v_num_decimals, 
+		ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
+		isreload=v_isreload, placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
+		widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
+		dv_parent_id=v_dv_parent_id, isnotupdate=v_isnotupdate, dv_querytext_filterc=v_dv_querytext_filterc, 
+		dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,action_function=v_action_function,editability=v_editability 
+		WHERE column_id=v_param_name AND formname=v_viewname;
+
 	ELSIF v_action = 'DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
 
@@ -514,7 +530,7 @@ ELSE
 			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
 			WHERE cat_feature_id='''''||v_cat_feature||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_config_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id
 			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
 		
@@ -528,7 +544,7 @@ ELSE
 			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
 			WHERE cat_feature_id='''''||v_cat_feature||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_config_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id
 			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
 
@@ -544,7 +560,7 @@ ELSE
 			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
 			WHERE cat_feature_id='''''||v_cat_feature||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_config_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
 		
@@ -601,7 +617,7 @@ ELSE
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 		
 	END IF;
-	
+
 	--create trigger on view 
 	EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
 

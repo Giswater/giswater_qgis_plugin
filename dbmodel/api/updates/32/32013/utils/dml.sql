@@ -169,3 +169,28 @@ INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, l
 INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('dimensioning', 'catalog', 'symbol_btn', 1, 7, true, NULL, 'button', 'Capture depth', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, 'gw_api_get_depth', NULL, true, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
 
 DELETE FROM config_api_form_tabs WHERE tabname='tab_connections' AND formname='v_edit_connec';
+
+
+--2019/08/01
+
+INSERT INTO config_api_typevalue VALUES ('datatype', 'text', 'text', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'string', 'string', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'date', 'date', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'bytea', 'bytea', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'character varying', 'character varying', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'boolean', 'boolean', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'double', 'double', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'integer', 'integer', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype', 'numeric', 'numeric', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'nowidget', 'nowidget', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'text', 'text', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'button', 'button', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'typeahead', 'typeahead', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'image', 'image', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'datepickertime', 'datepickertime', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'formDivider', 'formDivider', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'label', 'label', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'doubleSpinbox', 'doubleSpinbox', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'check', 'check', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'hyperlink', 'hyperlink', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('widgettype', 'combo', 'combo', NULL, NULL);

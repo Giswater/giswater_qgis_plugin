@@ -17,3 +17,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_
 ALTER TABLE config_api_cat_widgettype RENAME TO _config_api_cat_widgettype_;
 ALTER TABLE config_api_cat_formtemplate RENAME TO _config_api_cat_formtemplate_;
 ALTER TABLE config_api_cat_datatype RENAME TO _config_api_cat_datatype_;
+
+--2019/08/01
+CREATE TABLE config_api_typevalue
+( typevalue character varying(50) NOT NULL,
+  id character varying(30) NOT NULL,
+  idval character varying(100),
+  descript text,
+  addparam json,
+  CONSTRAINT config_api_typevalue_pkey PRIMARY KEY (typevalue, id)
+);
