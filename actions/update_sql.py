@@ -17,7 +17,7 @@ else:
 
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox, QAbstractButton, \
-    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit
+    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -2474,7 +2474,8 @@ class UpdateSQL(ApiParent):
                 self.controller.show_info_box(msg, "Info")
                 return
 
-            elif str(self.rows_typeahead) != '':
+            elif str(self.rows_typeahead) != '' and str(self.rows_typeahead) != 'None':
+
                 if str(utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)) == str(self.rows_typeahead[0]):
                     msg = "The column id value is already exists."
                     self.controller.show_info_box(msg, "Info")
@@ -2484,7 +2485,7 @@ class UpdateSQL(ApiParent):
 
             _json = {}
             for widget in list_widgets:
-                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView) \
+                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox, QTableView) \
                         and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
