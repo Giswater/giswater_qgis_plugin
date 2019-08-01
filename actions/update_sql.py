@@ -243,7 +243,7 @@ class UpdateSQL(ApiParent):
         super_users = self.settings.value('system_variables/super_users')
         self.super_users = []
         for super_user in super_users:
-            print(str(super_user))
+
             self.super_users.append(str(super_user))
 
         if connection_status is False:
@@ -1138,7 +1138,7 @@ class UpdateSQL(ApiParent):
             if str(self.date) != 'null':
                 extras += ', ' + '"date":"' + str(self.date) + '"'
         extras += ', "superUsers":' + str(self.super_users).replace("'",'"') + ''
-        print(str(self.super_users).replace("'",'"'))
+
         self.schema_name = schema_name
 
         # Get current locale
@@ -2255,10 +2255,13 @@ class UpdateSQL(ApiParent):
 
         data = ET.Element(str(row[0]))
         data = ET.tostring(data)
+        data = data.decode('utf-8')
+
         file_ui = open(tpath, "w")
 
         # TODO:: dont use replace for remove invalid characters
         data = data.replace(' />', '').replace('<<', '<')
+
         file_ui.write(data)
         file_ui.close()
         del file_ui
@@ -2325,11 +2328,11 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
 
-            sql = ("SELECT DISTINCT(child_layer), child_layer FROM " + str(schema_name) + ".cat_feature")
+            sql = ("SELECT DISTINCT(child_layer), child_layer FROM " + str(schema_name) + ".cat_feature WHERE active is TRUE")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
-            sql = ("SELECT DISTINCT(id), id FROM " + str(schema_name) + ".cat_feature")
+            sql = ("SELECT DISTINCT(id), id FROM " + str(schema_name) + ".cat_feature WHERE active is TRUE")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
@@ -2394,12 +2397,12 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = ("SELECT DISTINCT(id), id FROM " + schema_name + ".man_addfields_cat_widgettype")
+        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgettype'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
-        sql = ("SELECT DISTINCT(id), id FROM " + schema_name + ".man_addfields_cat_datatype")
+        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'datatype'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
@@ -2433,7 +2436,7 @@ class UpdateSQL(ApiParent):
         qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel()
         expr_filter = "formname ='" + result_child_layer[0] + "'"
-        self.fill_table(qtable, 'config_api_form_fields', self.model_update_table, expr_filter)
+        self.fill_table(qtable, 've_config_addfields', self.model_update_table, expr_filter)
         self.set_table_columns(self.dlg_manage_fields, qtable, 'config_api_form_fields', schema_name)
 
 
@@ -2579,11 +2582,11 @@ class UpdateSQL(ApiParent):
         sql = ("SELECT array_agg(DISTINCT(column_id)) "
                "FROM " + schema_name + ".config_api_form_fields "
                "WHERE formname = '" + result_child_layer[0] + "' AND column_id LIKE '%" + filter + "%'")
+
         self.rows_typeahead = self.controller.get_rows(sql, log_sql=True, commit=True)
         self.rows_typeahead = self.rows_typeahead[0][0]
         if self.rows_typeahead is None:
             self.rows_typeahead = ''
-
         self.set_completer_object_api(completer, model, widget, self.rows_typeahead)
 
 
