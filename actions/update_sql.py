@@ -2437,7 +2437,7 @@ class UpdateSQL(ApiParent):
         self.model_update_table = QSqlTableModel()
         expr_filter = "formname ='" + result_child_layer[0] + "'"
         self.fill_table(qtable, 've_config_addfields', self.model_update_table, expr_filter)
-        self.set_table_columns(self.dlg_manage_fields, qtable, 'config_api_form_fields', schema_name)
+        self.set_table_columns(self.dlg_manage_fields, qtable, 've_config_addfields', schema_name)
 
 
     def manage_delete_field(self, form_name):
@@ -2455,7 +2455,7 @@ class UpdateSQL(ApiParent):
 
         # Populate widgettype combo
         sql = ("SELECT DISTINCT(column_id), column_id "
-               "FROM " + schema_name + ".config_api_form_fields "
+               "FROM " + schema_name + ".ve_config_addfields "
                "WHERE formname = '" + result_child_layer[0] + "'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
@@ -2580,13 +2580,16 @@ class UpdateSQL(ApiParent):
         result_child_layer = self.controller.get_row(sql, log_sql=True, commit=True)
 
         sql = ("SELECT array_agg(DISTINCT(column_id)) "
-               "FROM " + schema_name + ".config_api_form_fields "
+               "FROM " + schema_name + ".ve_config_addfields "
                "WHERE formname = '" + result_child_layer[0] + "' AND column_id LIKE '%" + filter + "%'")
 
         self.rows_typeahead = self.controller.get_rows(sql, log_sql=True, commit=True)
         self.rows_typeahead = self.rows_typeahead[0][0]
+
         if self.rows_typeahead is None:
-            self.rows_typeahead = ''
+            model.setStringList([''])
+            return
+
         self.set_completer_object_api(completer, model, widget, self.rows_typeahead)
 
 
