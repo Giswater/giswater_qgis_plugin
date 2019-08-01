@@ -141,8 +141,6 @@ BEGIN
 		v_add_widgettype = 'QCheckBox';
 	ELSIF v_config_widgettype = 'datepickertime' THEN
 		v_add_widgettype='QDateTimeEdit';
-	ELSIF v_config_widgettype = 'doubleSpinbox' THEN
-		v_add_widgettype='QDoubleSpinBox';
 	ELSIF v_config_widgettype = 'textarea' THEN
 		v_add_widgettype = 'QTextEdit';
 	ELSE 
@@ -151,6 +149,8 @@ BEGIN
 
 	IF v_config_datatype='string' THEN
 		v_add_datatype = 'text';
+	ELSE 
+		v_add_datatype = v_config_datatype;
 	END IF;
 raise notice 'v_multi_create,%',v_multi_create;
 
@@ -404,7 +404,7 @@ raise notice '4/';
 
 	IF v_action='DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''';';
-		EXECUTE 'DELETE FROM man_addfields_parameter WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
+		EXECUTE 'DELETE FROM config_api_form_fields WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
 	
 	ELSIF v_action='UPDATE' THEN 
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
