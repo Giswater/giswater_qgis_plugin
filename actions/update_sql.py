@@ -2409,15 +2409,6 @@ class UpdateSQL(ApiParent):
         # Set default value for formtype widget
         utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
-        # Configure column_id as typeahead
-        completer = QCompleter()
-        model = QStringListModel()
-        self.filter_typeahead(schema_name, form_name, self.dlg_manage_fields.column_id, completer, model)
-
-        # Set listeners
-        self.dlg_manage_fields.column_id.textChanged.connect(
-            partial(self.filter_typeahead,schema_name, form_name, self.dlg_manage_fields.column_id, completer, model))
-
 
     def manage_update_field(self, form_name):
 
@@ -2465,6 +2456,10 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
+        # Execute manage add fields function
+        sql = ("SELECT param_name FROM man_addfields_parameter WHERE param_name = '" + utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) + "'")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        print(str(row))
         if action == 'Create':
 
             # Control mandatory widgets
@@ -2474,12 +2469,11 @@ class UpdateSQL(ApiParent):
                 self.controller.show_info_box(msg, "Info")
                 return
 
-            elif str(self.rows_typeahead) != '' and str(self.rows_typeahead) != 'None':
+            elif row is not None:
 
-                if str(utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)) == str(self.rows_typeahead[0]):
-                    msg = "The column id value is already exists."
-                    self.controller.show_info_box(msg, "Info")
-                    return
+                msg = "The column id value is already exists."
+                self.controller.show_info_box(msg, "Info")
+                return
 
             list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
 
@@ -2562,36 +2556,6 @@ class UpdateSQL(ApiParent):
             self.controller.show_warning(model.lastError().text())
         # Attach model to table view
         qtable.setModel(model)
-
-
-    def filter_typeahead(self, schema_name, form_name, widget, completer, model):
-
-        filter = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
-        if filter == 'null':
-            filter = ''
-
-        if schema_name is None:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
-            return
-        else:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
-
-        # Get child layer
-        sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
-        result_child_layer = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        sql = ("SELECT array_agg(DISTINCT(column_id)) "
-               "FROM " + schema_name + ".ve_config_addfields "
-               "WHERE formname = '" + result_child_layer[0] + "' AND column_id LIKE '%" + filter + "%'")
-
-        self.rows_typeahead = self.controller.get_rows(sql, log_sql=True, commit=True)
-        self.rows_typeahead = self.rows_typeahead[0][0]
-
-        if self.rows_typeahead is None:
-            model.setStringList([''])
-            return
-
-        self.set_completer_object_api(completer, model, widget, self.rows_typeahead)
 
 
     def change_project_type(self, widget):
