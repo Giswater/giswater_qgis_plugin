@@ -15,17 +15,12 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
 
-from qgis.core import QgsExpression, QgsFeatureRequest
-from qgis.PyQt.QtCore import Qt, QDate
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from ui_manager import DupPsector
 from functools import partial
 
 from .. import utils_giswater
 from .parent_manage import ParentManage
-from ..ui_manager import WorkcatEnd, NewWorkcat
-from ..ui_manager import WorkcatEndList
+
 
 
 class DuplicatePsector(ParentManage):
@@ -62,8 +57,8 @@ class DuplicatePsector(ParentManage):
 
         # Create body
         feature = '"type":"PSECTOR"'
-        filter_fields = '"psector_id":"' + str(id_psector) + '", "new_psector_name":"' + str(new_psector_name) + '"'
-        body = self.create_body(feature=feature, filter_fields=filter_fields)
+        extras = '"psector_id":"' + str(id_psector) + '", "new_psector_name":"' + str(new_psector_name) + '"'
+        body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
         # Execute manage add fields function
