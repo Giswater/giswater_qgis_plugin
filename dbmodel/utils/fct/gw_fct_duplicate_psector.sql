@@ -59,9 +59,6 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fprocesscat_id=53 AND user_name=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('DUPLICATE PSECTOR'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('------------------------------'));
-
-	--deactivate topocontrol
- 	UPDATE config_param_system SET value ='TRUE' WHERE parameter='edit_topocontrol_dsbl_error';
 		
 	--capture current value and deactivate connec and gully proximity
 	SELECT value::json into v_connec_proximity FROM config_param_system WHERE parameter='connec_proximity';
@@ -118,21 +115,21 @@ BEGIN
 
 	IF v_project_type='UD' THEN
 		INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript,link_geom, vnode_geom) 
-		SELECT gully_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_arc WHERE psector_id=v_old_psector_id and state=0;
+		SELECT gully_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id and state=0;
 	END IF;
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Copy features with state 0 -> Done' ));
 
 	--insert copy of the planified feature in the corresponding v_edit_* view and insert it into plan_psector_x_* table
-	FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category=1) LOOP
+	FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category=1 ORDER BY id DESC) LOOP
 	raise notice ' rec_type,%', rec_type;
 
 		EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 		FROM information_schema.columns where table_name='''||rec_type.parentlayer||''' and table_schema='''||v_schemaname||'''
 		and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema='''||v_schemaname||''') 
-		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'''
+		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'';'
 		INTO v_insert_fields;
-			
+
 		FOR rec IN EXECUTE 'SELECT * FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1' LOOP
 		raise notice ' rec,%', rec;
 		
@@ -146,21 +143,22 @@ BEGIN
 				v_field_id=rec.connec_id;
 			END IF;
 
-			raise notice ' v_field_id,%', v_field_id;
+			--activate topocontrol for arc, deactivate for other features 
+			if rec_type.id='arc' THEN
+				UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_dsbl_error';
+			ELSE
+				UPDATE config_param_system SET value ='TRUE' WHERE parameter='edit_topocontrol_dsbl_error';
+			END IF;
 			
 			EXECUTE 'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
 			WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
 			
-			
-			v_sql :=  'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
-			WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
-
-			raise notice ' v_sql,%', v_sql;
 				
 		END LOOP;
 	END LOOP;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Copy features with state 1 -> Done' ));
 
+	
 	--activate the functions an set back the values of parameters
 	IF v_connect2network is not null then
 		update config_param_user SET value=v_connect2network WHERE parameter='edit_connect_force_automatic_connect2network' and cur_user=current_user;
@@ -170,7 +168,7 @@ BEGIN
 	UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_dsbl_error';
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Activate topology control -> Done' ));
-
+	
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=53) row; 
 
