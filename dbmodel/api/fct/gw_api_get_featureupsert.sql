@@ -352,7 +352,7 @@ BEGIN
 				IF v_project_type ='UD' THEN
 					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||'  LIMIT 1' INTO field_value;
 				ELSE
-					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||' WHERE ' || v_catfeature.type || 'type_id = ''' || v_type || ''' LIMIT 1' INTO field_value;
+					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||' WHERE ' || v_catfeature.type || 'type_id = ''' || v_catfeature.system_id || ''' LIMIT 1' INTO field_value;
 				END IF;
 			ELSIF (aux_json->>'column_id') = 'code' THEN
 				field_value = v_code;
