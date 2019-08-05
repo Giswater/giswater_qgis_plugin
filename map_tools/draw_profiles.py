@@ -86,6 +86,7 @@ class DrawProfiles(ParentMapTool):
 
         # Set signals
         self.dlg_draw_profile.rejected.connect(partial(self.close_dialog, self.dlg_draw_profile))
+        self.dlg_draw_profile.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_draw_profile))
         self.dlg_draw_profile.btn_add_start_point.clicked.connect(partial(self.activate_snapping, start_point))
         self.dlg_draw_profile.btn_add_end_point.clicked.connect(partial(self.activate_snapping, end_point))
         self.dlg_draw_profile.btn_add_start_point.clicked.connect(partial(self.activate_snapping_node, self.dlg_draw_profile.btn_add_start_point))
