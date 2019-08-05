@@ -7,8 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2710
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mapzones(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mapzones(p_data json)
-RETURNS integer AS
+RETURNS json AS
 $BODY$
 
 /*
@@ -20,7 +21,7 @@ set to_arc on tables inp_valve (for presszone), inp_pump (for presszone), inp_sh
 
 TO EXECUTE
 -- for any exploitation you want
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "exploitation": "[1,2]"}, "upsertFeature":TRUE}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "exploitation": "[1,2]"}, "upsertFeature":"TRUE"}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "exploitation": "[1,2]"}, "upsertFeature":TRUE}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "exploitation": "[1,2]"}, "upsertFeature":TRUE}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "exploitation": "[1,2]"}, "upsertFeature":TRUE}}');
@@ -57,7 +58,7 @@ v_class text;
 v_feature record;
 v_expl json;
 v_data json;
-v_fprocesscat integer;
+v_fprocesscat_id integer;
 v_addparam record;
 v_attribute text;
 v_nodeid text;
@@ -66,6 +67,14 @@ v_text text;
 v_querytext text;
 v_upsertattributes boolean;
 v_mapzone integer;
+v_result_info 		json;
+v_result_point		json;
+v_result_line 		json;
+v_result_polygon	json;
+v_result 		text;
+v_count			json;
+v_version		text;
+
 
 BEGIN
 	-- Search path
@@ -74,19 +83,27 @@ BEGIN
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
 	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'node');
-	v_upsertattributes = (SELECT ((p_data::json->>'data')::json->>'upsertFeature');
+	v_upsertattributes = (SELECT ((p_data::json->>'data')::json->>'upsertFeature'));
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
+	-- select config values
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+
 	-- set fprocesscat
-	IF v_class = 'presszone' THEN v_fprocesscat=46; 
-	ELSIF v_class = 'dma' THEN v_fprocesscat=45; 
-	ELSIF v_class = 'dqa' THEN v_fprocesscat=44;
-	ELSIF v_class = 'sector' THEN v_fprocesscat=30; 
+	IF v_class = 'presszone' THEN v_fprocesscat_id=46; 
+	ELSIF v_class = 'dma' THEN v_fprocesscat_id=45; 
+	ELSIF v_class = 'dqa' THEN v_fprocesscat_id=44;
+	ELSIF v_class = 'sector' THEN v_fprocesscat_id=30; 
 	END IF;
+
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------'));
+		
 
 	-- reset graf & audit_log tables
 	DELETE FROM anl_graf where user_name=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat AND user_name=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -191,60 +208,66 @@ BEGIN
 		----------------
 		
 		-- insert arc results into audit table
-		raise notice '% % %', v_fprocesscat, v_featureid, v_class;
+		raise notice '% % %', v_fprocesscat_id, v_featureid, v_class;
 		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
-			SELECT '||v_fprocesscat||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' 
+			SELECT '||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' 
 			FROM (SELECT arc_id, max(water) as water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' AND user_name=current_user
 			AND water=1 GROUP by arc_id, flag having flag < 3) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
 
 		-- insert node results into audit table
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT '||v_fprocesscat||', nodecat_id, b.node_id, the_geom, '||(v_featureid)||' FROM (SELECT node_1 as node_id FROM anl_graf 
+			SELECT '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_featureid)||' FROM (SELECT node_1 as node_id FROM anl_graf 
 			WHERE water >0 AND grafclass='||quote_literal(v_class)||' AND user_name=current_user)a
 			JOIN v_edit_node b USING (node_id)';
+			
+		-- message
+		SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND arc_id=v_featureid AND cur_user=current_user;
+		
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+		VALUES (v_fprocesscat_id, concat('INFO: Mapzone ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
 				
 	END LOOP;
 	
 	IF v_upsertattributes THEN 
 
-		IF v_fprocesscat=46 THEN -- presszone
+		IF v_fprocesscat_id=46 THEN -- presszone
 
 			-- upsert presszone on parent tables
 			UPDATE arc SET presszonecat_id = b.id FROM anl_arc a join (SELECT id, json_array_elements_text(nodeparent) as nodeparent from cat_presszone) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=46 AND a.arc_id=arc_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=46 AND a.arc_id=arc.arc_id;
 			UPDATE node SET presszonecat_id = b.id FROM anl_node a join (SELECT id, json_array_elements_text(nodeparent) as nodeparent from cat_presszone) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=46 AND a.node_id=node_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=46 AND a.node_id=node.node_id;
 			--UPDATE connec SET presszonecat_id = b.id FROM anl_connec a join (SELECT id, json_array_elements_text(nodeparent) as nodeparent from cat_presszone) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=46 AND a.arc_id=connec_id;
 						
-		ELSIF v_fprocesscat=45 THEN -- dma
+		ELSIF v_fprocesscat_id=45 THEN -- dma
 			
 			-- upsert dma on parent tables
 			UPDATE arc SET dma_id = b.dma_id FROM anl_arc a join (SELECT dma_id, json_array_elements_text(nodeparent) as nodeparent from dma) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.arc_id=arc_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.arc_id=arc.arc_id;
 			UPDATE node SET dma_id = b.dma_id FROM anl_node a join (SELECT dma_id, json_array_elements_text(nodeparent) as nodeparent from dma) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.node_id=node_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.node_id=node.node_id;
 			--UPDATE connec SET dma_id = b.dma_id FROM anl_connec a join (SELECT dma_id, json_array_elements_text(nodeparent) as nodeparent from dma) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.feature_id=connec_id;
 
 
-		ELSIF v_fprocesscat=44 THEN -- dqa
+		ELSIF v_fprocesscat_id=44 THEN -- dqa
 		
 			-- upsert dqa on parent tables
 			UPDATE arc SET dqa_id = b.dqa_id FROM anl_arc a join (SELECT dqa_id, json_array_elements_text(nodeparent) as nodeparent from dqa) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.arc_id=arc_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.arc_id=arc.arc_id;
 			UPDATE node SET dqa_id = b.dqa_id FROM anl_node a join (SELECT dqa_id, json_array_elements_text(nodeparent) as nodeparent from dqa) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.node_id=node_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.node_id=node.node_id;
 			--UPDATE connec SET dqa_id = b.dqa_id FROM anl_connec a join (SELECT dqa_id, json_array_elements_text(nodeparent) as nodeparent from dqa) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.feature_id=connec_id;
 
-		ELSIF v_fprocesscat=30 THEN -- sector
+		ELSIF v_fprocesscat_id=30 THEN -- sector
 			
 			-- upsert sector on parent tables
 			UPDATE arc SET sector_id = b.sector_id FROM anl_arc a join (SELECT sector_id, json_array_elements_text(nodeparent) as nodeparent from sector) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.arc_id=arc_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.arc_id=arc.arc_id;
 			UPDATE node SET sector_id = b.sector_id FROM anl_node a join (SELECT sector_id, json_array_elements_text(nodeparent) as nodeparent from sector) b 
-			ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.node_id=node_id;
+			ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.node_id=node.node_id;
 			--UPDATE connec SET sector_id = b.sector_id FROM anl_connec a join (SELECT sector_id, json_array_elements_text(nodeparent) as nodeparent from sector) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.connec_id=connec_id;
 			
@@ -262,13 +285,64 @@ BEGIN
 			-- update staticpressure on parent tables
 			UPDATE node SET staticpressure=log_message::float FROM audit_log_data a WHERE a.feature_id=node_id AND fprocesscat_id=47 AND user_name=current_user;
 			UPDATE connec SET staticpressure=log_message::float FROM audit_log_data a WHERE a.feature_id=connec_id AND fprocesscat_id=47 AND user_name=current_user;
+
+			-- message
+			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+			VALUES (v_fprocesscat_id, concat('WARNING: Attribute ', v_class ,' on arc/node/connec features have been updated by this process'));
+			
 		END IF;
 	END IF;
-	
-	-- todo:
-	-- update selectors of anl_arc & anl_node
 
-RETURN v_cont1;
+	-- set selector
+	DELETE FROM selector_audit WHERE cur_user=current_user;
+	INSERT INTO selector_audit (fprocesscat_id, cur_user) VALUES (v_fprocesscat_id, current_user);
+	
+
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+	--polygons
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
+
+	
+	--    Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
+	
+
+--  Return
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||'}'||
+		       '}'||
+	    '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -7,8 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2710
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(p_data json)
-RETURNS integer AS
+RETURNS json AS
 $BODY$
 
 /*
@@ -35,10 +36,18 @@ TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
 */
 
 DECLARE
-v_count1 integer = 0;
-v_expl json;
-v_data json;
-v_arc text;
+v_count1 			integer = 0;
+v_expl 				json;
+v_data 				json;
+v_arc 				text;
+v_result_info 		json;
+v_result_point		json;
+v_result_line 		json;
+v_result_polygon	json;
+v_result 			text;
+v_count				json;
+v_version			text;
+v_fprocesscat_id	integer = 29;
 
 BEGIN
 	-- Search path
@@ -47,6 +56,14 @@ BEGIN
 	-- get variables
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
+	-- select config values
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MASSIVE MINCUT ANALYSIS (FPROCESSCAT_ID 29 & 49) - '));
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('-----------------------------------------------------------'));
+
+	
 	INSERT INTO anl_mincut_result_cat VALUES (-1) ON CONFLICT (id) DO nothing;
 
 	-- reset selectors
@@ -103,6 +120,63 @@ BEGIN
 		SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM anl_mincut_result_hydrometer WHERE result_id=-1;
 
 	END LOOP;
+
+	-- message
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+	VALUES (v_fprocesscat_id, concat('INFO: Massive analysis have been done. Tho check results you can query:'));
+
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+	VALUES (v_fprocesscat_id, concat('RESUME (29): SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=49 AND user_name=current_user'));
+
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+	VALUES (v_fprocesscat_id, concat('DETAIL (49): SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=29 AND user_name=current_user'));
+
+	
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+	--polygons
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
+
+	
+	--    Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
+	
+
+--  Return
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mincut massive process done succesfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||'}'||
+		       '}'||
+	    '}')::json;
 	
 RETURN v_count1;
 END;

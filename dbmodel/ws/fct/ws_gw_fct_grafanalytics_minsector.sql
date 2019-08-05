@@ -7,14 +7,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2706
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_minsector(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_minsector(p_data json)
-RETURNS integer AS
+RETURNS json AS
 $BODY$
 
 /*
 delete from anl_graf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]"}, "upsertFeature":"TRUE"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]"}, "upsertFeature":"TRUE"}}');
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002"}, "upsertFeature":"TRUE" }}}')
 
 delete from SCHEMA_NAME.audit_log_data;
@@ -32,7 +33,7 @@ v_class text = 'MINSECTOR';
 v_feature record;
 v_expl json;
 v_data json;
-v_fprocesscat integer;
+v_fprocesscat_id integer;
 v_addparam record;
 v_attribute text;
 v_arcid text;
@@ -41,6 +42,13 @@ v_featureid integer;
 v_querytext text;
 v_upsertattributes boolean;
 v_arc text;
+v_result_info 		json;
+v_result_point		json;
+v_result_line 		json;
+v_result_polygon	json;
+v_result 		text;
+v_count			json;
+v_version		text;
 
 BEGIN
 
@@ -49,16 +57,23 @@ BEGIN
 
 	-- get variables
 	v_arcid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'arc');
-	v_upsertattributes = (SELECT ((p_data::json->>'data')::json->>'upsertFeature');
+	v_upsertattributes = (SELECT (p_data::json->>'data')::json->>'upsertFeature');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
+	-- select config values
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+
 	-- set variables
-	v_fprocesscat=34;  
+	v_fprocesscat_id=34;  
 	v_featuretype='arc';
-	
+
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MINSECTOR DYNAMIC SECTORITZATION'));
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('---------------------------------------------------'));
+		
 	-- reset graf & audit_log tables
 	DELETE FROM anl_graf where user_name=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat AND user_name=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -120,19 +135,19 @@ BEGIN
 		
 		-- insert arc results into audit table
 		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
-			SELECT '||v_fprocesscat||', arccat_id, a.arc_id, the_geom, '||(v_arc)||' 
+			SELECT '||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_arc)||' 
 			FROM (SELECT arc_id, max(water) as water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' 
 			AND water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
 	
 		-- insert node results into audit table
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT '||v_fprocesscat||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
+			SELECT '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' UNION SELECT node_2,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||')a
 			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c USING(node_id)';
 
 		-- insert node delimiters into audit table
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT '||v_fprocesscat||', nodecat_id, b.node_id, the_geom, 0 FROM (SELECT node_1 as node_id FROM
+			SELECT '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, 0 FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||')a
 			GROUP BY node_1, water HAVING water=1 AND count(node_1)=1)b JOIN v_edit_node USING(node_id)';
 
@@ -143,13 +158,66 @@ BEGIN
 	
 	IF v_upsertattributes THEN 
 		-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
-		UPDATE arc SET minsector_id = descript::integer FROM anl_arc a WHERE fprocesscat_id=34 AND a.arc_id=arc_id;
-		UPDATE node SET minsector_id = descript::integer FROM anl_node a WHERE fprocesscat_id=34 AND a.node_id=node_id;
+		UPDATE arc SET minsector_id = a.descript::integer FROM anl_arc a WHERE fprocesscat_id=34 AND a.arc_id=arc.arc_id;
+		UPDATE node SET minsector_id = a.descript::integer FROM anl_node a WHERE fprocesscat_id=34 AND a.node_id=node.node_id;
 		--UPDATE connec SET minsector_id = descript::integer FROM anl_node a WHERE fprocesscat_id=34 AND a.feature_id=connec_id;
-	END IF;
 
-	-- todo:
-	-- update selectors of anl_arc & anl_node
+		-- message
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+		VALUES (v_fprocesscat_id, concat('WARNING: Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
+		
+	END IF;
+	
+
+	-- set selector
+	DELETE FROM selector_audit WHERE cur_user=current_user;
+	INSERT INTO selector_audit (fprocesscat_id, cur_user) VALUES (v_fprocesscat_id, current_user);
+
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+	--polygons
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
+
+	
+	--    Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
+	
+
+--  Return
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||'}'||
+		       '}'||
+	    '}')::json;
 	
 RETURN cont1;
 END;
