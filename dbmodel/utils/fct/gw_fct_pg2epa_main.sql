@@ -7,21 +7,21 @@ This version of Giswater is provided by Giswater Association
 -- FUNCTION CODE: 2646  
 -- FPROCESSCAT : 35
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa_main(p_data json);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa_main(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_main(p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_main(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_pg2epa_main($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
-SELECT ws_sample.gw_fct_pg2epa_main($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"start", "resultId":"p2", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
-SELECT ws_sample.gw_fct_pg2epa_main($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
@@ -53,7 +53,7 @@ v_i integer = 0;
 BEGIN
 
 --  Search path
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  Get input data
 	v_iterative = (p_data->>'data')::json->>'iterative';
