@@ -314,7 +314,15 @@ BEGIN
 
 		
 		EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
-	
+		
+		--reconect existing link to the new feature
+		IF v_feature_type='connec' OR v_feature_type='gully' THEN
+			UPDATE link SET feature_id = v_id WHERE feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1;
+			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+		ELSIF v_feature_type='node' THEN
+			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+		END IF;
+
 		-- enable config parameter arc_searchnodes AND connec proximity
 		UPDATE config SET arc_searchnodes_control=TRUE;
 		UPDATE config SET connec_proximity_control=TRUE;
