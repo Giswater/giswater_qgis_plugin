@@ -160,9 +160,6 @@ class GwToolBox(ApiParent):
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
 
-        if self.controller.plugin_settings_value(str(function_name) + "_" + cur_user + "_chk_save") == 'true':
-            dialog.chk_save.setChecked(True)
-
         if self.controller.plugin_settings_value(str(function_name)+"_" + cur_user + "_rbt_previous") == 'true':
             dialog.rbt_previous.setChecked(True)
         else:
@@ -176,8 +173,6 @@ class GwToolBox(ApiParent):
         function_name = function[0]['functionname']
         self.controller.plugin_settings_set_value(str(function_name)+"_" + cur_user + "_rbt_previous",
                                                   dialog.rbt_previous.isChecked())
-        self.controller.plugin_settings_set_value(str(function_name)+"_" + cur_user + "_chk_save",
-                                                  dialog.chk_save.isChecked())
 
 
     def execute_function(self, dialog, combo, result):
@@ -273,7 +268,7 @@ class GwToolBox(ApiParent):
             extras = extras[:-2] + '}'
         else:
             extras += '}'
-        extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
+
         body = self.create_body(feature=feature_field, extras=extras)
         sql = ("SELECT "+str(function_name)+"($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
@@ -368,8 +363,6 @@ class GwToolBox(ApiParent):
         dialog.grb_selection_type.setVisible(False)
         dialog.rbt_previous.setChecked(False)
         dialog.rbt_layer.setChecked(True)
-        dialog.chk_save.setChecked(True)
-        dialog.chk_save.setEnabled(False)
 
         dialog.grb_parameters.setEnabled(False)
         dialog.grb_parameters.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
