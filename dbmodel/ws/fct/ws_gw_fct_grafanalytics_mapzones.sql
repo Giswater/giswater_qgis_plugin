@@ -102,6 +102,8 @@ BEGIN
 		
 
 	-- reset graf & audit_log tables
+	DELETE FROM anl_arc where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
+	DELETE FROM anl_node where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
 	DELETE FROM anl_graf where user_name=current_user;
 	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 
@@ -129,41 +131,42 @@ BEGIN
 	IF v_class = 'pzone' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''sector'',''presszone'')';
+			  WHERE graf_delimiter IN (''sector'',''PRESSZONE'')';
 	
 	ELSIF v_class = 'dma' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''sector'',''dma'')';
+			  WHERE graf_delimiter IN (''sector'',''DMA'')';
 
 	ELSIF v_class = 'dqa' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''sector'',''dqa'')';
+			  WHERE graf_delimiter IN (''sector'',''DQA'')';
 
 	ELSIF v_class = 'sector' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''sector'')';
+			  WHERE graf_delimiter IN (''SECTOR'')';
 
 	END IF;
-
 
 		-- update boundary conditions setting flag=2 for all nodes that fits on graf delimiters and closed valves
 		v_querytext  = 'UPDATE anl_graf SET flag=2 WHERE node_1 IN('||v_text||' UNION
 				SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
-				LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINsector'' AND closed=TRUE))';
+				LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))';
 	
 		RAISE NOTICE 'v_querytext %', v_querytext;
 		
 		EXECUTE v_querytext;
 
-		-- open boundary conditions enabling sense for graf delimiters allowed on inp_pump/inp_valve/inp_shortpipe/inlet_x_exps tables
+		-- open boundary conditions enabling sense for graf delimiters allowed on inp_pump/inp_valve/inp_shortpipe/inp_inlet tables
 		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_pump ON to_arc = arc_id WHERE node_1=node_id);
 		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_valve ON to_arc = arc_id WHERE node_1=node_id);
 		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_shortpipe ON to_arc = arc_id WHERE node_1=node_id);
-		UPDATE anl_graf SET flag=0 WHERE id IN (SELECT id FROM anl_graf JOIN (SELECT node_id, json_array_elements_text(to_arc) as to_arc 
-		FROM anl_mincut_inlet_x_exploitation)a ON to_arc = arc_id WHERE node_1=node_id);
+		UPDATE anl_graf SET flag=0 WHERE id IN (SELECT id FROM anl_graf JOIN inp_inlet ON to_arc  = arc_id WHERE node_1=node_id);
+		UPDATE anl_graf SET flag=0 WHERE id IN 
+		(SELECT id FROM anl_graf JOIN inp_inlet ON to_arc  = arc_id WHERE node_1=node_id UNION SELECT id FROM anl_graf JOIN inp_reservoir ON to_arc  = arc_id WHERE node_1=node_id);
+
 
 	-- starting process
 	LOOP
@@ -176,7 +179,7 @@ BEGIN
 			IF v_querytext IS NOT NULL THEN
 				EXECUTE v_querytext INTO v_feature;
 			END IF;
-			raise notice 'v_querytext %',v_querytext;
+
 			v_featureid = v_feature.node_id;
 			EXIT WHEN v_featureid IS NULL;
 			
@@ -196,6 +199,8 @@ BEGIN
 		AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
 		EXECUTE v_querytext;
 
+		cont1 = 0;
+
 		-- inundation process
 		LOOP	
 			cont1 = cont1+1;
@@ -203,12 +208,12 @@ BEGIN
 			GET DIAGNOSTICS affected_rows =row_count;
 			EXIT WHEN affected_rows = 0;
 			EXIT WHEN cont1 = 200;
+			raise notice 'cont1 % v_feature %', cont1, v_featureid;
 		END LOOP;
 		-- finish engine
 		----------------
 		
-		-- insert arc results into audit table
-		raise notice '% % %', v_fprocesscat_id, v_featureid, v_class;
+		-- insert arc results into audit table	
 		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
 			SELECT '||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' 
 			FROM (SELECT arc_id, max(water) as water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' AND user_name=current_user
@@ -221,11 +226,14 @@ BEGIN
 			JOIN v_edit_node b USING (node_id)';
 			
 		-- message
-		SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND arc_id=v_featureid AND cur_user=current_user;
+		SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND descript=v_featureid::text AND cur_user=current_user;
 		
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 		VALUES (v_fprocesscat_id, concat('INFO: Mapzone ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
-				
+
+		raise notice '% % % %', v_fprocesscat_id, v_featureid, v_count, v_class;
+
+
 	END LOOP;
 	
 	IF v_upsertattributes THEN 

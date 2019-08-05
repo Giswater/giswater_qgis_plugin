@@ -7,6 +7,26 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+CREATE OR REPLACE VIEW v_anl_graf AS 
+ WITH nodes_a AS (
+         SELECT anl_graf_1.node_1,
+            anl_graf_1.node_2,
+            anl_graf_1.flag
+           FROM anl_graf anl_graf_1
+          WHERE anl_graf_1.water = 1
+        )
+ SELECT anl_graf.grafclass,
+    anl_graf.arc_id,
+    anl_graf.node_1,
+    anl_graf.node_2,
+    anl_graf.flag,
+    nodes_a.flag AS flagi
+   FROM anl_graf
+     JOIN nodes_a ON anl_graf.node_1::text = nodes_a.node_2::text
+  WHERE anl_graf.flag = 0 AND anl_graf.user_name::name = "current_user"();
+
+
+
 drop view if exists v_rtc_period_nodepattern cascade;
 create or replace view v_rtc_period_nodepattern as           
 SELECT row_number() over (order by pattern_id, idrow) as id, 
