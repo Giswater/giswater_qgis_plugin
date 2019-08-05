@@ -61,8 +61,8 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
 
         # Check if user can use recursion or not
-        go2eparecurisve = self.settings.value('system_variables/go2eparecurisve')
-        if str(go2eparecurisve) == "FALSE":
+        go2epaiterative = self.settings.value('system_variables/go2epaiterative')
+        if str(go2epaiterative) == "FALSE":
             self.dlg_go2epa.chk_recurrent.setVisible(False)
             self.dlg_go2epa.chk_recurrent.setChecked(False)
 
@@ -441,9 +441,9 @@ class Go2Epa(ApiParent):
         os.chdir(folder_path)
         message = self.controller.tr("Select RPT file")
         if Qgis.QGIS_VERSION_INT < 29900:
-            self.file_rpt = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
+            self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
         else:
-            self.file_rpt, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
+            self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
 
         utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 

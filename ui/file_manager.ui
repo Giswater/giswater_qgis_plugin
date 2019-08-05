@@ -169,7 +169,7 @@
               <item row="1" column="2">
                <widget class="QCheckBox" name="chk_recurrent">
                 <property name="text">
-                 <string>Use recursive function</string>
+                 <string>Use iterative calls</string>
                 </property>
                </widget>
               </item>
