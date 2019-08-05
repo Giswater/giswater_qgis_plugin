@@ -144,6 +144,8 @@ class Go2Epa(ApiParent):
                 self.dlg_go2epa.chk_import_result.setEnabled(False)
             else:
                 utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, False)
+                self.dlg_go2epa.chk_recurrent.setCheckState(0)
+
 
 
     def check_inp_chk(self, file_inp):
