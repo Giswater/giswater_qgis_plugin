@@ -498,7 +498,7 @@ class ApiCF(ApiParent):
                 layout.addWidget(label, 0, field['layout_order'])
                 layout.addWidget(widget, 1, field['layout_order'])
             else:
-                self.put_widgets(self.dlg_cf, field, label, None, widget)
+                self.put_widgets(self.dlg_cf, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
