@@ -19,7 +19,7 @@ SELECT * from SCHEMA_NAME.arc where arc_id='2205'
 
 TO EXECUTE
 -- for any exploitation you want
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"exploitation": "[1]"}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]"}}}');
 
 29 & 49 fprocesscat are relationed
 29 it is one row for mincut to resume data for each minsector
@@ -45,7 +45,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get variables
-	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
+	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	INSERT INTO anl_mincut_result_cat VALUES (-1) ON CONFLICT (id) DO nothing;
 
@@ -75,10 +75,10 @@ BEGIN
 
 		--RAISE NOTICE 'MIN SECTOR %', v_arc;
 		
-		-- get arc_id representinc minsector (fprocesscat = 34)			
-		v_arc = (SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE enabled IS NULL AND fprocesscat_id=34 AND user_name=current_user LIMIT 1);
+		-- get arc_id represented minsector (fprocesscat = 34)			
+		v_arc = (SELECT log_message FROM audit_log_data WHERE enabled IS NULL AND fprocesscat_id=34 AND user_name=current_user LIMIT 1);
 
-		exit when v_arc is null;
+		EXIT WHEN v_arc is null;
 		
 		-- set flag not don't take it in next loop
 		UPDATE audit_log_data SET enabled=true WHERE log_message=v_arc AND fprocesscat_id=34 AND user_name=current_user;

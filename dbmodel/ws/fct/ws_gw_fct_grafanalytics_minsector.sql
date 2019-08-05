@@ -14,13 +14,14 @@ $BODY$
 /*
 delete from anl_graf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"exploitation":"[1,2]", "upsertFeature":"TRUE"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"arc":"2002", "upsertFeature":"TRUE" }}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]"}, "upsertFeature":"TRUE"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002"}, "upsertFeature":"TRUE" }}}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.anl_graf
 
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
+SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND user_name=current_user
+SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND user_name=current_user
 
 */
 
@@ -47,10 +48,9 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	-- get variables
-	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
-	v_arcid = (SELECT (p_data::json->>'data')::json->>'arc');
-	v_upsertattributes = (SELECT (p_data::json->>'data')::json->>'upsertFeature');
-	v_expl = (SELECT (p_data::json->>'data')::json->>'exploitation');
+	v_arcid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'arc');
+	v_upsertattributes = (SELECT ((p_data::json->>'data')::json->>'upsertFeature');
+	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- set variables
 	v_fprocesscat=34;  
@@ -87,7 +87,7 @@ BEGIN
 	-- starting process
 	LOOP
 		EXIT WHEN cont1 = -1;
-		cont1 = cont1+1;
+		cont1 = 0;
 
 		-- reset water flag
 		UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
@@ -103,9 +103,7 @@ BEGIN
 		EXIT WHEN v_arc IS NULL;
 				
 		-- set the starting element
-		v_querytext = 'UPDATE anl_graf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||' AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
-		RAISE NOTICE '%', v_querytext;
-			
+		v_querytext = 'UPDATE anl_graf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||' AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 		
 		EXECUTE v_querytext;
 
 		-- inundation process
@@ -114,42 +112,45 @@ BEGIN
 			UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
 			GET DIAGNOSTICS affected_rows =row_count;
 			EXIT WHEN affected_rows = 0;
-			EXIT WHEN cont1 = 100;
+			EXIT WHEN cont1 = 200;
 		END LOOP;
 		
 		-- finish engine
 		----------------
 		
 		-- insert arc results into audit table
-		EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			SELECT '||v_fprocesscat||', cat_arctype_id, a.arc_id, '||(v_arc)||' 
+		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
+			SELECT '||v_fprocesscat||', arccat_id, a.arc_id, the_geom, '||(v_arc)||' 
 			FROM (SELECT arc_id, max(water) as water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' 
 			AND water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
 	
 		-- insert node results into audit table
-		EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			SELECT '||v_fprocesscat||', nodetype_id, b.node_id, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
+		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
+			SELECT '||v_fprocesscat||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' UNION SELECT node_2,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||')a
 			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c USING(node_id)';
 
 		-- insert node delimiters into audit table
-		EXECUTE 'INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			SELECT '||v_fprocesscat||', nodetype_id, b.node_id, 0 FROM (SELECT node_1 as node_id FROM
+		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
+			SELECT '||v_fprocesscat||', nodecat_id, b.node_id, the_geom, 0 FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||')a
 			GROUP BY node_1, water HAVING water=1 AND count(node_1)=1)b JOIN v_edit_node USING(node_id)';
 
 		-- delete duplicate delimiter
-		DELETE FROM audit_log_data WHERE feature_id IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=34 AND log_message = '0') AND fprocesscat_id=34 AND log_message::integer > 0;
+		DELETE FROM anl_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=34 AND descript = '0') AND fprocesscat_id=34 AND descript::integer > 0;
 		
 	END LOOP;
 	
 	IF v_upsertattributes THEN 
-		-- due URN concept whe can update massively feature from audit_log_data without check if is arc/node/connec.....
-		UPDATE arc SET minsector_id = log_message::integer FROM audit_log_data a WHERE fprocesscat_id=34 AND a.feature_id=arc_id;
-		UPDATE node SET minsector_id = log_message::integer FROM audit_log_data a WHERE fprocesscat_id=34 AND a.feature_id=node_id;
-		UPDATE connec SET minsector_id = log_message::integer FROM audit_log_data a WHERE fprocesscat_id=34 AND a.feature_id=connec_id;
+		-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
+		UPDATE arc SET minsector_id = descript::integer FROM anl_arc a WHERE fprocesscat_id=34 AND a.arc_id=arc_id;
+		UPDATE node SET minsector_id = descript::integer FROM anl_node a WHERE fprocesscat_id=34 AND a.node_id=node_id;
+		--UPDATE connec SET minsector_id = descript::integer FROM anl_node a WHERE fprocesscat_id=34 AND a.feature_id=connec_id;
 	END IF;
 
+	-- todo:
+	-- update selectors of anl_arc & anl_node
+	
 RETURN cont1;
 END;
 $BODY$
