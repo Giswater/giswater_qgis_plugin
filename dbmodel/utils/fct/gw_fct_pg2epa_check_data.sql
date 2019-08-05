@@ -337,8 +337,6 @@ BEGIN
 		-- nod2arc control
 		v_nodearc_real = (SELECT st_length (the_geom) FROM rpt_inp_arc WHERE  arc_type='NODE2ARC' AND result_id=v_result_id LIMIT 1);
 		v_nodearc_user = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' AND cur_user=current_user);
-		
-		
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message)
 			VALUES (14, v_result_id, concat('WARNING: The node2arc parameter have been modified from ', v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts'));
@@ -346,6 +344,9 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message)
 			VALUES (14, v_result_id, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value:', v_nodearc_user::numeric(12,3)));
 		END IF;
+
+		-- rules control
+		
 		
 		IF v_demandtype > 1 THEN --(2 or 3)
 
