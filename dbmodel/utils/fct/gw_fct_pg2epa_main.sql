@@ -7,21 +7,21 @@ This version of Giswater is provided by Giswater Association
 -- FUNCTION CODE: 2646  
 -- FPROCESSCAT : 35
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_main(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_main(p_data json)  
+DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa_main(p_data json);
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa_main(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
+SELECT ws_sample.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
+SELECT ws_sample.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"iterative":"ongoing", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"iterative":"start", "resultId":"p2", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
+SELECT ws_sample.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
@@ -38,7 +38,7 @@ v_stepsmain integer;
 v_functionidsec text;
 v_functionnamesec text;
 v_stepssec integer;
-v_steps integer;
+v_steps integer = 0;
 v_currentstep integer;
 v_storeallresults boolean;
 v_tableid text;
@@ -53,7 +53,7 @@ v_i integer = 0;
 BEGIN
 
 --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
 --  Get input data
 	v_iterative = (p_data->>'data')::json->>'iterative';
@@ -66,16 +66,10 @@ BEGIN
 	
 		-- get values of iterative function
 		v_functionidmain = (SELECT value FROM config_param_user WHERE parameter='inp_iterative_main_function' AND cur_user=current_user);
-		v_functionidsec = (SELECT value FROM config_param_user WHERE parameter='inp_iterative_secondary_function' AND cur_user=current_user);
-		
 		v_functionnamemain = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidmain);
-		v_functionnamesec = (SELECT (addparam->>'functionName') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidsec);
-
 		v_stepsmain = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidmain);
-		v_stepssec = (SELECT ((addparam::json->>'systemParameters')::json->>'steps') FROM inp_typevalue WHERE typevalue='inp_iterative_function' AND id = v_functionidsec);
 
 		raise notice ' MAIN v_functionnamemain % v_stepsmain % ', v_functionnamemain, v_stepsmain;
-		raise notice ' SEC: v_functionnamesec % v_stepssec % ', v_functionnamesec, v_stepssec;
 
 		-- setting temp_table with any rows any calls using steps number defined on inp_typevalue parameter
 		IF v_iterative='start' THEN
@@ -95,18 +89,8 @@ BEGIN
 				concat('{"data":{"functionName":"'||v_functionnamemain||'","step":"',v_main,'", "resultId":"',v_result,'"}}'));
 				EXIT WHEN v_main = v_stepsmain;	
 
-				LOOP
-					EXIT WHEN v_stepssec IS NULL;						
-					
-					raise notice ' v_sec %', v_sec;	
-					v_sec = v_sec + 1;
-					v_steps = v_steps + 1;
-
-					INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35, 
-					concat('{"data":{"functionName":"'||v_functionnamesec||'","step":"',v_sec,'", "resultId":"',v_result,'"}}'));
-					EXIT WHEN v_sec = v_stepssec;											
-				END LOOP;
-									
+				v_steps = v_steps + 1;
+			
 			END LOOP;
 		
 		ELSIF v_iterative='ongoing' THEN
@@ -120,9 +104,11 @@ BEGIN
 		
 		-- set counter
 		v_currentstep = v_steps - v_count;
+
+		raise notice 'v_steps %', v_steps;
 				
 		-- setting v_data to call iterative function
-		v_data = (SELECT text_column FROM ws.temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
+		v_data = (SELECT text_column FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1);
 
 		raise notice 'v_data % % v_functionnamemain', v_data, v_functionnamemain;
 	
@@ -150,7 +136,7 @@ BEGIN
 	    -- setting counter
 	    v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
 		END IF;   
-		
+
 RETURN v_return;
 	
 END;
