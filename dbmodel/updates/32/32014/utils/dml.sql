@@ -9,26 +9,36 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_arc_orphannode_delete';
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2704, 'gw_fct_grafanalytics_engine', 'ws','function', 'Engine function of grafanalytics', 'role_om',TRUE, FALSE,FALSE); -- this function was born deprecated!!!
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2704, 'gw_fct_grafanalytics_engine', 'ws','function', 'Engine function of grafanalytics', 'role_om', TRUE, FALSE, null, FALSE); -- this function was born deprecated!!!
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2706, 'gw_fct_grafanalytics_minsector', 'ws','function', '{"featureType":""}', 
+'[{"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layout_order":1, "placeholder":"[1,2]", "value":""},
+{"widgetname":"upsertFeature", "label":"Upsert feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_bottom","layout_order":1, "value":"FALSE"}]',
+'Function of grafanalytics for minimun sector', 'role_om',FALSE, TRUE, 'Minsector analysis', TRUE);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2706, 'gw_fct_grafanalytics_minsector', 'ws','function', 'Function of grafanalytics for minimun sector', 'role_om',FALSE, FALSE,FALSE);
+VALUES (2708, 'gw_fct_grafanalytics_mincut', 'ws','function', 'Function of grafanalytics for mincut', 'role_om',FALSE, FALSE, FALSE);
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2708, 'gw_fct_grafanalytics_mincut', 'ws','function', 'Function of grafanalytics for mincut', 'role_om',FALSE, FALSE,FALSE);
-
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
 VALUES (2710, 'gw_fct_grafanalytics_mapzones', 'ws','function', '{"featureType":""}',
-'[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"string","layoutname":"grl_option_parameters","layout_order":1,"value":"SECTORA"},
-{"widgetname":"arc", "label":"Arcid:","widgettype":"combo","datatype":"string","comboIds":["PZONE","DQA","DMA","SECTOR"], 
-"comboNames":["Pressure Zonification", "District Quality Areas", "District Metering Areas", "Inlet Sectorization"], "selectedId":!a",
- "layoutname":"grl_option_parameters","layout_order":2,"value":null},
-{"widgetname":"node", "label":"Nodeid:","widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layout_order":3,"value":null}]',
-'Function to analyze graf of network. Multiple analysis is avaliable' ,'role_om',FALSE, TRUE, TRUE);
+'[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"comboIds":["PZONE","DQA","DMA","SECTOR"],
+"comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"PZONE"}, 
+{"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"json","layoutname":"grl_option_parameters","layout_order":2, "placeholder":"[1,2]", "value":""},
+{"widgetname":"upsertFeature", "label":"Upsert feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_bottom","layout_order":1, "value":"FALSE"}]',
+'Function to analyze graf of network. Multiple analysis is avaliable. Dynamic analisys to sectorize network using the flow traceability function. 
+Before work with this funcion it is mandatory to configurate the system:
+- field nodeparent on [dma, sector, cat_presszone and dqa] tables
+- field to_arc on [inp_shortpipe, inp_inlet, inp_reservoir, inp_valve, inp_pump] tables' ,'role_om',FALSE, TRUE, 'Mapzones analysis', TRUE);
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2712, 'gw_fct_grafanalytics_mincutzones', 'ws','function', 'Function of grafanalytics for massive mincutzones identification', 'role_om',FALSE, FALSE,FALSE);
+INSERT INTO audit_cat_function 
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES 
+(2712, 'gw_fct_grafanalytics_mincutzones', 'ws','function', '{"featureType":""}',
+'[{"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layout_order":2, "placeholder":"[1,2]", "value":""},{"widgetname":"upsertFeature", "label":"Upsert feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_bottom","layout_order":1, "value":"FALSE"}]',
+'Function of grafanalytics for massive mincutzones identification. Multiple analysis is avaliable. It works applying massive mincut for the whole network of selected exploitation. It can take a lot of time. Be patient!!!'
+,'role_om',FALSE, TRUE, 'Massive mincut analysis', TRUE);
 
 UPDATE config_param_system SET isenabled=false, isdeprecated='true' WHERE parameter='gw_trg_arc_orphannode_delete';
 
