@@ -63,7 +63,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
-	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_message:= ((p_data ->>'data')::json->>'parameters')::json->>'message'::text;
 

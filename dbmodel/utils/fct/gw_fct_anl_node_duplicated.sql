@@ -41,7 +41,7 @@ BEGIN
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_nodetolerance := ((p_data ->>'data')::json->>'parameters')::json->>'nodeTolerance';
 
 	raise notice 'v_worklayer % v_nodetolerance % v_id %',v_worklayer ,v_nodetolerance ,v_array;

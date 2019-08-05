@@ -45,7 +45,7 @@ BEGIN
 	SELECT wsoftware, giswater  INTO project_type_aux, v_version FROM version order by 1 desc limit 1;
 
 	-- getting input data 	
-	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	
 	-- delete old values on result table

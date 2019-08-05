@@ -36,7 +36,7 @@ BEGIN
 
 
 	-- getting input data 	
-	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_result_id := (((p_data ->>'data')::json->>'parameters')::json->>'resultId')::text;
 	v_result_type := (((p_data ->>'data')::json->>'parameters')::json->>'resultType')::text;
 	v_coefficient := (((p_data ->>'data')::json->>'parameters')::json->>'coefficient')::float;
