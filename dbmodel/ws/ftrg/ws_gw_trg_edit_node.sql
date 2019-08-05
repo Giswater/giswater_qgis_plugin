@@ -421,6 +421,9 @@ BEGIN
         ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
 			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
 			
+        ELSIF (NEW.epa_type = 'INLET') THEN
+			INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);
+			
         END IF;
 
         RETURN NEW;
@@ -443,6 +446,8 @@ BEGIN
                 v_inp_table:= 'inp_valve';    
             ELSIF (OLD.epa_type = 'PUMP') THEN
                 v_inp_table:= 'inp_pump';  
+            ELSIF (OLD.epa_type = 'INLET') THEN
+                v_inp_table:= 'inp_inlet';
             END IF;
             IF v_inp_table IS NOT NULL THEN
                 v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
@@ -462,6 +467,8 @@ BEGIN
                 v_inp_table:= 'inp_valve';    
             ELSIF (NEW.epa_type = 'PUMP') THEN
                 v_inp_table:= 'inp_pump';  
+            ELSIF (NEW.epa_type = 'INLET') THEN
+                v_inp_table:= 'inp_inlet';  
             END IF;
             IF v_inp_table IS NOT NULL THEN
                 v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';

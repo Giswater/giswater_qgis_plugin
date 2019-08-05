@@ -7,6 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+UPDATE audit_cat_table SET isdeprecated = TRUE where id='inp_controls_x_node';
+
+INSERT INTO inp_node_type VALUES ('INLET');
+
+INSERT INTO inp_connec SELECT connec_id FROM connec;
+
 UPDATE sys_csv2pg_config SET target='{"Node Results:", "MINIMUM Node"}' WHERE tablename = 'rpt_node';
 UPDATE sys_csv2pg_config SET target='{"MINIMUM Link", "Link Results:"}' WHERE tablename = 'rpt_arc';
 UPDATE sys_csv2pg_config SET target='{"Pump Factor"}' WHERE tablename = 'rpt_energy_usage';

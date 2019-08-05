@@ -496,10 +496,8 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
-
-
-   CREATE OR REPLACE VIEW v_edit_inp_pump AS 
- SELECT v_node.node_id,
+CREATE OR REPLACE VIEW v_edit_inp_pump AS 
+ SELECT DISTINCT ON (node_id) v_node.node_id,
     v_node.elevation,
     v_node.depth,
     v_node.nodecat_id,
@@ -522,7 +520,7 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_reservoir AS 
- SELECT v_node.node_id,
+ SELECT DISTINCT ON (node_id) v_node.node_id,
     v_node.elevation,
     v_node.depth,
     v_node.nodecat_id,
@@ -531,7 +529,8 @@ CREATE OR REPLACE VIEW v_edit_inp_reservoir AS
     v_node.state,
     v_node.annotation,
     v_node.the_geom,
-    inp_reservoir.pattern_id
+    inp_reservoir.pattern_id,
+	inp_reservoir.to_arc
    FROM inp_selector_sector, v_node
     JOIN inp_reservoir USING (node_id)
      JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
@@ -540,7 +539,7 @@ CREATE OR REPLACE VIEW v_edit_inp_reservoir AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
- SELECT v_node.node_id,
+ SELECT DISTINCT ON (node_id) v_node.node_id,
     v_node.elevation,
     v_node.depth,
     v_node.nodecat_id,
@@ -559,7 +558,7 @@ CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS
 
 
 CREATE OR REPLACE VIEW v_edit_inp_tank AS 
- SELECT v_node.node_id,
+ SELECT DISTINCT ON (node_id) v_node.node_id,
     v_node.elevation,
     v_node.depth,
     v_node.nodecat_id,
@@ -579,6 +578,32 @@ CREATE OR REPLACE VIEW v_edit_inp_tank AS
      JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
+	 
+
+CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
+ SELECT DISTINCT ON (node_id) v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id,
+	inp_inlet.pattern_id,
+	inp_inlet.to_arc
+   FROM inp_selector_sector, v_node
+     JOIN inp_inlet USING (node_id)
+     JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
+     WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+	 
    
 CREATE OR REPLACE VIEW v_edit_inp_valve AS 
  SELECT v_node.node_id,
@@ -619,3 +644,117 @@ CREATE OR REPLACE VIEW v_edit_inp_valve AS
    FROM inp_selector_sector, connec
     JOIN inp_connec USING (connec_id)
     WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+		
+CREATE OR REPLACE VIEW vi_reservoirs AS 
+ SELECT inp_reservoir.node_id,
+    rpt_inp_node.elevation AS head,
+    inp_reservoir.pattern_id
+   FROM inp_selector_result,  inp_reservoir
+     JOIN rpt_inp_node ON inp_reservoir.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+ UNION
+SELECT inp_inlet.node_id,
+    rpt_inp_node.elevation AS head,
+    inp_inlet.pattern_id
+   FROM inp_selector_result, inp_inlet
+     LEFT JOIN (SELECT node_id, count(*)AS ct FROM (select node_1 as node_id FROM rpt_inp_arc UNION ALL select node_2 FROM rpt_inp_arc)a GROUP BY 1)b  USING (node_id) 
+     JOIN rpt_inp_node ON inp_inlet.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+  AND ct=1;
+
+  
+CREATE OR REPLACE VIEW vi_tanks AS 
+ SELECT inp_tank.node_id,
+    rpt_inp_node.elevation,
+    inp_tank.initlevel,
+    inp_tank.minlevel,
+    inp_tank.maxlevel,
+    inp_tank.diameter,
+    inp_tank.minvol,
+    inp_tank.curve_id
+   FROM inp_selector_result,
+    inp_tank
+     JOIN rpt_inp_node ON inp_tank.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+  UNION
+  SELECT inp_inlet.node_id,
+    rpt_inp_node.elevation,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id
+   FROM inp_selector_result,
+    inp_inlet
+      LEFT JOIN (SELECT node_id, count(*)AS ct FROM (select node_1 as node_id FROM rpt_inp_arc UNION ALL select node_2 FROM rpt_inp_arc)a GROUP BY 1)b  USING (node_id) 
+     JOIN rpt_inp_node ON inp_inlet.node_id::text = rpt_inp_node.node_id::text
+     WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+     AND ct=1;
+  
+  
+  
+CREATE OR REPLACE VIEW vi_junctions AS 
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elevation,
+    rpt_inp_node.demand,
+    rpt_inp_node.pattern_id
+   FROM inp_selector_result,
+    rpt_inp_node
+     LEFT JOIN inp_junction ON inp_junction.node_id::text = rpt_inp_node.node_id::text
+  WHERE (rpt_inp_node.epa_type::text = ANY (ARRAY['JUNCTION'::character varying, 'SHORTPIPE'::character varying]::text[])) AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+  ORDER BY rpt_inp_node.node_id;
+  
+  
+  CREATE OR REPLACE VIEW vi_controls AS 
+ SELECT c.text
+   FROM ( SELECT a.id,
+            a.text
+           FROM ( SELECT inp_controls_x_arc.id,
+                    inp_controls_x_arc.text
+                   FROM inp_selector_result,
+                    inp_controls_x_arc
+                     JOIN rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                  WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+				  AND active IS NOT FALSE
+                  ORDER BY inp_controls_x_arc.id) a) c
+  ORDER BY c.id;
+
+  
+  
+CREATE OR REPLACE VIEW vi_rules AS 
+ SELECT c.text
+   FROM ( SELECT a.id,
+            a.text
+           FROM ( SELECT inp_rules_x_arc.id,
+                    inp_rules_x_arc.text
+                   FROM inp_selector_result,
+                    inp_rules_x_arc
+                     JOIN rpt_inp_arc ON inp_rules_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                  WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+				  AND active IS NOT FALSE
+				  ORDER BY inp_rules_x_arc.id) a
+        UNION
+         SELECT b.id,
+            b.text
+           FROM ( SELECT inp_rules_x_node.id + 1000000 AS id,
+                    inp_rules_x_node.text
+                   FROM inp_selector_result,
+                    inp_rules_x_node
+                     JOIN rpt_inp_node ON inp_rules_x_node.node_id::text = rpt_inp_node.node_id::text
+                  WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+   				  AND active IS NOT FALSE
+				  ORDER BY inp_rules_x_node.id) b
+        UNION
+         SELECT d.id,
+            d.text
+           FROM ( SELECT inp_rules_x_sector.id + 2000000 AS id,
+                    inp_rules_x_sector.text
+                   FROM inp_selector_sector,
+                    inp_rules_x_sector
+                  WHERE inp_selector_sector.sector_id = inp_rules_x_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text
+   				  AND active IS NOT FALSE
+				  ORDER BY inp_rules_x_sector.id) d) c
+  ORDER BY c.id;
+
