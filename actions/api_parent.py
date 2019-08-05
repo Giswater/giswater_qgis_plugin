@@ -1343,7 +1343,7 @@ class ApiParent(ParentAction):
         if layout is None:
             return
         layout.addWidget(lbl, int(field['layout_order']), 0)
-        layout.addWidget(widget, int(field['layout_order']), 1)
+        layout.addWidget(widget, int(field['layout_order']), 2)
         layout.setColumnStretch(2, 1)
 
 
