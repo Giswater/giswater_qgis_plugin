@@ -53,7 +53,7 @@ Rest of arcs are clasified as NON HYDRANT (H4) arcs
 */
 
 DECLARE
-	v_step 		integer;
+	v_step	 	text;
 	v_text 		text;
 	v_return 	text;
 	v_result 	text;
@@ -76,7 +76,7 @@ DECLARE
 	v_1		integer;
 	v_2		integer;
 	v_record	record;
-	v_steps 	integer;
+	v_steps 	text;
 
 BEGIN
 	--  Search path
@@ -193,8 +193,9 @@ BEGIN
 		-- insert into anl_node only that nodes with positive result
 		DELETE FROM anl_node WHERE fprocesscat_id=56 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 56, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
-		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=current_user ) group by 2;
+		SELECT 56, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > v_mcaminpress 
+		AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
+		AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=55 and cur_user=currnt_user ) group by 2;
 
 		-- update demands
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
@@ -213,7 +214,8 @@ BEGIN
 
 		DELETE FROM anl_node WHERE fprocesscat_id=57 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 57, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float < 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
+		SELECT 57, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float < v_mcaminpress
+		AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user
 		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=56 and cur_user=current_user ) group by 2;
 
 		-- reset demands
@@ -232,7 +234,8 @@ BEGIN
 		DELETE FROM anl_arc WHERE fprocesscat_id=57 AND cur_user=current_user;
 		INSERT INTO anl_arc (fprocesscat_id, arc_id, descript)
 		SELECT 57, arc_id, concat ('{"tstep":',row_number() over (order by arc_id),', "node_1":"', node_1,'", "node_2":"',node_2,'"}') FROM (
-		SELECT DISTINCT ON (arc.arc_id) arc.arc_id, node_1, node_2 FROM arc JOIN anl_node ON node_id=node_1 or node_id=node_2 WHERE fprocesscat_id=57 AND cur_user=current_user AND node_id 
+		SELECT DISTINCT ON (arc.arc_id) arc.arc_id, node_1, node_2 FROM arc JOIN anl_node ON node_id=node_1 or node_id=node_2 
+		WHERE fprocesscat_id=57 AND cur_user=current_user AND node_id 
 		IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=57 and cur_user=current_user))a;
 
 		-- getting patterns
@@ -255,7 +258,8 @@ BEGIN
 			v_node = (v_record.addparam->>'node_id');
 
 			-- getting pattern values
-			SELECT array_agg(col) INTO v::integer[] FROM (SELECT unnest(v_record.text_column::integer[]) as col FROM temp_table WHERE user_name=current_user AND fprocesscat_id=57 AND id=v_record.id) a;
+			SELECT array_agg(col) INTO v::integer[] FROM (SELECT unnest(v_record.text_column::integer[]) as col FROM temp_table 
+			WHERE user_name=current_user AND fprocesscat_id=57 AND id=v_record.id) a;
 
 			-- getting and setting tsteps with = 1
 			FOR v_steps IN SELECT (descript::json->'tstep') FROM anl_arc WHERE fprocesscat_id=57 AND cur_user=current_user 
@@ -272,7 +276,8 @@ BEGIN
 				INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6,
 				factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 				VALUES (v_result, v_node, v[v_count+1], v[v_count+2], v[v_count+3], v[v_count+4], v[v_count+5], v[v_count+6], v[v_count+7], v[v_count+8], 
-				v[v_count+9], v[v_count+10], v[v_count+11], v[v_count+12], v[v_count+13], v[v_count+14], v[v_count+15], v[v_count+16], v[v_count+17], v[v_count+18]);
+				v[v_count+9], v[v_count+10], v[v_count+11], v[v_count+12], v[v_count+13], v[v_count+14], v[v_count+15], 
+				v[v_count+16], v[v_count+17], v[v_count+18]);
 
 				EXIT WHEN v[v_count+18] IS NULL;				
 				
@@ -289,7 +294,8 @@ BEGIN
 		-- insert into anl_node only that nodes with positive result
 		DELETE FROM anl_node WHERE fprocesscat_id=58 AND cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id)
-		SELECT 58, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > 15 AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user;
+		SELECT 58, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > v_mcaminpress
+		AND fprocesscat_id = 35 and feature_type='rpt_node' AND user_name=current_user;
 		
 		-- delete all patterns
 		DELETE FROM rpt_inp_pattern_value WHERE user_name=current_user AND result_id=v_result;
