@@ -15,8 +15,8 @@ $BODY$
 /*
 delete from anl_graf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]"}, "upsertFeature":"TRUE"}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002"}, "upsertFeature":"TRUE" }}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "upsertFeature":"TRUE"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "upsertFeature":"TRUE" }}}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.anl_graf
@@ -57,7 +57,7 @@ BEGIN
 
 	-- get variables
 	v_arcid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'arc');
-	v_upsertattributes = (SELECT (p_data::json->>'data')::json->>'upsertFeature');
+	v_upsertattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'upsertFeature');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- select config values

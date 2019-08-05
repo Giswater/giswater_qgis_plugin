@@ -21,16 +21,16 @@ set to_arc on tables inp_valve (for presszone), inp_pump (for presszone), inp_sh
 
 TO EXECUTE
 -- for any exploitation you want
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "exploitation": "[1,2]"}, "upsertFeature":"TRUE"}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "exploitation": "[1,2]"}, "upsertFeature":TRUE}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "exploitation": "[1,2]"}, "upsertFeature":TRUE}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "exploitation": "[1,2]"}, "upsertFeature":TRUE}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
 
 -- for one specific node
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "node":"113952"}, "upsertFeature":TRUE}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "node":"113952"}, "upsertFeature":TRUE}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "node":"113952"}, "upsertFeature":TRUE}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "node":"113952"}, "upsertFeature":TRUE}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "node":"113952", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "node":"113952", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "node":"113952", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "node":"113952", "upsertFeature":TRUE}}}');
 
 
 TO SEE RESULTS ON LOG TABLE
@@ -83,14 +83,14 @@ BEGIN
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
 	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'node');
-	v_upsertattributes = (SELECT ((p_data::json->>'data')::json->>'upsertFeature'));
+	v_upsertattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'upsertFeature');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- select config values
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- set fprocesscat
-	IF v_class = 'presszone' THEN v_fprocesscat_id=46; 
+	IF v_class = 'pzone' THEN v_fprocesscat_id=46; 
 	ELSIF v_class = 'dma' THEN v_fprocesscat_id=45; 
 	ELSIF v_class = 'dqa' THEN v_fprocesscat_id=44;
 	ELSIF v_class = 'sector' THEN v_fprocesscat_id=30; 
@@ -126,7 +126,7 @@ BEGIN
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 	-- set boundary conditions of graf table	
-	IF v_class = 'presszone' THEN
+	IF v_class = 'pzone' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
 			  WHERE graf_delimiter IN (''sector'',''presszone'')';

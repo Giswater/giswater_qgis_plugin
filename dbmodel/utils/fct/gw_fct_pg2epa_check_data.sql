@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"resultId":"p1"},"saveOnDatabase":true}}$$)
+"feature":{},"data":{"parameters":{"resultId":"p1","saveOnDatabase":true}}}$$)
 */
 
 DECLARE
@@ -63,7 +63,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
-	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_message:= ((p_data ->>'data')::json->>'parameters')::json->>'message'::text;
 

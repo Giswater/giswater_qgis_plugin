@@ -15,7 +15,7 @@ SELECT SCHEMA_NAME.gw_fct_anl_connec_duplicated($${
 "feature":{"tableName":"v_edit_man_wjoin", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection",
 	"parameters":{"connecTolerance":1},
-	"saveOnDatabase":true}}$$)
+	"parameters":{"saveOnDatabase":true}}}$$)
 */
 
 DECLARE
@@ -43,7 +43,7 @@ BEGIN
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
 	v_connectolerance := ((p_data ->>'data')::json->>'parameters')::json->>'connecTolerance';
 
 	-- Reset values

@@ -15,8 +15,7 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_duplicated($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_junction", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection",
-  "parameters":{"nodeProximity":300},
-  "saveOnDatabase":true}}$$)
+  "parameters":{"nodeProximity":300, "saveOnDatabase":true}}}$$)
 */
 
 DECLARE
@@ -40,7 +39,7 @@ BEGIN
     v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
     v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
     v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-    v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
     v_nodeproximity := ((p_data ->>'data')::json->>'parameters')::json->>'nodeProximity';
 
     -- Reset values

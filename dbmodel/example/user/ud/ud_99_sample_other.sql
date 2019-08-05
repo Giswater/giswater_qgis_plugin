@@ -56,7 +56,7 @@ select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'CON
 select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'GULLY');
 
 SELECT gw_fct_plan_result($${"client":{"device":3, "infoType":100, "lang":"ES"},
-							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices"},"saveOnDatabase":true}}$$);
+							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
 							
 SELECT gw_fct_fill_doc_tables();
 SELECT gw_fct_fill_om_tables();

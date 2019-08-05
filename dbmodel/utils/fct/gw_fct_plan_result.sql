@@ -16,7 +16,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_plan_result($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"coefficient":1.67, "description":"test descript", "resultType":1, "resultId":"test1"},"saveOnDatabase":true}}$$)
+"feature":{},"data":{"parameters":{"coefficient":1.67, "description":"test descript", "resultType":1, "resultId":"test1","saveOnDatabase":true}}}$$)
 */
 
 DECLARE 
@@ -36,7 +36,7 @@ BEGIN
 
 
 	-- getting input data 	
-	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
 	v_result_id := (((p_data ->>'data')::json->>'parameters')::json->>'resultId')::text;
 	v_result_type := (((p_data ->>'data')::json->>'parameters')::json->>'resultType')::text;
 	v_coefficient := (((p_data ->>'data')::json->>'parameters')::json->>'coefficient')::float;

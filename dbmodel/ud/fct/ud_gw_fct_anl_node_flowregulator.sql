@@ -15,8 +15,8 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_anl_node_flowregulator($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_manhole", "id":["138","139"]},
-"data":{"selectionMode":"previousSelection",
-	"saveOnDatabase":true}}$$)
+"data":{"selectionMode":"previousSelection",  "parameters":{"saveOnDatabase":true}
+	}}$$)
 */
 
 
@@ -48,7 +48,7 @@ BEGIN
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json-'parameters')::json->>'saveOnDatabase')::boolean;
 
 	-- Computing process
 	IF v_array != '()' THEN
