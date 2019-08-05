@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>474</width>
-    <height>581</height>
+    <width>566</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -70,7 +70,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>24</width>
+                <width>20</width>
                 <height>20</height>
                </size>
               </property>
@@ -82,7 +82,7 @@
                <bool>false</bool>
               </property>
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -111,7 +111,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>35</width>
+                <width>45</width>
                 <height>20</height>
                </size>
               </property>
@@ -175,7 +175,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>36</width>
+                <width>42</width>
                 <height>20</height>
                </size>
               </property>
@@ -233,6 +233,69 @@
            </layout>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_ext_code">
+              <property name="text">
+               <string>Ext code:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_27">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>28</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="ext_code"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_status">
+              <property name="text">
+               <string>Status:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_28">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>18</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QComboBox" name="status">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QLabel" name="lbl_expl_id">
@@ -251,7 +314,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>13</width>
+                <width>11</width>
                 <height>20</height>
                </size>
               </property>
@@ -296,7 +359,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>17</width>
+                <width>16</width>
                 <height>20</height>
                </size>
               </property>
@@ -339,7 +402,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>46</width>
+                <width>48</width>
                 <height>20</height>
                </size>
               </property>
@@ -384,7 +447,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>4</width>
+                <width>2</width>
                 <height>20</height>
                </size>
               </property>
@@ -485,7 +548,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>39</width>
+                <width>40</width>
                 <height>20</height>
                </size>
               </property>
@@ -531,7 +594,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>39</width>
+                <width>40</width>
                 <height>20</height>
                </size>
               </property>
@@ -577,7 +640,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>10</width>
+                <width>8</width>
                 <height>20</height>
                </size>
               </property>
@@ -613,7 +676,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>84</width>
+                <width>88</width>
                 <height>20</height>
                </size>
               </property>
@@ -653,59 +716,95 @@
             <property name="title">
              <string>Map details</string>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <item>
-              <widget class="QLabel" name="label_scale_3">
-               <property name="text">
-                <string>Scale:</string>
-               </property>
-              </widget>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_28">
+               <item>
+                <widget class="QLabel" name="label_scale_3">
+                 <property name="text">
+                  <string>Scale:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="scale">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_29">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_rotation_3">
+                 <property name="text">
+                  <string>Rotation:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="rotation">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_30">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_atlas_id">
+                 <property name="text">
+                  <string>Atlas id:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="atlas_id">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
-             <item>
-              <widget class="QLineEdit" name="scale">
-               <property name="maximumSize">
-                <size>
-                 <width>150</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_rotation_3">
-               <property name="text">
-                <string>Rotation:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="rotation">
-               <property name="maximumSize">
-                <size>
-                 <width>150</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_atlas_id">
-               <property name="text">
-                <string>Atlas id:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="atlas_id">
-               <property name="maximumSize">
-                <size>
-                 <width>150</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
+             <item row="0" column="1">
               <spacer name="horizontalSpacer_14">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -847,8 +946,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>412</width>
-                 <height>414</height>
+                 <width>176</width>
+                 <height>143</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -920,8 +1019,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>161</width>
-                 <height>139</height>
+                 <width>194</width>
+                 <height>169</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1712,6 +1811,16 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btn_accept">
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="text">
+           <string>Accept</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <spacer name="horizontalSpacer_4">
           <property name="orientation">
@@ -1724,16 +1833,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="btn_accept">
-          <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
-          </property>
-          <property name="text">
-           <string>Accept</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>
@@ -1754,9 +1853,6 @@
   <tabstop>text2</tabstop>
   <tabstop>observ</tabstop>
   <tabstop>active</tabstop>
-  <tabstop>scale</tabstop>
-  <tabstop>rotation</tabstop>
-  <tabstop>atlas_id</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
   <tabstop>all_rows</tabstop>

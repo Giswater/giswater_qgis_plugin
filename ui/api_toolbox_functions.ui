@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>919</width>
+    <width>722</width>
     <height>623</height>
    </rect>
   </property>
@@ -90,7 +90,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Previus selection</string>
+             <string>Selected features only</string>
             </property>
            </widget>
           </item>
@@ -103,7 +103,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Whole layer</string>
+             <string>All features</string>
             </property>
            </widget>
           </item>
