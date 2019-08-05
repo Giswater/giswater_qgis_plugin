@@ -14,6 +14,7 @@ DECLARE
 	v_mantable varchar;
 	v_projectype varchar;
 	v_arc record;
+	v_connect record;
 	v_node record;
 	v_connec1 record;
 	v_gully1 record;
@@ -95,6 +96,33 @@ BEGIN
     -- topology control
     IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 	
+		-- control of relationship with connec / gully
+		SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state=1
+		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
+		
+		IF v_projectype = 'UD'THEN
+			SELECT * INTO v_connect FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state=1
+			ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom) LIMIT 1;
+		END IF;
+
+		IF v_connect IS NULL THEN
+
+			NEW.the_geom = ST_reverse (NEW.the_geom);
+
+			-- check control again
+			SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state=1
+			ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
+		
+			IF v_projectype = 'UD' THEN
+				SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state=1
+				ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+			END IF;
+			
+			IF v_connect IS NULL THEN
+				RAISE EXCEPTION 'Link needs one connec/gully feature as start point. Geometry have been checked and there is no connec/gully feature as start/end point';
+			END IF;		
+		END IF;
+
 		-- arc as end point
 		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state=1
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom) LIMIT 1;
