@@ -85,8 +85,8 @@ class DrawProfiles(ParentMapTool):
         self.start_end_node = [None, None]
 
         # Set signals
-        self.dlg_draw_profile.rejected.connect(partial(self.close_dialog, self.dlg_draw_profile))
-        self.dlg_draw_profile.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_draw_profile))
+        self.dlg_draw_profile.rejected.connect(self.manage_rejected)
+        self.dlg_draw_profile.btn_close.clicked.connect(self.manage_rejected)
         self.dlg_draw_profile.btn_add_start_point.clicked.connect(partial(self.activate_snapping, start_point))
         self.dlg_draw_profile.btn_add_end_point.clicked.connect(partial(self.activate_snapping, end_point))
         self.dlg_draw_profile.btn_add_start_point.clicked.connect(partial(self.activate_snapping_node, self.dlg_draw_profile.btn_add_start_point))
@@ -1796,4 +1796,8 @@ class DrawProfiles(ParentMapTool):
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()
         self.canvas.refresh()
-        
+
+
+    def manage_rejected(self):
+        self.close_dialog(self.dlg_draw_profile)
+        self.remove_vertex()

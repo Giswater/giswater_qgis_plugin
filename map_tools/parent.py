@@ -132,7 +132,18 @@ class ParentMapTool(QgsMapTool):
         self.canvas.setCursor(self.std_cursor)
 
         # Remove highlight
-        self.vertex_marker.hide()        
+        self.vertex_marker.hide()
+
+
+
+    def remove_vertex(self):
+        """ Remove vertex_marker from canvas"""
+        vertex_items = [i for i in self.iface.mapCanvas().scene().items() if issubclass(type(i), QgsVertexMarker)]
+
+        for ver in vertex_items:
+            if ver in self.iface.mapCanvas().scene().items():
+                if self.vertex_marker == ver:
+                    self.iface.mapCanvas().scene().removeItem(ver)
 
 
     def set_icon(self, widget, icon):
