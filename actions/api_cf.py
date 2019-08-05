@@ -325,8 +325,9 @@ class ApiCF(ApiParent):
             elif type(widget) is QgsDateTimeEdit:
                 value = utils_giswater.getCalendarDate(dialog, widget)
             else:
-                print(type(widget))
-                print(type(widget.objectName()))
+                if widget is None:
+                    msg = "Widget {} is not configured or have a bad config".format(field['widgetname'])
+                    self.controller.show_message(msg)
 
             if str(value) != '' and value is not None and value is not -1:
                 self.my_json[str(widget.property('column_id'))] = str(value)
