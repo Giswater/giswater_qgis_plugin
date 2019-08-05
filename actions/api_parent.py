@@ -1251,7 +1251,7 @@ class ApiParent(ParentAction):
             self.vertex_marker.hide()
 
 
-    def construct_form_param_user(self, dialog, row, pos, _json, put_chk=True):
+    def construct_form_param_user(self, dialog, row, pos, _json):
 
         field_id = ''
         if 'fields' in row[pos]:
@@ -1274,15 +1274,6 @@ class ApiParent(ParentAction):
                 lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
                 if 'tooltip' in field['label']:
                     lbl.setToolTip(field['tooltip'])
-                chk = None
-                if put_chk is True:
-                    chk = QCheckBox()
-                    chk.setObjectName('chk_' + field['widgetname'])
-                    if field['checked'] == "True":
-                        chk.setChecked(True)
-                    elif field['checked'] == "False":
-                        chk.setChecked(False)
-                    chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
@@ -1293,16 +1284,16 @@ class ApiParent(ParentAction):
                             widget.setValidator(QRegExpValidator(reg_exp))
                     if Qgis.QGIS_VERSION_INT < 29900:
                         widget.lostFocus.connect(
-                            partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                            partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     else:
                         widget.editingFinished.connect(
-                            partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                            partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
 
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
@@ -1310,21 +1301,21 @@ class ApiParent(ParentAction):
                         widget.setChecked(True)
                     else:
                         widget.setChecked(False)
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datepickertime':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
                     date = QDate.fromString(field['value'], 'yyyy/MM/dd')
                     widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] not in(None, ""):
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                 # Set editable/readonly
@@ -1342,24 +1333,17 @@ class ApiParent(ParentAction):
                             widget.setEnabled(False)
                 widget.setObjectName(field['widgetname'])
 
-                # Set signals
-                if put_chk is True:
-                    chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
-                self.put_widgets(dialog, field, lbl, chk, widget)
+                self.put_widgets(dialog, field, lbl, widget)
 
 
-    def put_widgets(self, dialog, field,  lbl, chk, widget):
+    def put_widgets(self, dialog, field,  lbl, widget):
         """ Insert widget into layout """
 
         layout = dialog.findChild(QGridLayout, field['layoutname'])
         if layout is None:
             return
         layout.addWidget(lbl, int(field['layout_order']), 0)
-        # This if put auxiliar checkbox into config form
-        if chk is not None and type(widget) is not QCheckBox:
-            layout.addWidget(chk, int(field['layout_order']), 1)
-
-        layout.addWidget(widget, int(field['layout_order']), 2)
+        layout.addWidget(widget, int(field['layout_order']), 1)
         layout.setColumnStretch(2, 1)
 
 

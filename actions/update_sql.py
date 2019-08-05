@@ -2659,7 +2659,7 @@ class UpdateSQL(ApiParent):
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
                 self.function_list = []
-                self.construct_form_param_user(dialog, function, 0, self.function_list, False)
+                self.construct_form_param_user(dialog, function, 0, self.function_list)
                 status = True
                 break
 

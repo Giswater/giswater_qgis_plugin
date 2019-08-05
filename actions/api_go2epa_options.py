@@ -49,7 +49,7 @@ class Go2EpaOptions(ApiParent):
             return False
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list, False)
+        self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)

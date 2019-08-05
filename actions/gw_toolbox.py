@@ -251,6 +251,9 @@ class GwToolBox(ApiParent):
                         elif type(widget) in ('', QComboBox):
                             value = utils_giswater.get_item_data(dialog, widget, 0)
                             extras += '"' + param_name + '":"' + str(value).lower() + '", '
+                        elif type(widget) in ('', QCheckBox):
+                            value = utils_giswater.isChecked(dialog, widget)
+                            extras += '"' + param_name + '":"' + str(value).lower() + '", '
 
         if widget_is_void:
             message = "This paramater is mandatory. Please, set a value"
@@ -340,7 +343,7 @@ class GwToolBox(ApiParent):
                     dialog.grb_selection_type.setVisible(False)
                 else:
                     self.populate_layer_combo(function[0]['input_params']['featureType'])
-                self.construct_form_param_user(dialog, function, 0, self.function_list, False)
+                self.construct_form_param_user(dialog, function, 0, self.function_list)
                 self.load_settings_values(dialog, function)
                 status = True
                 break
