@@ -49,7 +49,7 @@ INSERT INTO inp_reservoir  VALUES ('1101', NULL, '2205');
 
 
 -- recover constraints
-SELECTSCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
 
 -- dynamic sectorization
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
