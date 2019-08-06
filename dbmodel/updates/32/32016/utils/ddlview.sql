@@ -498,4 +498,28 @@ SELECT DISTINCT ON (node_id) ve_node.*
 FROM ve_node
 JOIN vi_parent_arc a ON a.node_1::text = ve_node.node_id::text OR a.node_2::text = ve_node.node_id::text;
 
-
+--2019/08/06
+CREATE OR REPLACE VIEW v_edit_plan_psector AS 
+ SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.descript,
+    plan_psector.priority,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.sector_id,
+    plan_psector.atlas_id,
+    plan_psector.gexpenses,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.the_geom,
+    plan_psector.expl_id,
+    plan_psector.psector_type,
+    plan_psector.active,
+    plan_psector.ext_code,
+    plan_psector.status
+   FROM selector_expl,
+    plan_psector
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;

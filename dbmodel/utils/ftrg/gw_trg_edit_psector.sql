@@ -79,9 +79,10 @@ BEGIN
 	ELSIF om_aux='plan' THEN
 
 		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale, sector_id,
-		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active)
+		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, ext_code, status)
 		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation, 
-		NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active);
+		NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active,
+		NEW.ext_code, NEW.status);
 	END IF;
 
 		
@@ -102,7 +103,7 @@ BEGIN
 		UPDATE plan_psector 
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, 
 		text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
-		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active
+		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, ext_code=NEW.ext_code, status=NEW.status
 		WHERE psector_id=OLD.psector_id;
 	END IF;
 
