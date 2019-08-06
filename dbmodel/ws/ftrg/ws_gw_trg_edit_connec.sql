@@ -277,6 +277,16 @@ BEGIN
 			
 		END IF;	
 
+		IF v_man_table='parent' THEN
+		    v_man_table:= (SELECT connec_type.man_table FROM connec_type JOIN cat_connec ON cat_connec.id=NEW.connecat_id 
+		    	WHERE connec_type.id = cat_connec.connectype_id LIMIT 1)::text;
+	         
+	        IF v_man_table IS NOT NULL THEN
+	            v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
+	            EXECUTE v_sql;
+	        END IF;
+	    END IF;
+
 		-- Control of automatic insert of link and vnode
 		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
