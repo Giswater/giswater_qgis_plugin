@@ -285,7 +285,6 @@ class ApiCF(ApiParent):
                 msg = row[0]['body']['data']['fields']['message']['text']
                 priority = int(row[0]['body']['data']['fields']['message']['priority'])
                 self.controller.show_message(msg, message_level=priority)
-                self.controller.show_message(msg, message_level=priority)
                 return False, None
 
         self.complet_result = row

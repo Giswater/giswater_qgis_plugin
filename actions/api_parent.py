@@ -1098,7 +1098,9 @@ class ApiParent(ParentAction):
         if 'fields' not in fields:
             return
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
-        for field in fields["fields"]:
+
+        for x, field in enumerate(fields["fields"]):
+
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
             label.setText(field['label'].capitalize())
@@ -1123,12 +1125,17 @@ class ApiParent(ParentAction):
                 widget = self.add_hyperlink(dialog, field)
             elif field['widgettype'] == 'textarea':
                 widget = self.add_textarea(field)
+            elif field['widgettype'] == 'combo':
+                widget = QComboBox()
+                self.populate_combo(widget, field)
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
             # elif field['widgettype'] == 'typeahead':
             #     completer = QCompleter()
             #     widget = self.add_comboline(dialog, field, completer)
 
-            grid_layout.addWidget(label, field['layout_order'], 0)
-            grid_layout.addWidget(widget, field['layout_order'], 1)
+            grid_layout.addWidget(label,x, 0)
+            grid_layout.addWidget(widget, x, 1)
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         grid_layout.addItem(verticalSpacer1)
