@@ -121,9 +121,9 @@ CREATE OR REPLACE VIEW vp_basic_connec AS
 
 DROP VIEW IF EXISTS vp_basic_gully;
 CREATE OR REPLACE VIEW vp_basic_gully AS 
- SELECT v_edit_arc.arc_id AS nid,
-    v_edit_arc.arc_type AS custom_type
-   FROM v_edit_arc;
+ SELECT v_edit_gully.gully_id AS nid,
+    v_edit_gully.gully_type AS custom_type
+   FROM v_edit_gully;
    
   
 CREATE OR REPLACE VIEW vp_epa_arc AS 
