@@ -81,17 +81,17 @@ BEGIN
             END IF;
         END IF;
 	
-	-- Exploitation
-	IF (NEW.expl_id IS NULL) THEN
-		NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
-			NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.expl_id IS NULL) THEN
-				PERFORM audit_function(2012,1116,NEW.link_id::text);
-			END IF;		
-		END IF;
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					PERFORM audit_function(2012,1116,NEW.link_id::text);
+				END IF;		
+			END IF;
+		END IF;	
 	END IF;	
-    END IF;	
         
     -- topology control
     IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -138,7 +138,7 @@ BEGIN
 			END IF;
 		END IF;
 		
-		IF v_node.node_id IS NULL THEN
+		--IF v_node.node_id IS NULL THEN
 		
 			-- connec as init point
 			SELECT * INTO v_connec1 FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state=1 
@@ -224,7 +224,7 @@ BEGIN
 				END IF;
 			
 				-- update common fields of connec
-				UPDATE connec SET arc_id=v_node.arc_id, feature_id=v_node.node_id, featurecat_id=v_node.node_type, dma_id=v_node.dma_id, 
+				UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_node.node_id, featurecat_id=v_node.node_type, dma_id=v_node.dma_id, 
 				sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
 				WHERE connec_id=v_connec1.connec_id;
 			
@@ -294,10 +294,14 @@ BEGIN
 			NEW.the_geom = (ST_SetPoint(NEW.the_geom, (ST_NumPoints(NEW.the_geom)-1), v_end_point));
 
 		END IF;
+	--END IF;	
 		
 		IF TG_OP ='INSERT' THEN
+
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom);
+		
+		RETURN NEW;
 		
 		ELSIF TG_OP = 'UPDATE' THEN 
 				
@@ -321,39 +325,39 @@ BEGIN
 				WHERE plan_psector_x_connec.connec_id=NEW.feature_id AND plan_psector_x_connec.arc_id=v_edit_connec.arc_id;
 			END IF;
 		
-		END IF;
+		--END IF;
 					
-		-- Update state_type if edit_connect_update_statetype is TRUE
-		IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
-		
-			UPDATE connec SET state_type = (SELECT ((value::json->>'connec')::json->>'state_type')::int2 
-			FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=v_connec1.connec_id;
+			-- Update state_type if edit_connect_update_statetype is TRUE
+			IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
+			
+				UPDATE connec SET state_type = (SELECT ((value::json->>'connec')::json->>'state_type')::int2 
+				FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=v_connec1.connec_id;
 
-			IF v_projectype = 'UD' THEN
-				UPDATE gully SET state_type = (SELECT ((value::json->>'gully')::json->>'state_type')::int2 
-				FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE gully_id=v_gully1.gully_id;
+				IF v_projectype = 'UD' THEN
+					UPDATE gully SET state_type = (SELECT ((value::json->>'gully')::json->>'state_type')::int2 
+					FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE gully_id=v_gully1.gully_id;
+				END IF;
 			END IF;
-		END IF;
 	
 		RETURN NEW;
 						
-	ELSIF TG_OP = 'DELETE' THEN
-	
-		IF OLD.exit_type='VNODE' THEN
-
-			-- delete vnode if no more links are related to vnode
-			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=OLD.exit_id;
-						
-			IF v_count < 2 THEN -- only 1 link or cero exists
-				DELETE FROM vnode WHERE  vnode_id::text=OLD.exit_id;
-			END IF;
-		END IF;
+		ELSIF TG_OP = 'DELETE' THEN
 		
-		DELETE FROM link WHERE link_id = OLD.link_id;
-					
-        RETURN NULL;
-   
-    END IF;
+			IF OLD.exit_type='VNODE' THEN
+
+				-- delete vnode if no more links are related to vnode
+				SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=OLD.exit_id;
+							
+				IF v_count < 2 THEN -- only 1 link or cero exists
+					DELETE FROM vnode WHERE  vnode_id::text=OLD.exit_id;
+				END IF;
+			END IF;
+			
+			DELETE FROM link WHERE link_id = OLD.link_id;
+						
+	        RETURN NULL;
+	   
+	    END IF;
 
   
 
