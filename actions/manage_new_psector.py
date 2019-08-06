@@ -94,10 +94,12 @@ class ManageNewPsector(ParentManage):
 
         # tab General elements
         self.psector_id = self.dlg_plan_psector.findChild(QLineEdit, "psector_id")
+        self.ext_code = self.dlg_plan_psector.findChild(QLineEdit, "ext_code")
         self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
         self.cmb_sector_id = self.dlg_plan_psector.findChild(QComboBox, "sector_id")
         self.cmb_result_id = self.dlg_plan_psector.findChild(QComboBox, "result_id")
+        self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
         self.dlg_plan_psector.lbl_result_id.setVisible(True)
         self.cmb_result_id.setVisible(True)
 
@@ -111,6 +113,11 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
+
+        # Populate combo status
+        sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.cmb_status, rows, 1)
 
         if self.plan_om == 'om':
             self.populate_result_id(self.dlg_plan_psector.result_id, self.plan_om + '_result_cat')
@@ -202,7 +209,7 @@ class ManageNewPsector(ParentManage):
                                 set_edit_triggers=QTableView.DoubleClicked)
                 self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully")
             sql = ("SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
-                   "observ, atlas_id, scale, rotation, active "
+                   "observ, atlas_id, scale, rotation, active, ext_code "
                    "FROM " + self.plan_om + "_psector "
                    "WHERE psector_id = " + str(psector_id))
             row = self.controller.get_row(sql, log_sql=True)
@@ -211,6 +218,8 @@ class ManageNewPsector(ParentManage):
 
             self.dlg_plan_psector.setWindowTitle("Plan psector - " + str(row['name']))
             self.psector_id.setText(str(row['psector_id']))
+            if str(row['ext_code']) != 'None':
+                self.ext_code.setText(str(row['ext_code']))
             sql = ("SELECT name FROM plan_psector_cat_type "
                    "WHERE id = " + str(row['psector_type']))
             result = self.controller.get_row(sql)
