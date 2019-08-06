@@ -397,7 +397,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 elif tablename == 'v_edit_connec':
                     self.geom_type = 'connec'
                 elif tablename == 'v_edit_gully':
-                    self.geom_type = 'grate'
+                    self.geom_type = 'gully'
 
                 self.geom_view = tablename
                 self.cat_table = 'cat_' + self.geom_type
