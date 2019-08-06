@@ -59,12 +59,14 @@ DECLARE
 	verified_id_aux text;
 	inventory_aux boolean;
 	v_connec_proximity_value text;
-	v_connec_proximity_activ text;
+	v_connec_proximity_active text;
 	v_result_id text= 'replace feature';
 	v_project_type text;
 	v_version text;
 	v_result text;
 	v_result_info text;
+	v_arc_searchnodes_value text;
+	v_arc_searchnodes_active text;
 
 BEGIN
 
@@ -73,6 +75,9 @@ BEGIN
 
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 	
+	SELECT  value::json->>'value' as value INTO v_arc_searchnodes_value FROM config_param_system where parameter = 'arc_searchnodes';
+	SELECT  value::json->>'activated' INTO v_arc_searchnodes_active FROM config_param_system where parameter = 'arc_searchnodes';
+
 		-- manage log (fprocesscat = 43)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=43 AND user_name=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('REPLACE FEATURE'));
@@ -89,7 +94,7 @@ BEGIN
 	--deactivate connec proximity control
 	IF v_feature_type='connec' THEN
 		SELECT  value::json->>'value' as value INTO v_connec_proximity_value FROM config_param_system where parameter = 'connec_proximity';
-		SELECT  value::json->>'activated' INTO v_connec_proximity_activ FROM config_param_system where parameter = 'connec_proximity';
+		SELECT  value::json->>'activated' INTO v_connec_proximity_active FROM config_param_system where parameter = 'connec_proximity';
 		UPDATE config_param_system SET value ='{"activated":false,"value":0.1}' WHERE parameter='connec_proximity';
 	END IF;
 
@@ -293,8 +298,10 @@ BEGIN
 		-- reconnecting arcs 
 		-- Dissable config parameter arc_searchnodes
 		IF v_feature_type='node' THEN
-			UPDATE config SET arc_searchnodes_control=FALSE;
-				
+			UPDATE config_param_system SET value =concat('{"activated":','false',', "value":',v_arc_searchnodes_value,'}') 
+			WHERE parameter='arc_searchnodes';
+		END IF;
+
 			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=v_old_feature_id
 			LOOP
 				UPDATE arc SET node_1=v_id where arc_id=rec_arc.arc_id;
@@ -324,13 +331,13 @@ BEGIN
 		END IF;
 
 		-- enable config parameter arc_searchnodes AND connec proximity
-		UPDATE config SET arc_searchnodes_control=TRUE;
-		UPDATE config SET connec_proximity_control=TRUE;
+		UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='arc_searchnodes';
 		IF v_feature_type='connec' THEN
-			UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_activ,', "value":',v_connec_proximity_value,'}') WHERE parameter='connec_proximity';
+			UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') 
+			WHERE parameter='connec_proximity';
 		END IF;
 
-	END IF;
+
 	-- manage log (fprocesscat 43)
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Insert new feature into parent table -> Done'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Copy parent, man_table and epa information -> Done'));
