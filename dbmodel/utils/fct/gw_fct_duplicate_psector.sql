@@ -179,9 +179,8 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	api_version := COALESCE(api_version, '[]');
 
-    RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
-             ',"body":{"message":{"priority":1, "text":'||v_result_info||'}}}')::json;
-
+RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
+            ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
