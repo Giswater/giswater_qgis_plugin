@@ -448,29 +448,22 @@ CREATE OR REPLACE VIEW v_inp_pjointpattern AS
 
 
   
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_connec as
+CREATE OR REPLACE VIEW vi_parent_connec as
 SELECT ve_connec.*
 FROM ve_connec, inp_selector_sector 
 WHERE ve_connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_hydrometer as
+CREATE OR REPLACE VIEW vi_parent_hydrometer as
 SELECT v_rtc_hydrometer.*
 FROM v_rtc_hydrometer
 JOIN ve_connec USING (connec_id);
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_dma as
+CREATE OR REPLACE VIEW vi_parent_dma as
 SELECT DISTINCT ON (dma.dma_id) dma.* 
 FROM dma
 JOIN vi_parent_arc USING (dma_id);
-
-
-CREATE OR REPLACE VIEW v_anl_graf AS
-WITH nodes_a AS (SELECT anl_graf.node_1, anl_graf.node_2 FROM anl_graf WHERE water = 1)
-SELECT grafclass, anl_graf.arc_id, anl_graf.node_1 FROM anl_graf
-LEFT JOIN nodes_a ON anl_graf.node_1::text = nodes_a.node_2::text
-WHERE (anl_graf.flag = 0 AND nodes_a.node_1 IS NOT NULL) OR anl_graf.flag = 1 AND anl_graf.user_name::name = "current_user"();
 
 
 

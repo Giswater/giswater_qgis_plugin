@@ -16,10 +16,12 @@ UPDATE node_type SET graf_delimiter = 'DMA' WHERE type=NULL;
 UPDATE node_type SET graf_delimiter = 'SECTOR' WHERE type IN ('TANK', 'WATERWELL', 'WTP', 'SOURCE');
 
 
-INSERT INTO macroexploitation VALUES (0, 'Border element');
-INSERT INTO exploitation VALUES (0, 'Border element',0);
-INSERT INTO dma VALUES (0, 'Border element');
-INSERT INTO sector VALUES (0, 'Border element');
-INSERT INTO cat_presszone VALUES (0, 'Border element',0);
+INSERT INTO macroexploitation VALUES (0, 'Undefined');
+INSERT INTO exploitation VALUES (0, 'Undefined',0);
+INSERT INTO macrodma VALUES (0, 'Undefined');
+INSERT INTO dma VALUES (0, 'Undefined');
+INSERT INTO macrosector VALUES (0, 'Undefined');
+INSERT INTO sector VALUES (0, 'Undefined');
+INSERT INTO cat_presszone VALUES (0, 'Undefined',0);
 
 INSERT INTO inp_typevalue VALUES ('inp_iterative_function', '1', 'NODES COUPLE CAPACITY', null, '{"functionName":"gw_fct_pg2epa_nodescouplecapacity", "systemParameters":{"storeAllResults":"false", "steps":"4"}}');
