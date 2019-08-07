@@ -7,16 +7,45 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE OR REPLACE VIEW ve_config_addfields AS
-SELECT  row_number() OVER (ORDER BY config_api_form_fields.id) AS row_id, column_id,datatype, config_api_form_fields.field_length, config_api_form_fields.num_decimals, widgettype,label,default_value,
-layout_name, layout_order,orderby as addfield_order, man_addfields_parameter.active as addfield_active, isenabled,
-       widgetdim, tooltip, placeholder,
-       ismandatory, isparent, config_api_form_fields.iseditable,
-      isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id,
-      dv_querytext_filterc, widgetfunction, action_function, isreload,
-      stylesheet, isnotupdate, typeahead, listfilterparam,
-      editability, widgetcontrols, formname,man_addfields_parameter.id as param_id
- FROM man_addfields_parameter
- JOIN cat_feature ON cat_feature.id=man_addfields_parameter.cat_feature_id
- JOIN config_api_form_fields ON child_layer=formname and column_id = param_name;
- 
+ CREATE OR REPLACE VIEW ve_config_addfields AS 
+ SELECT  DISTINCT on (man_addfields_parameter.id) row_number() OVER (ORDER BY config_api_form_fields.id) AS row_id,
+    man_addfields_parameter.param_name as column_id,
+    config_api_form_fields.datatype,
+    config_api_form_fields.field_length,
+    config_api_form_fields.num_decimals,
+    config_api_form_fields.widgettype,
+    config_api_form_fields.label,
+    man_addfields_parameter.default_value,
+    config_api_form_fields.layout_name,
+    config_api_form_fields.layout_order,
+    man_addfields_parameter.orderby AS addfield_order,
+    man_addfields_parameter.active AS addfield_active,
+    config_api_form_fields.isenabled,
+    config_api_form_fields.widgetdim,
+    config_api_form_fields.tooltip,
+    config_api_form_fields.placeholder,
+    config_api_form_fields.ismandatory,
+    config_api_form_fields.isparent,
+    config_api_form_fields.iseditable,
+    config_api_form_fields.isautoupdate,
+    config_api_form_fields.dv_querytext,
+    config_api_form_fields.dv_orderby_id,
+    config_api_form_fields.dv_isnullvalue,
+    config_api_form_fields.dv_parent_id,
+    config_api_form_fields.dv_querytext_filterc,
+    config_api_form_fields.widgetfunction,
+    config_api_form_fields.action_function,
+    config_api_form_fields.isreload,
+    config_api_form_fields.stylesheet,
+    config_api_form_fields.isnotupdate,
+    config_api_form_fields.typeahead,
+    config_api_form_fields.listfilterparam,
+    config_api_form_fields.editability,
+    config_api_form_fields.widgetcontrols,
+    CASE WHEN man_addfields_parameter.cat_feature_id is not null then config_api_form_fields.formname
+    else null end as formname,
+    man_addfields_parameter.id AS param_id,
+    man_addfields_parameter.cat_feature_id
+   FROM man_addfields_parameter
+     LEFT JOIN cat_feature ON cat_feature.id::text = man_addfields_parameter.cat_feature_id::text
+     LEFT JOIN config_api_form_fields ON config_api_form_fields.column_id::text = man_addfields_parameter.param_name::text;
