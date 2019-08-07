@@ -724,7 +724,7 @@ class ParentAction(object):
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
         if change_tab:
             qtabwidget.setCurrentIndex(1)
-
+        return change_tab
 
     def get_composers_list(self):
 
