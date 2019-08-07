@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>774</width>
-    <height>785</height>
+    <width>696</width>
+    <height>551</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,57 +20,35 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_doc_id">
-        <property name="text">
-         <string>Filter by arc_id:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLineEdit" name="arc_id">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="5">
-       <widget class="QPushButton" name="btn_accept">
-        <property name="text">
-         <string>Ok</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="5">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>80</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="2" column="0" colspan="7">
+      <item row="4" column="0" colspan="3">
        <widget class="QTableView" name="tbl_arc_x_relations"/>
       </item>
-      <item row="3" column="6">
+      <item row="5" column="2">
        <widget class="QPushButton" name="btn_cancel">
         <property name="text">
          <string>Cancel</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="5">
+      <item row="5" column="1">
+       <widget class="QPushButton" name="btn_accept">
+        <property name="text">
+         <string>Ok</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_doc_id">
+          <property name="text">
+           <string>Filter by arc_id:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="5" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -83,18 +61,48 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>These connecs or gullys will be disconnected when selected arcs are deleted</string>
-        </property>
-       </widget>
+      <item row="2" column="0" colspan="3">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLineEdit" name="arc_id">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>These connecs or gullys will be disconnected when selected arcs are deleted</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>80</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

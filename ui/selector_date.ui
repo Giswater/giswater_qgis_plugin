@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>170</height>
+    <width>357</width>
+    <height>150</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
@@ -18,7 +24,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>300</width>
+    <width>600</width>
     <height>325</height>
    </size>
   </property>
@@ -28,102 +34,127 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>135</x>
-     <y>130</y>
-     <width>65</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Ok</string>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>15</x>
-     <y>15</y>
-     <width>266</width>
-     <height>106</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string/>
-   </property>
-   <widget class="QDateEdit" name="date_from">
-    <property name="geometry">
-     <rect>
-      <x>124</x>
-      <y>15</y>
-      <width>126</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="calendarPopup">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>25</y>
-      <width>96</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Date from:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>15</x>
-      <y>60</y>
-      <width>86</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Date to:</string>
-    </property>
-   </widget>
-   <widget class="QDateEdit" name="date_to">
-    <property name="geometry">
-     <rect>
-      <x>125</x>
-      <y>55</y>
-      <width>126</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="calendarPopup">
-     <bool>true</bool>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QPushButton" name="btn_close">
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>130</y>
-     <width>65</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Close</string>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0" rowspan="2" colspan="4">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" colspan="3">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Date from:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>30</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QDateEdit" name="date_from">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0" colspan="3">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Date to:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>46</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QDateEdit" name="date_to">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>125</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="btn_close">
+     <property name="text">
+      <string>Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="btn_accept">
+     <property name="text">
+      <string>OK</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <tabstops>
   <tabstop>date_from</tabstop>
-  <tabstop>date_to</tabstop>
-  <tabstop>btn_accept</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
