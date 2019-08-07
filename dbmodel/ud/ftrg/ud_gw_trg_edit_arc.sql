@@ -63,8 +63,7 @@ BEGIN
 				IF NEW.arc_type IS NULL THEN 
 					NEW.arc_type:=(SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 				END IF;
-				v_man_table = (SELECT man_table FROM arc_type WHERE id=NEW.arc_type LIMIT 1);
-			
+				
 			ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
 				NEW.arc_type:= (SELECT id FROM arc_type WHERE arc_type.man_table=v_type_v_man_table LIMIT 1);
 			END IF;
@@ -242,8 +241,8 @@ BEGIN
 				
 			ELSIF v_man_table='man_waccel' THEN
 				
-				INSERT INTO man_waccel (arc_id, sander_length,sander_depth,prot_surface,name) 
-				VALUES (NEW.arc_id, NEW.sander_length, NEW.sander_depth,NEW.prot_surface,NEW.name);
+				INSERT INTO man_waccel (arc_id, sander_length,sander_depth,prot_surface,accessibility, name) 
+				VALUES (NEW.arc_id, NEW.sander_length, NEW.sander_depth,NEW.prot_surface,NEW.accessibility, NEW.name);
 				
 			ELSIF v_man_table='man_varc' THEN
 						
@@ -428,7 +427,8 @@ BEGIN
 		
 		ELSIF v_man_table='man_waccel' THEN
 						
-			UPDATE man_waccel SET  sander_length=NEW.sander_length, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface,name=NEW.name
+			UPDATE man_waccel SET  sander_length=NEW.sander_length, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface,
+			accessibility=NEW.accessibility, name=NEW.name
 			WHERE arc_id=OLD.arc_id;
 			
 		ELSIF v_man_table='man_varc' THEN
