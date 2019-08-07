@@ -257,12 +257,12 @@ class Giswater(QObject):
 
         # List of nodes from node_type_cat_type - nodes which we are using
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
-
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
                     index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                obj_action.setShortcutVisibleInContextMenu(True)
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
@@ -272,6 +272,7 @@ class Giswater(QObject):
             if index_action == '01' and feature_cat.feature_type.upper() == 'CONNEC':
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                obj_action.setShortcutVisibleInContextMenu(True)
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
@@ -281,6 +282,7 @@ class Giswater(QObject):
             if index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.wsoftware == 'ud':
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                obj_action.setShortcutVisibleInContextMenu(True)
                 menu.addSeparator()
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
