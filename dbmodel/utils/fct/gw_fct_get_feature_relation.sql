@@ -118,15 +118,6 @@ INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the featue -> ',v_doc ));
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the featue -> ',v_visit ));
 
-
-v_connect_node := COALESCE(v_connect_node, '[]');  
-v_connect_arc := COALESCE(v_connect_arc, '[]');  
-v_connect_connec := COALESCE(v_connect_connec, '[]');  
-v_connect_gully := COALESCE(v_connect_gully, '[]');  
-v_element := COALESCE(v_element, '[]');  
-v_visit := COALESCE(v_visit, '[]');  
-v_doc := COALESCE(v_doc, '[]');  
-
 SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=51) row; 
 
@@ -141,14 +132,8 @@ v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 raise notice 'v_result,%',v_result;
 raise notice 'v_result_info,%',v_result_info;
 
-    RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
-             ',"body":{"message":{"priority":1, "text":'||v_result_info||'}'||
-			',"form":{}'||
-			',"feature":'||(p_data ->>'feature')||
-			',"data":'||(p_data ->>'data')||
-			',"relation":{"node":"'|| v_connect_node ||'","arc":"'|| v_connect_arc ||'","connec":"'|| v_connect_connec ||'","gully":"'|| v_connect_gully ||
-			'","element":"'|| v_element ||'","visit":"'|| v_visit ||'","document":"'|| v_doc ||'"}'||'}'
-	    '}')::json;
+RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
+            ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 END;
 $BODY$
