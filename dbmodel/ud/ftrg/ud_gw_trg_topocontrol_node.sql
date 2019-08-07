@@ -16,33 +16,35 @@ DECLARE
     replace_node_aux boolean;
     node_id_var varchar;
     node_rec record;
-	querystring Varchar; 
+    querystring Varchar; 
     arcrec Record; 
     nodeRecord1 Record; 
     nodeRecord2 Record; 
     optionsRecord Record;
     z1 double precision;
     z2 double precision;
-	xvar double precision;
+    xvar double precision;
     yvar double precision;
-	pol_id_var varchar;
-	top_elev_aux double precision;
-	v_arc record;
-	v_arcrecord "SCHEMA_NAME".v_edit_arc;
-	v_node_proximity_control boolean;
-	v_node_proximity double precision;
-	v_dsbl_error boolean;
-	v_psector_id integer;
-	v_tempvalue text;
+    pol_id_var varchar;
+    top_elev_aux double precision;
+    v_arc record;
+    v_arcrecord "SCHEMA_NAME".v_edit_arc;
+    v_arcrecordtb "SCHEMA_NAME".arc;
+    v_node_proximity_control boolean;
+    v_node_proximity double precision;
+    v_dsbl_error boolean;
+    v_psector_id integer;
+    v_tempvalue text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    -- Get parameters
-    SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
+	-- Get parameters
+	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
 	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
-
+   	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
+	SELECT value INTO v_psector_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'psector_vdefault';
 
 	-- For state=0
     IF NEW.state=0 THEN
@@ -57,41 +59,56 @@ BEGIN
     	
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 		
-		-- Checking number of nodes 
-			numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node_id!=NEW.node_id AND node.state!=0);
 
-			IF (numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
-				IF v_dsbl_error IS NOT TRUE THEN
-					PERFORM audit_function (1096,1334, NEW.node_id);	
-				ELSE
-					INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'There are two state > (0) nodes on same position. The maximum allowed, one with state (1) and other with state (2)');
-				END IF;
-			
-			ELSIF (numNodes =1) AND (v_node_proximity_control IS TRUE) THEN
-			
-				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
-				
-				IF (NEW.state=1 AND node_rec.state=1) THEN
+			-- Checking conflict state=1 nodes (exiting vs new one)
+			IF (NEW.state=1) AND (v_node_proximity_control IS TRUE) THEN
 
+				-- check existing state=1 nodes
+				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
+				IF node_rec.node_id IS NOT NULL THEN
+		
 					IF v_dsbl_error IS NOT TRUE THEN
 						PERFORM audit_function (1097,1334, NEW.node_id);	
 					ELSE
-						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node with state 1 over another node with state=1 it s not allowed');
+						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) 
+						VALUES (4, NEW.node_id, 'Node with state 1 over another node with state=1 it is not allowed');
 					END IF;
+				END IF;		
 
-				ELSIF (NEW.state=2 AND node_rec.state=1) THEN
+			-- Checking conflict state=2 nodes (exitings on same alternative vs new one)
+			ELSIF (NEW.state=2) AND (v_node_proximity_control IS TRUE) THEN
 
-					-- getting psector vdefault
-					v_psector_id := (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter = 'psector_vdefault');
+				-- check existing state=2 nodes on same alternative
+				SELECT * INTO node_rec FROM node JOIN plan_psector_x_node USING (node_id) WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) 
+				AND node.node_id != NEW.node_id AND node.state=2 AND psector_id=v_psector_id;
+			
+				IF node_rec.node_id IS NOT NULL THEN
+			
+					IF v_dsbl_error IS NOT TRUE THEN
+						PERFORM audit_function (1096,1334, NEW.node_id);	
+					ELSE
+						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, 
+						NEW.node_id, 'Node with state 2 over another node with state=2 on same alternative it is not allowed');
+					END IF;
+				END IF;		
+			END IF;
+
+
+			-- check for existing node (1)
+			SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
+
+			IF (NEW.state=2 AND node_rec.node_id IS NOT NULL) THEN
 				
 					-- inserting on plan_psector_x_node the existing node as state=0
 					INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
 
 					-- looking for all the arcs (1 and 2) using existing node
-					FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=node_rec.node_id AND state >0 UNION SELECT arc_id, node_2 FROM arc WHERE node_2=node_rec.node_id AND state >0)
+					FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=node_rec.node_id 
+					AND state >0 UNION SELECT arc_id, node_2 FROM arc WHERE node_2=node_rec.node_id AND state >0)
 					LOOP
+
 						-- if exists some arc planified on same alternative attached to that existing node
-						IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id=v_psector_id) THEN 
+						IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id=v_psector_id AND arc.state=2) THEN 
 							
 							-- reconnect the planified arc to the new planified node in spite of connected to the node state=1
 							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
@@ -99,21 +116,20 @@ BEGIN
 							ELSE
 								UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=node_rec.node_id;
 							END IF;
-							
 						ELSE
 							-- getting values to create new 'fictius' arc
-							SELECT * INTO v_arcrecord FROM v_edit_arc WHERE arc_id = v_arc.arc_id::text;
+							SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
 								
 							-- refactoring values fo new one
 							PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-							v_arcrecord.arc_id:= (SELECT nextval('urn_id_seq'));
-							v_arcrecord.code = v_arcrecord.arc_id;
-							v_arcrecord.state=2;
-							v_arcrecord.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius' LIMIT 1);
+							v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
+							v_arcrecordtb.code = v_arcrecordtb.arc_id;
+							v_arcrecordtb.state=2;
+							v_arcrecordtb.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius' LIMIT 1);
 							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
-								v_arcrecord.node_1 = NEW.node_id;
+								v_arcrecordtb.node_1 = NEW.node_id;
 							ELSE
-								v_arcrecord.node_2 = NEW.node_id;
+								v_arcrecordtb.node_2 = NEW.node_id;
 							END IF;
 	
 							-- set temporary values for config variables
@@ -122,7 +138,7 @@ BEGIN
 							UPDATE config_param_system  SET value='TRUE' WHERE parameter='edit_enable_arc_nodes_update';
 	
 							-- Insert new records into arc table
-							INSERT INTO v_edit_arc SELECT v_arcrecord.*;
+							INSERT INTO arc SELECT v_arcrecordtb.*;
 
 							-- restore temporary value for config variables
 							UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',true) where parameter='arc_searchnodes';
@@ -131,30 +147,20 @@ BEGIN
 							--Copy addfields from old arc to new arcs	
 							INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 							SELECT 
-							v_arcrecord.arc_id,
+							v_arcrecordtb.arc_id,
 							parameter_id,
 							value_param
 							FROM man_addfields_value WHERE feature_id=v_arc.arc_id;
 																				
 							-- Update doability for the new arc (false)
-							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=v_arcrecord.arc_id;
+							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=v_arcrecordtb.arc_id;
 	
 							-- insert old arc on the alternative							
 							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector_id, v_arc.arc_id, 0, FALSE);
 	
 						END IF;
 					END LOOP;				
-
-				ELSIF (NEW.state=2 AND node_rec.state=2)  AND (v_node_proximity_control IS TRUE) THEN
-
-					IF v_dsbl_error IS NOT TRUE THEN
-						PERFORM audit_function (1100,1334, NEW.node_id);	
-					ELSE
-						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node wit state2 is not allowed over another node with state 2');
-					END IF;
-				END IF;
 			END IF;
-				
 				
 		ELSIF TG_OP ='UPDATE' THEN			
 			
