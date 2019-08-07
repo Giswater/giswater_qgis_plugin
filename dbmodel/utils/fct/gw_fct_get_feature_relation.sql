@@ -108,15 +108,15 @@ BEGIN
 
 
 
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the featue -> ',v_connect_arc ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the featue -> ',v_connect_node ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the featue -> ',v_connect_connec ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the feature -> ',v_connect_arc ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature -> ',v_connect_node ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the feature -> ',v_connect_connec ));
 IF v_project_type = 'UD' THEN 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the featue -> ',v_connect_gully ));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature -> ',v_connect_gully ));
 END IF;
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the featue -> ',v_element ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the featue -> ',v_doc ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the featue -> ',v_visit ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the feature -> ',v_element ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the feature -> ',v_doc ));
+INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the feature -> ',v_visit ));
 
 SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=51) row; 
