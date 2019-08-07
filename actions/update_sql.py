@@ -2370,6 +2370,7 @@ class UpdateSQL(ApiParent):
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+        self.chk_multi_insert = utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
 
         if action == 'Create':
             window_title = 'Create field on "' + str(form_name_fields) + '"'
@@ -2420,13 +2421,15 @@ class UpdateSQL(ApiParent):
         else:
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
-        # Get child layer
-        sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
-        result_child_layer = self.controller.get_row(sql, log_sql=True, commit=True)
-
+        # Populate table update
         qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel()
-        expr_filter = "formname ='" + result_child_layer[0] + "'"
+
+        if self.chk_multi_insert:
+            expr_filter = "cat_feature_id IS NULL"
+        else:
+            expr_filter = "cat_feature_id = '" + form_name + "'"
+
         self.fill_table(qtable, 've_config_addfields', self.model_update_table, expr_filter)
         self.set_table_columns(self.dlg_manage_fields, qtable, 've_config_addfields', schema_name)
 
@@ -2440,14 +2443,18 @@ class UpdateSQL(ApiParent):
         else:
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
-        # Get child layer
-        sql = ("SELECT child_layer FROM " + schema_name + ".cat_feature WHERE id = '" + form_name + "'")
-        result_child_layer = self.controller.get_row(sql, log_sql=True, commit=True)
-
         # Populate widgettype combo
-        sql = ("SELECT DISTINCT(column_id), column_id "
-               "FROM " + schema_name + ".ve_config_addfields "
-               "WHERE formname = '" + result_child_layer[0] + "'")
+        if self.chk_multi_insert:
+
+            sql = ("SELECT DISTINCT(column_id), column_id "
+                   "FROM " + schema_name + ".ve_config_addfields "
+                   "WHERE cat_feature_id IS NULL ")
+        else:
+
+            sql = ("SELECT DISTINCT(column_id), column_id "
+                   "FROM " + schema_name + ".ve_config_addfields "
+                   "WHERE cat_feature_id = '" + form_name + "'")
+
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
@@ -2459,7 +2466,7 @@ class UpdateSQL(ApiParent):
         # Execute manage add fields function
         sql = ("SELECT param_name FROM man_addfields_parameter WHERE param_name = '" + utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) + "'")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-        print(str(row))
+
         if action == 'Create':
 
             # Control mandatory widgets
@@ -2498,9 +2505,9 @@ class UpdateSQL(ApiParent):
                         result_json = json.dumps(_json)
 
             # Create body
-            chk_multi_insert = utils_giswater.isChecked(self.dlg_manage_fields,self.dlg_manage_fields.chk_multi_insert)
+
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", "multi_create":' + str(chk_multi_insert).lower() + ', "parameters":' + result_json + ''
+            extras = '"action":"CREATE", "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
