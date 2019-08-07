@@ -41,7 +41,14 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="3" column="0">
-       <widget class="QTextEdit" name="txt_infolog"/>
+       <widget class="QTextEdit" name="txt_infolog">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QPushButton" name="btn_relations">
@@ -136,8 +143,6 @@
        </widget>
       </item>
      </layout>
-     <zorder></zorder>
-     <zorder></zorder>
      <zorder></zorder>
      <zorder>btn_relations</zorder>
      <zorder>txt_infolog</zorder>
