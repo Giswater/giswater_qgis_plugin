@@ -644,7 +644,7 @@ class ApiSearch(ApiParent):
         row = element[0].row()
 
         geom_type = qtable.model().record(row).value('feature_type').lower()
-        table_name = "ve_" + geom_type
+        table_name = "v_edit_" + geom_type
 
         feature_id = qtable.model().record(row).value('feature_id')
 
