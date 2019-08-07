@@ -84,3 +84,6 @@ VALUES (3018, 'Customer code is duplicated for connecs with state=1','Review you
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (43, 'Replace feature','Edit','Replace feature', 'utils');
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox,isparametric)
+VALUES (2742, 'gw_trg_edit_config_feature_fields','utils','trigger', 'Edit fields of config api form fields','role_admin',false,false,false);

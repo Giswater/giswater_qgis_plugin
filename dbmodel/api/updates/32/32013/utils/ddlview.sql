@@ -49,3 +49,23 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
    FROM man_addfields_parameter
      LEFT JOIN cat_feature ON cat_feature.id::text = man_addfields_parameter.cat_feature_id::text
      LEFT JOIN config_api_form_fields ON config_api_form_fields.column_id::text = man_addfields_parameter.param_name::text;
+
+
+    CREATE OR REPLACE VIEW ve_config_feature_fields as
+    SELECT id, 
+    formname, 
+    column_id,
+    label, 
+    layout_name, 
+    layout_order, 
+    isenabled, 
+    iseditable,
+    ismandatory, 
+    widgetdim, 
+    tooltip, 
+    placeholder, 
+    dv_orderby_id,
+    dv_isnullvalue, 
+    editability
+      FROM config_api_form_fields
+      WHERE formtype='feature' and (formname!='ve_arc' and formname!='ve_node' and formname!='ve_connec'and formname!='ve_gully');
