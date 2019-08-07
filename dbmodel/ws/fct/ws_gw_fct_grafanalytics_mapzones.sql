@@ -12,41 +12,45 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mapzones(p_data json
 RETURNS json AS
 $BODY$
 
+
 /*
 TO CONFIGURE
 set graf_delimiter field on node_type table
-set to_arc on anl_mincut_inlet_x_macroexploitation (for sectors)
-set to_arc on tables inp_valve (for presszone), inp_pump (for presszone), inp_shortpipe (for dqa, dma)
+set to_arc on anl_mincut_inlet_x_macroexploitation (for SECTORs)
+set to_arc on tables inp_valve (for presszone), inp_pump (for presszone), inp_shortpipe (for DQA, DMA)
 
+
+update arc set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0;
+update node set sector_id=0, dma_id=0, dqa_id=0,  presszonecat_id=0;
+update connec set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0
 
 TO EXECUTE
 -- for any exploitation you want
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
+
 
 -- for one specific node
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "node":"113952", "upsertFeature":TRUE}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "node":"113952", "upsertFeature":TRUE}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "node":"113952", "upsertFeature":TRUE}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "node":"113952", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"113952", "upsertFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "upsertFeature":TRUE}}}');
 
 
 TO SEE RESULTS ON LOG TABLE
 SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=48 AND user_name=current_user group by log_message order by 2 --PZONE
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=44 AND user_name=current_user group by log_message order by 2 --dqa
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user group by log_message order by 2 --dma
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=30 AND user_name=current_user group by log_message order by 2 --sector
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=44 AND user_name=current_user group by log_message order by 2 --DQA
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user group by log_message order by 2 --DMA
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=30 AND user_name=current_user group by log_message order by 2 --SECTOR
 
 
 TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertFeature":"TRUE")
-SELECT count(presszonecat_id), presszonecat_id from v_edit_arc  group by presszonecat_id
-SELECT count(dma_id), dma_id from v_edit_arc  group by dma_id
-SELECT count(dma_id), dma_id from v_edit_node  group by dma_id
-SELECT count(sector_id), sector_id from v_edit_arc group by sector_id
-SELECT count(sector_id), sector_id from v_edit_node group by sector_id
-SELECT count(value_param) , value_param from man_addfields_value WHERE parameter_id=57 group by value_param -- dqa (pipes)
+SELECT presszonecat_id, count(presszonecat_id) from v_edit_arc  group by presszonecat_id order by 1;
+SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
+SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
+SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1;
 */
 
 DECLARE
@@ -66,7 +70,7 @@ v_featureid integer;
 v_text text;
 v_querytext text;
 v_upsertattributes boolean;
-v_mapzone integer;
+v_maPRESSZONE integer;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
@@ -90,10 +94,10 @@ BEGIN
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- set fprocesscat
-	IF v_class = 'pzone' THEN v_fprocesscat_id=46; 
-	ELSIF v_class = 'dma' THEN v_fprocesscat_id=45; 
-	ELSIF v_class = 'dqa' THEN v_fprocesscat_id=44;
-	ELSIF v_class = 'sector' THEN v_fprocesscat_id=30; 
+	IF v_class = 'PRESSZONE' THEN v_fprocesscat_id=46; 
+	ELSIF v_class = 'DMA' THEN v_fprocesscat_id=45; 
+	ELSIF v_class = 'DQA' THEN v_fprocesscat_id=44;
+	ELSIF v_class = 'SECTOR' THEN v_fprocesscat_id=30; 
 	END IF;
 
 	-- Starting process
@@ -110,7 +114,7 @@ BEGIN
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	DELETE FROM selector_psector WHERE cur_user=current_user;
+	DELETE FROM selector_pSECTOR WHERE cur_user=current_user;
 	
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
@@ -128,22 +132,22 @@ BEGIN
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 	-- set boundary conditions of graf table	
-	IF v_class = 'pzone' THEN
+	IF v_class = 'PRESSZONE' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''sector'',''PRESSZONE'')';
+			  WHERE graf_delimiter IN (''SECTOR'',''PRESSZONE'')';
 	
-	ELSIF v_class = 'dma' THEN
+	ELSIF v_class = 'DMA' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''sector'',''DMA'')';
+			  WHERE graf_delimiter IN (''SECTOR'',''DMA'')';
 
-	ELSIF v_class = 'dqa' THEN
+	ELSIF v_class = 'DQA' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''sector'',''DQA'')';
+			  WHERE graf_delimiter IN (''SECTOR'',''DQA'')';
 
-	ELSIF v_class = 'sector' THEN
+	ELSIF v_class = 'SECTOR' THEN
 		-- query text to select graf_delimiters
 		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
 			  WHERE graf_delimiter IN (''SECTOR'')';
@@ -151,12 +155,14 @@ BEGIN
 	END IF;
 
 		-- update boundary conditions setting flag=2 for all nodes that fits on graf delimiters and closed valves
-		v_querytext  = 'UPDATE anl_graf SET flag=2 WHERE node_1 IN('||v_text||' UNION
+		v_querytext  = 'UPDATE anl_graf SET flag=2 WHERE 
+				node_1 IN('||v_text||' UNION
+				SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
+				LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
+				OR node_2 IN ('||v_text||' UNION
 				SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
 				LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))';
 	
-		RAISE NOTICE 'v_querytext %', v_querytext;
-		
 		EXECUTE v_querytext;
 
 		-- open boundary conditions enabling sense for graf delimiters allowed on inp_pump/inp_valve/inp_shortpipe/inp_inlet tables
@@ -167,7 +173,6 @@ BEGIN
 		UPDATE anl_graf SET flag=0 WHERE id IN 
 		(SELECT id FROM anl_graf JOIN inp_inlet ON to_arc  = arc_id WHERE node_1=node_id UNION SELECT id FROM anl_graf JOIN inp_reservoir ON to_arc  = arc_id WHERE node_1=node_id);
 
-
 	-- starting process
 	LOOP
 	
@@ -176,6 +181,7 @@ BEGIN
 		
 		IF v_nodeid IS NULL THEN
 			v_querytext = 'SELECT * FROM ('||v_text||' AND checkf=0 LIMIT 1)a';
+			raise notice 'v_querytext abgsrghasrghsrgh %', v_querytext;
 			IF v_querytext IS NOT NULL THEN
 				EXECUTE v_querytext INTO v_feature;
 			END IF;
@@ -197,18 +203,23 @@ BEGIN
 		-- set the starting element
 		v_querytext = 'UPDATE anl_graf SET flag=flag+1, water=1, checkf=1 WHERE node_1='||quote_literal(v_featureid)||'  
 		AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
+
 		EXECUTE v_querytext;
 
 		cont1 = 0;
 
+
 		-- inundation process
 		LOOP	
+			raise notice 'cont1 INICI % v_feature %', cont1, v_featureid;
 			cont1 = cont1+1;
+			
 			UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where flagi < 3 AND n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
+			
 			GET DIAGNOSTICS affected_rows =row_count;
 			EXIT WHEN affected_rows = 0;
 			EXIT WHEN cont1 = 200;
-			raise notice 'cont1 % v_feature %', cont1, v_featureid;
+			raise notice 'cont1 FINAL % v_feature %', cont1, v_featureid;
 		END LOOP;
 		-- finish engine
 		----------------
@@ -229,7 +240,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND descript=v_featureid::text AND cur_user=current_user;
 		
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-		VALUES (v_fprocesscat_id, concat('INFO: Mapzone ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
+		VALUES (v_fprocesscat_id, concat('INFO: MaPRESSZONE ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
 
 		raise notice '% % % %', v_fprocesscat_id, v_featureid, v_count, v_class;
 
@@ -248,38 +259,38 @@ BEGIN
 			--UPDATE connec SET presszonecat_id = b.id FROM anl_connec a join (SELECT id, json_array_elements_text(nodeparent) as nodeparent from cat_presszone) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=46 AND a.arc_id=connec_id;
 						
-		ELSIF v_fprocesscat_id=45 THEN -- dma
+		ELSIF v_fprocesscat_id=45 THEN -- DMA
 			
-			-- upsert dma on parent tables
+			-- upsert DMA on parent tables
 			UPDATE arc SET dma_id = b.dma_id FROM anl_arc a join (SELECT dma_id, json_array_elements_text(nodeparent) as nodeparent from dma) b 
 			ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.arc_id=arc.arc_id;
 			UPDATE node SET dma_id = b.dma_id FROM anl_node a join (SELECT dma_id, json_array_elements_text(nodeparent) as nodeparent from dma) b 
 			ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.node_id=node.node_id;
-			--UPDATE connec SET dma_id = b.dma_id FROM anl_connec a join (SELECT dma_id, json_array_elements_text(nodeparent) as nodeparent from dma) b 
+			--UPDATE connec SET dma_id = b.dma_id FROM anl_connec a join (SELECT dma_id, json_array_elements_text(nodeparent) as nodeparent from DMA) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=45 AND a.feature_id=connec_id;
 
 
-		ELSIF v_fprocesscat_id=44 THEN -- dqa
+		ELSIF v_fprocesscat_id=44 THEN -- DQA
 		
-			-- upsert dqa on parent tables
+			-- upsert DQA on parent tables
 			UPDATE arc SET dqa_id = b.dqa_id FROM anl_arc a join (SELECT dqa_id, json_array_elements_text(nodeparent) as nodeparent from dqa) b 
 			ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.arc_id=arc.arc_id;
 			UPDATE node SET dqa_id = b.dqa_id FROM anl_node a join (SELECT dqa_id, json_array_elements_text(nodeparent) as nodeparent from dqa) b 
 			ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.node_id=node.node_id;
-			--UPDATE connec SET dqa_id = b.dqa_id FROM anl_connec a join (SELECT dqa_id, json_array_elements_text(nodeparent) as nodeparent from dqa) b 
+			--UPDATE connec SET dqa_id = b.dqa_id FROM anl_connec a join (SELECT dqa_id, json_array_elements_text(nodeparent) as nodeparent from DQA) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=44 AND a.feature_id=connec_id;
 
-		ELSIF v_fprocesscat_id=30 THEN -- sector
+		ELSIF v_fprocesscat_id=30 THEN -- SECTOR
 			
-			-- upsert sector on parent tables
+			-- upsert SECTOR on parent tables
 			UPDATE arc SET sector_id = b.sector_id FROM anl_arc a join (SELECT sector_id, json_array_elements_text(nodeparent) as nodeparent from sector) b 
 			ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.arc_id=arc.arc_id;
 			UPDATE node SET sector_id = b.sector_id FROM anl_node a join (SELECT sector_id, json_array_elements_text(nodeparent) as nodeparent from sector) b 
 			ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.node_id=node.node_id;
-			--UPDATE connec SET sector_id = b.sector_id FROM anl_connec a join (SELECT sector_id, json_array_elements_text(nodeparent) as nodeparent from sector) b 
+			--UPDATE connec SET sector_id = b.sector_id FROM anl_connec a join (SELECT sector_id, json_array_elements_text(nodeparent) as nodeparent from SECTOR) b 
 			--ON  nodeparent = descript WHERE fprocesscat_id=30 AND a.connec_id=connec_id;
 			
-			-- get sectornodeparent elevation
+			-- get SECTORnodeparent elevation
 			
 			-- recalculate staticpressure (fprocesscat_id=47)
 			DELETE FROM audit_log_data WHERE fprocesscat_id=47 AND user_name=current_user;
@@ -343,7 +354,7 @@ BEGIN
 	
 
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"MaPRESSZONEs dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||

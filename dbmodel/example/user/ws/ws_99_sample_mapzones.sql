@@ -22,10 +22,16 @@ delete from dma;
 INSERT INTO dma VALUES (1, 'dma1-1d', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '[113766]');
 INSERT INTO dma VALUES (2, 'dma1-2d', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '[1080]');
 INSERT INTO dma VALUES (3, 'dma2-1d', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '[113952]');
+INSERT INTO dma VALUES (4, 'source', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '[1097,1101]');
+INSERT INTO dma VALUES (5, 'source', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '[111111]');
+
 
 delete from dqa;
-INSERT INTO dqa  VALUES (1, 'dqa1-1d', NULL, NULL, NULL, NULL, NULL, NULL,'[113766]', 'chlorine');
-INSERT INTO dqa  VALUES (2, 'dqa2-1d', NULL, NULL, NULL, NULL, NULL, NULL,'[113952]', 'chlorine');
+INSERT INTO dqa VALUES (1, 'dqa1-1d', NULL, NULL, NULL, NULL, NULL, NULL,'[113766]', 'chlorine');
+INSERT INTO dqa VALUES (2, 'dqa2-1d', NULL, NULL, NULL, NULL, NULL, NULL,'[113952]', 'chlorine');
+INSERT INTO dqa VALUES (3, 'source', 1, NULL, NULL, NULL, NULL, NULL, NULL, '[1097,1101]');
+INSERT INTO dqa VALUES (4, 'source', 2, NULL, NULL, NULL, NULL, NULL, NULL, '[111111]');
+
 
 delete from sector;
 INSERT INTO sector VALUES (1, 'sector1-1s', 1, NULL, NULL, NULL, '[1097]', 'source');
@@ -43,9 +49,9 @@ INSERT INTO inp_reservoir  VALUES ('111111', NULL, '114025');
 INSERT INTO inp_reservoir  VALUES ('1097', NULL, '2207');
 INSERT INTO inp_reservoir  VALUES ('1101', NULL, '2205');
 
-update arc set presszonecat_id=null;
-update node set presszonecat_id=null;
-update connec set presszonecat_id=null;
+update arc set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0;
+update node set sector_id=0, dma_id=0, dqa_id=0,  presszonecat_id=0;
+update connec set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0;
 
 INSERT INTO dma VALUES (0, 'Undefined', 0);
 INSERT INTO dqa VALUES (0, 'Undefined', 0);
@@ -62,6 +68,7 @@ SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action"
 --SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
 --SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
 --SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
+--SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "upsertFeature":"TRUE"}}}');
 
 
 
