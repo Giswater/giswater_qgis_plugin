@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- bug fix. Exists node with 2001 (impossible con garantie the consistency of URN. Exists also one arc)
-UPDATE node SET node_id='111111' WHERE node_id='2001';
 UPDATE inp_shortpipe SET to_arc='2092' WHERE node_id='1080';
 UPDATE inp_shortpipe SET to_arc=null WHERE node_id='114254';
 
@@ -72,34 +70,6 @@ INSERT INTO anl_mincut_selector_valve VALUES('GEN-PURP.VALVE');
 INSERT INTO anl_mincut_selector_valve VALUES('THROTTLE-VALVE');
 
 
-INSERT INTO dqa (dqa_id, name) select dma_id, name from dma;
-
-UPDATE dma SET nodeparent = '[-1]' WHERE dma_id=-1;
-UPDATE dma SET nodeparent = '[113766]' WHERE dma_id=1;
-UPDATE dma SET nodeparent = '[113952]' WHERE dma_id=2;
-UPDATE dma SET nodeparent = '[1080]' WHERE dma_id=3;
-
-UPDATE sector SET nodeparent = '[-1]' WHERE sector_id=-1;
-UPDATE sector SET nodeparent = '[113766]' WHERE sector_id=1;
-UPDATE sector SET nodeparent = '[113952]' WHERE sector_id=2;
-UPDATE sector SET nodeparent = '[1097]' WHERE sector_id=3;
-UPDATE sector SET nodeparent = '[1101]' WHERE sector_id=4;
-UPDATE sector SET nodeparent = '[2001]' WHERE sector_id=5;
-
-UPDATE dqa SET nodeparent = '[-1]' WHERE dqa_id=-1;
-UPDATE dqa SET nodeparent = '[113766]' WHERE dqa_id=1;
-UPDATE dqa SET nodeparent = '[113952]' WHERE dqa_id=2;
-
-UPDATE cat_presszone SET nodeparent = '[-1]' WHERE id='-1';
-UPDATE cat_presszone SET nodeparent = '[113766]', id='1' WHERE id='High-Expl_01';
-UPDATE cat_presszone SET nodeparent = '[113952]', id='2' WHERE id='High-Expl_02';
-UPDATE cat_presszone SET nodeparent = '[1083]', id='3' WHERE id='Medium-Expl_01';
-UPDATE cat_presszone SET id='4' WHERE id='Low-Expl_01';
-UPDATE cat_presszone SET id='5' WHERE id='Medium-Expl_02';
-UPDATE cat_presszone SET id='6' WHERE id='Low-Expl_02';
-
-
-
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 
@@ -116,8 +86,6 @@ select gw_fct_audit_check_project(1);
 
 SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"PIPE"},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
-
-
 
 
 

@@ -511,10 +511,7 @@ INSERT INTO inp_pump_additional VALUES (1,'1105',1, NULL, 'PUMP_02', NULL, NULL,
 
 INSERT INTO inp_reservoir VALUES (1097);
 INSERT INTO inp_reservoir VALUES (1101);
-INSERT INTO inp_reservoir VALUES (18);
-INSERT INTO inp_reservoir VALUES (2001);
-INSERT INTO inp_reservoir VALUES (113952);
-
+INSERT INTO inp_reservoir VALUES (111111);
 
 INSERT INTO inp_rules_x_node VALUES (1, '113766', 'RULE 1');
 INSERT INTO inp_rules_x_node VALUES (3, '113766', 'THEN PUMP 1105_n2a STATUS IS CLOSED');

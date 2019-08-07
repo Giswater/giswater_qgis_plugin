@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS dqa (
  the_geom geometry(MultiPolygon,SRID_VALUE),
  pattern_id character varying(16),
  nodeparent json,
+ dqa_type varchar(16),
  link text);
  
  
