@@ -10,16 +10,13 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-
-from ui_manager import DupPsector
+import json
+from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
 from .parent_manage import ParentManage
+from ..ui_manager import DupPsector
 
 
 
@@ -63,11 +60,20 @@ class DuplicatePsector(ParentManage):
 
         # Execute manage add fields function
         sql = ("SELECT gw_fct_duplicate_psector($${" + body + "}$$)::text")
-        print(str(sql))
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
-        if not status:
+        if not row or row[0] is None:
+            self.controller.show_message("Function gw_fct_duplicate_psector executed with no result ", 3)
             return
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
+        # Populate tab info
+        qtabwidget = self.dlg_duplicate_psector.mainTab
+        qtextedit = self.dlg_duplicate_psector.txt_infolog
+        data = complet_result[0]['body']['data']
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                change_tab = self.populate_info_text(self.dlg_duplicate_psector, qtabwidget, qtextedit, data)
         # Close dialog
-        self.close_dialog(self.dlg_duplicate_psector)
+        if not change_tab:
+            self.close_dialog(self.dlg_duplicate_psector)
