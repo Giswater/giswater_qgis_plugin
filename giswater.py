@@ -1082,20 +1082,19 @@ class Giswater(QObject):
 
 
     def set_layer_config(self):
-        self.enable_python_console()
+        """ Set layer fields configured according to client configuration """
+
         layers_list = self.settings.value('system_variables/set_layer_config')
-        print(layers_list)
         for layer_name in layers_list:
-            print(layer_name)
             layer = self.controller.get_layer_by_tablename(layer_name)
-            if layer_name == 'v_edit_node':
-                feature_id = '1051'
-            elif layer_name == 'v_edit_arc':
-                feature_id = '113854'
-            feature = '"tableName":"' + str(layer_name) + '", "id":"' + str(feature_id) + '"'
+            if not layer:
+                msg = "Layer {} does not found, therefore, not configured".format(layer_name)
+                self.controller.show_warning(msg)
+                continue
+                
+            feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
             sql = ("SELECT gw_api_getinfofromid($${" + body + "}$$)")
-
             row = self.controller.get_row(sql, log_sql=True, commit=True)
 
             if not row:
