@@ -140,7 +140,7 @@ BEGIN
 			ELSIF rec_type.id='CONNEC' THEN
 				v_field_id=rec.connec_id;
 			ELSIF rec_type.id='GULLY' THEN
-				v_field_id=rec.connec_id;
+				v_field_id=rec.gully_id;
 			END IF;
 
 			--activate topocontrol for arc, deactivate for other features 
