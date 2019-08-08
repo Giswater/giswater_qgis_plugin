@@ -16,7 +16,7 @@ else:
     import configparser
     from qgis.core import QgsSnappingUtils, QgsPointLocator, QgsTolerance
 
-from qgis.core import QgsExpressionContextUtils, QgsProject
+from qgis.core import QgsExpressionContextUtils, QgsProject, QgsEditorWidgetSetup
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
 from qgis.PyQt.QtGui import QIcon, QKeySequence
@@ -705,6 +705,9 @@ class Giswater(QObject):
         # Manage project variable 'expl_id'
         self.manage_expl_id()
 
+        # Manage layer fields
+        self.set_layer_config()
+
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
@@ -1077,3 +1080,63 @@ class Giswater(QObject):
         finally:
             return value
 
+
+    def set_layer_config(self):
+        self.enable_python_console()
+        layers_list = self.settings.value('system_variables/set_layer_config')
+        print(layers_list)
+        for layer_name in layers_list:
+            print(layer_name)
+            layer = self.controller.get_layer_by_tablename(layer_name)
+            if layer_name == 'v_edit_node':
+                feature_id = '1051'
+            elif layer_name == 'v_edit_arc':
+                feature_id = '113854'
+            feature = '"tableName":"' + str(layer_name) + '", "id":"' + str(feature_id) + '"'
+            body = self.create_body(feature=feature)
+            sql = ("SELECT gw_api_getinfofromid($${" + body + "}$$)")
+
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+            if not row:
+                self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                return
+
+            # When info is nothing
+            if 'results' in row[0]:
+                if row[0]['results'] == 0:
+                    self.controller.show_message(row[0]['message']['text'], 1)
+                    return
+            complet_result = row[0]
+            for field in complet_result['body']['data']['fields']:
+                if field['widgettype'] != 'combo':
+                    continue
+
+                fieldIndex = layer.fields().indexFromName(field['column_id'])
+                if field['label']:
+                    layer.setFieldAlias(fieldIndex, field['label'])
+
+                _values = {}
+                if 'comboIds' in field:
+                    for i in range(0, len(field['comboIds'])):
+                         _values[field['comboNames'][i]] = field['comboIds'][i]
+
+                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras is not None:
+            data += ', ' + extras
+        data += '}'
+        body = "" + client + form + feature + data
+
+        return body
