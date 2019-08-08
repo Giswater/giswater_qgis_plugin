@@ -32,3 +32,21 @@ CREATE TABLE IF NOT EXISTS inp_inlet
   to_arc varchar (16)
   );
 
+
+  CREATE TABLE IF NOT EXISTS minsector(
+  minsector_id SERIAL PRIMARY KEY,
+  dma_id integer,
+  dqa_id integer,
+  presszonecat_id integer,
+  sector_id integer,
+  expl_id integer,
+  the_geom geometry (POLYGON, SRID_VALUE)
+   );
+   
+   
+  CREATE TABLE IF NOT EXISTS minsector_graf(
+  node_id varchar (16) PRIMARY KEY,
+  nodecat_id varchar (30),
+  minsector_1 integer,
+  minsector_2 integer
+    );

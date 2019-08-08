@@ -27,16 +27,16 @@ update connec set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0
 TO EXECUTE
 -- for any exploitation you want
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
-"updateFeature":"TRUE","updateMapZone":{"status":"TRUE","concaveHullParam":0.80}}}}');
+"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":{"status":"TRUE","concaveHullParam":0.80}}}}');
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":{"status":"TRUE","concaveHullParam":0.80}}}}');
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
-"updateFeature":"TRUE","updateMapZone":{"status":"TRUE","concaveHullParam":0.80}}}}');
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
 
 -- for one specific node
@@ -63,30 +63,30 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 DECLARE
 
 affected_rows 		numeric;
-cont1 			integer default 0;
-v_cont1 		integer default 0;
-v_class 		text;
-v_feature 		record;
-v_expl 			json;
-v_data 			json;
+cont1 				integer default 0;
+v_cont1 			integer default 0;
+v_class 			text;
+v_feature 			record;
+v_expl 				json;
+v_data 				json;
 v_fprocesscat_id 	integer;
-v_nodeid 		text;
+v_nodeid 			text;
 v_featureid 		integer;
-v_text 			text;
+v_text 				text;
 v_querytext 		text;
-v_updatetattributes 	boolean;
-v_updatemapzonesgeom 	boolean;
+v_updatetattributes boolean;
+v_updatemapzgeom	boolean;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
-v_result 		text;
-v_count			json;
-v_version		text;
-v_table			text;
-v_field 		text;
-v_fieldmp 		text;
-v_srid 			integer;
+v_result 			text;
+v_count				json;
+v_version			text;
+v_table				text;
+v_field 			text;
+v_fieldmp 			text;
+v_srid 				integer;
 v_concavehull		float;
 
 BEGIN
@@ -97,8 +97,8 @@ BEGIN
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
 	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'node');
 	v_updatetattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
-	v_updatemapzonesgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZones');
-	v_concavehull = (SELECT (((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZones')::json->>'concaveHullParam');
+	v_updatemapzgeom = (SELECT (((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
+	v_concavehull = (SELECT (((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- select config values
@@ -190,16 +190,17 @@ BEGIN
 				LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
 				OR node_2 IN ('||v_text||' UNION
 				SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
-				LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))';
+				LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
+				AND user_name=current_user';
 	
 		EXECUTE v_querytext;
 
 		-- open boundary conditions enabling sense for graf delimiters allowed on inp_pump/inp_valve/inp_shortpipe/inp_inlet tables
-		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_pump ON to_arc = arc_id WHERE node_1=node_id);
-		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_valve ON to_arc = arc_id WHERE node_1=node_id);
-		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_shortpipe ON to_arc = arc_id WHERE node_1=node_id);
+		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_pump ON to_arc = arc_id WHERE node_1=node_id) AND user_name=current_user;
+		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_valve ON to_arc = arc_id WHERE node_1=node_id AND user_name=current_user);
+		UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_shortpipe ON to_arc = arc_id WHERE node_1=node_id) AND user_name=current_user;
 		UPDATE anl_graf SET flag=0 WHERE id IN (SELECT id FROM anl_graf JOIN inp_inlet ON to_arc  = arc_id WHERE node_1=node_id 
-		UNION SELECT id FROM anl_graf JOIN inp_reservoir ON to_arc  = arc_id WHERE node_1=node_id);
+		UNION SELECT id FROM anl_graf JOIN inp_reservoir ON to_arc  = arc_id WHERE node_1=node_id) AND user_name=current_user;
 
 	-- starting process
 	LOOP
@@ -283,16 +284,16 @@ BEGIN
 		-- upsert arc table
 		v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
 				FROM anl_arc a join (SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text(nodeparent) as nodeparent from '
-				||quote_ident(v_table)||') b	ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.arc_id=arc.arc_id';
+				||quote_ident(v_table)||') b	ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 		EXECUTE v_querytext;
 
 		-- upsert node table
 		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
 				FROM anl_node a join (SELECT  '||quote_ident(v_fieldmp)||', json_array_elements_text(nodeparent) as nodeparent from '
-				||quote_ident(v_table)||') b ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.node_id=node.node_id';
+				||quote_ident(v_table)||') b ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.node_id=node.node_id AND cur_user=current_user';
 		EXECUTE v_querytext;
 
-		-- upsert connec table
+		-- used v_edit_connec to the exploitation filter. Rows before is not neeeded because on table anl_* is data filtered by the process...
 		v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_connec.arc_id';
 		EXECUTE v_querytext;
 
@@ -311,11 +312,11 @@ BEGIN
 			-- update staticpressure on node / connec tables
 			UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id AND fprocesscat_id=47 AND user_name=current_user;
 
-			UPDATE connec SET staticpressure = (b.elevation-connec.elevation) FROM 
+			UPDATE v_edit_connec SET staticpressure = (b.elevation-v_edit_connec.elevation) FROM 
 				(SELECT connec_id, a.elevation FROM connec JOIN (SELECT a.sector_id, node_id, elevation FROM 
 					(SELECT json_array_elements_text(nodeparent) as node_id, sector_id FROM sector)a JOIN node USING (node_id))a
 				USING (sector_id)) b
-				WHERE connec.connec_id=b.connec_id;
+				WHERE v_edit_connec.connec_id=b.connec_id;
 		END IF;
 
 		-- message
@@ -325,17 +326,18 @@ BEGIN
 	END IF;
 
 	-- update geometry of mapzones
-	IF v_updatemapzonesgeom THEN
+	IF v_updatemapzgeom THEN
 
 		v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
 				FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM arc group by '||quote_ident(v_field)||') 
 				SELECT '||quote_ident(v_field)||
-				', CASE WHEN st_geometrytype(st_concavehull(g, 0.8)) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
+				', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
+				v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
 				ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 				)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
 
 
-		RAISE NOTICE 'v_querytext %', v_querytext;
+		RAISE NOTICE 'v_querytext % % % % %', v_querytext, v_table, v_concavehull, v_fieldmp, v_field;
 
 		EXECUTE v_querytext;	
 
@@ -356,29 +358,28 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-	--points
+	-- points
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
 
-	--lines
+	-- lines
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
-	--polygons
+	-- polygons
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
 
-	
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 

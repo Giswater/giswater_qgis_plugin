@@ -81,24 +81,24 @@ BEGIN
 		(SELECT distinct(macroexpl_id) FROM SCHEMA_NAME.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
-	--call previous minsector function
-	v_data = '{"data":{"upsertFeatureAttrib":"TRUE", "exploitation":"'||v_expl||'"}}';
-	RAISE NOTICE 'v_data %', v_data;
-	PERFORM gw_fct_grafanalytics_minsector(v_data);
+	--call previous minsector function (no used)
+	--v_data = '{"data":{"updateFeature":"TRUE", "updateMinsectorGeom":{"status":"TRUE","concaveHullParam":0.85}, "exploitation":"'||v_expl||'"}}';
+	--RAISE NOTICE 'v_data %', v_data;
+	--PERFORM gw_fct_grafanalytics_minsector(v_data);
 	
 	-- starting recursive process for all minsectors
 	LOOP
 		v_count1 = v_count1 + 1;
 
-		--RAISE NOTICE 'MIN SECTOR %', v_arc;
+		RAISE NOTICE 'MIN SECTOR %', v_arc;
 		
 		-- get arc_id represented minsector (fprocesscat = 34)			
-		v_arc = (SELECT log_message FROM audit_log_data WHERE enabled IS NULL AND fprocesscat_id=34 AND user_name=current_user LIMIT 1);
+		v_arc = (SELECT descript FROM anl_arc WHERE result_id IS NULL AND fprocesscat_id=34 AND cur_user=current_user LIMIT 1);
 
 		EXIT WHEN v_arc is null;
 		
 		-- set flag not don't take it in next loop
-		UPDATE audit_log_data SET enabled=true WHERE log_message=v_arc AND fprocesscat_id=34 AND user_name=current_user;
+		UPDATE anl_arc SET result_id='flag' WHERE descript=v_arc AND fprocesscat_id=34 AND cur_user=current_user;
 
 		--call engine function
 		PERFORM gw_fct_mincut(v_arc, 'arc', -1);

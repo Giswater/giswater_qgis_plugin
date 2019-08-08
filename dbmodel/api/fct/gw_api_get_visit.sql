@@ -159,8 +159,8 @@ DECLARE
 BEGIN
 	
 	-- Set search path to local schema
-	SET search_path = "ws_sample32", public;
-	v_schemaname := 'ws_sample32';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
