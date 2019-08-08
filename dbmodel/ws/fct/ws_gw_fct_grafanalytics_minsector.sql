@@ -66,8 +66,8 @@ BEGIN
 	v_arcid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'arc');
 	v_updatefeature = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
-	v_updatemapzgeom = (SELECT (((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_concavehull = (SELECT (((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
+	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
+	v_concavehull = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;

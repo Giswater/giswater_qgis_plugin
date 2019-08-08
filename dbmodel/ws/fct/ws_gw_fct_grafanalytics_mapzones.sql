@@ -97,8 +97,8 @@ BEGIN
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
 	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'node');
 	v_updatetattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
-	v_updatemapzgeom = (SELECT (((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_concavehull = (SELECT (((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
+	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
+	v_concavehull = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- select config values
@@ -130,17 +130,16 @@ BEGIN
 		v_fieldmp = 'sector_id';
 	END IF;
 
-	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------'));
-		
-
 	-- reset graf & audit_log tables
 	DELETE FROM anl_arc where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
 	DELETE FROM anl_node where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
 	DELETE FROM anl_graf where user_name=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------'));
+	
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
@@ -272,7 +271,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND descript=v_featureid::text AND cur_user=current_user;
 		
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-		VALUES (v_fprocesscat_id, concat('INFO: MaPRESSZONE ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
+		VALUES (v_fprocesscat_id, concat('INFO: Mapzone type ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
 
 		raise notice 'PROCESS % FEATURE % COUNT % CLASS %', v_fprocesscat_id, v_featureid, v_count, v_class;
 
@@ -336,9 +335,6 @@ BEGIN
 				ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 				)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
 
-
-		RAISE NOTICE 'v_querytext % % % % %', v_querytext, v_table, v_concavehull, v_fieldmp, v_field;
-
 		EXECUTE v_querytext;	
 
 		-- message
@@ -357,7 +353,8 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
+	/*
 	-- points
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -379,6 +376,7 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
 
+	*/
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
@@ -387,14 +385,8 @@ BEGIN
 	
 
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"MaPRESSZONEs dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||'}'||
-		       '}'||
-	    '}')::json;
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

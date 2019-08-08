@@ -59,6 +59,10 @@ BEGIN
 	-- select config values
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
+	-- reset previous data
+	DELETE FROM audit_log_data WHERE user_name=current_user AND fprocesscat_id IN (29,49,34);
+	DELETE FROM audit_check_data WHERE user_name=current_user AND fprocesscat_id =v_fprocesscat_id;
+
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MASSIVE MINCUT ANALYSIS (FPROCESSCAT_ID 29 & 49) - '));
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('-----------------------------------------------------------'));
@@ -70,9 +74,6 @@ BEGIN
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 	DELETE FROM selector_psector WHERE cur_user=current_user;
-
-	-- reset previous data
-	DELETE FROM audit_log_data WHERE user_name=current_user AND fprocesscat_id IN (29,49,34);
 		
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
@@ -81,10 +82,10 @@ BEGIN
 		(SELECT distinct(macroexpl_id) FROM SCHEMA_NAME.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
-	--call previous minsector function (no used)
-	--v_data = '{"data":{"updateFeature":"TRUE", "updateMinsectorGeom":{"status":"TRUE","concaveHullParam":0.85}, "exploitation":"'||v_expl||'"}}';
-	--RAISE NOTICE 'v_data %', v_data;
-	--PERFORM gw_fct_grafanalytics_minsector(v_data);
+	--call previous minsector function
+	v_data = '{"data":{"updateFeature":"TRUE", "updateMinsectorGeom":{"status":"TRUE","concaveHullParam":0.85}, "exploitation":"'||v_expl||'"}}';
+	RAISE NOTICE 'v_data %', v_data;
+	PERFORM gw_fct_grafanalytics_minsector(v_data);
 	
 	-- starting recursive process for all minsectors
 	LOOP
