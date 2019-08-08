@@ -44,6 +44,8 @@ delete from inp_inlet;
 INSERT INTO inp_inlet VALUES ('113766', 1.0000, 0.0000, 3.5000, 12.0000, 0.0000, NULL, NULL, '113906');
 INSERT INTO inp_inlet VALUES ('113952', 1.0000, 0.0000, 3.5000, 12.0000, 0.0000, NULL, NULL, '114146');
 
+UPDATE node SET epa_type='INLET' WHERE node_id IN ('113766', '113952');
+
 delete from inp_reservoir;
 INSERT INTO inp_reservoir  VALUES ('111111', NULL, '114025');
 INSERT INTO inp_reservoir  VALUES ('1097', NULL, '2207');

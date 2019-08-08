@@ -7,14 +7,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE OR REPLACE VIEW v_anl_graf AS 
- WITH nodes_a AS (
-         SELECT anl_graf_1.node_1,
-            anl_graf_1.node_2,
-            anl_graf_1.flag
-           FROM anl_graf anl_graf_1
-          WHERE anl_graf_1.water = 1
-        )
+create or replace VIEW v_anl_graf as 
+WITH nodes_a AS (SELECT * FROM anl_graf WHERE water = 1)
  SELECT anl_graf.grafclass,
     anl_graf.arc_id,
     anl_graf.node_1,
@@ -22,8 +16,8 @@ CREATE OR REPLACE VIEW v_anl_graf AS
     anl_graf.flag,
     nodes_a.flag AS flagi
    FROM anl_graf
-     JOIN nodes_a ON anl_graf.node_1::text = nodes_a.node_2::text
-  WHERE anl_graf.flag = 0 AND anl_graf.user_name::name = "current_user"();
+     JOIN nodes_a ON (anl_graf.node_1 = nodes_a.node_2 or anl_graf.node_2 = nodes_a.node_2)
+  WHERE anl_graf.flag < 2 and anl_graf.water =0 and nodes_a.flag < 2 and anl_graf.user_name::name = "current_user"();
 
 
 
@@ -690,8 +684,8 @@ CREATE OR REPLACE VIEW vi_tanks AS
     inp_tank
      JOIN rpt_inp_node ON inp_tank.node_id::text = rpt_inp_node.node_id::text
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-  UNION
-  SELECT inp_inlet.node_id,
+UNION
+ SELECT inp_inlet.node_id,
     rpt_inp_node.elevation,
     inp_inlet.initlevel,
     inp_inlet.minlevel,
@@ -701,11 +695,16 @@ CREATE OR REPLACE VIEW vi_tanks AS
     inp_inlet.curve_id
    FROM inp_selector_result,
     inp_inlet
-      LEFT JOIN (SELECT node_id, count(*)AS ct FROM (select node_1 as node_id FROM rpt_inp_arc UNION ALL select node_2 FROM rpt_inp_arc)a GROUP BY 1)b  USING (node_id) 
+     LEFT JOIN ( SELECT a.node_id,
+            count(*) AS ct
+           FROM ( SELECT rpt_inp_arc.node_1 AS node_id
+                   FROM rpt_inp_arc
+                UNION ALL
+                 SELECT rpt_inp_arc.node_2
+                   FROM rpt_inp_arc) a
+          GROUP BY a.node_id) b USING (node_id)
      JOIN rpt_inp_node ON inp_inlet.node_id::text = rpt_inp_node.node_id::text
-     WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-     AND ct=1;
-  
+  WHERE b.ct > 1;  
   
   
 CREATE OR REPLACE VIEW vi_junctions AS 
@@ -771,3 +770,25 @@ CREATE OR REPLACE VIEW vi_rules AS
 				  ORDER BY inp_rules_x_sector.id) d) c
   ORDER BY c.id;
 
+  
+CREATE VIEW v_arc_x_vnode AS
+SELECT vnode_id, arc_id, a.feature_type, feature_id, 
+node_1,
+node_2,
+(length*locate)::numeric(12,3) AS vnode_distfromnode1,
+(length*(1-locate))::numeric(12,3) AS vnode_distfromnode2,
+(elevation1 - locate*(elevation1-elevation2))::numeric (12,3) as vnode_elevation
+FROM (
+SELECT vnode_id, arc_id, a.feature_type, feature_id,
+st_length(v_edit_arc.the_geom) as length,
+st_linelocatepoint (v_edit_arc.the_geom , vnode.the_geom)::numeric(12,3) as locate,
+node_1,
+node_2,
+elevation1,
+elevation2
+from v_edit_arc , vnode 
+JOIN v_edit_link a ON vnode_id=exit_id::integer
+where st_dwithin ( v_edit_arc.the_geom, vnode.the_geom, 0.01) 
+and v_edit_arc.state>0 and vnode.state>0
+) a
+order by 2,6 desc;

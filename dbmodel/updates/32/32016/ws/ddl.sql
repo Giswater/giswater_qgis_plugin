@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_presszone", "column":"the_geom", "dataType":"geometry(MULTIPOLYGON, SRID_VALUE)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"sector_type", "dataType":"varchar(16)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_reservoir", "column":"to_arc", "dataType":"varchar(16)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_rules_x_arc", "column":"active", "dataType":"boolean"}}$$);
