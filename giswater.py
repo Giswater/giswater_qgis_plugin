@@ -1082,9 +1082,13 @@ class Giswater(QObject):
 
 
     def set_layer_config(self):
-        """ Set layer fields configured according to client configuration """
+        """ Set layer fields configured according to client configuration.
+            At the moment manage:
+                ValueMap as combos and alias"""
 
         layers_list = self.settings.value('system_variables/set_layer_config')
+        if not layers_list:
+            return
         for layer_name in layers_list:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
