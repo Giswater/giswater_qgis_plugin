@@ -250,7 +250,7 @@ class GwToolBox(ApiParent):
                             extras += '"' + param_name + '":"' + str(value) + '", '
                         elif type(widget) in ('', QComboBox):
                             value = utils_giswater.get_item_data(dialog, widget, 0)
-                            extras += '"' + param_name + '":"' + str(value).lower() + '", '
+                            extras += '"' + param_name + '":"' + str(value) + '", '
                         elif type(widget) in ('', QCheckBox):
                             value = utils_giswater.isChecked(dialog, widget)
                             extras += '"' + param_name + '":"' + str(value).lower() + '", '
