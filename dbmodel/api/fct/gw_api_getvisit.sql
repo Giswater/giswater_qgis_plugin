@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_api_getvisit($${"client":{"device":3,"infoType":100,"lang"
 
 BEGIN
 
-	RETURN SCHEMA_NAME.gw_api_get_visit('planned', p_data);	
+	RETURN SCHEMA_NAME.gw_api_get_visit(1, p_data);	
 
 END;
 $BODY$

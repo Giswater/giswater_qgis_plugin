@@ -91,34 +91,39 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_idname := (p_data ->> 'feature')::json->> 'idName';
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
-	
-	
+
+	IF v_fields::text = '{}' THEN
+		v_fields := ((p_data ->> 'data')::json->> 'relatedFeature')::json;
+	END IF;
+
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
+
+	
 
 	-- query text, step1
 	v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||' (';
 
 	-- query text, step2
 	i=1;
+
 	FOREACH text IN ARRAY v_text 
 	LOOP
 		SELECT v_text [i] into v_jsonfield;
 		v_field:= (SELECT (v_jsonfield ->> 'key')) ;
 		v_value := (SELECT (v_jsonfield ->> 'value')) ; -- getting v_value in order to prevent null values
-				
+	
 		IF v_value !='null' OR v_value !='NULL' OR v_value IS NOT NULL THEN 
-
+			
 			--building the query text
 			IF i=1 THEN
-				v_querytext := concat (v_querytext, quote_ident(v_field));
+				v_querytext := concat (v_querytext, v_field);
 			ELSIF i>1 THEN
 				v_querytext := concat (v_querytext, ', ', quote_ident(v_field));
 			END IF;
-				
 		END IF;
-		i=i+1;
+		i=i+1;	
 	END LOOP;
-	
+
 	-- query text, step3
 	v_querytext := concat (v_querytext, ') VALUES (');
 	

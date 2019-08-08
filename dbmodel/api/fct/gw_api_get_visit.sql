@@ -8,7 +8,10 @@ This version of Giswater is provided by Giswater Association
 
 
 --DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(text, p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit_new( p_visittype integer,  p_data json)
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit(
+    p_visittype integer,
+    p_data json)
   RETURNS json AS
 $BODY$
 
@@ -154,10 +157,10 @@ DECLARE
 	
 
 BEGIN
-
+	
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := 'SCHEMA_NAME';
+	SET search_path = "ws_sample32", public;
+	v_schemaname := 'ws_sample32';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -184,11 +187,9 @@ BEGIN
 	v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
-	v_featuretablename = ((p_data ->>'relatedFeature')::json->>'tableName');
+	v_featuretablename = (((p_data ->>'data')::json->>'relatedFeature')::json->>'tableName');
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
-
-	
 
 	--v_offline = 'true';
 
@@ -204,6 +205,7 @@ BEGIN
 		v_id = v_existvisit_id;
 	END IF;
 	
+	
 	--  get visitclass
 	IF v_visitclass IS NULL THEN
 		
@@ -212,6 +214,7 @@ BEGIN
 
 			-- get vdefault visitclass
 			IF v_offline THEN
+				raise notice '======> %',v_featuretablename;
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
 				v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
 			ELSE
@@ -223,34 +226,24 @@ BEGIN
 					IF v_featuretablename IS NOT NULL THEN
 						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_unspected_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
 					ELSE
-						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_noinfra_vdef') AND cur_user=current_user)::integer;	
-
-						-- manage null case (user has not vdefault for noinfra visits)
-						IF v_visitclass IS NULL THEN 
-							v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename LIMIT 1)::integer;				
-						END IF;
-										
+						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_noinfra_vdef') AND cur_user=current_user)::integer;
 					END IF;
 				END IF;
-
-				-- manage null case (user has not vdefault for infra)
-				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename LIMIT 1)::integer;			
-				END IF;
-				
 			END IF;				
 							
 		-- existing visit
 		ELSE 
 			v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);
-			IF v_visitclass IS NULL THEN
-				v_visitclass := 0;
-			END IF;
 		END IF;
 	END IF;
+
+	IF v_visitclass IS NULL THEN
+		v_visitclass := 0;
+	END IF;
+
 	
 	--  get formname and tablename
-	
+
 	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
@@ -279,25 +272,18 @@ BEGIN
 				UNION SELECT connec_id, visit_id FROM om_visit_x_connec UNION SELECT gully_id, visit_id FROM om_visit_x_gully LIMIT 1) a WHERE visit_id=v_id::int8);
 	END IF;
 
-	IF v_queryinfra IS NOT NULL OR v_featureid IS NOT NULL THEN  -- for existing and for new visits
-		v_noinfra = FALSE;
-	ELSE
-		v_noinfra = TRUE;
-	END IF;
-	
-
 
 	IF isnewvisit IS FALSE THEN
+
 		v_extvisitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
 		v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
 		v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
 		v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
 	END IF;
 
-raise notice 'v_extvisitclass %', v_extvisitclass;
-
 	-- get change class
 	IF v_extvisitclass <> v_visitclass THEN
+	
 		v_isclasschanged = true;
 		-- update change of class
 		UPDATE om_visit SET class_id=v_visitclass WHERE id=v_id::int8;
@@ -380,7 +366,6 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 	IF v_currentactivetab = 'tabData' AND (v_isclasschanged IS FALSE OR v_tab_data IS FALSE) AND v_status > 0 THEN
 
 		RAISE NOTICE '--- gw_api_getvisit: Upsert visit calling ''gw_api_setvisit'' with : % ---', p_data;
-		
 		SELECT gw_api_setvisit (p_data) INTO v_return;
 		v_id = ((v_return->>'body')::json->>'feature')::json->>'id';
 		v_message = (v_return->>'message');
@@ -437,9 +422,13 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
      
 		-- Data tab
 		-----------
+		IF v_activedatatab IS NULL AND v_activefilestab IS NULL THEN
+			v_activedatatab = True;
+		END IF;
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
-		 
+
 			IF isnewvisit THEN
+
 				IF v_formname IS NULL THEN
 					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
 				END IF;
@@ -455,9 +444,11 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 						RAISE NOTICE ' --- SETTING feature id VALUE % ---',v_featureid ;
 
 					END IF;
-
+					
 					-- setting visit id value
-					IF (aux_json->>'column_id') = 'visit_id' THEN
+					IF (aux_json->>'column_id') = 'visit_id' AND v_offline THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', ''::text);
+					ELSIF (aux_json->>'column_id') = 'visit_id'THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_id);
 						RAISE NOTICE ' --- SETTING visit id VALUE % ---',v_id ;
 					END IF;
@@ -513,7 +504,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 						
 					END IF;
 					
-					-- disable visitclass if project is offline
+					-- disable visit type if project is offline
 					IF (aux_json->>'column_id') = 'class_id' AND v_offline = 'true' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
 					END IF;
@@ -532,8 +523,6 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 	
 				-- replace in case of om_visit table
 				v_values = REPLACE (v_values::text, '"id":', '"visit_id":');
-
-				raise notice 'v_values %', v_values;
 			
 				-- setting values
 				FOREACH aux_json IN ARRAY v_fields 
@@ -601,7 +590,6 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 			v_tab.tabactions = '{}';
 		END IF;
 
-
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction',v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs || v_tabaux::text;
@@ -613,9 +601,9 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 		------------
 		
 		--show tab only if it is not new visit or offline is true
-		IF (isnewvisit IS FALSE OR v_addfile IS NOT NULL OR v_status=0) OR v_offline = 'true' THEN
-
+		
 			--filling tab (only if it's active)
+
 			IF v_activefilestab THEN
 
 				-- getting filterfields
@@ -665,7 +653,6 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 				v_tab.tabactions = '{}';
 			END IF;
 
-
 			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active', v_activefilestab);
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 
@@ -675,16 +662,16 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 	 		-- setting pageInfo
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'pageInfo', v_pageinfo);
 			v_formtabs := v_formtabs  || ',' || v_tabaux::text;
-		END IF; 		
-		
+
 	--closing tabs array
 	v_formtabs := (v_formtabs ||']');
 
 	-- header form
-	IF v_noinfra IS TRUE THEN
-		v_formheader :=concat('INCIDENCY - ',v_id);	
-	ELSE
+
+	IF p_visittype = 1 THEN
 		v_formheader :=concat('VISIT - ',v_id);	
+	ELSE
+		v_formheader :=concat('INCIDENCY - ',v_id);	
 	END IF;
 
 	-- getting geometry
@@ -712,6 +699,11 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_layermanager := COALESCE(v_layermanager, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
+
+	-- If project is offline dont send id
+	IF v_offline THEN
+		v_id = '""';
+	END IF;
 
   
 	-- Return

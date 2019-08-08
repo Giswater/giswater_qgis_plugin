@@ -71,9 +71,9 @@ BEGIN
 
     EXECUTE 'SELECT wsoftware FROM version'
 	INTO v_version;
-
+	
 --  get input values
-    v_id = ((p_data ->>'feature')::json->>'id')::integer;
+    v_id = ((p_data ->>'feature')::json->>'id');
     v_feature = p_data ->>'feature';
     v_class = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
     v_visitextcode = ((p_data ->>'data')::json->>'fields')::json->>'ext_code';
@@ -88,8 +88,6 @@ BEGIN
 
     v_node_id = ((p_data ->>'data')::json->>'fields')::json->>'node_id';
 
- raise notice ' v_thegeom  %', v_thegeom ;
- 
 	-- setting output parameter
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
 
@@ -115,19 +113,25 @@ BEGIN
 	ELSE
 		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitcat_vdefault', v_visitcat, current_user);
 	END IF;
-
+ 
 	--upsert visit
+	
 	IF (SELECT id FROM om_visit WHERE id=v_id) IS NULL THEN
 
 		-- setting the insert
 		v_id = (SELECT nextval('SCHEMA_NAME.om_visit_id_seq'::regclass));
 		v_feature = gw_fct_json_object_set_key (v_feature, 'id', v_id);
 		v_outputparameter = gw_fct_json_object_set_key (v_outputparameter, 'feature', v_feature);
+
 		SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
 
 		-- getting new id
-		v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;
-					
+		IF (((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer IS NOT NULL THEN
+		
+			v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;
+			
+		END IF;
+		
 		-- updating v_feature setting new id
 		v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_id);
 		
@@ -158,7 +162,7 @@ BEGIN
 		RAISE NOTICE '--- UPDATE VISIT gw_api_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
 
 	END IF;
-	 
+
 	-- update event with device parameters
 	RAISE NOTICE 'UPDATE EVENT USING deviceTrace %', ((p_data ->>'data')::json->>'deviceTrace');
 	UPDATE om_visit_event SET xcoord=(((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float,
@@ -167,13 +171,14 @@ BEGIN
 				  tstamp=now() 
 				  WHERE visit_id=v_id;
 
-
+	
+	
 	-- getting geometry
-	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || v_id || ')a')
-            INTO v_geometry;
-
-            raise notice 'v_geometry %', v_geometry;
-
+	IF v_id IS NOT NULL THEN
+		EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || v_id || ')a')
+		    INTO v_geometry;
+	END IF;
+	
 	-- only applied for arbrat viari (nodes).
 	IF v_status='4' THEN
 	    UPDATE om_visit SET enddate = current_timestamp::timestamp WHERE id = v_id;
@@ -189,8 +194,11 @@ BEGIN
 	return_event_manager_aux := COALESCE(return_event_manager_aux, '{}');
 				  
 --    Return
-      RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
-	      "body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json; 
+
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
+	"body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json; 
+
+      
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
