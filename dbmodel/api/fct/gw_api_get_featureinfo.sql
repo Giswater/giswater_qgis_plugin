@@ -77,13 +77,11 @@ BEGIN
 		
     IF  p_configtable THEN 
 
-       raise notice 'Configuration fields are defined on config_api_layer_field';
+       raise notice 'Configuration fields are defined on config_api_layer_field, calling gw_api_get_formfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
 
-       	-- Call the function of feature fields generation
-       	
+       	-- Call the function of feature fields generation      	
 	SELECT gw_api_get_formfields( p_table_id, 'feature', 'data', p_table_id, null, p_id, null, 'SELECT',null, p_device) INTO fields_array;
-	--SELECT gw_api_get_formfields( p_table_id, 'feature', 'data', p_table_id, 'arc_id', p_id, 'text', 'SELECT',null, p_device) INTO fields_array;
-
+	
     ELSE
 
        raise notice 'Configuration fields are NOT defined on config_api_layer_field. System values will be used';
@@ -91,7 +89,7 @@ BEGIN
 	-- Get fields
 	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
 		(SELECT a.attname as label, a.attname as column_id, concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
-		(case when a.atttypid=16 then ''checkbox'' else ''textline'' end ) as widgettype, 
+		(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
 		(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
 		''::TEXT AS tooltip, ''::TEXT as placeholder, false AS iseditable, false as isclickable,
 		row_number()over() AS orderby, 
