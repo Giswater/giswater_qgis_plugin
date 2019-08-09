@@ -276,8 +276,8 @@ class MincutParent(ParentAction):
             if action_pan:
                 self.iface.actionPan().trigger()     
             self.vertex_marker.hide()
-        except Exception:          
-            pass
+        except Exception as e:
+            print(type(e).__name__)
 
 
     def real_start(self):
@@ -360,6 +360,12 @@ class MincutParent(ParentAction):
 
 
     def set_real_location(self):
+        # Vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
 
         # Activate snapping of node and arcs
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
@@ -1403,6 +1409,7 @@ class MincutParent(ParentAction):
         if not self.snapper_manager.result_is_valid():
             return
 
+        self.disconnect_snapping(False)
         node_exist = False
         layer = self.snapper_manager.get_snapped_layer(result)
         # Check feature
