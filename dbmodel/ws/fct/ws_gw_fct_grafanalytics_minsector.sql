@@ -76,16 +76,18 @@ BEGIN
 	v_fprocesscat_id=34;  
 	v_featuretype='arc';
 
-	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MINSECTOR DYNAMIC SECTORITZATION'));
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('---------------------------------------------------'));
-		
-	-- reset graf & audit_log tables
+		-- reset graf & audit_log tables
 	DELETE FROM anl_graf where user_name=current_user;
 	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id=34 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=34 AND user_name=current_user;
 
+	
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MINSECTOR DYNAMIC SECTORITZATION'));
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('---------------------------------------------------'));
+		
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
@@ -170,12 +172,19 @@ BEGIN
 	
 		-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
 		UPDATE arc SET minsector_id = a.descript::integer FROM anl_arc a WHERE fprocesscat_id=34 AND a.arc_id=arc.arc_id AND cur_user=current_user;
+	
+		-- update graf nodes inside minsector
 		UPDATE node SET minsector_id = a.descript::integer FROM anl_node a WHERE fprocesscat_id=34 AND a.node_id=node.node_id AND a.descript::integer >0 AND cur_user=current_user;
+	
+		-- update graf nodes on the border of minsectors
 		UPDATE node SET minsector_id = 0 FROM anl_node a JOIN v_edit_node USING (node_id) JOIN node_type c ON c.id=node_type 
 		WHERE fprocesscat_id=34 AND a.node_id=node.node_id AND a.descript::integer =0 AND graf_delimiter!='NONE' AND cur_user=current_user;
-
+			
+		-- update non graf nodes (not connected) using arc_id parent on v_edit_node (not used node table because the exploitation filter).
+		UPDATE v_edit_node SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_node.arc_id;
+	
 		-- used v_edit_connec to the exploitation filter. Rows before is not neeeded because on table anl_* is data filtered by the process...
-		UPDATE v_edit_connec SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_connec.connec_id;
+		UPDATE v_edit_connec SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_connec.arc_id;
 
 		-- insert into minsector table
 		DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
@@ -201,9 +210,16 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 		VALUES (v_fprocesscat_id, concat('WARNING: Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
 		
+	ELSE
+		-- message
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+		VALUES (v_fprocesscat_id, concat('INFO: Minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
+		VALUES (v_fprocesscat_id, concat('INFO: To take a look on results you can do querys like this:'));
+		VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_arc WHERE fprocesscat_id = 34  AND cur_user=current_user;'));
+		VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_node WHERE fprocesscat_id = 34  AND cur_user=current_user;'));
+	
 	END IF;
 	
-
 	-- set selector
 	DELETE FROM selector_audit WHERE cur_user=current_user;
 	INSERT INTO selector_audit (fprocesscat_id, cur_user) VALUES (v_fprocesscat_id, current_user);

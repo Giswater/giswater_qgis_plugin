@@ -280,19 +280,23 @@ BEGIN
 	-- update feature atributes
 	IF v_updatetattributes THEN 
 
-		-- upsert arc table
+		-- update arc table
 		v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
 				FROM anl_arc a join (SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text(nodeparent) as nodeparent from '
 				||quote_ident(v_table)||') b	ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 		EXECUTE v_querytext;
 
-		-- upsert node table
+		-- update node table with graf nodes
 		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
 				FROM anl_node a join (SELECT  '||quote_ident(v_fieldmp)||', json_array_elements_text(nodeparent) as nodeparent from '
 				||quote_ident(v_table)||') b ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.node_id=node.node_id AND cur_user=current_user';
 		EXECUTE v_querytext;
+		
+		-- update node table without graf nodes using v_edit_node because the exploitation filter. Rows before is not neeeded because on table anl_* is data filtered by the process...
+		v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_node.arc_id';
+		EXECUTE v_querytext;
 
-		-- used v_edit_connec to the exploitation filter. Rows before is not neeeded because on table anl_* is data filtered by the process...
+		-- used v_edit_connec because the exploitation filter (same before)
 		v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_connec.arc_id';
 		EXECUTE v_querytext;
 
@@ -308,9 +312,13 @@ BEGIN
 			JOIN node a ON a.node_id=anl_node.descript
 			WHERE fprocesscat_id=30 AND cur_user=current_user;
 
-			-- update staticpressure on node / connec tables
+			-- update node table with elements connected on graf
 			UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id AND fprocesscat_id=47 AND user_name=current_user;
-
+			
+			-- update node table with elements disconnected from graf
+			-- TODO: calculate staticpresure of that point of arc interpolating values (n1, n2)
+						
+			-- update connec table
 			UPDATE v_edit_connec SET staticpressure = (b.elevation-v_edit_connec.elevation) FROM 
 				(SELECT connec_id, a.elevation FROM connec JOIN (SELECT a.sector_id, node_id, elevation FROM 
 					(SELECT json_array_elements_text(nodeparent) as node_id, sector_id FROM sector)a JOIN node USING (node_id))a
@@ -321,7 +329,14 @@ BEGIN
 		-- message
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 		VALUES (v_fprocesscat_id, concat('WARNING: Attribute ', v_class ,' on arc/node/connec features have been updated by this process'));
-
+		
+	ELSE
+		-- message
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+		VALUES (v_fprocesscat_id, concat('INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
+		VALUES (v_fprocesscat_id, concat('INFO: To see results you can query using this values (XX): SECTOR:30, DQA:44, DMA:45, PRESSZONE:46, STATICPRESSURE, from SECTOR analysis:47'));		
+		VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_arc WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
+		VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_node WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
 	END IF;
 
 	-- update geometry of mapzones
