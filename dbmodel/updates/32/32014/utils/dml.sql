@@ -19,8 +19,8 @@ VALUES (2706, 'gw_fct_grafanalytics_minsector', 'ws','function', '{"featureType"
 '[{"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layout_order":1, "placeholder":"[1,2]", "value":""},
 {"widgetname":"updateFeature", "label":"Update feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":7, "value":"FALSE"},
 {"widgetname":"updateMapZone", "label":"Update mapzone geometry:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":8, "value":"FALSE"},
-{"widgetname":"concaveHullParam", "label":"ConcaveHull factor (for update geometry):","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":6, "placeholder":"0.9", "value":""}]',
-'Function of grafanalytics for minimun sector', 'role_om',FALSE, TRUE, 'Minsector analysis', TRUE);
+{"widgetname":"concaveHullParam", "label":"ConcaveHull factor (for update geometry):","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":6, "ismandatory":false, "placeholder":"0.9", "value":""}]',
+'Function of grafanalytics for minimun sector', 'role_master',FALSE, TRUE, 'Minsector analysis', TRUE);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2708, 'gw_fct_grafanalytics_mincut', 'ws','function', 'Function of grafanalytics for mincut', 'role_om',FALSE, FALSE, FALSE);
@@ -32,19 +32,17 @@ VALUES (2710, 'gw_fct_grafanalytics_mapzones', 'ws','function', '{"featureType":
 {"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"json","layoutname":"grl_option_parameters","layout_order":2, "placeholder":"[1,2]", "value":""},
 {"widgetname":"updateFeature", "label":"Update feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":7, "value":"FALSE"},
 {"widgetname":"updateMapZone", "label":"Update mapzone geometry:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":8, "value":"FALSE"},
-{"widgetname":"concaveHullParam", "label":"Concave hull parameter (in case of update geometry):","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":6, "placeholder":"0.9", "value":""}]',
+{"widgetname":"concaveHullParam", "label":"Concave hull parameter (in case of update geometry):","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":6, "ismandatory":false, "placeholder":"0.9", "value":""}]',
 'Function to analyze graf of network. Multiple analysis is avaliable. Dynamic analisys to sectorize network using the flow traceability function. 
 Before work with this funcion it is mandatory to configurate the system:
 - field nodeparent on [dma, sector, cat_presszone and dqa] tables
-- field to_arc on [inp_shortpipe, inp_inlet, inp_reservoir, inp_valve, inp_pump] tables' ,'role_om',FALSE, TRUE, 'Mapzones analysis', TRUE);
+- field to_arc on [inp_shortpipe, inp_inlet, inp_reservoir, inp_valve, inp_pump] tables' ,'role_master',FALSE, TRUE, 'Mapzones analysis', TRUE);
 
-INSERT INTO audit_cat_function 
-(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
-VALUES 
-(2712, 'gw_fct_grafanalytics_mincutzones', 'ws','function', '{"featureType":""}',
+INSERT INTO audit_cat_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2712, 'gw_fct_grafanalytics_mincutzones', 'ws','function', '{"featureType":""}',
 '[{"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layout_order":1, "placeholder":"[1,2]", "value":""}]',
 'Function of grafanalytics for massive mincutzones identification. Multiple analysis is avaliable. It works applying massive mincut for the whole network of selected exploitation. It can take a lot of time. Be patient!!!'
-,'role_om',FALSE, TRUE, 'Massive mincut analysis', TRUE);
+,'role_master',FALSE, TRUE, 'Massive mincut analysis', TRUE);
 
 UPDATE config_param_system SET isenabled=false, isdeprecated='true' WHERE parameter='gw_trg_arc_orphannode_delete';
 

@@ -44,6 +44,75 @@ UNION
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
 
 
+CREATE OR REPLACE VIEW vu_node AS 
+ SELECT node.node_id,
+    node.code,
+    node.elevation,
+    node.depth,
+    cat_node.nodetype_id,
+    node_type.type AS sys_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    sector.macrosector_id,
+    node.arc_id,
+    node.parent_id,
+    node.state,
+    node.state_type,
+    node.annotation,
+    node.observ,
+    node.comment,
+    node.dma_id,
+    node.presszonecat_id,
+    node.soilcat_id,
+    node.function_type,
+    node.category_type,
+    node.fluid_type,
+    node.location_type,
+    node.workcat_id,
+    node.buildercat_id,
+    node.workcat_id_end,
+    node.builtdate,
+    node.enddate,
+    node.ownercat_id,
+    node.muni_id,
+    node.postcode,
+    node.streetaxis_id,
+    node.postnumber,
+    node.postcomplement,
+    node.postcomplement2,
+    node.streetaxis2_id,
+    node.postnumber2,
+    node.descript,
+    cat_node.svg,
+    node.rotation,
+    concat(node_type.link_path, node.link) AS link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x,
+    node.label_y,
+    node.label_rotation,
+    node.publish,
+    node.inventory,
+    dma.macrodma_id,
+    node.expl_id,
+    node.hemisphere,
+    node.num_value,
+    node.minsector_id,
+    node.dqa_id,
+    dqa.macrodqa_id,
+    node.staticpressure,
+    cat_node.label
+   FROM node
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN node_type ON node_type.id::text = cat_node.nodetype_id::text
+     LEFT JOIN dma ON node.dma_id = dma.dma_id
+     LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
+     LEFT JOIN sector ON node.sector_id = sector.sector_id; 
 
 CREATE OR REPLACE VIEW v_arc AS 
  SELECT arc.arc_id,
@@ -103,19 +172,20 @@ CREATE OR REPLACE VIEW v_arc AS
     arc.expl_id,
     arc.num_value,
     arc.builtdate,
-	CASE
+        CASE
             WHEN arc.custom_length IS NOT NULL THEN arc.custom_length::numeric(12,3)
             ELSE st_length2d(arc.the_geom)::numeric(12,3)
         END AS length,
     arc.the_geom,
-	arc.minsector_id,
-	arc.dqa_id,
-	dqa.macrodqa_id,
-	arc.staticpressure,
-	cat_arc.label,
-    cat_arc.arctype_id as arc_type,
-	a.nodetype_id as nodetype_1,
-	b.nodetype_id as nodetype_2
+    arc.minsector_id,
+    arc.dqa_id,
+    dqa.macrodqa_id,
+    cat_arc.label,
+    cat_arc.arctype_id AS arc_type,
+    a.nodetype_id AS nodetype_1,
+    a.staticpressure AS staticpress1,
+    b.nodetype_id AS nodetype_2,
+    b.staticpressure AS staticpress2
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
      JOIN v_state_arc ON arc.arc_id::text = v_state_arc.arc_id::text
@@ -125,8 +195,9 @@ CREATE OR REPLACE VIEW v_arc AS
      LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
      LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
      LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id;
-	 
 
+	 
+	 
 CREATE OR REPLACE VIEW v_edit_arc AS 
  SELECT v_arc.arc_id,
     v_arc.code,
@@ -183,17 +254,18 @@ CREATE OR REPLACE VIEW v_edit_arc AS
     v_arc.macrodma_id,
     v_arc.expl_id,
     v_arc.num_value,
-	v_arc.minsector_id,
-	v_arc.dqa_id,
-	v_arc.macrodqa_id,
-	v_arc.staticpressure,
+    v_arc.minsector_id,
+    v_arc.dqa_id,
+    v_arc.macrodqa_id,
     v_arc.arc_type,
-	v_arc.nodetype_1,
-	v_arc.elevation1,
+    v_arc.nodetype_1,
+    v_arc.elevation1,
     v_arc.depth1,
+    v_arc.staticpress1,   
     v_arc.nodetype_2,
-	v_arc.elevation2,
-    v_arc.depth2
+    v_arc.elevation2,
+    v_arc.depth2,
+    v_arc.staticpress2
    FROM v_arc;
 	 
 	 
@@ -531,27 +603,22 @@ CREATE OR REPLACE VIEW ve_arc AS
  SELECT v_arc.arc_id,
     v_arc.code,
     v_arc.node_1,
-    v_arc.nodetype_1,
-    v_arc.elevation1,
-    v_arc.depth1,
     v_arc.node_2,
-    v_arc.nodetype_2,
-    v_arc.elevation2,
-    v_arc.depth2,
     v_arc.arccat_id,
-    v_arc.arctype_id AS arc_type,
+    v_arc.arctype_id AS cat_arctype_id,
     v_arc.sys_type,
     v_arc.matcat_id AS cat_matcat_id,
     v_arc.pnom AS cat_pnom,
     v_arc.dnom AS cat_dnom,
     v_arc.epa_type,
     v_arc.sector_id,
-    sector.macrosector_id,
+    v_arc.macrosector_id,
     v_arc.state,
     v_arc.state_type,
     v_arc.annotation,
     v_arc.observ,
     v_arc.comment,
+    v_arc.label,
     v_arc.gis_length,
     v_arc.custom_length,
     v_arc.dma_id,
@@ -591,18 +658,24 @@ CREATE OR REPLACE VIEW ve_arc AS
     v_arc.minsector_id,
     v_arc.dqa_id,
     v_arc.macrodqa_id,
-    v_arc.staticpressure,
-    v_arc.label
-   FROM v_arc
-     LEFT JOIN sector ON v_arc.sector_id = sector.sector_id;
+    v_arc.arc_type,
+    v_arc.nodetype_1,
+    v_arc.elevation1,
+    v_arc.depth1,
+    v_arc.staticpress1,
+    v_arc.nodetype_2,
+    v_arc.elevation2,
+    v_arc.depth2,
+    v_arc.staticpress2
+   FROM v_arc;
 
-
+	 
 CREATE OR REPLACE VIEW ve_node AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.elevation,
     v_node.depth,
-    v_node.nodetype_id as node_type,
+    v_node.nodetype_id,
     v_node.sys_type,
     v_node.nodecat_id,
     v_node.cat_matcat_id,
@@ -610,7 +683,7 @@ CREATE OR REPLACE VIEW ve_node AS
     v_node.cat_dnom,
     v_node.epa_type,
     v_node.sector_id,
-    sector.macrosector_id,
+    v_node.macrosector_id,
     v_node.arc_id,
     v_node.parent_id,
     v_node.state,
@@ -618,6 +691,7 @@ CREATE OR REPLACE VIEW ve_node AS
     v_node.annotation,
     v_node.observ,
     v_node.comment,
+    v_node.label,
     v_node.dma_id,
     v_node.presszonecat_id,
     v_node.soilcat_id,
@@ -655,17 +729,14 @@ CREATE OR REPLACE VIEW ve_node AS
     v_node.expl_id,
     v_node.hemisphere,
     v_node.num_value,
-    v_node.minsector_id,
-    v_node.dqa_id,
-    v_node.macrodqa_id,
-    v_node.staticpressure,
-    v_node.label
-   FROM v_node
-     LEFT JOIN sector ON v_node.sector_id = sector.sector_id
-     LEFT JOIN cat_node ON v_node.nodecat_id::text = cat_node.id::text;
+	v_node.minsector_id,
+	v_node.dqa_id,
+	v_node.macrodqa_id,
+	v_node.staticpressure,
+    v_node.node_type
+   FROM v_node;
 
-
-
+   
 CREATE OR REPLACE VIEW ve_connec AS 
  SELECT connec.connec_id,
     connec.code,
