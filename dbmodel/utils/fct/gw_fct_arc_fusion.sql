@@ -126,9 +126,9 @@ BEGIN
             END LOOP;
 			-- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
 			-- to get values topocontrol arc needs to be before, but this is not possible
-			UPDATE config SET arc_searchnodes_control='false';
+			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'arc_searchnodes';
 			INSERT INTO v_edit_arc SELECT newRecord.*;
-			UPDATE config SET arc_searchnodes_control='true';
+			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'arc_searchnodes';
 
 			UPDATE arc SET node_1=newRecord.node_1, node_2=newRecord.node_2 where arc_id=newRecord.arc_id;
 					
@@ -148,7 +148,8 @@ BEGIN
 			
 				-- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
 				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', newRecord.state, newRecord.sector_id, newRecord.dma_id, newRecord.expl_id, v_node_geom) RETURNING vnode_id INTO v_vnode;
+				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', newRecord.state, newRecord.sector_id, newRecord.dma_id, newRecord.expl_id, v_node_geom) 
+				RETURNING vnode_id INTO v_vnode;
 				
 				-- update link with new vnode
 				UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=node_id_arg;	
