@@ -312,12 +312,15 @@ BEGIN
 			JOIN node a ON a.node_id=anl_node.descript
 			WHERE fprocesscat_id=30 AND cur_user=current_user;
 
-			-- update node table with elements connected on graf
+			-- update node table those elements connected on graf
 			UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id AND fprocesscat_id=47 AND user_name=current_user;
 			
-			-- update node table with elements disconnected from graf
-			-- TODO: calculate staticpresure of that point of arc interpolating values (n1, n2)
-						
+			-- update node table those elements disconnected from graf
+			UPDATE node SET staticpressure=(staticpress1-(staticpress1-staticpress2)*st_linelocatepoint(v_edit_arc.the_geom, n.the_geom))::numeric(12,3)
+							FROM v_edit_arc,node n
+							WHERE st_dwithin(v_edit_arc.the_geom, n.the_geom, 0.05::double precision) AND v_edit_arc.state = 1 AND n.state = 1
+							and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
+									
 			-- update connec table
 			UPDATE v_edit_connec SET staticpressure = (b.elevation-v_edit_connec.elevation) FROM 
 				(SELECT connec_id, a.elevation FROM connec JOIN (SELECT a.sector_id, node_id, elevation FROM 
