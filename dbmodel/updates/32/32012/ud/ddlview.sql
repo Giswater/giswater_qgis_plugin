@@ -154,88 +154,7 @@ CREATE OR REPLACE VIEW vp_epa_node AS
         END AS epatable
    FROM node;
 
-  
-
-CREATE OR REPLACE VIEW ve_arc AS 
- SELECT v_arc_x_node.arc_id,
-    v_arc_x_node.code,
-    v_arc_x_node.node_1,
-    v_arc_x_node.node_2,
-    v_arc_x_node.y1,
-    v_arc_x_node.custom_y1,
-    v_arc_x_node.sys_y1,
-    v_arc_x_node.elev1,
-    v_arc_x_node.custom_elev1,
-    v_arc_x_node.sys_elev1,
-    v_arc_x_node.y2,
-    v_arc_x_node.custom_y2,
-    v_arc_x_node.sys_y2,
-    v_arc_x_node.elev2,
-    v_arc_x_node.custom_elev2,
-    v_arc_x_node.sys_elev2,
-    v_arc_x_node.z1,
-    v_arc_x_node.z2,
-    v_arc_x_node.r1,
-    v_arc_x_node.r2,
-    v_arc_x_node.slope,
-    v_arc_x_node.arc_type,
-    v_arc_x_node.sys_type,
-    v_arc_x_node.arccat_id,
-    v_arc_x_node.matcat_id AS cat_matcat_id,
-    v_arc_x_node.shape AS cat_shape,
-    v_arc_x_node.geom1 AS cat_geom1,
-    v_arc_x_node.geom2 AS cat_geom2,
-    v_arc_x_node.gis_length,
-    v_arc_x_node.epa_type,
-    v_arc_x_node.sector_id,
-    v_arc_x_node.macrosector_id,
-    v_arc_x_node.state,
-    v_arc_x_node.state_type,
-    v_arc_x_node.annotation,
-    v_arc_x_node.observ,
-    v_arc_x_node.comment,
-    cat_arc.label,
-    v_arc_x_node.inverted_slope,
-    v_arc_x_node.custom_length,
-    v_arc_x_node.dma_id,
-    v_arc_x_node.soilcat_id,
-    v_arc_x_node.function_type,
-    v_arc_x_node.category_type,
-    v_arc_x_node.fluid_type,
-    v_arc_x_node.location_type,
-    v_arc_x_node.workcat_id,
-    v_arc_x_node.workcat_id_end,
-    v_arc_x_node.buildercat_id,
-    v_arc_x_node.builtdate,
-    v_arc_x_node.enddate,
-    v_arc_x_node.ownercat_id,
-    v_arc_x_node.muni_id,
-    v_arc_x_node.postcode,
-    v_arc_x_node.streetaxis_id,
-    v_arc_x_node.postnumber,
-    v_arc_x_node.postcomplement,
-    v_arc_x_node.postcomplement2,
-    v_arc_x_node.streetaxis2_id,
-    v_arc_x_node.postnumber2,
-    v_arc_x_node.descript,
-    v_arc_x_node.link,
-    v_arc_x_node.verified,
-    v_arc_x_node.the_geom,
-    v_arc_x_node.undelete,
-    v_arc_x_node.label_x,
-    v_arc_x_node.label_y,
-    v_arc_x_node.label_rotation,
-    v_arc_x_node.publish,
-    v_arc_x_node.inventory,
-    v_arc_x_node.uncertain,
-    v_arc_x_node.macrodma_id,
-    v_arc_x_node.expl_id,
-    v_arc_x_node.num_value
-   FROM v_arc_x_node
-     JOIN cat_arc ON v_arc_x_node.arccat_id::text = cat_arc.id::text;
-
-
-
+   
 CREATE OR REPLACE VIEW ve_node AS 
  SELECT v_node.node_id,
     v_node.code,
@@ -301,9 +220,7 @@ CREATE OR REPLACE VIEW ve_node AS
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value
-   FROM v_node
-     JOIN cat_node ON v_node.nodecat_id::text = cat_node.id::text;
-
+   FROM v_node;
 
 
 CREATE OR REPLACE VIEW ve_connec AS 

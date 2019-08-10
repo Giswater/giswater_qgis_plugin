@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_controls_x_arc", "column":"active", "dataType":"boolean"}}$$);
+
 ALTER TABLE temp_table ADD COLUMN addparam json;
 
 CREATE TABLE IF NOT EXISTS ext_timeseries (

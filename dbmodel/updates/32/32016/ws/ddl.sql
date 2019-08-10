@@ -14,8 +14,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_reservo
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_rules_x_arc", "column":"active", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_rules_x_node", "column":"active", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_rules_x_sector", "column":"active", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_controls_x_arc", "column":"active", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_controls_x_node", "column":"active", "dataType":"boolean"}}$$);
+
 
 ALTER TABLE inp_controls_x_node RENAME TO _inp_controls_x_node_;
 
