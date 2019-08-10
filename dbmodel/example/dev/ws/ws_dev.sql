@@ -10,8 +10,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- controls
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (6, '2005', 'LINK 2005 CLOSED IF 1001 BELOW 4');
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (2, '2002', 'LINK 2002 CLOSED IF 1001 ABOVE 3');
+INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (1, '2005', 'LINK 2005 CLOSED IF 1001 BELOW 4', true);
+INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (2, '2002', 'LINK 2002 CLOSED IF 1001 ABOVE 3', true);
 
 
 -- emiteers

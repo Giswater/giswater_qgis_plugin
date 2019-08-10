@@ -38,16 +38,18 @@ INSERT INTO inp_adjustments VALUES ('1', 'TEMPERATURE', NULL, NULL, NULL, NULL, 
 INSERT INTO inp_aquifer VALUES ('aquifer01', 0.5000, 0.1500, 0.3000, 5.0000, 10.0000, 15.0000, 0.3500, 14.0000, 0.0020, 0.0000, 10.0000, 0.3000, NULL);
 
 
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (2, '201', 'IF TIME SIMULATION IS >3');
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (4, '201', 'THEN PUMP 2 OPEN');
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (6, '201', 'ELSE PUM 2 CLOSED');
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (7, '201', 'EVER: STATUS ON');
+INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (1, '201', 
+'IF TIME SIMULATION IS >3
+THEN PUMP 2 OPEN
+ELSE PUM 2 CLOSED
+EVER: STATUS ON'
+, true);
 
-
-INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (1, '101', 'IF TIME SIMULATION IS >3');
-INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (4, '101', 'THEN JUNCTION 101 IS OPEN');
-INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (5, '101', 'ELSE JUNCTION 101 IS CLOSED');
-INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (6, '101', 'EVER: STATUS ON ');
+INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (1, '101', 
+'IF TIME SIMULATION IS >3
+THEN JUNCTION 101 IS OPEN
+ELSE JUNCTION 101 IS CLOSED
+EVER: STATUS ON', true');
 
 
 INSERT INTO inp_curve_id (id, curve_type) VALUES ('C1_CONTROL', 'CONTROL');
