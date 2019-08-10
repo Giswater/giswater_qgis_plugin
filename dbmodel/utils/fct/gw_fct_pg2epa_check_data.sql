@@ -637,6 +637,44 @@ BEGIN
 			END IF;	
 	END IF;
 	
+	
+	-- info data analysis
+	IF v_project_type  = 'UD' THEN
+		SELECT min(length), max(length) INTO v_min, vmax FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for length are: (',v_min,',',v_max,')');
+
+		SELECT min(n), max(n) INTO v_min, vmax FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for manning roughness coeficient are: (',v_min,',',v_max,')');
+
+		SELECT min(z1), max(z1) INTO v_min, vmax FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for conduit z1 are: (',v_min,',',v_max,')');
+		
+		SELECT min(z2), max(z2) INTO v_min, vmax FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for conduit z2 are: (',v_min,',',v_max,')');
+	
+		SELECT min(slope), max(slope) INTO v_min, v_max FROM v_edit_arc WHERE SECTOR IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for slope are: (',v_min,',',v_max,')');
+		
+		SELECT min(sys_elev), max(sys_elev) INTO v_min, v_max FROM v_edit_node WHERE SECTOR IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for node elevation are: (',v_min,',',v_max,')');
+	
+	ELSE
+		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM v_edit_node WHERE SECTOR IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for elevation are: (',v_min,',',v_max,')');
+	
+		SELECT min(length), max(length) INTO v_min, vmax FROM vi_pipes;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for pipe length are: (',v_min,',',v_max,')');
+	
+		SELECT min(diameter), max(diameter) INTO v_min, vmax FROM vi_pipes;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for pipe diameter are: (',v_min,',',v_max,')');
+	
+		SELECT min(roughness), max(roughness) INTO v_min, vmax FROM vi_pipes;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for pipe roughness are: (',v_min,',',v_max,')');
+	
+	END IF;
+	
+
+	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
