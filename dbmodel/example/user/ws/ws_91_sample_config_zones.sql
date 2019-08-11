@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+-- drop constraints
+SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pipecat_vdefault', 'FC110-PN10', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_measurement_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('tankcat_vdefault', 'TANK_01', current_user);

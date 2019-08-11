@@ -61,17 +61,22 @@ INSERT INTO sector VALUES (0, 'Undefined', 0);
 INSERT INTO cat_presszone VALUES (0, 'Undefined',0);
 
 
-
 -- recover constraints
 SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
 
--- dynamic sectorization
---SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"presszone", "exploitation": "[1,2]", "upsertFeature":"TRUE"}}}');
---SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dma", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
---SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"dqa", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
---SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"sector", "exploitation": "[1,2]", "upsertFeature":TRUE}}}');
---SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "upsertFeature":"TRUE"}}}');
 
+-- sectorization
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
+"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
 
 

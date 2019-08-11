@@ -32,3 +32,9 @@ ALTER TABLE element ALTER COLUMN workcat_id SET NOT NULL;
 ALTER TABLE element ALTER COLUMN verified SET NOT NULL;
 ALTER TABLE element ALTER COLUMN code SET NOT NULL;
 
+
+
+-- recover constraints
+SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
+
+
