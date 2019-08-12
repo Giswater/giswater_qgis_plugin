@@ -1438,15 +1438,15 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
         srid = self.controller.plugin_settings_value('srid')
-
+        real_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         if self.is_new == True:
             self.set_id_val()
             self.is_new = False
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state)"
+                   " VALUES (0) RETURNING id;")
+            new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
+            real_mincut_id = new_mincut_id[0]
 
-        sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state)"
-               " VALUES (0) RETURNING id;")
-        new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
-        real_mincut_id = new_mincut_id[0]
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
