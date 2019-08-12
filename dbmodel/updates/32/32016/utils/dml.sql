@@ -61,3 +61,8 @@ INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_use
 VALUES (3020,'This planified feature (state=2) is already used in another psector.','Create a new feature in order to assign it.', 2, true,'utils',false);
 
 UPDATE config_param_system SET context=null, parameter='_api_search_visit' WHERE parameter='api_search_visit';
+
+UPDATE audit_cat_param_user  SET isparent= TRUE WHERE id='state_vdefault';
+UPDATE audit_cat_param_user  SET dv_parent_id= 'state_vdefault', 
+dv_querytext = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL ', dv_querytext_filterc = ' AND state = '
+WHERE id='statetype_vdefault';
