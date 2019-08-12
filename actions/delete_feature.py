@@ -5,6 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+from collections import OrderedDict
+
+
 try:
     from qgis.core import Qgis
 except ImportError:
@@ -128,13 +132,21 @@ class DeleteFeature(ApiParent):
         sql = ("SELECT gw_fct_set_delete_feature($${" + body + "}$$)")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
-        if not row:
-            msg = "Some error has occurred executing delete feature function."
-            self.controller.show_message(msg, 1)
+        if not row or row[0] is None:
+            self.controller.show_message("Function gw_fct_set_delete_feature executed with no result ", 3)
             return
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        msg = "Process has been executed correctly."
-        self.controller.show_message(msg, 0)
+        # Populate tab info
+        qtabwidget = self.dlg_delete_feature.mainTab
+        qtextedit = self.dlg_delete_feature.txt_infolog_delete
+        data = complet_result[0]['body']['data']
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                change_tab = self.populate_info_text(self.dlg_delete_feature, qtabwidget, qtextedit, data)
+        # Close dialog
+        if not change_tab:
+            self.close_dialog(self.dlg_delete_feature)
 
 
     def selection_init(self, dialog):
