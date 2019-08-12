@@ -637,6 +637,11 @@ class DrawProfiles(ParentMapTool):
             # SELECT 0 AS z1, 0 AS z2 , dnom/1000, NULL as  sys_elev1,  NULL as  sys_elev2,  NULL as  y1,  NULL as  y2,   NULL as  slope, node_1, node_2,
 
             columns = ['z1','z2','cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
+
+            # Check if self.memory[n] is out of range
+            if n >= len(self.memory):
+                return
+
             if row:
                 # Check if we have all data for drawing
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
