@@ -23,7 +23,7 @@ INSERT INTO om_visit_class VALUES (4, 'Leak on connec', NULL, true, false, false
 INSERT INTO om_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 'NODE', 'role_om', 1);
 INSERT INTO om_visit_class VALUES (8, 'Incident', NULL, true, false, true, null, 'role_om', 2);
 
-
+SELECT setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
 
 INSERT INTO om_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
 INSERT INTO om_visit_parameter VALUES ('leak_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'leak on arc', 'event_standard', 'defaultvalue', FALSE, 'arc_insp_des');
@@ -52,13 +52,15 @@ INSERT INTO om_visit_class_x_parameter VALUES (5, 2, 'sediments_connec');
 INSERT INTO om_visit_class_x_parameter VALUES (6, 6, 'sediments_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (7, 5, 'defect_node');
 INSERT INTO om_visit_class_x_parameter VALUES (8, 5, 'clean_node');
-INSERT INTO om_visit_class_x_parameter VALUES (10, 1, 'leak_arc');
-INSERT INTO om_visit_class_x_parameter VALUES (11, 3, 'leak_node');
-INSERT INTO om_visit_class_x_parameter VALUES (12, 4, 'leak_connec');
-INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'incident_comment');
-INSERT INTO om_visit_class_x_parameter VALUES (15, 8, 'incident_type');
+INSERT INTO om_visit_class_x_parameter VALUES (9, 1, 'leak_arc');
+INSERT INTO om_visit_class_x_parameter VALUES (10, 3, 'leak_node');
+INSERT INTO om_visit_class_x_parameter VALUES (11, 4, 'leak_connec');
+INSERT INTO om_visit_class_x_parameter VALUES (12, 8, 'incident_comment');
+INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'incident_type');
 INSERT INTO om_visit_class_x_parameter VALUES (3, 6, 'defect_arc');
-INSERT INTO om_visit_class_x_parameter VALUES (16, 2, 'defect_connec');
+INSERT INTO om_visit_class_x_parameter VALUES (14, 2, 'defect_connec');
+
+SELECT setval('SCHEMA_NAME.om_visit_class_x_parameter_id_seq', (SELECT max(id) FROM om_visit_class_x_parameter), true);
 
 CREATE OR REPLACE VIEW ve_visit_noinfra AS 
  SELECT om_visit.id AS visit_id,

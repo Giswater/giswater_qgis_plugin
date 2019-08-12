@@ -23,6 +23,8 @@ INSERT INTO om_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 
 INSERT INTO om_visit_class VALUES (8, 'Incident', NULL, true, false, true, null, 'role_om', 2);
 INSERT INTO om_visit_class VALUES (9, 'Rehabilitation arc', NULL, true, false, true, 'ARC', 'role_om', 1);
 
+SELECT setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
+
 INSERT INTO om_visit_parameter VALUES ('arc_rehabit_1', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Rehabilitation arc parameter 1', 'event_ud_arc_rehabit', NULL, 'FALSE');
 INSERT INTO om_visit_parameter VALUES ('arc_rehabit_2', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Rehabilitation arc parameter 2', 'event_ud_arc_rehabit', NULL, 'FALSE');
 
@@ -56,17 +58,19 @@ INSERT INTO om_visit_class_x_parameter VALUES (5, 2, 'sediments_connec');
 INSERT INTO om_visit_class_x_parameter VALUES (6, 6, 'sediments_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (7, 5, 'defect_node');
 INSERT INTO om_visit_class_x_parameter VALUES (8, 5, 'clean_node');
-INSERT INTO om_visit_class_x_parameter VALUES (10, 1, 'leak_arc');
-INSERT INTO om_visit_class_x_parameter VALUES (11, 3, 'leak_node');
-INSERT INTO om_visit_class_x_parameter VALUES (12, 4, 'leak_connec');
-INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'incident_comment');
-INSERT INTO om_visit_class_x_parameter VALUES (15, 8, 'incident_type');
+INSERT INTO om_visit_class_x_parameter VALUES (9, 1, 'leak_arc');
+INSERT INTO om_visit_class_x_parameter VALUES (10, 3, 'leak_node');
+INSERT INTO om_visit_class_x_parameter VALUES (11, 4, 'leak_connec');
+INSERT INTO om_visit_class_x_parameter VALUES (12, 8, 'incident_comment');
+INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'incident_type');
 INSERT INTO om_visit_class_x_parameter VALUES (3, 6, 'defect_arc');
-INSERT INTO om_visit_class_x_parameter VALUES (16, 2, 'defect_arc');
-INSERT INTO om_visit_class_x_parameter VALUES (17, 9, 'arc_rehabit_1');
-INSERT INTO om_visit_class_x_parameter VALUES (18, 9, 'arc_rehabit_2');
-INSERT INTO om_visit_class_x_parameter VALUES (19, 7, 'clean_gully');
-INSERT INTO om_visit_class_x_parameter VALUES (20, 7, 'smells_gully');
+INSERT INTO om_visit_class_x_parameter VALUES (14, 2, 'defect_arc');
+INSERT INTO om_visit_class_x_parameter VALUES (15, 9, 'arc_rehabit_1');
+INSERT INTO om_visit_class_x_parameter VALUES (16, 9, 'arc_rehabit_2');
+INSERT INTO om_visit_class_x_parameter VALUES (17, 7, 'clean_gully');
+INSERT INTO om_visit_class_x_parameter VALUES (18, 7, 'smells_gully');
+
+SELECT setval('SCHEMA_NAME.om_visit_class_x_parameter_id_seq', (SELECT max(id) FROM om_visit_class_x_parameter), true);
 
 truncate config_api_visit;
 INSERT INTO config_api_visit VALUES (2, 'visit_connec_insp', 've_visit_connec_insp');
