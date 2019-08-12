@@ -129,7 +129,7 @@ class DeleteFeature(ApiParent):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = ("SELECT gw_fct_set_delete_feature($${" + body + "}$$)")
+        sql = ("SELECT gw_fct_set_delete_feature($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row or row[0] is None:
