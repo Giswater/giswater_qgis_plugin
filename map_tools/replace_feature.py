@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+
 try:
     from qgis.core import Qgis
 except ImportError:
@@ -29,6 +30,7 @@ from ..ui_manager import UDcatalog
 from ..ui_manager import WScatalog
 from ..ui_manager import FeatureReplace
 from ..ui_manager import NewWorkcat
+from ..actions.api_catalog import ApiCatalog
 
 
 class ReplaceFeatureMapTool(ParentMapTool):
@@ -115,7 +117,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
-        self.dlg_replace.btn_catalog.clicked.connect(partial(self.open_catalog_form, self.project_type, self.geom_type))
+        self.dlg_replace.btn_catalog.clicked.connect(partial(self.open_catalog))
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self.update_date)
 
         # Fill 1st combo boxes-new system node type
@@ -131,6 +133,19 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         # Open dialog
         self.open_dialog(self.dlg_replace, maximize_button=False)
+
+
+    def open_catalog(self):
+
+        # Get feature_type
+        feature_type = utils_giswater.getWidgetText(self.dlg_replace,self.dlg_replace.feature_type_new)
+
+        if feature_type is 'null':
+            msg = "New feature type is null. Please, select a valid value."
+            self.controller.show_info_box(msg, "Info")
+            return
+        self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', 'node', feature_type)
 
 
     def update_date(self):

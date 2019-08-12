@@ -30,10 +30,15 @@ class ChangeElemType(ParentMapTool):
         super(ChangeElemType, self).__init__(iface, settings, action, index_action)       
 
 
-    def open_catalog(self, tab_type, feature_type):
+    def open_catalog(self):
 
         # Get feature_type
         feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type,self.dlg_chg_node_type.node_node_type_new)
+
+        if feature_type is 'null':
+            msg = "New node type is null. Please, select a valid value."
+            self.controller.show_info_box(msg, "Info")
+            return
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
         self.catalog.api_catalog(self.dlg_chg_node_type,'node_nodecat_id', 'node', feature_type)
 
@@ -137,7 +142,7 @@ class ChangeElemType(ParentMapTool):
             node_type = feature.attribute('node_type')
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
-        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog, 'data', ''))
+        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
         self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
         
