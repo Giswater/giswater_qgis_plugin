@@ -77,3 +77,5 @@ class DuplicatePsector(ParentManage):
         # Close dialog
         if not change_tab:
             self.close_dialog(self.dlg_duplicate_psector)
+        else:
+            utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
