@@ -472,22 +472,44 @@ class Giswater(QObject):
         # Value: Object of the class SysFeatureCat
 
         self.feature_cat = {}
-        sql = ("SELECT * FROM cat_feature "
-               "WHERE active is True")
-        rows = self.controller.get_rows(sql)
 
-        if not rows:
-            return False
+        # TODO:: What happens with cat_* features on UD?
+        if self.wsoftware.upper() != 'UD':
+            sql = ("SELECT t1.* FROM cat_feature as t1 "
+                   "JOIN cat_node as t2 ON t2.nodetype_id = t1.id "
+                   "WHERE t2.active is True "
+                   "UNION "
+                   "SELECT t1.* FROM cat_feature as t1 "
+                   "JOIN cat_arc as t3 ON t3.arctype_id = t1.id "
+                   "WHERE t3.active is True "
+                   "UNION "
+                   "SELECT t1.* FROM cat_feature as t1 "
+                   "JOIN cat_connec as t4 ON t4.connectype_id = t1.id "
+                   "WHERE t4.active is True")
 
-        for row in rows:
-            tablename = row['child_layer']
-            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
-                                 row['parent_layer'], row['child_layer'], row['active'])
-            self.feature_cat[tablename] = elem
+            # TODO:: For UD projects get gullys
+            # if self.wsoftware.upper() == 'UD':
+            #     sql = (sql + " UNION "
+            #                 "SELECT DISTINCT(t5.gullytype_id) FROM cat_feature as t1 "
+            #                 "JOIN cat_grate as t5 ON t5.gullytype_id = t1.id "
+            #                 "WHERE t5.active is True")
 
-        self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
+            self.controller.log_info(str(sql))
 
-        return True
+            rows = self.controller.get_rows(sql)
+
+            if not rows:
+                return False
+
+            for row in rows:
+                tablename = row['child_layer']
+                elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
+                                     row['parent_layer'], row['child_layer'], row['active'])
+                self.feature_cat[tablename] = elem
+
+            self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
+
+            return True
 
 
     def unload(self, remove_modules=True):

@@ -2328,11 +2328,31 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
 
-            sql = ("SELECT DISTINCT(child_layer), child_layer FROM " + str(schema_name) + ".cat_feature WHERE active is TRUE")
+            sql = ("SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
+                   "JOIN cat_node as t2 ON t2.nodetype_id = t1.id "
+                   "WHERE t2.active is True "
+                   "UNION "
+                   "SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
+                   "JOIN cat_arc as t3 ON t3.arctype_id = t1.id "
+                   "WHERE t3.active is True "
+                   "UNION "
+                   "SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
+                   "JOIN cat_connec as t4 ON t4.connectype_id = t1.id "
+                   "WHERE t4.active is True")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
-            sql = ("SELECT DISTINCT(id), id FROM " + str(schema_name) + ".cat_feature WHERE active is TRUE")
+            sql = ("SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
+                   "JOIN cat_node as t2 ON t2.nodetype_id = t1.id "
+                   "WHERE t2.active is True "
+                   "UNION "
+                   "SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
+                   "JOIN cat_arc as t3 ON t3.arctype_id = t1.id "
+                   "WHERE t3.active is True "
+                   "UNION "
+                   "SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
+                   "JOIN cat_connec as t4 ON t4.connectype_id = t1.id "
+                   "WHERE t4.active is True")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
