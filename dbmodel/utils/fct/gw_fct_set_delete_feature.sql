@@ -45,7 +45,11 @@ BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
- 
+	
+		--  get api version
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
+         
  	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
 	-- manage log (fprocesscat = 52)
