@@ -94,7 +94,6 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_to', 'epaoptions'
 			NULL, NULL, FALSE, 14, 6, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,
 			NULL, NULL, 'grl_date_14', NULL, NULL, NULL, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');	
 
-UPDATE cat_feature SET active=true, code_autofill=true;
 
 UPDATE cat_feature SET child_layer='ve_node_throttlevalve' WHERE id='THROTTLE-VALVE';
 UPDATE cat_feature SET child_layer='ve_node_valveregister' WHERE id='VALVE-REGISTER';

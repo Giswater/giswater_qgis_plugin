@@ -40,8 +40,6 @@ ALTER TABLE cat_feature ADD COLUMN type character varying(30);
 ALTER TABLE cat_feature ADD COLUMN shortcut_key character varying(100);
 ALTER TABLE cat_feature ADD COLUMN parent_layer character varying(100);
 ALTER TABLE cat_feature ADD COLUMN child_layer character varying(100);
-ALTER TABLE cat_feature ADD COLUMN active boolean;
-ALTER TABLE cat_feature ADD COLUMN code_autofill boolean;
 
 
 --rename instead of add column?
