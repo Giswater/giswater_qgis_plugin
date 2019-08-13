@@ -158,11 +158,6 @@ class MincutParent(ParentAction):
         self.dlg_mincut.exec_user.setVisible(False)
 
         # Toolbar actions
-        action = self.dlg_mincut.findChild(QAction, "actionConfig")
-        action.triggered.connect(self.mincut_config.config)
-        self.set_icon(action, "99")
-        self.action_config = action
-
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self.auto_mincut)
         self.set_icon(action, "126")

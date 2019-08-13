@@ -1046,7 +1046,6 @@
    <addaction name="actionCustomMincut"/>
    <addaction name="actionAddConnec"/>
    <addaction name="actionAddHydrometer"/>
-   <addaction name="actionConfig"/>
    <addaction name="actionComposer"/>
    <addaction name="actionShowNotified"/>
   </widget>
