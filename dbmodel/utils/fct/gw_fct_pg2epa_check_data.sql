@@ -6,21 +6,22 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2430
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_check_data(text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
+DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa_check_data(text);
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
+SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"resultId":"p1","saveOnDatabase":true}}}$$)
 */
 
 DECLARE
+v_data 			json;
 valve_rec		record;
-v_countglobal	integer;
-v_record			record;
+v_countglobal		integer;
+v_record		record;
 setvalue_int		int8;
 v_project_type 		text;
 v_count			integer;
@@ -45,22 +46,22 @@ v_min 			numeric (12,4);
 v_max			numeric (12,4);
 v_headloss		text;
 v_message		text;
-v_demandtype 	integer;
-v_patternmethod	integer;
+v_demandtype 		integer;
+v_patternmethod		integer;
 v_period		text;
-v_networkmode	integer;
-v_valvemode	integer;
-v_demandtypeval text;
-v_patternmethodval text;
-v_periodval 	text;
-v_valvemodeval 	text;
+v_networkmode		integer;
+v_valvemode		integer;
+v_demandtypeval 	text;
+v_patternmethodval 	text;
+v_periodval 		text;
+v_valvemodeval 		text;
 v_networkmodeval	text;
 
 
 BEGIN
 
 	--  Search path	
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 
 	-- getting input data 	
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
@@ -71,12 +72,15 @@ BEGIN
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
+	v_data = '{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"false"}}';
+
+
 	-- call go2epa function in case of new result
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
 		IF v_project_type = 'WS' THEN
-			PERFORM gw_fct_pg2epa(  v_result_id, false, false);
+			PERFORM gw_fct_pg2epa_main(v_data);
 		ELSE
-			PERFORM gw_fct_pg2epa(  v_result_id, false, false, false);
+			PERFORM gw_fct_pg2epa_main(v_data);
 		END IF;
 	END IF;
 		
@@ -640,36 +644,36 @@ BEGIN
 	
 	-- info data analysis
 	IF v_project_type  = 'UD' THEN
-		SELECT min(length), max(length) INTO v_min, vmax FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for length are: (',v_min,',',v_max,')');
+		SELECT min(length), max(length) INTO v_min, v_max FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for length are: ( ',v_min,' - ',v_max,' )'));
 
-		SELECT min(n), max(n) INTO v_min, vmax FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for manning roughness coeficient are: (',v_min,',',v_max,')');
+		SELECT min(n), max(n) INTO v_min, v_max FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for manning roughness coeficient are: ( ',v_min,' - ',v_max,' )'));
 
-		SELECT min(z1), max(z1) INTO v_min, vmax FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for conduit z1 are: (',v_min,',',v_max,')');
+		SELECT min(z1), max(z1) INTO v_min, v_max FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for conduit z1 are: ( ',v_min,' - ',v_max,' )'));
 		
-		SELECT min(z2), max(z2) INTO v_min, vmax FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for conduit z2 are: (',v_min,',',v_max,')');
+		SELECT min(z2), max(z2) INTO v_min, v_max FROM vi_conduits;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for conduit z2 are: ( ',v_min,' - ',v_max,' )'));
 	
-		SELECT min(slope), max(slope) INTO v_min, v_max FROM v_edit_arc WHERE SECTOR IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for slope are: (',v_min,',',v_max,')');
+		SELECT min(slope), max(slope) INTO v_min, v_max FROM v_edit_arc WHERE sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for slope are: ( ',v_min,' - ',v_max,' )'));
 		
-		SELECT min(sys_elev), max(sys_elev) INTO v_min, v_max FROM v_edit_node WHERE SECTOR IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for node elevation are: (',v_min,',',v_max,')');
+		SELECT min(sys_elev), max(sys_elev) INTO v_min, v_max FROM v_edit_node WHERE sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for node elevation are: ( ',v_min,' - ',v_max,' )'));
 	
 	ELSE
-		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM v_edit_node WHERE SECTOR IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for elevation are: (',v_min,',',v_max,')');
+		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM v_edit_node WHERE sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for elevation are: ( ',v_min,' - ',v_max,' )'));
 	
-		SELECT min(length), max(length) INTO v_min, vmax FROM vi_pipes;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for pipe length are: (',v_min,',',v_max,')');
+		SELECT min(length), max(length) INTO v_min, v_max FROM vi_pipes;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for pipe length are: (',v_min,' - ',v_max,' )'));
 	
-		SELECT min(diameter), max(diameter) INTO v_min, vmax FROM vi_pipes;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for pipe diameter are: (',v_min,',',v_max,')');
+		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM vi_pipes;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for pipe diameter are: ( ',v_min,' - ',v_max,' )'));
 	
-		SELECT min(roughness), max(roughness) INTO v_min, vmax FROM vi_pipes;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, 'INFO: Minimum and maximum values for pipe roughness are: (',v_min,',',v_max,')');
+		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM vi_pipes;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('INFO:  Min. / Max. values for pipe roughness are: ( ',v_min,' - ',v_max,' )'));
 	
 	END IF;
 	

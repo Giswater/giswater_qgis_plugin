@@ -66,7 +66,7 @@ UPDATE audit_cat_param_user SET layout_id=4, layout_order = 10, layoutname='grl_
 UPDATE audit_cat_param_user SET label='Dscenario overwrites demand:', layout_id = 2, layout_order = 6, layoutname='grl_general_2', idval=null WHERE id='inp_options_overwritedemands';
 
 UPDATE audit_cat_param_user SET id='inp_iterative_main_function', label = 'Iterative function:', 
-								layout_id = 15, layout_order=1, layoutname=null, idval=null, isenabled=TRUE, dv_isnullvalue=TRUE, ismandatory=true,
+								layout_id = 15, layout_order=1, layoutname=null, idval=null, isenabled=FALSE, dv_isnullvalue=TRUE, ismandatory=true,
 								dv_querytext='SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_iterative_function''',
 								epaversion='{"from":"2.0.12", "to":null, "language":"english"}'
 								WHERE id='inp_other_recursive_function';
@@ -75,7 +75,7 @@ DELETE FROM audit_cat_param_user WHERE id='inp_recursive_function'; -- delete pa
 								
 INSERT INTO audit_cat_param_user VALUES ('inp_iterative_parameters', 'epaoptions', 'Parameters to work with iterative functions', 'role_epa',
 			NULL, null, 'Iterative parameters:', NULL, 
-			NULL, TRUE, 16, 1, 'ws', false, NULL, NULL, NULL, false, 'string', 'text', TRUE, NULL, '{"nodesCoupleCapacity":{"lpsDemand":16.6, "mcaMinPress":15, "minDiameter":75.6}}',
+			NULL, false, 16, 1, 'ws', false, NULL, NULL, NULL, false, 'string', 'text', TRUE, NULL, '{"nodesCoupleCapacity":{"lpsDemand":16.6, "mcaMinPress":15, "minDiameter":75.6}}',
 			null,NULL, NULL, TRUE, TRUE, NULL, NULL, false,'{"from":"2.0.12", "to":null, "language":"english"}');			
 									
 INSERT INTO audit_cat_param_user VALUES ('inp_options_demandtype', 'epaoptions', 'Demand type to use on EPANET simulation', 'role_epa', NULL, NULL, 'Demand type:', 
