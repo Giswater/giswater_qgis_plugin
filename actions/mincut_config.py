@@ -11,6 +11,7 @@ from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QStringListMo
 from PyQt4.QtSql import QSqlTableModel
 
 import datetime
+import os
 import subprocess
 import utils_giswater
 from functools import partial
@@ -179,7 +180,7 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector))
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
-        self.set_icon(self.btn_notify, "181")
+        self.set_icon(self.btn_notify, "307")
 
         btn_visible = self.settings.value('customized_actions/show_mincut_sms', 'FALSE')
         self.btn_notify.setVisible(True) if btn_visible.upper() == 'TRUE' else self.btn_notify.setVisible(False)
@@ -238,8 +239,10 @@ class MincutConfig(ParentAction):
 
     def call_sms_script(self, qtable):
         path = self.settings.value('customized_actions/path_sms_script')
-        if path is None:
+        if path is None or not os.path.exists(path):
+            self.controller.show_warning("File not found", parameter=path)
             return
+
         selected_list = qtable.selectionModel().selectedRows()
         list_mincut_id = []
         for i in range(0, len(selected_list)):
@@ -265,10 +268,12 @@ class MincutConfig(ParentAction):
                 client = str(row[0])
                 list_clients.append(client)
 
+            # Call script
             status_code = subprocess.call(['python', path, _type, from_date, to_date, list_clients])
+
+            # Update table with results
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
-            print(row[4])
             if row[4] is None:
                 sql += ("SET notified = ('[{\"code\":\""+str(status_code)+"\",\"date\":\""+str(_date_sended)+"\"}]') ")
             else:

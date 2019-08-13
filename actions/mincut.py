@@ -170,7 +170,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         action = self.dlg_mincut.findChild(QAction, "actionShowNotified")
         action.triggered.connect(self.show_notified_list)
-        self.set_icon(action, "181")
+        # self.set_icon(action, "308")
         self.show_notified = action
         action_visible = self.settings.value('customized_actions/show_sms_info', 'FALSE')
         self.show_notified.setVisible(True) if action_visible.upper() == 'TRUE' else self.show_notified.setVisible(False)
