@@ -33,6 +33,7 @@ DECLARE
 	v_created_addfields record;
 	v_polygon_view text;
 	v_project_type text;
+	v_querytext text;
 
 BEGIN
 
@@ -52,8 +53,19 @@ BEGIN
 
 --if the view should be created for all the features loop over the cat_features
 IF v_multi_create IS TRUE THEN
+
+	IF v_project_type ='WS' THEN
+		v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
+						UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
 	
-	FOR rec IN (SELECT * FROM cat_feature WHERE active IS TRUE ORDER BY id) LOOP
+	ELSIF v_project_type ='UD' THEN
+		v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
+						UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type, UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
+	END IF;
+
+	
+	FOR rec IN EXECUTE v_querytext 
+	LOOP
 	RAISE NOTICE 'rec.id,%',rec.id;
 	--get the system type and system_id of the feature and view name
 	v_feature_type = (SELECT type FROM cat_feature where id=rec.id);
