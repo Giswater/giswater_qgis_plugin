@@ -336,7 +336,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.rotation.setDisabled(False)
         self.dlg_draw_profile.scale_vertical.setDisabled(False)
         self.dlg_draw_profile.scale_horizontal.setDisabled(False)
-        self.exec_path()
         self.close_dialog(self.dlg_load)
 
 

@@ -2329,29 +2329,29 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
 
             sql = ("SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
-                   "JOIN cat_node as t2 ON t2.nodetype_id = t1.id "
+                   "JOIN " + schema_name + ".cat_node as t2 ON t2.nodetype_id = t1.id "
                    "WHERE t2.active is True "
                    "UNION "
                    "SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
-                   "JOIN cat_arc as t3 ON t3.arctype_id = t1.id "
+                   "JOIN " + schema_name + ".cat_arc as t3 ON t3.arctype_id = t1.id "
                    "WHERE t3.active is True "
                    "UNION "
                    "SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
-                   "JOIN cat_connec as t4 ON t4.connectype_id = t1.id "
+                   "JOIN " + schema_name + ".cat_connec as t4 ON t4.connectype_id = t1.id "
                    "WHERE t4.active is True")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
             sql = ("SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
-                   "JOIN cat_node as t2 ON t2.nodetype_id = t1.id "
+                   "JOIN " + schema_name + ".cat_node as t2 ON t2.nodetype_id = t1.id "
                    "WHERE t2.active is True "
                    "UNION "
                    "SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
-                   "JOIN cat_arc as t3 ON t3.arctype_id = t1.id "
+                   "JOIN " + schema_name + ".cat_arc as t3 ON t3.arctype_id = t1.id "
                    "WHERE t3.active is True "
                    "UNION "
                    "SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
-                   "JOIN cat_connec as t4 ON t4.connectype_id = t1.id "
+                   "JOIN " + schema_name + ".cat_connec as t4 ON t4.connectype_id = t1.id "
                    "WHERE t4.active is True")
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
@@ -2429,6 +2429,18 @@ class UpdateSQL(ApiParent):
 
         # Set default value for formtype widget
         utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
+
+        # Populate current_addfields table
+        # sql = "SELECT * FROM ws32_nestor.ve_config_addfields WHERE cat_feature_id = '" + form_name + "'"
+        # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+
+        qtable = self.dlg_manage_fields.findChild(QTableView, "current_addfields")
+        self.model_create_table = QSqlTableModel()
+
+        expr_filter = "cat_feature_id = '" + form_name + "'"
+        print(str(expr_filter))
+        self.fill_table(qtable, 've_config_addfields', self.model_create_table, expr_filter)
+        self.set_table_columns(self.dlg_manage_fields, qtable, 've_config_addfields', schema_name)
 
 
     def manage_update_field(self, form_name):
