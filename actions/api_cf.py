@@ -1465,7 +1465,7 @@ class ApiCF(ApiParent):
         self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dlg_cf.findChild(QDateEdit, "date_event_from")
 
-        self.set_dates_from_to(self.date_event_to, self.date_event_from, table_name, 'visit_start', 'visit_end')
+        self.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
         date = QDate.currentDate()
         self.date_event_to.setDate(date)
 

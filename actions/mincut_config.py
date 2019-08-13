@@ -162,6 +162,8 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit = Mincut_edit()
         self.load_settings(self.dlg_min_edit)
         self.set_dates()
+        # self.set_dates_from_to(self.dlg_min_edit.date_to, self.dlg_min_edit.date_to, 'v_ui_anl_mincut_result_cat',
+        #                        'forecast_start', 'forecast_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
@@ -189,13 +191,16 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.date_from.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
         self.dlg_min_edit.date_to.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
         self.dlg_min_edit.cmb_expl.currentIndexChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_min_edit.btn_show.clicked.connect(partial(self.show_selection))
-        self.dlg_min_edit.btn_cancel_mincut.clicked.connect(partial(self.set_state_cancel_mincut))
+        self.dlg_min_edit.spn_next_days.setRange(-9999, 9999)
+        self.dlg_min_edit.btn_next_days.clicked.connect(self.filter_by_days)
+        self.dlg_min_edit.spn_next_days.valueChanged.connect(self.filter_by_days)
+        self.dlg_min_edit.btn_show.clicked.connect(self.show_selection)
+        self.dlg_min_edit.btn_cancel_mincut.clicked.connect(self.set_state_cancel_mincut)
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
-        self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector))
+        self.dlg_min_edit.btn_selector_mincut.clicked.connect(self.mincut_selector)
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
         self.set_icon(self.btn_notify, "307")
@@ -405,6 +410,29 @@ class MincutConfig(ParentAction):
         self.mincut.load_mincut(result_mincut_id)
 
 
+    def filter_by_days(self):
+
+        date_from = datetime.datetime.now()
+        days_added = self.dlg_min_edit.spn_next_days.text()
+        date_to = datetime.datetime.now()
+        date_to += datetime.timedelta(days=int(days_added))
+
+        # If the date_to is less than the date_from, you have to exchange them or the interval will not work
+        if date_to < date_from:
+            aux = date_from
+            date_from = date_to
+            date_to = aux
+
+        format_low = '%Y-%m-%d 00:00:00.000'
+        format_high = '%Y-%m-%d 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            date_from.strftime(format_low), date_to.strftime(format_high))
+
+        expr = "(forecast_start BETWEEN {0})".format(interval)
+        self.controller.log_info(str(expr))
+        self.tbl_mincut_edit.model().setFilter(expr)
+        self.tbl_mincut_edit.model().select()
+
 
     def filter_by_id(self, qtable):
 
@@ -424,6 +452,8 @@ class MincutConfig(ParentAction):
             visit_start = self.dlg_min_edit.date_from.date()
             visit_end = self.dlg_min_edit.date_to.date()
             date_from = visit_start.toString('yyyyMMdd 00:00:00')
+            print(type(date_from))
+            self.controller.log_info(str(date_from))
             date_to = visit_end.toString('yyyyMMdd 23:59:59')
             if date_from > date_to:
                 message = "Selected date interval is not valid"
@@ -452,7 +482,7 @@ class MincutConfig(ParentAction):
         if state != '':
             expr += " AND state::text ILIKE '%" + state + "%' OR state IS null"
         expr += " AND expl_id::text ILIKE '%" + str(expl) + "%' OR expl_id IS null"
-
+        self.controller.log_info(str(expr))
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
         qtable.model().select()

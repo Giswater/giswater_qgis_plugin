@@ -796,7 +796,7 @@ class ParentAction(object):
                     widget.setEnabled(False)
 
 
-    def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
+    def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
 
         sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
                " FROM {}".format(table_name))
