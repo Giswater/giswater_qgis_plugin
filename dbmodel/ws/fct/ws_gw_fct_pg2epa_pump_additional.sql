@@ -47,7 +47,7 @@ BEGIN
     RAISE NOTICE 'Starting additional pumps process.';
 	
 --  Loop for pumping stations
-    FOR node_id_aux IN (SELECT DISTINCT node_id FROM inp_pump_additional)    
+    FOR node_id_aux IN (SELECT DISTINCT node_id FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id,'_n2a')=arc_id WHERE result_id=result_id_var)
     LOOP
 
 	SELECT * INTO arc_rec FROM rpt_inp_arc WHERE arc_id=concat(node_id_aux,'_n2a') AND result_id=result_id_var;

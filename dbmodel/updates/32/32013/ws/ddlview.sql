@@ -11,23 +11,24 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP VIEW vi_curves;
 CREATE OR REPLACE VIEW vi_curves AS 
  SELECT
+node_id,
         CASE
             WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
             ELSE a.curve_id
         END AS curve_id,
     a.x_value::numeric(12,4) AS x_value,
     a.y_value::numeric(12,4) AS y_value,
-	null::text as other
-   FROM ( SELECT DISTINCT ON (inp_curve.curve_id) ( SELECT min(sub.id) AS min
+    NULL::text AS other
+FROM ( SELECT DISTINCT ON (inp_curve.curve_id) ( SELECT min(sub.id) AS min
                    FROM inp_curve sub
                   WHERE sub.curve_id::text = inp_curve.curve_id::text) AS id,
             inp_curve.curve_id,
-            concat(';', inp_curve_id.curve_type, ':', inp_curve_id.descript ) AS curve_type,
+            concat(';', inp_curve_id.curve_type, ':', inp_curve_id.descript) AS curve_type,
             NULL::numeric AS x_value,
             NULL::numeric AS y_value
            FROM inp_curve_id
              JOIN inp_curve ON inp_curve.curve_id::text = inp_curve_id.id::text
-        UNION
+	UNION
          SELECT inp_curve.id,
             inp_curve.curve_id,
             inp_curve_id.curve_type,
@@ -35,10 +36,17 @@ CREATE OR REPLACE VIEW vi_curves AS
             inp_curve.y_value
            FROM inp_curve
              JOIN inp_curve_id ON inp_curve.curve_id::text = inp_curve_id.id::text
-  ORDER BY 1, 4 DESC) a
-	JOIN (SELECT node_id, curve_id FROM inp_pump UNION SELECT node_id, curve_id FROM inp_tank) b USING (curve_id)
-	WHERE node_id IN (SELECT node_id FROM rpt_inp_node WHERE result_id=(SELECT result_id FROM inp_selector_result WHERE cur_user=current_user))
-;
+		ORDER BY 1, 4 DESC) a
+JOIN ( SELECT inp_pump.node_id,
+            inp_pump.curve_id
+           FROM inp_pump
+		UNION
+		SELECT inp_tank.node_id,
+            inp_tank.curve_id
+           FROM inp_tank) b USING (curve_id)
+
+JOIN (SELECT * FROM (SELECT node_1 AS node_id , arc.sector_id FROM node JOIN arc on node_1=node_id UNION SELECT node_2, arc.sector_id FROM node JOIN arc ON node_2=node_id)c JOIN inp_selector_sector 
+USING (sector_id)) d using (node_id);
 
 
 

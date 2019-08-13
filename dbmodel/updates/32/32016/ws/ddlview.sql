@@ -665,7 +665,11 @@ SELECT inp_inlet.node_id,
     rpt_inp_node.elevation AS head,
     inp_inlet.pattern_id
    FROM inp_selector_result, inp_inlet
-     LEFT JOIN (SELECT node_id, count(*)AS ct FROM (select node_1 as node_id FROM rpt_inp_arc UNION ALL select node_2 FROM rpt_inp_arc)a GROUP BY 1)b  USING (node_id) 
+     LEFT JOIN (SELECT node_id, count(*)AS ct FROM (select node_1 as node_id FROM rpt_inp_arc,inp_selector_result
+                     WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text 
+					 UNION ALL select node_2 FROM rpt_inp_arc,inp_selector_result
+                     WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+                     )a GROUP BY 1)b  USING (node_id) 
      JOIN rpt_inp_node ON inp_inlet.node_id::text = rpt_inp_node.node_id::text
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
   AND ct=1;
@@ -698,10 +702,13 @@ UNION
      LEFT JOIN ( SELECT a.node_id,
             count(*) AS ct
            FROM ( SELECT rpt_inp_arc.node_1 AS node_id
-                   FROM rpt_inp_arc
-                UNION ALL
-                 SELECT rpt_inp_arc.node_2
-                   FROM rpt_inp_arc) a
+						FROM rpt_inp_arc,inp_selector_result
+						WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+						UNION ALL
+						SELECT rpt_inp_arc.node_2
+						FROM rpt_inp_arc,inp_selector_result
+						WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+                )a
           GROUP BY a.node_id) b USING (node_id)
      JOIN rpt_inp_node ON inp_inlet.node_id::text = rpt_inp_node.node_id::text
   WHERE b.ct > 1;  

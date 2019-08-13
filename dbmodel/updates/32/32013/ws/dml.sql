@@ -84,7 +84,7 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_demandtype', 'epaoptions',
 						
 INSERT INTO audit_cat_param_user VALUES ('inp_options_patternmethod', 'epaoptions', 'Pattern method used on EPANET simulation', 'role_epa', NULL, NULL, 'Pattern method:', 
 			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_patternmethod''', 'inp_options_demandtype', true, 1, 3, 'ws', FALSE, ' AND addparam->>''DemandType''=', NULL, NULL, FALSE, NULL, 'combo', true, 
-			NULL, '1', 'grl_general_1', NULL, TRUE, TRUE, TRUE, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
+			NULL, '11', 'grl_general_1', NULL, TRUE, TRUE, TRUE, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
 			
 INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_from', 'epaoptions', 'CRM interval used on EPANET simulation', 'role_epa', NULL, NULL, 'From CRM interval:', 
 			NULL, NULL, FALSE, 13, 6, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,
