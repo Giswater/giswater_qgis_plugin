@@ -10,9 +10,11 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QStringListModel, QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
+import datetime
+import subprocess
+import utils_giswater
 from functools import partial
 
-import utils_giswater
 from giswater.ui_manager import Multirow_selector
 from giswater.ui_manager import Multi_selector
 from giswater.ui_manager import Mincut_edit
@@ -29,6 +31,7 @@ class MincutConfig(ParentAction):
         self.plugin_dir = mincut.plugin_dir
         self.controller = self.mincut.controller
         self.schema_name = self.controller.schema_name
+        self.settings = self.mincut.settings
         
 
     def config(self):
@@ -174,12 +177,17 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
         self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector))
+        self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
+        self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
+        self.set_icon(self.btn_notify, "181")
 
+        btn_visible = self.settings.value('customized_actions/show_mincut_sms', 'FALSE')
+        self.btn_notify.setVisible(True) if btn_visible.upper() == 'TRUE' else self.btn_notify.setVisible(False)
         # Fill ComboBox state
         sql = ("SELECT name"
                " FROM " + self.schema_name + ".anl_mincut_cat_state"
                " ORDER BY name")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "v_ui_anl_mincut_result_cat"))
 
@@ -192,6 +200,85 @@ class MincutConfig(ParentAction):
         # Open the dialog
         self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_min_edit.show()
+
+    def get_clients_codes(self, qtable):
+
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        inf_text = "Are you sure you want to send smd to this clients?"
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable.model().record(row).value(str('id'))
+            inf_text += "\n\nMincut: " + str(id_) + ""
+            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, t2.mincut_type "
+                   "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
+                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
+                   "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
+                   "WHERE result_id = " + str(id_))
+
+            rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+            if not rows:
+                inf_text += "\nClients: None(No messages will be sent)"
+                continue
+
+            inf_text += "\nClients: \n"
+            for row in rows:
+                inf_text += str(row[0]) + ", "
+
+        inf_text = inf_text[:-2]
+        inf_text += "\n"
+        answer = self.controller.ask_question(str(inf_text))
+        if answer:
+            self.call_sms_script(qtable)
+
+
+    def call_sms_script(self, qtable):
+        path = self.settings.value('customized_actions/path_sms_script')
+        if path is None:
+            return
+        selected_list = qtable.selectionModel().selectedRows()
+        list_mincut_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable.model().record(row).value(str('id'))
+            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, t2.mincut_type, notified "
+                   "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
+                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
+                   "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
+                   "WHERE result_id = " + str(id_))
+
+            rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+            if not rows:
+                print("NOT ROWS")
+                continue
+
+            from_date = str(rows[0][1].strftime('%d/%m/%Y %H:%M'))
+            to_date = str(rows[0][2].strftime('%d/%m/%Y %H:%M'))
+            _type = rows[0][3]
+            list_clients = []
+            list_mincut_id.append(id_)
+            for row in rows:
+                client = str(row[0])
+                list_clients.append(client)
+
+            status_code = subprocess.call(['python', path, _type, from_date, to_date, list_clients])
+            _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
+            sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
+            print(row[4])
+            if row[4] is None:
+                sql += ("SET notified = ('[{\"code\":\""+str(status_code)+"\",\"date\":\""+str(_date_sended)+"\"}]') ")
+            else:
+                sql += ("SET notified= concat(replace(notified::text,']',','),'{\"code\":\""+str(status_code)+"\",\"date\":\""+str(_date_sended)+"\"}]')::json ")
+            sql += ("WHERE id = '"+str(id_)+"'")
+            row = self.controller.execute_sql(sql, commit=True, log_sql=True)
+
+            # Set a model with selected filter. Attach that model to selected table
+            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
+            self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
 
     def mincut_selector(self):

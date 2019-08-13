@@ -168,6 +168,13 @@ class MincutParent(ParentAction, MultipleSelection):
         self.set_icon(action, "181")
         self.action_mincut_composer = action
 
+        action = self.dlg_mincut.findChild(QAction, "actionShowNotified")
+        action.triggered.connect(self.show_notified_list)
+        self.set_icon(action, "181")
+        self.show_notified = action
+        action_visible = self.settings.value('customized_actions/show_sms_info', 'FALSE')
+        self.show_notified.setVisible(True) if action_visible.upper() == 'TRUE' else self.show_notified.setVisible(False)
+
         # Show future id of mincut
         self.set_id_val()
 
@@ -181,10 +188,24 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_mincut.show()
 
 
+    def show_notified_list(self):
+        mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        sql = ("SELECT notified FROM anl_mincut_result_cat "
+               "WHERE id = '" + str(mincut_id) + "'")
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if not row or row[0] is None:
+            return
+        text = ""
+        for item in row[0]:
+            text += "SMS sended on date: {}, with code result: {}.\n".format(item['date'], item['code'] + " ")
+        self.controller.show_info_box(str(text), "Sms info")
+
+
     def set_id_val(self):
         # Show future id of mincut
         result_mincut_id = 1
-        sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+        sql = ("SELECT setval('" + self.schema_name + ".anl_mincut_result_cat_seq', (SELECT max(id::integer) "
+               "FROM " + self.schema_name + ".anl_mincut_result_cat) , true)")
         row = self.controller.get_row(sql, log_sql=True)
 
         if row:

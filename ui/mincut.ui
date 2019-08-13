@@ -1048,6 +1048,7 @@
    <addaction name="actionAddHydrometer"/>
    <addaction name="actionConfig"/>
    <addaction name="actionComposer"/>
+   <addaction name="actionShowNotified"/>
   </widget>
   <action name="actionConfig">
    <property name="enabled">
@@ -1128,6 +1129,14 @@
    </property>
    <property name="text">
     <string>Composer</string>
+   </property>
+  </action>
+  <action name="actionShowNotified">
+   <property name="text">
+    <string>Show Notified</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Notified</string>
    </property>
   </action>
  </widget>
