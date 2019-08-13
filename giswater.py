@@ -473,43 +473,27 @@ class Giswater(QObject):
 
         self.feature_cat = {}
 
-        # TODO:: What happens with cat_* features on UD?
-        if self.wsoftware.upper() != 'UD':
-            sql = ("SELECT t1.* FROM cat_feature as t1 "
-                   "JOIN cat_node as t2 ON t2.nodetype_id = t1.id "
-                   "WHERE t2.active is True "
-                   "UNION "
-                   "SELECT t1.* FROM cat_feature as t1 "
-                   "JOIN cat_arc as t3 ON t3.arctype_id = t1.id "
-                   "WHERE t3.active is True "
-                   "UNION "
-                   "SELECT t1.* FROM cat_feature as t1 "
-                   "JOIN cat_connec as t4 ON t4.connectype_id = t1.id "
-                   "WHERE t4.active is True")
+        if self.wsoftware.upper() == 'WS':
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN " 
+                  "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+        elif self.wsoftware.upper() == 'UD':
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
+                   "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
 
-            # TODO:: For UD projects get gullys
-            # if self.wsoftware.upper() == 'UD':
-            #     sql = (sql + " UNION "
-            #                 "SELECT DISTINCT(t5.gullytype_id) FROM cat_feature as t1 "
-            #                 "JOIN cat_grate as t5 ON t5.gullytype_id = t1.id "
-            #                 "WHERE t5.active is True")
+        rows = self.controller.get_rows(sql)
 
-            self.controller.log_info(str(sql))
+        if not rows:
+            return False
 
-            rows = self.controller.get_rows(sql)
+        for row in rows:
+            tablename = row['child_layer']
+            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
+                                 row['parent_layer'], row['child_layer'], row['active'])
+            self.feature_cat[tablename] = elem
 
-            if not rows:
-                return False
+        self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
 
-            for row in rows:
-                tablename = row['child_layer']
-                elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
-                                     row['parent_layer'], row['child_layer'], row['active'])
-                self.feature_cat[tablename] = elem
-
-            self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
-
-            return True
+        return True
 
 
     def unload(self, remove_modules=True):

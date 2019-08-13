@@ -2328,31 +2328,26 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
 
-            sql = ("SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
-                   "JOIN " + schema_name + ".cat_node as t2 ON t2.nodetype_id = t1.id "
-                   "WHERE t2.active is True "
-                   "UNION "
-                   "SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
-                   "JOIN " + schema_name + ".cat_arc as t3 ON t3.arctype_id = t1.id "
-                   "WHERE t3.active is True "
-                   "UNION "
-                   "SELECT DISTINCT(t1.child_layer), child_layer FROM cat_feature as t1 "
-                   "JOIN " + schema_name + ".cat_connec as t4 ON t4.connectype_id = t1.id "
-                   "WHERE t4.active is True")
+            sql = ("SELECT wsoftware FROM " + str(schema_name) + ".version")
+            wsoftware = self.controller.get_row(sql)
+
+            if wsoftware[0].upper() == 'WS':
+                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM cat_feature JOIN "
+                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+            elif wsoftware[0].upper() == 'UD':
+                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM cat_feature JOIN "
+                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
-            sql = ("SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
-                   "JOIN " + schema_name + ".cat_node as t2 ON t2.nodetype_id = t1.id "
-                   "WHERE t2.active is True "
-                   "UNION "
-                   "SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
-                   "JOIN " + schema_name + ".cat_arc as t3 ON t3.arctype_id = t1.id "
-                   "WHERE t3.active is True "
-                   "UNION "
-                   "SELECT DISTINCT(t1.id), t1.id FROM cat_feature as t1 "
-                   "JOIN " + schema_name + ".cat_connec as t4 ON t4.connectype_id = t1.id "
-                   "WHERE t4.active is True")
+            if wsoftware[0].upper() == 'WS':
+                sql = ("SELECT cat_feature.id, cat_feature.id FROM cat_feature JOIN "
+                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+            elif wsoftware[0].upper() == 'UD':
+                sql = ("SELECT cat_feature.id, cat_feature.id FROM cat_feature JOIN "
+                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
