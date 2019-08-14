@@ -32,7 +32,7 @@ CREATE OR REPLACE VIEW vi_pipes AS
     rpt_inp_arc
      LEFT JOIN inp_typevalue ON inp_typevalue.id::text = rpt_inp_arc.status::text
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND inp_typevalue.typevalue::text = 'inp_value_status_pipe'::text
-  AND arc_type='PIPE'
+  AND (rpt_inp_arc.arc_type = 'VARC' or rpt_inp_arc.arc_type = 'PIPE')
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,

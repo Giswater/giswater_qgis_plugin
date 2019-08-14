@@ -12,8 +12,8 @@ UPDATE config_api_form_tabs SET tablabel = 'Network', tabtext = 'Network' WHERE 
 UPDATE config_api_form_tabs SET tablabel = 'Visit', tabtext = 'Visit' WHERE formname ='search' AND tabname = 'tab_visit';
 UPDATE config_api_form_tabs SET tablabel = 'Address', tabtext = 'Address' WHERE formname ='search' AND tabname = 'tab_address';
 UPDATE config_api_form_tabs SET tablabel = 'Psector', tabtext = 'Psector' WHERE formname ='search' AND tabname = 'tab_psector';
-UPDATE config_api_form_tabs SET tablabel = 'Hydrometer', tabtext = 'Hydrometer' WHERE formname ='search' AND tabname = 'tab_hydro';
-UPDATE config_api_form_tabs SET tablabel = 'Workcat', tabtext = 'Work order' WHERE formname ='search' AND tabname = 'tab_workcat';
+UPDATE config_api_form_tabs SET tablabel = 'Hydrometer', tabtext = 'Hydro' WHERE formname ='search' AND tabname = 'tab_hydro';
+UPDATE config_api_form_tabs SET tablabel = 'Workcat', tabtext = 'Workcat' WHERE formname ='search' AND tabname = 'tab_workcat';
 
 UPDATE config_api_form_tabs SET tablabel = 'Network', tabtext = 'Network' WHERE formname ='filters' AND tabname = 'tabNetworkState';
 UPDATE config_api_form_tabs SET tablabel = 'Exploitation', tabtext = 'Active exploitation' WHERE formname ='filters' AND tabname = 'tabExploitation';
