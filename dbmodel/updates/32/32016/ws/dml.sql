@@ -13,8 +13,8 @@ INSERT INTO inp_node_type VALUES ('INLET');
 
 INSERT INTO inp_connec SELECT connec_id FROM connec;
 
-UPDATE sys_csv2pg_config SET target='{"Node Results:", "MINIMUM Node"}' WHERE tablename = 'rpt_node';
-UPDATE sys_csv2pg_config SET target='{"MINIMUM Link", "Link Results:"}' WHERE tablename = 'rpt_arc';
+UPDATE sys_csv2pg_config SET target='{"Node Results", "MINIMUM Node"}' WHERE tablename = 'rpt_node';
+UPDATE sys_csv2pg_config SET target='{"MINIMUM Link", "Link Results"}' WHERE tablename = 'rpt_arc';
 UPDATE sys_csv2pg_config SET target='{"Pump Factor"}' WHERE tablename = 'rpt_energy_usage';
 UPDATE sys_csv2pg_config SET target='{"Hydraulic Status:"}' WHERE tablename = 'rpt_hydraulic_status';
 UPDATE sys_csv2pg_config SET target='{"Input Data"}' WHERE tablename = 'rpt_cat_result';
@@ -58,7 +58,9 @@ UPDATE audit_cat_param_user SET
 
 UPDATE config_param_user SET value = 1 WHERE cur_user=current_user AND parameter ='inp_options_valve_mode';
 
-	
+UPDATE INTO audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_hydrometer_period';
+UPDATE INTO audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_parameter_period';
+
 INSERT INTO audit_cat_table VALUES ('v_rtc_period_nodepattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_period_pjointpattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_pjointpattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);

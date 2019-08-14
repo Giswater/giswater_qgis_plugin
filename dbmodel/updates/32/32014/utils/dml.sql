@@ -57,10 +57,10 @@ UPDATE sys_fprocess_cat SET fprocess_name='Inlet Sectorization' WHERE id=30;
 UPDATE sys_fprocess_cat SET fprocess_name='Mincutzones identification' WHERE id=29;
 
 
-INSERT INTO sys_fprocess_cat VALUES (44, 'District Quality Areas', 'om', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (45, 'District Metering Areas', 'om', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (46, 'Pressure Zonification', 'om', '', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (47, 'Static pressure value', 'om', '', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (44, 'District Quality Areas', 'om', 'District Quality Areas', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (45, 'District Metering Areas', 'om', 'District Metering Areas', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (46, 'Pressure Zonification', 'om', 'Pressure Zonification', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (47, 'Static pressure value', 'om', 'Static pressure value', 'ws');
 
 -- 19/06/2019
 

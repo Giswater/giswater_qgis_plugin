@@ -16,38 +16,44 @@ INSERT INTO inp_curve_id VALUES ('PUMP_02', 'PUMP');
 INSERT INTO inp_curve VALUES (1, 'PUMP_02', 10, 50.0000);
 INSERT INTO inp_curve VALUES (2, 'PUMP_01', 5, 100.0000);
 
-INSERT INTO inp_pattern VALUES ('pattern_01','Supossed pattern from literature', 'UNITARY', null , null);
-INSERT INTO inp_pattern VALUES ('pattern_02','Supossed pattern from literature', 'UNITARY', null , null);
-INSERT INTO inp_pattern VALUES ('pattern_03','Supossed pattern from literature', 'UNITARY', null , null);
-INSERT INTO inp_pattern VALUES ('pattern_hydrant','Supossed pattern from literature', 'UNITARY', null , null);
-INSERT INTO inp_pattern VALUES ('dma02_period05', NULL, 'VOLUME', null , null);
-INSERT INTO inp_pattern VALUES ('dma02_period06', NULL, 'VOLUME', null , null);
-INSERT INTO inp_pattern VALUES ('dma02_period07', NULL, 'VOLUME', null , null);
-INSERT INTO inp_pattern VALUES ('dma03_period05', NULL, 'VOLUME', null , null);
-INSERT INTO inp_pattern VALUES ('dma03_period06', NULL, 'VOLUME', null , null);
-INSERT INTO inp_pattern VALUES ('dma03_period07', NULL, 'VOLUME', null , null);
+INSERT INTO inp_pattern VALUES ('pattern_01', 'Estimated pattern for hydrometer using values from technical information', 'UNITARY', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('pattern_02', 'Estimated pattern for hydrometer using values from technical information', 'UNITARY', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('pattern_03', 'Estimated pattern for hydrometer using values from technical information', 'UNITARY', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('pattern_hydrant', 'Especific pattern for hydrants', 'UNITARY', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma02_period05', 'Real pattern for dma based on values from dma flowmeters', 'VOLUME', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma02_period06', 'Real pattern for dma based on values from dma flowmeters', 'VOLUME', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma02_period07', 'Real pattern for dma based on values from dma flowmeters', 'VOLUME', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma03_period05', 'Real pattern for dma based on values from dma flowmeters', 'VOLUME', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma03_period06', 'Real pattern for dma based on values from dma flowmeters', 'VOLUME', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma03_period07', 'Real pattern for dma based on values from dma flowmeters', 'VOLUME', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma02_unitary', 'Estimated pattern for dma based on technical information', 'UNITARY', NULL, NULL);
+INSERT INTO inp_pattern VALUES ('dma03_unitary', 'Estimated pattern for dma based on technical information', 'UNITARY', NULL, NULL);
 
 
-INSERT INTO inp_pattern_value VALUES (1, 'pattern_01', 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000);
-INSERT INTO inp_pattern_value VALUES (2, 'pattern_01', 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000);
-INSERT INTO inp_pattern_value VALUES (3, 'pattern_02', 0.2000, 0.2000, 0.2500, 0.2600, 0.3000, 0.3000, 0.8000, 1.0000, 0.8000, 0.6500, 0.6000, 0.5000);
-INSERT INTO inp_pattern_value VALUES (4, 'pattern_02', 0.5000, 0.8500, 1.0000, 0.8500, 0.6800, 0.5000, 0.8000, 0.9000, 0.7500, 0.6000, 0.5000, 0.4000);
-INSERT INTO inp_pattern_value VALUES (5, 'pattern_03', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
-INSERT INTO inp_pattern_value VALUES (6, 'pattern_03', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
-INSERT INTO inp_pattern_value VALUES (7, 'pattern_hydrant', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 1.0000, 1.0000, 0.0000, 0.0000, 0.0000); 
-INSERT INTO inp_pattern_value VALUES (8, 'pattern_hydrant', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
-INSERT INTO inp_pattern_value VALUES (9, 'dma02_period06', 1.3100, 1.3400, 1.3800, 1.3900, 1.4200, 2.0500, 2.1200, 2.0100, 1.9500, 1.8800, 1.7700, 1.6600);
-INSERT INTO inp_pattern_value VALUES (10, 'dma02_period06', 1.8500, 1.9900, 2.1200, 1.9900, 1.8500, 1.7700, 1.9900, 2.0900, 1.9500, 1.7500, 1.6800, 1.6600);
-INSERT INTO inp_pattern_value VALUES (11, 'dma03_period06', 1.4500, 1.3400, 1.4800, 1.4700, 1.5000, 1.5000, 2.0500, 2.4400, 2.0500, 1.9900, 1.8800, 1.7400);
-INSERT INTO inp_pattern_value VALUES (12, 'dma03_period06', 1.8800, 2.1200, 2.4500, 2.2200, 1.9500, 1.8800, 2.0800, 2.2300, 2.0400, 1.8800, 1.7800, 1.6500);
-INSERT INTO inp_pattern_value VALUES (13, 'dma02_period05', 1.5500, 1.4200, 1.4300, 1.4400, 1.4500, 1.5500, 1.5600, 2.0500, 2.0500, 1.8800, 1.8000, 1.6700);
-INSERT INTO inp_pattern_value VALUES (14, 'dma02_period05', 1.4500, 1.6600, 2.0100, 2.1100, 1.8900, 1.6600, 1.9900, 2.0700, 1.9900, 1.8800, 1.6000, 1.5500);
-INSERT INTO inp_pattern_value VALUES (15, 'dma03_period05', 1.4520, 1.4400, 1.4500, 1.5500, 1.5600, 1.5800, 1.5800, 1.9900, 2.2200, 1.8800, 1.8800, 1.7100);
-INSERT INTO inp_pattern_value VALUES (16, 'dma03_period05', 1.4250, 1.8000, 2.1000, 2.2200, 2.0900, 1.9900, 1.8800, 2.1000, 2.1500, 1.9900, 1.9000, 1.7250);
-INSERT INTO inp_pattern_value VALUES (17, 'dma02_period07', 1.3330, 1.3100, 1.4440, 1.4550, 1.4254, 1.4350, 2.0550, 2.2220, 1.9900, 1.8900, 1.7800, 1.6900);
-INSERT INTO inp_pattern_value VALUES (18, 'dma02_period07', 1.6660, 2.0500, 2.2220, 2.0505, 1.8800, 1.6760, 2.0040, 1.9970, 1.9520, 1.7580, 1.6800, 1.5200);
-INSERT INTO inp_pattern_value VALUES (19, 'dma03_period07', 1.4440, 1.5000, 1.4550, 1.5500, 1.5550, 1.5632, 2.1450, 2.3540, 2.2240, 1.8880, 1.9990, 1.6700);
-INSERT INTO inp_pattern_value VALUES (20, 'dma03_period07', 1.7500, 2.1100, 2.3110, 2.2220, 1.9870, 1.7770, 2.1450, 2.1140, 1.9990, 1.9750, 1.7580, 1.8680);
+INSERT INTO inp_pattern_value  VALUES (1, 'pattern_01', 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000);
+INSERT INTO inp_pattern_value  VALUES (2, 'pattern_01', 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000);
+INSERT INTO inp_pattern_value  VALUES (3, 'pattern_02', 0.2000, 0.2000, 0.2500, 0.2600, 0.3000, 0.3000, 0.8000, 1.0000, 0.8000, 0.6500, 0.6000, 0.5000);
+INSERT INTO inp_pattern_value  VALUES (4, 'pattern_02', 0.5000, 0.8500, 1.0000, 0.8500, 0.6800, 0.5000, 0.8000, 0.9000, 0.7500, 0.6000, 0.5000, 0.4000);
+INSERT INTO inp_pattern_value  VALUES (5, 'pattern_03', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_pattern_value  VALUES (6, 'pattern_03', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_pattern_value  VALUES (7, 'pattern_hydrant', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 1.0000, 1.0000, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_pattern_value  VALUES (8, 'pattern_hydrant', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_pattern_value  VALUES (9, 'dma02_period06', 1.3100, 1.3400, 1.3800, 1.3900, 1.4200, 2.0500, 2.1200, 2.0100, 1.9500, 1.8800, 1.7700, 1.6600);
+INSERT INTO inp_pattern_value  VALUES (10, 'dma02_period06', 1.8500, 1.9900, 2.1200, 1.9900, 1.8500, 1.7700, 1.9900, 2.0900, 1.9500, 1.7500, 1.6800, 1.6600);
+INSERT INTO inp_pattern_value  VALUES (11, 'dma03_period06', 1.4500, 1.3400, 1.4800, 1.4700, 1.5000, 1.5000, 2.0500, 2.4400, 2.0500, 1.9900, 1.8800, 1.7400);
+INSERT INTO inp_pattern_value  VALUES (12, 'dma03_period06', 1.8800, 2.1200, 2.4500, 2.2200, 1.9500, 1.8800, 2.0800, 2.2300, 2.0400, 1.8800, 1.7800, 1.6500);
+INSERT INTO inp_pattern_value  VALUES (13, 'dma02_period05', 1.5500, 1.4200, 1.4300, 1.4400, 1.4500, 1.5500, 1.5600, 2.0500, 2.0500, 1.8800, 1.8000, 1.6700);
+INSERT INTO inp_pattern_value  VALUES (14, 'dma02_period05', 1.4500, 1.6600, 2.0100, 2.1100, 1.8900, 1.6600, 1.9900, 2.0700, 1.9900, 1.8800, 1.6000, 1.5500);
+INSERT INTO inp_pattern_value  VALUES (15, 'dma03_period05', 1.4520, 1.4400, 1.4500, 1.5500, 1.5600, 1.5800, 1.5800, 1.9900, 2.2200, 1.8800, 1.8800, 1.7100);
+INSERT INTO inp_pattern_value  VALUES (16, 'dma03_period05', 1.4250, 1.8000, 2.1000, 2.2200, 2.0900, 1.9900, 1.8800, 2.1000, 2.1500, 1.9900, 1.9000, 1.7250);
+INSERT INTO inp_pattern_value  VALUES (17, 'dma02_period07', 1.3330, 1.3100, 1.4440, 1.4550, 1.4254, 1.4350, 2.0550, 2.2220, 1.9900, 1.8900, 1.7800, 1.6900);
+INSERT INTO inp_pattern_value  VALUES (18, 'dma02_period07', 1.6660, 2.0500, 2.2220, 2.0505, 1.8800, 1.6760, 2.0040, 1.9970, 1.9520, 1.7580, 1.6800, 1.5200);
+INSERT INTO inp_pattern_value  VALUES (19, 'dma03_period07', 1.4440, 1.5000, 1.4550, 1.5500, 1.5550, 1.5632, 2.1450, 2.3540, 2.2240, 1.8880, 1.9990, 1.6700);
+INSERT INTO inp_pattern_value  VALUES (20, 'dma03_period07', 1.7500, 2.1100, 2.3110, 2.2220, 1.9870, 1.7770, 2.1450, 2.1140, 1.9990, 1.9750, 1.7580, 1.8680);
+INSERT INTO inp_pattern_value  VALUES (21, 'dma02_unitary', 0.2000, 0.2000, 0.2500, 0.2600, 0.3000, 0.3000, 0.8000, 1.0000, 0.8000, 0.6500, 0.6000, 0.5000);
+INSERT INTO inp_pattern_value  VALUES (22, 'dma02_unitary', 0.2000, 0.2000, 0.2500, 0.2600, 0.3000, 0.3000, 0.8000, 1.0000, 0.8000, 0.6500, 0.6000, 0.5000);
+INSERT INTO inp_pattern_value  VALUES (23, 'dma03_unitary', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_pattern_value  VALUES (24, 'dma03_unitary', 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000);
 
 
 INSERT INTO inp_demand VALUES (1, '1009', 8.000000, 'pattern_hydrant', NULL, 1);
@@ -503,8 +509,8 @@ INSERT INTO inp_pipe VALUES ('113907', NULL, 'OPEN', NULL, NULL);
 INSERT INTO inp_pipe VALUES ('113905', NULL, 'OPEN', NULL, NULL);
 INSERT INTO inp_pipe VALUES ('113906', NULL, 'OPEN', NULL, NULL);
 
-INSERT INTO inp_pump VALUES ('1105', NULL, 'PUMP_02', NULL, NULL, 'CLOSED', 113881);
-INSERT INTO inp_pump VALUES ('113951', NULL, 'PUMP_01', NULL, NULL, 'CLOSED', 114026);
+INSERT INTO inp_pump VALUES ('1105', NULL, 'PUMP_02', NULL, NULL, 'OPEN', 113881);
+INSERT INTO inp_pump VALUES ('113951', NULL, 'PUMP_01', NULL, NULL, 'OPEN', 114026);
 
 INSERT INTO inp_pump_additional VALUES (1,'1105',1, NULL, 'PUMP_02', NULL, NULL, 'CLOSED');
 

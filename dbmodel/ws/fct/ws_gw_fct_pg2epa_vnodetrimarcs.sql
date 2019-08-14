@@ -75,9 +75,10 @@ BEGIN
 		null,
 		ST_LineInterpolatePoint (a.the_geom, (text_column::json->>'locate')::numeric(12,4)) as the_geom
 		FROM temp_table
-		JOIN arc a ON arc_id=text_column::json->>'arc_id'
+		JOIN rpt_inp_arc a ON arc_id=text_column::json->>'arc_id'
 		JOIN connec ON concat('VN',pjoint_id)=text_column::json->>'vnode_id'
 		WHERE text_column::json->>'vnode_id' ilike 'VN%' AND user_name=current_user
+		AND result_id=result_id_var
 		AND fprocesscat_id=50 ;
 
 
@@ -132,16 +133,9 @@ BEGIN
 	--delete only trimmed arc on rpt_inp_arc table
 	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT annotation::json->>'parentArc' FROM rpt_inp_arc WHERE result_id=result_id_var) AND result_id=result_id_var;
 
-	-- step 2: in case of conflict againts vnodes over node2arc features rename closest rpt_inp_nodes using vnode name, in order to don't lose the inlet information that will be setted later
-	FOR v_record IN SELECT vnode_id, vnode.the_geom FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer 
-	WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC' AND result_id=result_id_var
-	LOOP 
-		UPDATE rpt_inp_node SET node_id=v_record.vnode_id WHERE node_id IN 
-			(SELECT node_id FROM rpt_inp_node WHERE st_dwithin(rpt_inp_node.the_geom, v_record.the_geom, 0.5) LIMIT 1);
-		
-		v_result = v_result + 1;
-	
-	END LOOP;
+	-- set minimum value of arcs
+	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id=result_id_var;
+
 	
 RETURN v_result;
 END;

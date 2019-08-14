@@ -99,17 +99,6 @@ BEGIN
 		-- set demand and patterns in function of demand type and pattern method choosed
 		SELECT gw_fct_pg2epa_rtc(v_result) INTO v_response;	
 
-		IF v_response = 1 THEN -- when it is trying to use connec pattern method without network using vnodes to trim arcs
-			-- manage return message
-			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'","saveOnDatabase":true}}}')::json;
-			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
-				
-			v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
-			'"message":{"priority":2, "text":"You are trying to use pattern method with connects but your network geometry is not defined with vnodes treaming arcs. 
-			Please check pattern method and/or network geometry generator mode"}')::json;
-			RETURN v_return;
-		END IF;
-	
 		-- Update demand values filtering by dscenario
 		PERFORM gw_fct_pg2epa_dscenario(v_result);	
 	END IF;

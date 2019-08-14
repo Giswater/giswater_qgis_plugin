@@ -73,17 +73,17 @@ BEGIN
 			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||'
 				UNION 
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
-			JOIN inp_shortpipe ON rpt_inp_node.node_id=inp_shortpipe.node_id WHERE result_id='||quote_literal(result_id_var)||'
-				UNION 
+			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var)||'
+				UNION
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
-			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var);
+			JOIN inp_shortpipe ON rpt_inp_node.node_id=inp_shortpipe.node_id WHERE result_id='||quote_literal(result_id_var);
     END IF;
 
     FOR node_id_aux IN EXECUTE v_query_text
     LOOP
 	
         -- Get node data
-		SELECT * INTO record_node FROM rpt_inp_node WHERE node_id = node_id_aux AND result_id=result_id_var;
+	SELECT * INTO record_node FROM rpt_inp_node WHERE node_id = node_id_aux AND result_id=result_id_var;
 
         -- Get arc data
         SELECT COUNT(*) INTO num_arcs FROM rpt_inp_arc WHERE (node_1 = node_id_aux OR node_2 = node_id_aux) AND result_id=result_id_var;
@@ -233,8 +233,8 @@ BEGIN
 
         -- Values to insert into arc table
         record_new_arc.arc_id := concat(node_id_aux, '_n2a');   
-		record_new_arc.arccat_id := record_node.nodecat_id;
-		record_new_arc.epa_type := record_node.epa_type;
+	record_new_arc.arccat_id := record_node.nodecat_id;
+	record_new_arc.epa_type := record_node.epa_type;
         record_new_arc.sector_id := record_node.sector_id;
         record_new_arc.state := record_node.state;
         record_new_arc.state_type := record_node.state_type;
@@ -244,26 +244,26 @@ BEGIN
         
 
         -- Identifing and updating (if it's needed) the right direction
-		SELECT to_arc,status INTO to_arc_aux, v_status FROM (SELECT node_id,to_arc,status FROM inp_valve UNION SELECT node_id,to_arc,status FROM inp_shortpipe UNION 
-										SELECT node_id,to_arc,status FROM inp_pump) a WHERE node_id=node_id_aux;
+	SELECT to_arc,status INTO to_arc_aux, v_status FROM (SELECT node_id,to_arc,status FROM inp_valve UNION SELECT node_id,to_arc,status FROM inp_shortpipe UNION 
+								SELECT node_id,to_arc,status FROM inp_pump) a WHERE node_id=node_id_aux;
 
-			SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
-						ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
+	SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
+			ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
 
-			IF arc_id_aux=to_arc_aux THEN
-				record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
-				record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
-			ELSE
-				record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
-				record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
-				record_new_arc.the_geom := st_reverse(record_new_arc.the_geom);
-			END IF; 
+	IF arc_id_aux=to_arc_aux THEN
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+	ELSE
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
+		record_new_arc.the_geom := st_reverse(record_new_arc.the_geom);
+	END IF; 
 
 
         -- Inserting new arc into arc table
         INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, status, the_geom)
-		VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.arccat_id, record_new_arc.epa_type, record_new_arc.sector_id, 
-			record_new_arc.state, record_new_arc.state_type, record_new_arc.diameter, record_new_arc.roughness, record_new_arc.annotation, record_new_arc.length, v_status, record_new_arc.the_geom);
+	VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.arccat_id, record_new_arc.epa_type, record_new_arc.sector_id, 
+	record_new_arc.state, record_new_arc.state_type, record_new_arc.diameter, record_new_arc.roughness, record_new_arc.annotation, record_new_arc.length, v_status, record_new_arc.the_geom);
 
         -- Inserting new nodes into node table
         record_node.epa_type := 'JUNCTION';
@@ -271,14 +271,14 @@ BEGIN
         record_node.node_id := concat(node_id_aux, '_n2a_1');
 		
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
-		VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
-			record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
+	VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
+	record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
 
         record_node.the_geom := valve_arc_node_2_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_2');
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
-		VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
-			record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
+	VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
+	record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
 
 
         -- Deleting old node from node table
