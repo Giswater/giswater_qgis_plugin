@@ -983,7 +983,7 @@ class Go2Epa(ApiParent):
         sql = ("SELECT DISTINCT " + field + ", " + field + " "
                "FROM rpt_arc "
                "WHERE result_id ILIKE '" + str(result_id) + "' "
-               "ORDER BY resulttime")
+               "ORDER BY " + field + ";")
 
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(combo_time, rows)
