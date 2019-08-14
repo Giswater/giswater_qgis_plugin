@@ -488,7 +488,7 @@ class Giswater(QObject):
         for row in rows:
             tablename = row['child_layer']
             elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
-                                 row['parent_layer'], row['child_layer'], row['active'])
+                                 row['parent_layer'], row['child_layer'])
             self.feature_cat[tablename] = elem
 
         self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
