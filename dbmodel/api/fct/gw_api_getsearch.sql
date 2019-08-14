@@ -392,11 +392,11 @@ BEGIN
 
         -- Create tabs array
         IF v_firsttab THEN 
-            formVisit := json_build_object('tabName','visit','tabtext','Visita', 'active', v_active );
+            formVisit := json_build_object('tabName','visit','tabtext',rec_tab.tabtext, 'active', v_active );
             formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
             v_form := v_form || ',' || formVisit::text;
         ELSE 
-            formVisit := json_build_object('tabName','visit','tabtext','Visita', 'active', true );
+            formVisit := json_build_object('tabName','visit','tabtext',rec_tab.tabtext, 'active', true );
             formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
             v_form := v_form || formVisit::text;
         END IF;
