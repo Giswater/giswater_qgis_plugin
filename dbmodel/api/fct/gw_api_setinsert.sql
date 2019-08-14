@@ -65,6 +65,7 @@ DECLARE
     v_idname text;
     v_feature json;
     v_message json;
+    v_first boolean;
 
 BEGIN
 	--    Set search path to local schema
@@ -92,20 +93,14 @@ BEGIN
 	v_idname := (p_data ->> 'feature')::json->> 'idName';
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
 
-	IF v_fields::text = '{}' THEN
-		v_fields := ((p_data ->> 'data')::json->> 'relatedFeature')::json;
-	END IF;
-
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
-
-	
 
 	-- query text, step1
 	v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||' (';
 
 	-- query text, step2
 	i=1;
-
+	v_first=FALSE;
 	FOREACH text IN ARRAY v_text 
 	LOOP
 		SELECT v_text [i] into v_jsonfield;
@@ -115,11 +110,16 @@ BEGIN
 		IF v_value !='null' OR v_value !='NULL' OR v_value IS NOT NULL THEN 
 			
 			--building the query text
-			IF i=1 THEN
+			IF i=1 OR v_first IS FALSE THEN
+				IF v_tablename = 'om_visit' AND v_field = 'visit_id' THEN
+					v_field := 'id';
+				END IF;
 				v_querytext := concat (v_querytext, v_field);
+				v_first = TRUE;
 			ELSIF i>1 THEN
 				v_querytext := concat (v_querytext, ', ', quote_ident(v_field));
 			END IF;
+		
 		END IF;
 		i=i+1;	
 	END LOOP;
@@ -129,11 +129,17 @@ BEGIN
 	
 	-- query text, step4
 	i=1;
+	v_first=FALSE;
 	FOREACH text IN ARRAY v_text 
 	LOOP
 		SELECT v_text [i] into v_jsonfield;
 		v_field:= (SELECT (v_jsonfield ->> 'key')) ;
 		v_value := (SELECT (v_jsonfield ->> 'value')) ;
+
+		IF v_tablename = 'om_visit' AND v_field = 'visit_id' THEN
+			v_field := 'id';
+		END IF;
+				
 		-- Get column type
 		EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
 			USING v_schemaname, v_field
@@ -155,26 +161,30 @@ BEGIN
 				v_value := (SELECT ST_SetSRID((v_value)::geometry, 25831));				
 			END IF;
 			--building the query text
-			IF i=1 THEN
+			IF i=1 OR v_first IS FALSE THEN
 				v_querytext := concat (v_querytext, quote_literal(v_value),'::',v_columntype);
+				v_first = TRUE;
 			ELSIF i>1 THEN
 				v_querytext := concat (v_querytext, ', ',  quote_literal(v_value),'::',v_columntype);
 			END IF;
+
 		END IF;
 		i=i+1;
 
 	END LOOP;
 
 	-- query text, final step
+	IF v_tablename = 'om_visit' AND v_idname = 'visit_id' THEN
+		v_idname := 'id';
+	END IF;
 	v_querytext := concat ((v_querytext),' ) RETURNING ',quote_ident(v_idname));
 
 	RAISE NOTICE '--- Insert new file with query:: % ---', v_querytext;
 
 	--v_querytext = 'SELECT 1*1';
-	
+
 	-- execute query text
 	EXECUTE v_querytext INTO v_newid;
-
 	-- updating v_feature setting new id
 	v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_newid);
 
