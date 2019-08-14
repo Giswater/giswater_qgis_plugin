@@ -54,8 +54,8 @@ BEGIN
 	-- For state=1,2
     ELSE
 
-	-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
-	PERFORM gw_fct_state_control('NODE', NEW.node_id, NEW.state, TG_OP);
+		-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
+		PERFORM gw_fct_state_control('NODE', NEW.node_id, NEW.state, TG_OP);
     	
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 		
@@ -99,69 +99,69 @@ BEGIN
 
 			IF (NEW.state=2 AND node_rec.node_id IS NOT NULL) THEN
 				
-					-- inserting on plan_psector_x_node the existing node as state=0
-					INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
+				-- inserting on plan_psector_x_node the existing node as state=0
+				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
 
-					-- looking for all the arcs (1 and 2) using existing node
-					FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=node_rec.node_id 
-					AND state >0 UNION SELECT arc_id, node_2 FROM arc WHERE node_2=node_rec.node_id AND state >0)
-					LOOP
+				-- looking for all the arcs (1 and 2) using existing node
+				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=node_rec.node_id 
+				AND state >0 UNION SELECT arc_id, node_2 FROM arc WHERE node_2=node_rec.node_id AND state >0)
+				LOOP
 
-						-- if exists some arc planified on same alternative attached to that existing node
-						IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id=v_psector_id AND arc.state=2) THEN 
+					-- if exists some arc planified on same alternative attached to that existing node
+					IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc JOIN arc USING (arc_id) WHERE psector_id=v_psector_id AND arc.state=2) THEN 
 							
-							-- reconnect the planified arc to the new planified node in spite of connected to the node state=1
-							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
-								UPDATE arc SET node_1=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_1=node_rec.node_id;							
-							ELSE
-								UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=node_rec.node_id;
-							END IF;
+						-- reconnect the planified arc to the new planified node in spite of connected to the node state=1
+						IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
+							UPDATE arc SET node_1=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_1=node_rec.node_id;							
 						ELSE
-							-- getting values to create new 'fictius' arc
-							SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
-								
-							-- refactoring values fo new one
-							PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-							v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
-							v_arcrecordtb.code = v_arcrecordtb.arc_id;
-							v_arcrecordtb.state=2;
-							v_arcrecordtb.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius' LIMIT 1);
-							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
-								v_arcrecordtb.node_1 = NEW.node_id;
-							ELSE
-								v_arcrecordtb.node_2 = NEW.node_id;
-							END IF;
-	
-							-- set temporary values for config variables
-							SELECT value INTO v_tempvalue FROM config_param_system WHERE parameter='edit_enable_arc_nodes_update';
-							UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',false) where parameter='arc_searchnodes';
-							UPDATE config_param_system  SET value='TRUE' WHERE parameter='edit_enable_arc_nodes_update';
-	
-							-- Insert new records into arc table
-							INSERT INTO arc SELECT v_arcrecordtb.*;
-
-							-- restore temporary value for config variables
-							UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',true) where parameter='arc_searchnodes';
-							UPDATE config_param_system SET value=v_tempvalue WHERE parameter='edit_enable_arc_nodes_update';
-	
-							--Copy addfields from old arc to new arcs	
-							INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
-							SELECT 
-							v_arcrecordtb.arc_id,
-							parameter_id,
-							value_param
-							FROM man_addfields_value WHERE feature_id=v_arc.arc_id;
-																				
-							-- Update doability for the new arc (false)
-							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=v_arcrecordtb.arc_id;
-	
-							-- insert old arc on the alternative							
-							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector_id, v_arc.arc_id, 0, FALSE);
-	
+							UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=node_rec.node_id;
 						END IF;
-					END LOOP;				
+					ELSE
+						-- getting values to create new 'fictius' arc
+						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
+							
+						-- refactoring values fo new one
+						PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+						v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
+						v_arcrecordtb.code = v_arcrecordtb.arc_id;
+						v_arcrecordtb.state=2;
+						v_arcrecordtb.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius' LIMIT 1);
+						IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
+							v_arcrecordtb.node_1 = NEW.node_id;
+						ELSE
+							v_arcrecordtb.node_2 = NEW.node_id;
+						END IF;
+						
+						-- set temporary values for config variables
+						SELECT value INTO v_tempvalue FROM config_param_system WHERE parameter='edit_enable_arc_nodes_update';
+						UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',false) where parameter='arc_searchnodes';
+						UPDATE config_param_system  SET value='TRUE' WHERE parameter='edit_enable_arc_nodes_update';
+						
+						-- Insert new records into arc table
+						INSERT INTO arc SELECT v_arcrecordtb.*;
+						
+						-- restore temporary value for config variables
+						UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',true) where parameter='arc_searchnodes';
+						UPDATE config_param_system SET value=v_tempvalue WHERE parameter='edit_enable_arc_nodes_update';
+
+						--Copy addfields from old arc to new arcs	
+						INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
+						SELECT 
+						v_arcrecordtb.arc_id,
+						parameter_id,
+						value_param
+						FROM man_addfields_value WHERE feature_id=v_arc.arc_id;
+																			
+						-- Update doability for the new arc (false)
+						UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=v_arcrecordtb.arc_id;
+
+						-- insert old arc on the alternative							
+						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector_id, v_arc.arc_id, 0, FALSE);
+
+					END IF;
+				END LOOP;				
 			END IF;
-				
+			
 		ELSIF TG_OP ='UPDATE' THEN			
 			
 		-- Updating expl / dma

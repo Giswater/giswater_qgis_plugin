@@ -100,7 +100,7 @@ BEGIN
 			LOOP
 
 				-- if exists some arc planified on same alternative attached to that existing node
-				IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id=v_psector_id AND arc.state=2) THEN 
+				IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc JOIN arc USING (arc_id) WHERE psector_id=v_psector_id AND arc.state=2) THEN 
 					
 					-- reconnect the planified arc to the new planified node in spite of connected to the node state=1
 					IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
