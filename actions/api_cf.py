@@ -1260,12 +1260,14 @@ class ApiCF(ApiParent):
             field_object_id = "feature_id"
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
         sys_type = self.tbl_relations.model().record(row).value("sys_type")
-
+        sql = ("SELECT feature_type FROM cat_feature "
+               "WHERE id = '"+str(sys_type)+"'")
+        sys_type = self.controller.get_row(sql, commit=True)
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
 
         if table_name is None:
-            table_name = 'v_edit_' + sys_type.lower()
+            table_name = 'v_edit_' + sys_type[0].lower()
 
         if feature_id is None:
             feature_id = selected_object_id
