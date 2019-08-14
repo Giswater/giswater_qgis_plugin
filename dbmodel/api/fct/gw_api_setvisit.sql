@@ -59,6 +59,14 @@ DECLARE
 	v_event_manager json;
 	v_node_id integer;
 	v_version varchar;
+	v_addfile json;
+	v_deletefile json;
+	v_fields_json json;
+	v_message1 text;
+	v_message2 text;
+	v_fileid text;
+	v_filefeature json;
+	v_client json;
 
 BEGIN
 
@@ -73,19 +81,19 @@ BEGIN
 	INTO v_version;
 	
 --  get input values
+    v_client = (p_data ->>'client')::json;
     v_id = ((p_data ->>'feature')::json->>'id');
     v_feature = p_data ->>'feature';
     v_class = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
     v_visitextcode = ((p_data ->>'data')::json->>'fields')::json->>'ext_code';
     v_visitcat = ((p_data ->>'data')::json->>'fields')::json->>'visitcat_id';
-
+    v_addfile = ((p_data ->>'data')::json->>'newFile')::json;
+    v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
     v_status = ((p_data ->>'data')::json->>'fields')::json->>'status';
     v_tablename = ((p_data ->>'feature')::json->>'tableName');
     v_xcoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
     v_ycoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
-    
     v_thegeom = st_setsrid(st_makepoint(v_xcoord, v_ycoord),25831);
-
     v_node_id = ((p_data ->>'data')::json->>'fields')::json->>'node_id';
 
 	-- setting output parameter
@@ -113,8 +121,9 @@ BEGIN
 	ELSE
 		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitcat_vdefault', v_visitcat, current_user);
 	END IF;
- 
+
 	--upsert visit
+	
 	
 	IF (SELECT id FROM om_visit WHERE id=v_id) IS NULL THEN
 
@@ -122,9 +131,8 @@ BEGIN
 		v_id = (SELECT nextval('SCHEMA_NAME.om_visit_id_seq'::regclass));
 		v_feature = gw_fct_json_object_set_key (v_feature, 'id', v_id);
 		v_outputparameter = gw_fct_json_object_set_key (v_outputparameter, 'feature', v_feature);
-
 		SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
-
+		
 		-- getting new id
 		IF (((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer IS NOT NULL THEN
 		
@@ -146,6 +154,7 @@ BEGIN
 	ELSE 
 
 		-- refactorize om_visit and om_visit_event in case of update of class the change of parameters is need)
+
 		EXECUTE ('SELECT visit_id FROM ' || quote_ident(v_tablename) || ' WHERE visit_id = ' || quote_literal(v_id) || '') INTO v_ckeckchangeclass;
 		IF v_ckeckchangeclass IS NULL THEN
 			DELETE FROM om_visit_event WHERE visit_id = v_id;
@@ -161,6 +170,46 @@ BEGIN
 
 		RAISE NOTICE '--- UPDATE VISIT gw_api_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
 
+	END IF;
+
+	-- Manage ADD FILE / PHOTO
+	v_filefeature = '{"featureType":"file", "tableName":"om_visit_event_photo", "idName": "id"}';
+
+	IF v_addfile IS NOT NULL THEN
+
+		RAISE NOTICE '--- ACTION ADD FILE /PHOTO ---';
+
+		-- setting input for insert files function
+		v_fields_json = gw_fct_json_object_set_key((v_addfile->>'fileFields')::json,'visit_id', v_id::text);
+		v_addfile = gw_fct_json_object_set_key(v_addfile, 'fileFields', v_fields_json);
+		v_addfile = replace (v_addfile::text, 'fileFields', 'fields');
+		v_addfile = concat('{"data":',v_addfile::text,'}');
+		v_addfile = gw_fct_json_object_set_key(v_addfile, 'feature', v_filefeature);
+		v_addfile = gw_fct_json_object_set_key(v_addfile, 'client', v_client);
+
+		RAISE NOTICE '--- CALL gw_api_setfileinsert PASSING (v_addfile): % ---', v_addfile;
+	
+		-- calling insert files function
+		SELECT gw_api_setfileinsert (v_addfile) INTO v_addfile;
+		
+		-- building message
+		v_message1 = v_message::text;
+		v_message = (v_addfile->>'message');
+		v_message = gw_fct_json_object_set_key(v_message, 'hint', v_message1);
+
+	ELSIF v_deletefile IS NOT NULL THEN
+
+		-- setting input function
+		v_fileid = ((v_deletefile ->>'feature')::json->>'id')::text;
+		v_filefeature = gw_fct_json_object_set_key(v_filefeature, 'id', v_fileid);
+		v_deletefile = gw_fct_json_object_set_key(v_deletefile, 'feature', v_filefeature);
+
+		RAISE NOTICE '--- CALL gw_api_setdelete PASSING (v_deletefile): % ---', v_deletefile;
+
+		-- calling input function
+		SELECT gw_api_setdelete(v_deletefile) INTO v_deletefile;
+		v_message = (v_deletefile ->>'message')::json;
+		
 	END IF;
 
 	-- update event with device parameters
@@ -182,9 +231,11 @@ BEGIN
 	-- only applied for arbrat viari (nodes).
 	IF v_status='4' THEN
 	    UPDATE om_visit SET enddate = current_timestamp::timestamp WHERE id = v_id;
+
 	    IF v_version='TM' THEN
-	    SELECT row_to_json(a) FROM (SELECT gw_fct_om_visit_event_manager(v_id::integer) as "st_astext")a INTO return_event_manager_aux ;
+		SELECT row_to_json(a) FROM (SELECT gw_fct_om_visit_event_manager(v_id::integer) as "st_astext")a INTO return_event_manager_aux ;
     	END IF;
+    	
     END IF;
 
 	--  Control NULL's
@@ -199,7 +250,6 @@ BEGIN
 	"body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json; 
 
       
-
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
     --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
