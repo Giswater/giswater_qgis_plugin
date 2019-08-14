@@ -327,8 +327,8 @@ ELSIF tab_arg = 'address' THEN
 		st_astext(st_envelope(a.'||quote_ident(v_street_geom_field)||'))
 		FROM '||quote_ident(v_street_layer)||' a
 		JOIN '||quote_ident(v_muni_layer)|| ' b  ON b.'||quote_ident(v_muni_id_field)||' = a.'||quote_ident(v_street_muni_id_field) ||'
-		WHERE b.'||quote_ident(v_muni_display_field)||' = $1
-		AND a.'||quote_ident(v_street_display_field)||' ILIKE $2 LIMIT 10 )a'
+		WHERE lower(unaccent(b.'||quote_ident(v_muni_display_field)||')) = lower($1)
+		AND lower(unaccent(a.'||quote_ident(v_street_display_field)||')) ILIKE lower($2) LIMIT 10 )a'
         USING name_arg, text_arg
         INTO response_json;
     
