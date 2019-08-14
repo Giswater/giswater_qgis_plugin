@@ -6,16 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2314
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa(character varying, boolean, boolean);
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(p_data json)  
 RETURNS json AS 
 $BODY$
 
 
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_pg2epa($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"resultId":"Prueba1", "useNetworkGeom":"true"}}$$)
 */
@@ -39,7 +39,7 @@ BEGIN
 	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
 
 	--  Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Getting user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);

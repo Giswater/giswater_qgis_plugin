@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2430
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa_check_data(text);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa_check_data(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_check_data(text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -61,7 +61,7 @@ v_networkmodeval	text;
 BEGIN
 
 	--  Search path	
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
