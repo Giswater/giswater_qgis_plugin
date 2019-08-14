@@ -1466,8 +1466,6 @@ class ApiCF(ApiParent):
         self.date_event_from = self.dlg_cf.findChild(QDateEdit, "date_event_from")
 
         self.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
-        date = QDate.currentDate()
-        self.date_event_to.setDate(date)
 
         btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit")
         btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit")
@@ -1918,23 +1916,13 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
         """ Fill tab 'Document' """
-
-        self.set_vdefault_values(self.dlg_cf.date_document_to,
-            self.complet_result[0]['body']['feature']['vdefaultValues'], 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_document_from,
-            self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
         table_document = "v_ui_doc_x_"+self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_columns_config(self.tbl_document, table_document)
-        self.set_vdefault_values(self.dlg_cf.doc_type,
-            self.complet_result[0]['body']['feature']['vdefaultValues'], 'document_type_vdefault')
 
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
-
-        # Set model of selected widget
-        self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
 
         # Get widgets
         txt_doc_id = self.dlg_cf.findChild(QLineEdit, "txt_doc_id")
@@ -1945,6 +1933,12 @@ class ApiCF(ApiParent):
         btn_doc_delete = self.dlg_cf.findChild(QPushButton, "btn_doc_delete")
         btn_doc_insert = self.dlg_cf.findChild(QPushButton, "btn_doc_insert")
         btn_doc_new = self.dlg_cf.findChild(QPushButton, "btn_doc_new")
+
+        # Set max and min dates
+        self.set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
 
         # Set signals
         doc_type.currentIndexChanged.connect(partial(self.set_filter_table_man, widget))
@@ -2384,20 +2378,6 @@ class ApiCF(ApiParent):
 
 
     """ OTHER FUNCTIONS """
-    def set_vdefault_values(self, widget, values, parameter):
-
-        # Set dates from
-        if type(widget) is QDateEdit:
-            if parameter in values:
-                date = QDate.fromString(values[parameter], 'yyyy/MM/dd')
-            else:
-                date = QDate.currentDate()
-            widget.setDate(date)
-        elif type(widget) is QComboBox:
-            if parameter in values:
-                utils_giswater.set_combo_itemData(widget, values[parameter], 0)
-
-
     def set_image(self, dialog, widget):
         utils_giswater.setImage(dialog, widget, "ws_shape.png")
 
