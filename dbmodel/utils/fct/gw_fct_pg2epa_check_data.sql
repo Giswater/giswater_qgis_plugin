@@ -194,6 +194,9 @@ BEGIN
 			v_countglobal=v_countglobal+v_count+v_count_2; 
 			v_count=0;
 			v_count_2=0;
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Any junction have been swiched on the fly to OUTFALL. Only junctions node sink with outfallparam values will be transformed on the fly to OUTFALL'));
 		END IF;
 			
 		-- check common mistakes
@@ -461,7 +464,8 @@ BEGIN
 			VALUES (14, v_result_id, 1, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value:', v_nodearc_user::numeric(12,3)));
 		END IF;
 
-		-- rules control
+		-- timestep control (patterns used againsts timesetep simulation)
+		--TODO
 		
 	
 		IF v_demandtype > 1 THEN --(2 or 3)
