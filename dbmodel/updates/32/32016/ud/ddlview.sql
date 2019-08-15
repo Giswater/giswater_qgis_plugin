@@ -45,13 +45,77 @@ v_node.the_geom,
 v_node.annotation, 
 inp_junction.y0, 
 inp_junction.ysur,
-inp_junction.apond
+inp_junction.apond,
+inp_junction.outfallparam
 FROM inp_selector_sector, v_node
      JOIN inp_junction ON inp_junction.node_id = v_node.node_id
      JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)
      WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
-
+	 
+DROP VIEW vi_outfalls;
+CREATE OR REPLACE VIEW vi_outfalls AS 
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elev,
+    inp_outfall.outfall_type,
+    inp_outfall.stage::text as other1, 
+    inp_outfall.gate::text as other2
+   FROM inp_selector_result, rpt_inp_node
+     JOIN inp_outfall ON inp_outfall.node_id::text = rpt_inp_node.node_id::text
+  WHERE inp_outfall.outfall_type::text = 'FIXED'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elev,
+    inp_outfall.outfall_type,
+    inp_outfall.gate,
+    null as other2
+   FROM inp_selector_result, rpt_inp_node
+     JOIN inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
+  WHERE inp_outfall.outfall_type::text = 'FREE'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elev,
+    inp_outfall.outfall_type,
+    inp_outfall.gate,
+    null as other2
+   FROM inp_selector_result, rpt_inp_node
+     JOIN inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
+  WHERE inp_outfall.outfall_type::text = 'NORMAL'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elev,
+    inp_typevalue.idval AS outfall_type,
+    inp_outfall.curve_id,
+    inp_outfall.gate
+     FROM inp_selector_result, rpt_inp_node
+     JOIN inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_outfall.outfall_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_outfall'::text AND inp_outfall.outfall_type::text = 'TIDAL'::text 
+  AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elev,
+    inp_typevalue.idval AS outfall_type,
+    inp_outfall.timser_id,
+    inp_outfall.gate
+   FROM inp_selector_result, rpt_inp_node
+     JOIN inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_outfall.outfall_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_outfall'::text AND inp_outfall.outfall_type::text = 'TIMESERIES'::text 
+  AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elev,
+    outfallparam->>'outfall_type',
+    case when outfallparam->>'stage' is not null then outfallparam->>'stage'
+	 when outfallparam->>'curve_id' is not null then outfallparam->>'curve_id'
+	 when outfallparam->>'timser_id' is not null then outfallparam->>'timser_id'
+    END as other1,
+    outfallparam->>'gate' as other2
+   FROM inp_selector_result, rpt_inp_node JOIN inp_junction USING (node_id) 
+  WHERE rpt_inp_node.epa_type='OUTFALL' AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+   
+  
 
 CREATE OR REPLACE VIEW v_edit_inp_divider AS
 SELECT 
@@ -282,7 +346,7 @@ UNION
      JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
      GROUP BY connec.arc_id
 UNION
- SELECT gUlly.arc_id,
+ SELECT gully.arc_id,
     10 AS orderby,
     'gully'::text AS identif,
     'Various catalog'::character varying AS catalog_id,

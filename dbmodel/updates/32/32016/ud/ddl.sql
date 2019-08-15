@@ -8,3 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_controls_x_node", "column":"active", "dataType":"boolean"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timser_id", "column":"idval", "dataType":"varchar(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"outfallparam", "dataType":"json"}}$$);

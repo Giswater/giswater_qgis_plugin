@@ -33,7 +33,7 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_event('om_visit_event');
 CREATE TRIGGER gw_trg_ui_event_x_node INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_event_x_node
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_event('om_visit_event');
 
--- DROP TRIGGER gw_trg_man_addfields_value_arc_control ON ud_sample.arc;
+-- DROP TRIGGER gw_trg_man_addfields_value_arc_control ON SCHEMA_NAME.arc;
 
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_arc_control ON arc;
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_node_control ON node;

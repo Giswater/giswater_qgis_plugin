@@ -63,11 +63,11 @@ BEGIN
 
 	FOR rec_node IN  EXECUTE v_sql
 	LOOP
-		-- Insert in analytics table
-		INSERT INTO anl_node (node_id, expl_id, num_arcs, fprocesscat_id, the_geom, nodecat_id, state) 
-		VALUES(rec_node.node_id, rec_node.expl_id, 
-			(SELECT COUNT(*) FROM arc WHERE state = 1 AND (node_1 = rec_node.node_id OR node_2 = rec_node.node_id)), 
-			13, rec_node.the_geom, rec_node.nodecat_id, rec_node.state);
+		-- Insert in analytics table  (note: expl_id have been removed because not all tables node have exp_id defined)
+		INSERT INTO anl_node (node_id, num_arcs, fprocesscat_id, the_geom, nodecat_id, state) 
+		VALUES(rec_node.node_id, (SELECT COUNT(*) FROM arc WHERE state = 1 AND (node_1 = rec_node.node_id OR node_2 = rec_node.node_id)), 
+		13, rec_node.the_geom, rec_node.nodecat_id, rec_node.state);
+		
 	END LOOP;
 	    
 	-- get results

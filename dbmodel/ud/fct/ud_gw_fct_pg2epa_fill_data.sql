@@ -30,6 +30,7 @@ BEGIN
 
    
 -- Insert on node rpt_inp table
+-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
@@ -37,8 +38,14 @@ BEGIN
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_junction ON v_edit_node.node_id=inp_junction.node_id
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
+			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
+		WHERE (is_operative IS TRUE) OR (is_operative IS NULL)
 	UNION
 	SELECT 
 	result_id_var,
@@ -46,8 +53,14 @@ BEGIN
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_divider ON v_edit_node.node_id=inp_divider.node_id
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
+			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
+		WHERE (is_operative IS TRUE) OR (is_operative IS NULL)
 	UNION
 	SELECT 
 	result_id_var,
@@ -55,8 +68,14 @@ BEGIN
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_storage ON v_edit_node.node_id=inp_storage.node_id
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
+			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
+		WHERE (is_operative IS TRUE) OR (is_operative IS NULL)
 	UNION
 	SELECT 
 	result_id_var,
@@ -64,10 +83,22 @@ BEGIN
 	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN inp_outfall ON v_edit_node.node_id=inp_outfall.node_id
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
+		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
+			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
+			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
+		WHERE (is_operative IS TRUE) OR (is_operative IS NULL);
 
 
+	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
+	PERFORM gw_fct_anl_node_sink($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
+
+	UPDATE rpt_inp_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id) 
+	WHERE outfallparam IS NOT NULL AND fprocesscat_id=13 AND cur_user=current_user
+	AND rpt_inp_node.node_id=a.node_id AND rpt_inp_node.result_id=result_id_var;
 
 -- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom)

@@ -41,10 +41,10 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get SRID
-	v_srid = (SELECT ST_srid (the_geom) FROM ud_sample.sector limit 1);
+	v_srid = (SELECT ST_srid (the_geom) FROM sector limit 1);
 
 	-- Make geom point
 	v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));

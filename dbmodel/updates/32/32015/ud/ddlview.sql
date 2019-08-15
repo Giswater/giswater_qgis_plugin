@@ -332,7 +332,7 @@ UNION
      LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id);
 	 
 	 
-CREATE VIEW v_arc_x_vnode AS
+CREATE OR REPLACE VIEW v_arc_x_vnode AS
 SELECT vnode_id, arc_id, a.feature_type, feature_id, 
 node_1,
 node_2,
@@ -406,8 +406,8 @@ CREATE OR REPLACE VIEW vi_coverages AS
    FROM inp_coverage_land_x_subc
      JOIN v_edit_subcatchment ON inp_coverage_land_x_subc.subc_id::text = v_edit_subcatchment.subc_id::text
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, * 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+		   (SELECT unnest(subcatchment.outlet_id::text[]) AS node_array, * 
+			FROM subcatchment where left (outlet_id,1)='{' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
 		
 
@@ -426,8 +426,8 @@ CREATE OR REPLACE VIEW vi_groundwater AS
    FROM v_edit_subcatchment
      JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_subcatchment.subc_id::text
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, * 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+		   (SELECT unnest(subcatchment.outlet_id::text[]) AS node_array, * 
+			FROM subcatchment where left (outlet_id,1)='{' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id;
 
   
@@ -442,8 +442,8 @@ CREATE OR REPLACE VIEW vi_infiltration AS
    FROM v_edit_subcatchment
      JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, * 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+		   (SELECT unnest(subcatchment.outlet_id::text[]) AS node_array, * 
+			FROM subcatchment where left (outlet_id,1)='{' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
   WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
 UNION
@@ -456,8 +456,8 @@ UNION
    FROM v_edit_subcatchment
      JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, * 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+		   (SELECT unnest(subcatchment.outlet_id::text[]) AS node_array, * 
+			FROM subcatchment where left (outlet_id,1)='{' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
   WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
 UNION
@@ -470,8 +470,8 @@ UNION
    FROM v_edit_subcatchment
      JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_subcatchment.hydrology_id
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, * 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+		   (SELECT unnest(subcatchment.outlet_id::text[]) AS node_array, * 
+			FROM subcatchment where left (outlet_id,1)='{' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
   WHERE cat_hydrology.infiltration::text = 'MODIFIED_HORTON'::text OR cat_hydrology.infiltration::text = 'HORTON'::text
   ORDER BY 2;
@@ -488,12 +488,7 @@ CREATE OR REPLACE VIEW vi_lid_usage AS
     inp_lidusage_subc_x_lidco.toperv::integer AS toperv,
     inp_lidusage_subc_x_lidco.rptfile
    FROM v_edit_subcatchment
-     JOIN inp_lidusage_subc_x_lidco ON inp_lidusage_subc_x_lidco.subc_id::text = v_edit_subcatchment.subc_id::text
-	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, subc_id
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
-			ON v_edit_subcatchment.subc_id=b.subc_id;
-
+     JOIN inp_lidusage_subc_x_lidco ON inp_lidusage_subc_x_lidco.subc_id::text = v_edit_subcatchment.subc_id::text;
  
 CREATE OR REPLACE VIEW vi_gwf AS 
  SELECT inp_groundwater.subc_id,
@@ -509,13 +504,8 @@ CREATE OR REPLACE VIEW vi_loadings AS
     inp_loadings_pol_x_subc.poll_id,
     inp_loadings_pol_x_subc.ibuildup
    FROM v_edit_subcatchment
-     JOIN inp_loadings_pol_x_subc ON inp_loadings_pol_x_subc.subc_id::text = v_edit_subcatchment.subc_id::text
-	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, subc_id 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
-			ON v_edit_subcatchment.subc_id=b.subc_id;
-
- 
+     JOIN inp_loadings_pol_x_subc ON inp_loadings_pol_x_subc.subc_id::text = v_edit_subcatchment.subc_id::text;
+     
  
  CREATE OR REPLACE VIEW vi_subareas AS 
  SELECT v_edit_subcatchment.subc_id,
@@ -526,14 +516,9 @@ CREATE OR REPLACE VIEW vi_loadings AS
     v_edit_subcatchment.zero,
     v_edit_subcatchment.routeto,
     v_edit_subcatchment.rted
-   FROM v_edit_subcatchment
-   	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, v_node.node_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, subc_id 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
-			ON v_edit_subcatchment.subc_id=b.subc_id;
+   FROM v_edit_subcatchment;
 
- 
- 
+  
 CREATE OR REPLACE VIEW vi_subcatchments AS 
  SELECT v_edit_subcatchment.subc_id,
     v_edit_subcatchment.rg_id,
@@ -550,12 +535,12 @@ CREATE OR REPLACE VIEW vi_subcatchments AS
     v_edit_subcatchment.snow_id
    FROM v_edit_subcatchment
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, node_array as outlet_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS node_array, subc_id 
-			FROM subcatchment where left (outlet_id,1)='[' ) a JOIN v_node ON v_node.node_id::text = a.node_array::text) b 
+		   (SELECT unnest(subcatchment.outlet_id::text[]) AS node_array, subc_id FROM subcatchment where left (outlet_id,1)='{' ) a 
+		   JOIN rpt_inp_node b ON b.node_id::text = a.node_array::text WHERE result_id = (SELECT result_id FROM inp_selector_result WHERE cur_user=current_user)) b 
 			ON v_edit_subcatchment.subc_id=b.subc_id
 	 LEFT JOIN  (SELECT DISTINCT ON (subc_id) subc_id, parent_array as outlet_id FROM 
-		   (SELECT json_array_elements_text(subcatchment.outlet_id::json) AS parent_array, subc_id 
-			FROM subcatchment where left (outlet_id,1)='[' ) e) c ON v_edit_subcatchment.subc_id=c.subc_id;
+		   (SELECT unnest(subcatchment.outlet_id::text[]) AS parent_array, subc_id 
+			FROM subcatchment where left (outlet_id,1)='{' ) e) c ON v_edit_subcatchment.subc_id=c.subc_id;
 
 
 CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
@@ -746,7 +731,7 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
     v_arc.custom_y1,
     v_arc.elev1,
     v_arc.custom_elev1,
-    v_arc.sys_elev1
+    v_arc.sys_elev1,
     a.sys_top_elev - v_arc.sys_elev1 AS sys_y1,
     a.sys_top_elev - v_arc.sys_elev1 - v_arc.geom1 AS r1,
         CASE

@@ -16,3 +16,8 @@ ON SCHEMA_NAME.gully FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_connect_u
 CREATE TRIGGER gw_trg_om_lot_x_gully_geom AFTER INSERT OR UPDATE OR DELETE
 ON om_visit_lot_x_gully FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('lot');
 
+DROP TRIGGER gw_trg_topocontrol_node ON node;
+
+CREATE TRIGGER gw_trg_topocontrol_node AFTER INSERT OR UPDATE 
+OF the_geom, state, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, sys_elev
+ON node  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_topocontrol_node();
