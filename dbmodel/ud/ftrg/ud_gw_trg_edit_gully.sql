@@ -332,7 +332,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 		-- UPDATE geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+		IF st_equals(NEW.the_geom, OLD.the_geom)is false THEN   
 			UPDATE gully SET the_geom=NEW.the_geom WHERE gully_id = OLD.gully_id;		
 		END IF;	
 		

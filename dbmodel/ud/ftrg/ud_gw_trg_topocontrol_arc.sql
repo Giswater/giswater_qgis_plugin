@@ -181,10 +181,12 @@ BEGIN
 
 			-- in case of sys_elev_aux null
 			sys_elev1_aux:= (CASE WHEN sys_elev1_aux IS NOT NULL THEN sys_elev1_aux ELSE 
-					(SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord1.node_id) - (CASE WHEN sys_y1_aux IS NOT NULL THEN sys_y1_aux ELSE 0 END) END);
+					(SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord1.node_id) - (CASE WHEN sys_y1_aux IS NOT NULL THEN sys_y1_aux 
+					ELSE (SELECT sys_ymax FROM v_node WHERE node_id=nodeRecord1.node_id) END) END);
 					
 			sys_elev2_aux:= (CASE WHEN sys_elev2_aux IS NOT NULL THEN sys_elev2_aux ELSE
-					(SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord2.node_id) - (CASE WHEN sys_y2_aux IS NOT NULL THEN sys_y2_aux ELSE 0 END) END);
+					(SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord2.node_id) - (CASE WHEN sys_y2_aux IS NOT NULL THEN sys_y2_aux 
+					ELSE (SELECT sys_ymax FROM v_node WHERE node_id=nodeRecord2.node_id) END) END);
 		
 			-- Update coordinates
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);

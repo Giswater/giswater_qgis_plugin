@@ -34,7 +34,7 @@ UPDATE audit_cat_param_user SET feature_field_id ='workcat_id' WHERE id='workcat
 UPDATE audit_cat_param_user SET feature_field_id ='workcat_id_end' WHERE id='workcat_id_end_vdefault';
 UPDATE audit_cat_param_user SET feature_field_id ='soilcat_id' WHERE id='soilcat_vdefault';
 			
-UPDATE audit_cat_param_user SET label='Automatic insert connec double geometry:'
+UPDATE audit_cat_param_user SET label='Automatic link from connec to network:'
 			WHERE id='edit_connect_force_automatic_connect2network';
 
 UPDATE audit_cat_param_user SET formname=null

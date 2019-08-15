@@ -5,6 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 1248
+--FUNCTION DEPRECATED ON 3.2.016
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_gully_update() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 

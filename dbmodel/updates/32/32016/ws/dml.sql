@@ -58,8 +58,8 @@ UPDATE audit_cat_param_user SET
 
 UPDATE config_param_user SET value = 1 WHERE cur_user=current_user AND parameter ='inp_options_valve_mode';
 
-UPDATE INTO audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_hydrometer_period';
-UPDATE INTO audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_parameter_period';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_hydrometer_period';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_parameter_period';
 
 INSERT INTO audit_cat_table VALUES ('v_rtc_period_nodepattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_period_pjointpattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);

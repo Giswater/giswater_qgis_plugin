@@ -746,10 +746,7 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
     v_arc.custom_y1,
     v_arc.elev1,
     v_arc.custom_elev1,
-	CASE
-	    WHEN sys_elev1 IS NULL THEN a.sys_elev
-	    ELSE sys_elev1
-	END AS sys_elev1,
+    v_arc.sys_elev1
     a.sys_top_elev - v_arc.sys_elev1 AS sys_y1,
     a.sys_top_elev - v_arc.sys_elev1 - v_arc.geom1 AS r1,
         CASE
@@ -761,10 +758,7 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
     v_arc.custom_y2,
     v_arc.elev2,
     v_arc.custom_elev2,
-	CASE
-	    WHEN sys_elev2 IS NULL THEN b.sys_elev
-	    ELSE sys_elev2
-	END AS sys_elev2,
+	v_arc.sys_elev2,
     b.sys_top_elev - v_arc.sys_elev2 AS sys_y2,
     b.sys_top_elev - v_arc.sys_elev2 - v_arc.geom1 AS r2,
         CASE

@@ -60,7 +60,9 @@ IF v_multi_create IS TRUE THEN
 	
 	ELSIF v_project_type ='UD' THEN
 		v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
-						UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type, UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
+															UNION SELECT id,active FROM arc_type 
+															UNION SELECT id,active FROM connec_type 
+															UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
 	END IF;
 
 	

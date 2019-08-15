@@ -11,7 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 DROP VIEW vi_curves;
 CREATE OR REPLACE VIEW vi_curves AS 
  SELECT
-node_id,
         CASE
             WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
             ELSE a.curve_id

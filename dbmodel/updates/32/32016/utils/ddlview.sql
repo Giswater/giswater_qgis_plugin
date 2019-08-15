@@ -225,7 +225,7 @@ UNION
    FROM v_rtc_period_hydrometer
   WHERE v_rtc_period_hydrometer.pjoint_id IS NULL
   GROUP BY v_rtc_period_hydrometer.node_2, v_rtc_period_hydrometer.period_id, v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.effc, v_rtc_period_hydrometer.minc, v_rtc_period_hydrometer.maxc) a
- GROUP BY node_id, period_id, dma_id, effc, minc, maxc
+ GROUP BY node_id, period_id, dma_id, effc, minc, maxc;
 
 
  
