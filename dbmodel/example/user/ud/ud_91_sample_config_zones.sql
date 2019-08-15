@@ -7,13 +7,13 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('state_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gratecat_vdefault', 'S/I', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gratecat_vdefault', 'N/I', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('verified_vdefault', 'VERIFIED', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('arccat_vdefault', 'CON-CC040', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('connecat_vdefault', 'PVC-CC025_D', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('elementcat_vdefault', 'COVER70', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('nodecat_vdefault', 'C_MANHOLE-BR100', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gullycat_vdefault', 'EMB1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gullycat_vdefault', 'SGRT1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitcat_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_param_type_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_scale_vdefault', '1000', current_user);
