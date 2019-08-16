@@ -32,6 +32,7 @@ from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
 from .actions.master import Master
 from .actions.mincut import MincutParent
+from .actions.notify_functions import NotifyFunctions
 from .actions.om import Om
 from .actions.tm_basic import TmBasic
 from .actions.update_sql import UpdateSQL
@@ -717,6 +718,9 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
+
+        notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
+        notify.create_thread('watchers')
 
 
     def manage_layers(self):
