@@ -50,13 +50,10 @@ class NotifyFunctions(ParentAction):
             while conn.notifies:
                 notify = conn.notifies.pop(0)
                 print("Got NOTIFY:{}, {}, {}".format(notify.pid, notify.channel, notify.payload))
-                complet_result = notify.payload
-                print(type(complet_result))
-                print(complet_result)
-                print("\n--------------------------------------------------")
-                complet_result = [json.loads(complet_result, object_pairs_hook=OrderedDict)]
-                print(type(complet_result))
-                print(complet_result)
+                if not notify.payload:
+                    continue
+
+                complet_result = [json.loads(notify.payload, object_pairs_hook=OrderedDict)]
                 print("\n--------------------------------------------------")
                 self.controller.log_info(str(complet_result[0]['functionAction']))
                 function_name = complet_result[0]['functionAction']['name']
