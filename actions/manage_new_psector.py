@@ -113,6 +113,7 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
+        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority', False)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
@@ -127,10 +128,6 @@ class ManageNewPsector(ParentManage):
             self.dlg_plan_psector.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
             self.dlg_plan_psector.chk_enable_all.setEnabled(False)
-
-        sql = "SELECT DISTINCT(id) FROM value_priority ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_plan_psector, "priority", rows, False)
 
         # tab Bugdet
         total_arc = self.dlg_plan_psector.findChild(QLineEdit, "total_arc")
@@ -236,7 +233,7 @@ class ManageNewPsector(ParentManage):
             utils_giswater.setChecked(self.dlg_plan_psector, "active", row['active'])
             utils_giswater.fillWidget(self.dlg_plan_psector, "name", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "descript", row)
-            utils_giswater.setSelectedItem(self.dlg_plan_psector, "priority", row["priority"])
+            utils_giswater.set_combo_itemData(self.dlg_plan_psector.priority, str(row["priority"]), 1)
             utils_giswater.fillWidget(self.dlg_plan_psector, "text1", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "text2", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "observ", row)
@@ -872,7 +869,7 @@ class ManageNewPsector(ParentManage):
         
         sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
                " FROM " + table_name + " ORDER BY " + field_name)
-        rows = self.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return
         combo.blockSignals(True)
@@ -979,11 +976,9 @@ class ManageNewPsector(ParentManage):
                         elif widget_type is QDateEdit:
                             date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
-                        elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'
-                              or column_name == 'result_id' or column_name == 'psector_type'):
+                        elif widget_type is QComboBox:
                             combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
-                            elem = combo.itemData(combo.currentIndex())
-                            value = str(elem[0])
+                            value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
                         else:
                             value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
                         if value is None or value == 'null':
@@ -1009,11 +1004,9 @@ class ManageNewPsector(ParentManage):
                             elif widget_type is QDateEdit:
                                 date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'
-                                or column_name == 'result_id' or column_name == 'psector_type'):
+                            elif widget_type is QComboBox:
                                 combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
-                                elem = combo.itemData(combo.currentIndex())
-                                value = str(elem[0])
+                                value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
                             else:
                                 value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
                             if value is None or value == 'null':
