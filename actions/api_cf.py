@@ -1329,10 +1329,7 @@ class ApiCF(ApiParent):
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
         self.set_columns_config(self.tbl_hydrometer, table_hydro)
-        if Qgis.QGIS_VERSION_INT < 29900:
-            txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer,  table_hydro))
-        else:
-            txt_hydrometer_id.editingFinished.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
+        txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
         self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
         self.dlg_cf.findChild(QPushButton, "btn_link").clicked.connect(self.check_url)
 
