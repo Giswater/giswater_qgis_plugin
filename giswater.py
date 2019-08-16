@@ -720,7 +720,7 @@ class Giswater(QObject):
         self.controller.log_info(message)
 
         notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-        notify.create_thread('watchers')
+        notify.start_listening('watchers', 'wait_notifications', (self.controller.dao.conn, ))
 
 
     def manage_layers(self):

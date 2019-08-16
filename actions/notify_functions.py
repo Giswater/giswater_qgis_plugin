@@ -14,8 +14,10 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    pass
     import ConfigParser as configparser
 else:
+    pass
     import configparser
 
 import json
@@ -25,14 +27,21 @@ from functools import partial
 from .parent import ParentAction
 
 class NotifyFunctions(ParentAction):
+
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control toolbar 'edit' """
+        """ Class to control notify from PostgresSql """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
-
-    def create_thread(self, channel_name):
+    def start_listening(self, channel_name, target=None, args=()):
+        """
+        :param channel_name: Channel to be listened
+        :param target:  is the callable object to be invoked by the run()
+                        method. Defaults to None, meaning nothing is called.
+        :param args: is the argument tuple for the target invocation. Defaults to ().
+        :return:
+        """
         self.controller.execute_sql("LISTEN "+str(channel_name)+";")
-        self.thread = threading.Thread(target=self.wait_notifications, args=(self.controller.dao.conn,))
+        self.thread = threading.Thread(target=getattr(self, target), args=args)
         self.thread.start()
 
     def wait_notifications(self, conn):
@@ -45,15 +54,19 @@ class NotifyFunctions(ParentAction):
                 print(type(complet_result))
                 print(complet_result)
                 print("\n--------------------------------------------------")
-                # complet_result = [json.loads(complet_result, object_pairs_hook=OrderedDict)]
+                complet_result = [json.loads(complet_result, object_pairs_hook=OrderedDict)]
                 print(type(complet_result))
                 print(complet_result)
                 print("\n--------------------------------------------------")
                 self.controller.log_info(str(complet_result[0]['functionAction']))
-                # getattr(self, function_name)
+                function_name = complet_result[0]['functionAction']['name']
+                print(function_name)
+                # (partial(getattr(self, function_name), dialog, self.my_json))
+                getattr(self, function_name)('test param', 'test param2')
 
-    def getinfofromid(self):
-        print("WORKS")
+    def getinfofromid(self, *argv):
+        for arg in argv:
+            print(arg)
 
 
 
