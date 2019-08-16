@@ -46,7 +46,6 @@ class MoveNodeMapTool(ParentMapTool):
                " WHERE node_id = '" + node_id + "'")
         status = self.controller.execute_sql(sql) 
         if status:
-            
             # Execute SQL function and show result to the user
             function_name = "gw_fct_arc_divide"
             row = self.controller.check_function(function_name)
@@ -239,6 +238,7 @@ class MoveNodeMapTool(ParentMapTool):
                 title = "Info"
                 answer = self.controller.ask_question(message, title)
                 if answer:
+                    self.iface.activeLayer().updateFeature(self.snapped_feat)
                     self.move_node(node_id, point)
 
         elif event.button() == Qt.RightButton:
