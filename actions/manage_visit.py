@@ -578,7 +578,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
 
-        # Set dignals
+        # Set signals
         self.dlg_man.tbl_visit.doubleClicked.connect(
             partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_open.clicked.connect(
