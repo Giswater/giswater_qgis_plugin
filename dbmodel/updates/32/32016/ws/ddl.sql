@@ -49,3 +49,6 @@ CREATE TABLE IF NOT EXISTS inp_inlet
   minsector_1 integer,
   minsector_2 integer
     );
+    
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_mincut_result_cat", "column":"notified", "dataType":"json"}}$$);
+
