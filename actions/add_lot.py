@@ -1481,7 +1481,7 @@ class AddNewLot(ParentManage):
         tableright = "selector_lot"
         field_id_left = "id"
         field_id_right = "lot_id"
-        hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+        hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         hide_right = [0, 1, 2]
 
         self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
