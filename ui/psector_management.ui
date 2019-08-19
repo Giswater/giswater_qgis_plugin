@@ -20,14 +20,7 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="3" column="5">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
+      <item row="1" column="6">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -47,13 +40,17 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="6">
-       <widget class="QTableView" name="tbl_psm"/>
+      <item row="3" column="6">
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLineEdit" name="txt_name">
+      <item row="1" column="3">
+       <widget class="QLabel" name="lbl_vdefault_psector">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -76,17 +73,10 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="4">
-       <widget class="QPushButton" name="btn_update_psector">
-        <property name="text">
-         <string>Current psector</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="lbl_vdefault_psector">
+      <item row="1" column="0">
+       <widget class="QLineEdit" name="txt_name">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -95,6 +85,9 @@
          <string/>
         </property>
        </widget>
+      </item>
+      <item row="2" column="0" colspan="7">
+       <widget class="QTableView" name="tbl_psm"/>
       </item>
       <item row="3" column="0" colspan="5">
        <spacer name="horizontalSpacer">
@@ -108,6 +101,20 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="btn_update_psector">
+        <property name="text">
+         <string>Current psector</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QPushButton" name="btn_duplicate">
+        <property name="text">
+         <string>Duplicate</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

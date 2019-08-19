@@ -82,7 +82,7 @@ class Basic(ParentAction):
 
 
     def basic_hydrometer_state_selector(self):
-        """ Button 51: Hydrometer selector """
+        """ Button 86: Hydrometer selector """
 
         # Create the dialog and signals
         self.dlg_hydro_state = Multirow_selector()
