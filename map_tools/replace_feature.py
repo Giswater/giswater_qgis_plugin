@@ -630,7 +630,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         if wsoftware == 'ws' and self.feature_type_new is not None:
             sql_where = " WHERE " + geom_type + "type_id = '" + self.feature_type_new + "'"
-        if mats != "null":
+        if mats != "null" and mats is not None:
             if sql_where == "":
                 sql_where = " WHERE"
             else:
