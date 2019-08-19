@@ -14,27 +14,37 @@ $BODY$
 /*EXAMPLE
 
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"ARC"},
-"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_ARC5","parameter_id":"param_leak3", "active":"True","ismultifeature":"false","ismultievent":"True",
+SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE","parameter_id":"param_leak_node", "active":"True","ismultifeature":"false","ismultievent":"True",
 "visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
-"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null}}}$$);
+"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null, "viewname":"aaa_ve_node_leak"}}}$$);
 
-	SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"ARC"},
-	"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_ARC5","parameter_id":"param_leak88", "active":"True","ismultifeature":"false","ismultievent":"True",
-	"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
-	"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null}}}$$);
+		SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+		"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE","parameter_id":"param_leak_node", "active":"True","ismultifeature":"false","ismultievent":"True",
+		"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"integer", "code":"123", 
+		"v_param_options":null, "form_type":"event_standard","vdefault":1, "short_descript":null, "viewname":"aaa_ve_node_leak","isenabled":"True",
+		"widgettype":"text", "isenabled":"True", "iseditable":"True", "ismandatory":"True", "dv_querytext":null}}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"UPDATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE","parameter_id":"param_leak_node", "active":"True","ismultifeature":"false","ismultievent":"True",
+"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"777", 
+"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":"true", "viewname":"aaa_ve_node_leak","widgettype":"combo",
+"isenabled":"True", "iseditable":"True", "ismandatory":"True", "dv_querytext":"SELECT muni_id as id, name as idval FROM ext_municipality"}}}$$);
+
+
+SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"UPDATE", "action_type":"class", "parameters":{"class_id":"20","class_name":"LEAK_NODE","parameter_id":"param_leak_node", "active":"True","ismultifeature":"false","ismultievent":"True",
+"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"777", 
+"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":"true", "viewname":"aaa_ve_node_leak324","widgettype":"combo",
+"isenabled":"True", "iseditable":"True", "ismandatory":"True", "dv_querytext":"SELECT muni_id as id, name as idval FROM ext_municipality"}}}$$);
+
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"ARC"},
-"data":{"action":"UPDATE", "action_type":"parameter", "parameters":{"class_id":"11","class_name":"LEAK_ARC5","parameter_id":"param_leak88", "active":"True","ismultifeature":"false","ismultievent":"True",
-"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"integer", "code":"777", 
-"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":"777"}}}$$);
-
+"data":{"action":"DELETE", "action_type":"class", "parameters":{"class_name":"16"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"ARC"},
-"data":{"action":"DELETE", "action_type":"class"}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"ARC"},
-"data":{"action":"DELETE", "action_type":"parameter","parameters":{"class_id":"11","class_name":"LEAK_ARC5","parameter_id":"param_leak88"}}}$$);
+"data":{"action":"DELETE", "action_type":"parameter","parameters":{"class_id":"11","class_name":"LEAK_NODE","parameter_id":"param_leak88",
+"viewname":"aaa_ve_arc_leak"}}}$$);
 */
 
 
@@ -49,18 +59,19 @@ DECLARE
 	v_ismultievent boolean;
 	v_ismultifeature boolean;
 	v_data_type text;
+	v_config_data_type text;
 	v_parameter_type text;
 	v_descript text;
 	v_form_type text;
 	v_vdefault text;
 	v_short_descript text;
 	v_action text;
-	v_param_options text;
+	v_param_options json;
 	v_class_id integer;
 	v_action_type text;
 	v_param_name text;
 	v_code text;
-
+	v_widgettype text;
 
 	v_om_visit_x_feature_fields text;
 	v_om_visit_fields text;
@@ -69,6 +80,13 @@ DECLARE
 	v_viewname text;
 	v_definition text;
 	v_old_viewname text;
+	v_config_fields text;
+	rec record;
+	v_layout_order integer;
+	v_isenabled boolean;
+	v_dv_querytext text;
+	v_ismandatory boolean;
+	v_iseditable boolean;
 
 BEGIN
 
@@ -85,15 +103,16 @@ BEGIN
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_action_type = ((p_data ->>'data')::json->>'action_type')::text;
 
+	v_viewname = (((p_data ->>'data')::json->>'parameters')::json->>'viewname')::text; 
 	v_class_id = (((p_data ->>'data')::json->>'parameters')::json->>'class_id')::integer; 
 	v_class_name = (((p_data ->>'data')::json->>'parameters')::json->>'class_name')::text; 
-	v_feature_system_id = ((p_data ->>'feature')::json->>'feature_type')::text;
+	v_feature_system_id = lower(((p_data ->>'feature')::json->>'feature_type')::text);
 	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'active')::text;
 	v_visit_type = (((p_data ->>'data')::json->>'parameters')::json->>'visit_type')::text;
 	v_ismultievent = (((p_data ->>'data')::json->>'parameters')::json->>'ismultievent')::boolean;
 	v_ismultifeature = (((p_data ->>'data')::json->>'parameters')::json->>'ismultifeature')::text;
 	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'parameter_id')::text; 
-	raise notice 'v_param_name,%',v_param_name;
+
 	v_data_type = (((p_data ->>'data')::json->>'parameters')::json->>'data_type')::text; 
 	v_parameter_type = (((p_data ->>'data')::json->>'parameters')::json->>'parameter_type')::text;
 	v_code = (((p_data ->>'data')::json->>'parameters')::json->>'code')::text;
@@ -102,8 +121,21 @@ BEGIN
 	v_vdefault = (((p_data ->>'data')::json->>'parameters')::json->>'default')::text;
 	v_short_descript = (((p_data ->>'data')::json->>'parameters')::json->>'short_descript')::text;
 	v_param_options = (((p_data ->>'data')::json->>'parameters')::json->>'v_param_options')::json;
+	v_widgettype = (((p_data ->>'data')::json->>'parameters')::json->>'widgettype')::text;
+	v_isenabled = (((p_data ->>'data')::json->>'parameters')::json->>'isenabled')::boolean;
 
+	v_ismandatory = (((p_data ->>'data')::json->>'parameters')::json->>'ismandatory')::boolean;
+	v_iseditable = (((p_data ->>'data')::json->>'parameters')::json->>'iseditable')::text;
+	v_dv_querytext = (((p_data ->>'data')::json->>'parameters')::json->>'dv_querytext')::text;
 
+	IF v_data_type = 'text' THEN 
+		v_config_data_type = 'string';
+	END IF;
+	
+	--capture the id of the class
+	IF v_class_id IS NULL AND  v_action_type = 'parameter' THEN
+		SELECT id INTO v_class_id FROM om_visit_class WHERE idval = v_class_name;
+	END IF;
 	
 	--capture current parameters related to the class
 	SELECT string_agg(concat('a.',om_visit_parameter.id),E',\n    ' order by om_visit_parameter.id) as a_param,
@@ -114,89 +146,108 @@ BEGIN
 	FROM om_visit_parameter JOIN om_visit_class_x_parameter ON om_visit_parameter.id=om_visit_class_x_parameter.parameter_id
 	WHERE class_id=v_class_id;
 
-	--set the view name
-	v_viewname = concat('aaa_v_om_visit_',lower(v_feature_system_id),'_',lower(v_class_name));
+	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
 	
 IF v_action = 'CREATE' THEN
 	--insert new class and parameter
 	IF v_action_type = 'class' THEN
 		INSERT INTO om_visit_class (idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role_id, visit_type, param_options)
-		VALUES (v_class_name, v_descript, v_active, v_ismultifeature, v_ismultievent, v_feature_system_id, 'role_om', v_visit_type, v_param_options::json);
+		VALUES (v_class_name, v_descript, v_active, v_ismultifeature, v_ismultievent,upper(v_feature_system_id), 'role_om', v_visit_type, v_param_options::json)
+		RETURNING id INTO v_class_id;
 
-	ELSIF v_action_type = 'parameter' THEN
-		--capture the id of the class
-		SELECT id INTO v_class_id FROM om_visit_class WHERE idval = v_class_name;
+		--insert values into api config
+		IF (SELECT visitclass_id FROM config_api_visit WHERE visitclass_id = v_class_id) IS NULL THEN
+			INSERT INTO config_api_visit (visitclass_id, formname, tablename) VALUES (v_class_id, v_viewname, v_viewname);
+		END IF;
 		
+		IF (SELECT visitclass_id FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id) IS NULL THEN
+			INSERT INTO config_api_visit_x_featuretable (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
+		END IF;
+		
+		IF (SELECT formname FROM config_api_form_fields WHERE formname = v_viewname) IS NULL THEN
+		
+			EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
+			FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
+			AND column_name!=''id'' AND column_name!=''formname'';'
+			INTO v_config_fields;
+			
+			RAISE NOTICE 'v_config_fields,%',v_config_fields;
 
+			FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname='visit_multievent')
+			LOOP
+				EXECUTE 'INSERT INTO config_api_form_fields(formname,'||v_config_fields||')
+				SELECT '''||v_viewname||''','||v_config_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
+			END LOOP;
+
+			UPDATE config_api_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') WHERE column_id = 'feature_id' and formname = v_viewname;
+		END IF;
+		
+	ELSIF v_action_type = 'parameter' THEN
+		
 		--insert new parameter
 		INSERT INTO om_visit_parameter(id, code, parameter_type, feature_type, data_type, descript, form_type, vdefault, ismultifeature, short_descript)
-  	 	VALUES (v_param_name, v_code, v_parameter_type,v_feature_system_id,v_data_type, v_descript, v_form_type, v_vdefault,
+  	 	VALUES (v_param_name, v_code, v_parameter_type, upper(v_feature_system_id),v_data_type, v_descript, v_form_type, v_vdefault,
 		v_ismultifeature, v_short_descript);
 
 		--relate new parameters with new class
 		INSERT INTO om_visit_class_x_parameter (class_id, parameter_id)
 		VALUES (v_class_id, v_param_name);
 	    
-		--capture new parameters related to the class
-		SELECT string_agg(concat('a.',om_visit_parameter.id),E',\n    ' order by om_visit_parameter.id) as a_param,
-		string_agg(concat('ct.',om_visit_parameter.id),E',\n            ' order by om_visit_parameter.id) as ct_param,
-		string_agg(concat('(''''',om_visit_parameter.id,''''')'),',' order by om_visit_parameter.id) as id_param,
-		string_agg(concat(om_visit_parameter.id,' ', lower(om_visit_parameter.data_type)),', ' order by om_visit_parameter.id) as datatype
-		INTO v_new_parameters
-		FROM om_visit_parameter JOIN om_visit_class_x_parameter ON om_visit_parameter.id=om_visit_class_x_parameter.parameter_id
-		WHERE class_id=v_class_id;
 
+		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
+		AND layout_name = ''data_1'';'
+		INTO v_layout_order;
 
-	--RAISE NOTICE 'v_new_parameters,%',v_new_parameters;
+		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, layout_name,
+		iseditable, ismandatory, dv_querytext)
+		VALUES (v_viewname, 'visit', v_param_name,1,v_layout_order, true, v_data_type, v_widgettype, v_param_name, 'data_1',
+		v_iseditable, v_ismandatory, v_dv_querytext);
 
+		--PARA LOS FORMS DE VISITA SE VA A USAR TODAS LAS OPCIONES QUE DA EL CONFIG_API_FORM_FIELDS?
     END IF;	
 
 				
     --check if th visit is multievent
 	IF v_ismultievent = TRUE and v_action_type = 'parameter' THEN
 
-		--check if the view for this visit already exists if not create one
+			--check if the view for this visit already exists if not create one
 		
 			IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS FALSE THEN
 
-				EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit_x_'||lower(v_feature_system_id)||'.'',column_name)::text,'', '')
-				FROM information_schema.columns where table_name=''om_visit_x_'||lower(v_feature_system_id)||''' and table_schema='''||v_schemaname||''' 
-				and column_name!=''is_last'''
-				INTO v_om_visit_x_feature_fields;
-			    		    
-				EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit.'',column_name)::text,'', '')
-				FROM information_schema.columns where table_name=''om_visit'' and table_schema='''||v_schemaname||''' and column_name!=''publish'' and column_name!=''id'''
-				INTO v_om_visit_fields;
-		
+				PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,null,null,null,null,v_feature_system_id,v_viewname);
 
-				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.aaa_v_om_visit_'||lower(v_feature_system_id)||'_'||lower(v_class_name)||' AS
-					SELECT '||v_om_visit_x_feature_fields||',
-					'||v_om_visit_fields||',
-					'||v_new_parameters.a_param||'
-					FROM om_visit
-					JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
-					JOIN om_visit_x_'||lower(v_feature_system_id)||' ON om_visit.id = om_visit_x_'||lower(v_feature_system_id)||'.visit_id
-					LEFT JOIN ( SELECT ct.visit_id,
-		            '||v_new_parameters.ct_param||'
-		           FROM crosstab(''SELECT visit_id, om_visit_event.parameter_id, value 
-				      FROM '||v_schemaname||'.om_visit 
-				      JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
-				      JOIN '||v_schemaname||'.om_visit_class on om_visit_class.id=om_visit.class_id
-				      JOIN '||v_schemaname||'.om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-				      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2''::text, '' VALUES ('''''||v_new_parameters.id_param||''''')''::text) 
-				      ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
-				  WHERE om_visit_class.ismultievent = true AND om_visit_class.id='||v_class_id||';';
 			ELSE
 
-			--if the view doesnt exist and there are parameters defined for the class
-			PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
-			v_old_parameters.datatype,v_feature_system_id,v_viewname);
+				--if the view doesn't exist and there are parameters defined for the class or add new parameter to the class
+			
+				PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
+				v_old_parameters.datatype,v_feature_system_id,v_viewname);
 
 			END IF;
 
-		END IF;
 	END IF;
+END IF;
 
+IF v_action = 'UPDATE' AND v_action_type = 'class' THEN
+
+	
+	UPDATE om_visit_class
+   	SET idval=v_class_name, descript=v_descript, active=v_active, visit_type=v_visit_type, param_options=v_param_options
+ 	WHERE id = v_class_id;
+
+ 	SELECT tablename INTO v_old_viewname FROM config_api_visit WHERE visitclass_id = v_class_id;
+
+	RAISE NOTICE 'v_old_viewname,v_viewname,%,%',v_old_viewname, v_viewname;
+	
+ 	IF v_old_viewname != v_viewname THEN
+ 		
+ 		UPDATE config_api_visit SET tablename = v_viewname WHERE visitclass_id = v_class_id;
+
+ 		EXECUTE 'ALTER VIEW '||v_old_viewname||' RENAME TO '||v_viewname||';';
+ 	
+ 	END IF;
+
+END IF;
 
 IF (v_action = 'UPDATE' OR v_action = 'DELETE') AND v_action_type = 'parameter' THEN
 		--capture old parameters related to the class
@@ -212,26 +263,42 @@ END IF;
 
 IF v_action = 'UPDATE' AND v_action_type = 'parameter' THEN
 
-		UPDATE om_visit_parameter SET code = v_code, parameter_type = v_parameter_type, feature_type = v_feature_system_id, data_type = v_data_type, 
+		UPDATE om_visit_parameter SET code = v_code, parameter_type = v_parameter_type, feature_type = upper(v_feature_system_id), data_type = v_data_type, 
   	 	descript = v_descript, form_type = v_form_type, vdefault = v_vdefault, short_descript = v_short_descript
   	 	WHERE id = v_param_name;
 		
-		PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
-		v_old_parameters.datatype,v_feature_system_id,v_viewname);
+		IF v_ismultievent = TRUE THEN
+			PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
+			v_old_parameters.datatype,v_feature_system_id,v_viewname);
+		END IF;
+
+		UPDATE config_api_form_fields SET formname = v_viewname, layout_order = v_layout_order, isenabled = v_isenabled, 
+		datatype = v_data_type, widgettype = v_widgettype, label = v_param_name, iseditable = v_iseditable, ismandatory = v_ismandatory,
+		dv_querytext = v_dv_querytext 
+		WHERE formname = v_viewname and formtype='visit' and column_id = v_param_name;
 
 ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 
 		DELETE FROM om_visit_class_x_parameter WHERE parameter_id = v_param_name;
 		DELETE FROM om_visit_parameter WHERE id = v_param_name;
 
-		PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
-		v_old_parameters.datatype,v_feature_system_id,v_viewname);
+		IF v_ismultievent = TRUE THEN
+			PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
+			v_old_parameters.datatype,v_feature_system_id,v_viewname);
+		END IF;
 		
 ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
+		raise notice 'delete class - class_id,%',v_class_id;
 
+		v_viewname = (SELECT tablename FROM config_api_visit WHERE visitclass_id = v_class_id);
+		-- COMO GESTIONAR EL DELETE DE CLASES? SE ELIMINA TODO O SOLO RELACION DE CLASE - PARAMETRO PARA NO PERDER DATOS DE VISITA SI EXISTE?
 		DELETE FROM om_visit_class_x_parameter WHERE class_id = v_class_id;
 		DELETE FROM om_visit_class WHERE id = v_class_id;
-
+		DELETE FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id;
+		DELETE FROM config_api_form_fields WHERE formtype='visit' and formname IN (SELECT formname FROM config_api_visit WHERE visitclass_id = v_class_id);
+		DELETE FROM config_api_visit WHERE visitclass_id = v_class_id;
+		
+		EXECUTE 'DROP VIEW IF EXISTS '||v_viewname||';';
 		
 END IF;
 
