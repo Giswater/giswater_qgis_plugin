@@ -165,7 +165,7 @@ class AddNewLot(ParentManage):
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
-            self.set_dates()
+            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja', 'startdate','enddate')
             self.reload_table_visit()
             self.manage_cmb_status()
 
@@ -787,7 +787,8 @@ class AddNewLot(ParentManage):
                 if len(row) > 0:
                     standard_model.appendRow(row)
         self.hilight_features(self.rb_list)
-        self.set_dates()
+        self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja',
+                               'startdate', 'enddate')
         self.reload_table_visit()
 
 
@@ -854,7 +855,8 @@ class AddNewLot(ParentManage):
             self.ids.remove(feature_id)
             model.takeRow(row)
         self.hilight_features(self.rb_list)
-        self.set_dates()
+        self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja',
+                               'startdate', 'enddate')
         self.reload_table_visit()
 
 
@@ -900,28 +902,6 @@ class AddNewLot(ParentManage):
                 else:
                     self.dlg_lot.tab_widget.setTabEnabled(index, True)
         utils_giswater.set_combo_itemData(self.feature_type, feature_type, 1)
-
-
-    def set_dates(self):
-        """ Set Max and Min date """
-
-        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
-        if table_name is None:
-            return
-        sql = ("SELECT MIN(startdate), MAX(enddate) "
-               "FROM {}".format(table_name))
-        row = self.controller.get_row(sql)
-        if row:
-            if row[0]:
-                self.dlg_lot.date_event_from.setDate(row[0])
-            else:
-                current_date = QDate.currentDate()
-                self.dlg_lot.date_event_from.setDate(current_date)
-            if row[1]:
-                self.dlg_lot.date_event_to.setDate(row[1])
-            else:
-                current_date = QDate.currentDate()
-                self.dlg_lot.date_event_to.setDate(current_date)
 
 
     def reload_table_visit(self):
@@ -1354,6 +1334,7 @@ class AddNewLot(ParentManage):
             utils_giswater.set_item_data(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
 
         table_object = "v_ui_om_visit_lot"
+
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
         sql = ('SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
@@ -1568,6 +1549,10 @@ class AddNewLot(ParentManage):
 
         widget = utils_giswater.getWidget(dialog, str(widget_name))
         csv_path = utils_giswater.getWidgetText(dialog, widget)
+        if str(csv_path) == 'null':
+            msg = "Select a valid path."
+            self.controller.show_info_box(msg, "Info")
+            return
         all_rows = []
         row = []
         # Get headers from model

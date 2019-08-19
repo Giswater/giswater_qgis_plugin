@@ -589,17 +589,7 @@ class ManageVisit(ParentManage, QObject):
             partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
-        current_date = QDate.currentDate()        
-        sql = ("SELECT MIN(startdate), MAX(enddate)"
-               " FROM {}.{}".format(self.schema_name, 'om_visit'))
-        row = self.controller.get_row(sql, log_info=False, commit=self.autocommit)
-        if row:
-            if row[0]:
-                self.dlg_man.date_event_from.setDate(row[0])
-            if row[1]:
-                self.dlg_man.date_event_to.setDate(row[1])
-            else:
-                self.dlg_man.date_event_to.setDate(current_date)
+        self.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to, 'om_visit', 'startdate', 'enddate')
 
         # set date events
         self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))

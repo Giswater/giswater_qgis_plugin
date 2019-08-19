@@ -798,19 +798,19 @@ class ParentAction(object):
 
     def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
 
-        sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
-               " FROM {}".format(table_name))
+        sql = ("SELECT MIN(LEAST({0}, {1})),"
+               " MAX(GREATEST({0}, {1}))"
+               " FROM {2}".format(field_from, field_to, table_name))
         row = self.controller.get_row(sql, log_sql=False)
+        current_date = QDate.currentDate()
         if row:
             if row[0]:
                 widget_from.setDate(row[0])
             else:
-                current_date = QDate.currentDate()
                 widget_from.setDate(current_date)
             if row[1]:
                 widget_to.setDate(row[1])
             else:
-                current_date = QDate.currentDate()
                 widget_to.setDate(current_date)
 
 

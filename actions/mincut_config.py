@@ -52,9 +52,7 @@ class MincutConfig(ParentAction):
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         self.load_settings(self.dlg_min_edit)
-        self.set_dates()
-        # self.set_dates_from_to(self.dlg_min_edit.date_to, self.dlg_min_edit.date_to, 'v_ui_anl_mincut_result_cat',
-        #                        'forecast_start', 'forecast_end')
+        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'v_ui_anl_mincut_result_cat', 'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
@@ -443,20 +441,3 @@ class MincutConfig(ParentAction):
             if layer is not None:
                 layer.triggerRepaint()
 
-
-    def set_dates(self):
-
-        sql = ("SELECT MIN(LEAST(forecast_start, exec_start)), MAX(GREATEST(forecast_end, exec_end))"
-               " FROM {}".format('v_ui_anl_mincut_result_cat'))
-        row = self.controller.get_row(sql, log_sql=True)
-        if row:
-            if row[0]:
-                self.dlg_min_edit.date_from.setDate(row[0])
-            else:
-                current_date = QDate.currentDate()
-                self.dlg_min_edit.date_from.setDate(current_date)
-            if row[1]:
-                self.dlg_min_edit.date_to.setDate(row[1])
-            else:
-                current_date = QDate.currentDate()
-                self.dlg_min_edit.date_to.setDate(current_date)

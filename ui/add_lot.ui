@@ -766,7 +766,11 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_20">
             <item>
-             <widget class="QLineEdit" name="txt_path_rel"/>
+             <widget class="QLineEdit" name="txt_path_rel">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_path_rel">
@@ -973,7 +977,11 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_21">
             <item>
-             <widget class="QLineEdit" name="txt_path"/>
+             <widget class="QLineEdit" name="txt_path">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_path">
