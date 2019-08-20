@@ -672,7 +672,7 @@ class ApiCF(ApiParent):
 
         # Set image
         img = section_result[0]['body']['data']['shapepng']
-        utils_giswater.setImage(dlg_sections, 'lbl_section_image', img+".png")
+        utils_giswater.setImage(dlg_sections, 'lbl_section_image', img)
 
         # Set values into QLineEdits
         for field in section_result[0]['body']['data']['fields']:
