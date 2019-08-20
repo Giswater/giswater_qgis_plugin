@@ -95,7 +95,7 @@ BEGIN
 		ELSIF rec.data_type = 'numeric' THEN
 			v_datatype='double';
 			v_widgettype='text';
-		ELSIF rec.data_type = 'integer' THEN
+		ELSIF rec.data_type = 'integer' OR rec.data_type = 'smallint' THEN
 			v_datatype='integer';
 			v_widgettype='text';
 		ELSIF rec.data_type = 'boolean' THEN
@@ -104,8 +104,11 @@ BEGIN
 		ELSIF rec.data_type = 'date' THEN
 			v_datatype='date';
 			v_widgettype='datepickertime';
+		ELSE 
+			v_datatype='string';
+			v_widgettype='text';
 		END IF;
-		
+
 		--insert into config_api_form_fields
 		IF v_datatype='double' THEN
 			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, 
