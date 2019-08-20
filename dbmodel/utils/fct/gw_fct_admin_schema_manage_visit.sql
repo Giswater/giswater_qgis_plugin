@@ -13,6 +13,20 @@ $BODY$
 
 /*EXAMPLE
 
+SINGLE EVENT
+SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
+"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"text", "code":"123", 
+"v_param_options":null, "form_type":"event_standard","vdefault":null, "short_descript":null, "viewname":"aaa_ve_node_leak67"}}}$$);
+
+		SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+		"data":{"action":"CREATE", "action_type":"parameter", "parameters":{"class_name":"LEAK_NODE67","parameter_id":"param_leak_node67", "active":"True","ismultifeature":"false","ismultievent":"False",
+		"visit_type":1,  "parameter_type":"INSPECTION", "data_type":"integer", "code":"123", 
+		"v_param_options":null, "form_type":"event_standard","vdefault":1, "short_descript":null, "viewname":"aaa_ve_node_leak67","isenabled":"True",
+		"widgettype":"text", "isenabled":"True", "iseditable":"True", "ismandatory":"True", "dv_querytext":null}}}$$);
+
+-------------
+
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
 "data":{"action":"CREATE", "action_type":"class", "parameters":{"class_name":"LEAK_NODE","parameter_id":"param_leak_node", "active":"True","ismultifeature":"false","ismultievent":"True",
@@ -157,7 +171,12 @@ IF v_action = 'CREATE' THEN
 
 		--insert values into api config
 		IF (SELECT visitclass_id FROM config_api_visit WHERE visitclass_id = v_class_id) IS NULL THEN
-			INSERT INTO config_api_visit (visitclass_id, formname, tablename) VALUES (v_class_id, v_viewname, v_viewname);
+			IF v_ismultievent = TRUE THEN
+				INSERT INTO config_api_visit (visitclass_id, formname, tablename) VALUES (v_class_id, v_viewname, v_viewname);
+			ELSE
+				INSERT INTO config_api_visit (visitclass_id, formname, tablename) 
+				VALUES (v_class_id, v_viewname, concat('ve_visit_',v_feature_system_id,'_singlevent'));
+			END IF;
 		END IF;
 		
 		IF (SELECT visitclass_id FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id) IS NULL THEN
@@ -173,13 +192,23 @@ IF v_action = 'CREATE' THEN
 			
 			RAISE NOTICE 'v_config_fields,%',v_config_fields;
 
-			FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname='visit_multievent')
-			LOOP
-				EXECUTE 'INSERT INTO config_api_form_fields(formname,'||v_config_fields||')
-				SELECT '''||v_viewname||''','||v_config_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
-			END LOOP;
+			IF v_ismultievent = TRUE THEN
+				FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname='visit_multievent')
+				LOOP
+					EXECUTE 'INSERT INTO config_api_form_fields(formname,'||v_config_fields||')
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
+				END LOOP;
+			ELSE
+				FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname='visit_singlevent')
+				LOOP
+					EXECUTE 'INSERT INTO config_api_form_fields(formname,'||v_config_fields||')
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
+				END LOOP;
+			END IF;
 
-			UPDATE config_api_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') WHERE column_id = 'feature_id' and formname = v_viewname;
+			UPDATE config_api_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') 
+			WHERE column_id = 'feature_id' and formname = v_viewname;
+
 		END IF;
 		
 	ELSIF v_action_type = 'parameter' THEN
@@ -193,17 +222,17 @@ IF v_action = 'CREATE' THEN
 		INSERT INTO om_visit_class_x_parameter (class_id, parameter_id)
 		VALUES (v_class_id, v_param_name);
 	    
+		IF v_ismultievent = TRUE THEN
+			EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
+			AND layout_name = ''data_1'';'
+			INTO v_layout_order;
 
-		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-		AND layout_name = ''data_1'';'
-		INTO v_layout_order;
+			INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, layout_name,
+			iseditable, ismandatory, dv_querytext)
+			VALUES (v_viewname, 'visit', v_param_name,1,v_layout_order, true, v_data_type, v_widgettype, v_param_name, 'data_1',
+			v_iseditable, v_ismandatory, v_dv_querytext);
+		END IF;
 
-		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, layout_name,
-		iseditable, ismandatory, dv_querytext)
-		VALUES (v_viewname, 'visit', v_param_name,1,v_layout_order, true, v_data_type, v_widgettype, v_param_name, 'data_1',
-		v_iseditable, v_ismandatory, v_dv_querytext);
-
-		--PARA LOS FORMS DE VISITA SE VA A USAR TODAS LAS OPCIONES QUE DA EL CONFIG_API_FORM_FIELDS?
     END IF;	
 
 				
