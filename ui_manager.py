@@ -20,7 +20,7 @@ class GwDialog(QDialog):
     
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
-            
+            QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
             path = os.path.dirname(__file__) + '/config/ui_config.config'
             parser.read(path)
@@ -29,11 +29,13 @@ class GwDialog(QDialog):
                 tag = f'{self.objectName()}_{self.subtag}'
             else:
                 tag = str(self.objectName())
+                
+            try:
+                tag = parser.get('web_tag', tag)
+                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
+            except Exception as e:
+                print(type(e).__name__)
             
-            tag = parser.get('web_tag', tag)
-            
-            QWhatsThis.leaveWhatsThisMode()
-            webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
             return True
         return False
 
@@ -57,20 +59,22 @@ class GwMainWindow(QMainWindow):
     
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
-            
+            QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
             path = os.path.dirname(__file__) + '/config/ui_config.config'
             parser.read(path)
-            
+        
             if self.subtag is not None:
                 tag = f'{self.objectName()}_{self.subtag}'
             else:
                 tag = str(self.objectName())
-            
-            tag = parser.get(section='web_tag', option=tag)
-            
-            QWhatsThis.leaveWhatsThisMode()
-            webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
+                
+            try:
+                tag = parser.get('web_tag', tag)
+                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
+            except Exception as e:
+                print(type(e).__name__)
+
             return True
         return False
 
