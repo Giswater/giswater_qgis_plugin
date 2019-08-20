@@ -1415,7 +1415,7 @@ class AddNewLot(ParentManage):
         self.dlg_user_manage.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
 
         # Open form
-        self.dlg_user_manage.show()
+        self.open_dialog(self.dlg_user_manage)
 
 
     def manage_accept(self, widget):

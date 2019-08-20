@@ -347,7 +347,8 @@ class ApiCF(ApiParent):
         self.hydro_info_dlg.btn_accept.setEnabled(False)
 
         # Open dialog
-        self.hydro_info_dlg.open()
+        self.open_dialog(self.hydro_info_dlg)
+        
         return result, self.hydro_info_dlg
 
 
@@ -563,7 +564,7 @@ class ApiCF(ApiParent):
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
-        self.dlg_cf.show()
+        self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
 
 
@@ -1593,7 +1594,8 @@ class ApiCF(ApiParent):
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         utils_giswater.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
-        self.dlg_event_full.open()
+        
+        self.open_dialog(self.dlg_event_full)
 
 
     def populate_tbl_docs_x_event(self):
@@ -1882,7 +1884,7 @@ class ApiCF(ApiParent):
                 item_doc = QListWidgetItem(str(row[0]))
                 self.tbl_list_doc.addItem(item_doc)
 
-            self.dlg_load_doc.open()
+            self.open_dialog(self.dlg_load_doc)
 
 
     def open_selected_doc(self):

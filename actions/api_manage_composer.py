@@ -94,8 +94,8 @@ class ApiManageComposer(ApiParent):
 
         self.check_whidget_exist(self.dlg_composer)
         self.load_composer_values(self.dlg_composer)
-        self.dlg_composer.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_composer.show()
+        
+        self.open_dialog(self.dlg_composer)
 
         # Control if no have composers
         if composers_list != '"{}"':

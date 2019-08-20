@@ -166,7 +166,8 @@ class ApiConfig(ApiParent):
         self.hide_void_groupbox(self.dlg_config)
 
         # Open form
-        self.dlg_config.show()
+        self.open_dialog(self.dlg_config)
+        
 
 
     def construct_form_param_user(self, row, pos):

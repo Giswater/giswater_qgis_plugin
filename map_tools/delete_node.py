@@ -78,8 +78,7 @@ class DeleteNodeMapTool(ParentMapTool):
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)
             self.dlg_fusion.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_fusion))
 
-            self.dlg_fusion.setWindowFlags(Qt.WindowStaysOnTopHint)
-            self.dlg_fusion.open()
+            self.open_dialog(self.dlg_fusion)
 
 
     def exec_fusion(self):

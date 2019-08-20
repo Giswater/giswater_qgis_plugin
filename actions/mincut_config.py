@@ -107,8 +107,7 @@ class MincutConfig(ParentAction):
         #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
         # Open the dialog
-        self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_min_edit.show()
+        self.open_dialog(self.dlg_min_edit)
 
 
     def get_clients_codes(self, qtable):

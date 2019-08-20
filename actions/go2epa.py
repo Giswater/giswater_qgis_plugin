@@ -98,7 +98,7 @@ class Go2Epa(ApiParent):
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
         # Open dialog
-        self.dlg_go2epa.show()
+        self.open_dialog(self.dlg_go2epa)
 
 
     def cancel_imports(self):

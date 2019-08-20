@@ -200,7 +200,7 @@ class MincutParent(ParentAction):
         self.sql_connec = ""
         self.sql_hydro = ""
         
-        self.dlg_mincut.show()
+        self.open_dialog(self.dlg_mincut)
 
 
     def show_notified_list(self):
@@ -253,7 +253,7 @@ class MincutParent(ParentAction):
         # Enable/Disable widget depending state
         self.enable_widgets('0')
 
-        self.dlg_mincut.show()
+        self.open_dialog(self.dlg_mincut)
 
 
     def mincut_close(self):
@@ -371,8 +371,7 @@ class MincutParent(ParentAction):
         self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)        
 
         # Open the dialog
-        self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_fin.show()
+        self.open_dialog(self.dlg_fin)
 
 
     def set_real_location(self):
@@ -663,8 +662,8 @@ class MincutParent(ParentAction):
             # Read selection and reload table
             self.select_features_connec()
         self.snapping_selection_connec()
-        self.dlg_connec.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_connec.show()
+        
+        self.open_dialog(self.dlg_connec)
 
         
     def set_completer_customer_code(self, widget, set_signal=False):
@@ -823,8 +822,7 @@ class MincutParent(ParentAction):
             # Read selection and reload table
             self.select_features_hydro()
 
-        self.dlg_hydro.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_hydro.show()
+        self.open_dialog(self.dlg_hydro)
 
 
     def auto_fill_hydro_id(self):
@@ -2254,8 +2252,7 @@ class MincutParent(ParentAction):
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
         
         # Open dialog
-        self.dlg_comp.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_comp.open()
+        self.open_dialog(self.dlg_comp)
 
 
     def set_template(self):

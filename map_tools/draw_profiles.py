@@ -121,7 +121,7 @@ class DrawProfiles(ParentMapTool):
         self.nodes = []
         self.list_of_selected_nodes = []
 
-        self.dlg_draw_profile.open()
+        self.open_dialog(self.dlg_draw_profile)
 
 
     def save_profile(self):
@@ -185,8 +185,7 @@ class DrawProfiles(ParentMapTool):
                 item_arc = QListWidgetItem(str(row[0]))
                 self.dlg_load.tbl_profiles.addItem(item_arc)
 
-        self.dlg_load.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_load.open()
+        self.open_dialog(self.dlg_load)
         self.deactivate()
 
 

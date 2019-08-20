@@ -301,7 +301,7 @@ class TmBasic(TmParentAction):
         dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, dlg_selector))
         dlg_selector.rejected.connect(partial(self.close_dialog, dlg_selector))  
         
-        dlg_selector.open()
+        self.open_dialog(dlg_selector)
         
 
     def force_chk_current(self, dialog):

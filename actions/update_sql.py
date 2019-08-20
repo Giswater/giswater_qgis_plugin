@@ -238,7 +238,7 @@ class UpdateSQL(ApiParent):
         window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        self.dlg_readsql.show()
+        self.open_dialog(self.dlg_readsql)
 
         super_users = self.settings.value('system_variables/super_users')
         self.super_users = []
@@ -322,7 +322,7 @@ class UpdateSQL(ApiParent):
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_create_gis_project))
 
         # Open MainWindow
-        self.dlg_create_gis_project.show()
+        self.open_dialog(self.dlg_create_gis_project)
 
 
     def btn_constrains_changed(self, button, call_function=False):
@@ -1117,7 +1117,7 @@ class UpdateSQL(ApiParent):
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
 
         # Open dialog
-        self.dlg_import_inp.show()
+        self.open_dialog(self.dlg_import_inp)
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
@@ -1632,7 +1632,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
 
         # Open dialog
-        self.dlg_readsql_show_info.show()
+        self.open_dialog(self.dlg_readsql_show_info)
 
 
     def read_info_version(self):
@@ -1934,7 +1934,7 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle('Create Project - ' + str(connection_name))
-        self.dlg_readsql_create_project.show()
+        self.open_dialog(self.dlg_readsql_create_project)
 
 
     def open_rename(self):
@@ -1957,7 +1957,7 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle('Rename project - ' + schema)
-        self.dlg_readsql_rename.show()
+        self.open_dialog(self.dlg_readsql_rename)
 
 
     def executeFiles(self, filedir, i18n=False, no_ct=False):
@@ -2409,7 +2409,7 @@ class UpdateSQL(ApiParent):
         self.dlg_manage_fields.btn_open.clicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
 
-        self.dlg_manage_fields.show()
+        self.open_dialog(self.dlg_manage_fields)
 
 
     def update_selected_addfild(self, widget):
@@ -2460,7 +2460,7 @@ class UpdateSQL(ApiParent):
                 value = None
             utils_giswater.setWidgetText(self.dlg_manage_fields, result, value)
 
-        self.dlg_manage_fields.show()
+        self.open_dialog(self.dlg_manage_fields)
 
 
     def manage_create_field(self, form_name):

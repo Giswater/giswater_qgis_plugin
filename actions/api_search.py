@@ -105,10 +105,10 @@ class ApiSearch(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-        # Open dialog
-        self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
-        self.dlg_search.show()
+    
+        # Open dialog
+        self.open_dialog(self.dlg_search)
 
 
     def set_completer(self, widget, completer=None):
@@ -374,7 +374,7 @@ class ApiSearch(ApiParent):
         field_id = str(row[0]['body']['feature']['idName'])
         self.populate_basic_info(self.hydro_info_dlg, row, field_id)
 
-        self.hydro_info_dlg.open()
+        self.open_dialog(self.hydro_info_dlg)
 
 
     def workcat_open_table_items(self, item):
@@ -438,8 +438,7 @@ class ApiSearch(ApiParent):
         self.fill_label_data(workcat_id, table_name)
         self.fill_label_data(workcat_id, table_name_end, extension)
 
-        self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
-        self.items_dialog.open()
+        self.open_dialog(self.items_dialog)
 
 
     def force_expl(self,  workcat_id):

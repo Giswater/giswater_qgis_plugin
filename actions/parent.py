@@ -32,6 +32,7 @@ if 'nt' in sys.builtin_module_names:
     import ctypes
 
 from .. import utils_giswater
+from ..ui_manager import GwDialog, GwMainWindow
 import os
 import webbrowser
 
@@ -174,7 +175,7 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
         
         
-    def open_dialog(self, dlg=None, dlg_name=None, maximize_button=True, stay_on_top=True): 
+    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
         if dlg is None or type(dlg) is bool:
@@ -182,18 +183,28 @@ class ParentAction(object):
             
         # Manage i18n of the dialog                  
         if dlg_name:      
-            self.controller.manage_translation(dlg_name, dlg)      
-            
-        # Manage stay on top and maximize button
-        if maximize_button and stay_on_top:           
-            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)       
-        elif not maximize_button and stay_on_top:
-            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowStaysOnTopHint) 
-        elif maximize_button and not stay_on_top:
-            dlg.setWindowFlags(Qt.WindowMaximizeButtonHint)              
+            self.controller.manage_translation(dlg_name, dlg)
+
+        # Manage stay on top, maximize/minimize button and information button
+        # if info is True maximize flag will be ignored
+        # To enable maximize button you must set info to False
+        flags = Qt.WindowCloseButtonHint
+        if info:
+            flags |= Qt.WindowSystemMenuHint | Qt.WindowContextHelpButtonHint
+        else:
+            if maximize_button:
+                flags |= Qt.WindowMinMaxButtonsHint
+
+        if stay_on_top:
+            flags |= Qt.WindowStaysOnTopHint
+
+        dlg.setWindowFlags(flags)
 
         # Open dialog
-        dlg.open()      
+        if issubclass(type(dlg), GwDialog):
+            dlg.open()
+        elif issubclass(type(dlg), GwMainWindow):
+            dlg.show()
     
         
     def close_dialog(self, dlg=None): 

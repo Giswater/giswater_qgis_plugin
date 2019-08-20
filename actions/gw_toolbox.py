@@ -72,7 +72,8 @@ class GwToolBox(ApiParent):
         self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'])
         self.dlg_toolbox.txt_filter.textChanged.connect(partial(self.filter_functions))
         self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
-        self.dlg_toolbox.show()
+        
+        self.open_dialog(self.dlg_toolbox)
 
 
     def filter_functions(self, text):
@@ -130,7 +131,8 @@ class GwToolBox(ApiParent):
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
                                                    self.dlg_functions.cmb_layers, complet_result[0]['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
-        self.dlg_functions.show()
+        
+        self.open_dialog(self.dlg_functions)
 
 
     def set_selected_layer(self, dialog, combo):

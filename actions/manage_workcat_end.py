@@ -219,8 +219,8 @@ class ManageWorkcatEnd(ParentManage):
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self.open_selected_object, self.tbl_arc_x_relations))
-            self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
-            self.dlg_work.show()
+            
+            self.open_dialog(self.dlg_work)
 
         # TODO: Function update_geom_type() don't use parameter ids_list
         else:
@@ -416,7 +416,7 @@ class ManageWorkcatEnd(ParentManage):
         except AttributeError:
             pass
 
-        self.dlg_work_end.open()
+        self.open_dialog(self.dlg_work_end)
 
 
     def manage_close(self, dialog, table_object, cur_active_layer=None, force_downgrade=False, show_warning=False):
