@@ -212,3 +212,46 @@ INSERT INTO man_type_function VALUES (1, 'Standard Function', 'NODE');
 INSERT INTO man_type_function VALUES (2, 'Standard Function', 'ARC');
 INSERT INTO man_type_function VALUES (3, 'Standard Function', 'CONNEC');
 INSERT INTO man_type_function VALUES (4, 'Standard Function', 'ELEMENT');
+
+
+
+-- ----------------------------
+-- Update shortcuts
+-- ----------------------------
+
+UPDATE cat_feature SET shortcut_key=NULL;
+UPDATE cat_feature SET shortcut_key='Alt+A' WHERE id = 'AIR-VALVE';
+UPDATE cat_feature SET shortcut_key='C' WHERE id = 'CHECK-VALVE';
+UPDATE cat_feature SET shortcut_key='V' WHERE id = 'CURVE';
+UPDATE cat_feature SET shortcut_key='E' WHERE id = 'ENDLINE';
+UPDATE cat_feature SET shortcut_key='K' WHERE id = 'EXPANTANK';
+UPDATE cat_feature SET shortcut_key='F' WHERE id = 'FILTER';
+UPDATE cat_feature SET shortcut_key='L' WHERE id = 'FLEXUNION';
+UPDATE cat_feature SET shortcut_key='W' WHERE id = 'FLOWMETER';
+UPDATE cat_feature SET shortcut_key='Ctrl+N' WHERE id = 'FOUNTAIN';
+UPDATE cat_feature SET shortcut_key='G' WHERE id = 'GREEN-VALVE';
+UPDATE cat_feature SET shortcut_key='Ctrl+G' WHERE id = 'GREENTAP';
+UPDATE cat_feature SET shortcut_key='H' WHERE id = 'HYDRANT';
+UPDATE cat_feature SET shortcut_key='J' WHERE id = 'JUNCTION';
+UPDATE cat_feature SET shortcut_key='M' WHERE id = 'MANHOLE';
+UPDATE cat_feature SET shortcut_key='N' WHERE id = 'NETELEMENT';
+UPDATE cat_feature SET shortcut_key='S' WHERE id = 'NETSAMPLEPOINT';
+UPDATE cat_feature SET shortcut_key='O' WHERE id = 'OUTFALL-VALVE';
+UPDATE cat_feature SET shortcut_key='Alt+I' WHERE id = 'PIPE';
+UPDATE cat_feature SET shortcut_key='Alt+Q' WHERE id = 'PR-REDUC.VALVE';
+UPDATE cat_feature SET shortcut_key='B' WHERE id = 'PRESSURE-METER';
+UPDATE cat_feature SET shortcut_key='U' WHERE id = 'PUMP';
+UPDATE cat_feature SET shortcut_key='Z' WHERE id = 'REDUCTION';
+UPDATE cat_feature SET shortcut_key='R' WHERE id = 'REGISTER';
+UPDATE cat_feature SET shortcut_key='I' WHERE id = 'SHUTOFF-VALVE';
+UPDATE cat_feature SET shortcut_key='D' WHERE id = 'SOURCE';
+UPDATE cat_feature SET shortcut_key='T' WHERE id = 'T';
+UPDATE cat_feature SET shortcut_key='Alt+K' WHERE id = 'TANK';
+UPDATE cat_feature SET shortcut_key='Ctrl+T' WHERE id = 'TAP';
+UPDATE cat_feature SET shortcut_key='Alt+T' WHERE id = 'VARC';
+UPDATE cat_feature SET shortcut_key='Alt+V' WHERE id = 'VCONNEC';
+UPDATE cat_feature SET shortcut_key='Y' WHERE id = 'WATER-CONNECTION';
+UPDATE cat_feature SET shortcut_key='Alt+Y' WHERE id = 'WATERWELL';
+UPDATE cat_feature SET shortcut_key='Ctrl+W' WHERE id = 'WJOIN';
+UPDATE cat_feature SET shortcut_key='P' WHERE id = 'WTP';
+UPDATE cat_feature SET shortcut_key='X' WHERE id = 'X';
