@@ -182,6 +182,9 @@ INSERT INTO man_type_function VALUES (5, 'Standard Function', 'GULLY');
 -- ----------------------------
 -- Update shortcuts
 -- ----------------------------
+
+UPDATE cat_feature SET shortcut_key=NULL;
+
 UPDATE cat_feature SET shortcut_key='B' WHERE id = 'CHAMBER';
 UPDATE cat_feature SET shortcut_key='E' WHERE id = 'CHANGE';
 UPDATE cat_feature SET shortcut_key='M' WHERE id = 'CIRC-MANHOLE';
