@@ -177,3 +177,38 @@ INSERT INTO man_type_function VALUES (3, 'Standard Function', 'CONNEC');
 INSERT INTO man_type_function VALUES (4, 'Standard Function', 'ELEMENT');
 INSERT INTO man_type_function VALUES (5, 'Standard Function', 'GULLY');
 
+
+
+-- ----------------------------
+-- Update shortcuts
+-- ----------------------------
+UPDATE cat_feature SET shortcut_key='B' WHERE id = 'CHAMBER';
+UPDATE cat_feature SET shortcut_key='E' WHERE id = 'CHANGE';
+UPDATE cat_feature SET shortcut_key='M' WHERE id = 'CIRC-MANHOLE';
+UPDATE cat_feature SET shortcut_key='Alt+X' WHERE id = 'CONDUIT';
+UPDATE cat_feature SET shortcut_key='Ctrl+C' WHERE id = 'CONNEC';
+UPDATE cat_feature SET shortcut_key='Ctrl+G' WHERE id = 'GULLY';
+UPDATE cat_feature SET shortcut_key='H' WHERE id = 'HIGHPOINT';
+UPDATE cat_feature SET shortcut_key='J' WHERE id = 'JUMP';
+UPDATE cat_feature SET shortcut_key='N' WHERE id = 'JUNCTION';
+UPDATE cat_feature SET shortcut_key='A' WHERE id = 'NETELEMENT';
+UPDATE cat_feature SET shortcut_key='Y' WHERE id = 'NETGULLY';
+UPDATE cat_feature SET shortcut_key='I' WHERE id = 'NETINIT';
+UPDATE cat_feature SET shortcut_key='O' WHERE id = 'OUTFALL';
+UPDATE cat_feature SET shortcut_key='G' WHERE id = 'OWERFLOW-STORAGE';
+UPDATE cat_feature SET shortcut_key='Ctrl+A' WHERE id = 'PGULLY';
+UPDATE cat_feature SET shortcut_key='Alt+U' WHERE id = 'PUMP-PIPE';
+UPDATE cat_feature SET shortcut_key='P' WHERE id = 'PUMP-STATION';
+UPDATE cat_feature SET shortcut_key='R' WHERE id = 'RECT-MANHOLE';
+UPDATE cat_feature SET shortcut_key='U' WHERE id = 'REGISTER';
+UPDATE cat_feature SET shortcut_key='X' WHERE id = 'SANDBOX';
+UPDATE cat_feature SET shortcut_key='L' WHERE id = 'SEWER-STORAGE';
+UPDATE cat_feature SET shortcut_key='Alt+B' WHERE id = 'SIPHON';
+UPDATE cat_feature SET shortcut_key='V' WHERE id = 'VALVE';
+UPDATE cat_feature SET shortcut_key='Alt+Q' WHERE id = 'VARC';
+UPDATE cat_feature SET shortcut_key='Ctrl+E' WHERE id = 'VCONNEC';
+UPDATE cat_feature SET shortcut_key='Ctrl+R' WHERE id = 'VGULLY';
+UPDATE cat_feature SET shortcut_key='Q' WHERE id = 'VIRTUAL_NODE';
+UPDATE cat_feature SET shortcut_key='Alt+G' WHERE id = 'WACCEL';
+UPDATE cat_feature SET shortcut_key='F' WHERE id = 'WEIR';
+UPDATE cat_feature SET shortcut_key='W' WHERE id = 'WWTP';
