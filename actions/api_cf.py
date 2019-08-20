@@ -342,6 +342,11 @@ class ApiCF(ApiParent):
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result[0]['body']['feature']['idName'])
         result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id)
+
+        # Disable button accept for info on generic form
+        self.hydro_info_dlg.btn_accept.setEnabled(False)
+
+        # Open dialog
         self.hydro_info_dlg.open()
         return result, self.hydro_info_dlg
 
