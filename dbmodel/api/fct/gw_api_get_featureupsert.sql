@@ -89,7 +89,8 @@ DECLARE
 	v_max double precision;
 	v_widgetcontrols json;
 	v_type text;
-	
+	v_active_feature text;
+
 BEGIN
 
 -- get basic parameters
@@ -136,7 +137,23 @@ BEGIN
 
 --  get feature propierties
 ---------------------------
-    SELECT * INTO v_catfeature FROM cat_feature WHERE child_layer = p_table_id;
+
+    IF  v_project_type='WS' THEN
+		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN (SELECT id, active, code_autofill FROM node_type 
+															UNION SELECT id, active, code_autofill FROM arc_type 
+															UNION SELECT id, active, code_autofill FROM connec_type) a 
+															USING (id) WHERE a.active IS TRUE 
+															AND child_layer = '''|| p_table_id ||''' ORDER BY cat_feature.id';
+	ELSE 
+		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN (SELECT id,active, code_autofill FROM node_type 
+															UNION SELECT id,active, code_autofill FROM arc_type 
+															UNION SELECT id,active, code_autofill FROM connec_type 
+															UNION SELECT id,active, code_autofill FROM gully_type) a 
+															USING (id) WHERE a.active IS TRUE 
+															AND child_layer =  '''|| p_table_id ||''' ORDER BY cat_feature.id';
+	END IF;
+
+	EXECUTE v_active_feature INTO v_catfeature;
 
     -- Get id column
     EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
