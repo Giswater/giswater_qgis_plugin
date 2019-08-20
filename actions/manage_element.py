@@ -75,8 +75,18 @@ class ManageElement(ParentManage):
         sql = "SELECT DISTINCT(elementtype_id) FROM cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_add_element, "element_type", rows, False)
-        self.populate_combo(self.dlg_add_element, "state", "value_state", "name")
         self.populate_combo(self.dlg_add_element, "expl_id", "exploitation", "name")
+
+        # Combo state
+        sql = "SELECT DISTINCT(id), name FROM value_state"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
+
+        # Combo state type
+        sql = "SELECT DISTINCT(id), name FROM value_state_type WHERE state = " + str(utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)) + ""
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
+        self.filter_state_type()
 
         sql = ("SELECT location_type"
                " FROM man_type_location"
@@ -126,7 +136,7 @@ class ManageElement(ParentManage):
         self.dlg_add_element.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
-
+        self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
 
@@ -147,6 +157,17 @@ class ManageElement(ParentManage):
         # Open the dialog    
         self.open_dialog(self.dlg_add_element, maximize_button=False)
         return self.dlg_add_element
+
+
+
+    def filter_state_type(self):
+
+        sql = "SELECT DISTINCT(id), name FROM value_state_type WHERE state = " + str(utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)) + ""
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
+
+        print(str(sql))
+        print(str(rows))
 
 
     def update_location_cmb(self):
@@ -218,12 +239,18 @@ class ManageElement(ParentManage):
             self.controller.show_warning(message, parameter="expl_id")
             return  
                     
-        # Manage fields state and expl_id
+        # Manage fields state, state_type, expl_id
         sql = ("SELECT id FROM value_state"
                " WHERE name = '" + state_value + "'")
         row = self.controller.get_row(sql)
         if row:
             state = row[0]
+
+        sql = ("SELECT id FROM value_state_type "
+               "WHERE name = '" + state_value + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            state_type = row[0]
 
         sql = ("SELECT expl_id FROM exploitation"
                " WHERE name = '" + expl_value + "'")
@@ -244,19 +271,19 @@ class ManageElement(ParentManage):
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
-                sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state"
+                sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
-                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
+                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '" + str(state_type) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
                               + str(link) + "', '" + str(undelete) + "'")
 
             else:
-                sql = ("INSERT INTO v_edit_element (element_id, , elementcat_id, num_elements, state"
+                sql = ("INSERT INTO v_edit_element (element_id, , elementcat_id, num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code")
 
-                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(num_elements) + "', '" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
+                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(num_elements) + "', '" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '" + str(state_type) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
                               + str(link) + "', '" + str(undelete) + "'")
 
@@ -300,7 +327,11 @@ class ManageElement(ParentManage):
                 sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
+                print(str("TEST0"))
+                print(str(sql))
                 new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                print(str("TEST1"))
+                print(str(new_elem_id))
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])
