@@ -29,21 +29,22 @@ INSERT INTO cat_mat_node VALUES ('FC-FC-FC', 'Fiberconcret', 'c:\\users\users\ca
 INSERT INTO cat_mat_node VALUES ('FC', 'Fiberconcret', 'c:\\users\users\catalog.pdf');
 INSERT INTO cat_mat_node VALUES ('FD-FD-PVC', 'Iron-Iron-PVC', 'c:\\users\users\catalog.pdf');
 
+INSERT INTO cat_arc_shape VALUES ('CIRCULAR', 'CIRCULAR', 'ws_shape.png',null, true);
 
-INSERT INTO cat_arc VALUES ('PVC63-PN10', 'PIPE', 'PVC', '10', '63', 56.70000, 63.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc63_pn10.svg', 0.10, 0.10, 0.06, 0.0031, 0.86, 3.15, 'm', 'A_PVC63_PN10', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('PVC110-PN16', 'PIPE', 'PVC', '16', '110', 99.00000, 110.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc110_pn16.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PVC110_PN16', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('PVC200-PN16', 'PIPE', 'PVC', '16', '200', 180.00000, 200.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc200_pn16.svg', 0.10, 0.10, 0.20, 0.0314, 1.00, 10.00, 'm', 'A_PVC200_PN16', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('FD150', 'PIPE', 'FD', '16', '150', 153.00000, 170.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd150.svg', 0.10, 0.10, 0.17, 0.0227, 0.97, 8.50, 'm', 'A_FD150', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('FD200', 'PIPE', 'FD', '16', '200', 204.00000, 222.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd200.svg', 0.10, 0.10, 0.22, 0.0387, 1.02, 11.10, 'm', 'A_FD200', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('PEHD110-PN16', 'PIPE', 'PE-HD', '16', '110', 99.00000, 110.00000, 'PEHD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pehd110_pn16.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PEHD110_PN16', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('PELD110-PN10', 'PIPE', 'PE-LD', '10', '110', 99.00000, 110.00000, 'PELD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'peld110_pn10.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PELD110_PN10', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('PVC160-PN16', 'PIPE', 'PVC', '16', '160', 144.00000, 160.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc160_pn16.svg', 0.10, 0.10, 0.16, 0.0201, 0.96, 8.00, 'm', 'A_PVC160_PN16', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('FC63-PN10', 'PIPE', 'FC', '10', '63', 56.70000, 63.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc63_pn10.svg', 0.10, 0.10, 0.06, 0.0031, 0.86, 3.15, 'm', 'A_FC63_PN10', 'S_REP', 'S_NULL', false);
-INSERT INTO cat_arc VALUES ('FC110-PN10', 'PIPE', 'FC', '10', '110', 99.00000, 110.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110_pn10.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false);
-INSERT INTO cat_arc VALUES ('FC160-PN10', 'PIPE', 'FC', '10', '160', 144.00000, 160.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc160_pn10.svg', 0.10, 0.10, 0.16, 0.0201, 0.96, 8.00, 'm', 'A_FC160_PN10', 'S_REP', 'S_NULL', false);
-INSERT INTO cat_arc VALUES ('PVC90-PN16', 'PIPE', 'PVC', '16', '90', 82.00000, 90.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc90_pn10.svg', 0.10, 0.10, 0.09, 0.0064, 0.95, 4.50, 'm', 'A_PVC90_PN16', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('VFD150-PN16', 'VARC', 'FD', '16', '150', 153.00000, 170.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd150.svg', 0.10, 0.10, 0.17, 0.0227, 0.97, 8.50, 'm', 'A_FD150', 'S_REP', 'S_NULL', true);
-INSERT INTO cat_arc VALUES ('VFC110-PN10', 'VARC', 'FC', '10', '110', 99.00000, 110.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110.svg', 0.10, 0.10, 0.09, 0.0095, 0.91, 4.00, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false);
+INSERT INTO cat_arc VALUES ('PVC63-PN10', 'PIPE', 'PVC', '10', '63', 56.70000, 63.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc63_pn10.svg', 0.10, 0.10, 0.06, 0.0031, 0.86, 3.15, 'm', 'A_PVC63_PN10', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('PVC110-PN16', 'PIPE', 'PVC', '16', '110', 99.00000, 110.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc110_pn16.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PVC110_PN16', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('PVC200-PN16', 'PIPE', 'PVC', '16', '200', 180.00000, 200.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc200_pn16.svg', 0.10, 0.10, 0.20, 0.0314, 1.00, 10.00, 'm', 'A_PVC200_PN16', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('FD150', 'PIPE', 'FD', '16', '150', 153.00000, 170.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd150.svg', 0.10, 0.10, 0.17, 0.0227, 0.97, 8.50, 'm', 'A_FD150', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('FD200', 'PIPE', 'FD', '16', '200', 204.00000, 222.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd200.svg', 0.10, 0.10, 0.22, 0.0387, 1.02, 11.10, 'm', 'A_FD200', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('PEHD110-PN16', 'PIPE', 'PE-HD', '16', '110', 99.00000, 110.00000, 'PEHD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pehd110_pn16.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PEHD110_PN16', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('PELD110-PN10', 'PIPE', 'PE-LD', '10', '110', 99.00000, 110.00000, 'PELD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'peld110_pn10.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PELD110_PN10', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('PVC160-PN16', 'PIPE', 'PVC', '16', '160', 144.00000, 160.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc160_pn16.svg', 0.10, 0.10, 0.16, 0.0201, 0.96, 8.00, 'm', 'A_PVC160_PN16', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('FC63-PN10', 'PIPE', 'FC', '10', '63', 56.70000, 63.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc63_pn10.svg', 0.10, 0.10, 0.06, 0.0031, 0.86, 3.15, 'm', 'A_FC63_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('FC110-PN10', 'PIPE', 'FC', '10', '110', 99.00000, 110.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110_pn10.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('FC160-PN10', 'PIPE', 'FC', '10', '160', 144.00000, 160.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc160_pn10.svg', 0.10, 0.10, 0.16, 0.0201, 0.96, 8.00, 'm', 'A_FC160_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('PVC90-PN16', 'PIPE', 'PVC', '16', '90', 82.00000, 90.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc90_pn10.svg', 0.10, 0.10, 0.09, 0.0064, 0.95, 4.50, 'm', 'A_PVC90_PN16', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('VFD150-PN16', 'VARC', 'FD', '16', '150', 153.00000, 170.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd150.svg', 0.10, 0.10, 0.17, 0.0227, 0.97, 8.50, 'm', 'A_FD150', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('VFC110-PN10', 'VARC', 'FC', '10', '110', 99.00000, 110.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110.svg', 0.10, 0.10, 0.09, 0.0095, 0.91, 4.00, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
 
 
 INSERT INTO cat_brand VALUES ('brand1');
@@ -63,6 +64,7 @@ INSERT INTO cat_builder VALUES ('builder1');
 INSERT INTO cat_builder VALUES ('builder2');
 INSERT INTO cat_builder VALUES ('builder3');
 
+UPDATE connec_type SET active = false WHERE id = 'VCONNEC';
 
 INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'WJOIN', 'PVC', '16', '25', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, 'N_WATER-CONNECT', 'A_PVC25_PN10', 'S_EXC', true);
 INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', 'WJOIN', 'PVC', '16', '32', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, 'N_WATER-CONNECT', 'A_PVC32_PN10', 'S_EXC', true);
@@ -83,6 +85,8 @@ INSERT INTO cat_element VALUES ('REGISTER40X40', 'REGISTER', 'CONCRET', '40x40 c
 INSERT INTO cat_element VALUES ('REGISTER60X60', 'REGISTER', 'CONCRET', '60x60 cm', 'Register concret 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_60x60.svg', true);
 INSERT INTO cat_element VALUES ('VREGISTER200X200', 'REGISTER', 'BRICK+IRON', '200x200 cm', 'Vertical register concret/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'v_register.svg', true);
 
+UPDATE node_type SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL-CONTR.VALVE' OR id = 'GEN-PURP.VALVE' OR id = 'PR-SUSTA.VALVE' OR id = 'PR-BREAK.VALVE' 
+OR id = 'VALVE-REGISTER' OR id = 'TAP' OR id = 'ADAPTATION' OR id = 'BYPASS-REGISTER' OR id = 'CONTROL-REGISTER' OR id = 'THROTTLE-VALVE';
 
 INSERT INTO cat_node VALUES ('REGISTER', 'REGISTER', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Register', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REGISTER', true);
 INSERT INTO cat_node VALUES ('WATER-CONNECTION', 'WATER-CONNECTION', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netwjoin', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_WATER-CONNECT', true);
