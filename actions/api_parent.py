@@ -1129,10 +1129,8 @@ class ApiParent(ParentAction):
                 widget = QComboBox()
                 self.populate_combo(widget, field)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
-            # elif field['widgettype'] == 'typeahead':
-            #     completer = QCompleter()
-            #     widget = self.add_comboline(dialog, field, completer)
+            elif field['widgettype'] == 'checkbox':
+                widget = self.add_checkbox(dialog, field)
 
             grid_layout.addWidget(label,x, 0)
             grid_layout.addWidget(widget, x, 1)
