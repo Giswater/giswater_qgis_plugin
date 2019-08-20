@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy
+from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
 
 import json
 import operator
@@ -233,11 +233,18 @@ class ApiCatalog(ApiParent):
 
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
         catalog_id = utils_giswater.getWidgetText(self.dlg_catalog, widget_id)
-        widget = previous_dialog.findChild(QLineEdit, widget_name)
-        if widget:
+
+        widget = previous_dialog.findChild(QWidget, widget_name)
+
+        if type(widget) is QLineEdit:
             widget.setText(catalog_id)
+            widget.setFocus()
+        elif type(widget) is QComboBox:
+            utils_giswater.setWidgetText(previous_dialog, widget, catalog_id)
             widget.setFocus()
         else:
             msg = ("Widget not found: " + str(widget_name))
             self.controller.show_message(msg, 2)
+
         self.close_dialog(self.dlg_catalog)
+
