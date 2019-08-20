@@ -33,7 +33,7 @@ class Master(ParentAction):
         self.config_dict = {}
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
-        self.duplicate_psector = DuplicatePsector(iface, settings, controller, plugin_dir)
+
 
 
     def set_project_type(self, project_type):
@@ -56,19 +56,19 @@ class Master(ParentAction):
         column_id = "psector_id"
 
         # Tables
-        qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
-        qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
+        self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
-        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_psector_mng, qtbl_psm, "v_edit_plan_psector", column_id))
-        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, "v_edit_plan_psector", column_id))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
-        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, qtbl_psm, self.dlg_psector_mng.txt_name, "plan_psector"))
-        self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
-        self.fill_table_psector(qtbl_psm, table_name)
-        self.set_table_columns(self.dlg_psector_mng, qtbl_psm, table_name)
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, "plan_psector"))
+        self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
+        self.fill_table_psector(self.qtbl_psm, table_name)
+        self.set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
         self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
@@ -485,4 +485,8 @@ class Master(ParentAction):
 
     def psector_duplicate(self):
         """" Button 51: Duplicate psector """
+        self.duplicate_psector = DuplicatePsector(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'plan_psector'))
         self.duplicate_psector.manage_duplicate_psector()
+
+

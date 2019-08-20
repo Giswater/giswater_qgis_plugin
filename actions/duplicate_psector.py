@@ -14,16 +14,18 @@ import json
 from collections import OrderedDict
 from functools import partial
 
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 from .. import utils_giswater
 from .parent_manage import ParentManage
 from ..ui_manager import DupPsector
 
 
 
-class DuplicatePsector(ParentManage):
-
+class DuplicatePsector(ParentManage, QObject):
+    is_duplicated = pyqtSignal()
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Workcat end' of toolbar 'edit' """
+        QObject.__init__(self)
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
@@ -79,3 +81,7 @@ class DuplicatePsector(ParentManage):
             self.close_dialog(self.dlg_duplicate_psector)
         else:
             utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
+
+
+
+        self.is_duplicated.emit()
