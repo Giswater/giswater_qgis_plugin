@@ -962,7 +962,13 @@ class ApiCF(ApiParent):
 
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
 
-        self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type, feature_type[0])
+        # Check geom_type
+        if self.geom_type == 'connec':
+            widget = tab_type+"_"+self.geom_type+'at_id'
+        else:
+            widget = tab_type+"_"+self.geom_type+'cat_id'
+
+        self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type[0])
 
 
     def show_actions(self, tab_name):
