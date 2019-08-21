@@ -219,7 +219,9 @@ class MincutParent(ParentAction):
     def set_id_val(self):
 
         # Show future id of mincut
-        result_mincut_id = 1
+        sql = ("SELECT last_value FROM anl_mincut_result_cat_seq")
+        row = self.controller.get_row(sql, log_sql=True)
+        result_mincut_id = row[0] + 1
         sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) "
                "FROM anl_mincut_result_cat), true)")
         row = self.controller.get_row(sql, log_sql=True)
@@ -227,8 +229,7 @@ class MincutParent(ParentAction):
             if row[0]:
                 if self.is_new:
                     result_mincut_id = str(int(row[0])+1)
-
-        self.result_mincut_id.setText(str(result_mincut_id))
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
 
     def mg_mincut(self):
@@ -400,11 +401,11 @@ class MincutParent(ParentAction):
 
         mincut_result_type = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
         anl_cause = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
-        work_order = self.work_order.text()
+        work_order = self.dlg_mincut.work_order.text()
 
         anl_descript = utils_giswater.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
-        exec_from_plot = str(self.distance.text())
-        exec_depth = str(self.depth.text())
+        exec_from_plot = str(self.dlg_mincut.distance.text())
+        exec_depth = str(self.dlg_mincut.depth.text())
         exec_descript = utils_giswater.getWidgetText(self.dlg_mincut, "real_description", return_string_null=False)
         exec_user = utils_giswater.getWidgetText(self.dlg_mincut, "exec_user", return_string_null=False)
         
@@ -450,7 +451,7 @@ class MincutParent(ParentAction):
             self.is_new = False
 
         # Check if id exist in table 'anl_mincut_result_cat'
-        result_mincut_id = self.result_mincut_id.text()        
+        result_mincut_id = self.dlg_mincut.result_mincut_id.text()
         sql = ("SELECT id FROM anl_mincut_result_cat " 
                "WHERE id = '" + str(result_mincut_id) + "';")
         rows = self.controller.get_rows(sql)
@@ -668,7 +669,7 @@ class MincutParent(ParentAction):
         
     def set_completer_customer_code(self, widget, set_signal=False):
         """ Set autocompleter for 'customer_code' """
-        
+
         # Get list of 'customer_code'
         sql = "SELECT DISTINCT(customer_code) FROM v_edit_connec"
         rows = self.controller.get_rows(sql)
@@ -922,7 +923,7 @@ class MincutParent(ParentAction):
         """ Select features of 'connec' of selected mincut """
                     
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_connec, self.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = ("SELECT connec_id FROM anl_mincut_result_connec"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
