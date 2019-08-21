@@ -16,3 +16,18 @@ DROP TRIGGER IF EXISTS gw_trg_unique_field ON connec ;
 CREATE TRIGGER gw_trg_unique_field
 AFTER INSERT OR UPDATE OF customer_code, state
 ON connec  FOR EACH ROW EXECUTE PROCEDURE gw_trg_unique_field('connec');
+
+DROP TRIGGER IF EXISTS gw_trg_unique_field ON plan_psector_x_arc ;
+CREATE TRIGGER gw_trg_unique_field
+AFTER INSERT OR UPDATE OF arc_id, state
+ON plan_psector_x_arc FOR EACH ROW EXECUTE PROCEDURE gw_trg_unique_field('plan_x_arc');
+
+DROP TRIGGER IF EXISTS gw_trg_unique_field ON plan_psector_x_node ;
+CREATE TRIGGER gw_trg_unique_field
+AFTER INSERT OR UPDATE OF node_id, state
+ON plan_psector_x_node FOR EACH ROW EXECUTE PROCEDURE gw_trg_unique_field('plan_x_node');
+
+DROP TRIGGER IF EXISTS gw_trg_unique_field ON plan_psector_x_connec ;
+CREATE TRIGGER gw_trg_unique_field
+AFTER INSERT OR UPDATE OF connec_id, state
+ON plan_psector_x_connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_unique_field('plan_x_connec');

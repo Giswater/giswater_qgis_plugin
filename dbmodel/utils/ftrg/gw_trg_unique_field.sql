@@ -18,12 +18,29 @@ BEGIN
    
    table_name:= TG_ARGV[0];
   
-   IF table_name = 'connec' AND NEW.state = 1 THEN 
+    IF table_name = 'connec' AND NEW.state = 1 THEN 
    
 	   IF (SELECT count(connec_id) FROM connec WHERE state=1 AND customer_code=NEW.customer_code) > 1 THEN
 	       PERFORM audit_function(2702,3018);
 	   END IF;
-END IF;
+
+    ELSIF table_name = 'plan_x_arc' AND NEW.state=1 THEN
+      IF (SELECT count(arc_id) FROM plan_psector_x_arc WHERE state=1 AND arc_id=NEW.arc_id) > 1 THEN
+        PERFORM audit_function(3020,2702);
+      END IF;
+    ELSIF table_name = 'plan_x_node' AND NEW.state=1 THEN
+       IF (SELECT count(node_id) FROM plan_psector_x_node WHERE state=1 AND node_id=NEW.node_id) > 1 THEN
+        PERFORM audit_function(3020,2702);
+      END IF;
+     ELSIF table_name = 'plan_x_connec' AND NEW.state=1 THEN
+       IF (SELECT count(connec_id) FROM plan_psector_x_connec WHERE state=1 AND connec_id=NEW.connec_id) > 1 THEN
+        PERFORM audit_function(3020,2702);
+      END IF;
+    ELSIF table_name = 'plan_x_gully' AND NEW.state=1 THEN
+      IF (SELECT count(gully_id) FROM plan_psector_x_gully WHERE state=1 AND gully_id=NEW.gully_id) > 1 THEN
+        PERFORM audit_function(3020,2702);
+      END IF;
+    END IF;
 			
 RETURN NULL;
 

@@ -63,7 +63,7 @@ INSERT INTO sys_fprocess_cat VALUES (62, 'Check pattern related to hydro', 'epa'
 
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3020,'This planified feature (state=2) is already used in another psector.','Create a new feature in order to assign it.', 2, true,'utils',false);
+VALUES (3020,'This planified feature (state=2) is already used in another psector','Create a new feature in order to assign it.', 2, true,'utils',false);
 
 UPDATE config_param_system SET context=null, parameter='_api_search_visit' WHERE parameter='api_search_visit';
 
