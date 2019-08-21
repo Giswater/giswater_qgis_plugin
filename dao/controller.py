@@ -183,7 +183,10 @@ class DaoController(object):
                            'host': None, 'port': None, 'user': None, 'password': None}
             if default_connection:
                 settings.beginGroup("PostgreSQL/connections/" + default_connection)
-                credentials['host'] = settings.value('host')
+                if settings.value('host') in (None, ""):
+                    credentials['host'] = 'localhost'
+                else:
+                    credentials['host'] = settings.value('host')
                 credentials['port'] = settings.value('port')
                 credentials['db'] = settings.value('database')
                 credentials['user'] = settings.value('username')

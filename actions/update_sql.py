@@ -1542,7 +1542,10 @@ class UpdateSQL(ApiParent):
 
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections/" + connection_name)
-        credentials['host'] = settings.value('host')
+        if settings.value('host') in (None, ""):
+            credentials['host'] = 'localhost'
+        else:
+            credentials['host'] = settings.value('host')
         credentials['port'] = settings.value('port')
         credentials['db'] = settings.value('database')
         credentials['user'] = settings.value('username')
