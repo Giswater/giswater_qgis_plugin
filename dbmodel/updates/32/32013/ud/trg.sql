@@ -7,7 +7,3 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DROP TRIGGER IF EXISTS gw_trg_unique_field ON plan_psector_x_gully ;
-CREATE TRIGGER gw_trg_unique_field
-AFTER INSERT OR UPDATE OF gully_id, state
-ON plan_psector_x_gully FOR EACH ROW EXECUTE PROCEDURE gw_trg_unique_field('plan_x_gully');
