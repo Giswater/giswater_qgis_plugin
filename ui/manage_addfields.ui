@@ -65,23 +65,11 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>565</width>
-            <height>1485</height>
+            <width>577</width>
+            <height>1139</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QGroupBox" name="group_current_addfields">
-             <property name="title">
-              <string>Current addfields</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <widget class="QTableView" name="current_addfields"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
            <item>
             <widget class="QGroupBox" name="groupBox_2">
              <property name="title">

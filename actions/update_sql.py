@@ -2425,7 +2425,8 @@ class UpdateSQL(ApiParent):
 
         form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
-
+        self.dlg_manage_fields.column_id.setEnabled(False)
+        
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
             partial(self.manage_accept, 'Update', form_name_fields, self.model_update_table))
@@ -2482,15 +2483,6 @@ class UpdateSQL(ApiParent):
 
         # Set default value for formtype widget
         utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
-
-        # Populate current_addfields table
-        qtable = self.dlg_manage_fields.findChild(QTableView, "current_addfields")
-
-
-        sql = ("SELECT * FROM ve_config_addfields WHERE cat_feature_id = '" + form_name + "'")
-
-        # Populate Table
-        self.fill_table_by_query(qtable, sql)
 
 
     def manage_update_field(self, form_name):
