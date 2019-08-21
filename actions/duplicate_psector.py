@@ -36,10 +36,16 @@ class DuplicatePsector(ParentManage, QObject):
         self.load_settings(self.dlg_duplicate_psector)
 
         # Populate combo duplicate psector
-        sql = ('SELECT psector_id as id, name as id_val FROM plan_psector')
+        sql = "SELECT psector_id, name FROM plan_psector"
         rows = self.controller.get_rows(sql)
-
         utils_giswater.set_item_data(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
+
+        # Set QComboBox with current psector
+        sql = ("SELECT value FROM config_param_user "
+               "WHERE parameter='psector_vdefault' AND cur_user = current_user")
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if row:
+            utils_giswater.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, row[0], 0)
 
         # Set listeners
         self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_duplicate_psector))
