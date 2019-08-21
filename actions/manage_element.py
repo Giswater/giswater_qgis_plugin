@@ -83,9 +83,6 @@ class ManageElement(ParentManage):
         utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
 
         # Combo state type
-        sql = "SELECT DISTINCT(id), name FROM value_state_type WHERE state = " + str(utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)) + ""
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
         self.filter_state_type()
 
         sql = ("SELECT location_type"
@@ -159,15 +156,12 @@ class ManageElement(ParentManage):
         return self.dlg_add_element
 
 
-
     def filter_state_type(self):
-
-        sql = "SELECT DISTINCT(id), name FROM value_state_type WHERE state = " + str(utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)) + ""
+        state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
+        sql = ("SELECT DISTINCT(id), name FROM value_state_type "
+               "WHERE state = " + str(state) + "")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
-
-        print(str(sql))
-        print(str(rows))
 
 
     def update_location_cmb(self):
