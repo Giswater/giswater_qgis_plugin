@@ -90,6 +90,7 @@ DECLARE
 	v_widgetcontrols json;
 	v_type text;
 	v_active_feature text;
+	v_promixity_buffer double precision;
 
 BEGIN
 
@@ -122,6 +123,8 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
 
     SELECT value INTO v_samenode_init_end_control FROM config_param_system WHERE parameter = 'samenode_init_end_control';
+
+	SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='proximity_buffer';
 
     -- get tablename and formname
     -- Common
@@ -249,8 +252,8 @@ BEGIN
 		IF count_aux = 1 THEN
 			v_sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001) LIMIT 1);
 		ELSIF count_aux > 1 THEN
-			v_sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, promixity_buffer_aux) 
-			order by ST_Distance (p_the_geom, v_edit_node.the_geom) LIMIT 1);
+			v_sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
+			order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
 		END IF;	
 	
 		-- Macrosector
@@ -261,8 +264,8 @@ BEGIN
 		IF count_aux = 1 THEN
 			v_dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) LIMIT 1);
 		ELSIF count_aux > 1 THEN
-			v_dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, promixity_buffer_aux) 
-			order by ST_Distance (p_the_geom, v_edit_node.the_geom) LIMIT 1);
+			v_dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
+			order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
 		END IF;
 	
 		-- Macrodma
