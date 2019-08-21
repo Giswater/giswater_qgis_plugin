@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION gw_trg_plan_psector_x_connec()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_connec()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -26,12 +26,6 @@ BEGIN
 		NEW.state=1;
 		NEW.doable=true;
 	END IF;
-
-	-- update geometry
-	v_link_geom := ST_ShortestLine((SELECT the_geom FROM connec WHERE connec_id=NEW.connec_id), (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id));
-	v_vnode_geom = ST_EndPoint(v_link_geom);
-	
-	UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom WHERE id=NEW.id;
 
 RETURN NEW;
 

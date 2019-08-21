@@ -25,12 +25,16 @@ CREATE TRIGGER gw_trg_om_psector_x_gully AFTER INSERT OR UPDATE OR DELETE ON om_
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('om');
   
   
-CREATE TRIGGER gw_trg_plan_psector_x_gully BEFORE INSERT OR UPDATE OF gully_id, arc_id ON plan_psector_x_gully 
+CREATE TRIGGER gw_trg_plan_psector_x_gully BEFORE INSERT OR UPDATE OF gully_id ON plan_psector_x_gully 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_x_gully();
 
   
 CREATE TRIGGER gw_trg_plan_psector_x_gully_geom AFTER INSERT OR UPDATE OR DELETE  ON plan_psector_x_gully
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('plan');
+
+
+CREATE TRIGGER gw_trg_plan_psector_link AFTER INSERT OR UPDATE OF arc_id ON plan_psector_x_gully 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_link('gully');
 
 
 --28/06/2019
