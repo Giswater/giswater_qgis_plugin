@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ws_man_node</class>
- <widget class="QMainWindow" name="ws_man_node">
+ <class>api_cf</class>
+ <widget class="QMainWindow" name="api_cf">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -52,7 +52,7 @@
              <x>0</x>
              <y>0</y>
              <width>634</width>
-             <height>382</height>
+             <height>381</height>
             </rect>
            </property>
            <attribute name="label">
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>634</width>
-             <height>382</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>add_visit</class>
- <widget class="QDialog" name="add_visit">
+ <class>add_element</class>
+ <widget class="QDialog" name="add_element">
   <property name="geometry">
    <rect>
     <x>0</x>

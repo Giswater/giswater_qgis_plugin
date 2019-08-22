@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>document_management</class>
- <widget class="QDialog" name="document_management">
+ <class>mincut_edit</class>
+ <widget class="QDialog" name="mincut_edit">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1056</width>
-    <height>785</height>
+    <width>989</width>
+    <height>501</height>
    </rect>
   </property>
   <property name="windowTitle">

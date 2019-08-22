@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>visit_management</class>
- <widget class="QDialog" name="visit_management">
+ <class>mincut_add_connec</class>
+ <widget class="QDialog" name="mincut_add_connec">
   <property name="geometry">
    <rect>
     <x>0</x>

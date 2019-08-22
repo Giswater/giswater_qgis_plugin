@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Price_result_management</class>
- <widget class="QDialog" name="Price_result_management">
+ <class>plan_estimate_result_manager</class>
+ <widget class="QDialog" name="plan_estimate_result_manager">
   <property name="geometry">
    <rect>
     <x>0</x>

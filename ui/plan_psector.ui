@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>add_visit</class>
- <widget class="QDialog" name="add_visit">
+ <class>plan_psector</class>
+ <widget class="QDialog" name="plan_psector">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -946,8 +946,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>176</width>
-                 <height>143</height>
+                 <width>146</width>
+                 <height>122</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1019,8 +1019,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>194</width>
-                 <height>169</height>
+                 <width>161</width>
+                 <height>139</height>
                 </rect>
                </property>
                <attribute name="label">

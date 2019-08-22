@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>api_config</class>
+ <widget class="QMainWindow" name="api_config">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>692</width>
-    <height>546</height>
+    <height>545</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,7 +57,7 @@
          <x>0</x>
          <y>0</y>
          <width>672</width>
-         <height>495</height>
+         <height>494</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">

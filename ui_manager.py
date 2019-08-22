@@ -35,6 +35,7 @@ class GwDialog(QDialog):
                 webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
             except Exception as e:
                 print(type(e).__name__)
+                webbrowser.open_new_tab('giswater.org/giswater-manual')
             
             return True
         return False
@@ -125,12 +126,12 @@ class ApiSearchUi(QDockWidget, FORM_CLASS):
         
 
 FORM_CLASS = get_ui_class('add_doc.ui')
-class AddDoc(GwDialog, FORM_CLASS):             # TODO objectName is add_visit
+class AddDoc(GwDialog, FORM_CLASS):
     pass
 
 
 FORM_CLASS = get_ui_class('add_element.ui')
-class AddElement(GwDialog, FORM_CLASS):         # TODO objectName is add_visit
+class AddElement(GwDialog, FORM_CLASS):
     pass
 
 
@@ -177,7 +178,7 @@ class AddVisit(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('api_config.ui')
-class ApiConfigUi(GwMainWindow, FORM_CLASS):        # TODO objectName is MainWindow
+class ApiConfigUi(GwMainWindow, FORM_CLASS):
     pass
 
 
@@ -217,7 +218,7 @@ class ChangeNodeType(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('csv2pg.ui')
-class Csv2Pg(GwDialog, FORM_CLASS):             # TODO objectName is add_visit
+class Csv2Pg(GwDialog, FORM_CLASS):
     pass
 
 
@@ -276,8 +277,9 @@ class EventUDarcStandard(GwDialog, FORM_CLASS):
     pass
 
 
+# TODO change file and class name to go2epa
 FORM_CLASS = get_ui_class('file_manager.ui')
-class FileManager(GwDialog, FORM_CLASS):            # TODO objectName is Dialog
+class FileManager(GwDialog, FORM_CLASS):
     pass
 
 
@@ -300,7 +302,7 @@ FORM_CLASS = get_ui_class('info_show_info.ui')
 class InfoShowInfo(GwDialog, FORM_CLASS):
     pass
 
-
+# TODO change file and class name to workcat_search
 FORM_CLASS = get_ui_class('list_items.ui')
 class ListItems(GwDialog, FORM_CLASS):
     pass
