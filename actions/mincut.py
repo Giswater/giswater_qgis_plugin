@@ -189,6 +189,8 @@ class MincutParent(ParentAction, MultipleSelection):
                "WHERE id = '" + str(mincut_id) + "'")
         row = self.controller.get_row(sql, commit=True, log_sql=True)
         if not row or row[0] is None:
+            text = "Nothing to show"
+            self.controller.show_info_box(str(text), "Sms info")
             return
         text = ""
         for item in row[0]:

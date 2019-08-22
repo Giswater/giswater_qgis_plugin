@@ -7,20 +7,23 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QStringListModel, QCompleter, QAbstractItemView
+from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QStringListModel, QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
 import datetime
-import os
-import subprocess
 import utils_giswater
 from functools import partial
 
 from giswater.ui_manager import Multirow_selector
-from giswater.ui_manager import Multi_selector
 from giswater.ui_manager import Mincut_edit
-
 from giswater.actions.parent import ParentAction
+
+show_button = True
+try:
+    from giswater.actions.sms_sender.notification import CutNotification
+except:
+    show_button = False
+
 
 
 class MincutConfig(ParentAction):
@@ -74,7 +77,11 @@ class MincutConfig(ParentAction):
         self.set_icon(self.btn_notify, "307")
 
         btn_visible = self.settings.value('customized_actions/show_mincut_sms', 'FALSE')
-        self.btn_notify.setVisible(True) if btn_visible.upper() == 'TRUE' else self.btn_notify.setVisible(False)
+        if btn_visible.upper() == 'TRUE' and show_button:
+            self.btn_notify.setVisible(True)
+        else:
+            self.btn_notify.setVisible(False)
+
         # Fill ComboBox state
         sql = ("SELECT name"
                " FROM " + self.schema_name + ".anl_mincut_cat_state"
@@ -129,10 +136,6 @@ class MincutConfig(ParentAction):
 
 
     def call_sms_script(self, qtable):
-        path = self.settings.value('customized_actions/path_sms_script')
-        if path is None or not os.path.exists(path):
-            self.controller.show_warning("File not found", parameter=path)
-            return
 
         selected_list = qtable.selectionModel().selectedRows()
         list_mincut_id = []
@@ -160,7 +163,8 @@ class MincutConfig(ParentAction):
                 list_clients.append(client)
 
             # Call script
-            status_code = subprocess.call(['python', path, _type, from_date, to_date, list_clients])
+            notification = CutNotification(_type, from_date, to_date, list_clients)
+            status_code = notification.send_notification()
 
             # Update table with results
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
