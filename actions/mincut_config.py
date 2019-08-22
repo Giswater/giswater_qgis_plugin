@@ -15,20 +15,23 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
 
-from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import datetime
-import os
-import subprocess
 from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import Multirow_selector
-from ..ui_manager import Multi_selector
 from ..ui_manager import Mincut_edit
 from .parent import ParentAction
+
+
+show_button = True
+try:
+    from giswater.actions.sms_sender.notification import CutNotification
+except:
+    show_button = False
 
 
 class MincutConfig(ParentAction):
@@ -95,7 +98,10 @@ class MincutConfig(ParentAction):
         self.set_icon(self.btn_notify, "307")
 
         btn_visible = self.settings.value('customized_actions/show_mincut_sms', 'FALSE')
-        self.btn_notify.setVisible(True) if btn_visible.upper() == 'TRUE' else self.btn_notify.setVisible(False)
+        if btn_visible.upper() == 'TRUE' and show_button:
+            self.btn_notify.setVisible(True)
+        else:
+            self.btn_notify.setVisible(False)
 
         self.populate_combos()
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
@@ -146,11 +152,6 @@ class MincutConfig(ParentAction):
 
 
     def call_sms_script(self, qtable):
-        path = self.settings.value('customized_actions/path_sms_script')
-        if path is None or not os.path.exists(path):
-            self.controller.show_warning("File not found", parameter=path)
-            return
-
         selected_list = qtable.selectionModel().selectedRows()
         list_mincut_id = []
         for i in range(0, len(selected_list)):
@@ -176,7 +177,9 @@ class MincutConfig(ParentAction):
                 client = str(row[0])
                 list_clients.append(client)
 
-            status_code = subprocess.call(['python', path, _type, from_date, to_date, list_clients])
+            notification = CutNotification(_type, from_date, to_date, list_clients)
+            status_code = notification.send_notification()
+
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
             print(row[4])
