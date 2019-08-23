@@ -1125,11 +1125,11 @@ class ApiParent(ParentAction):
                 widget = self.add_hyperlink(dialog, field)
             elif field['widgettype'] == 'textarea':
                 widget = self.add_textarea(field)
-            elif field['widgettype'] == 'combo':
+            elif field['widgettype'] in ('combo', 'combobox'):
                 widget = QComboBox()
                 self.populate_combo(widget, field)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            elif field['widgettype'] == 'checkbox':
+            elif field['widgettype'] in ('check','checkbox'):
                 widget = self.add_checkbox(dialog, field)
 
             grid_layout.addWidget(label,x, 0)
