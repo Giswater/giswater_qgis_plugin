@@ -291,17 +291,18 @@ class ManageNewPsector(ParentManage):
                 canvas_rec = QgsRectangle(startPoint, endPoint)
                 canvas_width = ext.xMaximum() - ext.xMinimum()
                 canvas_height = ext.yMaximum() - ext.yMinimum()
-
                 # Get boundingBox(QgsRectangle) from selected feature
-                feature = layer.selectedFeatures()[0]
-                if feature.geometry() is not None:
-                    psector_rec = feature.geometry().boundingBox()
-                    # Do zoom when QgsRectangles don't intersect
-                    if not canvas_rec.intersects(psector_rec):
-                        self.zoom_to_selected_features(layer)
-                    if psector_rec.width() < (canvas_width * 10)/100 or psector_rec.height() < (canvas_height * 10)/100:
-                        self.zoom_to_selected_features(layer)
-                    layer.removeSelection()
+                # feature = layer.selectedFeatures()[0]
+                feature = layer.selectedFeatures()
+                if feature != []:
+                    if feature.geometry() is not None:
+                        psector_rec = feature.geometry().boundingBox()
+                        # Do zoom when QgsRectangles don't intersect
+                        if not canvas_rec.intersects(psector_rec):
+                            self.zoom_to_selected_features(layer)
+                        if psector_rec.width() < (canvas_width * 10)/100 or psector_rec.height() < (canvas_height * 10)/100:
+                            self.zoom_to_selected_features(layer)
+                        layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
