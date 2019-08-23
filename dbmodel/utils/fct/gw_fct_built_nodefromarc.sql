@@ -94,7 +94,7 @@ BEGIN
 		UPDATE node_type SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
 	
 		-- execute function
-		PERFORM gw_fct_repair_arc(arc_id, 0,0) FROM arc WHERE exp_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
+		PERFORM gw_fct_repair_arc(arc_id, 0,0) FROM arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
 	
 		-- restore isarcdivide to previous value
 		UPDATE node_type SET isarcdivide=v_isarcdivide WHERE id=v_nodetype_id;	
