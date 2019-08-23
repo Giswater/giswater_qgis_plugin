@@ -237,7 +237,7 @@ class ApiParent(ParentAction):
         canvas.zoomOut()
 
 
-    def api_action_help(self, wsoftware, geom_type):
+    def api_action_help(self, geom_type):
         """ Open PDF file with selected @wsoftware and @geom_type """
 
         # Get locale of QGIS application
@@ -248,7 +248,7 @@ class ApiParent(ParentAction):
             locale = 'ca'
         elif locale == 'en_us':
             locale = 'en'
-
+        wsoftware = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
         pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")

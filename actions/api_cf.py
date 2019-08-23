@@ -550,7 +550,7 @@ class ApiCF(ApiParent):
         action_rotation.triggered.connect(partial(self.action_rotation, self.dlg_cf))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
-        action_help.triggered.connect(partial(self.api_action_help, 'ud', 'node'))
+        action_help.triggered.connect(partial(self.api_action_help, self.geom_type))
         ep = QgsMapToolEmitPoint(self.canvas)
         action_interpolate.triggered.connect(partial(self.activate_snapping, ep))
 
