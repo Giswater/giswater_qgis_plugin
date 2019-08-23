@@ -145,7 +145,8 @@ class ChangeElemType(ParentMapTool):
         self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
         self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
-        
+        self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self.filter_catalog))
+
         # Fill 1st combo boxes-new system node type
         sql = ("SELECT DISTINCT(id) FROM node_type "
                "WHERE active is True "
@@ -155,6 +156,20 @@ class ChangeElemType(ParentMapTool):
 
         # Open dialog
         self.open_dialog(self.dlg_chg_node_type, dlg_name='change_node_type', maximize_button=False)
+
+
+    def filter_catalog(self):
+
+        node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type,
+                                                          self.dlg_chg_node_type.node_node_type_new)
+
+        if node_node_type_new =="null":
+            return
+
+        # Populate catalog_id
+        sql = "SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '" + node_node_type_new +"' ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 
     def close_dialog(self, dlg=None):
