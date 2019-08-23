@@ -19,6 +19,8 @@ v_visittable text;
 v_querytext text;
 v_visit record;
 v_triggerfromtable text;
+v_lot integer;
+v_code text;
 
 
 BEGIN
@@ -55,6 +57,29 @@ BEGIN
 			END IF;
 
 		ELSIF v_triggerfromtable ='om_visit_x_feature' THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
+
+			-- insert element into lot_x_element table in case if doesn't exist
+			IF v_featuretype ='arc' THEN	
+				IF (SELECT arc_id FROM om_visit_lot_x_arc where arc_id=NEW.arc_id AND lot_id=v_lot) IS NULL THEN
+					v_code = (SELECT code FROM arc WHERE arc_id=NEW.arc_id);
+					INSERT INTO om_visit_lot_x_arc SELECT (v_lot, NEW.arc_id, 'code', 1);
+				END IF;				
+			ELSIF v_featuretype ='node' THEN	
+				IF (SELECT node_id FROM om_visit_lot_x_node where node_id=NEW.node_id AND lot_id=v_lot) IS NULL THEN
+					v_code = (SELECT code FROM node WHERE node_id=NEW.node_id);
+					INSERT INTO om_visit_lot_x_node SELECT (v_lot, NEW.node_id, 'code', 1);
+				END IF;	
+			ELSIF v_featuretype ='connec' THEN	
+				IF (SELECT connec_id FROM om_visit_lot_x_connec where connec_id=NEW.connec_id AND lot_id=v_lot) IS NULL THEN
+					v_code = (SELECT code FROM connec WHERE connec_id=NEW.connec_id);
+					INSERT INTO om_visit_lot_x_connec SELECT (v_lot, NEW.connec_id, 'code', 1);
+				END IF;	
+			ELSIF v_featuretype ='gully' THEN	
+				IF (SELECT gully_id FROM om_visit_lot_x_gully where gully_id=NEW.gully_id AND lot_id=v_lot) IS NULL THEN
+					v_code = (SELECT code FROM gully WHERE gully_id=NEW.gully_id);
+					INSERT INTO om_visit_lot_x_gully VALUES (v_lot, NEW.gully_id, v_code, 1);
+				END IF;				
+			END IF;
 
 			SELECT * INTO v_visit FROM om_visit WHERE id=NEW.visit_id;
 
