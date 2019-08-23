@@ -295,6 +295,9 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setMaximum(1)
         dialog.progressBar.setValue(1)
 
+        #Disable button run at the end of process
+        self.dlg_functions.btn_run.setEnabled(False)
+
 
     def execute_no_parametric(self, dialog, function_name):
 

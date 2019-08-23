@@ -367,6 +367,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.deactivate()
             self.set_action_pan()
 
+            #Disable ok button at the end of process
+            self.dlg_replace.btn_accept.setEnabled(False)
+
 
     """ QgsMapTools inherited event functions """
 
