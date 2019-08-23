@@ -144,8 +144,12 @@ class ReplaceFeatureMapTool(ParentMapTool):
             msg = "New feature type is null. Please, select a valid value."
             self.controller.show_info_box(msg, "Info")
             return
+
+        sql = ("SELECT type FROM cat_feature WHERE id = '" + str(feature_type) + "'")
+        row = self.controller.get_row(sql)
+
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', 'node', feature_type)
+        self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
 
 
     def update_date(self):
