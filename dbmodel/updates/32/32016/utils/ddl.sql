@@ -77,3 +77,13 @@ CREATE TABLE ext_workorder(
 );
 	
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"publish", "dataType":"boolean"}}$$);
+
+
+CREATE TABLE typevalue_fk(
+  id serial NOT NULL  PRIMARY KEY,
+  typevalue_table text,
+  typevalue_name text,
+  typevalue_field text,
+  target_table text,
+  target_field text
+);

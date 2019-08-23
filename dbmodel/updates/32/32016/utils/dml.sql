@@ -71,3 +71,9 @@ UPDATE audit_cat_param_user  SET isparent= TRUE WHERE id='state_vdefault';
 UPDATE audit_cat_param_user  SET dv_parent_id= 'state_vdefault', 
 dv_querytext = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL ', dv_querytext_filterc = ' AND state = '
 WHERE id='statetype_vdefault';
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type,isdeprecated)
+VALUES (3022, 'The inserted value is not present in a catalog. Catalog, field:', 'Add it to the corresponding typevalue table in order to use it.', 2, true, 'utils', false);
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2744, 'gw_trg_typevalue_fk', 'utils', 'trigger', 'Control foreign keys created in typevalue tables', 'role_edit',false, false, false);
