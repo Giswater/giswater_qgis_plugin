@@ -18,7 +18,7 @@
     <item>
      <layout class="QGridLayout" name="main_layout">
       <item row="0" column="0">
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="grb_distance">
         <property name="title">
          <string>Distance</string>
         </property>
@@ -30,7 +30,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QGroupBox" name="groupBox_2">
+       <widget class="QGroupBox" name="grb_depth">
         <property name="title">
          <string>Depth</string>
         </property>
@@ -42,7 +42,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QGroupBox" name="groupBox_3">
+       <widget class="QGroupBox" name="grb_symbology">
         <property name="title">
          <string>Circle symbology</string>
         </property>
