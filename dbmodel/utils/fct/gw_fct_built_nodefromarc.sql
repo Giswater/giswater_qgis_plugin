@@ -12,9 +12,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc(p_data json) RET
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_built_nodefromarc($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"explotation":1, "buffer":0.1, "insertIntoNode":true}}}$$)
+
+SELECT SCHEMA_NAME.gw_fct_built_nodefromarc($${"client":{"device":9, "infoType":100, "lang":"ES"},
+"form":{}, "feature":{"tableName":"v_edit_arc", "id":[]},
+"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+"parameters":{"exploitation":"1", "inserIntoNode":"true", "nodeTolerance":"0.01", "saveOnDatabase":"true"}}}$$)::text
 */
 
 DECLARE
@@ -47,7 +49,7 @@ BEGIN
 
 	-- getting input data   
 	v_expl :=  ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
-	v_buffer := ((p_data ->>'data')::json->>'parameters')::json->>'buffer';
+	v_buffer := ((p_data ->>'data')::json->>'parameters')::json->>'nodeTolerance';
 	v_insertnode := ((p_data ->>'data')::json->>'parameters')::json->>'insertIntoNode';
 
 
