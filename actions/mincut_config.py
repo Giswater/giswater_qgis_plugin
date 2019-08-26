@@ -129,7 +129,7 @@ class MincutConfig(ParentAction):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
             inf_text += "\n\nMincut: " + str(id_) + ""
-            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, t2.mincut_type "
+            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, anl_cause "
                    "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
                    "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
                    "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
@@ -157,7 +157,7 @@ class MincutConfig(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, t2.mincut_type, notified "
+            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, anl_cause, notified "
                    "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
                    "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
                    "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
@@ -176,9 +176,9 @@ class MincutConfig(ParentAction):
             if rows[0][2] is not None:
                 to_date = str(rows[0][2].strftime('%d/%m/%Y %H:%M'))
 
-            _type = ""
+            _cause = ""
             if rows[0][3] is not None:
-                _type = rows[0][3]
+                _cause = rows[0][3]
 
             list_clients = []
             list_mincut_id.append(id_)
@@ -186,7 +186,7 @@ class MincutConfig(ParentAction):
                 client = str(row[0])
                 list_clients.append(client)
 
-            notification = CutNotification(_type, from_date, to_date, list_clients)
+            notification = CutNotification(_cause, from_date, to_date, list_clients)
             status_code = notification.send_notification()
 
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
