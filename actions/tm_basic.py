@@ -70,7 +70,7 @@ class TmBasic(TmParentAction):
         if self.rows_cmb_poda_type is None:
             self.update_cmb_poda_type()     
 
-        self.dlg_new_campaign.exec_()
+        self.open_dialog(self.dlg_new_campaign)
 
 
     def manage_new_price_catalog(self):
@@ -143,7 +143,8 @@ class TmBasic(TmParentAction):
         table_view = 'v_edit_price'
         self.fill_table_prices(dlg_prices_management.tbl_price_list, table_view, id_new_camp, set_edit_triggers=QTableView.DoubleClicked)
         self.set_table_columns(dlg_prices_management, dlg_prices_management.tbl_price_list, table_view, 'basic_cat_price')
-        dlg_prices_management.exec_()
+
+        self.open_dialog(dlg_prices_management)
 
 
     def update_cmb_poda_type(self):
@@ -198,7 +199,7 @@ class TmBasic(TmParentAction):
         dlg_tree_manage.btn_accept.clicked.connect(partial(self.get_year, dlg_tree_manage))
         self.set_completer_object(table_name, dlg_tree_manage.txt_campaign, field_name)
 
-        dlg_tree_manage.exec_()
+        self.open_dialog(dlg_tree_manage)
 
 
     def populate_cmb_years(self, table_name, field_id, field_name, combo, reverse=False):

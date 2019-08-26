@@ -962,6 +962,7 @@ class Giswater(QObject):
                 if rows:
                     self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
                     self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                    # TODO .exec_() to open_dialog
                     self.dlg_audit_project.exec_()
                     # Fill log file with the names of the layers
                     message = "This is not a valid Giswater project"
@@ -984,6 +985,7 @@ class Giswater(QObject):
                     if rows:
                         self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
                         self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                        # TODO .exec_() to open_dialog
                         self.dlg_audit_project.exec_()
                         # Fill log file with the names of the layers
                         message = "Layers of your role not found"

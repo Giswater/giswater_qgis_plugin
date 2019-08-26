@@ -48,8 +48,8 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle.btn_accept.clicked.connect(partial(self.get_radius, point))
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
-
-        self.dlg_create_circle.exec_()
+        
+        self.open_dialog(self.dlg_create_circle)
 
 
     def get_radius(self, point):

@@ -315,8 +315,8 @@ class Go2Epa(ApiParent):
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
                                          self.controller.tr('Selected dscenarios', context_name='labels'))
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
-        dlg_psector_sel.setWindowFlags(Qt.WindowStaysOnTopHint)
-        dlg_psector_sel.exec_()
+        
+        self.open_dialog(dlg_psector_sel)
 
 
     def epa_options(self):
@@ -357,8 +357,7 @@ class Go2Epa(ApiParent):
             utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
 
         self.update_labels()
-        self.dlg_hydrology_selector.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_hydrology_selector.exec_()
+        self.open_dialog(self.dlg_hydrology_selector)
 
 
     def save_hydrology(self):
@@ -954,8 +953,7 @@ class Go2Epa(ApiParent):
             utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
 
         # Open the dialog
-        self.dlg_go2epa_result.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_go2epa_result.exec_()
+        self.open_dialog(self.dlg_go2epa_result)
 
 
     def populate_date_time(self, combo_result, combo_date, combo_time):
