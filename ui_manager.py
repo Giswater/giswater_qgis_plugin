@@ -348,7 +348,6 @@ class Mincut(GwMainWindow, FORM_CLASS):
         self.closeMainWin = False
         self.mincutCanceled = True
         super().__init__()
-        self.setupUi(self)
 
     def closeEvent(self, event):
         """ Overwrite closeEvent method """
