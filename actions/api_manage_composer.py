@@ -50,6 +50,8 @@ class ApiManageComposer(ApiParent):
             self.controller.show_info_box(msg, "Info")
             return
 
+        self.initial_rotation = self.iface.mapCanvas().rotation()
+
         self.dlg_composer = ApiComposerUi()
         self.load_settings(self.dlg_composer)
 
@@ -186,7 +188,7 @@ class ApiManageComposer(ApiParent):
 
 
     def destructor(self):
-
+        self.iface.mapCanvas().setRotation(self.initial_rotation)
         self.destroyed = True
         if self.rubber_polygon:
             self.iface.mapCanvas().scene().removeItem(self.rubber_polygon)
