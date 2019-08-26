@@ -451,28 +451,25 @@ class DrawProfiles(ParentMapTool):
         # Draw first | start node
         # Function self.draw_first_node(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1)
         self.draw_first_node(self.memory[0][0], self.memory[0][1], self.memory[0][2], self.memory[0][3],
-                             self.memory[0][4], self.memory[0][5], self.memory[0][6], self.memory[0][16], self.memory[0][17], self.memory[0][15],0)
+                             self.memory[0][4], self.memory[0][5], self.memory[0][6], self.memory[0][16],
+                             self.memory[0][17], self.memory[0][15], 0)
         # Draw nodes between first and last node
         # Function self.draw_nodes(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, index)
 
         for i in range(1, self.n - 1):
 
             self.draw_nodes(self.memory[i][0], self.memory[i][1], self.memory[i][2], self.memory[i][6],
-                            self.memory[i-1][3], self.memory[i-1][4], self.memory[i-1][5], self.memory[i-1][16], self.memory[i-1][17],
-                            self.memory[i][3], self.memory[i][4], self.memory[i][5], self.memory[i][16], self.memory[i][17], self.memory[i][15],i)
-            # Check if is first node and set correct variable for draw ground (drawn centered)
-            if i!=1:
-                self.node_top_x = self.node_top_x + self.memory[i][6] / 2
-                self.first_top_x = self.first_top_x + self.memory[i][6] / 2
-            else:
-                self.node_top_x = self.node_top_x + self.memory[i][6] / 2
+                            self.memory[i-1][3], self.memory[i-1][4], self.memory[i-1][5], self.memory[i-1][16],
+                            self.memory[i-1][17], self.memory[i][3], self.memory[i][4], self.memory[i][5],
+                            self.memory[i][16], self.memory[i][17], self.memory[i][15], i)
 
             self.draw_ground()
 
         # Draw last node
-        self.draw_last_node(self.memory[self.n - 1][0], self.memory[self.n - 1][1], self.memory[self.n - 1][2],self.memory[self.n - 1][6],  self.memory[self.n - 1][15],
-                            self.memory[self.n - 2][3],self.memory[self.n - 2][4], self.memory[self.n - 2][5],
-                            self.memory[self.n - 2][16],self.memory[self.n - 2][17], self.n - 1)
+        self.draw_last_node(self.memory[self.n - 1][0], self.memory[self.n - 1][1], self.memory[self.n - 1][2],
+                            self.memory[self.n - 1][6],  self.memory[self.n - 1][15], self.memory[self.n - 2][3],
+                            self.memory[self.n - 2][4], self.memory[self.n - 2][5], self.memory[self.n - 2][16],
+                            self.memory[self.n - 2][17], self.n - 1)
 
         # Set correct variable for draw ground (drawn centered)
         self.first_top_x = self.first_top_x + self.memory[self.n - 2][6] / 2
@@ -822,37 +819,37 @@ class DrawProfiles(ParentMapTool):
         """ Draw nodes between first and last node """
 
         if node_id == node_12:
-            z1=z12
+            z1 = z12
         elif node_id == node_11:
-            z1=z11
+            z1 = z11
 
         if node_id == node_21:
-            z2=z21
+            z2 = z21
         elif node_id == node_22:
-            z2=z22
+            z2 = z22
 
         # Get superior points
         s1x = self.slast[0]
         s1y = self.slast[1]
-        s2x = start_point
-        s2y = top_elev -ymax + z1 + cat_geom1
-        s3x = start_point
+        s2x = start_point - geom1 / 2
+        s2y = top_elev - ymax + z1 + cat_geom1
+        s3x = start_point - geom1 / 2
         s3y = top_elev
-        s4x = start_point + geom1
+        s4x = start_point + geom1 / 2
         s4y = top_elev
-        s5x = start_point + geom1
+        s5x = start_point + geom1 / 2
         s5y = top_elev -ymax + z2 + cat_geom2
 
         # Get inferior points
         i1x = self.ilast[0]
         i1y = self.ilast[1]
-        i2x = start_point
+        i2x = start_point - geom1 / 2
         i2y = top_elev - ymax + z1
-        i3x = start_point
+        i3x = start_point - geom1 / 2
         i3y = top_elev - ymax
-        i4x = start_point + geom1
+        i4x = start_point + geom1 / 2
         i4y = top_elev - ymax
-        i5x = start_point + geom1
+        i5x = start_point + geom1 / 2
         i5y = top_elev - ymax + z2
 
         # Create list points
@@ -861,7 +858,8 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x, s4x, s5x]
         ysup = [s1y, s2y, s3y, s4y, s5y]
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
+        sql = ("SELECT value FROM config_param_user "
+               "WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row is not None:
             row = json.loads(row[0])
