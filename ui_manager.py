@@ -6,6 +6,47 @@ import os
 import webbrowser
 
 
+class GwDockWidget(QDockWidget):
+    dlg_closed = QtCore.pyqtSignal()
+    
+    def __init__(self, subtag=None):
+        super().__init__()
+        self.setupUi(self)
+        
+        self.subtag = subtag
+        
+        # Enable event filter
+        self.installEventFilter(self)
+        
+        print(f'{type(self)}: {self.objectName()}')
+    
+    def closeEvent(self, event):
+        self.dlg_closed.emit()
+        return super().closeEvent(event)
+    
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
+            QWhatsThis.leaveWhatsThisMode()
+            parser = configparser.ConfigParser()
+            path = os.path.dirname(__file__) + '/config/ui_config.config'
+            parser.read(path)
+            
+            if self.subtag is not None:
+                tag = f'{self.objectName()}_{self.subtag}'
+            else:
+                tag = str(self.objectName())
+            
+            try:
+                tag = parser.get('web_tag', tag)
+                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
+            except Exception as e:
+                print(type(e).__name__)
+                webbrowser.open_new_tab('giswater.org/giswater-manual')
+            
+            return True
+        return False
+
+
 class GwDialog(QDialog):
     def __init__(self, subtag=None):
         super().__init__()
@@ -113,16 +154,8 @@ class ApiCfUi(GwMainWindow, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('api_search.ui')
-class ApiSearchUi(QDockWidget, FORM_CLASS):
-    dlg_closed = QtCore.pyqtSignal()
-
-    def __init__(self, parent=None):
-        super(ApiSearchUi, self).__init__(parent)
-        self.setupUi(self)
-
-    def closeEvent(self, event):
-        self.dlg_closed.emit()
-        return super(ApiSearchUi, self).closeEvent(event)
+class ApiSearchUi(GwDockWidget, FORM_CLASS):
+    pass
         
 
 FORM_CLASS = get_ui_class('add_doc.ui')
@@ -156,10 +189,8 @@ class ApiComposerUi(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('api_toolbox.ui')
-class ApiDlgToolbox(QDockWidget, FORM_CLASS):
-    def __init__(self):
-        QDialog.__init__(self)      # TODO QDialog constructor when child of QDockWidget
-        self.setupUi(self)
+class ApiDlgToolbox(GwDockWidget, FORM_CLASS):
+    pass
 
 
 FORM_CLASS = get_ui_class('api_toolbox_functions.ui')

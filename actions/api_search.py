@@ -106,9 +106,6 @@ class ApiSearch(ApiParent):
             gridlayout.addItem(vertical_spacer1)
 
         self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
-    
-        # Open dialog
-        self.open_dialog(self.dlg_search)
 
 
     def set_completer(self, widget, completer=None):

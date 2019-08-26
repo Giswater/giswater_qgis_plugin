@@ -72,8 +72,6 @@ class GwToolBox(ApiParent):
         self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'])
         self.dlg_toolbox.txt_filter.textChanged.connect(partial(self.filter_functions))
         self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
-        
-        self.open_dialog(self.dlg_toolbox)
 
 
     def filter_functions(self, text):

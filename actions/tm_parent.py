@@ -148,6 +148,9 @@ class TmParentAction(object):
             dlg.open()
         elif issubclass(type(dlg), GwMainWindow):
             dlg.show()
+        else:
+            print(f"WARNING: dialog type {type(dlg)} is not handled!")
+            dlg.show()
 
 
     def close_dialog(self, dlg=None):
