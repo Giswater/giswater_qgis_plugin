@@ -215,7 +215,7 @@ class Master(ParentAction):
         """ Button 47: Psector selector """
 
         # Create the dialog and signals
-        self.dlg_psector_selector = Multirow_selector()
+        self.dlg_psector_selector = Multirow_selector('psector')
         self.load_settings(self.dlg_psector_selector)
         self.dlg_psector_selector.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_psector_selector))
         self.dlg_psector_selector.setWindowTitle("Psector selector")

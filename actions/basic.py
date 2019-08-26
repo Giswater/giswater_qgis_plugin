@@ -39,7 +39,7 @@ class Basic(ParentAction):
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
                 
-        self.dlg_expoitation = Multirow_selector()
+        self.dlg_expoitation = Multirow_selector('exploitation')
         self.load_settings(self.dlg_expoitation)
 
         self.dlg_expoitation.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_expoitation))
@@ -63,7 +63,7 @@ class Basic(ParentAction):
         """ Button 48: State selector """
             
         # Create the dialog and signals
-        self.dlg_state = Multirow_selector()
+        self.dlg_state = Multirow_selector('state')
         self.load_settings(self.dlg_state)
         self.dlg_state.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_state))
         self.dlg_state.rejected.connect(partial(self.close_dialog, self.dlg_state))
@@ -85,7 +85,7 @@ class Basic(ParentAction):
         """ Button 86: Hydrometer selector """
 
         # Create the dialog and signals
-        self.dlg_hydro_state = Multirow_selector()
+        self.dlg_hydro_state = Multirow_selector('hydrometer')
         self.load_settings(self.dlg_hydro_state)
         self.dlg_hydro_state.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_hydro_state))
         self.dlg_hydro_state.rejected.connect(partial(self.close_dialog, self.dlg_hydro_state))
