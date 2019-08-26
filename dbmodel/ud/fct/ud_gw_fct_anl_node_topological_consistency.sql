@@ -51,20 +51,22 @@ BEGIN
 
 	-- Computing process
 	IF v_array != '()' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fprocesscat_id, the_geom)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 8, '||v_worklayer||'.the_geom 
+		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fprocesscat_id, the_geom, state)
+				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 8, '||v_worklayer||'.the_geom , '||v_worklayer||'.state
 				FROM '||v_worklayer||' 
 				INNER JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id 
 				WHERE '||v_worklayer||'.node_type != ''OUTFALL'' AND  node_id IN '||v_array||'
-				GROUP BY '||v_worklayer||'.node_id,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
+				GROUP BY '||v_worklayer||'.node_id,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,
+				'||v_worklayer||'.state 
 				HAVING COUNT(*) = 1;';
 	ELSE
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fprocesscat_id, the_geom)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 8, '||v_worklayer||'.the_geom 
+		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fprocesscat_id, the_geom, state)
+				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 8, '||v_worklayer||'.the_geom,'||v_worklayer||'.state 
 				FROM '||v_worklayer||'
 				INNER JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id 
 				WHERE '||v_worklayer||'.node_type != ''OUTFALL'' 
-				GROUP BY '||v_worklayer||'.node_id,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
+				GROUP BY '||v_worklayer||'.node_id,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,
+				'||v_worklayer||'.state
 				HAVING COUNT(*) = 1;';
 	END IF;
 

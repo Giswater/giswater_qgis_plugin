@@ -49,19 +49,19 @@ BEGIN
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=10;
 	    
-	-- Computing process
+	/*-- Computing process
 	 INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, the_geom)
 	 SELECT arc_id, expl_id, 10, the_geom 
 		FROM v_edit_arc
-		WHERE slope < 0;
+		WHERE slope < 0;*/
 
 	-- Computing process
 	IF v_array != '()' THEN 
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, the_geom, arccat_id)
-	 			SELECT arc_id, expl_id, 10, the_geom, arccat_id FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN '||v_array||';';
+		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, the_geom, arccat_id, state)
+	 			SELECT arc_id, expl_id, 10, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN '||v_array||';';
 	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, the_geom, arccat_id)
-	 			SELECT arc_id, expl_id, 10, the_geom, arccat_id FROM '||v_worklayer||' WHERE slope < 0';
+		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, the_geom, arccat_id, state)
+	 			SELECT arc_id, expl_id, 10, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0';
 	END IF;
 
 	-- get results
