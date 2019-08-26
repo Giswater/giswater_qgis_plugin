@@ -292,8 +292,11 @@ class ManageNewPsector(ParentManage):
                 canvas_width = ext.xMaximum() - ext.xMinimum()
                 canvas_height = ext.yMaximum() - ext.yMinimum()
                 # Get boundingBox(QgsRectangle) from selected feature
-                # feature = layer.selectedFeatures()[0]
-                feature = layer.selectedFeatures()
+                try:
+                    feature = layer.selectedFeatures()[0]
+                except IndexError:
+                    feature = layer.selectedFeatures()
+                    
                 if feature != []:
                     if feature.geometry() is not None:
                         psector_rec = feature.geometry().boundingBox()
