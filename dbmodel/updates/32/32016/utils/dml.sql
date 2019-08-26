@@ -65,7 +65,7 @@ INSERT INTO sys_fprocess_cat VALUES (62, 'Check pattern related to hydro', 'epa'
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3020,'This planified feature (state=2) is already used in another psector','Create a new feature in order to assign it.', 2, true,'utils',false);
 
-UPDATE config_param_system SET context=null, parameter='_api_search_visit' WHERE parameter='api_search_visit';
+--UPDATE config_param_system SET context=null, parameter='_api_search_visit' WHERE parameter='api_search_visit';
 
 UPDATE audit_cat_param_user  SET isparent= TRUE WHERE id='state_vdefault';
 UPDATE audit_cat_param_user  SET dv_parent_id= 'state_vdefault', 
@@ -77,3 +77,7 @@ VALUES (3022, 'The inserted value is not present in a catalog. Catalog, field:',
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2744, 'gw_trg_typevalue_fk', 'utils', 'trigger', 'Control foreign keys created in typevalue tables', 'role_edit',false, false, false);
+
+UPDATE audit_cat_function SET   
+return_type='[{"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"text", "datatype":"integer","layoutname":"grl_option_parameters","layout_order":1,"value":null},{"widgetname":"inserIntoNode", "label":"Direct insert into node table:", "widgettype":"check", "datatype":"boolean","layoutname":"grl_option_parameters","layout_order":2,"value":"true"},{"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layout_order":3,"value":0.01}]'
+WHERE function_name='gw_fct_built_nodefromarc';

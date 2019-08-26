@@ -199,7 +199,7 @@ UPDATE cat_feature SET shortcut_key='Y' WHERE id = 'NETGULLY';
 UPDATE cat_feature SET shortcut_key='I' WHERE id = 'NETINIT';
 UPDATE cat_feature SET shortcut_key='O' WHERE id = 'OUTFALL';
 UPDATE cat_feature SET shortcut_key='G' WHERE id = 'OWERFLOW-STORAGE';
-UPDATE cat_feature SET shortcut_key='Ctrl+A' WHERE id = 'PGULLY';
+UPDATE cat_feature SET shortcut_key='Ctrl+X' WHERE id = 'PGULLY';
 UPDATE cat_feature SET shortcut_key='Alt+U' WHERE id = 'PUMP-PIPE';
 UPDATE cat_feature SET shortcut_key='P' WHERE id = 'PUMP-STATION';
 UPDATE cat_feature SET shortcut_key='R' WHERE id = 'RECT-MANHOLE';
