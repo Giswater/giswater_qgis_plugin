@@ -152,9 +152,12 @@ class MincutConfig(ParentAction):
             if not rows:
                 print("NOT ROWS")
                 continue
-
-            from_date = str(rows[0][1].strftime('%d/%m/%Y %H:%M'))
-            to_date = str(rows[0][2].strftime('%d/%m/%Y %H:%M'))
+            from_date = ""
+            if rows[0][1] is not None:
+                from_date = str(rows[0][1].strftime('%d/%m/%Y %H:%M'))
+            to_date = ""
+            if rows[0][2] is not None:
+                to_date = str(rows[0][2].strftime('%d/%m/%Y %H:%M'))
             _type = rows[0][3]
             list_clients = []
             list_mincut_id.append(id_)
