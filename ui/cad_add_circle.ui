@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>cad_add_circe</class>
- <widget class="QDialog" name="cad_add_circe">
+ <class>cad_add_circle</class>
+ <widget class="QDialog" name="cad_add_circle">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>go2epa</class>
- <widget class="QDialog" name="go2epa">
+ <class>api_epa_options</class>
+ <widget class="QDialog" name="api_epa_options">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -83,7 +83,7 @@
         <x>0</x>
         <y>0</y>
         <width>668</width>
-        <height>697</height>
+        <height>695</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
