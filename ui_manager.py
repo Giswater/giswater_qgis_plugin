@@ -153,6 +153,11 @@ class ApiCfUi(GwMainWindow, FORM_CLASS):
             return super(ApiCfUi, self).keyPressEvent(event)
 
 
+FORM_CLASS = get_ui_class('api_dimensioning.ui')
+class ApiDimensioningUi(GwMainWindow, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('api_search.ui')
 class ApiSearchUi(GwDockWidget, FORM_CLASS):
     pass
