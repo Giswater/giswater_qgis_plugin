@@ -632,6 +632,7 @@ class MincutParent(ParentAction):
             sql = ("INSERT INTO anl_mincut_result_cat (id, mincut_class) "
                    " VALUES ('" + str(result_mincut_id_text) + "', 2);")
             self.controller.execute_sql(sql)
+            self.is_new = False
 
         # Disable Auto, Custom, Hydrometer
         self.action_mincut.setDisabled(True)
@@ -793,7 +794,8 @@ class MincutParent(ParentAction):
             sql = ("INSERT INTO anl_mincut_result_cat (id, mincut_class)"
                    " VALUES ('" + str(result_mincut_id_text) + "', 3);")
             self.controller.execute_sql(sql)
-
+            self.is_new = False
+            
         # On inserting work order
         self.action_mincut.setDisabled(True)
         self.action_custom_mincut.setDisabled(True)
