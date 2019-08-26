@@ -15,36 +15,11 @@ class GwDockWidget(QDockWidget):
         
         self.subtag = subtag
         
-        # Enable event filter
-        self.installEventFilter(self)
-        
         print(f'{type(self)}: {self.objectName()}')
     
     def closeEvent(self, event):
         self.dlg_closed.emit()
         return super().closeEvent(event)
-    
-    def eventFilter(self, object, event):
-        if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
-            QWhatsThis.leaveWhatsThisMode()
-            parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + '/config/ui_config.config'
-            parser.read(path)
-            
-            if self.subtag is not None:
-                tag = f'{self.objectName()}_{self.subtag}'
-            else:
-                tag = str(self.objectName())
-            
-            try:
-                tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
-            except Exception as e:
-                print(type(e).__name__)
-                webbrowser.open_new_tab('giswater.org/giswater-manual')
-            
-            return True
-        return False
 
 
 class GwDialog(QDialog):
@@ -72,8 +47,8 @@ class GwDialog(QDialog):
                 tag = str(self.objectName())
                 
             try:
-                tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
+                web_tag = parser.get('web_tag', tag)
+                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
                 print(type(e).__name__)
                 webbrowser.open_new_tab('giswater.org/giswater-manual')
@@ -112,10 +87,11 @@ class GwMainWindow(QMainWindow):
                 tag = str(self.objectName())
                 
             try:
-                tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + tag)
+                web_tag = parser.get('web_tag', tag)
+                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
                 print(type(e).__name__)
+                webbrowser.open_new_tab('giswater.org/giswater-manual')
 
             return True
         return False
