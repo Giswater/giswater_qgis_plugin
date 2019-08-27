@@ -31,6 +31,10 @@ INSERT INTO plan_psector_x_arc VALUES (8, '2086', 1, 0, false, NULL);
 
 INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
 
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3103', NULL, 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3104', NULL, 1, 0, false, NULL, NULL, NULL);
+UPDATE plan_psector_x_connec SET arc_id = '20851' WHERE connec_id = '114461';
+UPDATE plan_psector_x_connec SET arc_id = '20851' WHERE connec_id = '114462';
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
 INSERT INTO doc VALUES ('Demo document 3', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762257', current_user, '2018-03-14 17:09:59.762257');
@@ -88,6 +92,120 @@ SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100,
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
 
 
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"outfallvalve_param_1", "datatype":"string", 
+"widgettype":"text", "label":"Outvalve param_1","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True","isenabled":"True"}}}$$);
+
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"outfallvalve_param_2", "datatype":"boolean", 
+"widgettype":"check", "label":"Outvalve param_2","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_1", "datatype":"string", 
+"widgettype":"combo", "label":"Shtvalve param_1","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
+"isenabled":"True","dv_querytext":"SELECT value as id, value as idval FROM man_addfields_cat_combo WHERE parameter_id=11"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_2", "datatype":"string", 
+"widgettype":"text", "label":"Shtvalve param_2","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"GREEN-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"greenvalve_param_1", "datatype":"boolean", 
+"widgettype":"check", "label":"Gvalve param_1","ismandatory":"False",
+"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"GREEN-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"greenvalve_param_2", "datatype":"string", 
+"widgettype":"text", "label":"Gvalve param_2","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"AIR-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"airvalve_param_1", "datatype":"string", 
+"widgettype":"text", "label":"Airvalve param_1","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"AIR-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"airvalve_param_2", "datatype":"integer", 
+"widgettype":"text", "label":"Airvalve param_2","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHECK-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"checkvalve_param_1", "datatype":"integer", 
+"widgettype":"text", "label":"Check param_1","ismandatory":"False",
+"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHECK-VALVE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"checkvalve_param_2", "datatype":"string", 
+"widgettype":"text", "label":"Check param_2","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PIPE"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pipe_param_1", "datatype":"string", 
+"widgettype":"text", "label":"Pipe param_1","ismandatory":"False",
+"fieldLength":"150", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE-METER"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_1", "datatype":"string", 
+"widgettype":"combo", "label":"Pressmeter param_1","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
+"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=3"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE-METER"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_2", "datatype":"date", 
+"widgettype":"datepickertime", "label":"Pressmeter param_2","ismandatory":"False",
+"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"filter_param_1", "datatype":"integer", 
+"widgettype":"text", "label":"Filter param_1","ismandatory":"False",
+"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"filter_param_2", "datatype":"string", 
+"widgettype":"text", "label":"Filter param_2","ismandatory":"False",
+"fieldLength":"200", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"TANK"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"tank_param_1", "datatype":"integer", 
+"widgettype":"text", "label":"Tank param_1","ismandatory":"False",
+"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"TANK"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"tank_param_2", "datatype":"date", 
+"widgettype":"datepickertime", "label":"Tank param_2","ismandatory":"False",
+"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_1", "datatype":"string", 
+"widgettype":"combo", "label":"Hydrant param_1","ismandatory":"False",
+"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
+"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=35"}}}$$);
+
+SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_2", "datatype":"integer", 
+"widgettype":"text", "label":"Hydrant param_2","ismandatory":"False",
+"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+
+
+
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo1',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo2',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo3',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo4',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo5',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo1',NULL FROM man_addfields_parameter where param_name='pressmeter_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo2',NULL FROM man_addfields_parameter where param_name='pressmeter_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo3',NULL FROM man_addfields_parameter where param_name='pressmeter_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo1',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo2',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo3',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
+INSERT INTO man_addfields_cat_combo SELECT id, 'combo4',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
 
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('SHUTOFF-VALVE', 've_node_shutoffvalve');
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CHECK-VALVE', 've_node_checkvalve');

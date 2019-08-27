@@ -996,6 +996,8 @@ INSERT INTO connec VALUES ('3022', '3022', 40.3024, NULL, 'PVC25-PN16-DOM', 2, '
 INSERT INTO connec VALUES ('3023', '3023', 39.9832, NULL, 'PVC25-PN16-DOM', 2, 'cc3023', 1, 2, '2074', NULL, NULL, NULL, NULL, 2, 'High-Expl_01', 'Standard soil', NULL, 'Standard Category', 'Standard Fluid', 'Standard Location', 'work1', NULL, 'builder1', '2017-12-06', NULL, 'owner1', 1, '8830', '1-11000C', 169, NULL, NULL, NULL, NULL, NULL, 'https://www.giswater.org', 'TO REVIEW', NULL, '0101000020E76400007605C8F1A69519414371F33E62755141', NULL, NULL, NULL, NULL, NULL, true, 1, NULL, 'CONNEC', NULL);
 INSERT INTO connec VALUES ('114305', '114305', 38.4700, NULL, 'PVC25-PN16-DOM', 3, 'cc114305', 1, 2, '114204', NULL, '', '', '', 3, 'High-Expl_02', 'soil1', NULL, 'Standard Category', 'Standard Fluid', 'Standard Location', 'work4', NULL, 'builder1', '2017-12-06', '2018-03-07', 'owner1', 1, '8830', '1-10350C', 99, NULL, NULL, NULL, NULL, '', 'https://www.giswater.org', 'TO REVIEW', NULL, '0101000020E7640000BC538625C88919413F490D8990765141', false, NULL, NULL, NULL, false, true, 2, NULL, 'CONNEC', NULL);
 
+INSERT INTO connec (connec_id, code, elevation, depth, connecat_id, sector_id, customer_code, state, state_type, arc_id, connec_length, annotation, observ, comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, featurecat_id, feature_id, pjoint_type, pjoint_id, minsector_id, dqa_id, staticpressure) VALUES ('114461', '114461', 40.7686, NULL, 'PVC32-PN16-DOM', 3, '114461', 2, 99, '2087', NULL, NULL, NULL, NULL, 2, 'High-Expl_02', 'Standard soil', 'Standard Function', 'Standard Category', 'Standard Fluid', 'Standard Location', 'work4', NULL, 'builder1', '2019-08-27', NULL, 'owner1', 1, NULL, '1-10450C', NULL, NULL, '1-10450C', NULL, NULL, NULL, '', 'TO REVIEW', NULL, '0101000020E76400001CFB4E6BEA951941BD10DCFA45755141', false, NULL, NULL, NULL, false, true, 1, NULL, 'CONNEC', '2019-08-27 08:17:59.526751', NULL, NULL, 'VNODE', '476', NULL, 0, NULL);
+INSERT INTO connec (connec_id, code, elevation, depth, connecat_id, sector_id, customer_code, state, state_type, arc_id, connec_length, annotation, observ, comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, featurecat_id, feature_id, pjoint_type, pjoint_id, minsector_id, dqa_id, staticpressure) VALUES ('114462', '114462', 44.2132, NULL, 'PVC32-PN16-DOM', 3, '114462', 2, 99, '20851', NULL, NULL, NULL, NULL, 2, 'High-Expl_02', 'Standard soil', 'Standard Function', 'Standard Category', 'Standard Fluid', 'Standard Location', 'work4', NULL, 'builder1', '2019-08-27', NULL, 'owner1', 1, NULL, '1-10450C', NULL, NULL, '1-10450C', NULL, NULL, NULL, '', 'TO REVIEW', NULL, '0101000020E76400002E8CB910ED941941CE69EF0546755141', false, NULL, NULL, NULL, false, true, 1, NULL, 'CONNEC', '2019-08-27 08:18:19.379607', NULL, NULL, 'VNODE', '477', NULL, 0, NULL);
 
 
 
@@ -10225,39 +10227,5 @@ INSERT INTO man_wjoin VALUES ('114448', NULL, NULL);
 
 INSERT INTO man_wtp VALUES (18);
 
-INSERT INTO man_addfields_parameter VALUES (11, 'outfallvalve_param_1', 'OUTFALL-VALVE', false, 'text', NULL, NULL, NULL, 'Outvalve param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=11', NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (12, 'outfallvalve_param_2', 'OUTFALL-VALVE', false, 'boolean', NULL, NULL, NULL, 'Outvalve param_2', 'QCheckBox', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (22, 'shtvalve_param_1', 'SHUTOFF-VALVE', false, 'text', 255, NULL, NULL, 'Shtvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (23, 'shtvalve_param_2', 'SHUTOFF-VALVE', false, 'text', 255, NULL, NULL, 'Shtvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (24, 'greenvalve_param_1', 'GREEN-VALVE', false, 'boolean', NULL, NULL, NULL, 'Gvalve param_1', 'QCheckBox', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (25, 'greenvalve_param_2', 'GREEN-VALVE', false, 'text', 255, NULL, NULL, 'Gvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (26, 'airvalve_param_1', 'AIR-VALVE', false, 'text', 255, NULL, NULL, 'Airvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (27, 'airvalve_param_2', 'AIR-VALVE', false, 'text', 255, NULL, NULL, 'Airvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (47, 'checkvalve_param_1', 'CHECK-VALVE', false, 'integer', NULL, NULL, NULL, 'Chkvalve param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (48, 'checkvalve_param_2', 'CHECK-VALVE', false, 'text', 255, NULL, NULL, 'Chkvalve param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (50, 'pipe_param_1', 'PIPE', false, 'text', 150, NULL, NULL, 'Pipe param_1', 'QTextEdit', NULL, NULL, NULL, NULL, NULL, false, true);
-INSERT INTO man_addfields_parameter VALUES (3, 'pressmeter_param_1', 'PRESSURE-METER', false, 'text', 255, NULL, NULL, 'Pressmeter_param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=3', NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (4, 'pressmeter_param_2', 'PRESSURE-METER', false, 'date', NULL, NULL, NULL, 'Pressmeter_param_2', 'QDateEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (5, 'filter_param_1', 'FILTER', false, 'integer', NULL, NULL, NULL, 'Filter_param_1', 'QTextEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (6, 'filter_param_2', 'FILTER', false, 'text', 255, NULL, NULL, 'Filter_param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (29, 'tank_param_2', 'TANK', false, 'integer', NULL, NULL, NULL, 'Tank_param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-INSERT INTO man_addfields_parameter VALUES (28, 'tank_param_1', 'TANK', false, 'date', NULL, NULL, NULL, 'Tank_param_1', 'QDateEdit', NULL, NULL, NULL, NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (35, 'hydrant_param_1', 'HYDRANT', false, 'text', 255, NULL, NULL, 'Hydrant_param_1', 'QComboBox', NULL, NULL, 'SELECT value FROM man_addfields_cat_combo WHERE parameter_id=35', NULL, 1, true, true);
-INSERT INTO man_addfields_parameter VALUES (36, 'hydrant_param_2', 'HYDRANT', false, 'integer', NULL, NULL, NULL, 'Hydrant_param_2', 'QTextEdit', NULL, NULL, NULL, NULL, 2, true, true);
-
-
-
-INSERT INTO man_addfields_cat_combo VALUES (11, 'combo1', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (11, 'combo2', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (11, 'combo3', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (11, 'combo4', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (11, 'combo5', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (3, 'combo1', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (3, 'combo2', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (3, 'combo3', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (35, 'combo1', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (35, 'combo2', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (35, 'combo3', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (35, 'combo4', NULL);
 
 
