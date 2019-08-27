@@ -1132,6 +1132,11 @@ class ApiCF(ApiParent):
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
             self.controller.execute_sql(sql, log_sql=False)
+            if widget.objectName() == 'tbl_document':
+                date_to = self.dlg_cf.tab_main.findChild(QDateEdit, 'date_document_to')
+                if date_to:
+                    current_date = QDate.currentDate()
+                    date_to.setDate(current_date)
             widget.model().select()
 
 
@@ -1800,6 +1805,8 @@ class ApiCF(ApiParent):
     # creat the new visit GUI
     def update_visit_table(self):
         """ Convenience fuction set as slot to update table after a Visit GUI close. """
+        table_name = "v_ui_event_x_" + self.geom_type
+        self.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
         self.tbl_event_cf.model().select()
 
 
@@ -2041,7 +2048,7 @@ class ApiCF(ApiParent):
         """ Execute action of button 34 """
 
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
-        doc.manage_document(feature=feature)
+        doc.manage_document(feature=feature, geom_type=self.geom_type)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
 
