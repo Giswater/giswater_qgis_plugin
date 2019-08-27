@@ -23,7 +23,7 @@ BEGIN
     IF v_table_name = 'connec' THEN
     	SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
     ELSIF v_table_name = 'gully' THEN
-    	SELECT the_geom INTO v_feature_geom FROM connec WHERE gully_id=NEW.gully_id;
+    	SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
     END IF;
 
 	-- update geometry
