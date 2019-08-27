@@ -48,10 +48,10 @@ class GwDialog(QDialog):
                 
             try:
                 web_tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + web_tag)
+                webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
                 print(type(e).__name__)
-                webbrowser.open_new_tab('giswater.org/giswater-manual')
+                webbrowser.open_new_tab('https://giswater.org/giswater-manual')
             
             return True
         return False
@@ -88,10 +88,10 @@ class GwMainWindow(QMainWindow):
                 
             try:
                 web_tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab('giswater.org/giswater-manual/#' + web_tag)
+                webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
                 print(type(e).__name__)
-                webbrowser.open_new_tab('giswater.org/giswater-manual')
+                webbrowser.open_new_tab('https://giswater.org/giswater-manual')
 
             return True
         return False
