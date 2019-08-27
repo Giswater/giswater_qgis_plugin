@@ -108,7 +108,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Shtvalve param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval FROM man_addfields_cat_combo WHERE parameter_id=11"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT value as id, value as idval FROM man_addfields_cat_combo WHERE parameter_id=6"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF-VALVE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_2", "datatype":"string", 
@@ -154,7 +154,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Pressmeter param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=3"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=24"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE-METER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_2", "datatype":"date", 
@@ -185,7 +185,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Hydrant param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=35"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=36"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_2", "datatype":"integer", 
