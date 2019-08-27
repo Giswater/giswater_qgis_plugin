@@ -38,6 +38,27 @@ from ..ui_manager import DrawProfile
 from ..ui_manager import LoadProfiles
 
 
+class NodeData:
+    def __init__(self):
+        self.start_point = None
+        self.top_elev = None
+        self.ymax = None
+        self.z1 = None
+        self.z2 = None
+        self.cat_geom = None
+        self.geom = None
+        self.slope = None
+        self.elev1 = None
+        self.elev2 = None
+        self.y1 = None
+        self.y2 = None
+        self.node_id = None
+        self.elev = None
+        self.code = None
+        self.node_1 = None
+        self.node_2 = None
+        
+
 class DrawProfiles(ParentMapTool):
     """ Button 43: Draw_profiles """
 
@@ -45,7 +66,7 @@ class DrawProfiles(ParentMapTool):
         """ Class constructor """
 
         # Call ParentMapTool constructor
-        super(DrawProfiles, self).__init__(iface, settings, action, index_action)
+        super().__init__(iface, settings, action, index_action)
 
         self.list_of_selected_nodes = []
         self.nodes = []
@@ -118,7 +139,6 @@ class DrawProfiles(ParentMapTool):
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
 
-        self.nodes = []
         self.list_of_selected_nodes = []
 
         self.open_dialog(self.dlg_draw_profile)
@@ -156,7 +176,7 @@ class DrawProfiles(ParentMapTool):
         for i in range(n):
             sql += ("INSERT INTO anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
                     " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "');\n")
-        status = self.controller.execute_sql(sql) 
+        status = self.controller.execute_sql(sql)
         if not status:
             message = "Error inserting profile table, you need to review data"
             self.controller.show_warning(message)
@@ -197,12 +217,12 @@ class DrawProfiles(ParentMapTool):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        # Selected item from list 
+        # Selected item from list
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
         # Get data from DB for selected item| profile_id, start_point, end_point
         sql = ("SELECT start_point, end_point"
-               " FROM anl_arc_profile_value" 
+               " FROM anl_arc_profile_value"
                " WHERE profile_id = '" + selected_profile + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -297,9 +317,9 @@ class DrawProfiles(ParentMapTool):
         for i in range(len(arc_id)):
             expr_filter += "'" + str(arc_id[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
-        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable
         if not is_valid:
-            return             
+            return
 
         # Build a list of feature id's from the previous result
         # Select features with these id's
@@ -450,29 +470,22 @@ class DrawProfiles(ParentMapTool):
         # Start drawing
         # Draw first | start node
         # Function self.draw_first_node(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1)
-        self.draw_first_node(self.memory[0][0], self.memory[0][1], self.memory[0][2], self.memory[0][3],
-                             self.memory[0][4], self.memory[0][5], self.memory[0][6], self.memory[0][16],
-                             self.memory[0][17], self.memory[0][15], 0)
+        self.draw_first_node(self.nodes[0])
+        
         # Draw nodes between first and last node
         # Function self.draw_nodes(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, index)
 
         for i in range(1, self.n - 1):
 
-            self.draw_nodes(self.memory[i][0], self.memory[i][1], self.memory[i][2], self.memory[i][6],
-                            self.memory[i-1][3], self.memory[i-1][4], self.memory[i-1][5], self.memory[i-1][16],
-                            self.memory[i-1][17], self.memory[i][3], self.memory[i][4], self.memory[i][5],
-                            self.memory[i][16], self.memory[i][17], self.memory[i][15], i)
+            self.draw_nodes(self.nodes[i], self.nodes[i - 1], i)
 
             self.draw_ground()
 
         # Draw last node
-        self.draw_last_node(self.memory[self.n - 1][0], self.memory[self.n - 1][1], self.memory[self.n - 1][2],
-                            self.memory[self.n - 1][6],  self.memory[self.n - 1][15], self.memory[self.n - 2][3],
-                            self.memory[self.n - 2][4], self.memory[self.n - 2][5], self.memory[self.n - 2][16],
-                            self.memory[self.n - 2][17], self.n - 1)
+        self.draw_last_node(self.nodes[self.n - 1], self.nodes[self.n - 2], self.n - 1)
 
         # Set correct variable for draw ground (drawn centered)
-        self.first_top_x = self.first_top_x + self.memory[self.n - 2][6] / 2
+        self.first_top_x = self.first_top_x + self.nodes[self.n - 2].geom / 2
 
         self.draw_ground()
         self.draw_table_horizontals()
@@ -513,8 +526,8 @@ class DrawProfiles(ParentMapTool):
         self.rect.set_facecolor('white')
 
         # Set axes
-        x_min = round(self.memory[0][0] - self.fix_x - self.fix_x * Decimal(0.15))
-        x_max = round(self.memory[self.n - 1][0] + self.fix_x * Decimal(0.15))
+        x_min = round(self.nodes[0].start_point - self.fix_x - self.fix_x * Decimal(0.15))
+        x_max = round(self.nodes[self.n - 1].start_point + self.fix_x * Decimal(0.15))
         self.axes.set_xlim([x_min, x_max])
 
         # Set y-axes
@@ -550,20 +563,22 @@ class DrawProfiles(ParentMapTool):
         for i in range(1, n):
             x = self.start_point[i - 1] + self.gis_length[i]
             self.start_point.append(x)
-            i = i + 1
+            i += 1
 
 
     def fill_memory(self):
-        """ Get parameters from data base. Fill self.memory with parameters postgres """
+        """ Get parameters from data base. Fill self.nodes with parameters postgres """
 
-        self.memory = []
-        test_id_list = []
-        i = 0
+        self.nodes = []
+        bad_nodes_id = []
+        
         # Get parameters and fill the memory
-        for node_id in self.node_id:
+        for i, node_id in enumerate(self.node_id):
             # self.parameters : list of parameters for one node
             # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
-            parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+    
+            parameters = NodeData()
+            parameters.start_point = self.start_point[i]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
             sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code "
@@ -576,9 +591,9 @@ class DrawProfiles(ParentMapTool):
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
             if row:
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None:
-                    test_id_list.append(node_id)
+                    bad_nodes_id.append(node_id)
                 # Check if we have all data for drawing
-                for x in range(0, len(columns)):
+                for x in range(len(columns)):
                     if row[x] is None:
                         sql = ("SELECT value::decimal(12,3) "
                                "FROM  config_param_system "
@@ -586,12 +601,12 @@ class DrawProfiles(ParentMapTool):
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
-                parameters[1] = row[0]
-                parameters[2] = row[1]
-                parameters[13] = row[2]
+                parameters.top_elev = row[0]
+                parameters.ymax = row[1]
+                parameters.elev = row[2]
                 nodecat_id = row[3]
-                parameters[14] = row[4]
-                parameters[15] = str(node_id)
+                parameters.code = row[4]
+                parameters.node_id = str(node_id)
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
@@ -603,7 +618,7 @@ class DrawProfiles(ParentMapTool):
             columns = ['geom1']
             if row:
                 if row[0] is None:
-                    test_id_list.append(node_id)
+                    bad_nodes_id.append(node_id)
                 # Check if we have all data for drawing
                 for x in range(0, len(columns)):
                     if row[x] is None:
@@ -613,12 +628,11 @@ class DrawProfiles(ParentMapTool):
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
-                parameters[6] = row[0]
+                parameters.geom = row[0]
 
             # Set node_id in memory
-            parameters[12] = node_id
-            self.memory.append(parameters)
-            i = i + 1
+            parameters.node_id = node_id
+            self.nodes.append(parameters)
 
         n = 0
         for element_id in self.arc_id:
@@ -633,15 +647,15 @@ class DrawProfiles(ParentMapTool):
 
             columns = ['z1','z2','cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
 
-            # Check if self.memory[n] is out of range
-            if n >= len(self.memory):
+            # Check if self.nodes[n] is out of range
+            if n >= len(self.nodes):
                 return
 
             if row:
                 # Check if we have all data for drawing
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
                    row[5] is None or row[6] is None or row[7] is None:
-                    test_id_list.append(element_id)
+                    bad_nodes_id.append(element_id)
                 for x in range(0, len(columns)):
                     if row[x] is None:
                         sql = ("SELECT value::decimal(12,3) "
@@ -650,48 +664,49 @@ class DrawProfiles(ParentMapTool):
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
-                self.memory[n][3] = row[0]
-                self.memory[n][4] = row[1]
-                self.memory[n][5] = row[2]
-                self.memory[n][8] = row[3]
-                self.memory[n][9] = row[4]
-                self.memory[n][10] = row[5]
-                self.memory[n][11] = row[6]
-                self.memory[n][7] = row[7]
-                self.memory[n][16] = row[8]
-                self.memory[n][17] = row[9]
-                n = n + 1
+                self.nodes[n].z1 = row[0]
+                self.nodes[n].z2 = row[1]
+                self.nodes[n].cat_geom = row[2]
+                self.nodes[n].elev1 = row[3]
+                self.nodes[n].elev2 = row[4]
+                self.nodes[n].y1 = row[5]
+                self.nodes[n].y2 = row[6]
+                self.nodes[n].slope = row[7]
+                self.nodes[n].node_1 = row[8]
+                self.nodes[n].node_2 = row[9]
+                
+                n += 1
 
-        if test_id_list == []:
+        if not bad_nodes_id:
             return
 
         message = "Some parameters are missing (Values Defaults used for)"
-        self.controller.show_info_box(message, "Info", str(test_id_list))
+        self.controller.show_info_box(message, "Info", str(bad_nodes_id))
 
 
-    def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, node_1, node_2, node_id, indx): #@UnusedVariable
+    def draw_first_node(self, node): #@UnusedVariable
         """ Draw first node """
 
-        if node_id == node_1:
-            z=z1
+        if node.node_id == node.node_1:
+            z = node.z1
         else:
-            z=z2
+            z = node.z2
 
         # Get superior points
-        s1x = -geom1/2
-        s1y = top_elev
-        s2x = geom1/2
-        s2y = top_elev
-        s3x = geom1/2
-        s3y = top_elev - ymax + z + cat_geom1
+        s1x = -node.geom / 2
+        s1y = node.top_elev
+        s2x = node.geom / 2
+        s2y = node.top_elev
+        s3x = node.geom / 2
+        s3y = node.top_elev - node.ymax + z + node.cat_geom
 
         # Get inferior points
-        i1x = -geom1/2
-        i1y = top_elev - ymax
-        i2x = geom1/2
-        i2y = top_elev - ymax
-        i3x = geom1/2
-        i3y = top_elev - ymax + z
+        i1x = -node.geom / 2
+        i1y = node.top_elev - node.ymax
+        i2x = node.geom / 2
+        i2y = node.top_elev - node.ymax
+        i3x = node.geom / 2
+        i3y = node.top_elev - node.ymax + z
 
         # Create list points
         xinf = [s1x, i1x, i2x, i3x]
@@ -699,7 +714,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x]
         ysup = [s1y, s2y, s3y]
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
+        sql = ("SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row is not None:
             row = json.loads(row[0])
@@ -713,10 +728,10 @@ class DrawProfiles(ParentMapTool):
 
 
         self.first_top_x = 0
-        self.first_top_y = top_elev
+        self.first_top_y = node.top_elev
 
         # Draw fixed part of table
-        self.draw_fix_table(start_point)
+        self.draw_fix_table(node.start_point)
 
 
         # Save last points for first node
@@ -815,42 +830,42 @@ class DrawProfiles(ParentMapTool):
         self.fill_data(0, 0)
 
 
-    def draw_nodes(self, start_point, top_elev, ymax, geom1, z11, z12, cat_geom1, node_11, node_12, z21, z22, cat_geom2, node_21, node_22, node_id, indx):    #@UnusedVariable
+    def draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
 
-        if node_id == node_12:
-            z1 = z12
-        elif node_id == node_11:
-            z1 = z11
+        if node.node_id == prev_node.node_2:
+            z1 = prev_node.z2
+        elif node.node_id == prev_node.node_1:
+            z1 = prev_node.z1
 
-        if node_id == node_21:
-            z2 = z21
-        elif node_id == node_22:
-            z2 = z22
+        if node.node_id == node.node_1:
+            z2 = node.z1
+        elif node.node_id == node.node_2:
+            z2 = node.z2
 
         # Get superior points
         s1x = self.slast[0]
         s1y = self.slast[1]
-        s2x = start_point - geom1 / 2
-        s2y = top_elev - ymax + z1 + cat_geom1
-        s3x = start_point - geom1 / 2
-        s3y = top_elev
-        s4x = start_point + geom1 / 2
-        s4y = top_elev
-        s5x = start_point + geom1 / 2
-        s5y = top_elev -ymax + z2 + cat_geom2
+        s2x = node.start_point - node.geom / 2
+        s2y = node.top_elev - node.ymax + z1 + prev_node.cat_geom
+        s3x = node.start_point - node.geom / 2
+        s3y = node.top_elev
+        s4x = node.start_point + node.geom / 2
+        s4y = node.top_elev
+        s5x = node.start_point + node.geom / 2
+        s5y = node.top_elev -node.ymax + z2 + node.cat_geom
 
         # Get inferior points
         i1x = self.ilast[0]
         i1y = self.ilast[1]
-        i2x = start_point - geom1 / 2
-        i2y = top_elev - ymax + z1
-        i3x = start_point - geom1 / 2
-        i3y = top_elev - ymax
-        i4x = start_point + geom1 / 2
-        i4y = top_elev - ymax
-        i5x = start_point + geom1 / 2
-        i5y = top_elev - ymax + z2
+        i2x = node.start_point - node.geom / 2
+        i2y = node.top_elev - node.ymax + z1
+        i3x = node.start_point - node.geom / 2
+        i3y = node.top_elev - node.ymax
+        i4x = node.start_point + node.geom / 2
+        i4y = node.top_elev - node.ymax
+        i5x = node.start_point + node.geom / 2
+        i5y = node.top_elev - node.ymax + z2
 
         # Create list points
         xinf = [i1x, i2x, i3x, i4x, i5x]
@@ -871,16 +886,16 @@ class DrawProfiles(ParentMapTool):
             plt.plot(xinf, yinf, 'black', zorder=100)
             plt.plot(xsup, ysup, 'black', zorder=100)
 
-        self.node_top_x = start_point
-        self.node_top_y = top_elev
-        self.first_top_x = self.memory[indx - 1][0]
-        self.first_top_y = self.memory[indx - 1][1]
+        self.node_top_x = node.start_point
+        self.node_top_y = node.top_elev
+        self.first_top_x = prev_node.start_point
+        self.first_top_y = prev_node.top_elev
 
         # DRAW TABLE-MARKS
-        self.draw_marks(start_point)
+        self.draw_marks(node.start_point)
 
         # Fill table
-        self.fill_data(start_point,indx)
+        self.fill_data(node.start_point, index)
 
         # Save last points before the last node
         self.slast = [s5x, s5y]
@@ -892,31 +907,30 @@ class DrawProfiles(ParentMapTool):
         self.ilast2 = [i3x, i3y]
 
 
-
     def fill_data(self, start_point, indx):
 
         # Fill top_elevation and node_id for all nodes
         # Fill top_elevation
-        plt.annotate(' ' + '\n' + str(round(self.memory[indx][1], 2)) + '\n' + ' ',
+        plt.annotate(' ' + '\n' + str(round(self.nodes[indx].top_elev, 2)) + '\n' + ' ',
                      xy=(Decimal(start_point), self.min_top_elev - Decimal(self.height_row * 2 + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Draw node_id
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
-                 self.memory[indx][14], fontsize=7.5,
+                 self.nodes[indx].code, fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
 
         # Fill y_max and elevation
         # 1st node : y_max,y2 and top_elev, elev2
         if indx == 0:
             # Fill y_max
-            plt.annotate(' ' + '\n' + str(round(self.memory[0][2], 2)) + '\n' + str(round(self.memory[0][10], 2)),
+            plt.annotate(' ' + '\n' + str(round(self.nodes[0].ymax, 2)) + '\n' + str(round(self.nodes[0].y1, 2)),
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
-            plt.annotate(' ' + '\n' + str(round(self.memory[0][13], 2)) + '\n' + str(round(self.memory[0][8], 2)),
+            plt.annotate(' ' + '\n' + str(round(self.nodes[0].elev, 2)) + '\n' + str(round(self.nodes[0].elev1, 2)),
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
@@ -925,13 +939,13 @@ class DrawProfiles(ParentMapTool):
         elif indx == self.n-1:
             pass
             # Fill y_max
-            plt.annotate(str(round(self.memory[indx-1][11], 2)) + '\n' + str(round(self.memory[indx][2], 2)) + '\n' + ' ',
+            plt.annotate(str(round(self.nodes[indx-1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + ' ',
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
-            plt.annotate(str(round(self.memory[indx-1][9], 2)) + '\n' + str(round(self.memory[indx][13], 2)) + '\n' + ' ',
+            plt.annotate(str(round(self.nodes[indx-1].elev2, 2)) + '\n' + str(round(self.nodes[indx].elev, 2)) + '\n' + ' ',
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
@@ -939,13 +953,13 @@ class DrawProfiles(ParentMapTool):
 
         else:
             # Fill y_max
-            plt.annotate(str(round(self.memory[indx-1][11], 2)) + '\n' + str(round(self.memory[indx][2], 2)) + '\n' + str(round(self.memory[indx][10], 2)),
+            plt.annotate(str(round(self.nodes[indx-1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + str(round(self.nodes[indx].y1, 2)),
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
                              rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
-            plt.annotate(str(round(self.memory[indx-1][9], 2)) + '\n' + str(round(self.memory[indx][13], 2)) + '\n' + str(round(self.memory[indx][8], 2)),
+            plt.annotate(str(round(self.nodes[indx-1].elev2, 2)) + '\n' + str(round(self.nodes[indx].elev, 2)) + '\n' + str(round(self.nodes[indx].elev1, 2)),
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
                              rotation='vertical', horizontalalignment='center', verticalalignment='center')
@@ -954,43 +968,43 @@ class DrawProfiles(ParentMapTool):
         if indx != self.n - 1:
             # Draw diameter
             center = self.gis_length[indx + 1] / 2
-            plt.text(center + start_point, self.min_top_elev - 1*self.height_row - Decimal(0.45)*self.height_row, round(self.memory[indx][5], 2),
+            plt.text(center + start_point, self.min_top_elev - 1*self.height_row - Decimal(0.45)*self.height_row, round(self.nodes[indx].cat_geom, 2),
                      fontsize=7.5,horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
             # Draw slope / length
-            slope = str(round((self.memory[indx][7]*100),2))
-            length = str(round(self.gis_length[indx+1],2))
+            slope = str(round((self.nodes[indx].slope * 100), 2))
+            length = str(round(self.gis_length[indx+1], 2))
 
             plt.text(center + start_point, self.min_top_elev - 1*self.height_row - Decimal(0.8)*self.height_row, slope + '%/' + length,
                      fontsize=7.5, horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
 
 
-    def draw_last_node(self, start_point, top_elev, ymax, geom1, node_id, z1, z2, cat_geom1,  node_1, node_2, indx):  #@UnusedVariable
+    def draw_last_node(self, node, prev_node, index):
 
-        if node_id == node_2:
-            z=z2
+        if node.node_id == prev_node.node_2:
+            z = prev_node.z2
         else:
-            z=z1
+            z = prev_node.z1
 
         # TODO:: comentar lista slast i ilast
         s1x = self.slast[0]
         s1y = self.slast[1]
-        s2x = start_point - geom1/2
-        s2y = top_elev - ymax + z + cat_geom1
-        s3x = start_point - geom1/2
-        s3y = top_elev
-        s4x = start_point + geom1 /2
-        s4y = top_elev
+        s2x = node.start_point - node.geom / 2
+        s2y = node.top_elev - node.ymax + z + prev_node.cat_geom
+        s3x = node.start_point - node.geom / 2
+        s3y = node.top_elev
+        s4x = node.start_point + node.geom /2
+        s4y = node.top_elev
 
 
         # Get inferior points
         i1x = self.ilast[0]
         i1y = self.ilast[1]
-        i2x = start_point - geom1/2
-        i2y = top_elev - ymax + z
-        i3x = start_point - geom1/2
-        i3y = top_elev - ymax
-        i4x = start_point + geom1 / 2
-        i4y = top_elev - ymax
+        i2x = node.start_point - node.geom / 2
+        i2y = node.top_elev - node.ymax + z
+        i3x = node.start_point - node.geom / 2
+        i3y = node.top_elev - node.ymax
+        i4x = node.start_point + node.geom / 2
+        i4y = node.top_elev - node.ymax
 
         # Create list points
         xinf = [i1x, i2x, i3x, i4x]
@@ -1013,34 +1027,32 @@ class DrawProfiles(ParentMapTool):
         self.first_top_x = self.slast2[0]
         self.first_top_y = self.slast2[1]
 
-        self.node_top_x = start_point
-        self.node_top_y = top_elev
+        self.node_top_x = node.start_point
+        self.node_top_y = node.top_elev
 
         # DRAW TABLE
         # DRAW TABLE-MARKS
-        self.draw_marks(start_point)
+        self.draw_marks(node.start_point)
 
         # Fill table
-        self.fill_data(start_point, indx)
-
-
+        self.fill_data(node.start_point, index)
 
 
     def set_table_parameters(self):
 
         # Search y coordinate min_top_elev ( top_elev- ymax)
-        self.min_top_elev = self.memory[0][1] - self.memory[0][2]
+        self.min_top_elev = self.nodes[0].top_elev - self.nodes[0].ymax
         for i in range(1, self.n):
-            if (self.memory[i][1] - self.memory[i][2]) < self.min_top_elev:
-                self.min_top_elev = self.memory[i][1] - self.memory[i][2]
+            if (self.nodes[i].top_elev - self.nodes[i].ymax) < self.min_top_elev:
+                self.min_top_elev = self.nodes[i].top_elev - self.nodes[i].ymax
         # Search y coordinate max_top_elev
-        self.max_top_elev = self.memory[0][1]
+        self.max_top_elev = self.nodes[0].top_elev
         for i in range(1, self.n):
-            if (self.memory[i][1]) > self.max_top_elev:
-                self.max_top_elev = self.memory[i][1]
+            if self.nodes[i].top_elev > self.max_top_elev:
+                self.max_top_elev = self.nodes[i].top_elev
 
         # Calculating dimensions of x-fixed part of table
-        self.fix_x = Decimal(0.15) * self.memory[self.n - 1][0]
+        self.fix_x = Decimal(0.15) * self.nodes[self.n - 1].start_point
 
         # Calculating dimensions of y-fixed part of table
         # Height y = height of table + height of graph
@@ -1057,35 +1069,35 @@ class DrawProfiles(ParentMapTool):
 
         # DRAWING TABLE
         # Draw horizontal lines
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - self.height_row, self.min_top_elev - self.height_row]
         plt.plot(x, y, 'black',zorder=100)
 
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - 2 * self.height_row, self.min_top_elev - 2 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
 
         # Draw horizontal(shorter) lines
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 3 * self.height_row, self.min_top_elev - 3 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 4 * self.height_row, self.min_top_elev - 4 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
 
         # Last two lines
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - 5 * self.height_row, self.min_top_elev - 5 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - 6 * self.height_row, self.min_top_elev - 6 * self.height_row]
         plt.plot(x, y, 'black',zorder=100)
 
 
     def draw_coordinates(self):
 
-        start_point = self.memory[self.n - 1][0]
-        geom1 = self.memory[self.n - 1][6]
+        start_point = self.nodes[self.n - 1].start_point
+        geom1 = self.nodes[self.n - 1].geom
 
         # Draw coocrdinates
         x = [0, 0]
@@ -1122,10 +1134,10 @@ class DrawProfiles(ParentMapTool):
     def draw_grid(self):
 
         # Values right y_ordinate_max
-        start_point = self.memory[self.n-1][0]
-        geom1 = self.memory[self.n-1][6]
+        start_point = self.nodes[self.n-1].start_point
+        geom1 = self.nodes[self.n-1].geom
         plt.annotate('P.C. '+str(round(self.min_top_elev - 1 * self.height_row,2)) + '\n' + ' ',
-                     xy=(0 - geom1*Decimal(1.5) , self.min_top_elev - 1 * self.height_row),
+                     xy=(0 - geom1 * Decimal(1.5) , self.min_top_elev - 1 * self.height_row),
                      fontsize=6.5, horizontalalignment='right', verticalalignment='center')
 
         # Values right x_ordinate_min
@@ -1175,7 +1187,7 @@ class DrawProfiles(ParentMapTool):
         plt.plot(x, y, 'green', linestyle='dashed')
 
     
-    def shortest_path(self,start_point, end_point):
+    def shortest_path(self, start_point, end_point):
         """ Calculating shortest path using dijkstra algorithm """
         
         self.arc_id = []
@@ -1204,7 +1216,7 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Clear list of arcs and nodes - preparing for new profile
-        sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost" 
+        sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
                " FROM v_anl_pgrouting_arc', "
                + str(rstart_point) + ", " + str(rend_point) + ", false")
         if self.version == '2':
@@ -1356,7 +1368,6 @@ class DrawProfiles(ParentMapTool):
         # Clear list of nodes and arcs
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
-        self.nodes = []
         self.arcs = []
         self.start_end_node = []
         self.start_end_node = [None, None]
