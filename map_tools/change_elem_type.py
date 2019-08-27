@@ -138,14 +138,18 @@ class ChangeElemType(ParentMapTool):
         project_type = self.controller.get_project_type()         
         if project_type == 'ws':
             node_type = feature.attribute('nodetype_id')
+            self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self.filter_catalog))
         elif project_type == 'ud':
             node_type = feature.attribute('node_type')
+            sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
+            rows = self.controller.get_rows(sql)
+            utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
         self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
         self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
-        self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self.filter_catalog))
+
 
         # Fill 1st combo boxes-new system node type
         sql = ("SELECT DISTINCT(id) FROM node_type "
