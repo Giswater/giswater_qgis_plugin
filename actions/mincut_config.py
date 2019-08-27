@@ -100,8 +100,9 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_min_edit.show()
 
-    def get_clients_codes(self, qtable):
 
+    def get_clients_codes(self, qtable):
+        field_code = self.settings.value('customized_actions/field_code', 'code')
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -113,10 +114,10 @@ class MincutConfig(ParentAction):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
             inf_text += "\n\nMincut: " + str(id_) + ""
-            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, anl_cause"
+            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause "
                    "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
-                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
-                   "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
+                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
+                   "JOIN " + self.schema_name + ".anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    "WHERE result_id = " + str(id_))
 
             rows = self.controller.get_rows(sql, commit=True, log_sql=True)
@@ -136,31 +137,35 @@ class MincutConfig(ParentAction):
 
 
     def call_sms_script(self, qtable):
-
+        field_code = self.settings.value('customized_actions/field_code', 'code')
         selected_list = qtable.selectionModel().selectedRows()
         list_mincut_id = []
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, anl_cause, notified "
+            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause "
                    "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
-                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
-                   "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
+                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
+                   "JOIN " + self.schema_name + ".anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    "WHERE result_id = " + str(id_))
 
             rows = self.controller.get_rows(sql, commit=True, log_sql=True)
             if not rows:
                 print("NOT ROWS")
                 continue
+
             from_date = ""
             if rows[0][1] is not None:
                 from_date = str(rows[0][1].strftime('%d/%m/%Y %H:%M'))
+
             to_date = ""
             if rows[0][2] is not None:
                 to_date = str(rows[0][2].strftime('%d/%m/%Y %H:%M'))
+
             _cause = ""
             if rows[0][3] is not None:
                 _cause = rows[0][3]
+
             list_clients = []
             list_mincut_id.append(id_)
             for row in rows:
