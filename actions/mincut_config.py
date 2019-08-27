@@ -123,16 +123,16 @@ class MincutConfig(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-
+        field_code = self.settings.value('customized_actions/field_code', 'code')
         inf_text = "Are you sure you want to send smd to this clients?"
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
             inf_text += "\n\nMincut: " + str(id_) + ""
-            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, anl_cause "
-                   "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
-                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
-                   "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
+            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause "
+                   "FROM anl_mincut_result_hydrometer AS t1 "
+                   "JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
+                   "JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    "WHERE result_id = " + str(id_))
 
             rows = self.controller.get_rows(sql, commit=True, log_sql=True)
@@ -153,14 +153,15 @@ class MincutConfig(ParentAction):
 
     def call_sms_script(self, qtable):
         selected_list = qtable.selectionModel().selectedRows()
+        field_code = self.settings.value('customized_actions/field_code', 'code')
         list_mincut_id = []
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            sql = ("SELECT code, t2.forecast_start, t2.forecast_end, anl_cause, notified "
-                   "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
-                   "JOIN " + self.schema_name + ".ext_rtc_hydrometer ON t1.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint "
-                   "JOIN " + self.schema_name + ".anl_mincut_result_cat as t2 ON t1.result_id = t2.id "
+            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause "
+                   "FROM anl_mincut_result_hydrometer AS t1 "
+                   "JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
+                   "JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    "WHERE result_id = " + str(id_))
 
             rows = self.controller.get_rows(sql, commit=True, log_sql=True)
