@@ -81,3 +81,12 @@ VALUES (2744, 'gw_trg_typevalue_fk', 'utils', 'trigger', 'Control foreign keys c
 UPDATE audit_cat_function SET   
 return_type='[{"widgetname":"exploitation", "label":"Exploitation:", "widgettype":"text", "datatype":"integer","layoutname":"grl_option_parameters","layout_order":1,"value":null},{"widgetname":"inserIntoNode", "label":"Direct insert into node table:", "widgettype":"check", "datatype":"boolean","layoutname":"grl_option_parameters","layout_order":2,"value":"true"},{"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layout_order":3,"value":0.01}]'
 WHERE function_name='gw_fct_built_nodefromarc';
+
+
+UPDATE audit_cat_function SET isparametric = TRUE, istoolbox = TRUE,
+return_type = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layout_order":1,"value":""},{"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]'
+WHERE function_name = 'gw_fct_plan_audit_check_data';
+
+UPDATE audit_cat_function SET isparametric = TRUE, istoolbox = TRUE,
+return_type = '[{"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]'
+WHERE function_name = 'gw_fct_anl_arc_intersection';

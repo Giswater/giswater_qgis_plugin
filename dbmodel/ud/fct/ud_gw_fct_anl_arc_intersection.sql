@@ -49,16 +49,16 @@ BEGIN
 	    
 	-- Computing process
 	IF v_array != '()' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, arc_id_aux, the_geom_p, arccat_id)
+		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, arc_id_aux, the_geom_p, the_geom, arccat_id, state)
 		SELECT a.arc_id AS arc_id_1, a.expl_id, 9, b.arc_id AS arc_id_2, 
-		(ST_Dumppoints(ST_Multi(ST_Intersection(a.the_geom, b.the_geom)))).geom AS the_geom, a.arccat_id
+		(ST_Dumppoints(ST_Multi(ST_Intersection(a.the_geom, b.the_geom)))).geom AS the_geom_p,a.the_geom, a.arccat_id, a.state
 		FROM '||v_worklayer||' AS a, '||v_worklayer||' AS b 
 		WHERE a.state=1 AND b.state=1 AND ST_Intersects(a.the_geom, b.the_geom) AND a.arc_id != b.arc_id AND NOT ST_Touches(a.the_geom, b.the_geom)
 		AND a.the_geom is not null and b.the_geom is not null AND a.arc_id IN '||v_array||';';
 	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, arc_id_aux, the_geom_p, arccat_id)
+		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, arc_id_aux, the_geom_p,the_geom, arccat_id, state)
 		SELECT a.arc_id AS arc_id_1, a.expl_id, 9, b.arc_id AS arc_id_2, 
-		(ST_Dumppoints(ST_Multi(ST_Intersection(a.the_geom, b.the_geom)))).geom AS the_geom, a.arccat_id
+		(ST_Dumppoints(ST_Multi(ST_Intersection(a.the_geom, b.the_geom)))).geom AS the_geom_p,a.the_geom, a.arccat_id, a.state
 		FROM '||v_worklayer||' AS a, '||v_worklayer||' AS b 
 		WHERE a.state=1 AND b.state=1 AND ST_Intersects(a.the_geom, b.the_geom) AND a.arc_id != b.arc_id AND NOT ST_Touches(a.the_geom, b.the_geom)
 		AND a.the_geom is not null and b.the_geom is not null;';
