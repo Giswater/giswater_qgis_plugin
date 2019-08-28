@@ -1,8 +1,8 @@
--- Function: SCHEMA_NAME.gw_trg_notify_trigger()
+-- Function: SCHEMA_NAME.gw_trg_notify()
 
--- DROP FUNCTION SCHEMA_NAME.gw_trg_notify_trigger();
+-- DROP FUNCTION SCHEMA_NAME.gw_trg_notify();
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_notify_trigger()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_notify()
   RETURNS trigger AS
 $BODY$
 DECLARE
@@ -116,5 +116,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_trg_notify_trigger()
-  OWNER TO postgres;
