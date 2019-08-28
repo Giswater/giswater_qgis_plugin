@@ -88,3 +88,5 @@ CREATE TABLE typevalue_fk(
   target_table text,
   target_field text
 );
+
+ALTER TABLE audit_cat_table ADD COLUMN notify_action json;
