@@ -103,3 +103,18 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify');
 ------
+
+INSERT INTO audit_cat_table VALUES ('om_visit_type', 'O&M', 'Catalog of visit types', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_class', 'O&M', 'Catalog of visit classes', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_class_x_parameter', 'O&M', 'Table that relates visit parameters with visit classes', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_lot', 'O&M', 'Table with all lots that took place', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_lot_x_arc', 'O&M', 'Table of arcs related to lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_lot_x_node', 'O&M', 'Table of nodes related to lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_lot_x_connec', 'O&M', 'Table of connecs related to lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('selector_lot', 'Selector', 'Selector of lots', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('cat_team', 'Catalog', 'Catalog of teams', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_team_x_user', 'O&M', 'Table that relates users with teams', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_filetype_x_extension', 'O&M', 'Catalog of diferent filetypes and their extensions used in visits', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('om_visit_lot_x_user', 'O&M', 'Table that saves information about works made by a user in relation to one lot', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+
+INSERT INTO audit_cat_table VALUES ('ve_visit_arc_singlevent', 'O&M', 'Editable view that saves visits to arcs and its event data', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
