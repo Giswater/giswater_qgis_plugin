@@ -69,7 +69,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 function_name = "gw_fct_flow_exit"
                 
             elem_id = self.snapped_feat.attribute('node_id')
-            sql = "SELECT " + function_name + "('" + str(elem_id) + "');"
+            sql = f"SELECT {function_name} ('{elem_id}');"
             result = self.controller.execute_sql(sql)
             if result:
                 # Get 'arc' and 'node' list and select them
@@ -86,23 +86,23 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
     def select_features(self, elem_type):
  
         if self.index_action == '56':
-            tablename = "anl_flow_" + elem_type
+            tablename = f"anl_flow_{elem_type}"
             where = " WHERE context = 'Flow trace'"
         else:
-            tablename = "anl_flow_" + elem_type
+            tablename = f"anl_flow_{elem_type}"
             where = " WHERE context = 'Flow exit'"
             
-        sql = "SELECT * FROM " + tablename
+        sql = f"SELECT * FROM {tablename}"
         sql = sql + where
-        sql += " ORDER BY " + elem_type + "_id"
+        sql += f" ORDER BY {elem_type}_id"
         rows = self.controller.get_rows(sql)
         if not rows:
             return
             
         # Build an expression to select them
-        aux = "\""+elem_type+"_id\" IN ("
-        for row in rows:            
-            aux += "'" + str(row[1]) + "', "
+        aux = f'"{elem_type}_id" IN ('
+        for row in rows:
+            aux += f"'{row[1]}', "
         aux = aux[:-2] + ")"
 
         # Get a featureIterator from this expression
@@ -113,7 +113,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             return
 
         # Select features with these id's
-        tablename = 'v_edit_' + elem_type
+        tablename = f'v_edit_{elem_type}'
         layer = self.controller.get_layer_by_tablename(tablename)
         if layer:
             it = layer.getFeatures(QgsFeatureRequest(expr))

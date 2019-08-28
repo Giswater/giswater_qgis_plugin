@@ -318,6 +318,7 @@ class SnappingConfigManager(object):
             if select_feature:
                 self.select_snapped_feature(result, feature_id)
         except:
+            # TODO Elies: e is not defined
             self.controller.log_info(str(e))
         finally:
             return snapped_feat
