@@ -29,7 +29,6 @@ INSERT INTO cat_mat_node VALUES ('FC-FC-FC', 'Fiberconcret', 'c:\\users\users\ca
 INSERT INTO cat_mat_node VALUES ('FC', 'Fiberconcret', 'c:\\users\users\catalog.pdf');
 INSERT INTO cat_mat_node VALUES ('FD-FD-PVC', 'Iron-Iron-PVC', 'c:\\users\users\catalog.pdf');
 
-INSERT INTO cat_arc_shape VALUES ('CIRCULAR', 'CIRCULAR', 'ws_shape.png',null, true);
 
 INSERT INTO cat_arc VALUES ('PVC63-PN10', 'PIPE', 'PVC', '10', '63', 56.70000, 63.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc63_pn10.svg', 0.10, 0.10, 0.06, 0.0031, 0.86, 3.15, 'm', 'A_PVC63_PN10', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
 INSERT INTO cat_arc VALUES ('PVC110-PN16', 'PIPE', 'PVC', '16', '110', 99.00000, 110.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc110_pn16.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PVC110_PN16', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');

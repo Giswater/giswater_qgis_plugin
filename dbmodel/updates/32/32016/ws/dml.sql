@@ -73,3 +73,5 @@ DELETE FROM inp_typevalue WHERE typevalue='inp_value_opti_valvemode';
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 1, 'EPA TABLES', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 2, 'INVENTORY VALUES', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 3, 'MINCUT RESULTS', NULL);
+
+INSERT INTO cat_arc_shape VALUES ('CIRCULAR', 'CIRCULAR', 'ws_shape.png',null, true) ON CONFLICT ON CONSTRAINT cat_arc_shape_pkey DO NOTHING;
