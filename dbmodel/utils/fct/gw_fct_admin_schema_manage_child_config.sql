@@ -89,7 +89,7 @@ BEGIN
 		INTO v_orderby;
 
 		--transform data and widget types
-		IF rec.data_type = 'character varying' THEN
+		IF rec.data_type = 'character varying' OR  rec.data_type = 'text' THEN
 			v_datatype='string';
 			v_widgettype='text';
 		ELSIF rec.data_type = 'numeric' THEN
