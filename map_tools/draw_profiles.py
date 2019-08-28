@@ -158,9 +158,9 @@ class DrawProfiles(ParentMapTool):
             return
         
         # Check if id of profile already exists in DB
-        sql = ("SELECT DISTINCT(profile_id)"
-               " FROM anl_arc_profile_value"
-               " WHERE profile_id = '" + profile_id + "'")
+        sql = (f"SELECT DISTINCT(profile_id) "
+               f"FROM anl_arc_profile_value "
+               f"WHERE profile_id = '{profile_id}'")
         row = self.controller.get_row(sql)
         if row:
             message = "Selected 'profile_id' already exist in database"
@@ -174,8 +174,8 @@ class DrawProfiles(ParentMapTool):
 
         sql = ""
         for i in range(n):
-            sql += ("INSERT INTO anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
-                    " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "');\n")
+            sql += (f"INSERT INTO anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
+                    f" VALUES ('{profile_id}', '{list_arc[i]}', '{start_point}', '{end_point}');\n")
         status = self.controller.execute_sql(sql)
         if not status:
             message = "Error inserting profile table, you need to review data"
@@ -259,7 +259,7 @@ class DrawProfiles(ParentMapTool):
             
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            sql = "SELECT parent_layer FROM " + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
+            sql = "SELECT parent_layer FROM cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
@@ -300,7 +300,7 @@ class DrawProfiles(ParentMapTool):
             
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            sql = "SELECT parent_layer FROM" + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
+            sql = "SELECT parent_layer FROM cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
@@ -437,17 +437,17 @@ class DrawProfiles(ParentMapTool):
         aux = ""
         if str(self.widget_point.objectName()) == "start_point":
             self.start_end_node[0] = self.widget_point.text()
-            aux = "node_id = '" + str(self.start_end_node[0]) + "'"
+            aux = f"node_id = '{self.start_end_node[0]}'"
 
         if str(self.widget_point.objectName()) == "end_point":
             self.start_end_node[1] = self.widget_point.text()
-            aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
+            aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
 
         if str(self.widget_point.objectName()) == "list_sdditional_points":
             # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
-            aux = "node_id = '" + str(self.start_end_node[0]) + "' OR node_id = '" + str(self.start_end_node[1]) + "'"
+            aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
             for i in range(2, len(self.start_end_node)):
-                aux += " OR node_id = '" + str(self.start_end_node[i]) + "'"
+                aux += f" OR node_id = '{self.start_end_node[i]}'"
 
         # Select snapped features
         selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
@@ -469,12 +469,9 @@ class DrawProfiles(ParentMapTool):
 
         # Start drawing
         # Draw first | start node
-        # Function self.draw_first_node(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1)
         self.draw_first_node(self.nodes[0])
         
         # Draw nodes between first and last node
-        # Function self.draw_nodes(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, index)
-
         for i in range(1, self.n - 1):
 
             self.draw_nodes(self.nodes[i], self.nodes[i - 1], i)
@@ -551,9 +548,9 @@ class DrawProfiles(ParentMapTool):
         # Get length (gis_length) of arcs and save them in separate list ( self.gis_length )
         for arc_id in self.list_of_selected_arcs:
             # Get gis_length from v_edit_arc
-            sql = ("SELECT gis_length"
-                   " FROM v_edit_arc"
-                   " WHERE arc_id = '" + str(arc_id) + "'")
+            sql = (f"SELECT gis_length "
+                   f"FROM v_edit_arc "
+                   f"WHERE arc_id = '{arc_id}'")
             row = self.controller.get_row(sql)
             if row:
                 self.gis_length.append(row[0])
@@ -569,21 +566,20 @@ class DrawProfiles(ParentMapTool):
     def fill_memory(self):
         """ Get parameters from data base. Fill self.nodes with parameters postgres """
 
-        self.nodes = []
+        self.nodes.clear()
         bad_nodes_id = []
         
-        # Get parameters and fill the memory
+        # Get parameters and fill the nodes
         for i, node_id in enumerate(self.node_id):
-            # self.parameters : list of parameters for one node
-            # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
-    
+            
+            # parameters : list of parameters for one node
             parameters = NodeData()
             parameters.start_point = self.start_point[i]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
-            sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code "
-                   " FROM v_edit_node "
-                   " WHERE node_id = '" + str(node_id) + "'")
+            sql = (f"SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code "
+                   f"FROM v_edit_node "
+                   f"WHERE node_id = '{node_id}'")
                 # query for nodes
                 # SELECT elevation AS top_elev, depth AS ymax, top_elev-depth AS sys_elev, nodecat_id, code"
 
@@ -595,9 +591,9 @@ class DrawProfiles(ParentMapTool):
                 # Check if we have all data for drawing
                 for x in range(len(columns)):
                     if row[x] is None:
-                        sql = ("SELECT value::decimal(12,3) "
-                               "FROM  config_param_system "
-                               "WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        sql = (f"SELECT value::decimal(12,3) "
+                               f"FROM config_param_system "
+                               f"WHERE parameter = '{columns[x]}_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
@@ -611,9 +607,9 @@ class DrawProfiles(ParentMapTool):
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
             # Geom1 from cat_node
-            sql = ("SELECT geom1 "
-                   "FROM cat_node "
-                   "WHERE id = '" + str(nodecat_id) + "'")
+            sql = (f"SELECT geom1 "
+                   f"FROM cat_node "
+                   f"WHERE id = '{nodecat_id}'")
             row = self.controller.get_row(sql)
             columns = ['geom1']
             if row:
@@ -622,24 +618,24 @@ class DrawProfiles(ParentMapTool):
                 # Check if we have all data for drawing
                 for x in range(0, len(columns)):
                     if row[x] is None:
-                        sql = ("SELECT value::decimal(12,3) "
-                               "FROM config_param_system "
-                               "WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        sql = (f"SELECT value::decimal(12,3) "
+                               f"FROM config_param_system "
+                               f"WHERE parameter = '{columns[x]}_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
                 parameters.geom = row[0]
 
-            # Set node_id in memory
+            # Set node_id in nodes
             parameters.node_id = node_id
             self.nodes.append(parameters)
 
         n = 0
         for element_id in self.arc_id:
 
-            sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, sys_y1 AS y1, sys_y2 AS y2, slope, node_1, node_2 "
-                   "FROM v_edit_arc "
-                   "WHERE arc_id = '" + str(element_id) + "'")
+            sql = (f"SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, sys_y1 AS y1, sys_y2 AS y2, slope, node_1, node_2 "
+                   f"FROM v_edit_arc "
+                   f"WHERE arc_id = '{element_id}'")
             row = self.controller.get_row(sql)
 
             # TODO:: v_nodes -> query for arcs
@@ -658,9 +654,9 @@ class DrawProfiles(ParentMapTool):
                     bad_nodes_id.append(element_id)
                 for x in range(0, len(columns)):
                     if row[x] is None:
-                        sql = ("SELECT value::decimal(12,3) "
-                               "FROM config_param_system "
-                               "WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        sql = (f"SELECT value::decimal(12,3) "
+                               f"FROM config_param_system "
+                               f"WHERE parameter = '{columns[x]}_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
@@ -684,7 +680,7 @@ class DrawProfiles(ParentMapTool):
         self.controller.show_info_box(message, "Info", str(bad_nodes_id))
 
 
-    def draw_first_node(self, node): #@UnusedVariable
+    def draw_first_node(self, node):
         """ Draw first node """
 
         if node.node_id == node.node_1:
@@ -714,7 +710,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x]
         ysup = [s1y, s2y, s3y]
 
-        sql = ("SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
+        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row is not None:
             row = json.loads(row[0])
@@ -910,7 +906,6 @@ class DrawProfiles(ParentMapTool):
     def fill_data(self, start_point, indx):
 
         # Fill top_elevation and node_id for all nodes
-        # Fill top_elevation
         plt.annotate(' ' + '\n' + str(round(self.nodes[indx].top_elev, 2)) + '\n' + ' ',
                      xy=(Decimal(start_point), self.min_top_elev - Decimal(self.height_row * 2 + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
@@ -1012,7 +1007,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x, s4x, i4x]
         ysup = [s1y, s2y, s3y, s4y, i4y]
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
+        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row is not None:
             row = json.loads(row[0])
@@ -1166,7 +1161,8 @@ class DrawProfiles(ParentMapTool):
             plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1 )),
                 fontsize=6.5, horizontalalignment='center')
 
-
+    
+    # TODO: Not used
     def draw_arc(self):
 
         x = [self.x, self.x2]
@@ -1196,17 +1192,17 @@ class DrawProfiles(ParentMapTool):
         self.rarc_id = []
 
         rstart_point = None
-        sql = ("SELECT rid"
-               " FROM v_anl_pgrouting_node"
-               " WHERE node_id = '" + start_point + "'")
+        sql = (f"SELECT rid "
+               f"FROM v_anl_pgrouting_node "
+               f"WHERE node_id = '{start_point}'")
         row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])
 
         rend_point = None
-        sql = ("SELECT rid"
-              " FROM v_anl_pgrouting_node"
-              " WHERE node_id = '" + end_point + "'")
+        sql = (f"SELECT rid "
+               f"FROM v_anl_pgrouting_node "
+               f"WHERE node_id = '{end_point}'")
         row = self.controller.get_row(sql)
         if row:
             rend_point = int(row[0])
@@ -1216,9 +1212,9 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Clear list of arcs and nodes - preparing for new profile
-        sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
-               " FROM v_anl_pgrouting_arc', "
-               + str(rstart_point) + ", " + str(rend_point) + ", false")
+        sql = (f"SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
+               f" FROM v_anl_pgrouting_arc', {rstart_point}, {rend_point}, false")
+        
         if self.version == '2':
             sql += ", false"
         elif self.version == '3':
@@ -1244,34 +1240,34 @@ class DrawProfiles(ParentMapTool):
 
         for n in range(0, len(self.rarc_id)):
             # convert arc_ids
-            sql = ("SELECT arc_id"
-                   " FROM v_anl_pgrouting_arc"
-                   " WHERE id = '" +str(self.rarc_id[n]) + "'")
+            sql = (f"SELECT arc_id "
+                   f"FROM v_anl_pgrouting_arc "
+                   f"WHERE id = '{self.rarc_id[n]}'")
             row = self.controller.get_row(sql)
             if row:
                 self.arc_id.append(str(row[0]))
 
         for m in range(0, len(self.rnode_id)):
             # convert node_ids
-            sql = ("SELECT node_id"
-                   " FROM v_anl_pgrouting_node"
-                   " WHERE rid = '" + str(self.rnode_id[m]) + "'")
+            sql = (f"SELECT node_id "
+                   f"FROM v_anl_pgrouting_node "
+                   f"WHERE rid = '{self.rnode_id[m]}'")
             row = self.controller.get_row(sql)
             if row:
                 self.node_id.append(str(row[0]))
 
         # Select arcs of the shortest path
         for element_id in self.arc_id:
-            sql = ("SELECT sys_type"
-                   " FROM v_edit_arc"
-                   " WHERE arc_id = '" + str(element_id) + "'")
+            sql = (f"SELECT sys_type "
+                   f"FROM v_edit_arc "
+                   f"WHERE arc_id = '{element_id}'")
             row = self.controller.get_row(sql)
             if not row:
                 return
 
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            sql = "SELECT parent_layer FROM " + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
+            sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
@@ -1285,21 +1281,21 @@ class DrawProfiles(ParentMapTool):
 
         # Select nodes of shortest path on layers v_edit_man_|feature
         for element_id in self.node_id:
-            sql = ("SELECT sys_type"
-                   " FROM v_edit_node"
-                   " WHERE node_id = '" + str(element_id) + "'")
+            sql = (f"SELECT sys_type "
+                   f"FROM v_edit_node "
+                   f"WHERE node_id = '{element_id}'")
             row = self.controller.get_row(sql)
             if not row:
                 return
 
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
-            sql = "SELECT parent_layer FROM " + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
+            sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
             for row in self.node_id:
-                aux += "node_id = '" + str(row) + "' OR "
+                aux += f"node_id = '{row}' OR "
             aux = aux[:-3] + ""
 
             # Select snapped features
@@ -1307,9 +1303,9 @@ class DrawProfiles(ParentMapTool):
             self.layer_feature.selectByIds([a.id() for a in selection])
 
         # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
-        expr_filter = "\"arc_id\" IN ("
+        expr_filter = '"arc_id" IN ('
         for i in range(len(self.arc_id)):
-            expr_filter += "'" + str(self.arc_id[i]) + "', "
+            expr_filter += f"'{self.arc_id[i]}', "
         expr_filter = expr_filter[:-2] + ")"
         (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable
         if not is_valid:
@@ -1541,21 +1537,20 @@ class DrawProfiles(ParentMapTool):
 
         if self.rotation_vd_exist:
             if str(rotation) != 'null':
-                sql = ("UPDATE " + tablename + ""
-                       " SET value = '" + str(rotation) + "'"
-                       " WHERE parameter = 'rotation_vdefault'")
+                sql = (f"UPDATE {tablename} "
+                       f"SET value = '{rotation}' "
+                       f"WHERE parameter = 'rotation_vdefault'")
             else:
-                sql = ("UPDATE " + tablename + ""
-                       " SET value = '0'"
-                       " WHERE parameter = 'rotation_vdefault'")
+                sql = (f"UPDATE {tablename} "
+                       f"SET value = '0' "
+                       f"WHERE parameter = 'rotation_vdefault'")
         else:
             if str(rotation) != 'null':
-                sql = ("INSERT INTO " + tablename + "(parameter, value, cur_user)"
-                       " VALUES ('rotation_vdefault', '" + str(
-                    rotation) + "', current_user)")
+                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
+                       f"VALUES ('rotation_vdefault', '{rotation}', current_user)")
             else:
-                sql = ("INSERT INTO " + tablename + "(parameter, value, cur_user)"
-                       " VALUES ('rotation_vdefault', '0', current_user)")
+                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
+                       f"VALUES ('rotation_vdefault', '0', current_user)")
 
         if sql:
             self.controller.execute_sql(sql)
@@ -1576,17 +1571,17 @@ class DrawProfiles(ParentMapTool):
             self.rarc_id = []
 
             rstart_point = None
-            sql = ("SELECT rid"
-                   " FROM v_anl_pgrouting_node"
-                   " WHERE node_id = '" + start_point + "'")
+            sql = (f"SELECT rid "
+                   f"FROM v_anl_pgrouting_node "
+                   f"WHERE node_id = '{start_point}'")
             row = self.controller.get_row(sql)
             if row:
                 rstart_point = int(row[0])
 
             rend_point = None
-            sql = ("SELECT rid"
-                   " FROM v_anl_pgrouting_node"
-                   " WHERE node_id = '" + end_point + "'")
+            sql = (f"SELECT rid "
+                   f"FROM v_anl_pgrouting_node "
+                   f"WHERE node_id = '{end_point}'")
             row = self.controller.get_row(sql)
             if row:
                 rend_point = int(row[0])
@@ -1596,9 +1591,8 @@ class DrawProfiles(ParentMapTool):
                 return
 
             # Clear list of arcs and nodes - preparing for new profile
-            sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
-                   " FROM v_anl_pgrouting_arc', "
-                   + str(rstart_point) + ", " + str(rend_point) + ", false")
+            sql = (f"SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost "
+                   f"FROM v_anl_pgrouting_arc', {rstart_point}, {rend_point}, false")
             if self.version == '2':
                 sql += ", false"
             elif self.version == '3':
@@ -1622,39 +1616,39 @@ class DrawProfiles(ParentMapTool):
 
             for n in range(0, len(self.rarc_id)):
                 # Convert arc_ids
-                sql = ("SELECT arc_id"
-                       " FROM v_anl_pgrouting_arc"
-                       " WHERE id = '" + str(self.rarc_id[n]) + "'")
+                sql = (f"SELECT arc_id "
+                       f"FROM v_anl_pgrouting_arc "
+                       f"WHERE id = '{self.rarc_id[n]}'")
                 row = self.controller.get_row(sql)
                 if row:
                     self.arc_id.append(str(row[0]))
 
             for m in range(0, len(self.rnode_id)):
                 # Convert node_ids
-                sql = ("SELECT node_id"
-                       " FROM v_anl_pgrouting_node"
-                       " WHERE rid = '" + str(self.rnode_id[m]) + "'")
+                sql = (f"SELECT node_id "
+                       f"FROM v_anl_pgrouting_node "
+                       f"WHERE rid = '{self.rnode_id[m]}'")
                 row = self.controller.get_row(sql)
                 if row:
                     self.node_id.append(str(row[0]))
 
             # Select arcs of the shortest path
             for element_id in self.arc_id:
-                sql = ("SELECT sys_type"
-                       " FROM v_edit_arc"
-                       " WHERE arc_id = '" + str(element_id) + "'")
+                sql = (f"SELECT sys_type "
+                       f"FROM v_edit_arc "
+                       f"WHERE arc_id = '{element_id}'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
-                sql = "SELECT parent_layer FROM " + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
+                sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
                 row = self.controller.get_row(sql, log_sql=True, commit=True)
                 self.layer_feature = self.controller.get_layer_by_tablename(row[0])
                 aux = ""
                 for row in self.arc_id:
-                    aux += "arc_id = '" + str(row) + "' OR "
+                    aux += f"arc_id = '{row}' OR "
                 aux = aux[:-3] + ""
 
                 # Select snapped features
@@ -1663,21 +1657,21 @@ class DrawProfiles(ParentMapTool):
 
             # Select nodes of shortest path on layers v_edit_man_|feature
             for element_id in self.node_id:
-                sql = ("SELECT sys_type"
-                       " FROM v_edit_node"
-                       " WHERE node_id = '" + str(element_id) + "'")
+                sql = (f"SELECT sys_type "
+                       f"FROM v_edit_node "
+                       f"WHERE node_id = '{element_id}'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
-                sql = "SELECT parent_layer FROM " + self.schema_name + ".cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
+                sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
                 row = self.controller.get_row(sql, log_sql=True, commit=True)
                 self.layer_feature = self.controller.get_layer_by_tablename(row[0])
                 aux = ""
                 for row in self.node_id:
-                    aux += "node_id = '" + str(row) + "' OR "
+                    aux += f"node_id = '{row}' OR "
                 aux = aux[:-3] + ""
 
                 # Select snapped features
@@ -1685,9 +1679,9 @@ class DrawProfiles(ParentMapTool):
                 self.layer_feature.selectByIds([a.id() for a in selection])
 
             # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
-            expr_filter = "\"arc_id\" IN ("
+            expr_filter = '"arc_id" IN ('
             for i in range(len(self.arc_id)):
-                expr_filter += "'" + str(self.arc_id[i]) + "', "
+                expr_filter += f"'{self.arc_id[i]}', "
             expr_filter = expr_filter[:-2] + ")"
             (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable
             if not is_valid:
@@ -1772,8 +1766,8 @@ class DrawProfiles(ParentMapTool):
         answer = self.controller.ask_question(message, "Delete profile", selected_profile)
         if answer:
             # Delete selected profile
-            sql = ("DELETE FROM anl_arc_profile_value"
-                   " WHERE profile_id = '" + str(selected_profile) + "'")
+            sql = (f"DELETE FROM anl_arc_profile_value "
+                   f"WHERE profile_id = '{selected_profile}'")
             status = self.controller.execute_sql(sql)
             if not status:
                 message = "Error deleting profile"

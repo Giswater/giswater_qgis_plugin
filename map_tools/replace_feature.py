@@ -89,8 +89,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
-            sql = ("SELECT builtdate FROM cat_work "
-                   "WHERE id = '" + str(work_id) + "'")
+            sql = (f"SELECT builtdate FROM cat_work "
+                   f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
@@ -111,7 +111,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         elif self.project_type == 'ud':
             feature_type = feature.attribute(self.feature_type_ud)
             if self.geom_type in ('node', 'connec'):
-                sql = "SELECT DISTINCT(id) FROM " + self.cat_table + " ORDER BY id"
+                sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
@@ -121,9 +121,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self.update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = ("SELECT DISTINCT(id) FROM " + self.geom_type + "_type "
-               "WHERE active is True "
-               "ORDER BY id")
+        sql = (f"SELECT DISTINCT(id) FROM {self.geom_type}_type "
+               f"WHERE active is True "
+               f"ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_replace, "feature_type_new", rows)
 
@@ -145,7 +145,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.controller.show_info_box(msg, "Info")
             return
 
-        sql = ("SELECT type FROM cat_feature WHERE id = '" + str(feature_type) + "'")
+        sql = f"SELECT type FROM cat_feature WHERE id = '{feature_type}'"
         row = self.controller.get_row(sql)
 
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -161,8 +161,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
-            sql = ("SELECT builtdate FROM cat_work "
-                   "WHERE id = '" + str(work_id) + "'")
+            sql = (f"SELECT builtdate FROM cat_work "
+                   f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
@@ -233,15 +233,15 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 self.controller.show_info_box(msg, "Warning")
             else:
                 # Check if this element already exists
-                sql = ("SELECT DISTINCT(id)"
-                       " FROM " + str(table_object) + ""
-                       " WHERE id = '" + str(cat_work_id) + "'")
+                sql = (f"SELECT DISTINCT(id) "
+                       f"FROM {table_object} "
+                       f"WHERE id = '{cat_work_id}'")
                 row = self.controller.get_row(sql, log_info=False, log_sql=True)
                 if row is None:
-                    sql = ("INSERT INTO cat_work (" + fields + ") VALUES (" + values + ")")
+                    sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                     self.controller.execute_sql(sql, log_sql=True)
 
-                    sql = ("SELECT id FROM cat_work ORDER BY id")
+                    sql = "SELECT id FROM cat_work ORDER BY id"
                     rows = self.controller.get_rows(sql)
                     if rows:
                         utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
@@ -267,9 +267,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if not widget:
             return
 
-        sql = ("SELECT DISTINCT(" + field_id + ") "
-               "FROM " + tablename + " "
-               "ORDER BY "+ field_id + "")
+        sql = (f"SELECT DISTINCT({field_id}) "
+               f"FROM {tablename} "
+               f"ORDER BY {field_id}")
         row = self.controller.get_rows(sql)
         for i in range(0, len(row)):
             aux = row[i]
@@ -298,16 +298,16 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if answer:
 
             # Get function input parameters
-            feature = '"type":"' + str(self.geom_type) + '"'
-            extras = '"old_feature_id":"' + str(self.feature_id) + '"'
-            extras += ', "workcat_id_end":"' + str(self.workcat_id_end_aux) + '"'
-            extras += ', "enddate":"' + str(self.enddate_aux) + '"'
-            extras += ', "keep_elements":"' + str(utils_giswater.isChecked(dialog, "keep_elements")) + '"'
+            feature = f'"type":"{self.geom_type}"'
+            extras = f'"old_feature_id":"{self.feature_id}"'
+            extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
+            extras += f', "enddate":"{self.enddate_aux}"'
+            extras += f', "keep_elements":"{utils_giswater.isChecked(dialog, "keep_elements")}"'
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
-            sql = ("SELECT " + str(function_name) + "($${" + body + "}$$)::text")
+            sql = f"SELECT {function_name}($${{{body}}}$$)::text"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row:
                 message = "Error replacing feature"
@@ -323,17 +323,17 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Force user to manage with state = 1 features
             current_user = self.controller.get_project_user()
-            sql = ("DELETE FROM selector_state "
-                   "WHERE state_id = 1 AND cur_user = '" + str(current_user) + "';"
-                   "\nINSERT INTO selector_state (state_id, cur_user) "
-                   "VALUES (1, '" + str(current_user) + "');")
+            sql = (f"DELETE FROM selector_state "
+                   f"WHERE state_id = 1 AND cur_user = '{current_user}';"
+                   f"\nINSERT INTO selector_state (state_id, cur_user) "
+                   f"VALUES (1, '{current_user}');")
             self.controller.execute_sql(sql)
 
             if feature_type_new != "null" and featurecat_id != "null":
                 # Get id of new generated feature
-                sql = ("SELECT " + self.geom_type + "_id "
-                       "FROM " + self.geom_view + " "
-                       "ORDER BY " + self.geom_type + "_id::int4 DESC LIMIT 1")
+                sql = (f"SELECT {self.geom_type}_id "
+                       f"FROM {self.geom_view} "
+                       f"ORDER BY {self.geom_type}_id::int4 DESC LIMIT 1")
                 row = self.controller.get_row(sql)
                 if row:
                     if self.geom_type == 'connec':
@@ -341,14 +341,14 @@ class ReplaceFeatureMapTool(ParentMapTool):
                     else:
                         field_cat_id = self.geom_type + "cat_id"
                     if self.geom_type != 'gully':
-                        sql = ("UPDATE " + self.geom_view + " "
-                               "SET " + field_cat_id + " = '" + str(featurecat_id) + "' "
-                               "WHERE " + self.geom_type + "_id = '" + str(row[0]) + "'")
+                        sql = (f"UPDATE {self.geom_view} "
+                               f"SET {field_cat_id} = '{featurecat_id}' "
+                               f"WHERE {self.geom_type}_id = '{row[0]}'")
                     self.controller.execute_sql(sql, log_sql=True)
                     if self.project_type == 'ud':
-                        sql = ("UPDATE " + self.geom_view + " "
-                               "SET " + self.geom_type + "_type = '" + str(feature_type_new) + "' "
-                               "WHERE " + self.geom_type + "_id = '" + str(row[0]) + "'")
+                        sql = (f"UPDATE {self.geom_view} "
+                               f"SET {self.geom_type}_type = '{feature_type_new}' "
+                               f"WHERE {self.geom_type}_id = '{row[0]}'")
                         self.controller.execute_sql(sql, log_sql=True)
 
                 message = "Values has been updated"
@@ -479,9 +479,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
             utils_giswater.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
-            sql = ("SELECT DISTINCT(id) "
-                   "FROM " + self.cat_table + " "
-                   "WHERE " + self.feature_type_ws + " = '" + str(feature_type_new) + "'")
+            sql = (f"SELECT DISTINCT(id) "
+                   f"FROM {self.cat_table} "
+                   f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
@@ -509,21 +509,21 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if wsoftware == 'ws':
             self.feature_type_new = feature_type_new
 
-        sql = ("SELECT DISTINCT(matcat_id) as matcat_id "
-               "FROM cat_" + geom_type)
+        sql = (f"SELECT DISTINCT(matcat_id) as matcat_id "
+               f"FROM cat_{geom_type}")
         if wsoftware == 'ws':
-            sql += " WHERE " + str(geom_type) + "type_id = '" + str(self.feature_type_new) + "'"
+            sql += f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
 
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.matcat_id, rows)
 
-        sql = ("SELECT DISTINCT(" + self.field2 + ") "
-               "FROM cat_" + geom_type)
+        sql = (f"SELECT DISTINCT({self.field2}) "
+               f"FROM cat_{geom_type}")
         if wsoftware == 'ws':
-            sql += " WHERE " + str(geom_type) + "type_id = '" + str(self.feature_type_new) + "'"
+            sql += f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
 
-        sql += " ORDER BY " + str(self.field2)
+        sql += f" ORDER BY {self.field2}"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
 
@@ -554,23 +554,24 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         # Get values from filters
         mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
-
+        
         # Set SQL query
         sql_where = ""
-        sql = ("SELECT DISTINCT(" + self.field2 + ") "
-               "FROM cat_" + geom_type)
+        sql = (f"SELECT DISTINCT({self.field2}) "
+               f"FROM cat_{geom_type}")
 
         # Build SQL filter
         if mats != "null":
+            # TODO: useless check?
             if sql_where == "":
                 sql_where = " WHERE"
-            sql_where += " matcat_id = '" + mats + "'"
+            sql_where += f" matcat_id = '{mats}'"
         if wsoftware == 'ws' and self.feature_type_new is not None:
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " " + geom_type + "type_id = '" + self.feature_type_new + "'"
+            sql_where += f" {geom_type}type_id = '{self.feature_type_new}'"
         sql += sql_where + " ORDER BY " + self.field2
 
         rows = self.controller.get_rows(sql)
@@ -587,35 +588,35 @@ class ReplaceFeatureMapTool(ParentMapTool):
         # Set SQL query
         sql_where = ""
         if wsoftware == 'ws' and geom_type != 'connec':
-            sql = "SELECT " + str(self.field3)
-            sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + str(self.field3) + "),'-','', 'g')) as x, " + str(self.field3)
+            sql = f"SELECT {self.field3}"
+            sql += f" FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM {self.field3}),'-','', 'g')) as x, {self.field3}"
         elif wsoftware == 'ws' and geom_type == 'connec':
-            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + str(self.field3) + ")) as " + str(self.field3)
+            sql = f"SELECT DISTINCT(TRIM(TRAILING ' ' from {self.field3})) as {self.field3}"
         else:
-            sql = "SELECT DISTINCT(" + self.field3 + ")"
-        sql += " FROM cat_" + str(geom_type)
+            sql = f"SELECT DISTINCT({self.field3})"
+        sql += f" FROM cat_{geom_type}"
 
         # Build SQL filter
         if wsoftware == 'ws' and self.feature_type_new is not None:
-            sql_where = " WHERE " + str(geom_type) + "type_id = '" + str(self.feature_type_new) + "'"
+            sql_where = f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
 
         if mats != "null":
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " matcat_id = '" + str(mats) + "'"
+            sql_where += f" matcat_id = '{mats}'"
 
         if filter2 is not None and filter2 != "null":
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " " + str(self.field2) + " = '" + str(filter2) + "'"
+            sql_where += f" {self.field2} = '{filter2}'"
         if wsoftware == 'ws' and geom_type != 'connec':
-            sql += sql_where + " ORDER BY x) AS " + str(self.field3)
+            sql += sql_where + f" ORDER BY x) AS {self.field3}"
         else:
-            sql += sql_where + " ORDER BY " + str(self.field3)
+            sql += sql_where + f" ORDER BY {self.field3}"
 
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter3, rows)
@@ -632,17 +633,17 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         # Set SQL query
         sql_where = ""
-        sql = ("SELECT DISTINCT(id) as id "
-               "FROM cat_" + geom_type)
+        sql = (f"SELECT DISTINCT(id) as id "
+               f"FROM cat_{geom_type}")
 
         if wsoftware == 'ws' and self.feature_type_new is not None:
-            sql_where = " WHERE " + geom_type + "type_id = '" + self.feature_type_new + "'"
+            sql_where = f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
         if mats != "null" and mats is not None:
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " matcat_id = '" + mats + "'"
+            sql_where += f" matcat_id = '{mats}'"
 
         if filter2 is not None and filter2 != "null":
             self.controller.log_info("filter2")
@@ -650,14 +651,14 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " " + self.field2 + " = '" + filter2 + "'"
+            sql_where += f" {self.field2} = '{filter2}'"
 
         if filter3 is not None and filter3 != "null":
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " " + self.field3 + " = '" + filter3 + "'"
+            sql_where += f" {self.field3} = '{filter3}'"
         sql += sql_where + " ORDER BY id"
 
         rows = self.controller.get_rows(sql)

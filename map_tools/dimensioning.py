@@ -56,9 +56,9 @@ class Dimensioning(ParentMapTool):
         pass
 
     def keyPressEvent(self, event):
-        print("{} PRESSED".format(event.key()))
+        print(f"{event.key()} PRESSED")
         if event.key() == Qt.Key_Escape:
-            print("{} PRESSED".format(event.key()))
+            print(f"{event.key()} PRESSED")
             self.action().trigger()
             return
 

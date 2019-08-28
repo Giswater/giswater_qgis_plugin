@@ -385,7 +385,7 @@ class ParentMapTool(QgsMapTool):
         """ Create and return parameters as body to functions"""
 
         client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
-        form = '"form":{' + form + '}, '
+        form = f'"form":{{{form}}}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
         page_info = '"pageInfo":{}'

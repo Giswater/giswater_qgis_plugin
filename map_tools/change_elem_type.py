@@ -54,40 +54,40 @@ class ChangeElemType(ParentMapTool):
         if node_node_type_new != "null":
                     
             if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (project_type == 'ud'):
-                sql = ("SELECT man_table FROM node_type "
-                       "WHERE id = '" + old_node_type + "'")
+                sql = (f"SELECT man_table FROM node_type "
+                       f"WHERE id = '{old_node_type}'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
                 # Delete from current table 
-                sql = ("DELETE FROM " + row[0] + " "
-                       "WHERE node_id = '" + str(self.node_id) + "'")
+                sql = (f"DELETE FROM {row[0]} "
+                       f"WHERE node_id = '{self.node_id}'")
                 self.controller.execute_sql(sql)
 
-                sql = ("SELECT man_table FROM node_type "
-                       "WHERE id = '" + node_node_type_new + "'")
+                sql = (f"SELECT man_table FROM node_type "
+                       f"WHERE id = '{node_node_type_new}'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
 
                 # Insert into new table
-                sql = ("INSERT INTO " + row[0] + "(node_id)"
-                       " VALUES ('" + str(self.node_id) + "')")
+                sql = (f"INSERT INTO {row[0]} (node_id) "
+                       f"VALUES ('{self.node_id}')")
                 self.controller.execute_sql(sql)
 
                 # Update field 'nodecat_id'
-                sql = ("UPDATE node SET nodecat_id = '" + node_nodecat_id + "'"
-                       " WHERE node_id = '" + str(self.node_id) + "'")
+                sql = (f"UPDATE node SET nodecat_id = '{node_nodecat_id}' "
+                       f"WHERE node_id = '{self.node_id}'")
                 self.controller.execute_sql(sql)
 
                 if project_type == 'ud':
-                    sql = ("UPDATE node SET node_type = '" + node_node_type_new + "'"
-                        " WHERE node_id = '" + str(self.node_id) + "'")
+                    sql = (f"UPDATE node SET node_type = '{node_node_type_new}' "
+                           f"WHERE node_id = '{self.node_id}'")
                     self.controller.execute_sql(sql)
                     
                 # Set active layer
-                viewname = "v_edit_" + str(row[0])
+                viewname = f"v_edit_{row[0]}"
                 layer = self.controller.get_layer_by_tablename(viewname)
                 if layer:
                     self.iface.setActiveLayer(layer)
@@ -111,7 +111,7 @@ class ChangeElemType(ParentMapTool):
         self.refresh_map_canvas()
 
         # Check if the expression is valid
-        expr_filter = "node_id = '" + str(self.node_id) + "'"
+        expr_filter = f"node_id = '{self.node_id}'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
@@ -171,7 +171,7 @@ class ChangeElemType(ParentMapTool):
             return
 
         # Populate catalog_id
-        sql = "SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '" + node_node_type_new +"' ORDER BY id"
+        sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 

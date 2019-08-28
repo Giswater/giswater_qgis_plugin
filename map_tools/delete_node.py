@@ -66,7 +66,7 @@ class DeleteNodeMapTool(ParentMapTool):
             self.load_settings(self.dlg_fusion)
 
             # Fill ComboBox workcat_id_end
-            sql = ("SELECT id FROM cat_work ORDER BY id")
+            sql = "SELECT id FROM cat_work ORDER BY id"
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
 
@@ -95,8 +95,7 @@ class DeleteNodeMapTool(ParentMapTool):
             self.controller.show_warning(message, parameter=function_name)
             return
 
-        sql = ("SELECT " + function_name + "('"
-               + str(self.node_id) + "','" + str(workcat_id_end) + "','" + str(enddate_str) + "');")
+        sql = f"SELECT {function_name} ('{self.node_id}', '{workcat_id_end}', '{enddate_str}');"
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             message = "Arc sucessfully fusioned. Node have been downgraded to state=0"

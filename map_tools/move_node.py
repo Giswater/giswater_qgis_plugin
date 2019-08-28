@@ -41,9 +41,9 @@ class MoveNodeMapTool(ParentMapTool):
         srid = self.controller.plugin_settings_value('srid')                 
                    
         # Update node geometry
-        the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(srid) + ")";
-        sql = ("UPDATE node SET the_geom = " + the_geom + ""
-               " WHERE node_id = '" + node_id + "'")
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
+        sql = (f"UPDATE node SET the_geom = {the_geom} "
+               f"WHERE node_id = '{node_id}'")
         status = self.controller.execute_sql(sql) 
         if status:
             # Execute SQL function and show result to the user
@@ -57,7 +57,7 @@ class MoveNodeMapTool(ParentMapTool):
                     self.controller.show_warning(message, parameter=function_name)
                     return
 
-            sql = "SELECT " + function_name + "('" + str(node_id) + "');"
+            sql = f"SELECT {function_name} ('{node_id}');"
             self.controller.execute_sql(sql, commit=True)
 
         else:
@@ -232,9 +232,9 @@ class MoveNodeMapTool(ParentMapTool):
 
                 # Move selected node to the released point
                 # Show message before executing
-                message = ("The procedure will delete features on database."
-                           " Please ensure that features has no undelete value on true."
-                           " On the other hand you must know that traceability table will storage precedent information.")
+                message = ("The procedure will delete features on database. "
+                           "Please ensure that features has no undelete value on true. "
+                           "On the other hand you must know that traceability table will storage precedent information.")
                 title = "Info"
                 answer = self.controller.ask_question(message, title)
                 if answer:

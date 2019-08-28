@@ -76,16 +76,16 @@ class CadAddPoint(ParentMapTool):
             else:
                 self.direction = 2
 
-            sql = ("SELECT ST_GeomFromText('POINT("+str(point_1[0])+" "+ str(point_1[1])+")', "+str(self.srid)+")")
+            sql = f"SELECT ST_GeomFromText('POINT({point_1[0]} {point_1[1]})', {self.srid})"
             row = self.controller.get_row(sql)
             point_1 = row[0]
-            sql = ("SELECT ST_GeomFromText('POINT("+str(point_2[0])+" "+ str(point_2[1])+")', "+str(self.srid)+")")
+            sql = f"SELECT ST_GeomFromText('POINT({point_2[0]} {point_2[1]})', {self.srid})"
             row = self.controller.get_row(sql)
             point_2 = row[0]
 
-            sql = ("SELECT gw_fct_cad_add_relative_point"
-                   "('" + str(point_1) + "', '" + str(point_2) + "', " + str(self.dist_x) + ", "
-                   + str(self.dist_y) + ", "+str(self.direction)+", "+str(self.delete_prev)+" )")
+            sql = (f"SELECT gw_fct_cad_add_relative_point "
+                   f"('{point_1}', '{point_2}', {self.dist_x}, "
+                   f"{self.dist_y}, {self.direction}, {self.delete_prev})")
             self.controller.execute_sql(sql)
             self.layer_points.commitChanges()
             self.layer_points.dataProvider().forceReload()

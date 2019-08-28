@@ -226,8 +226,8 @@ class ConnecMapTool(ParentMapTool):
 
             # Execute function
             function_name = "gw_fct_connect_to_network"
-            sql = ("SELECT " + function_name + ""
-                   "('" + list_feature_id + "', '" + geom_type.upper() + "');")
+            sql = (f"SELECT {function_name} "
+                   f"('{list_feature_id}', '{geom_type.upper()}');")
             self.controller.execute_sql(sql, log_sql=True)
             layer.removeSelection()
 
