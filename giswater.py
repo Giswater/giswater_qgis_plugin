@@ -377,8 +377,7 @@ class Giswater(QObject):
             list_actions = ['37', '41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
-            toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
-            self.set_toolbar_position(toolbar_name, x, y)
+            self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
     def toolbar_utils(self, x=None, y=None):
@@ -389,8 +388,7 @@ class Giswater(QObject):
             list_actions = ['206', '99', '83', '58']
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
-            toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
-            self.set_toolbar_position(toolbar_name, x, y)
+            self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
         self.basic.set_controller(self.controller)
         self.utils.set_controller(self.controller)
@@ -398,45 +396,41 @@ class Giswater(QObject):
         self.utils.set_project_type(self.wsoftware)
 
 
-    def toolbar_om_ws(self, x, y):
+    def toolbar_om_ws(self, x=0, y=0):
         toolbar_id = "om_ws"
         list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
+        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
-    def toolbar_om_ud(self, x, y):
+    def toolbar_om_ud(self, x=0, y=0):
         toolbar_id = "om_ud"
         list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
-        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
-        self.set_toolbar_position(toolbar_name, x, y)
+        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
-    def toolbar_edit(self, x, y):
+    def toolbar_edit(self, x=0, y=0):
         toolbar_id = "edit"
         list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '39', '34', '66', '33', '67', '69']
         self.manage_toolbar(toolbar_id, list_actions)
-        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
-        self.set_toolbar_position(toolbar_name, x, y)
+        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
-    def toolbar_cad(self, x, y):
+    def toolbar_cad(self, x=0, y=0):
         toolbar_id = "cad"
         list_actions = ['71', '72']
         self.manage_toolbar(toolbar_id, list_actions)
-        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
-        self.set_toolbar_position(toolbar_name, x, y)
+        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
-    def toolbar_epa(self, x, y):
+    def toolbar_epa(self, x=0, y=0):
         toolbar_id = "epa"
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
-        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
-        self.set_toolbar_position(toolbar_name, x, y)
+        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
-    def toolbar_master(self, x, y):
+    def toolbar_master(self, x=0, y=0):
         toolbar_id = "master"
         list_actions = ['45', '46', '47', '38', '49', '50']
         self.manage_toolbar(toolbar_id, list_actions)
-        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
-        self.set_toolbar_position(toolbar_name, x, y)
+        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
     def get_all_actions(self):
         actions_list = self.iface.mainWindow().findChildren(QActionGroup)
@@ -456,7 +450,7 @@ class Giswater(QObject):
         #Get all QToolBar
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
 
-        x=1
+        x=0
         own_toolbars=[]
         # Get a list with own QToolBars
         for w in widget_list:
@@ -478,6 +472,7 @@ class Giswater(QObject):
         toolbar = self.iface.mainWindow().findChild(QToolBar, tb_name)
         toolbar.move(int(x), int(y))
 
+
     def manage_toolbars(self):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
@@ -488,7 +483,7 @@ class Giswater(QObject):
         path = os.path.dirname(__file__) + '/config/ui_config.config'
         parser.read(path)
 
-        for x in range(1,9):
+        for x in range(0,8):
             toolbar_id = parser.get("toolbars_position", 'pos_'+str(x)).split(',')
             if toolbar_id:
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
@@ -802,6 +797,7 @@ class Giswater(QObject):
         self.controller.log_info(message)
         self.get_all_actions()
 
+        # Create a thread and start listen
         notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
         notify.start_listening('watchers', 'wait_notifications', (self.controller.dao.conn, ))
 
