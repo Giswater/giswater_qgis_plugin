@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2690
+--FUNCTION CODE: 2746
 
 --drop function SCHEMA_NAME.gw_fct_admin_manage_visit(json)
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_visit(p_data json)
@@ -54,7 +54,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature
 
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"ARC"},
-"data":{"action":"DELETE", "action_type":"class", "parameters":{"class_name":"16"}}}$$);
+"data":{"action":"DELETE", "action_type":"class", "parameters":{"class_id":"11"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"ARC"},
 "data":{"action":"DELETE", "action_type":"parameter","parameters":{"class_id":"11","class_name":"LEAK_NODE","parameter_id":"param_leak88",
@@ -307,26 +307,39 @@ IF v_action = 'UPDATE' AND v_action_type = 'parameter' THEN
 		WHERE formname = v_viewname and formtype='visit' and column_id = v_param_name;
 
 ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
+	
+		IF (SELECT count(id) FROM om_visit_event WHERE parameter_id = v_param_name) = 0 THEN
 
-		DELETE FROM om_visit_class_x_parameter WHERE parameter_id = v_param_name;
-		DELETE FROM om_visit_parameter WHERE id = v_param_name;
+			DELETE FROM om_visit_class_x_parameter WHERE parameter_id = v_param_name;
+			DELETE FROM om_visit_parameter WHERE id = v_param_name;
 
-		IF v_ismultievent = TRUE THEN
-			PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
-			v_old_parameters.datatype,v_feature_system_id,v_viewname);
+			IF v_ismultievent = TRUE THEN
+				PERFORM gw_fct_admin_manage_visit_view(v_class_id,v_schemaname,v_old_parameters.a_param,v_old_parameters.ct_param,v_old_parameters.id_param,
+				v_old_parameters.datatype,v_feature_system_id,v_viewname);
+			END IF;
+
+		ELSE
+			 PERFORM audit_function(3024,2746);
 		END IF;
-		
+
 ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 		raise notice 'delete class - class_id,%',v_class_id;
 
 		v_viewname = (SELECT tablename FROM config_api_visit WHERE visitclass_id = v_class_id);
-		-- COMO GESTIONAR EL DELETE DE CLASES? SE ELIMINA TODO O SOLO RELACION DE CLASE - PARAMETRO PARA NO PERDER DATOS DE VISITA SI EXISTE?
-		DELETE FROM om_visit_class_x_parameter WHERE class_id = v_class_id;
-		DELETE FROM om_visit_class WHERE id = v_class_id;
-		DELETE FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id;
-		DELETE FROM config_api_form_fields WHERE formtype='visit' and formname IN (SELECT formname FROM config_api_visit WHERE visitclass_id = v_class_id);
-		DELETE FROM config_api_visit WHERE visitclass_id = v_class_id;
-		
+
+		IF (SELECT count(id) FROM om_visit WHERE class_id = v_class_id) = 0 THEN
+			
+			DELETE FROM om_visit_class_x_parameter WHERE class_id = v_class_id;
+			DELETE FROM om_visit_class WHERE id = v_class_id;
+			DELETE FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id;
+			DELETE FROM config_api_form_fields WHERE formtype='visit' and formname IN (SELECT formname FROM config_api_visit WHERE visitclass_id = v_class_id);
+			DELETE FROM config_api_visit WHERE visitclass_id = v_class_id;
+		ELSE
+			UPDATE om_visit_class SET active = FALSE WHERE id = v_class_id;
+			
+			PERFORM audit_function(3026,2746);
+		END IF;
+
 		EXECUTE 'DROP VIEW IF EXISTS '||v_viewname||';';
 		
 END IF;

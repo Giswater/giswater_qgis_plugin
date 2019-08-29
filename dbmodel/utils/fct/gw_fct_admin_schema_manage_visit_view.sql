@@ -4,10 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2690
+--FUNCTION CODE: 2748
 
---drop function SCHEMA_NAME.gw_fct_admin_manage_visit_view(json)
---CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_visit_view(p_data json)
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_visit_view(p_class_id integer,p_schemaname text,p_old_a_param text,
 p_old_ct_param text, p_old_id_param text,p_old_datatype text,p_feature_system_id text,p_viewname text)
   RETURNS void AS
