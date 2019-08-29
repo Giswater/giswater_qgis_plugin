@@ -61,7 +61,6 @@ UPDATE config_param_user SET value = 1 WHERE cur_user=current_user AND parameter
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_hydrometer_period';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_parameter_period';
 
-INSERT INTO audit_cat_table VALUES ('v_rtc_period_nodepattern', 'Hydraulic data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_period_pjointpattern', 'Hydraulic data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_pjointpattern', 'Hydraulic data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_connec', 'Hydraulic input data', 'Table that relates connecs with its pattern and demand', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -80,7 +79,6 @@ INSERT INTO audit_cat_table VALUES ('cat_arc_shape', 'Catalog', 'Catalog of arc 
 INSERT INTO audit_cat_table VALUES ('ve_pol_tank', 'Editable view', 'Editable view for tank polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('ve_pol_register', 'Editable view', 'Editable view for register polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('ve_pol_fountain', 'Editable view', 'Editable view for fountain polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_plan_arc_cost', 'User interface view', 'User interface view for arcs and its prices', 'role_master', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('rpt_inp_pattern_value', 'Hydraulic result data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('macrodqa', 'GIS feature', 'Table of macrodqas', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('dqa', 'GIS feature', 'Table of spatial objects representing District Quality Area', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
