@@ -577,8 +577,9 @@ class Giswater(QObject):
 
     def unload(self, remove_modules=True):
         """ Removes plugin menu items and icons from QGIS GUI """
-
         try:
+            # Unlisten notify channel and stop thread
+            self.notify.stop_listening('watchers')
 
             # Remove icon of action 'Info'
             self.iface.removeToolBarIcon(self.action_info)
@@ -798,8 +799,8 @@ class Giswater(QObject):
         self.get_all_actions()
 
         # Create a thread and start listen
-        notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-        notify.start_listening('watchers', 'wait_notifications', (self.controller.dao.conn, ))
+        self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.notify.start_listening('watchers', 'wait_notifications', (self.controller.dao.conn, ))
 
         #Save toolbar position when save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)

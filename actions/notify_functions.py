@@ -31,6 +31,12 @@ class NotifyFunctions(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control notify from PostgresSql """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.iface = iface
+        self.canvas = self.iface.mapCanvas()
+        self.settings = settings
+        self.controller = controller
+        self.plugin_dir = plugin_dir
+        
 
     def start_listening(self, channel_name, target=None, args=()):
         """
@@ -40,9 +46,17 @@ class NotifyFunctions(ParentAction):
         :param args: is the argument tuple for the target invocation. Defaults to ().
         :return:
         """
-        self.controller.execute_sql("LISTEN "+str(channel_name)+";")
+        self.controller.execute_sql(f"LISTEN {channel_name};")
         self.thread = threading.Thread(target=getattr(self, target), args=args)
         self.thread.start()
+
+
+    def kill(self):
+        self.killed = True
+
+    def stop_listening(self, channel_name):
+        self.controller.execute_sql(f"UNLISTEN {channel_name};")
+        self.thread._stop()
 
     def wait_notifications(self, conn):
         while True:
