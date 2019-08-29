@@ -63,7 +63,7 @@ class OpenVisit(ParentMapTool):
         if snapped_feat:
             visit_id = snapped_feat.attribute('id')
             manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
-            manage_visit.manage_visit(visit_id=visit_id)
+            manage_visit.manage_visit(visit_id=visit_id, tag='info')
 
 
     def activate(self):

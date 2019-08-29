@@ -295,7 +295,7 @@ class Go2Epa(ApiParent):
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
         """ Load the tables in the selection form """
 
-        dlg_psector_sel = Multirow_selector()
+        dlg_psector_sel = Multirow_selector('dscenario')
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
         if tableleft == 'sector':
