@@ -512,7 +512,8 @@ BEGIN
 			v_status = 'Failed';
 		END IF;
 					
-	ELSE 
+	ELSIF v_editable = FALSE OR v_id IS NULL THEN 
+	
 		RAISE NOTICE 'User has NOT permissions to edit table';
 		-- call info form function
 		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5)'
