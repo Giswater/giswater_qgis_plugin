@@ -133,5 +133,16 @@ INSERT INTO audit_cat_table VALUES ('cat_team', 'Catalog', 'Catalog of teams', '
 INSERT INTO audit_cat_table VALUES ('om_visit_team_x_user', 'O&M', 'Table that relates users with teams', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_filetype_x_extension', 'O&M', 'Catalog of diferent filetypes and their extensions used in visits', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_lot_x_user', 'O&M', 'Table that saves information about works made by a user in relation to one lot', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
-
 INSERT INTO audit_cat_table VALUES ('ve_visit_arc_singlevent', 'O&M', 'Editable view that saves visits to arcs and its event data', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_visit_connec_singlevent', 'O&M', 'Editable view that saves visits to connecs and its event data', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_visit_node_singlevent', 'O&M', 'Editable view that saves visits to nodes and its event data', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_cat_column', 'System', 'Catalog of columns', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('edit_typevalue', 'value domain', 'Value domain of edit tables', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_plan_node_cost', 'User interface view', 'User interface view for nodes and its prices', 'role_master', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vp_basic_arc', 'Auxiliar view', 'Auxiliar view for arcs with id and type', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vp_basic_node', 'Auxiliar view', 'Auxiliar view for nodes with id and type', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vp_basic_connec', 'Auxiliar view', 'Auxiliar view for connecs with id and type', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vp_epa_arc', 'Auxiliar view', 'Auxiliar view for arcs with id, type and epa view', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vp_epa_node', 'Auxiliar view', 'Auxiliar view for nodes with id, type and epa view', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ext_hydrometer_category_x_pattern', 'external table', 'Table that related hydrometer category with its pattern', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ext_cat_period_type', 'external table', 'Catalog of different types of periods', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);

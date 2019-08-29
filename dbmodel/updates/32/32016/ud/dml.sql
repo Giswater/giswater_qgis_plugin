@@ -23,3 +23,14 @@ UPDATE audit_cat_param_user SET layoutname='grl_general_1', layout_id=1, layout_
 
 UPDATE audit_cat_param_user SET layout_order=2 WHERE id='inp_options_rtc_period_id';
 
+INSERT INTO audit_cat_table VALUES ('om_visit_lot_x_gully', 'O&M', 'Table of gullys related to lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vp_basic_gully', 'Auxiliar view', 'Auxiliar view for gullys with id and type', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_node', 'Editable view', 'Editable view for nodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_connec', 'Editable view', 'Editable view for conncs', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_gully', 'Editable view', 'Editable view for gullys', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_pol_chamber', 'Editable view', 'Editable view for chamber polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_pol_gully', 'Editable view', 'Editable view for gully polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_pol_netgully', 'Editable view', 'Editable view for netgully polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_pol_storage', 'Editable view', 'Editable view for storage polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('ve_pol_wwtp', 'Editable view', 'Editable view for wwtp polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+
