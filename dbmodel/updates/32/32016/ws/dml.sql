@@ -61,10 +61,10 @@ UPDATE config_param_user SET value = 1 WHERE cur_user=current_user AND parameter
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_hydrometer_period';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='v_rtc_dma_parameter_period';
 
-INSERT INTO audit_cat_table VALUES ('v_rtc_period_nodepattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_rtc_period_pjointpattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_inp_pjointpattern', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('inp_connec', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_rtc_period_nodepattern', 'Hydraulic data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_rtc_period_pjointpattern', 'Hydraulic data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_inp_pjointpattern', 'Hydraulic data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('inp_connec', 'Hydraulic input data', 'Table that relates connecs with its pattern and demand', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
 INSERT INTO audit_cat_function VALUES (2730, 'trg_edit_inp_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'Trigger to edit v_edit_inp_connec view', 'role_epa', false, false, NULL, false);
@@ -82,4 +82,16 @@ INSERT INTO audit_cat_table VALUES ('ve_pol_register', 'Editable view', 'Editabl
 INSERT INTO audit_cat_table VALUES ('ve_pol_fountain', 'Editable view', 'Editable view for fountain polygons', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_plan_arc_cost', 'User interface view', 'User interface view for arcs and its prices', 'role_master', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('rpt_inp_pattern_value', 'Hydraulic result data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
-
+INSERT INTO audit_cat_table VALUES ('macrodqa', 'GIS feature', 'Table of macrodqas', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('dqa', 'GIS feature', 'Table of spatial objects representing District Quality Area', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('anl_graf', 'Analysis', NULL, 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('inp_inlet', 'Hydraulic input data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('minsector', 'GIS feature', 'Table of minsectors', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('minsector_graf', NULL, NULL, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('v_anl_graf', 'Analysis', NULL, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('v_rtc_period_nodepattern', 'Real time control', NULL, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vi_parent_connec', 'Hydraulic input data', 'Parent table of nodes filtered by inp selector', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vi_parent_hydrometer', 'Hydraulic input data', 'Parent table of hydrometers', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('vi_parent_dma', 'Hydraulic input data', 'Parent table of dmas', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('v_edit_inp_inlet', 'Hydraulic input data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('v_arc_x_vnode', 'Auxiliar', 'Shows the relation between arc and vnodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);

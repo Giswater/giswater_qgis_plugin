@@ -501,13 +501,13 @@ CREATE OR REPLACE VIEW v_visit_lot_user AS
  LIMIT 1;
 
  
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_arc AS 
+CREATE OR REPLACE VIEW vi_parent_arc AS 
 SELECT ve_arc.*
 FROM ve_arc, inp_selector_sector 
 WHERE ve_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_node as
+CREATE OR REPLACE VIEW vi_parent_node as
 SELECT DISTINCT ON (node_id) ve_node.*
 FROM ve_node
 JOIN vi_parent_arc a ON a.node_1::text = ve_node.node_id::text OR a.node_2::text = ve_node.node_id::text;
