@@ -118,8 +118,8 @@ class Om(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            inf_text += str(id_)+", "
-            list_id = list_id+"'"+str(id_)+"', "
+            inf_text += f"{id_}, "
+            list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
@@ -127,7 +127,7 @@ class Om(ParentAction):
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = "DELETE FROM " + table_name
-            sql += " WHERE "+column_id+" IN ("+list_id+")"
+            sql += f" WHERE {column_id} IN ({list_id})"
             self.controller.execute_sql(sql)
             widget.model().select()
 
@@ -144,12 +144,12 @@ class Om(ParentAction):
         sql = "SELECT * FROM selector_psector WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql)
         if rows:
-            sql = ("UPDATE selector_psector"
-                   " SET psector_id = '" + str(psector_id) + "'"
-                   " WHERE cur_user = current_user")
+            sql = (f"UPDATE selector_psector"
+                   f" SET psector_id = '{psector_id}'"
+                   f" WHERE cur_user = current_user")
         else:
-            sql = ("INSERT INTO selector_psector (psector_id, cur_user)"
-                   " VALUES ('" + str(psector_id) + "', current_user)")
+            sql = (f"INSERT INTO selector_psector (psector_id, cur_user)"
+                   f" VALUES ('{psector_id}', current_user)")
 
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
@@ -177,33 +177,33 @@ class Om(ParentAction):
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
-                    sql = "UPDATE " + tablename + " SET value="
+                    sql = f"UPDATE {tablename} SET value="
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + utils_giswater.getWidgetText(dialog, widget) + "' WHERE parameter='" + parameter + "'"
+                        sql += f"'{utils_giswater.getWidgetText(dialog, widget)}' WHERE parameter='{parameter}'"
                     else:
-                        sql += ("(SELECT id FROM value_state"
-                                " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "')"
-                                " WHERE parameter = 'state_vdefault'")
+                        sql += (f"(SELECT id FROM value_state"
+                                f" WHERE name = '{utils_giswater.getWidgetText(dialog, widget)}')"
+                                f" WHERE parameter = 'state_vdefault'")
                 else:
-                    sql = "INSERT INTO " + tablename + "(parameter, value, cur_user)"
+                    sql = f"INSERT INTO {tablename} (parameter, value, cur_user)"
                     if widget.objectName() != 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(dialog, widget) + "', current_user)"
+                        sql += f" VALUES ('{parameter}', '{utils_giswater.getWidgetText(dialog, widget)}', current_user)"
                     else:
-                        sql += (" VALUES ('" + parameter + "',"
-                                " (SELECT id FROM value_state"
-                                " WHERE name ='" + utils_giswater.getWidgetText(dialog, widget) + "'), current_user)")
+                        sql += (f" VALUES ('{parameter}',"
+                                f" (SELECT id FROM value_state"
+                                f" WHERE name ='{utils_giswater.getWidgetText(dialog, widget)}'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
                     exist_param = True
             if exist_param:
-                sql = "UPDATE " + tablename + " SET value="
+                sql = f"UPDATE {tablename} SET value="
                 _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+                sql += f"'{_date}' WHERE parameter='{parameter}'"
             else:
-                sql = "INSERT INTO " + tablename + "(parameter, value, cur_user)"
+                sql = f"INSERT INTO {tablename} (parameter, value, cur_user)"
                 _date = widget.dateTime().toString('yyyy-MM-dd')
-                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                sql += f" VALUES ('{parameter}', '{_date}', current_user)"
                 
         self.controller.execute_sql(sql)
 
@@ -212,7 +212,7 @@ class Om(ParentAction):
 
         result_select = utils_giswater.getWidgetText(self.dlg_psector_mng, widget_txt)
         if result_select != 'null':
-            expr = " name ILIKE '%" + result_select + "%'"
+            expr = f" name ILIKE '%{result_select}'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
@@ -244,17 +244,17 @@ class Om(ParentAction):
 
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
-        sql = ("SELECT * FROM selector_date"
-               " WHERE cur_user = '" + self.current_user + "'")
+        sql = (f"SELECT * FROM selector_date"
+               f" WHERE cur_user = '{self.current_user}'")
         row = self.controller.get_row(sql)
         if not row :
-            sql = ("INSERT INTO selector_date"
-                   " (from_date, to_date, context, cur_user)"
-                   " VALUES('" + from_date + "', '" + to_date + "', 'om_visit', '" + self.current_user + "')")
+            sql = (f"INSERT INTO selector_date"
+                   f" (from_date, to_date, context, cur_user)"
+                   f" VALUES('{from_date}', '{to_date}', 'om_visit', '{self.current_user}')")
         else:
-            sql = ("UPDATE selector_date"
-                   " SET (from_date, to_date) = ('" + from_date + "', '" + to_date + "')"
-                   " WHERE cur_user = '" + self.current_user + "'")
+            sql = (f"UPDATE selector_date"
+                   f" SET (from_date, to_date) = ('{from_date}', '{to_date}')"
+                   f" WHERE cur_user = '{self.current_user}'")
 
         self.controller.execute_sql(sql)
 
@@ -283,8 +283,8 @@ class Om(ParentAction):
     def get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
 
-        sql = ("SELECT from_date, to_date FROM selector_date"
-               " WHERE cur_user = '" + self.current_user + "'")
+        sql = (f"SELECT from_date, to_date FROM selector_date"
+               f" WHERE cur_user = '{self.current_user}'")
         row = self.controller.get_row(sql)
         try:
             if row:

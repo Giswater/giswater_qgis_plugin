@@ -115,10 +115,10 @@ class ManageDocument(ParentManage):
         widget = "tbl_doc_x_" + geom_type
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = geom_type + "_id = '" + str(feature_id) + "'"
+        expr_filter = f"{geom_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        table_name = self.schema_name + ".v_edit_" + geom_type
+        table_name = f"{self.schema_name}.v_edit_{geom_type}"
         self.set_model_to_table(widget, table_name, expr_filter)
 
 
@@ -136,22 +136,22 @@ class ManageDocument(ParentManage):
             return
 
         # Check if this document already exists
-        sql = ("SELECT DISTINCT(id)"
-               " FROM " + str(table_object) + ""
-               " WHERE id = '" + str(doc_id) + "'")
+        sql = (f"SELECT DISTINCT(id)"
+               f" FROM {table_object}"
+               f" WHERE id = '{doc_id}'")
         row = self.controller.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
         if row is None:
             if doc_id == 'null':
-                sql = ("INSERT INTO doc (doc_type, path, observ)"
-                       " VALUES ('" + doc_type + "', '" + path + "', '" + observ + "') RETURNING id;")
+                sql = (f"INSERT INTO doc (doc_type, path, observ)"
+                       f" VALUES ('{doc_type}', '{path}', '{observ}') RETURNING id;")
                 new_doc_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
                 sql = ""
                 doc_id = str(new_doc_id[0])
             else:
-                sql = ("INSERT INTO doc (id, doc_type, path, observ)"
-                       " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "');")
+                sql = (f"INSERT INTO doc (id, doc_type, path, observ)"
+                       f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}');")
 
         # If document exists perform an UPDATE
         else:
@@ -159,37 +159,37 @@ class ManageDocument(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE doc "
-                   " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
-                   " WHERE id = '" + str(doc_id) + "';")
+            sql = (f"UPDATE doc "
+                   f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}'"
+                   f" WHERE id = '{doc_id}';")
 
         # Manage records in tables @table_object_x_@geom_type
-        sql += ("\nDELETE FROM doc_x_node"
-                " WHERE doc_id = '" + str(doc_id) + "';")
-        sql += ("\nDELETE FROM doc_x_arc"
-                " WHERE doc_id = '" + str(doc_id) + "';")
-        sql += ("\nDELETE FROM doc_x_connec"
-                " WHERE doc_id = '" + str(doc_id) + "';")
+        sql += (f"\nDELETE FROM doc_x_node"
+                f" WHERE doc_id = '{doc_id}';")
+        sql += (f"\nDELETE FROM doc_x_arc"
+                f" WHERE doc_id = '{doc_id}';")
+        sql += (f"\nDELETE FROM doc_x_connec"
+                f" WHERE doc_id = '{doc_id}';")
         if self.project_type == 'ud':        
-            sql += ("\nDELETE FROM doc_x_gully"
-                    " WHERE doc_id = '" + str(doc_id) + "';")
+            sql += (f"\nDELETE FROM doc_x_gully"
+                    f" WHERE doc_id = '{doc_id}';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
-                sql += ("\nINSERT INTO doc_x_arc (doc_id, arc_id)"
-                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                sql += (f"\nINSERT INTO doc_x_arc (doc_id, arc_id)"
+                        f" VALUES ('{doc_id}', '{feature_id}');")
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
-                sql += ("\nINSERT INTO doc_x_node (doc_id, node_id)"
-                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                sql += (f"\nINSERT INTO doc_x_node (doc_id, node_id)"
+                        f" VALUES ('{doc_id}', '{feature_id}');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
-                sql += ("\nINSERT INTO doc_x_connec (doc_id, connec_id)"
-                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                sql += (f"\nINSERT INTO doc_x_connec (doc_id, connec_id)"
+                        f" VALUES ('{doc_id}', '{feature_id}');")
         if self.project_type == 'ud' and self.list_ids['gully']:
             for feature_id in self.list_ids['gully']:
-                sql += ("\nINSERT INTO doc_x_gully (doc_id, gully_id)"
-                        " VALUES ('" + str(doc_id) + "', '" + str(feature_id) + "');")
+                sql += (f"\nINSERT INTO doc_x_gully (doc_id, gully_id)"
+                        f" VALUES ('{doc_id}', '{feature_id}');")
 
         status = self.controller.execute_sql(sql)
         if status:
@@ -199,11 +199,11 @@ class ManageDocument(ParentManage):
         if tablename is None:
             return
         else:
-            sql = ("INSERT INTO doc_x_"+str(tablename)+"(doc_id, "+str(tablename)+"_id) "
-                   " VALUES('"+str(doc_id)+"', '"+str(item_id)+"')")
+            sql = (f"INSERT INTO doc_x_{tablename} (doc_id, {tablename}_id) "
+                   f" VALUES('{doc_id}', '{item_id}')")
             self.controller.execute_sql(sql)
-            expr = "" + str(tablename) + "_id = '" + str(item_id) + "'"
-            self.fill_table_object(qtable, self.schema_name + ".v_ui_doc_x_"+str(tablename)+"", expr_filter=expr)
+            expr = f"{tablename}_id = '{item_id}'"
+            self.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr_filter=expr)
 
 
     def edit_document(self):

@@ -61,7 +61,7 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
@@ -76,9 +76,9 @@ class GwToolBox(ApiParent):
 
     def filter_functions(self, text):
 
-        extras = '"filterText":"' + text + '"'
+        extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
@@ -108,10 +108,10 @@ class GwToolBox(ApiParent):
         self.dlg_functions.rbt_layer.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_layer))
         self.dlg_functions.rbt_layer.setChecked(True)
 
-        extras = '"filterText":"' + self.alias_function + '"'
+        extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
@@ -160,7 +160,7 @@ class GwToolBox(ApiParent):
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
 
-        if self.controller.plugin_settings_value(str(function_name)+"_" + cur_user + "_rbt_previous") == 'true':
+        if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_rbt_previous") == 'true':
             dialog.rbt_previous.setChecked(True)
         else:
             dialog.rbt_layer.setChecked(True)
@@ -171,7 +171,7 @@ class GwToolBox(ApiParent):
 
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-        self.controller.plugin_settings_set_value(str(function_name)+"_" + cur_user + "_rbt_previous",
+        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous",
                                                   dialog.rbt_previous.isChecked())
 
 
@@ -208,7 +208,7 @@ class GwToolBox(ApiParent):
                 layer = self.set_selected_layer(dialog, combo)
 
             selection_mode = self.rbt_checked['widget']
-            extras += '"selectionMode":"'+selection_mode+'",'
+            extras += f'"selectionMode":"{selection_mode}",'
             # Check selection mode and get (or not get) all feature id
             feature_id_list = '"id":['
             if (selection_mode == 'wholeSelection') or(selection_mode == 'previousSelection' and layer is None):
@@ -217,14 +217,14 @@ class GwToolBox(ApiParent):
                 features = layer.selectedFeatures()
                 for feature in features:
                     feature_id = feature.attribute(feature_type+"_id")
-                    feature_id_list += '"'+feature_id+'", '
+                    feature_id_list += f'"{feature_id}", '
                 if len(features) > 0:
                     feature_id_list = feature_id_list[:-2] + ']'
                 else:
                     feature_id_list += ']'
 
             if layer_name != -1:
-                feature_field = '"tableName":"' + layer_name + '", '
+                feature_field = f'"tableName":"{layer_name}", '
             feature_field += feature_id_list
 
         widget_list = dialog.grb_parameters.findChildren(QWidget)
@@ -239,7 +239,7 @@ class GwToolBox(ApiParent):
                         if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet("border: 1px solid gray")
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                            extras += '"' + param_name + '":"' + str(value) + '", '
+                            extras += f'"{param_name}":"{value}", '
                             if value is '':
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
@@ -247,13 +247,13 @@ class GwToolBox(ApiParent):
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
                             if value == '':
                                 value = 0
-                            extras += '"' + param_name + '":"' + str(value) + '", '
+                            extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QComboBox):
                             value = utils_giswater.get_item_data(dialog, widget, 0)
-                            extras += '"' + param_name + '":"' + str(value) + '", '
+                            extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QCheckBox):
                             value = utils_giswater.isChecked(dialog, widget)
-                            extras += '"' + param_name + '":"' + str(value).lower() + '", '
+                            extras += f'"{param_name}":"{str(value).lower()}", '
 
         if widget_is_void:
             message = "This paramater is mandatory. Please, set a value"
@@ -273,10 +273,10 @@ class GwToolBox(ApiParent):
             extras += '}'
 
         body = self.create_body(feature=feature_field, extras=extras)
-        sql = ("SELECT "+str(function_name)+"($${" + body + "}$$)::text")
+        sql = f"SELECT {function_name}($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
-            self.controller.show_message("Function : " + str(function_name)+" executed with no result ", 3)
+            self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
             dialog.progressBar.setVisible(False)
             dialog.progressBar.setMinimum(0)
             dialog.progressBar.setMaximum(1)
@@ -287,7 +287,7 @@ class GwToolBox(ApiParent):
 
         self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
 
-        dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
+        dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
@@ -300,20 +300,20 @@ class GwToolBox(ApiParent):
     def execute_no_parametric(self, dialog, function_name):
 
         dialog.progressBar.setMinimum(0)
-        dialog.progressBar.setFormat("Running function: " + str(function_name))
+        dialog.progressBar.setFormat(f"Running function: {function_name}")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setFormat("")
 
-        sql = ("SELECT " + str(function_name) + "()::text")
+        sql = f"SELECT {function_name}()::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row or row[0] is None:
-            self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
+            self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
-        dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
+        dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 
         return True
@@ -408,12 +408,12 @@ class GwToolBox(ApiParent):
             main_parent.setIcon(icon)
 
         for group, functions in result['fields'].items():
-            parent1 = QStandardItem('{}   [{} Giswater algorithm]'.format(group, len(functions)))
-            self.no_clickable_items.append('{}   [{} Giswater algorithm]'.format(group, len(functions)))
+            parent1 = QStandardItem(f'{group}   [{len(functions)} Giswater algorithm]')
+            self.no_clickable_items.append(f'{group}   [{len(functions)} Giswater algorithm]')
             functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
-                func_name = QStandardItem('{}'.format(function['functionname']))
-                label = QStandardItem('{}'.format(function['alias']))
+                func_name = QStandardItem(str(function['functionname']))
+                label = QStandardItem(str(function['alias']))
                 row = self.controller.check_function(function['functionname'])
                 if not row:
                     if os.path.exists(path_icon_red):
@@ -422,7 +422,7 @@ class GwToolBox(ApiParent):
                         label.setForeground(QColor(255, 0, 0))
                         msg = "Function configured on the table audit_cat_function, but not found in the database"
                         label.setToolTip(msg)
-                        self.no_clickable_items.append('{}'.format(function['alias']))
+                        self.no_clickable_items.append(str(function['alias']))
                 else:
                     if os.path.exists(path_icon_blue):
                         icon = QIcon(path_icon_blue)
@@ -459,7 +459,7 @@ class GwToolBox(ApiParent):
                 if counter > 0:
                     counter = len(data[k]['values'])
                     geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(str(geometry_type) + "?crs=epsg:" + str(srid), function_name, 'memory')
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
                     self.populate_vlayer(v_layer, data, k, counter)
 
 
@@ -483,8 +483,8 @@ class GwToolBox(ApiParent):
             for k, v in list(item.items()):
                 if str(k) != 'the_geom':
                     attributes.append(v)
-                if str(k) in ('the_geom'):
-                    sql = ("SELECT St_AsText('"+str(v)+"')")
+                if str(k) in 'the_geom':
+                    sql = f"SELECT St_AsText('{v}')"
                     row = self.controller.get_row(sql, log_sql=False)
                     geometry = QgsGeometry.fromWkt(str(row[0]))
                     fet.setGeometry(geometry)

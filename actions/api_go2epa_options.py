@@ -42,7 +42,7 @@ class Go2EpaOptions(ApiParent):
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
         # Get layers under mouse clicked
-        sql = ("SELECT gw_api_getconfig($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_getconfig($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -73,9 +73,9 @@ class Go2EpaOptions(ApiParent):
 
         my_json = json.dumps(_json)
         form = '"formName":"epaoptions"'
-        extras = '"fields":' + my_json + ''
+        extras = f'"fields":{my_json}'
         body = self.create_body(form=form, extras=extras)
-        sql = ("SELECT gw_api_setconfig($${" + body + "}$$)")
+        sql = f"SELECT gw_api_setconfig($${{{body}}}$$)"
         self.controller.execute_sql(sql, log_sql=True, commit=True)
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -96,7 +96,7 @@ class Go2EpaOptions(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
-        sql = ("SELECT gw_api_get_combochilds('epaoptions" + "', '', '', '" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
+        sql = f"SELECT gw_api_get_combochilds('epaoptions', '', '', '{combo_parent}', '{combo_id}', '')"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:

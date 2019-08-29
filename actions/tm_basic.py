@@ -82,18 +82,18 @@ class TmBasic(TmParentAction):
             msg = "Has de possar l'any corresponent"
             self.controller.show_warning(msg)
             return
-        sql = ("SELECT id FROM cat_campaign "
-               " WHERE name = '" + str(new_camp) + "'")
+        sql = (f"SELECT id FROM cat_campaign "
+               f" WHERE name = '{new_camp}'")
         row = self.controller.get_row(sql)
 
         # If campaign not exist, create new one
         if row is None:
             start_date = utils_giswater.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.start_date)
             end_date = utils_giswater.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.end_date)
-            sql = ("INSERT INTO cat_campaign(name, start_date, end_date) "
-                   " VALUES('" + str(new_camp) + "', '" + str(start_date) + "', '" + str(end_date) + "');")
+            sql = (f"INSERT INTO cat_campaign(name, start_date, end_date) "
+                   f" VALUES('{new_camp}', '{start_date}', '{end_date}');")
             self.controller.execute_sql(sql)
-            sql = ("SELECT currval('cat_campaign_id_seq');")
+            sql = "SELECT currval('cat_campaign_id_seq');"
             row = self.controller.get_row(sql)
             
             # Update contents of variable 'self.cmb_poda_type'
@@ -114,20 +114,20 @@ class TmBasic(TmParentAction):
         else:
             id_old_camp = 0
 
-        sql = ("SELECT DISTINCT(campaign_id) FROM " + str(table_name) + " "
-               " WHERE campaign_id = '" + str(id_new_camp) + "'")
+        sql = (f"SELECT DISTINCT(campaign_id) FROM {table_name} "
+               f" WHERE campaign_id = '{id_new_camp}'")
         row = self.controller.get_row(sql)
 
         if not row or row is None:
-            sql = ("SELECT create_price('" + str(id_new_camp) + "','" + str(id_old_camp) + "')")
+            sql = f"SELECT create_price('{id_new_camp}','{id_old_camp}')"
             self.controller.execute_sql(sql)
         else:
-            message = ("Estas a punt de sobreescriure els preus de la campanya " + new_camp + " ")
+            message = f"Estas a punt de sobreescriure els preus de la campanya {new_camp} "
             answer = self.controller.ask_question(message, "Warning")
             if not answer:
                 return
             else:
-                sql = ("SELECT create_price('" + str(id_new_camp) + "','" + str(id_old_camp) + "')")
+                sql = f"SELECT create_price('{id_new_camp}','{id_old_camp}')"
                 self.controller.execute_sql(sql)
 
         # Close perevious dialog
@@ -178,7 +178,7 @@ class TmBasic(TmParentAction):
             return
         
         # Attach model to table view
-        expr = "campaign_id = '"+new_camp+"'"
+        expr = f"campaign_id = '{new_camp}'"
         qtable.setModel(model)
         qtable.model().setFilter(expr)
 
@@ -204,9 +204,9 @@ class TmBasic(TmParentAction):
 
     def populate_cmb_years(self, table_name, field_id, field_name, combo, reverse=False):
 
-        sql = ("SELECT DISTINCT(" + str(field_id) + ")::text, " + str(field_name) + "::text"
-               " FROM " + table_name + ""
-               " WHERE " + str(field_name) + "::text != ''")
+        sql = (f"SELECT DISTINCT({field_id})::text, {field_name}::text"
+               f" FROM {table_name}"
+               f" WHERE {field_name}::text != ''")
         rows = self.controller.get_rows(sql)
         if rows is None:
             return
@@ -221,8 +221,8 @@ class TmBasic(TmParentAction):
 
         if dialog.txt_campaign.text() != '':
             
-            sql = ("SELECT id FROM cat_campaign "
-                   " WHERE name = '" + str(dialog.txt_campaign.text()) + "'")
+            sql = (f"SELECT id FROM cat_campaign "
+                   f" WHERE name = '{dialog.txt_campaign.text()}'")
             row = self.controller.get_row(sql)
             if row is None:
                 message = "No hi ha preus per aquest any"
@@ -232,8 +232,8 @@ class TmBasic(TmParentAction):
 
             if utils_giswater.isChecked(dialog, dialog.chk_campaign) and utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
                 self.selected_camp = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0)
-                sql = ("SELECT DISTINCT(campaign_id) FROM planning"
-                       " WHERE campaign_id ='" + str(self.selected_camp) + "'")
+                sql = (f"SELECT DISTINCT(campaign_id) FROM planning"
+                       f" WHERE campaign_id ='{self.selected_camp}'")
                 row = self.controller.get_row(sql)
                 if row:
                     update = True
@@ -337,10 +337,10 @@ class TmBasic(TmParentAction):
         ids = ids[:-2] + ""
 
         # Build expression
-        expr = (" mu_name ILIKE '%" + dialog.txt_search.text() + "%'"
-                " AND mu_id NOT IN (" + ids + ")"
-                " AND campaign_id::text = '" + str(self.campaign_id) + "'"
-                " OR campaign_id IS null")
+        expr = (f" mu_name ILIKE '%{dialog.txt_search.text()}%'"
+                f" AND mu_id NOT IN ({ids})"
+                f" AND campaign_id::text = '{self.campaign_id}'"
+                f" OR campaign_id IS null")
         self.controller.log_info(expr)
         # (is_valid, expr) = self.check_expression(expr)  # @UnusedVariable
         # # if not is_valid:
@@ -375,11 +375,11 @@ class TmBasic(TmParentAction):
             self.controller.show_warning(model.lastError().text())
 
         # Create expresion
-        expr = " mu_name ILIKE '%" + dialog.txt_selected_filter.text() + "%'"
+        expr = f" mu_name ILIKE '%{dialog.txt_selected_filter.text()}%'"
         if self.selected_camp is not None:
-            expr += " AND campaign_id = '" + str(self.campaign_id) + "'"
+            expr += f" AND campaign_id = '{self.campaign_id}'"
             if update:
-                expr += " OR campaign_id = '" + str(self.selected_camp) + "'"
+                expr += f" OR campaign_id = '{self.selected_camp}'"
 
         # Attach model to table or view
         dialog.selected_rows.setModel(model)
@@ -413,8 +413,8 @@ class TmBasic(TmParentAction):
 
     def insert_into_planning(self, tableright):
         
-        sql = ("SELECT * FROM " + tableright + " "
-               "WHERE campaign_id::text = '" + str(self.selected_camp) + "'")
+        sql = (f"SELECT * FROM {tableright} "
+               f"WHERE campaign_id::text = '{self.selected_camp}'")
         rows = self.controller.get_rows(sql)
 
         if not rows:
@@ -424,34 +424,34 @@ class TmBasic(TmParentAction):
             insert_values = ""
             function_values = ""
             if row['mu_id'] is not None:
-                insert_values += "'" + str(row['mu_id']) + "', "
-                function_values += "'" + str(row['mu_id']) + "', "
+                insert_values += f"'{row['mu_id']}', "
+                function_values += f"'{row['mu_id']}', "
             else:
                 insert_values += 'null, '
             if row['work_id'] is not None:
-                insert_values += "'" + str(row['work_id']) + "', "
-                function_values += "'" + str(row['work_id']) + "', "
+                insert_values += f"'{row['work_id']}', "
+                function_values += f"{row['work_id']}', "
             else:
                 insert_values += 'null, '
             if str(row['price']) != 'NULL':
-                insert_values += "'" + str(row['price']) + "', "
+                insert_values += f"'{row['price']}', "
             else:
                 insert_values += 'null, '
-            insert_values += "'" + str(self.campaign_id) + "', "
+            insert_values += f"'{self.campaign_id}', "
             insert_values = insert_values[:len(insert_values) - 2]
-            function_values += "" + str(self.campaign_id) + ", "
+            function_values += f"{self.campaign_id}, "
             function_values = function_values[:len(function_values) - 2]
             # Check if mul_id and year_ already exists in planning
-            sql = ("SELECT  mu_id  "
-                   " FROM " + tableright + ""
-                   " WHERE mu_id = '" + str(row['mu_id']) + "'"
-                   " AND campaign_id ='" + str(self.campaign_id) + "'")
+            sql = (f"SELECT  mu_id  "
+                   f" FROM {tableright}"
+                   f" WHERE mu_id = '{row['mu_id']}'"
+                   f" AND campaign_id ='{self.campaign_id}'")
             row = self.controller.get_row(sql)
             if row is None:
-                sql = ("INSERT INTO " + tableright + ""
-                       " (mu_id, work_id, price, campaign_id) "
-                       " VALUES (" + insert_values + ");")
-                sql += ("\nSELECT set_plan_price(" + function_values + ");")
+                sql = (f"INSERT INTO {tableright}"
+                       f" (mu_id, work_id, price, campaign_id) "
+                       f" VALUES ({insert_values});")
+                sql += f"\nSELECT set_plan_price({function_values});"
                 self.controller.execute_sql(sql)
 
 
@@ -484,9 +484,9 @@ class TmBasic(TmParentAction):
         if utils_giswater.isChecked(dialog, dialog.chk_permanent):
             for i in range(0, len(left_selected_list)):
                 row = left_selected_list[i].row()
-                sql = ("UPDATE cat_mu "
-                       " SET work_id = '" + str(current_poda_type) + "'"
-                       " WHERE id = '" + str(dialog.all_rows.model().record(row).value('mu_id')) + "'")
+                sql = (f"UPDATE cat_mu "
+                       f" SET work_id = '{current_poda_type}'"
+                       f" WHERE id = '{dialog.all_rows.model().record(row).value('mu_id')}'")
                 self.controller.execute_sql(sql)
 
         for i in range(0, len(left_selected_list)):
@@ -494,41 +494,41 @@ class TmBasic(TmParentAction):
             values = ""
             function_values = ""
             if dialog.all_rows.model().record(row).value('mu_id') is not None:
-                values += "'" + str(dialog.all_rows.model().record(row).value('mu_id')) + "', "
-                function_values += "'" + str(dialog.all_rows.model().record(row).value('mu_id')) + "', "
+                values += f"'{dialog.all_rows.model().record(row).value('mu_id')}', "
+                function_values += f"'{dialog.all_rows.model().record(row).value('mu_id')}', "
             else:
                 values += 'null, '
 
             if dialog.all_rows.model().record(row).value('work_id') is not None:
                 if utils_giswater.isChecked(dialog, dialog.chk_current):
-                    values += "'" + str(current_poda_type) + "', "
-                    function_values += "'" + str(current_poda_type) + "', "
+                    values += f"'{current_poda_type}', "
+                    function_values += f"'{current_poda_type}', "
                 else:
-                    values += "'" + str(dialog.all_rows.model().record(row).value('work_id')) + "', "
-                    function_values += "'" + str(dialog.all_rows.model().record(row).value('work_id')) + "', "
+                    values += f"'{dialog.all_rows.model().record(row).value('work_id')}', "
+                    function_values += f"'{dialog.all_rows.model().record(row).value('work_id')}', "
             else:
                 values += 'null, '
 
-            values += "'" + str(self.campaign_id) + "', "
+            values += f"'{self.campaign_id}', "
             values = values[:len(values) - 2]
-            function_values += "'" + str(self.campaign_id) + "', "
+            function_values += f"'{self.campaign_id}', "
             function_values = function_values[:len(function_values) - 2]
 
             # Check if mul_id and year_ already exists in planning
-            sql = ("SELECT " + id_table_right + ""
-                   " FROM " + tableright + ""
-                   " WHERE " + id_table_right + " = '" + str(field_list[i]) + "'"
-                   " AND campaign_id = '" + str(self.campaign_id) + "';")
+            sql = (f"SELECT {id_table_right}"
+                   f" FROM {tableright}"
+                   f" WHERE {id_table_right} = '{field_list[i]}'"
+                   f" AND campaign_id = '{self.campaign_id}';")
             row = self.controller.get_row(sql, log_sql=True)
             if row is not None:
                 # if exist - show warning
                 message = "Aquest registre ja esta seleccionat"
                 self.controller.show_info_box(message, "Info", parameter=str(field_list[i]))
             else:
-                sql = ("INSERT INTO " + tableright + ""
-                       " (mu_id, work_id, campaign_id) VALUES (" + values + ")")
+                sql = (f"INSERT INTO {tableright}"
+                       f" (mu_id, work_id, campaign_id) VALUES ({values})")
                 self.controller.execute_sql(sql)
-                sql = ("SELECT set_plan_price(" + function_values + ")")
+                sql = f"SELECT set_plan_price({function_values})"
                 self.controller.execute_sql(sql)
 
         # Refresh tables
@@ -538,8 +538,8 @@ class TmBasic(TmParentAction):
 
     def rows_unselector(self, dialog, tableright, field_id_right, tableleft, table_view):
 
-        sql = ("DELETE FROM " + tableright + ""
-               " WHERE campaign_id = '" + str(self.campaign_id) + "' AND " + field_id_right + " = ")
+        sql = (f"DELETE FROM {tableright}"
+               f" WHERE campaign_id = '{self.campaign_id}' AND {field_id_right} = ")
         selected_list = dialog.selected_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Cap registre seleccionat"
@@ -552,7 +552,7 @@ class TmBasic(TmParentAction):
             id_ = str(dialog.selected_rows.model().record(row).value(field_id_right))
             field_list.append(id_)
         for i in range(0, len(field_list)):
-            _sql = (sql + "'" + str(field_list[i]) + "'")
+            _sql = sql + f"'{field_list[i]}'"
             self.controller.execute_sql(_sql, log_sql=True)
             
         # Refresh tables
@@ -616,8 +616,8 @@ class TmBasic(TmParentAction):
         month_selector.lbl_plan_code.setText(self.plan_code)
         month_selector.lbl_year.setText(self.planned_camp_name)
 
-        sql = ("SELECT start_date, end_date FROM cat_campaign "
-               " WHERE id ='" + str(self.planned_camp_id) + "'")
+        sql = (f"SELECT start_date, end_date FROM cat_campaign "
+               f" WHERE id ='{self.planned_camp_id}'")
         row = self.controller.get_row(sql)
         if row is not None:
             start_date = QDate.fromString(str(row[0]), 'yyyy-MM-dd')
@@ -683,19 +683,19 @@ class TmBasic(TmParentAction):
         # Update values
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
-            sql = ("UPDATE " + tableleft + " "
-                   " SET plan_code ='" + self.plan_code + "', "
-                   " plan_month_start = '" + plan_month_start + "', "
-                   " plan_month_end = '" + plan_month_end + "' "
-                   " WHERE id='" + str(dialog.all_rows.model().record(row).value('id')) + "'"
-                   " AND mu_id ='" + str(dialog.all_rows.model().record(row).value('mu_id')) + "'"
-                   " AND campaign_id = '" + self.planned_camp_id + "'")
+            sql = (f"UPDATE {tableleft} "
+                   f" SET plan_code ='{self.plan_code}', "
+                   f" plan_month_start = '{plan_month_start}', "
+                   f" plan_month_end = '{plan_month_end}' "
+                   f" WHERE id='{dialog.all_rows.model().record(row).value('id')}'"
+                   f" AND mu_id ='{dialog.all_rows.model().record(row).value('mu_id')}'"
+                   f" AND campaign_id = '{self.planned_camp_id}'")
             self.controller.execute_sql(sql)
 
         # Refresh QTableViews and recalculate price
         expr = " AND ( plan_code is NULL OR plan_code = '')"
         self.fill_table_planned_month(dialog.all_rows, dialog.txt_search, view_name, expr)
-        expr = " AND plan_code = '" + self.plan_code + "'"
+        expr = f" AND plan_code = '{self.plan_code}'"
         self.fill_table_planned_month(dialog.selected_rows, dialog.txt_selected_filter, view_name, expr)
         self.calculate_total_price(dialog, self.planned_camp_id)
 
@@ -717,18 +717,18 @@ class TmBasic(TmParentAction):
 
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
-            sql = ("UPDATE " + tableleft + " "
-                   " SET plan_code = null, "
-                   " plan_month_start = null, "
-                   " plan_month_end = null "
-                   " WHERE mu_id = '" + str(dialog.selected_rows.model().record(row).value('mu_id')) + "'"
-                   " AND campaign_id = '" + self.planned_camp_id + "'")
+            sql = (f"UPDATE {tableleft} "
+                   f" SET plan_code = null, "
+                   f" plan_month_start = null, "
+                   f" plan_month_end = null "
+                   f" WHERE mu_id = '{dialog.selected_rows.model().record(row).value('mu_id')}'"
+                   f" AND campaign_id = '{self.planned_camp_id}'")
             self.controller.execute_sql(sql)
 
         # Refresh QTableViews and recalculate price
         expr = " AND ( plan_code is NULL OR plan_code = '')"
         self.fill_table_planned_month(dialog.all_rows, dialog.txt_search, view_name, expr)
-        expr = " AND plan_code = '" + self.plan_code + "'"
+        expr = f" AND plan_code = '{self.plan_code}'"
         self.fill_table_planned_month(dialog.selected_rows, dialog.txt_selected_filter, view_name, expr)
         self.calculate_total_price(dialog, self.planned_camp_id)
 
@@ -750,8 +750,8 @@ class TmBasic(TmParentAction):
             self.controller.show_warning(model.lastError().text())
 
         # Create expresion
-        expr = (" mu_name ILIKE '%" + str(txt_filter.text()) + "%' "
-                " AND campaign_id = '" + str(self.planned_camp_id) + "' ")
+        expr = (f" mu_name ILIKE '%{txt_filter.text()}%' "
+                f" AND campaign_id = '{self.planned_camp_id}' ")
 
         if expression is not None:
             expr += expression
@@ -780,10 +780,10 @@ class TmBasic(TmParentAction):
     def get_table_columns(self, tablename):
 
         # Get columns name in order of the table
-        sql = ("SELECT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + tablename + "'"
-               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-               " ORDER BY ordinal_position")
+        sql = (f"SELECT column_name FROM information_schema.columns"
+               f" WHERE table_name = '{tablename}'"
+               f" AND table_schema = '" + self.schema_name.replace('"', '') + "'"
+               f" ORDER BY ordinal_position")
         column_names = self.controller.get_rows(sql)
         return column_names
 
@@ -801,9 +801,9 @@ class TmBasic(TmParentAction):
                 if dialog.selected_rows.model().record(row).value('work_id') is not None:
                     work_id = str(dialog.selected_rows.model().record(row).value('work_id'))
                     mu_id = str(dialog.selected_rows.model().record(row).value('mu_id'))
-                    sql = ("UPDATE " + tableleft + ""
-                           " SET work_id = '" + str(work_id) + "' "
-                           " WHERE mu_id = '" + str(mu_id) + "'")
+                    sql = (f"UPDATE {tableleft}"
+                           f" SET work_id = '{work_id}' "
+                           f" WHERE mu_id = '{mu_id}'")
                     self.controller.execute_sql(sql)
         else:
             model.database().rollback()

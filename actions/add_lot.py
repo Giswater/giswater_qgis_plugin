@@ -186,7 +186,7 @@ class AddNewLot(ParentManage):
 
         if table_name is not None:
 
-            sql = "SELECT column_id FROM config_client_forms WHERE location_type = 'tbl_visit' AND status IS NOT TRUE AND table_id = '" + table_name + "'"
+            sql = f"SELECT column_id FROM config_client_forms WHERE location_type = 'tbl_visit' AND status IS NOT TRUE AND table_id = '{table_name}'"
             rows = self.controller.get_rows(sql, commit=True)
             result_visit = []
             if rows is not None:
@@ -198,7 +198,7 @@ class AddNewLot(ParentManage):
             result_visit = ''
 
         # Get columns to ignore for tab_relations when export csv
-        sql = "SELECT column_id FROM config_client_forms WHERE location_type = 'lot' AND status IS NOT TRUE AND table_id = 've_lot_x_" + str(self.geom_type) + "'"
+        sql = f"SELECT column_id FROM config_client_forms WHERE location_type = 'lot' AND status IS NOT TRUE AND table_id = 've_lot_x_{self.geom_type}'"
         rows = self.controller.get_rows(sql, commit=True)
         result_relation = []
         if rows is not None:
@@ -350,10 +350,10 @@ class AddNewLot(ParentManage):
                " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
                " WHERE om_visit_lot.serie IS NULL")
         if lot_id:
-            _sql = ("SELECT serie FROM om_visit_lot "
-                    " WHERE id = '"+str(lot_id)+"'")
+            _sql = (f"SELECT serie FROM om_visit_lot "
+                    f" WHERE id = '{lot_id}'")
             ct = self.controller.get_row(_sql, commit=True)
-            sql += " OR ext_workorder.serie = '"+str(ct[0])+"'"
+            sql += f" OR ext_workorder.serie = '{ct[0]}'"
         sql += " order by ct"
         rows = self.controller.get_rows(sql, commit=True)
 
@@ -485,14 +485,14 @@ class AddNewLot(ParentManage):
             # Get index of column 'feature_id' and get value of this column in current row
             index_feature = utils_giswater.get_col_index_by_col_name(qtable, str(feature_type) + '_id')
             feature_id = row_index.sibling(row, index_feature).data()
-            id_list += "'"+feature_id+"', "
-            msg_records += "visit_id: " + str(visit_id) + ", "+str(feature_type)+"_id = '" + str(feature_id) + "';\n"
+            id_list += f"'{feature_id}', "
+            msg_records += f"visit_id: {visit_id}, {feature_type}_id = '{feature_id}';\n"
         id_list = id_list[:-2] + ")"
         answer = self.controller.ask_question(message, "Delete records", msg_records)
         if answer:
-            sql = ("DELETE FROM om_visit_x_" + str(feature_type) + ""
-                   " WHERE visit_id = '"+str(visit_id)+"' "
-                   " AND "+str(feature_type)+"_id IN " + str(id_list) + ";\n")
+            sql = (f"DELETE FROM om_visit_x_{feature_type} "
+                   f" WHERE visit_id = '{visit_id}' "
+                   f" AND {feature_type}_id IN {id_list};\n")
             self.controller.execute_sql(sql, commit=True)
 
         self.reload_table_visit()
@@ -589,7 +589,7 @@ class AddNewLot(ParentManage):
 
     def get_next_id(self, table_name, pk):
 
-        sql = ("SELECT max("+pk+"::integer) FROM "+table_name+";")
+        sql = f"SELECT max({pk}::integer) FROM {table_name};"
         row = self.controller.get_row(sql)
         if not row or not row[0]:
             return 0
@@ -653,11 +653,11 @@ class AddNewLot(ParentManage):
 
     def set_values(self, lot_id):
 
-        sql = ("SELECT * FROM om_visit_lot "
-               "WHERE id ='"+str(lot_id)+"'")
+        sql = (f"SELECT * FROM om_visit_lot "
+               f"WHERE id ='{lot_id}'")
         lot = self.controller.get_row(sql, commit=True)
         if lot:
-            value = str(lot['serie']) + " " + str(lot['class_id'])
+            value = f"{lot['serie']} {lot['class_id']}"
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot, value)
             index = self.dlg_lot.cmb_ot.currentIndex()
             self.set_ot_fields(index)
@@ -678,7 +678,7 @@ class AddNewLot(ParentManage):
         """ Set a model with selected filter. Attach that model to selected table """
 
         if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
+            table_name = f"{self.schema_name}.{table_name}"
 
         # Set model
         model = QSqlTableModel()
@@ -778,7 +778,7 @@ class AddNewLot(ParentManage):
                 if Qgis.QGIS_VERSION_INT < 29900:
                     item.append(feature.geometry().asWkb().encode('hex').upper())
                 else:
-                    sql = ("SELECT ST_GeomFromText('" + str(feature.geometry().asWkt()) + "', " + str(self.srid) + ")")
+                    sql = f"SELECT ST_GeomFromText('{feature.geometry().asWkt()}', {self.srid})"
                     the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
                     item.append(the_geom[0])
                 row = []
@@ -935,16 +935,14 @@ class AddNewLot(ParentManage):
         # Create interval dates
         format_low = self.lot_date_format + ' 00:00:00.000'
         format_high = self.lot_date_format + ' 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            visit_start.toString(format_low), visit_end.toString(format_high))
+        interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
 
-        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0}"
-                       " OR enddate is NULL)".format(interval))
+        expr_filter = f"(startdate BETWEEN {interval}) AND (enddate BETWEEN {interval} OR enddate is NULL)"
 
         if object_id != 'null':
-            expr_filter += " AND " + str(feature_type) + "_id::TEXT ILIKE '%" + str(object_id) + "%'"
+            expr_filter += f" AND {feature_type}_id::TEXT ILIKE '%{object_id}%'"
         if lot_id != '':
-            expr_filter += " AND lot_id='"+lot_id+"'"
+            expr_filter += f" AND lot_id='{lot_id}'"
 
         columns_name = self.controller.get_columns_list(table_name)
 
@@ -961,9 +959,9 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
 
         # Populate model visit
-        sql = ("SELECT * FROM " + str(table_name) + ""
-               " WHERE lot_id ='" + str(lot_id) + "'"
-               " AND " + str(expr_filter)+"")
+        sql = (f"SELECT * FROM {table_name}"
+               f" WHERE lot_id ='{lot_id}'"
+               f" AND {expr_filter}")
         rows = self.controller.get_rows(sql, commit=True)
 
         if rows is None:
@@ -1017,8 +1015,8 @@ class AddNewLot(ParentManage):
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
 
-        sql = ("SELECT * FROM ve_lot_x_" + str(feature_type) + " "
-               "WHERE lot_id ='"+str(lot_id)+"'")
+        sql = (f"SELECT * FROM ve_lot_x_{feature_type} "
+               f"WHERE lot_id ='{lot_id}'")
         rows = self.controller.get_rows(sql, commit=True)
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
                                isQStandardItemModel=True)
@@ -1080,33 +1078,33 @@ class AddNewLot(ParentManage):
             keys += "" + key + ", "
             if value not in ('', None):
                 if type(value) in (int, bool):
-                    values += "$$"+str(value)+"$$, "
-                    update += str(key) + "=$$" + str(value) + "$$, "
+                    values += f"$${value}$$, "
+                    update += f"{key}=$${value}$$, "
                 else:
-                    values += "$$" + value + "$$, "
-                    update += str(key) + "=$$" + value + "$$, "
+                    values += f"$${value}$$, "
+                    update += f"{key}=$${value}$$, "
             else:
                 values += "null, "
-                update += str(key) + "=null, "
+                update += f"{key}=null, "
 
         keys = keys[:-2]
         values = values[:-2]
         update = update[:-2]
 
         if self.is_new_lot is True:
-            sql = ("INSERT INTO om_visit_lot("+keys+") "
-                   " VALUES (" + values + ") RETURNING id")
+            sql = (f"INSERT INTO om_visit_lot({keys}) "
+                   f" VALUES ({values}) RETURNING id")
             row = self.controller.execute_returning(sql, commit=True)
             lot_id = row[0]
-            sql = ("INSERT INTO " + self.schema_name + ".selector_lot "
-                   "(lot_id, cur_user) VALUES(" + str(lot_id) + ", current_user);")
+            sql = (f"INSERT INTO selector_lot "
+                   f"(lot_id, cur_user) VALUES({lot_id}, current_user);")
             self.controller.execute_sql(sql)
             self.refresh_map_canvas()
         else:
             lot_id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
-            sql = ("UPDATE om_visit_lot "
-                   " SET "+str(update)+""
-                   " WHERE id = '" + str(lot_id) + "'; \n")
+            sql = (f"UPDATE om_visit_lot "
+                   f" SET {update}"
+                   f" WHERE id = '{lot_id}'; \n")
             self.controller.execute_sql(sql)
 
         self.save_relations(lot, lot_id)
@@ -1118,8 +1116,8 @@ class AddNewLot(ParentManage):
     def save_relations(self, lot, lot_id):
 
         # Manage relations
-        sql = ("DELETE FROM om_visit_lot_x_"+lot['feature_type'] + " "
-               "WHERE lot_id = '"  + str(lot_id) + "'; \n")
+        sql = (f"DELETE FROM om_visit_lot_x_{lot['feature_type']} "
+               f"WHERE lot_id = '{lot_id}'; \n")
 
         model_rows = self.read_standaritemmodel(self.tbl_relation)
 
@@ -1129,19 +1127,20 @@ class AddNewLot(ParentManage):
         # Save relations
         for item in model_rows:
             keys = "lot_id, "
-            values = "$$"+str(lot_id)+"$$, "
+            values = f"$${lot_id}$$, "
             for key, value in list(item.items()):
                 if key in (lot['feature_type']+'_id', 'code', 'status', 'observ', 'validate'):
                     if value not in('', None):
-                        keys += ""+key+", "
-                        if type(value) in (int, bool):
-                            values += "$$"+str(value)+"$$, "
-                        else:
-                            values += "$$" + value + "$$, "
+                        keys += f"{key}, "
+                        # if type(value) in (int, bool):
+                        #     values += f"$$"+str(value)+"$$, "
+                        # else:
+                        #     values += "$$" + value + "$$, "
+                        values += f"$${value}$$, "
             keys = keys[:-2]
             values = values[:-2]
-            sql += ("INSERT INTO om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
-                    "VALUES (" + values + "); \n")
+            sql += (f"INSERT INTO om_visit_lot_x_{lot['feature_type']}({keys}) "
+                    f"VALUES ({values}); \n")
         status = self.controller.execute_sql(sql)
         return status
 
@@ -1162,18 +1161,15 @@ class AddNewLot(ParentManage):
             status = None
             for key, value in list(item.items()):
                 if key=="visit_id":
-                    visit_id = "" + value + ""
+                    visit_id = str(value)
                 if key == "status":
                     if value not in('', None):
-                        if type(value) in (int, bool):
-                            status = "$$"+str(value)+"$$ "
-                        else:
-                            status = "$$" + value + "$$ "
+                        status = f"$${value}$$ "
 
             if visit_id and status:
-                sql += ("UPDATE " + str(table_name) + " "
-                        "SET (status) = (" + status + ") "
-                        "WHERE visit_id = '" + str(visit_id) + "';\n")
+                sql += (f"UPDATE {table_name} "
+                        f"SET (status) = ({status}) "
+                        f"WHERE visit_id = '{visit_id}';\n")
         if sql != "":
             status = self.controller.execute_sql(sql)
 
@@ -1239,11 +1235,11 @@ class AddNewLot(ParentManage):
         row = index.row()
         column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type+'_id')
         feature_id = index.sibling(row, column_index).data()
-        expr_filter = '"{}_id" IN ({})'.format(feature_type, "'"+feature_id+"'")
-
+        # expr_filter = '"{}_id" IN ({})'.format(feature_type, "'"+feature_id+"'")
+        expr_filter = f"\"{feature_type}_id\" IN ('{feature_id}')"
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
-
+        
         self.select_features_by_ids(feature_type, expr)
         # self.iface.actionZoomToSelected().trigger()
         self.iface.actionZoomActualSize().trigger()
@@ -1262,7 +1258,7 @@ class AddNewLot(ParentManage):
 
         coords = "LINESTRING( "
         for c in list_coord:
-            coords += str(c[0]) + " " + str(c[1]) + ","
+            coords += f"{c[0]} {c[1]},"
         coords = coords[:-1] + ")"
         list_coord = re.search('\((.*)\)', str(coords))
         points = self.get_points(list_coord)
@@ -1337,8 +1333,8 @@ class AddNewLot(ParentManage):
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = ('SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
-               ' FROM {}'.format(table_object))
+        sql = (f'SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
+               f' FROM {table_object}')
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             if row[0]:
@@ -1451,13 +1447,12 @@ class AddNewLot(ParentManage):
         # Create interval dates
         format_low = self.lot_date_format + ' 00:00:00.000'
         format_high = self.lot_date_format + ' 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            visit_start.toString(format_low), visit_end.toString(format_high))
+        interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
 
-        expr_filter = ("(starttime BETWEEN {0} OR starttime IS NULL) "
-                       "AND (endtime BETWEEN {0} OR endtime IS NULL)".format(interval))
+        expr_filter = (f"(starttime BETWEEN {interval} OR starttime IS NULL) "
+                       f"AND (endtime BETWEEN {interval} OR endtime IS NULL)")
 
-        expr_filter += " AND user_id LIKE '%" + str(filter) + "%'"
+        expr_filter += f" AND user_id LIKE '%{filter}%'"
         print(str(expr_filter))
 
         self.dlg_user_manage.tbl_user.model().setFilter(expr_filter)
@@ -1600,9 +1595,9 @@ class AddNewLot(ParentManage):
 
     def populate_combo_filters(self, combo, table_name, fields="id, idval"):
 
-        sql = ("SELECT " + str(fields) + " "
-               "FROM " + str(table_name) + " "
-               "ORDER BY idval")
+        sql = (f"SELECT {fields} "
+               f"FROM {table_name} "
+               f"ORDER BY idval")
         rows = self.controller.get_rows(sql, commit=True)
         if rows:
             rows.append(['', ''])
@@ -1621,10 +1616,10 @@ class AddNewLot(ParentManage):
             row = selected_list[x].row()
             _id = qtable.model().record(row).value('id')
             feature_type = qtable.model().record(row).value('feature_type')
-            sql = ("DELETE FROM om_visit_lot_x_" + str(feature_type) + " "
-                   " WHERE lot_id = '" + str(_id) + "'; \n "
-                   "DELETE FROM om_visit_lot "
-                   " WHERE id ='"+str(_id)+"'")
+            sql = (f"DELETE FROM om_visit_lot_x_{feature_type} "
+                   f" WHERE lot_id = '{_id}'; \n "
+                   f"DELETE FROM om_visit_lot "
+                   f" WHERE id ='{_id}'")
             self.controller.execute_sql(sql)
         self.filter_lot()
 
@@ -1646,9 +1641,9 @@ class AddNewLot(ParentManage):
 
         # Close this dialog and open selected object
         dialog.close()
-        sql = ("INSERT INTO selector_lot(lot_id, cur_user) "
-               " VALUES("+str(selected_object_id)+", current_user) "
-               " ON CONFLICT DO NOTHING;")
+        sql = (f"INSERT INTO selector_lot(lot_id, cur_user) "
+               f" VALUES({selected_object_id}, current_user) "
+               f" ON CONFLICT DO NOTHING;")
         self.controller.execute_sql(sql)
         # set previous dialog
         # if hasattr(self, 'previous_dialog'):
@@ -1675,19 +1670,18 @@ class AddNewLot(ParentManage):
         # Create interval dates
         format_low = self.lot_date_format + ' 00:00:00.000'
         format_high = self.lot_date_format + ' 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            visit_start.toString(format_low), visit_end.toString(format_high))
+        interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
 
-        expr_filter = ("(\"Data inici planificada\" BETWEEN {0} OR \"Data inici planificada\" IS NULL) "
-                       "AND (\"Data final planificada\" BETWEEN {0} OR \"Data final planificada\" IS NULL)".format(interval))
+        expr_filter = (f"(\"Data inici planificada\" BETWEEN {interval} OR \"Data inici planificada\" IS NULL) "
+                       f"AND (\"Data final planificada\" BETWEEN {interval} OR \"Data final planificada\" IS NULL)")
         if serie != 'null':
-            expr_filter += " AND \"Serie\" ILIKE '%" + str(serie) + "%'"
+            expr_filter += f" AND \"Serie\" ILIKE '%{serie}%'"
         if actuacio != '' and actuacio != -1:
-            expr_filter += " AND \"Tipus actuacio\" ILIKE '%" + str(actuacio) + "%' "
+            expr_filter += f" AND \"Tipus actuacio\" ILIKE '%{actuacio}%' "
         if adreca != '':
-            expr_filter += " AND adreca ILIKE '%" + str(adreca) + "%' "
+            expr_filter += f" AND adreca ILIKE '%{adreca}%' "
         if status != '':
-            expr_filter += " AND \"Estat\"::TEXT ILIKE '%" + str(status) + "%'"
+            expr_filter += f" AND \"Estat\"::TEXT ILIKE '%{status}%'"
         if assignat:
             expr_filter += " AND \"Serie\" IS NULL "
 

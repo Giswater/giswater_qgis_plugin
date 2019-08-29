@@ -46,7 +46,7 @@ class CreateGisProject():
             gis_locale_path = gis_folder + os.sep + "en"
 
         # Check if template_path and folder_path exists
-        template_path = gis_locale_path + os.sep + project_type + "_" + roletype + "." + gis_extension
+        template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
         if not os.path.exists(template_path):
             self.controller.show_warning("Template GIS file not found", parameter=template_path, duration=20)
             return
@@ -153,18 +153,18 @@ class CreateGisProject():
 
         aux = content
         if sqlite_conn:
-            sql = ("SELECT parameters, srs_id, srid, auth_name || ':' || auth_id as auth_id, description, "
-                   "projection_acronym, ellipsoid_acronym, is_geo "
-                   "FROM srs "
-                   "WHERE srid = '" + str(srid) + "'")
+            sql = (f"SELECT parameters, srs_id, srid, auth_name || ':' || auth_id as auth_id, description, "
+                   f"projection_acronym, ellipsoid_acronym, is_geo "
+                   f"FROM srs "
+                   f"WHERE srid = '{srid}'")
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
 
         else:
-            sql = ("SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
-                   "'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 'GRS80' as ellipsoid_acronym, 0 as is_geo "
-                   "FROM spatial_ref_sys "
-                   "WHERE srid = '" + str(srid) + "'")
+            sql = (f"SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
+                   f"'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 'GRS80' as ellipsoid_acronym, 0 as is_geo "
+                   f"FROM spatial_ref_sys "
+                   f"WHERE srid = '{srid}'")
             row = self.controller.get_row(sql, log_sql=True)
 
         if row:
@@ -188,10 +188,10 @@ class CreateGisProject():
         aux = content
         table_name = "node"
         geom_name = "the_geom"
-        sql = ("SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
-               "ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
-               "FROM "
-               "(SELECT ST_Collect(" + geom_name + ") AS gometries FROM " + schema_name + "." + table_name + ") AS foo")
+        sql = (f"SELECT ST_XMax(gometries) AS xmax, ST_XMin(gometries) AS xmin, "
+               f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
+               f"FROM "
+               f"(SELECT ST_Collect({geom_name}) AS gometries FROM {table_name}) AS foo")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if row:
             valor = row["xmin"]

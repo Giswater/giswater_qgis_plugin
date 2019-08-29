@@ -158,8 +158,8 @@ class ManageElement(ParentManage):
 
     def filter_state_type(self):
         state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
-        sql = ("SELECT DISTINCT(id), name FROM value_state_type "
-               "WHERE state = " + str(state) + "")
+        sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
+               f"WHERE state = {state}")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
 
@@ -167,10 +167,10 @@ class ManageElement(ParentManage):
     def update_location_cmb(self):
 
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
-        sql = ("SELECT location_type FROM man_type_location"
-               " WHERE feature_type = 'ELEMENT' "
-               " AND (featurecat_id = '"+str(element_type)+"' OR featurecat_id is null)"
-               " ORDER BY location_type")
+        sql = (f"SELECT location_type FROM man_type_location"
+               f" WHERE feature_type = 'ELEMENT' "
+               f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
+               f" ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
         if rows:
@@ -182,10 +182,10 @@ class ManageElement(ParentManage):
         widget = "tbl_element_x_" + geom_type
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = geom_type + "_id = '" + str(feature_id) + "'"
+        expr_filter = f"{geom_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        table_name = self.schema_name + ".v_edit_" + geom_type
+        table_name = f"{self.schema_name}.v_edit_{geom_type}"
         self.set_model_to_table(widget, table_name, expr_filter)
 
         # Adding auto-completion to a QLineEdit
@@ -234,20 +234,20 @@ class ManageElement(ParentManage):
             return  
                     
         # Manage fields state, state_type, expl_id
-        sql = ("SELECT id FROM value_state"
-               " WHERE name = '" + state_value + "'")
+        sql = (f"SELECT id FROM value_state"
+               f" WHERE name = '{state_value}'")
         row = self.controller.get_row(sql)
         if row:
             state = row[0]
 
-        sql = ("SELECT id FROM value_state_type "
-               "WHERE name = '" + state_value + "'")
+        sql = (f"SELECT id FROM value_state_type "
+               f"WHERE name = '{state_value}'")
         row = self.controller.get_row(sql)
         if row:
             state_type = row[0]
 
-        sql = ("SELECT expl_id FROM exploitation"
-               " WHERE name = '" + expl_value + "'")
+        sql = (f"SELECT expl_id FROM exploitation"
+               f" WHERE name = '{expl_value}'")
         row = self.controller.get_row(sql)
         if row:
             expl_id = row[0]
@@ -256,9 +256,9 @@ class ManageElement(ParentManage):
         srid = self.controller.plugin_settings_value('srid')   
         
         # Check if this element already exists
-        sql = ("SELECT DISTINCT(element_id)"
-               " FROM " + str(table_object) + ""
-               " WHERE element_id = '" + str(element_id) + "'")
+        sql = (f"SELECT DISTINCT(element_id)"
+               f" FROM {table_object}"
+               f" WHERE element_id = '{element_id}'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
 
         
@@ -268,55 +268,55 @@ class ManageElement(ParentManage):
                 sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
-                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '" + str(state_type) + "', '"
-                              + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
-                              + str(link) + "', '" + str(undelete) + "'")
+                sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
+                              f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
+                              f"'{link}', '{undelete}'")
 
             else:
                 sql = ("INSERT INTO v_edit_element (element_id, , elementcat_id, num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code")
 
-                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(num_elements) + "', '" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '" + str(state_type) + "', '"
-                              + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
-                              + str(link) + "', '" + str(undelete) + "'")
+                sql_values = (f" VALUES ('{element_id}', '{num_elements}', '{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
+                              f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
+                              f"'{link}', '{undelete}'")
 
             if builtdate:
-                sql_values += ", '" + str(builtdate) + "'"
+                sql_values += f", '{builtdate}'"
             else:
                 sql_values += ", null"
             if ownercat_id:
-                sql_values += ", '" + str(ownercat_id) + "'"
+                sql_values += f", '{ownercat_id}'"
             else:
                 sql_values += ", null"
             if location_type:
-                sql_values += ", '" + str(location_type) + "'"
+                sql_values += f", '{location_type}'"
             else:
                 sql_values += ", null"
             if buildercat_id:
-                sql_values += ", '" + str(buildercat_id) + "'"
+                sql_values += f", '{buildercat_id}'"
             else:
                 sql_values += ", null"
             if workcat_id:
-                sql_values += ", '" + str(workcat_id) + "'"
+                sql_values += f", '{workcat_id}'"
             else:
                 sql_values += ", null"
             if workcat_id_end:
-                sql_values += ", '" + str(workcat_id_end) + "'"
+                sql_values += f", '{workcat_id_end}'"
             else:
                 sql_values += ", null"
             if verified:
-                sql_values += ", '" + str(verified) + "'"
+                sql_values += f", '{verified}'"
             else:
                 sql_values += ", null"
 
             if str(self.x) != "":
-                sql_values += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
+                sql_values += f", ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
                 self.x = ""
             else:
                 sql_values += ", null"
             if code:
-                sql_values += ", '" + str(code) + "'"
+                sql_values += f", '{code}'"
             else:
                 sql_values += ", null"
             if element_id == '':
@@ -339,69 +339,68 @@ class ManageElement(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = ("UPDATE element"
-                   " SET elementcat_id = '" + str(elementcat_id) + "', num_elements = '" + str(num_elements) + "', state = '" + str(state) + "'"
-                   ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
-                   ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
-                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'")
+            sql = (f"UPDATE element"
+                   f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
+                   f", expl_id = '{expl_id}', rotation = '{rotation}'"
+                   f", comment = '{comment}', observ = '{observ}'"
+                   f", link = '{link}', undelete = '{undelete}'")
             if builtdate:
-                sql += ", builtdate = '" + str(builtdate) + "'"
+                sql += f", builtdate = '{builtdate}'"
             else:
                 sql += ", builtdate = null"
             if ownercat_id:
-                sql += ", ownercat_id = '" + str(ownercat_id) + "'"
+                sql += f", ownercat_id = '{ownercat_id}'"
             else:
                 sql += ", ownercat_id = null"
             if location_type:
-                sql += ", location_type = '" + str(location_type) + "'"
+                sql += f", location_type = '{location_type}'"
             else:
                 sql += ", location_type = null"
             if buildercat_id:
-                sql += ", buildercat_id = '" + str(buildercat_id) + "'"
+                sql += f", buildercat_id = '{buildercat_id}'"
             else:
                 sql += ", buildercat_id = null"
             if workcat_id:
-                sql += ", workcat_id = '" + str(workcat_id) + "'"
+                sql += f", workcat_id = '{workcat_id}'"
             else:
                 sql += ", workcat_id = null"
             if code:
-                sql += ", code = '" + str(code) + "'"
+                sql += f", code = '{code}'"
             else:
                 sql += ", code = null"
             if workcat_id_end:
-                sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"
+                sql += f", workcat_id_end = '{workcat_id_end}'"
             else:
                 sql += ", workcat_id_end = null"
             if verified:
-                sql += ", verified = '" + str(verified) + "'"
+                sql += f", verified = '{verified}'"
             else:
                 sql += ", verified = null"
             if str(self.x) != "":
-                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(
-                    srid) + ")"
+                sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
 
-            sql += " WHERE element_id = '" + str(element_id) + "';"
+            sql += f" WHERE element_id = '{element_id}';"
             
         # Manage records in tables @table_object_x_@geom_type
-        sql+= ("\nDELETE FROM element_x_node"
-               " WHERE element_id = '" + str(element_id) + "';")
-        sql+= ("\nDELETE FROM element_x_arc"
-               " WHERE element_id = '" + str(element_id) + "';")
-        sql+= ("\nDELETE FROM element_x_connec"
-               " WHERE element_id = '" + str(element_id) + "';")
+        sql+= (f"\nDELETE FROM element_x_node"
+               f" WHERE element_id = '{element_id}';")
+        sql+= (f"\nDELETE FROM element_x_arc"
+               f" WHERE element_id = '{element_id}';")
+        sql+= (f"\nDELETE FROM element_x_connec"
+               f" WHERE element_id = '{element_id}';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
-                sql += ("\nINSERT INTO element_x_arc (element_id, arc_id)"
-                       " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
+                sql += (f"\nINSERT INTO element_x_arc (element_id, arc_id)"
+                        f" VALUES ('{element_id}', '{feature_id}');")
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
-                sql+= ("\nINSERT INTO element_x_node (element_id, node_id)"
-                       " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
+                sql+= (f"\nINSERT INTO element_x_node (element_id, node_id)"
+                       f" VALUES ('{element_id}', '{feature_id}');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
-                sql += ("\nINSERT INTO element_x_connec (element_id, connec_id)"
-                       " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
+                sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
+                        f" VALUES ('{element_id}', '{feature_id}');")
                 
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
@@ -416,9 +415,9 @@ class ManageElement(ParentManage):
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
         
-        sql = ("SELECT DISTINCT(id) FROM cat_element"
-               " WHERE elementtype_id = '" + utils_giswater.getWidgetText(self.dlg_add_element, "element_type") + "'"
-               " ORDER BY id")
+        sql = (f"SELECT DISTINCT(id) FROM cat_element"
+               f" WHERE elementtype_id = '{utils_giswater.getWidgetText(self.dlg_add_element, 'element_type')}'"
+               f" ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_add_element, "elementcat_id", rows, False)
 

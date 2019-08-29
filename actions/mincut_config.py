@@ -128,12 +128,12 @@ class MincutConfig(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            inf_text += "\n\nMincut: " + str(id_) + ""
-            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause "
-                   "FROM anl_mincut_result_hydrometer AS t1 "
-                   "JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
-                   "JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
-                   "WHERE result_id = " + str(id_))
+            inf_text += f"\n\nMincut: {id_}"
+            sql = (f"SELECT t3.{field_code}, t2.forecast_start, t2.forecast_end, anl_cause "
+                   f"FROM anl_mincut_result_hydrometer AS t1 "
+                   f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
+                   f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
+                   f"WHERE result_id = {id_}")
 
             rows = self.controller.get_rows(sql, commit=True, log_sql=True)
             if not rows:
@@ -158,11 +158,11 @@ class MincutConfig(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause "
-                   "FROM anl_mincut_result_hydrometer AS t1 "
-                   "JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
-                   "JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
-                   "WHERE result_id = " + str(id_))
+            sql = (f"SELECT t3.{field_code}, t2.forecast_start, t2.forecast_end, anl_cause "
+                   f"FROM anl_mincut_result_hydrometer AS t1 "
+                   f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
+                   f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
+                   f"WHERE result_id = {id_}")
 
             rows = self.controller.get_rows(sql, commit=True, log_sql=True)
             if not rows:
@@ -194,10 +194,10 @@ class MincutConfig(ParentAction):
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
             print(row[4])
             if row[4] is None:
-                sql += ("SET notified = ('[{\"code\":\""+str(status_code)+"\",\"date\":\""+str(_date_sended)+"\"}]') ")
+                sql += f"SET notified = ('[{{\"code\":\"{status_code}\",\"date\":\"{date_sended}\"}}]') "
             else:
-                sql += ("SET notified= concat(replace(notified::text,']',','),'{\"code\":\""+str(status_code)+"\",\"date\":\""+str(_date_sended)+"\"}]')::json ")
-            sql += ("WHERE id = '"+str(id_)+"'")
+                sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{status_code}\",\"date\":\"{_date_sended}\"}}]')::json "
+            sql += f"WHERE id = '{id_}'"
             row = self.controller.execute_sql(sql, commit=True, log_sql=True)
 
             # Set a model with selected filter. Attach that model to selected table
@@ -217,16 +217,16 @@ class MincutConfig(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = self.tbl_mincut_edit.model().record(row).value("id")
-            inf_text += str(id_)+", "
-            list_id = list_id+"'"+str(id_)+"', "
+            inf_text += f"{id_}, "
+            list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         msg = "Are you sure you want to cancel these mincuts?"
         title = "Cancel mincuts"
         answer = self.controller.ask_question(msg, title, inf_text)
         if answer:
-            sql = ("UPDATE anl_mincut_result_cat SET mincut_state = 3 "
-                   " WHERE id::text IN ("+list_id+")")
+            sql = (f"UPDATE anl_mincut_result_cat SET mincut_state = 3 "
+                   f" WHERE id::text IN ({list_id})")
             self.controller.execute_sql(sql, log_sql=False)
             self.tbl_mincut_edit.model().select()
 
@@ -239,12 +239,12 @@ class MincutConfig(ParentAction):
             self.controller.show_warning(message)
             return
 
-        sql = ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;")
+        sql = "DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = self.tbl_mincut_edit.model().record(row).value("id")
-            sql += ("\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) "
-                    "  VALUES(current_user, " + str(id_) + ");")
+            sql += (f"\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) "
+                    f"  VALUES(current_user, {id_});")
         status = self.controller.execute_sql(sql)
         if not status:
             message = "Error updating table"
@@ -261,7 +261,7 @@ class MincutConfig(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
 
-        sql = ("SELECT expl_id, name FROM exploitation ORDER BY name")
+        sql = "SELECT expl_id, name FROM exploitation ORDER BY name"
         rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
@@ -326,10 +326,9 @@ class MincutConfig(ParentAction):
 
         format_low = '%Y-%m-%d 00:00:00.000'
         format_high = '%Y-%m-%d 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            date_from.strftime(format_low), date_to.strftime(format_high))
+        interval = f"'{date_from.strftime(format_low)}'::timestamp AND '{date_to.strftime(format_high)}'::timestamp"
 
-        expr = "(forecast_start BETWEEN {0})".format(interval)
+        expr = f"(forecast_start BETWEEN {interval})"
         self.controller.log_info(str(expr))
         self.tbl_mincut_edit.model().setFilter(expr)
         self.tbl_mincut_edit.model().select()
@@ -364,25 +363,24 @@ class MincutConfig(ParentAction):
             # Create interval dates
             format_low = 'yyyy-MM-dd 00:00:00.000'
             format_high = 'yyyy-MM-dd 23:59:59.999'
-            interval = "'{}'::timestamp AND '{}'::timestamp".format(
-                visit_start.toString(format_low), visit_end.toString(format_high))
+            interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
             if state in 'Planified':
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
-                dates_filter = ("AND (forecast_start BETWEEN {0}) AND (forecast_end BETWEEN {0})".format(interval))
+                dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
             elif state in ('In Progress', 'Finished'):
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: exec_end')
-                dates_filter = ("AND (exec_start BETWEEN {0}) AND (exec_end BETWEEN {0})".format(interval))
+                dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
             else:
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from:')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to:')
-        expr += " (id::text ILIKE '%" + id_ + "%'"
-        expr += " OR work_order::text ILIKE '%" + id_ + "%' OR work_order IS null)"
-        expr += " " + dates_filter + ""
+        expr += f" (id::text ILIKE '%{id_}%'"
+        expr += f" OR work_order::text ILIKE '%{id_}%' OR work_order IS null)"
+        expr += f" {dates_filter}"
         if state != '':
-            expr += " AND state::text ILIKE '%" + state + "%' OR state IS null"
-        expr += " AND expl_id::text ILIKE '%" + str(expl) + "%' OR expl_id IS null"
+            expr += f" AND state::text ILIKE '%{state}%' OR state IS null"
+        expr += f" AND expl_id::text ILIKE '%{expl}%' OR expl_id IS null"
         self.controller.log_info(str(expr))
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
@@ -422,16 +420,16 @@ class MincutConfig(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            inf_text+= str(id_) + ", "
-            list_id = list_id + "'" + str(id_) + "', "
+            inf_text += f"{id_}, "
+            list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = ("DELETE FROM " + table_name + ""
-                   " WHERE " + column_id + " IN (" + list_id + ")")
+            sql = (f"DELETE FROM {table_name}"
+                   f" WHERE {column_id} IN ({list_id})")
             self.controller.execute_sql(sql)
             widget.model().select()
             layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_node')
@@ -452,4 +450,3 @@ class MincutConfig(ParentAction):
             layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_hydrometer')
             if layer is not None:
                 layer.triggerRepaint()
-

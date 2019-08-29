@@ -108,8 +108,8 @@ class TmParentManage(TmParentAction, object):
         widget.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = ("SELECT " + geom_type + "_id"
-               " FROM " + viewname)
+        sql = (f"SELECT {geom_type}_id"
+               f" FROM {viewname}")
         row = self.controller.get_rows(sql, commit=self.autocommit)
         if row:
             for i in range(0, len(row)):
@@ -206,7 +206,7 @@ class TmParentManage(TmParentAction, object):
         self.disconnect_signal_selection_changed()
 
         if type(table_object) is str:
-            widget_name = "tbl_" + table_object + "_x_" + self.geom_type
+            widget_name = f"tbl_{table_object}_x_{self.geom_type}"
             widget = utils_giswater.getWidget(dialog, widget_name)
             if not widget:
                 message = "Widget not found"
@@ -235,7 +235,7 @@ class TmParentManage(TmParentAction, object):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_feature = widget.model().record(row).value(field_id)
-            inf_text += str(id_feature) + ", "
+            inf_text += f"{id_feature}, "
 
             del_id.append(id_feature)
         inf_text = inf_text[:-2]
@@ -254,9 +254,9 @@ class TmParentManage(TmParentAction, object):
         if len(self.ids) > 0:
 
             # Set expression filter with features in the list
-            expr_filter = "\"" + field_id + "\" IN ("
+            expr_filter = f'"{field_id}" IN ('
             for i in range(len(self.ids)):
-                expr_filter += "'" + str(self.ids[i]) + "', "
+                expr_filter += f"'{self.ids[i]}', "
             expr_filter = expr_filter[:-2] + ")"
 
             # Check expression
@@ -321,9 +321,9 @@ class TmParentManage(TmParentAction, object):
         expr_filter = None
         if len(self.ids) > 0:
             # Set 'expr_filter' with features that are in the list
-            expr_filter = "\"" + field_id + "\" IN ("
+            expr_filter = f'"{field_id}" IN ('
             for i in range(len(self.ids)):
-                expr_filter += "'" + str(self.ids[i]) + "', "
+                expr_filter += f"'{self.ids[i]}', "
             expr_filter = expr_filter[:-2] + ")"
 
             # Check expression
@@ -373,9 +373,9 @@ class TmParentManage(TmParentAction, object):
                 self.ids.append(str(feature_id))
 
         # Set expression filter with features in the list
-        expr_filter = "\"" + field_id + "\" IN ("
+        expr_filter = f'"{field_id}" IN ('
         for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
+            expr_filter += f"'{self.ids[i]}', "
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
@@ -490,7 +490,7 @@ class TmParentManage(TmParentAction, object):
 
         for layer in layers:
             if self.controller.is_layer_visible(layer):
-                visible_layer += '"' + str(layer.name()) + '", '
+                visible_layer += f'"{layer.name()}", '
         visible_layer = visible_layer[:-2] + "}"
 
         return visible_layer

@@ -109,13 +109,13 @@ class ManageWorkcatEnd(ParentManage):
                "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
-            sql = ("UPDATE config_param_user "
-                   "SET value = '" + str(value) + "' "
-                   "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
+            sql = (f"UPDATE config_param_user "
+                   f"SET value = '{value}' "
+                   f"WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
             self.controller.execute_sql(sql, log_sql=True)
         else:
-            sql = ("INSERT INTO config_param_user (parameter, value, cur_user) "
-                   "VALUES ('edit_arc_downgrade_force', '" + str(value) + "', current_user)")
+            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+                   f"VALUES ('edit_arc_downgrade_force', '{value}', current_user)")
             self.controller.execute_sql(sql, commit=self.autocommit)
 
 
@@ -131,7 +131,7 @@ class ManageWorkcatEnd(ParentManage):
             enddate = QDate.currentDate()
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
-        sql = ("SELECT id FROM cat_work")
+        sql = "SELECT id FROM cat_work"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
@@ -148,9 +148,9 @@ class ManageWorkcatEnd(ParentManage):
         workcat_id = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         if not workcat_id:
             return
-        sql = ("SELECT descript, builtdate "
-               "FROM cat_work "
-               "WHERE id = '" + workcat_id + "'")
+        sql = (f"SELECT descript, builtdate "
+               f"FROM cat_work "
+               f"WHERE id = '{workcat_id}'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
@@ -173,7 +173,7 @@ class ManageWorkcatEnd(ParentManage):
             index = selected_list.index(x, 0)
             id_ = selected_list.data(index)
             self.selected_list.append(id_)
-            ids_list = ids_list + "'" + id_ + "'" + ","
+            ids_list += f"'{id_}',"
         ids_list = ids_list[:-1]
 
         return ids_list
@@ -190,8 +190,8 @@ class ManageWorkcatEnd(ParentManage):
         ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
         row = None
         if ids_list:
-            sql = ("SELECT * FROM v_ui_arc_x_relations "
-                   "WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
+            sql = (f"SELECT * FROM v_ui_arc_x_relations "
+                   f"WHERE arc_id IN ( {ids_list}) AND arc_state = '1'")
             row = self.controller.get_row(sql)
             ids_list = None
 
@@ -212,7 +212,7 @@ class ManageWorkcatEnd(ParentManage):
 
             filter_ = ""
             for row in self.selected_list:
-                filter_ += "arc_id = '" + str(row) + "' OR "
+                filter_ += f"arc_id = '{row}' OR "
             filter_ = filter_[:-3] + ""
             filter_ += " AND arc_state = '1' "
 
@@ -249,10 +249,10 @@ class ManageWorkcatEnd(ParentManage):
 
         sql = ""
         for id_ in self.selected_list:
-            sql += ("UPDATE " + tablename + " "
-                    "SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "', "
-                    "enddate = '" + str(self.enddate) + "' "
-                    "WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
+            sql += (f"UPDATE {tablename} "
+                    f"SET state = '0', workcat_id_end = '{self.workcat_id_end}', "
+                    f"enddate = '{self.enddate}' "
+                    f"WHERE {geom_type}_id = '{id_}';\n")
         if sql != "":
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
@@ -302,9 +302,9 @@ class ManageWorkcatEnd(ParentManage):
         """ Open form corresponding to start or end node of the current arc """
 
         # Get sys_feature_cat.id from cat_feature.id
-        sql = ("SELECT sys_type"
-               " FROM v_edit_arc"
-               " WHERE arc_id = '" + arc_id + "'")
+        sql = (f"SELECT sys_type"
+               f" FROM v_edit_arc"
+               f" WHERE arc_id = '{arc_id}'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -314,7 +314,7 @@ class ManageWorkcatEnd(ParentManage):
         layer_arc= self.controller.get_layer_by_tablename(arc_table)
 
         aux = "\"arc_id\" = "
-        aux += "'" + str(arc_id) + "'"
+        aux += f"'{arc_id}'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error"
@@ -368,7 +368,7 @@ class ManageWorkcatEnd(ParentManage):
 
         id_ = utils_giswater.getWidgetText(self.dlg_work, widget_txt)
         if id_ != 'null':
-            expr = " arc_id = '" + id_ + "'"
+            expr = f" arc_id = '{id_}'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
@@ -381,7 +381,7 @@ class ManageWorkcatEnd(ParentManage):
 
         filter_ = ""
         for row in self.selected_list:
-            filter_ += "arc_id = '" + str(row) + "' OR "
+            filter_ += f"arc_id = '{row}' OR "
         filter_ = filter_[:-3] + ""
         filter_ += " AND arc_state = '1' "
 
@@ -436,9 +436,9 @@ class ManageWorkcatEnd(ParentManage):
                 for row in rows:
                     ids_ += str(row[1]) + ", "
                     state_statetype = str(row['log_message']).split(',')
-                    sql = ("UPDATE " + str(row[0].lower()) + " "
-                           "SET state = '" + str(state_statetype[0]) + "', state_type = '" + str(state_statetype[1]) + "' "
-                           "WHERE " + str(row[0]) + "_id = '" + str(row[1]) + "';")
+                    sql = (f"UPDATE {row[0].lower()} "
+                           f"SET state = '{state_statetype[0]}', state_type = '{state_statetype[1]}' "
+                           f"WHERE {row[0]}_id = '{row[1]}';")
                     self.controller.execute_sql(sql)
 
                 self.set_edit_arc_downgrade_force('False')
@@ -480,28 +480,28 @@ class ManageWorkcatEnd(ParentManage):
         cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
-            values += ("'" + str(cat_work_id) + "', ")
+            values += f"'{cat_work_id}', "
         descript = utils_giswater.getWidgetText(self.dlg_new_workcat, "descript")
         if descript != "null":
             fields += 'descript, '
-            values += ("'" + str(descript) + "', ")
+            values += f"'{descript}', "
         link = utils_giswater.getWidgetText(self.dlg_new_workcat, "link")
         if link != "null":
             fields += 'link, '
-            values += ("'" + str(link) + "', ")
+            values += f"'{link}', "
         workid_key_1 = utils_giswater.getWidgetText(self.dlg_new_workcat, "workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
-            values += ("'" + str(workid_key_1) + "', ")
+            values += f"'{workid_key_1}', "
         workid_key_2 = utils_giswater.getWidgetText(self.dlg_new_workcat, "workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
-            values += ("'" + str(workid_key_2) + "', ")
+            values += f"'{workid_key_2}', "
         builtdate = self.dlg_new_workcat.builtdate.dateTime().toString('yyyy-MM-dd')
 
         if builtdate != "null":
             fields += 'builtdate, '
-            values += ("'" + str(builtdate) + "', ")
+            values += f"'{builtdate}', "
 
         if values == "":
             return
@@ -513,14 +513,14 @@ class ManageWorkcatEnd(ParentManage):
             self.controller.show_info_box(msg, "Warning")
         else:
             # Check if this element already exists
-            sql = ("SELECT DISTINCT(id)"
-                   " FROM " + str(table_object) + ""
-                   " WHERE id = '" + str(cat_work_id) + "'")
+            sql = (f"SELECT DISTINCT(id)"
+                   f" FROM {table_object}"
+                   f" WHERE id = '{cat_work_id}'")
             row = self.controller.get_row(sql, log_info=False, log_sql=True)
             if row is None:
-                sql = ("INSERT INTO cat_work (" + fields + ") VALUES (" + values + ")")
+                sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                 self.controller.execute_sql(sql, log_sql=True)
-                sql = ("SELECT id FROM cat_work ORDER BY id")
+                sql = "SELECT id FROM cat_work ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 if rows:
                     utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)

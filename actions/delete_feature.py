@@ -43,7 +43,7 @@ class DeleteFeature(ApiParent):
         self.load_settings(self.dlg_delete_feature)
 
         # Populate combo feature type
-        sql = ('SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature')
+        sql = 'SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature'
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_delete_feature.feature_type, rows, 1)
 
@@ -81,7 +81,7 @@ class DeleteFeature(ApiParent):
         feature_id = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id)
 
         # Get child layer
-        sql = ("SELECT array_agg(" + feature_type + "_id) FROM " + feature_type + " WHERE " + feature_type + "_id LIKE '%" + feature_id + "%' LIMIT 10")
+        sql = f"SELECT array_agg({feature_type}_id) FROM {feature_type} WHERE {feature_type}_id LIKE '%{feature_id}%' LIMIT 10"
         self.rows_typeahead = self.controller.get_rows(sql, log_sql=True, commit=True)
         self.rows_typeahead = self.rows_typeahead[0][0]
 
@@ -102,7 +102,7 @@ class DeleteFeature(ApiParent):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = ("SELECT gw_fct_get_feature_relation($${" + body + "}$$)")
+        sql = f"SELECT gw_fct_get_feature_relation($${{{body}}}$$)"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row:
@@ -129,7 +129,7 @@ class DeleteFeature(ApiParent):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = ("SELECT gw_fct_set_delete_feature($${" + body + "}$$)::text")
+        sql = f"SELECT gw_fct_set_delete_feature($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row or row[0] is None:

@@ -87,7 +87,7 @@ class ApiParent(ParentAction):
         for layer in layers:
             if self.controller.is_layer_visible(layer):
                 table_name = self.controller.get_layer_source_table_name(layer)
-                visible_layer += '"' + str(table_name) + '", '
+                visible_layer += f'"{table_name}", '
         visible_layer = visible_layer[:-2]
 
         if as_list is True:
@@ -105,7 +105,7 @@ class ApiParent(ParentAction):
         for layer in layers:
             if not layer.isReadOnly():
                 table_name = self.controller.get_layer_source_table_name(layer)
-                editable_layer += '"' + str(table_name) + '", '
+                editable_layer += f'"{table_name}", '
         editable_layer = editable_layer[:-2] + "}"
         return editable_layer
 
@@ -138,8 +138,8 @@ class ApiParent(ParentAction):
         field_object_id = "id"
         if table_object == "element":
             field_object_id = table_object + "_id"
-        sql = ("SELECT DISTINCT(" + field_object_id + ")"
-               " FROM " + table_object)
+        sql = (f"SELECT DISTINCT({field_object_id})"
+               f" FROM {table_object}")
 
         rows = self.controller.get_rows(sql, log_sql=True)
         for i in range(0, len(rows)):
@@ -251,14 +251,14 @@ class ApiParent(ParentAction):
         wsoftware = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
-        pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+        pdf_path = os.path.join(pdf_folder, f"{wsoftware}_{geom_type}_{locale}.pdf")
 
         # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
         else:
             locale = "es"
-            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+            pdf_path = os.path.join(pdf_folder, f"{wsoftware}_{geom_type}_{locale}.pdf")
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
@@ -282,31 +282,31 @@ class ApiParent(ParentAction):
             return
 
         viewname = self.controller.get_layer_source_table_name(self.layer)
-        sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
-               " FROM " + viewname + ""
-               " WHERE node_id = '" + self.feature_id + "'")
+        sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
+               f" FROM {viewname}"
+               f" WHERE node_id = '{self.feature_id}'")
         row = self.controller.get_row(sql)
         if row:
             existing_point_x = row[0]
             existing_point_y = row[1]
 
-        sql = ("UPDATE node"
-               " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
-               " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
-               " WHERE node_id = '" + str(self.feature_id) + "'")
+        sql = (f"UPDATE node"
+               f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
+               f" ST_Point({point.x()}, {point.y()}))))"
+               f" WHERE node_id = '{self.feature_id}'")
         status = self.controller.execute_sql(sql)
         if not status:
             self.canvas.setMapTool(self.previous_map_tool)
             return
 
-        sql = ("SELECT rotation FROM node "
-               " WHERE node_id='" + str(self.feature_id) + "'")
+        sql = (f"SELECT rotation FROM node "
+               f" WHERE node_id='{self.feature_id}'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(dialog, "rotation", str(row[0]))
 
-        sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
-               " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
+        sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
+               f" ST_Point({point.x()}, {point.y()})))")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(dialog, "hemisphere", str(row[0]))
@@ -414,8 +414,8 @@ class ApiParent(ParentAction):
             self.api_disable_copy_paste(dialog)
             return
 
-        aux = "\"" + str(self.geom_type) + "_id\" = "
-        aux += "'" + str(self.feature_id) + "'"
+        aux = f'"{self.geom_type}_id" = '
+        aux += f"'{self.feature_id}'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error"
@@ -434,8 +434,8 @@ class ApiParent(ParentAction):
         # Select only first element of the feature list
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.geom_type) + '_id')
-        message = ("Selected snapped feature_id to copy values from: " + str(snapped_feature_attr[0]) + "\n"
-                   "Do you want to copy its values to the current node?\n\n")
+        message = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
+                   f"Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []
@@ -455,7 +455,7 @@ class ApiParent(ParentAction):
                     fields_aux.append(fields[i].name())
 
         for i in range(0, len(fields_aux)):
-            message += str(fields_aux[i]) + ": " + str(snapped_feature_attr_aux[i]) + "\n"
+            message += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
 
         # Ask confirmation question showing fields that will be copied
         answer = self.controller.ask_question(message, "Update records", None)
@@ -506,10 +506,10 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = ("SELECT column_index, width, alias, status"
-               " FROM config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
-               " ORDER BY column_index")
+        sql = (f"SELECT column_index, width, alias, status"
+               f" FROM config_client_forms"
+               f" WHERE table_id = '{table_name}'"
+               f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
@@ -541,10 +541,10 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_show = ""
-        sql = ("SELECT column_index, width, column_id, alias, status"
-               " FROM config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
-               " ORDER BY column_index")
+        sql = (f"SELECT column_index, width, column_id, alias, status"
+               f" FROM config_client_forms"
+               f" WHERE table_id = '{table_name}'"
+               f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return
@@ -595,7 +595,7 @@ class ApiParent(ParentAction):
                 function_name = field['widgetfunction']
                 exist = self.controller.check_python_function(self, function_name)
                 if not exist:
-                    msg = "widget {0} have associated function {1}, but {1} not exist".format(real_name, function_name)
+                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                     self.controller.show_message(msg, 2)
                     return widget
             else:
@@ -682,15 +682,15 @@ class ApiParent(ParentAction):
         if not widget:
             return
 
-        extras = '"queryText":"' + field['queryText'] + '"'
-        extras += ', "fieldToSearch":"' + str(field['fieldToSearch']) + '"'
-        extras += ', "queryTextFilter":"' + str(field['queryTextFilter']) + '"'
-        extras += ', "parentId":"' + str(field['parentId']) + '"'
-        extras += ', "parentValue":"' + str(utils_giswater.getWidgetText(dialog, 'data_' + str(field['parentId']))) + '"'
-        extras += ', "textToSearch":"' + str(utils_giswater.getWidgetText(dialog, widget))+'"'
+        extras = f'"queryText":"{field["queryText"]}"'
+        extras += f', "fieldToSearch":"{field["fieldToSearch"]}"'
+        extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
+        extras += f', "parentId":"{field["parentId"]}"'
+        extras += f', "parentValue":"{utils_giswater.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
+        extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
-        sql = ("SELECT gw_api_gettypeahead($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_gettypeahead($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -718,7 +718,7 @@ class ApiParent(ParentAction):
                 function_name = field['widgetfunction']
                 exist = self.controller.check_python_function(self, function_name)
                 if not exist:
-                    msg = "widget {0} have associated function {1}, but {1} not exist".format(real_name, function_name)
+                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                     self.controller.show_message(msg, 2)
                     return widget
         # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
@@ -728,7 +728,7 @@ class ApiParent(ParentAction):
 
     def no_function_associated(self, widget=None, message_level=1):
 
-        msg = "No function associated to {} {}: ".format(str(type(widget)), str(widget.objectName()))
+        msg = f"No function associated to {type(widget)} {widget.objectName()}: "
         self.controller.show_message(msg, message_level)
 
 
@@ -767,10 +767,10 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = ("SELECT column_index, width, alias, status"
-               " FROM config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
-               " ORDER BY column_index")
+        sql = (f"SELECT column_index, width, alias, status"
+               f" FROM config_client_forms"
+               f" WHERE table_id = '{table_name}'"
+               f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False, commit=True)
         if not rows:
             return widget
@@ -845,7 +845,7 @@ class ApiParent(ParentAction):
     def add_frame(self, field, x=None):
     
         widget = QFrame()
-        widget.setObjectName(field['widgetname'] + "_" + str(x))
+        widget.setObjectName(f"{field['widgetname']}_{x}")
         if 'column_id' in field:
             widget.setProperty('column_id', field['column_id'])
         widget.setFrameShape(QFrame.HLine)
@@ -890,7 +890,7 @@ class ApiParent(ParentAction):
                 func_name = field['widgetfunction']
                 exist = self.controller.check_python_function(self, func_name)
                 if not exist:
-                    msg = "widget {0} have associated function {1}, but {1} not exist".format(real_name, func_name)
+                    msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                     self.controller.show_message(msg, 2)
                     return widget
             else:
@@ -1230,9 +1230,9 @@ class ApiParent(ParentAction):
             self.iface.actionPan().trigger()
             self.iface.setActiveLayer(self.layer)
             self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
-            sql = ("SELECT gw_fct_node_interpolate('"
-                   ""+str(self.last_point[0])+"', '"+str(self.last_point[1])+"', '"
-                   ""+str(self.node1)+"', '"+self.node2+"')")
+            sql = (f"SELECT gw_fct_node_interpolate('"
+                   f"{self.last_point[0]}', '{self.last_point[1]}', '"
+                   f"{self.node1}', '{self.node2}')")
             row = self.controller.get_row(sql, log_sql=True)
             if row:
                 if 'elev' in row[0]:

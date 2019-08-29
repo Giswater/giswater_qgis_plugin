@@ -67,13 +67,13 @@ class Edit(ParentAction):
         list_points = None
         if self.layer.geometryType() == 0:
             points = geom.asPoint()
-            list_points = '"x1":' + str(points.x()) + ', "y1":' + str(points.y())
+            list_points = f'"x1":{points.x()}, "y1":{points.y()}'
         elif self.layer.geometryType() in(1, 2):
             points = geom.asPolyline()
             init_point = points[0]
             last_point = points[-1]
-            list_points = '"x1":' + str(init_point.x()) + ', "y1":' + str(init_point.y())
-            list_points += ', "x2":' + str(last_point.x()) + ', "y2":' + str(last_point.y())
+            list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
+            list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 

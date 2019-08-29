@@ -40,8 +40,8 @@ class ManageGallery(ParentManage):
         self.img_path_list1D = []
 
         # Get all pictures for event_id | visit_id
-        sql = ("SELECT value FROM om_visit_event_photo"
-               " WHERE event_id = '" + str(event_id) + "' AND visit_id = '" + str(visit_id) + "'")
+        sql = (f"SELECT value FROM om_visit_event_photo"
+               f" WHERE event_id = '{event_id}' AND visit_id = '{visit_id}'")
         rows = self.controller.get_rows(sql)
         num = len(rows)
 

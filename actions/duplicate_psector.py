@@ -65,12 +65,12 @@ class DuplicatePsector(ParentManage, QObject):
 
         # Create body
         feature = '"type":"PSECTOR"'
-        extras = '"psector_id":"' + str(id_psector) + '", "new_psector_name":"' + str(new_psector_name) + '"'
+        extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
         # Execute manage add fields function
-        sql = ("SELECT gw_fct_duplicate_psector($${" + body + "}$$)::text")
+        sql = f"SELECT gw_fct_duplicate_psector($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row or row[0] is None:
