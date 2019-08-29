@@ -215,8 +215,8 @@ class Utils(ParentAction):
     def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
         """ Delete records from temp_csv2pg for current user and selected cat """
 
-        sql = ("DELETE FROM " + temp_tablename + " "
-               "WHERE csv2pgcat_id = '" + str(csv2pgcat_id_aux) + "' AND user_name = current_user")
+        sql = (f"DELETE FROM {temp_tablename} "
+               f"WHERE csv2pgcat_id = '{csv2pgcat_id_aux}' AND user_name = current_user")
         self.controller.execute_sql(sql, log_sql=True)
 
 
@@ -252,8 +252,8 @@ class Utils(ParentAction):
         if insert_status is False:
             return
 
-        extras = '"importParam":"' + label_aux + '"'
-        extras += ', "csv2pgCat":"' + str(csv2pgcat_id_aux) + '"'
+        extras = f'"importParam":"{label_aux}"'
+        extras += f', "csv2pgCat":"{csv2pgcat_id_aux}"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + str(self.func_name) + "($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
@@ -293,10 +293,10 @@ class Utils(ParentAction):
                 continue
             if len(row) > 0:
                 sql += "INSERT INTO temp_csv2pg (csv2pgcat_id, "
-                values = "VALUES("+str(csv2pgcat_id_aux)+", "
+                values = f"VALUES({csv2pgcat_id_aux}, "
                 for x in range(0, len(row)):
-                        sql += "csv" + str(x + 1) + ", "
-                        value = "$$" + row[x].strip().replace("\n", "") + "$$, "
+                        sql += f"csv{x + 1}, "
+                        value = f"$$" + row[x].strip().replace("\n", "") + "$$, "
                         if Qgis.QGIS_VERSION_INT < 29900:
                             value = str(value.decode(str(_unicode)))
                         else:
@@ -326,9 +326,9 @@ class Utils(ParentAction):
         if roles is None:
             return
 
-        sql = ("SELECT DISTINCT(" + field_id + "), " + fields + ""
-               " FROM " + table_name + ""
-               " WHERE sys_role IN " + roles + " AND formname='importcsv' AND isdeprecated is not True")
+        sql = (f"SELECT DISTINCT({field_id}), {fields}"
+               f" FROM {table_name}"
+               f" WHERE sys_role IN {roles} AND formname='importcsv' AND isdeprecated is not True")
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "You do not have permission to execute this application"
@@ -378,12 +378,12 @@ class Utils(ParentAction):
         """ Insert @fprocesscat_id for current_user in table 'selector_audit' """
 
         tablename = "selector_audit"
-        sql = ("SELECT * FROM " + tablename + " "
-               "WHERE fprocesscat_id = " + str(fprocesscat_id) + " AND cur_user = current_user;")
+        sql = (f"SELECT * FROM {tablename} "
+               f"WHERE fprocesscat_id = {fprocesscat_id} AND cur_user = current_user;")
         row = self.controller.get_row(sql)
         if not row:
-            sql = ("INSERT INTO " + tablename + " (fprocesscat_id, cur_user) "
-                   "VALUES (" + str(fprocesscat_id) + ", current_user);")
+            sql = (f"INSERT INTO {tablename} (fprocesscat_id, cur_user) "
+                   f"VALUES ({fprocesscat_id}, current_user);")
         self.controller.execute_sql(sql)
 
 

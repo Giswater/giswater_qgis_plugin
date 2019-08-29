@@ -161,23 +161,23 @@ class ParentManage(ParentAction, object):
                     
             state = ""  
             if row['state']:          
-                sql = ("SELECT name FROM value_state"
-                       " WHERE id = '" + str(row['state']) + "'")
+                sql = (f"SELECT name FROM value_state"
+                       f" WHERE id = '{row['state']}'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     state = row_aux[0]
     
             expl_id = ""
             if row['expl_id']:
-                sql = ("SELECT name FROM exploitation"
-                       " WHERE expl_id = '" + str(row['expl_id']) + "'")
+                sql = (f"SELECT name FROM exploitation"
+                       f" WHERE expl_id = '{row['expl_id']}'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     expl_id = row_aux[0]
 
             utils_giswater.setWidgetText(dialog, "code", row['code'])
-            sql = ("SELECT elementtype_id FROM cat_element"
-                   " WHERE id = '" + str(row['elementcat_id']) + "'")
+            sql = (f"SELECT elementtype_id FROM cat_element"
+                   f" WHERE id = '{row['elementcat_id']}'")
             row_type = self.controller.get_row(sql)
             if row_type:
                 utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
@@ -210,12 +210,12 @@ class ParentManage(ParentAction, object):
         
         exists = self.controller.check_table(table_relation)
         if not exists:
-            self.controller.log_info("Not found: " + str(table_relation))
+            self.controller.log_info(f"Not found: {table_relation}")
             return
               
-        sql = ("SELECT " + geom_type + "_id "
-               "FROM " + table_relation + " "
-               "WHERE " + table_object + "_id = '" + str(object_id) + "'")
+        sql = (f"SELECT {geom_type}_id "
+               f"FROM {table_relation} "
+               f"WHERE {table_object}_id = '{object_id}'")
         rows = self.controller.get_rows(sql, log_info=False)
         if rows:
             for row in rows:
@@ -224,8 +224,8 @@ class ParentManage(ParentAction, object):
 
             expr_filter = self.get_expr_filter(geom_type)
             self.set_table_model(dialog, widget_name, geom_type, expr_filter)
-            
-                                
+    
+    
     def exist_object(self, dialog, table_object):
         """ Check if selected object (document or element) already exists """
         
@@ -238,9 +238,9 @@ class ParentManage(ParentAction, object):
         object_id = utils_giswater.getWidgetText(dialog, table_object + "_id")
 
         # Check if we already have data with selected object_id
-        sql = ("SELECT * " 
-               " FROM " + str(table_object) + ""
-               " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
+        sql = (f"SELECT * "
+               f" FROM {table_object}"
+               f" WHERE {field_object_id} = '{object_id}'")
         row = self.controller.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data
@@ -290,9 +290,9 @@ class ParentManage(ParentAction, object):
     def populate_combo(self, dialog, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
-        sql = ("SELECT " + field_name + ""
-               " FROM " + table_name + ""
-               " ORDER BY " + field_name)
+        sql = (f"SELECT {field_name}"
+               f" FROM {table_name}"
+               f" ORDER BY {field_name}")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(dialog, widget, rows)
         if rows:
@@ -302,9 +302,9 @@ class ParentManage(ParentAction, object):
     def set_combo(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
         """ Executes query and set combo box """
         
-        sql = ("SELECT t1." + field_name + " FROM " + table_name + " as t1"
-               " INNER JOIN config_param_user as t2 ON t1." + field_id + "::text = t2.value::text"
-               " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
+        sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
+               f" INNER JOIN config_param_user as t2 ON t1.{field_id}::text = t2.value::text"
+               f" WHERE parameter = '{parameter}' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(dialog, widget, row[0])
@@ -313,8 +313,8 @@ class ParentManage(ParentAction, object):
     def set_calendars(self, dialog, widget, table_name, value, parameter):
         """ Executes query and set QDateEdit """
         
-        sql = ("SELECT " + value + " FROM " + table_name + ""
-               " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
+        sql = (f"SELECT {value} FROM {table_name}"
+               f" WHERE parameter = '{parameter}' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
             date = QDate.fromString(row[0], 'yyyy-MM-dd')
@@ -411,8 +411,8 @@ class ParentManage(ParentAction, object):
             self.geom_type = "gully"
 
         self.hide_generic_layers()                  
-        widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
-        viewname = "v_edit_" + str(self.geom_type)
+        widget_name = f"tbl_{table_object}_x_{self.geom_type}"
+        viewname = f"v_edit_{self.geom_type}"
         self.widget = utils_giswater.getWidget(dialog, widget_name)
             
         # Adding auto-completion to a QLineEdit
@@ -434,8 +434,8 @@ class ParentManage(ParentAction, object):
         field_object_id = "id"
         if table_object == "element":
             field_object_id = table_object + "_id"
-        sql = ("SELECT DISTINCT(" + field_object_id + ")"
-               " FROM " + table_object)
+        sql = (f"SELECT DISTINCT({field_object_id})"
+               f" FROM {table_object}")
         row = self.controller.get_rows(sql, commit=self.autocommit)
         for i in range(0, len(row)):
             aux = row[i]
@@ -459,9 +459,9 @@ class ParentManage(ParentAction, object):
             return
 
         # Set SQL
-        sql = ("SELECT DISTINCT(" + field_id + ")"
-               " FROM " + tablename +""
-               " ORDER BY "+ field_id + "")
+        sql = (f"SELECT DISTINCT({field_id})"
+               f" FROM {tablename}"
+               f" ORDER BY {field_id}")
         row = self.controller.get_rows(sql)
         for i in range(0, len(row)):
             aux = row[i]
@@ -487,8 +487,8 @@ class ParentManage(ParentAction, object):
         widget.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = ("SELECT " + geom_type + "_id"
-               " FROM " + viewname)
+        sql = (f"SELECT {geom_type}_id"
+               f" FROM {viewname}")
         row = self.controller.get_rows(sql, commit=self.autocommit)
         if row:
             for i in range(0, len(row)):
@@ -512,7 +512,7 @@ class ParentManage(ParentAction, object):
         # Set expression filter with features in the list        
         expr_filter = field_id + " IN ("
         for i in range(len(list_ids)):
-            expr_filter += "'" + str(list_ids[i]) + "', "
+            expr_filter += f"'{list_ids[i]}', "
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
@@ -530,7 +530,7 @@ class ParentManage(ParentAction, object):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
         if type(table_object) is str:
-            widget_name = "tbl_" + table_object + "_x_" + geom_type
+            widget_name = f"tbl_{table_object}_x_{geom_type}"
             widget = utils_giswater.getWidget(dialog, widget_name)
 
             if not widget:
@@ -643,7 +643,7 @@ class ParentManage(ParentAction, object):
         self.disconnect_signal_selection_changed()
 
         if type(table_object) is str:
-            widget_name = "tbl_" + table_object + "_x_" + self.geom_type
+            widget_name = f"tbl_{table_object}_x_{self.geom_type}"
             widget = utils_giswater.getWidget(dialog, widget_name)
             if not widget:
                 message = "Widget not found"
@@ -666,7 +666,7 @@ class ParentManage(ParentAction, object):
         if query:
             full_list = widget.model()
             for x in range(0, full_list.rowCount()):
-                self.ids.append(widget.model().record(x).value(str(self.geom_type)+"_id"))
+                self.ids.append(widget.model().record(x).value(f"{self.geom_type}_id"))
         else:
             self.ids = self.list_ids[self.geom_type]
 
@@ -678,8 +678,8 @@ class ParentManage(ParentAction, object):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_feature = widget.model().record(row).value(field_id)
-            inf_text += str(id_feature) + ", "
-            list_id = list_id + "'" + str(id_feature) + "', "
+            inf_text += f"{id_feature}, "
+            list_id += f"'{id_feature}', "
             del_id.append(id_feature)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -697,9 +697,9 @@ class ParentManage(ParentAction, object):
         if len(self.ids) > 0:
 
             # Set expression filter with features in the list
-            expr_filter = "\"" + field_id + "\" IN ("
+            expr_filter = f'"{field_id}" IN ('
             for i in range(len(self.ids)):
-                expr_filter += "'" + str(self.ids[i]) + "', "
+                expr_filter += f"'{self.ids[i]}', "
             expr_filter = expr_filter[:-2] + ")"
 
             # Check expression
@@ -797,9 +797,9 @@ class ParentManage(ParentAction, object):
         expr_filter = None
         if len(self.ids) > 0:
             # Set 'expr_filter' with features that are in the list
-            expr_filter = "\"" + field_id + "\" IN ("
+            expr_filter = f'"{field_id}" IN ('
             for i in range(len(self.ids)):
-                expr_filter += "'" + str(self.ids[i]) + "', "
+                expr_filter += f"'{self.ids[i]}', "
             expr_filter = expr_filter[:-2] + ")"
 
             # Check expression
@@ -830,8 +830,8 @@ class ParentManage(ParentAction, object):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
-        sql = ("DELETE FROM " + self.plan_om + "_psector_x_" + geom_type + " "
-               "WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id = '" + str(value) + "'")
+        sql = (f"DELETE FROM {self.plan_om}_psector_x_{geom_type} "
+               f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
         self.controller.execute_sql(sql)
 
 
@@ -879,9 +879,9 @@ class ParentManage(ParentAction, object):
                 self.ids.append(str(feature_id))
 
         # Set expression filter with features in the list
-        expr_filter = "\"" + field_id + "\" IN ("
+        expr_filter = f'"{field_id}" IN ('
         for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
+            expr_filter += f"'{self.ids[i]}', "
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
@@ -916,13 +916,13 @@ class ParentManage(ParentAction, object):
 
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
-            sql = ("SELECT " + geom_type + "_id "
-                   "FROM " + self.plan_om + "_psector_x_" + geom_type + " "
-                   "WHERE " + geom_type + "_id = '" + str(self.ids[i]) + "' AND psector_id = '" + str(value) + "'")
+            sql = (f"SELECT {geom_type}_id "
+                   f"FROM {self.plan_om}_psector_x_{geom_type} "
+                   f"WHERE {geom_type}_id = '{self.ids[i]}' AND psector_id = '{value}'")
             row = self.controller.get_row(sql)
             if not row:
-                sql = ("INSERT INTO " + self.plan_om + "_psector_x_" + geom_type + ""
-                       "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
+                sql = (f"INSERT INTO {self.plan_om}_psector_x_{geom_type}"
+                       f"({geom_type}_id, psector_id) VALUES('{self.ids[i]}', '{value}')")
                 self.controller.execute_sql(sql)
             self.reload_qtable(dialog, geom_type, self.plan_om)
 
@@ -931,11 +931,11 @@ class ParentManage(ParentAction, object):
         """ Reload QtableView """
         
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
-        sql = ("SELECT * FROM " + plan_om + "_psector_x_" + geom_type + " "
-               "WHERE psector_id = '" + str(value) + "'")
-        qtable = utils_giswater.getWidget(dialog, 'tbl_psector_x_' + geom_type)
+        sql = (f"SELECT * FROM {plan_om}_psector_x_{geom_type} "
+               f"WHERE psector_id = '{value}'")
+        qtable = utils_giswater.getWidget(dialog, f'tbl_psector_x_{geom_type}')
         self.fill_table_by_query(qtable, sql)
-        self.set_table_columns(dialog, qtable, plan_om + "_psector_x_"+geom_type)
+        self.set_table_columns(dialog, qtable, f"{plan_om}_psector_x_{geom_type}")
         self.refresh_map_canvas()
 
 
@@ -981,7 +981,7 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         if object_id != 'null':
-            expr = field_object_id + "::text ILIKE '%" + str(object_id) + "%'"
+            expr = f"{field_object_id}::text ILIKE '%{object_id}%'"
             # Refresh model with selected filter
             widget_table.model().setFilter(expr)
             widget_table.model().select()
@@ -1011,16 +1011,16 @@ class ParentManage(ParentAction, object):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(field_object_id))
-            inf_text += str(id_) + ", "
-            list_id = list_id + "'" + str(id_) + "', "
+            inf_text += f"{id_}, "
+            list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = ("DELETE FROM " + table_object + " "
-                   "WHERE " + field_object_id + " IN (" + list_id + ")")
+            sql = (f"DELETE FROM {table_object} "
+                   f"WHERE {field_object_id} IN ({list_id})")
             self.controller.execute_sql(sql, commit=self.autocommit)
             widget.model().select()
 

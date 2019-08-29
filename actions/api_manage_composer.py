@@ -58,7 +58,7 @@ class ApiManageComposer(ApiParent):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_getprint($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_getprint($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -122,7 +122,7 @@ class ApiManageComposer(ApiParent):
             if type(item) != QgsLayoutItemLabel or item is None:
                 widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
-                widget.setPlaceholderText("Widget '{}' not found in the composer".format(widget.property('column_id')))
+                widget.setPlaceholderText(f"Widget '{widget.property('column_id')}' not found in the composer")
             elif type(item) == QgsLayoutItemLabel and item is not None:
                 widget.setStyleSheet("border: 1px solid gray")
 
@@ -349,7 +349,7 @@ class ApiManageComposer(ApiParent):
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "" + client + form + feature + data
-        sql = ("SELECT gw_api_setprint($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_setprint($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)

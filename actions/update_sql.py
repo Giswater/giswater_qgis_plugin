@@ -235,7 +235,7 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
-        window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
+        window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
         self.open_dialog(self.dlg_readsql)
@@ -335,7 +335,7 @@ class UpdateSQL(ApiParent):
             lbl_constrains_info.setText('(Constrains enabled)  ')
             if call_function:
                 # Enable constrains
-                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
+                sql = 'SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
                 self.controller.execute_sql(sql)
 
         elif button.text() == 'ON':
@@ -343,7 +343,7 @@ class UpdateSQL(ApiParent):
             lbl_constrains_info.setText('(Constrains dissabled)')
             if call_function:
                 # Disable constrains
-                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
+                sql = 'SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
                 self.controller.execute_sql(sql)
 
 
@@ -2718,7 +2718,7 @@ class UpdateSQL(ApiParent):
                 sp_n = dirty_list
 
             if len(sp_n) > 0:
-                sql += "INSERT INTO " + self.schema + ".temp_csv2pg (csv2pgcat_id, source, "
+                sql += "INSERT INTO temp_csv2pg (csv2pgcat_id, source, "
                 values = "VALUES(12, '" + target + "', "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:

@@ -205,8 +205,8 @@ class MincutParent(ParentAction):
 
     def show_notified_list(self):
         mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        sql = ("SELECT notified FROM anl_mincut_result_cat "
-               "WHERE id = '" + str(mincut_id) + "'")
+        sql = (f"SELECT notified FROM anl_mincut_result_cat "
+               f"WHERE id = '{mincut_id}'")
         row = self.controller.get_row(sql, commit=True, log_sql=True)
         if not row or row[0] is None:
             text = "Nothing to show"
@@ -214,14 +214,14 @@ class MincutParent(ParentAction):
             return
         text = ""
         for item in row[0]:
-            text += "SMS sended on date: {}, with code result: {}.\n".format(item['date'], item['code'] + " ")
+            text += f"SMS sended on date: {item['date']}, with code result: {item['code']} .\n"
         self.controller.show_info_box(str(text), "Sms info")
 
 
     def set_id_val(self):
 
         # Show future id of mincut
-        sql = ("SELECT last_value FROM anl_mincut_result_cat_seq")
+        sql = "SELECT last_value FROM anl_mincut_result_cat_seq"
         row = self.controller.get_row(sql, log_sql=True)
         result_mincut_id = row[0] + 1
         sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) "
@@ -267,12 +267,12 @@ class MincutParent(ParentAction):
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-            sql = ("SELECT id FROM anl_mincut_result_cat"
-                   " WHERE id = " + str(result_mincut_id))
+            sql = (f"SELECT id FROM anl_mincut_result_cat"
+                   f" WHERE id = {result_mincut_id}")
             row = self.controller.get_row(sql)
             if row:
-                sql = ("DELETE FROM anl_mincut_result_cat"
-                       " WHERE id = " + str(result_mincut_id))
+                sql = (f"DELETE FROM anl_mincut_result_cat"
+                       f" WHERE id = {result_mincut_id}")
                 self.controller.execute_sql(sql)
                 self.controller.show_info("Mincut canceled!")                   
         
@@ -454,60 +454,60 @@ class MincutParent(ParentAction):
 
         # Check if id exist in table 'anl_mincut_result_cat'
         result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-        sql = ("SELECT id FROM anl_mincut_result_cat " 
-               "WHERE id = '" + str(result_mincut_id) + "';")
+        sql = (f"SELECT id FROM anl_mincut_result_cat "
+               f"WHERE id = '{result_mincut_id}';")
         rows = self.controller.get_rows(sql)
         
         # If not found Insert just its 'id'
         sql = ""
         if not rows:
-            sql = ("INSERT INTO anl_mincut_result_cat (id) "
-                   "VALUES ('" + str(result_mincut_id) + "');\n")
+            sql = (f"INSERT INTO anl_mincut_result_cat (id) "
+                   f"VALUES ('{result_mincut_id}');\n")
 
         # Update all the fields
-        sql += ("UPDATE anl_mincut_result_cat"
-                " SET mincut_state = '" + str(mincut_result_state) + "',"
-                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
-                " anl_tstamp = '" + str(received_date) + "', received_date = '" + str(received_date) + "',"
-                " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
-                " assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
+        sql += (f"UPDATE anl_mincut_result_cat"
+                f" SET mincut_state = '{mincut_result_state}',"
+                f" mincut_type = '{mincut_result_type}', anl_cause = '{anl_cause}',"
+                f" anl_tstamp = '{received_date}', received_date = '{received_date}',"
+                f" forecast_start = '{forecast_start_predict}', forecast_end = '{forecast_end_predict}',"
+                f" assigned_to = '{assigned_to}', exec_appropiate = '{appropiate_status}'")
         
         # Manage fields 'work_order' and 'anl_descript'
         if work_order != "":        
-            sql += ", work_order = $$" + str(work_order) + "$$"
+            sql += f", work_order = $${work_order}$$"
         if anl_descript != "":        
-            sql += ", anl_descript = $$" + str(anl_descript) + "$$ "
+            sql += f", anl_descript = $${anl_descript}$$ "
         
         # Manage address
         if address_exploitation_id != -1:        
-            sql += ", muni_id = '" + str(address_exploitation_id) + "'"
+            sql += f", muni_id = '{address_exploitation_id}'"
         if address_street != -1:
-            sql += ", streetaxis_id = '" + str(address_street) + "'"
+            sql += f", streetaxis_id = '{address_street}'"
         if address_postal_code:
-            sql += ", postcode = '" + str(address_postal_code) + "'"            
+            sql += f", postcode = '{address_postal_code}'"
         if address_number:
-            sql += ", postnumber = '" + str(address_number) + "'"
+            sql += f", postnumber = '{address_number}'"
 
         # If state 'In Progress' or 'Finished'
         if mincut_result_state == 1 or mincut_result_state == 2:
-            sql += ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'"
+            sql += f", exec_start = '{forecast_start_real}', exec_end = '{forecast_end_real}'"
             if exec_from_plot != '':
-                sql += ", exec_from_plot = '" + str(exec_from_plot) + "'"
+                sql += f", exec_from_plot = '{exec_from_plot}'"
             if exec_depth != '':
-                sql += ",  exec_depth = '" + str(exec_depth) + "'"
+                sql += f",  exec_depth = '{exec_depth}'"
             if exec_descript != '':
-                sql += ", exec_descript = $$" + str(exec_descript) + "$$"
+                sql += f", exec_descript = $${exec_descript}$$"
             if exec_user != '':
-                sql += ", exec_user = '" + str(exec_user) + "'"
+                sql += f", exec_user = '{exec_user}'"
             else:
-                sql += ", exec_user = '" + str(cur_user) + "'"    
+                sql += f", exec_user = '{cur_user}'"
                 
-        sql += " WHERE id = '" + str(result_mincut_id) + "';\n"
+        sql += f" WHERE id = '{result_mincut_id}';\n"
         
         # Update table 'anl_mincut_result_selector'
-        sql += ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                "INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES "
-                "(current_user, " + str(result_mincut_id) + ");")
+        sql += (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
+                f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES "
+                f"(current_user, {result_mincut_id});")
         
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec != "":
@@ -528,14 +528,14 @@ class MincutParent(ParentAction):
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
 
-        sql = ("SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
-               " WHERE id = '" + str(result_mincut_id) + "'")
+        sql = (f"SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
+               f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql)
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()
                 result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-                sql = ("SELECT gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
+                sql = f"SELECT gw_fct_mincut_result_overlap('{result_mincut_id_text}', '{cur_user}');"
                 row = self.controller.get_row(sql, commit=True)
                 if row:
                     if row[0]:
@@ -573,9 +573,9 @@ class MincutParent(ParentAction):
     def update_result_selector(self, result_mincut_id, commit=True):    
         """ Update table 'anl_mincut_result_selector' """    
             
-        sql = ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"    
-               "\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"    
-               " (current_user, " + str(result_mincut_id) + ");")    
+        sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"
+               f"\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+               f" (current_user, {result_mincut_id});")
         status = self.controller.execute_sql(sql, commit)    
         if not status:    
             message = "Error updating table"    
@@ -625,12 +625,12 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in anl_mincut_result_cat
-        sql = ("SELECT id FROM anl_mincut_result_cat"
-               " WHERE id = '" + str(result_mincut_id_text) + "';")
+        sql = (f"SELECT id FROM anl_mincut_result_cat"
+               f" WHERE id = '{result_mincut_id_text}';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = ("INSERT INTO anl_mincut_result_cat (id, mincut_class) "
-                   " VALUES ('" + str(result_mincut_id_text) + "', 2);")
+            sql = (f"INSERT INTO anl_mincut_result_cat (id, mincut_class) "
+                   f" VALUES ('{result_mincut_id_text}', 2);")
             self.controller.execute_sql(sql)
             self.is_new = False
 
@@ -736,7 +736,7 @@ class MincutParent(ParentAction):
         # Set 'expr_filter' with features that are in the list
         expr_filter = "\"connec_id\" IN ("
         for i in range(len(self.connec_list)):
-            expr_filter += "'" + str(self.connec_list[i]) + "', "
+            expr_filter += f"'{self.connec_list[i]}', "
         expr_filter = expr_filter[:-2] + ")"
         if len(self.connec_list) == 0:
             expr_filter = "\"connec_id\" =''"
@@ -769,7 +769,7 @@ class MincutParent(ParentAction):
             # Set 'expr_filter' with features that are in the list
             expr_filter = "\"connec_id\" IN ("
             for i in range(len(self.connec_list)):
-                expr_filter += "'" + str(self.connec_list[i]) + "', "
+                expr_filter += f"'{self.connec_list[i]}', "
             expr_filter = expr_filter[:-2] + ")"
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
@@ -787,12 +787,12 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in table 'anl_mincut_result_cat'
-        sql = ("SELECT id FROM anl_mincut_result_cat"
-               " WHERE id = '" + str(result_mincut_id_text) + "';")
+        sql = (f"SELECT id FROM anl_mincut_result_cat"
+               f" WHERE id = '{result_mincut_id_text}';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = ("INSERT INTO anl_mincut_result_cat (id, mincut_class)"
-                   " VALUES ('" + str(result_mincut_id_text) + "', 3);")
+            sql = (f"INSERT INTO anl_mincut_result_cat (id, mincut_class)"
+                   f" VALUES ('{result_mincut_id_text}', 3);")
             self.controller.execute_sql(sql)
             self.is_new = False
             
@@ -844,9 +844,9 @@ class MincutParent(ParentAction):
             return        
         
         # Get 'hydrometers' related with this 'connec'
-        sql = ("SELECT DISTINCT(hydrometer_customer_code)"
-               " FROM v_rtc_hydrometer"
-               " WHERE connec_id = '" + str(connec_id) + "'")
+        sql = (f"SELECT DISTINCT(hydrometer_customer_code)"
+               f" FROM v_rtc_hydrometer"
+               f" WHERE connec_id = '{connec_id}'")
         rows = self.controller.get_rows(sql)
         values = []
         for row in rows:
@@ -875,8 +875,8 @@ class MincutParent(ParentAction):
             return
         
         # Check if hydrometer_id belongs to any 'connec_id'
-        sql = ("SELECT hydrometer_id FROM v_rtc_hydrometer"
-               " WHERE hydrometer_customer_code = '" + str(hydrometer_cc) + "'")
+        sql = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
+               f" WHERE hydrometer_customer_code = '{hydrometer_cc}'")
         row = self.controller.get_row(sql, log_sql=False)
         if not row:
             message = "Selected hydrometer_id not found"
@@ -895,7 +895,7 @@ class MincutParent(ParentAction):
         self.hydro_list.append(row[0])
         expr_filter = "\"hydrometer_id\" IN ("
         for i in range(len(self.hydro_list)):
-            expr_filter += "'" + str(self.hydro_list[i]) + "', "
+            expr_filter += f"'{self.hydro_list[i]}', "
         expr_filter = expr_filter[:-2] + ")"
         
         # Reload table
@@ -928,8 +928,8 @@ class MincutParent(ParentAction):
                     
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        sql = ("SELECT connec_id FROM anl_mincut_result_connec"
-               " WHERE result_id = " + str(result_mincut_id))
+        sql = (f"SELECT connec_id FROM anl_mincut_result_connec"
+               f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
         if rows:
             expr_filter = "\"connec_id\" IN ("
@@ -937,7 +937,7 @@ class MincutParent(ParentAction):
                 if row[0] not in self.connec_list and row[0] not in self.deleted_list:
                     self.connec_list.append(row[0])
             for connec_id in self.connec_list:
-                expr_filter += "'" + str(connec_id) + "', "
+                expr_filter += f"'{connec_id}', "
             expr_filter = expr_filter[:-2] + ")"
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
@@ -959,15 +959,15 @@ class MincutParent(ParentAction):
 
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
-        sql = ("SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
-               " INNER JOIN anl_mincut_result_hydrometer AS anl"
-               " ON anl.hydrometer_id = rtc.hydrometer_id"
-               " WHERE result_id = " + str(result_mincut_id))
+        sql = (f"SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
+               f" INNER JOIN anl_mincut_result_hydrometer AS anl"
+               f" ON anl.hydrometer_id = rtc.hydrometer_id"
+               f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
         if rows:
             expr_filter = "\"connec_id\" IN ("
             for row in rows:                   
-                expr_filter += "'" + str(row[0]) + "', "
+                expr_filter += f"'{row[0]}', "
             expr_filter = expr_filter[:-2] + ")"
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
@@ -984,8 +984,8 @@ class MincutParent(ParentAction):
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
-        sql = ("SELECT hydrometer_id FROM anl_mincut_result_hydrometer"
-               " WHERE result_id = " + str(result_mincut_id))
+        sql = (f"SELECT hydrometer_id FROM anl_mincut_result_hydrometer"
+               f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
 
         expr_filter = "\"hydrometer_id\" IN ("
@@ -997,7 +997,7 @@ class MincutParent(ParentAction):
             if hyd in self.hydro_list:
                 self.hydro_list.remove(hyd)
         for hyd in self.hydro_list:
-            expr_filter += "'" + str(hyd) + "', "
+            expr_filter += f"'{hyd}', "
 
         expr_filter = expr_filter[:-2] + ")"
         if len(self.hydro_list) == 0:
@@ -1054,7 +1054,7 @@ class MincutParent(ParentAction):
             # Set expression filter with 'connec_list'
             expr_filter = "\"connec_id\" IN ("
             for i in range(len(self.connec_list)):
-                expr_filter += "'" + str(self.connec_list[i]) + "', "
+                expr_filter += f"'{self.connec_list[i]}', "
             expr_filter = expr_filter[:-2] + ")"
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
@@ -1079,8 +1079,8 @@ class MincutParent(ParentAction):
     def get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
                    
-        sql = ("SELECT connec_id FROM v_edit_connec"
-               " WHERE customer_code = '" + customer_code + "'")
+        sql = (f"SELECT connec_id FROM v_edit_connec"
+               f" WHERE customer_code = '{customer_code}'")
         row = self.controller.get_row(sql)
         if not row:
             message = "Any 'connec_id' found with this 'customer_code'"
@@ -1190,7 +1190,7 @@ class MincutParent(ParentAction):
             row = selected_list[i].row()
             # id to delete
             id_feature = widget.model().record(row).value("connec_id")
-            list_id = list_id + "'" + str(id_feature) + "', "
+            list_id += f"'{id_feature}', "
             del_id.append(id_feature)
             # id to ask
             customer_code = widget.model().record(row).value("customer_code")
@@ -1210,7 +1210,7 @@ class MincutParent(ParentAction):
         # Select features which are in the list
         expr_filter = "\"connec_id\" IN ("
         for i in range(len(self.connec_list)):
-            expr_filter += "'" + str(self.connec_list[i]) + "', "
+            expr_filter += f"'{self.connec_list[i]}', "
         expr_filter = expr_filter[:-2] + ")"
 
         if len(self.connec_list) == 0:
@@ -1248,7 +1248,7 @@ class MincutParent(ParentAction):
             id_feature = widget.model().record(row).value("hydrometer_customer_code")
             hydro_id = widget.model().record(row).value("hydrometer_id")
             inf_text += str(id_feature) + ", "
-            list_id = list_id + "'" + str(id_feature) + "', "
+            list_id += f"'{id_feature}', "
             del_id.append(hydro_id)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -1266,7 +1266,7 @@ class MincutParent(ParentAction):
         # Select features that are in the list
         expr_filter = "\"hydrometer_id\" IN ("
         for i in range(len(self.hydro_list)):
-            expr_filter += "'" + str(self.hydro_list[i]) + "', "
+            expr_filter += f"'{self.hydro_list[i]}', "
         expr_filter = expr_filter[:-2] + ")"
 
         if len(self.hydro_list) == 0:
@@ -1287,22 +1287,22 @@ class MincutParent(ParentAction):
         if result_mincut_id == 'null':
             return
 
-        sql = ("DELETE FROM anl_mincut_result_" + str(element) + ""
-               " WHERE result_id = " + str(result_mincut_id) + ";\n")
+        sql = (f"DELETE FROM anl_mincut_result_{element}"
+               f" WHERE result_id = {result_mincut_id};\n")
         for element_id in self.connec_list:
-            sql += ("INSERT INTO anl_mincut_result_" + str(element) + ""
-                    " (result_id, " + str(element) + "_id) "
-                    " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
+            sql += (f"INSERT INTO anl_mincut_result_{element}"
+                    f" (result_id, {element}_id) "
+                    f" VALUES ('{result_mincut_id}', '{element_id}');\n")
             # Get hydrometer_id of selected connec
-            sql2 = ("SELECT hydrometer_id FROM v_rtc_hydrometer"
-                    " WHERE connec_id = '" + str(element_id) + "'")
+            sql2 = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
+                    f" WHERE connec_id = '{element_id}'")
             rows = self.controller.get_rows(sql2)
             if rows:
                 for row in rows:
                     # Hydrometers associated to selected connec inserted to the table anl_mincut_result_hydrometer
-                    sql += ("INSERT INTO anl_mincut_result_hydrometer"
-                            " (result_id, hydrometer_id) "
-                            " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
+                    sql += (f"INSERT INTO anl_mincut_result_hydrometer"
+                            f" (result_id, hydrometer_id) "
+                            f" VALUES ('{result_mincut_id}', '{row[0]}');\n")
 
         self.sql_connec = sql
         self.dlg_mincut.btn_start.setDisabled(False)
@@ -1317,12 +1317,12 @@ class MincutParent(ParentAction):
         if result_mincut_id == 'null':
             return
 
-        sql = ("DELETE FROM anl_mincut_result_" + str(element) + ""
-               " WHERE result_id = " + str(result_mincut_id) + ";\n")
+        sql = (f"DELETE FROM anl_mincut_result_{element}"
+               f" WHERE result_id = {result_mincut_id};\n")
         for element_id in self.hydro_list:
-            sql += ("INSERT INTO anl_mincut_result_" + str(element) + ""
-                    " (result_id, " + str(element) + "_id) "
-                    " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
+            sql += (f"INSERT INTO anl_mincut_result_{element}"
+                    f" (result_id, {element}_id) "
+                    f" VALUES ('{result_mincut_id}', '{element_id}');\n")
         
         self.sql_hydro = sql
         self.dlg_mincut.btn_start.setDisabled(False)
@@ -1414,10 +1414,9 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
-        sql = ("UPDATE anl_mincut_result_cat"
-               " SET exec_the_geom = ST_SetSRID(ST_Point(" + str(point.x()) + ", "
-               + str(point.y()) + ")," + str(srid) + ")"
-               " WHERE id = '" + result_mincut_id_text + "'")
+        sql = (f"UPDATE anl_mincut_result_cat"
+               f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
+               f" WHERE id = '{result_mincut_id_text}'")
         status = self.controller.execute_sql(sql)
         if status:
             message = "Real location has been updated"
@@ -1466,8 +1465,8 @@ class MincutParent(ParentAction):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        sql = ("SELECT gw_fct_mincut('" + str(elem_id) + "',"
-               " '" + str(elem_type) + "', '" + str(real_mincut_id) + "');")
+        sql = (f"SELECT gw_fct_mincut('{elem_id}',"
+               f" '{elem_type}', '{real_mincut_id}');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row:
@@ -1492,13 +1491,13 @@ class MincutParent(ParentAction):
             x2, y2 = polygon[2].split(' ')
             self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             
-            sql = ("UPDATE anl_mincut_result_cat"
-                   " SET mincut_class = 1, "
-                   " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_x) + ", "
-                   + str(snapping_y) + "), " + str(srid) + "),"
-                   " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
-                   " anl_feature_id = '" + str(elem_id) + "'"
-                   " WHERE id = '" + str(real_mincut_id) + "'")
+            sql = (f"UPDATE anl_mincut_result_cat"
+                   f" SET mincut_class = 1, "
+                   f" anl_the_geom = ST_SetSRID(ST_Point({snapping_x}, "
+                   f"{snapping_y}), {srid}),"
+                   f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
+                   f" anl_feature_id = '{elem_id}'"
+                   f" WHERE id = '{real_mincut_id}'")
             status = self.controller.execute_sql(sql, log_sql=True)
 
             if not status:
@@ -1516,9 +1515,9 @@ class MincutParent(ParentAction):
             self.action_mincut_composer.setDisabled(False)
 
             # Update table 'anl_mincut_result_selector'
-            sql = ("DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                   "INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
-                   " (current_user, " + str(real_mincut_id) + ");")
+            sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
+                   f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+                   f" (current_user, {real_mincut_id});")
             self.controller.execute_sql(sql, log_error=True, log_sql=True)
 
             # Refresh map canvas
@@ -1626,8 +1625,8 @@ class MincutParent(ParentAction):
         cur_user = self.controller.get_project_user()               
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = ("SELECT gw_fct_mincut_valve_unaccess"
-                   "('" + str(elem_id) + "', '" + str(result_mincut_id) + "', '" + str(cur_user) + "');")
+            sql = (f"SELECT gw_fct_mincut_valve_unaccess"
+                   f"('{elem_id}', '{result_mincut_id}', '{cur_user}');")
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
                 message = "Custom mincut executed successfully"
@@ -1663,13 +1662,13 @@ class MincutParent(ParentAction):
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
-        sql = ("SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
-               " FROM anl_mincut_result_cat"
-               " INNER JOIN anl_mincut_cat_state"
-               " ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
-               " INNER JOIN cat_users" 
-               " ON cat_users.id = anl_mincut_result_cat.assigned_to"
-               " WHERE anl_mincut_result_cat.id = '" + str(result_mincut_id) + "'")
+        sql = (f"SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
+               f" FROM anl_mincut_result_cat"
+               f" INNER JOIN anl_mincut_cat_state"
+               f" ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
+               f" INNER JOIN cat_users"
+               f" ON cat_users.id = anl_mincut_result_cat.assigned_to"
+               f" WHERE anl_mincut_result_cat.id = '{result_mincut_id}'")
 
         row = self.controller.get_row(sql, log_sql=False)
         if not row:
@@ -1696,8 +1695,8 @@ class MincutParent(ParentAction):
         self.update_result_selector(result_mincut_id)
         self.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
-        sql = ("SELECT mincut_class FROM anl_mincut_result_cat"
-               " WHERE id = '" + str(result_mincut_id) + "'")
+        sql = (f"SELECT mincut_class FROM anl_mincut_result_cat"
+               f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql)
         mincut_class_status = None
         if row[0]:
@@ -1842,8 +1841,8 @@ class MincutParent(ParentAction):
         
         # Get 'muni_name' from 'muni_id'  
         if row['muni_id'] and row['muni_id'] != -1:
-            sql = ("SELECT name FROM ext_municipality"
-                   " WHERE muni_id = '" + str(row['muni_id']) + "'")
+            sql = (f"SELECT name FROM ext_municipality"
+                   f" WHERE muni_id = '{row['muni_id']}'")
             row_aux = self.controller.get_row(sql)
             if row_aux:                
                 utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_exploitation, row_aux['name'])
@@ -1852,8 +1851,8 @@ class MincutParent(ParentAction):
         
         # Get 'street_name' from 'streetaxis_id'  
         if row['streetaxis_id'] and row['streetaxis_id'] != -1:
-            sql = ("SELECT name FROM ext_streetaxis"
-                   " WHERE id = '" + str(row['streetaxis_id']) + "'")
+            sql = (f"SELECT name FROM ext_streetaxis"
+                   f" WHERE id = '{row['streetaxis_id']}'")
             row_aux = self.controller.get_row(sql)
             if row_aux:
                 utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_street, row_aux['name'])
@@ -1919,7 +1918,7 @@ class MincutParent(ParentAction):
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM ext_address"
         if expl_id != -1:
-            sql += " WHERE " + self.street_field_expl[0] + " = '" + str(expl_id) + "'"
+            sql += f" WHERE {self.street_field_expl[0]} = '{expl_id}'"
         sql += " ORDER BY postcode"
         rows = self.controller.get_rows(sql)
         if not rows:
@@ -1979,12 +1978,12 @@ class MincutParent(ParentAction):
             records = [[-1, '']]
 
             # Set filter expression
-            expr_filter = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
+            expr_filter = f"{self.street_field_expl[0]} = '{expl_id}'"
 
             # Check filter and existence of fields
             expr = QgsExpression(expr_filter)
             if expr.hasParserError():
-                message = expr.parserErrorString() + ": " + expr_filter
+                message = f"{expr.parserErrorString()}: {expr_filter}"
                 self.controller.show_warning(message)
                 return
 
@@ -2045,7 +2044,7 @@ class MincutParent(ParentAction):
         else:
             idx_field_code = layer.fields().indexFromName(field_code)
             idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
-        expr_filter = field_code + " = '" + str(code) + "'"
+        expr_filter = f"{field_code} = '{code}'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return     
@@ -2174,9 +2173,9 @@ class MincutParent(ParentAction):
 
         if expl_id:
             # Set SQL to get 'expl_name'
-            sql = ("SELECT " + self.params['expl_field_name'] + ""
-                   " FROM " + self.params['expl_layer'] + ""
-                   " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
+            sql = (f"SELECT {self.params['expl_field_name']}"
+                   f" FROM {self.params['expl_layer']}"
+                   f" WHERE {self.params['expl_field_code']} = {expl_id}")
             row = self.controller.get_row(sql, log_sql=False)
             if row:
                 utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
@@ -2214,8 +2213,8 @@ class MincutParent(ParentAction):
             return
 
         # select this feature in order to copy to memory layer
-        aux = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
-               " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
+        aux = (f"{self.params['portal_field_code']} = '{elem[0]}'"
+               f" AND {self.params['portal_field_number']} = '{elem[1]}'")
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString()
@@ -2275,7 +2274,7 @@ class MincutParent(ParentAction):
             return
 
         # Check if template file exists
-        template_path = self.settings.value('system_variables/composers_path/' + os.sep + str(self.template) + '.qpt')
+        template_path = self.settings.value(f'system_variables/composers_path/{os.sep}{self.template}.qpt')
         if not os.path.exists(template_path):
             message = "File not found"
             self.controller.show_warning(message, parameter=template_path)

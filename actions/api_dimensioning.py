@@ -142,9 +142,9 @@ class ApiDimensioning(ApiParent):
             elif self.project_type == 'ud' and feat_type == 'connec':
                 fieldname = "connec_depth"
 
-            sql = ("SELECT " + fieldname + " "
-                   "FROM " + feat_type + " "
-                   "WHERE " + feat_type + "_id = '" + element_id + "'")
+            sql = (f"SELECT {fieldname} "
+                   f"FROM {feat_type} "
+                   f"WHERE {feat_type}_id = '{element_id}'")
             row = self.controller.get_row(sql)
             if not row:
                 return

@@ -234,11 +234,11 @@ class ParentAction(object):
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + tableleft + " WHERE " + name + " NOT IN "
-        query_left += "(SELECT " + tableleft + "." + name + " FROM " + tableleft
-        query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
-        query_left += " WHERE cur_user = current_user)"
-        query_left += " AND  "+field_id_left+" > -1"
+        query_left = f"SELECT * FROM {tableleft} WHERE {name} NOT IN "
+        query_left += f"(SELECT {tableleft}.{name} FROM {tableleft}"
+        query_left += f" RIGHT JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
+        query_left += f" WHERE cur_user = current_user)"
+        query_left += f" AND  {field_id_left} > -1"
         
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
@@ -248,8 +248,8 @@ class ParentAction(object):
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + tableleft
-        query_right += " JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+        query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right} FROM {tableleft}"
+        query_right += f" JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
 
         query_right += " WHERE cur_user = current_user"
 
@@ -260,8 +260,8 @@ class ParentAction(object):
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
-        query_delete = "DELETE FROM " + tableright
-        query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
+        query_delete = f"DELETE FROM {tableright}"
+        query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
@@ -322,9 +322,9 @@ class ParentAction(object):
             curuser_list.append(curuser)
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
-            sql = ("SELECT DISTINCT(" + id_des + ", cur_user)"
-                   " FROM " + tablename_des + ""
-                   " WHERE " + id_des + " = '" + str(expl_id[i]) + "' AND cur_user = current_user")
+            sql = (f"SELECT DISTINCT({id_des}, cur_user)"
+                   f" FROM {tablename_des}"
+                   f" WHERE {id_des} = '{expl_id[i]}' AND cur_user = current_user")
             row = self.controller.get_row(sql)
 
             if row:
@@ -332,8 +332,8 @@ class ParentAction(object):
                 message = "Id already selected"
                 self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
-                sql = ("INSERT INTO " + tablename_des + " (" + field_id + ", cur_user) "
-                       " VALUES (" + str(expl_id[i]) + ", current_user)")
+                sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
+                       f" VALUES ({expl_id[i]}, current_user)")
                 self.controller.execute_sql(sql)
 
         # Refresh
@@ -407,11 +407,11 @@ class ParentAction(object):
         """ Fill the QTableView by filtering through the QLineEdit"""
         
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
-        sql = ("SELECT * FROM " + tableleft + " WHERE " + name + " NOT IN "
-               "(SELECT " + tableleft + "." + name + " FROM " + tableleft + ""
-               " RIGHT JOIN " + tableright + ""
-               " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
-               " WHERE cur_user = current_user) AND LOWER(" + name + "::text) LIKE '%" + query + "%'")
+        sql = (f"SELECT * FROM {tableleft} WHERE {name} NOT IN "
+               f"(SELECT {tableleft}.{name} FROM {tableleft}"
+               f" RIGHT JOIN {tableright}"
+               f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
+               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'")
         self.fill_table_by_query(qtable, sql)
         
         
@@ -484,10 +484,10 @@ class ParentAction(object):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = ("SELECT column_index, width, alias, status"
-               " FROM config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
-               " ORDER BY column_index")
+        sql = (f"SELECT column_index, width, alias, status"
+               f" FROM config_client_forms"
+               f" WHERE table_id = '{table_name}'"
+               f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
@@ -566,16 +566,16 @@ class ParentAction(object):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            inf_text += str(id_) + ", "
-            list_id = list_id + "'" + str(id_) + "', "
+            inf_text += f"{id_}, "
+            list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = "DELETE FROM " + table_name
-            sql += " WHERE " + column_id + " IN (" + list_id + ")"
+            sql = f"DELETE FROM {table_name}"
+            sql += f" WHERE {column_id} IN ({list_id})"
             self.controller.execute_sql(sql)
             widget.model().select()
 
@@ -636,9 +636,9 @@ class ParentAction(object):
             return
 
         # Set SQL
-        sql = ("SELECT DISTINCT(" + field_search + ")"
-               " FROM " + tablename + ""
-               " ORDER BY " + field_search + "")
+        sql = (f"SELECT DISTINCT({field_search})"
+               f" FROM {tablename}"
+               f" ORDER BY {field_search}")
         row = self.controller.get_rows(sql)
 
         for i in range(0, len(row)):
@@ -707,11 +707,11 @@ class ParentAction(object):
         """ Create and return parameters as body to functions"""
 
         client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
-        form = '"form":{' + form + '}, '
-        feature = '"feature":{' + feature + '}, '
-        filter_fields = '"filterFields":{' + filter_fields + '}'
+        form = f'"form":{{{form}}}, '
+        feature = f'"feature":{{{feature}}}, '
+        filter_fields = f'"filterFields":{{{filter_fields}}}'
         page_info = '"pageInfo":{}'
-        data = '"data":{' + filter_fields + ', ' + page_info
+        data = f'"data":{{{filter_fields}, {page_info}'
         if extras is not None:
             data += ', ' + extras
         data += '}'
@@ -812,9 +812,9 @@ class ParentAction(object):
 
     def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
 
-        sql = ("SELECT MIN(LEAST({0}, {1})),"
-               " MAX(GREATEST({0}, {1}))"
-               " FROM {2}".format(field_from, field_to, table_name))
+        sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
+               f" MAX(GREATEST({field_from}, {field_to}))"
+               f" FROM {table_name}")
         row = self.controller.get_row(sql, log_sql=False)
         current_date = QDate.currentDate()
         if row:
@@ -830,10 +830,10 @@ class ParentAction(object):
 
     def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
 
-        sql = ("SELECT id, idval"
-               " FROM " + table_name + ""
-               " WHERE typevalue = '" + typevalue + "'"
-               " ORDER BY " + order_by + "")
+        sql = (f"SELECT id, idval"
+               f" FROM {table_name}"
+               f" WHERE typevalue = '{typevalue}'"
+               f" ORDER BY {order_by}")
         rows = self.controller.get_rows(sql, commit=True)
         return rows
 

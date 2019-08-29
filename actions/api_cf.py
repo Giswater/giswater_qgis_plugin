@@ -74,13 +74,13 @@ class ApiCF(ApiParent):
         scale_zoom = self.iface.mapCanvas().scale()
         srid = self.controller.plugin_settings_value('srid')
 
-        extras = '"pointClickCoords":{"xcoord":' + str(point.x()) + ', "ycoord":' + str(point.y()) + '}, '
-        extras += '"visibleLayers":' + str(visible_layers) + ', '
-        extras += '"zoomScale":' + str(scale_zoom) + ', '
+        extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
+        extras += f'"visibleLayers":{visible_layers}, '
+        extras += f'"zoomScale":{scale_zoom}, '
         extras += '"srid":' + str(srid)
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
-        sql = ("SELECT gw_api_getlayersfromcoordinates($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_getlayersfromcoordinates($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -118,7 +118,7 @@ class ApiCF(ApiParent):
         cont = 0
         for layer in complet_list[0]['body']['data']['layersNames']:
             cont += len(layer['ids'])
-        action = QAction('Identify all (' + str(cont) + ')', None)
+        action = QAction(f'Identify all ({cont})', None)
         action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
@@ -237,7 +237,7 @@ class ApiCF(ApiParent):
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
         role = self.controller.get_restriction()
-        extras += ', "rolePermissions":"' + role + '"'
+        extras += f', "rolePermissions":"{role}"'
 
         # IF insert new feature
         if point and feature_cat:
@@ -245,23 +245,23 @@ class ApiCF(ApiParent):
             self.new_feature_id = new_feature_id
             self.layer_new_feature = layer_new_feature
             self.iface.actionPan().trigger()
-            feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
-            extras += ', "coordinates":{'+str(point) + '}'
+            feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
+            extras += f', "coordinates":{{{point}}}'
             body = self.create_body(feature=feature, extras=extras)
-            sql = ("SELECT gw_api_getfeatureinsert($${" + body + "}$$)")
+            sql = f"SELECT gw_api_getfeatureinsert($${{{body}}}$$)"
         # IF click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
-            extras += ', "activeLayer":"'+active_layer+'"'
-            extras += ', "visibleLayer":'+visible_layer+''
-            extras += ', "coordinates":{"epsg":'+str(self.srid)+', "xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + ', "zoomRatio":1000}'
+            extras += f', "activeLayer":"{active_layer}"'
+            extras += f', "visibleLayer":{visible_layer}'
+            extras += f', "coordinates":{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":1000}'
             body = self.create_body(extras=extras)
-            sql = ("SELECT gw_api_getinfofromcoordinates($${" + body + "}$$)")
+            sql = f"SELECT gw_api_getinfofromcoordinates($${{{body}}}$$)"
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
-            feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
+            feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             body = self.create_body(feature=feature, extras=extras)
-            sql = ("SELECT gw_api_getinfofromid($${" + body + "}$$)")
+            sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
 
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
@@ -709,26 +709,26 @@ class ApiCF(ApiParent):
                 self.close_dialog(dialog)
                 return
 
-            feature = '"featureType":"'+str(self.feature_type)+'", '
-            feature += '"tableName":"' + p_table_id + '", '
-            feature += '"id":"' + self.new_feature.attribute(id_name) + '"'
+            feature = f'"featureType":"{self.feature_type}", '
+            feature += f'"tableName":"{p_table_id}", '
+            feature += f'"id":"{self.new_feature.attribute(id_name)}"'
             extras = '"fields":' + my_json + ''
             body = self.create_body(feature=feature, extras=extras)
-            sql = ("SELECT gw_api_setfields($${" + body + "}$$)")
+            sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
 
         else:
             my_json = json.dumps(_json)
-            feature = '"featureType":"'+self.feature_type+'", '
-            feature += '"tableName":"' + p_table_id + '", '
-            feature += '"id":"' + feature_id + '"'
-            extras = '"fields":' + my_json + ''
+            feature = f'"featureType":"{self.feature_type}", '
+            feature += f'"tableName":"{p_table_id}", '
+            feature += f'"id":"{feature_id}"'
+            extras = f'"fields":{my_json}'
             body = self.create_body(feature=feature, extras=extras)
-            sql = ("SELECT gw_api_setfields($${" + body + "}$$)")
+            sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
 
         row = self.controller.execute_returning(sql, log_sql=True, commit=True)
 
         if not row:
-            msg = "Fail in: {0}".format(sql)
+            msg = f"Fail in: {sql}"
             self.controller.show_message(msg, message_level=2)
             self.controller.log_info(str("FAIL IN: ")+str(sql))
             return
@@ -939,12 +939,12 @@ class ApiCF(ApiParent):
         combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
 
-        feature = '"featureType":"' + self.feature_type + '", '
-        feature += '"tableName":"' + self.tablename + '", '
-        feature += '"idName":"' + self.field_id + '"'
-        extras = '"comboParent":"'+combo_parent+'", "comboId":"'+combo_id+'"'
+        feature = f'"featureType":"{self.feature_type}", '
+        feature += f'"tableName":"{self.tablename}", '
+        feature += f'"idName":"{self.field_id}"'
+        extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = ("SELECT gw_api_getchilds($${" + body + "}$$)")
+        sql = f"SELECT gw_api_getchilds($${{{body}}}$$)"
         row = self.controller.get_row(sql, log_sql=False, commit=True)
         for combo_child in row[0]['body']['data']:
             if combo_child is not None:
@@ -964,9 +964,9 @@ class ApiCF(ApiParent):
 
         # Check geom_type
         if self.geom_type == 'connec':
-            widget = tab_type+"_"+self.geom_type+'at_id'
+            widget = f'{tab_type}_{self.geom_type}at_id'
         else:
-            widget = tab_type+"_"+self.geom_type+'cat_id'
+            widget = f'{tab_type}_{self.geom_type}cat_id'
 
         self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type[0])
 
@@ -1065,7 +1065,6 @@ class ApiCF(ApiParent):
         btn_new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
 
         # Set model of selected widget
-        table_name = self.schema_name + "." + table_name
         self.set_model_to_table(widget, table_name, expr_filter)
 
         # Adding auto-completion to a QLineEdit
@@ -1238,8 +1237,8 @@ class ApiCF(ApiParent):
         """ Hide tab 'relations' if no data in the view """
 
         # Check if data in the view
-        sql = ("SELECT * FROM " + viewname + ""
-               " WHERE " + str(field_id) + " = '" + str(self.feature_id) + "';")
+        sql = (f"SELECT * FROM {viewname}"
+               f" WHERE {field_id} = '{self.feature_id}';")
         row = self.controller.get_row(sql, log_info=True, log_sql=False, commit=True)
 
         if not row:
@@ -1254,7 +1253,7 @@ class ApiCF(ApiParent):
     def fill_tab_relations(self):
         """ Fill tab 'Relations' """
 
-        table_relations = "v_ui_"+self.geom_type+"_x_relations"
+        table_relations = f"v_ui_{self.geom_type}_x_relations"
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         self.set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
@@ -1277,8 +1276,8 @@ class ApiCF(ApiParent):
             field_object_id = "feature_id"
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
         sys_type = self.tbl_relations.model().record(row).value("sys_type")
-        sql = ("SELECT feature_type FROM cat_feature "
-               "WHERE id = '"+str(sys_type)+"'")
+        sql = (f"SELECT feature_type FROM cat_feature "
+               f"WHERE id = '{sys_type}'")
         sys_type = self.controller.get_row(sql, commit=True)
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
@@ -1402,8 +1401,8 @@ class ApiCF(ApiParent):
         """ Fill the table control to show hydrometers """
 
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
-        filter = "connec_id ILIKE '%" + self.feature_id + "%' "
-        filter += " AND hydrometer_customer_code ILIKE '%" + txt_hydrometer_id.text() + "%'"
+        filter = f"connec_id ILIKE '%{self.feature_id}%' "
+        filter += f" AND hydrometer_customer_code ILIKE '%{txt_hydrometer_id.text()}%'"
 
         # Set model of selected widget
         self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter)
@@ -1416,9 +1415,9 @@ class ApiCF(ApiParent):
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
 
         # Populate combo filter hydrometer value
-        sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
-               "FROM " + str(table_hydro_value) + " "
-               "ORDER BY cat_period_id")
+        sql = (f"SELECT DISTINCT cat_period_id, cat_period_id "
+               f"FROM {table_hydro_value} "
+               f"ORDER BY cat_period_id")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -1439,8 +1438,8 @@ class ApiCF(ApiParent):
 
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
         cat_period = utils_giswater.get_item_data(self.dlg_cf, cmb_cat_period_id_filter)
-        filter_ = "connec_id ILIKE '%" + self.feature_id + "%' "
-        filter_ += " AND cat_period_id ILIKE '%" + cat_period + "%'"
+        filter_ = f"connec_id ILIKE '%{self.feature_id}%' "
+        filter_ += f" AND cat_period_id ILIKE '%{cat_period}%'"
 
         # Set model of selected widget
         self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter_, QSqlTableModel.OnFieldChange)
@@ -1453,8 +1452,8 @@ class ApiCF(ApiParent):
         cat_period_id_filter = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
 
         # Set filter
-        expr = self.field_id + " = '" + self.feature_id + "'"
-        expr += " AND cat_period_id ILIKE '%" + cat_period_id_filter + "%'"
+        expr = f"{self.field_id} = '{self.feature_id}'"
+        expr += f" AND cat_period_id ILIKE '%{cat_period_id_filter}%'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -1519,19 +1518,19 @@ class ApiCF(ApiParent):
         table_name_event_id = "om_visit_parameter"
 
         # Fill ComboBox event_id
-        sql = ("SELECT DISTINCT(id), id "
-               "FROM " + table_name_event_id + " "
-               "WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL' "
-               "ORDER BY id")
+        sql = (f"SELECT DISTINCT(id), id "
+               f"FROM {table_name_event_id} "
+               f"WHERE feature_type = '{feature_type}' OR feature_type = 'ALL' "
+               f"ORDER BY id")
         rows = self.controller.get_rows(sql, commit=True)
         if rows:
             rows.append(['', ''])
             utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
-        sql = ("SELECT DISTINCT(parameter_type), parameter_type "
-               "FROM " + table_name_event_id + " "
-               "WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL' "
-               "ORDER BY parameter_type")
+        sql = (f"SELECT DISTINCT(parameter_type), parameter_type "
+               f"FROM {table_name_event_id} "
+               f"WHERE feature_type = '{feature_type}' OR feature_type = 'ALL' "
+               f"ORDER BY parameter_type")
         rows = self.controller.get_rows(sql, commit=True)
         if rows:
             rows.append(['', ''])
@@ -1547,11 +1546,10 @@ class ApiCF(ApiParent):
 
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            date_from.toString(format_low), date_to.toString(format_high))
+        interval = f"'{date_from.toString(format_low)}'::timestamp AND '{date_to.toString(format_high)}'::timestamp"
 
         # Set filter
-        filter_ += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
+        filter_ += f" AND(tstamp BETWEEN {interval}) AND (tstamp BETWEEN {interval})"
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
@@ -1565,8 +1563,8 @@ class ApiCF(ApiParent):
         self.load_settings(self.dlg_event_full)
         self.dlg_event_full.rejected.connect(partial(self.close_dialog, self.dlg_event_full))
         # Get all data for one visit
-        sql = ("SELECT * FROM om_visit_event"
-               " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        sql = (f"SELECT * FROM om_visit_event"
+               f" WHERE id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
         row = self.controller.get_row(sql, commit=True)
         if not row:
             return
@@ -1626,8 +1624,8 @@ class ApiCF(ApiParent):
 
         # Get values in order to populate model
 
-        sql = ("SELECT value, filetype, fextension FROM " + self.schema_name + ".om_visit_event_photo "
-               "WHERE visit_id='" + str(self.visit_id) + "' AND event_id='" + str(self.event_id) + "'")
+        sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
+               f"WHERE visit_id='{self.visit_id}' AND event_id='{self.event_id}'")
         rows = self.controller.get_rows(sql, commit=True)
         if rows is None:
             return
@@ -1682,8 +1680,8 @@ class ApiCF(ApiParent):
         self.event_id = self.tbl_event_cf.model().record(selected_row).value("event_id")
         self.parameter_id = self.tbl_event_cf.model().record(selected_row).value("parameter_id")
 
-        sql = ("SELECT gallery, document FROM " + table_name + ""
-               " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        sql = (f"SELECT gallery, document FROM {table_name}"
+               f" WHERE event_id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
         row = self.controller.get_row(sql, log_sql=False, commit=True)
         if not row:
             return
@@ -1726,10 +1724,10 @@ class ApiCF(ApiParent):
             feature_type = 'GULLY'
 
         # Fill ComboBox event_id
-        sql = ("SELECT DISTINCT(id), id FROM " + table_name_event_id + ""
-               " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')")
+        sql = (f"SELECT DISTINCT(id), id FROM {table_name_event_id}"
+               f" WHERE (feature_type = '{feature_type}' OR feature_type = 'ALL')")
         if event_type_value != 'null':
-            sql += " AND parameter_type ILIKE '%" + event_type_value + "%'"
+            sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_sql=False, commit=True)
         rows.append(['', ''])
@@ -1741,18 +1739,18 @@ class ApiCF(ApiParent):
         event_id = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            visit_start.toString(format_low), visit_end.toString(format_high))
+        interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
+        
         # Set filter to model
-        expr = self.field_id + " = '" + self.feature_id + "'"
+        expr = f"{self.field_id} = '{self.feature_id}'"
         # Set filter
-        expr += " AND visit_start BETWEEN {0}".format(interval)
+        expr += f" AND visit_start BETWEEN {interval}"
 
         if event_type_value != 'null':
-            expr += " AND parameter_type ILIKE '%" + event_type_value + "%'"
+            expr += f" AND parameter_type ILIKE '%{event_type_value}%'"
 
         if event_id != 'null':
-            expr += " AND parameter_id ILIKE '%" + event_id + "%'"
+            expr += f" AND parameter_id ILIKE '%{event_id}%'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -1774,20 +1772,20 @@ class ApiCF(ApiParent):
 
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            visit_start.toString(format_low), visit_end.toString(format_high))
+        interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
+        
         # Set filter to model
-        expr = self.field_id + " = '" + self.feature_id + "'"
+        expr = f"{self.field_id} = '{self.feature_id}'"
         # Set filter
-        expr += " AND visit_start BETWEEN {0}".format(interval)
+        expr += f" AND visit_start BETWEEN {interval}"
 
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
         if event_type_value != 'null':
-            expr += " AND parameter_type ILIKE '%" + event_type_value + "%'"
+            expr += f" AND parameter_type ILIKE '%{event_type_value}%'"
         event_id = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         if event_id != 'null':
-            expr += " AND parameter_id ILIKE '%" + event_id + "%'"
+            expr += f" AND parameter_id ILIKE '%{event_id}%'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -1825,7 +1823,7 @@ class ApiCF(ApiParent):
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call
         # so the workaroud is to do a unuseful query to have the dao controller active
-        sql = ("SELECT id FROM om_visit LIMIT 1")
+        sql = "SELECT id FROM om_visit LIMIT 1"
         self.controller.get_rows(sql, commit=True)
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id)
 
@@ -1843,8 +1841,8 @@ class ApiCF(ApiParent):
         """ Open document of selected record of the table """
 
         # Get all documents for one visit
-        sql = ("SELECT doc_id FROM doc_x_visit"
-               " WHERE visit_id = '" + str(self.visit_id) + "'")
+        sql = (f"SELECT doc_id FROM doc_x_visit"
+               f" WHERE visit_id = '{self.visit_id}'")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return
@@ -1854,9 +1852,9 @@ class ApiCF(ApiParent):
             # If just one document is attached directly open
 
             # Get path of selected document
-            sql = ("SELECT path"
-                   " FROM v_ui_doc"
-                   " WHERE id = '" + str(rows[0][0]) + "'")
+            sql = (f"SELECT path"
+                   f" FROM v_ui_doc"
+                   f" WHERE id = '{rows[0][0]}'")
             row = self.controller.get_row(sql, commit=True)
             if not row:
                 return
@@ -1906,8 +1904,8 @@ class ApiCF(ApiParent):
         selected_document = self.tbl_list_doc.currentItem().text()
 
         # Get path of selected document
-        sql = ("SELECT path FROM v_ui_doc"
-               " WHERE id = '" + str(selected_document) + "'")
+        sql = (f"SELECT path FROM v_ui_doc"
+               f" WHERE id = '{selected_document}'")
         row = self.controller.get_row(sql, commit=True)
         if not row:
             return
@@ -1935,7 +1933,7 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
         """ Fill tab 'Document' """
-        table_document = "v_ui_doc_x_"+self.geom_type
+        table_document = "v_ui_doc_x_" + self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_columns_config(self.tbl_document, table_document)
 
@@ -1970,7 +1968,7 @@ class ApiCF(ApiParent):
         btn_doc_new.clicked.connect(partial(self.manage_new_document, dialog, None, self.feature))
 
         # Fill ComboBox doc_type
-        sql = ("SELECT id, id FROM doc_type ORDER BY id")
+        sql = "SELECT id, id FROM doc_type ORDER BY id"
         rows = self.controller.get_rows(sql, commit=True)
         rows.append(['', ''])
         utils_giswater.set_item_data(doc_type, rows)
@@ -1997,17 +1995,16 @@ class ApiCF(ApiParent):
         # Create interval dates
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            date_from.toString(format_low), date_to.toString(format_high))
+        interval = f"'{date_from.toString(format_low)}'::timestamp AND '{date_to.toString(format_high)}'::timestamp"
 
         # Set filter
-        expr = self.field_id + " = '" + self.feature_id + "'"
-        expr += " AND(date BETWEEN {0}) AND (date BETWEEN {0})".format(interval)
+        expr = f"{self.field_id} = '{self.feature_id}'"
+        expr += f" AND(date BETWEEN {interval}) AND (date BETWEEN {interval})"
 
         # Get selected values in Comboboxes
         doc_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
-            expr += " AND doc_type ILIKE '%" + str(doc_type_value) + "%'"
+            expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
         print(str(expr))
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -2142,11 +2139,11 @@ class ApiCF(ApiParent):
 
     def get_list(self, complet_result, form_name='', tab_name='', filter_fields=''):
 
-        form = '"formName":"' + form_name + '", "tabName":"' + tab_name + '"'
+        form = f'"formName":"{form_name}", "tabName":"{tab_name}"'
         id_name = complet_result[0]['body']['feature']['idName']
-        feature = '"tableName":"' + self.tablename + '", "idName":"'+id_name+'", "id":"'+self.feature_id+'"'
+        feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = self.create_body(form, feature,  filter_fields)
-        sql = ("SELECT gw_api_getlist($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_getlist($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if row is None or row[0] is None:
@@ -2189,7 +2186,7 @@ class ApiCF(ApiParent):
                 column_id = widget.property('column_id')
                 text = utils_giswater.getWidgetText(dialog, widget)
                 if text != "null":
-                    filter_fields += '"' + column_id + '":"'+text+'", '
+                    filter_fields += f'"{column_id}":"{text}", '
 
         if filter_fields != "":
             filter_fields = filter_fields[:-2]
@@ -2235,13 +2232,13 @@ class ApiCF(ApiParent):
         if self.geom_type == 'arc' or self.geom_type == 'node':
             index_tab = self.tab_main.currentIndex()
             tab_name = self.tab_main.widget(index_tab).objectName()
-            form = '"tabName":"'+tab_name+'"'
-            feature = '"featureType":"'+complet_result[0]['body']['feature']['featureType']+'", '
-            feature += '"tableName":"' + self.tablename + '", '
-            feature += '"idName":"' + self.field_id + '", '
-            feature += '"id":"' + self.feature_id + '"'
+            form = f'"tabName":"{tab_name}"'
+            feature = f'"featureType":"{complet_result[0]["body"]["feature"]["featureType"]}", '
+            feature += f'"tableName":"{self.tablename}", '
+            feature += f'"idName":"{self.field_id}", '
+            feature += f'"id":"{self.feature_id}"'
             body = self.create_body(form, feature, filter_fields='')
-            sql = ("SELECT gw_api_getinfoplan($${" + body + "}$$)::text")
+            sql = f"SELECT gw_api_getinfoplan($${{{body}}}$$)::text"
             row = self.controller.get_row(sql, log_sql=False, commit=True)
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -2284,7 +2281,7 @@ class ApiCF(ApiParent):
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
         body += '"feature":{}, '
         body += '"data":{}'
-        sql = ("SELECT gw_api_getcatalog($${" + body + "}$$)::text")
+        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             return
@@ -2323,27 +2320,27 @@ class ApiCF(ApiParent):
         cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
-            values += ("'" + str(cat_work_id) + "', ")
+            values += f"'{cat_work_id}', "
         descript = utils_giswater.getWidgetText(self.dlg_new_workcat, descript)
         if descript != "null":
             fields += 'descript, '
-            values += ("'" + str(descript) + "', ")
+            values += f"'{descript}', "
         link = utils_giswater.getWidgetText(self.dlg_new_workcat, link)
         if link != "null":
             fields += 'link, '
-            values += ("'" + str(link) + "', ")
+            values += f"'{link}', "
         workid_key_1 = utils_giswater.getWidgetText(self.dlg_new_workcat, workid_key_1)
         if workid_key_1 != "null":
             fields += 'workid_key1, '
-            values += ("'" + str(workid_key_1) + "', ")
+            values += f"'{workid_key_1}', "
         workid_key_2 = utils_giswater.getWidgetText(self.dlg_new_workcat, workid_key_2)
         if workid_key_2 != "null":
             fields += 'workid_key2, '
-            values += ("'" + str(workid_key_2) + "', ")
+            values += f"'{workid_key_2}', "
         builtdate = builtdate.dateTime().toString('yyyy-MM-dd')
         if builtdate != "null":
             fields += 'builtdate, '
-            values += ("'" + str(builtdate) + "', ")
+            values += f"'{builtdate}', "
 
         if values != "":
             fields = fields[:-2]
@@ -2353,12 +2350,12 @@ class ApiCF(ApiParent):
                 self.controller.show_info_box(msg, "Warning")
             else:
                 # Check if this element already exists
-                sql = ("SELECT DISTINCT(id)"
-                       "FROM " + str(table_object) + " "
-                       "WHERE id = '" + str(cat_work_id) + "' ")
+                sql = (f"SELECT DISTINCT(id)"
+                       f"FROM {table_object} "
+                       f"WHERE id = '{cat_work_id}' ")
                 row = self.controller.get_row(sql, log_info=False, commit=True)
                 if row is None:
-                    sql = ("INSERT INTO cat_work (" + fields + ") VALUES (" + values + ")")
+                    sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                     self.controller.execute_sql(sql)
                     sql = "SELECT id, id FROM cat_work ORDER BY id"
                     rows = self.controller.get_rows(sql, commit=True)
@@ -2403,8 +2400,8 @@ class ApiCF(ApiParent):
 
     def check_column_exist(self, table_name, column_name):
 
-        sql = ("SELECT DISTINCT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + table_name + "' AND column_name = '" + column_name + "'")
+        sql = (f"SELECT DISTINCT column_name FROM information_schema.columns"
+               f" WHERE table_name = '{table_name}' AND column_name = '{column_name}'")
         row = self.controller.get_row(sql, log_sql=False, commit=True)
         return row
 

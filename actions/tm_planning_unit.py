@@ -85,10 +85,10 @@ class TmPlanningUnit(TmParentAction):
 
         utils_giswater.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.DoubleClicked)
 
-        sql = ("SELECT id, name FROM cat_campaign")
+        sql = "SELECT id, name FROM cat_campaign"
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_campaign, rows, 1)
-        sql = ("SELECT id, name FROM cat_work")
+        sql = "SELECT id, name FROM cat_work"
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_work, rows, 1)
         self.load_default_values()
@@ -122,8 +122,8 @@ class TmPlanningUnit(TmParentAction):
     def populate_comboline(self, dialog, widget, completer):
 
         _filter = utils_giswater.getWidgetText(dialog, widget)
-        sql = ("SELECT node_id FROM v_edit_node "
-               " WHERE node_id ILIKE '%" + str(_filter)+"%'")
+        sql = (f"SELECT node_id FROM v_edit_node "
+               f" WHERE node_id ILIKE '%{_filter}%'")
         rows = self.controller.get_rows(sql, log_sql=True)
         list_items = [row[0] for row in rows]
         model = QStringListModel()
@@ -159,8 +159,8 @@ class TmPlanningUnit(TmParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            inf_text += str(id_) + ", "
-            list_id = list_id + "'" + str(id_) + "', "
+            inf_text += f"{id_}, "
+            list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
@@ -375,7 +375,7 @@ class TmPlanningUnit(TmParentAction):
 
         for layer in layers:
             if self.controller.is_layer_visible(layer):
-                visible_layer += '"' + str(layer.name()) + '", '
+                visible_layer += f'"{layer.name()}", '
         visible_layer = visible_layer[:-2] + "}"
 
         return visible_layer

@@ -63,7 +63,7 @@ class NotifyFunctions(ParentAction):
             conn.poll()
             while conn.notifies:
                 notify = conn.notifies.pop(0)
-                print("Got NOTIFY:{}, {}, {}".format(notify.pid, notify.channel, notify.payload))
+                print(f"Got NOTIFY:{notify.pid}, {notify.channel}, {notify.payload}")
                 if not notify.payload:
                     continue
 

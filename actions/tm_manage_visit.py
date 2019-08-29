@@ -170,8 +170,8 @@ class TmManageVisit(TmParentManage, QObject):
 
     def set_combos(self, dialog, qcombo, parameter):
 
-        sql = ("SELECT value FROM config_param_user "
-               " WHERE parameter = '"+str(parameter)+"' AND cur_user= current_user AND context='arbrat'")
+        sql = (f"SELECT value FROM config_param_user "
+               f" WHERE parameter = '{parameter}' AND cur_user= current_user AND context='arbrat'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(dialog, qcombo, str(row['value']))
@@ -199,9 +199,9 @@ class TmManageVisit(TmParentManage, QObject):
         """ Update geometry field """
 
         srid = self.controller.plugin_settings_value('srid')
-        sql = ("UPDATE om_visit"
-               " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
-               " WHERE id = " + str(self.current_visit.id))
+        sql = (f"UPDATE om_visit"
+               f" SET the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
+               f" WHERE id = {self.current_visit.id}")
         self.controller.execute_sql(sql, log_sql=True)
 
 
@@ -244,7 +244,7 @@ class TmManageVisit(TmParentManage, QObject):
             self.fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
 
         # C) load all related events in the relative table
-        self.filter = "visit_id = '" + str(text) + "'"
+        self.filter = f"visit_id = '{text}'"
         table_name = self.schema_name + ".om_visit_event"
         self.fill_table_visit(self.tbl_event, table_name, self.filter)
         self.set_configuration(self.tbl_event, table_name)
@@ -273,8 +273,7 @@ class TmManageVisit(TmParentManage, QObject):
             # it will contain all the geometry type allows basing on project type
             geometry_type = self.feature_type.itemText(index).lower()
             table_name = 'om_visit_x_' + geometry_type
-            sql = ("SELECT id FROM {1} WHERE visit_id = '{2}'".format(
-                table_name, self.current_visit.id))
+            sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
             rows = self.controller.get_rows(sql, commit=self.autocommit)
             if not rows or not rows[0]:
                 continue
@@ -406,11 +405,11 @@ class TmManageVisit(TmParentManage, QObject):
     def set_parameter_id_combo(self):
         """ Set parameter_id combo basing on current selections """
 
-        sql = ("SELECT id, descript"
-               " FROM om_visit_parameter"
-               " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
-               " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'"
-               " ORDER BY id")
+        sql = (f"SELECT id, descript"
+               f" FROM om_visit_parameter"
+               f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
+               f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'"
+               f" ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
 
         if rows:
@@ -443,7 +442,7 @@ class TmManageVisit(TmParentManage, QObject):
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
-        fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
+        fake_filter = f'{self.geom_type}_id IN ("-1")'
         self.set_table_model(self.tbl_relation, self.geom_type, fake_filter)
 
         # set the callback to setup all events later
@@ -456,8 +455,7 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         table_name = 'om_visit_x_' + self.geom_type
-        sql = ("SELECT {0}_id FROM {1} WHERE visit_id = '{2}'".format(
-            self.geom_type, table_name, int(self.visit_id.text())))
+        sql = f"SELECT {self.geom_type}_id FROM {table_name} WHERE visit_id = '{int(self.visit_id.text())}'"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
@@ -465,7 +463,7 @@ class TmManageVisit(TmParentManage, QObject):
 
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, ','.join(ids))
+        expr_filter = f'"{self.geom_type}_id" IN ({",".join(ids)})'
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
@@ -529,7 +527,7 @@ class TmManageVisit(TmParentManage, QObject):
         widget.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " +str(table_name)
+        sql = f"SELECT DISTINCT(id) FROM {table_name}"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
@@ -570,8 +568,8 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         # get form associated
-        sql = ("SELECT form_type FROM om_visit_parameter"
-               " WHERE id = '" + str(parameter_id) + "'")
+        sql = (f"SELECT form_type FROM om_visit_parameter"
+               f" WHERE id = '{parameter_id}'")
         row = self.controller.get_row(sql, commit=False)
         form_type = str(row[0])
 
@@ -746,10 +744,10 @@ class TmManageVisit(TmParentManage, QObject):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = ("SELECT column_index, width, alias, status"
-               " FROM config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
-               " ORDER BY column_index")
+        sql = (f"SELECT column_index, width, alias, status"
+               f" FROM config_client_forms"
+               f" WHERE table_id = '{table_name}'"
+               f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
         if not rows:
             return

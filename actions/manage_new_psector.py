@@ -189,9 +189,9 @@ class ManageNewPsector(ParentManage):
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
             self.dlg_plan_psector.chk_enable_all.setDisabled(False)
-            sql = ("SELECT enable_all "
-                   "FROM " + self.plan_om+"_psector "
-                   "WHERE psector_id = '" + str(psector_id) + "'")
+            sql = (f"SELECT enable_all "
+                   f"FROM {self.plan_om}_psector "
+                   f"WHERE psector_id = '{psector_id}'")
             row = self.controller.get_row(sql)
             if row:
                 self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
@@ -205,28 +205,28 @@ class ManageNewPsector(ParentManage):
                 self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully",
                                 set_edit_triggers=QTableView.DoubleClicked)
                 self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully")
-            sql = ("SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
-                   "observ, atlas_id, scale, rotation, active, ext_code "
-                   "FROM " + self.plan_om + "_psector "
-                   "WHERE psector_id = " + str(psector_id))
+            sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
+                   f"observ, atlas_id, scale, rotation, active, ext_code "
+                   f"FROM {self.plan_om}_psector "
+                   f"WHERE psector_id = {psector_id}")
             row = self.controller.get_row(sql, log_sql=True)
             if not row:
                 return
 
-            self.dlg_plan_psector.setWindowTitle("Plan psector - " + str(row['name']))
+            self.dlg_plan_psector.setWindowTitle(f"Plan psector - {row['name']}")
             self.psector_id.setText(str(row['psector_id']))
             if str(row['ext_code']) != 'None':
                 self.ext_code.setText(str(row['ext_code']))
-            sql = ("SELECT name FROM plan_psector_cat_type "
-                   "WHERE id = " + str(row['psector_type']))
+            sql = (f"SELECT name FROM plan_psector_cat_type "
+                   f"WHERE id = {row['psector_type']}")
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_psector_type, str(result['name']), 1)
-            sql = ("SELECT name FROM exploitation "
-                   "WHERE expl_id = " + str(row['expl_id']))
+            sql = (f"SELECT name FROM exploitation "
+                   f"WHERE expl_id = {row['expl_id']}")
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_expl_id, str(result['name']), 1)
-            sql = ("SELECT name FROM sector "
-                   "WHERE sector_id = " + str(row['sector_id']))
+            sql = (f"SELECT name FROM sector "
+                   f"WHERE sector_id = {row['sector_id']}")
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_sector_id, str(result['name']), 1)
 
@@ -262,22 +262,22 @@ class ManageNewPsector(ParentManage):
             self.update = True
             psector_id_aux = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
             if psector_id_aux != 'null':
-                sql = ("DELETE FROM " + self.plan_om + "_psector_selector "
-                       "WHERE cur_user= current_user")
+                sql = (f"DELETE FROM {self.plan_om}_psector_selector "
+                       f"WHERE cur_user= current_user")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', psector_id_aux)
             if self.plan_om == 'plan':
-                sql = ("DELETE FROM selector_psector "
-                       "WHERE cur_user = current_user AND psector_id = '" + psector_id_aux + "'")
+                sql = (f"DELETE FROM selector_psector "
+                       f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
             layer = None
             if not is_api:
-                layername = 'v_edit_' + self.plan_om + '_psector'
+                layername = f'v_edit_{self.plan_om}_psector'
                 layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
             if layer:
 
-                expr_filter = "psector_id = '" + str(psector_id) + "'"
+                expr_filter = f"psector_id = '{psector_id}'"
                 (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
                 if not is_valid:
                     return
@@ -311,7 +311,7 @@ class ManageNewPsector(ParentManage):
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
-        sql = ("SELECT state_id FROM selector_state WHERE cur_user = current_user")
+        sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql)
         self.all_states = rows
         self.delete_psector_selector('selector_state')
@@ -363,9 +363,9 @@ class ManageNewPsector(ParentManage):
 
         self.set_completer()
 
-        sql = ("SELECT other, gexpenses, vat "
-               "FROM " + self.plan_om + "_psector "
-               "WHERE psector_id = '" + str(psector_id) + "'")
+        sql = (f"SELECT other, gexpenses, vat "
+               f"FROM {self.plan_om}_psector "
+               f"WHERE psector_id = '{psector_id}'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
@@ -394,7 +394,7 @@ class ManageNewPsector(ParentManage):
 
         value = utils_giswater.isChecked(self.dlg_plan_psector, "chk_enable_all")
         psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
-        sql = ("SELECT gw_fct_plan_psector_enableall(" + str(value) + ", '" + str(psector_id) + "')")
+        sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         self.controller.execute_sql(sql)
         self.reload_qtable(self.dlg_plan_psector, 'arc', self.plan_om)
         self.reload_qtable(self.dlg_plan_psector, 'node', self.plan_om)
@@ -402,9 +402,9 @@ class ManageNewPsector(ParentManage):
         if self.project_type.upper() == 'UD':
             self.reload_qtable(self.dlg_plan_psector, 'gully', self.plan_om)
 
-        sql = ("UPDATE plan_psector "
-               "SET enable_all = '" + str(value) + "' "
-               "WHERE psector_id = '" + str(psector_id) + "'")
+        sql = (f"UPDATE plan_psector "
+               f"SET enable_all = '{value}' "
+               f"WHERE psector_id = '{psector_id}'")
         self.controller.execute_sql(sql, log_sql=True)
         self.refresh_map_canvas()
 
@@ -496,15 +496,15 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
-               "WHERE parameter = 'composer_" + self.plan_om + "_vdefault' AND cur_user= current_user")
+        sql = (f"SELECT value FROM config_param_user "
+               f"WHERE parameter = 'composer_{self.plan_om}_vdefault' AND cur_user= current_user")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 0)
 
         utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'composer_" + self.plan_om + "_vdefault' AND cur_user= current_user")
+        sql = (f"SELECT value FROM config_param_user "
+               f"WHERE parameter = 'composer_{self.plan_om}_vdefault' AND cur_user= current_user")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, row[0])
@@ -540,7 +540,7 @@ class ManageNewPsector(ParentManage):
         # Generate csv detail
         if utils_giswater.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
             file_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_csv_path')
-            viewname = "v_" + self.plan_om + "_current_psector_budget_detail"
+            viewname = f"v_{self.plan_om}_current_psector_budget_detail"
             if self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 0:
                 viewname = 'v_om_current_psector_budget_detail_rec'
             elif self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 1:
@@ -556,7 +556,7 @@ class ManageNewPsector(ParentManage):
         # Generate csv
         if utils_giswater.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
             file_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_csv_detail_path')
-            viewname = "v_" + self.plan_om + "_current_psector_budget"
+            viewname = f"v_{self.plan_om}_current_psector_budget"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
                 self.controller.show_warning(message)
@@ -623,10 +623,10 @@ class ManageNewPsector(ParentManage):
     def generate_csv(self, path, viewname):
 
         # Get columns name in order of the table
-        sql = ("SELECT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + str(viewname) + "'"
-               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-               " ORDER BY ordinal_position")
+        sql = (f"SELECT column_name FROM information_schema.columns"
+               f" WHERE table_name = '{viewname}'"
+               f" AND table_schema = '" + self.schema_name.replace('"', '') + "'"
+               f" ORDER BY ordinal_position")
         rows = self.controller.get_rows(sql)
         columns = []
 
@@ -638,8 +638,8 @@ class ManageNewPsector(ParentManage):
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
-        sql = ("SELECT * FROM " + viewname + ""
-               " WHERE psector_id = '" + str(utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)) + "'")
+        sql = (f"SELECT * FROM {viewname}"
+               f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)}'")
         rows = self.controller.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
@@ -655,17 +655,17 @@ class ManageNewPsector(ParentManage):
 
     def populate_budget(self, dialog, psector_id):
         
-        sql = ("SELECT DISTINCT(column_name) FROM information_schema.columns"
-               " WHERE table_name = 'v_" + self.plan_om + "_current_psector'")
+        sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
+               f" WHERE table_name = 'v_{self.plan_om}_current_psector'")
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
-        sql = ("SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca"
-               " FROM v_" + self.plan_om + "_current_psector"
-               " WHERE psector_id = '" + str(psector_id) + "'")
+        sql = (f"SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca"
+               f" FROM v_{self.plan_om}_current_psector"
+               f" WHERE psector_id = '{psector_id}'")
         row = self.controller.get_row(sql)
         if row:
             for column_name in columns:
@@ -787,8 +787,8 @@ class ManageNewPsector(ParentManage):
 
     def enable_relation_tab(self, tablename):
         
-        sql = ("SELECT name FROM " + tablename + " "
-               " WHERE LOWER(name) = '" + utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name) + "'")
+        sql = (f"SELECT name FROM {tablename} "
+               f" WHERE LOWER(name) = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)}'")
         rows = self.controller.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
@@ -800,26 +800,26 @@ class ManageNewPsector(ParentManage):
 
 
     def delete_psector_selector(self, tablename):
-        sql = ("DELETE FROM " + tablename + ""
-               " WHERE cur_user = current_user")
+        sql = (f"DELETE FROM {tablename}"
+               f" WHERE cur_user = current_user")
         self.controller.execute_sql(sql)
 
 
     def insert_psector_selector(self, tablename, field, value):
 
-        sql = ("INSERT INTO " + tablename + " (" + field + ", cur_user) "
-               "VALUES ('" + str(value) + "', current_user)")
+        sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
+               f"VALUES ('{str(value)}', current_user)")
         self.controller.execute_sql(sql)
 
 
     def check_tab_position(self):
         
         self.dlg_plan_psector.name.setEnabled(False)
-        self.insert_or_update_new_psector(tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
+        self.insert_or_update_new_psector(tablename=f'v_edit_{self.plan_om}_psector', close_dlg=False)
         self.update = True
         if self.dlg_plan_psector.tabWidget.currentIndex() == 2:
             tableleft = "v_price_compost"
-            tableright = "v_edit_" + self.plan_om + "_psector_x_other"
+            tableright = f"v_edit_{self.plan_om}_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
@@ -827,12 +827,12 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(self.dlg_plan_psector, utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id'))
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')
-            expr = "psector_id = '" + str(psector_id) + "'"
+            expr = f"psector_id = '{psector_id}'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
 
-        sql = ("SELECT other, gexpenses, vat"
-               " FROM " + self.plan_om + "_psector "
-               " WHERE psector_id = '" + str(utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')) + "'")
+        sql = (f"SELECT other, gexpenses, vat"
+               f" FROM {self.plan_om}_psector "
+               f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')}'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
@@ -849,8 +849,8 @@ class ManageNewPsector(ParentManage):
     def populate_result_id(self, combo, table_name):
 
         index = self.dlg_plan_psector.psector_type.itemData(self.dlg_plan_psector.psector_type.currentIndex())
-        sql = ("SELECT result_type, name FROM " + table_name + ""
-               " WHERE result_type = " + str(index[0]) + " ORDER BY name DESC")
+        sql = (f"SELECT result_type, name FROM {table_name}"
+               f" WHERE result_type = {index[0]} ORDER BY name DESC")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
@@ -871,8 +871,8 @@ class ManageNewPsector(ParentManage):
 
     def populate_combos(self, combo, field_name, field_id, table_name, allow_nulls=True):
         
-        sql = ("SELECT DISTINCT(" + field_id + "), " + field_name + ""
-               " FROM " + table_name + " ORDER BY " + field_name)
+        sql = (f"SELECT DISTINCT({field_id}), {field_name}"
+               f" FROM {table_name} ORDER BY {field_name}")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return
@@ -889,8 +889,8 @@ class ManageNewPsector(ParentManage):
     def reload_states_selector(self):
         self.delete_psector_selector('selector_state')
         for x in range(0, len(self.all_states)):
-            sql = ("INSERT INTO selector_state (state_id, cur_user)"
-                   " VALUES ('" + str(self.all_states[x][0]) + "', current_user)")
+            sql = (f"INSERT INTO selector_state (state_id, cur_user)"
+                   f" VALUES ('{self.all_states[x][0]}', current_user)")
             self.controller.execute_sql(sql)
 
 
@@ -926,8 +926,8 @@ class ManageNewPsector(ParentManage):
     def check_name(self, psector_name):
         """ Check if name of new psector exist or not """
 
-        sql = ("SELECT name FROM " + self.plan_om + "_psector"
-               " WHERE name = '" + psector_name + "'")
+        sql = (f"SELECT name FROM {self.plan_om}_psector"
+               f" WHERE name = '{psector_name}'")
         row = self.controller.get_row(sql)
         if row is None:
             return False
@@ -954,11 +954,11 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(True)
             self.enable_buttons(True)
 
-        viewname = "'v_edit_" + self.plan_om + "_psector'"
-        sql = ("SELECT column_name FROM information_schema.columns "
-               "WHERE table_name = " + viewname + " "
-               "AND table_schema = '" + self.schema_name.replace('"', '') + "' "
-               "ORDER BY ordinal_position")
+        viewname = f"'v_edit_{self.plan_om}_psector'"
+        sql = (f"SELECT column_name FROM information_schema.columns "
+               f"WHERE table_name = {viewname} "
+               f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
+               f"ORDER BY ordinal_position")
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
@@ -990,15 +990,15 @@ class ManageNewPsector(ParentManage):
                         else:
                             if type(value) is not bool:
                                 value = value.replace(",", ".")
-                            sql += column_name + " = '" + str(value) + "', "
+                            sql += f"{column_name} = '{value}', "
 
                 sql = sql[:len(sql) - 2]
-                sql += " WHERE psector_id = '" + utils_giswater.getWidgetText(self.dlg_plan_psector, self.psector_id) + "'"
+                sql += f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.psector_id)}'"
 
         else:
             values = "VALUES("
             if columns:
-                sql = "INSERT INTO " + tablename + " ("
+                sql = f"INSERT INTO {tablename} ("
                 for column_name in columns:
                     if column_name != 'psector_id':
                         widget_type = utils_giswater.getWidgetType(self.dlg_plan_psector, column_name)
@@ -1017,7 +1017,7 @@ class ManageNewPsector(ParentManage):
                                 sql += column_name + ", "
                                 values += "null, "
                             else:
-                                values += "'" + value + "', "
+                                values += f"'{value}', "
                                 sql += column_name + ", "
 
                 sql = sql[:len(sql) - 2] + ") "
@@ -1033,12 +1033,12 @@ class ManageNewPsector(ParentManage):
                        " WHERE parameter = 'psector_vdefault' AND cur_user = current_user")
                 row = self.controller.get_row(sql)
                 if row:
-                    sql = ("UPDATE config_param_user "
-                           " SET value = '" + str(new_psector_id[0]) + "' "
-                           " WHERE parameter = 'psector_vdefault'")
+                    sql = (f"UPDATE config_param_user "
+                           f" SET value = '{new_psector_id[0]}' "
+                           f" WHERE parameter = 'psector_vdefault'")
                 else:
-                    sql = ("INSERT INTO config_param_user (parameter, value, cur_user) "
-                           " VALUES ('psector_vdefault', '" + str(new_psector_id[0]) + "', current_user)")
+                    sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+                           f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user)")
                 self.controller.execute_sql(sql, log_sql=True)
         else:
             self.controller.execute_sql(sql, log_sql=True)
@@ -1063,7 +1063,7 @@ class ManageNewPsector(ParentManage):
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr = " psector_id = '" + str(utils_giswater.getWidgetText(dialog, 'psector_id')) + "'"
+        expr = f" psector_id = '{utils_giswater.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
         self.set_table_columns(dialog, tbl_selected_rows, tableright)
@@ -1103,29 +1103,29 @@ class ManageNewPsector(ParentManage):
             row = selected_list[i].row()
             values = ""
             psector_id = utils_giswater.getWidgetText(dialog, 'psector_id')
-            values += "'" + str(psector_id) + "', "
+            values += f"'{psector_id}', "
             if tbl_all_rows.model().record(row).value('unit') not in  (None, 'null', 'NULL'):
-                values += "'" + str(tbl_all_rows.model().record(row).value('unit')) + "', "
+                values += f"'{tbl_all_rows.model().record(row).value('unit')}', "
             else:
                 values += 'null, '
             if tbl_all_rows.model().record(row).value('id') not in  (None, 'null', 'NULL'):
-                values += "'" + str(tbl_all_rows.model().record(row).value('id')) + "', "
+                values += f"'{tbl_all_rows.model().record(row).value('id')}', "
             else:
                 values += 'null, '
             if tbl_all_rows.model().record(row).value('description') not in  (None, 'null', 'NULL'):
-                values += "'" + str(tbl_all_rows.model().record(row).value('description')) + "', "
+                values += f"'{tbl_all_rows.model().record(row).value('description')}', "
             else:
                 values += 'null, '
             if tbl_all_rows.model().record(row).value('price') not in  (None, 'null', 'NULL'):
-                values += "'" + str(tbl_all_rows.model().record(row).value('price')) + "', "
+                values += f"'{tbl_all_rows.model().record(row).value('price')}', "
             else:
                 values += 'null, '
             values = values[:len(values) - 2]
             # Check if expl_id already exists in expl_selector
-            sql = ("SELECT DISTINCT(" + id_des + ")"
-                   " FROM " + tableright + ""
-                   " WHERE " + id_des + " = '" + str(expl_id[i]) + "'"
-                   " AND psector_id = '"+psector_id+"'")
+            sql = (f"SELECT DISTINCT({id_des})"
+                   f" FROM {tableright}"
+                   f" WHERE {id_des} = '{expl_id[i]}'"
+                   f" AND psector_id = '{psector_id}'")
 
             row = self.controller.get_row(sql, commit=True)
             if row is not None:
@@ -1133,13 +1133,13 @@ class ManageNewPsector(ParentManage):
                 message = "Id already selected"
                 self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
-                sql = ("INSERT INTO " + tableright + ""
-                       " (psector_id, unit, price_id, descript, price) "
-                       " VALUES (" + values + ")")
+                sql = (f"INSERT INTO {tableright}"
+                       f" (psector_id, unit, price_id, descript, price) "
+                       f" VALUES ({values})")
                 self.controller.execute_sql(sql)
 
         # Refresh
-        expr = " psector_id = '" + str(utils_giswater.getWidgetText(dialog, 'psector_id')) + "'"
+        expr = f" psector_id = '{utils_giswater.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
         self.set_table_columns(dialog, tbl_selected_rows, tableright)
@@ -1148,8 +1148,8 @@ class ManageNewPsector(ParentManage):
 
     def rows_unselector(self, dialog, tbl_selected_rows, tableright, field_id_right):
         
-        query = ("DELETE FROM " + tableright + ""
-               " WHERE  " + tableright + "." + field_id_right + " = ")
+        query = (f"DELETE FROM {tableright}"
+                 f" WHERE {tableright}.{field_id_right} = ")
         selected_list = tbl_selected_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1161,12 +1161,12 @@ class ManageNewPsector(ParentManage):
             id_ = str(tbl_selected_rows.model().record(row).value(field_id_right))
             expl_id.append(id_)
         for i in range(0, len(expl_id)):
-            sql = (query + "'" + str(expl_id[i]) + "'"
-                   " AND psector_id = '" + utils_giswater.getWidgetText(dialog, 'psector_id') + "'")
+            sql = (f"{query}'{expl_id[i]}'"
+                   f" AND psector_id = '{utils_giswater.getWidgetText(dialog, 'psector_id')}'")
             self.controller.execute_sql(sql)
 
         # Refresh
-        expr = " psector_id = '" + str(utils_giswater.getWidgetText(dialog, 'psector_id')) + "'"
+        expr = f" psector_id = '{utils_giswater.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
         self.set_table_columns(dialog, tbl_selected_rows, tableright)
@@ -1179,10 +1179,10 @@ class ManageNewPsector(ParentManage):
         query = utils_giswater.getWidgetText(dialog, text_line).lower()
         if query == 'null':
             query = ""
-        sql = ("SELECT * FROM " + tableleft + " WHERE LOWER(" + field_id + ")"
-               " LIKE '%"+query+"%' AND " + field_id + " NOT IN ("
-               " SELECT price_id FROM " + tableright + ""
-               " WHERE psector_id = '" + utils_giswater.getWidgetText(dialog, 'psector_id') + "')")
+        sql = (f"SELECT * FROM {tableleft} WHERE LOWER ({field_id})"
+               f" LIKE '%{query}%' AND {field_id} NOT IN ("
+               f" SELECT price_id FROM {tableright}"
+               f" WHERE psector_id = '{utils_giswater.getWidgetText(dialog, 'psector_id')}')")
         self.fill_table_by_query(qtable, sql)
 
 
@@ -1264,9 +1264,9 @@ class ManageNewPsector(ParentManage):
             return
 
         # Check if document already exist
-        sql = ("SELECT doc_id"
-               " FROM doc_x_psector"
-               " WHERE doc_id = '" + str(doc_id) + "' AND psector_id = '" + str(psector_id) + "'")
+        sql = (f"SELECT doc_id"
+               f" FROM doc_x_psector"
+               f" WHERE doc_id = '{doc_id}' AND psector_id = '{psector_id}'")
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             message = "Document already exist"
@@ -1274,8 +1274,8 @@ class ManageNewPsector(ParentManage):
             return
 
         # Insert into new table
-        sql = ("INSERT INTO doc_x_psector (doc_id, psector_id)"
-               " VALUES ('" + str(doc_id) + "', " + str(psector_id) + ")")
+        sql = (f"INSERT INTO doc_x_psector (doc_id, psector_id)"
+               f" VALUES ('{doc_id}', {psector_id})")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"
@@ -1302,8 +1302,8 @@ class ManageNewPsector(ParentManage):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, ','.join(selected_id))
         if answer:
-            sql = ("DELETE FROM doc_x_psector"
-            " WHERE id IN ({})".format(','.join(selected_id)))
+            sql = (f"DELETE FROM doc_x_psector"
+                   f" WHERE id IN ({','.join(selected_id)})")
             status = self.controller.execute_sql(sql)
             if not status:
                 message = "Error deleting data"

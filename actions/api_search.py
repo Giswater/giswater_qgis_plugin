@@ -246,14 +246,15 @@ class ApiSearch(ApiParent):
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
-        form_search += '"tabName":"'+self.dlg_search.main_tab.widget(index).objectName()+'"'
-        form_search_add += '"tabName":"' + self.dlg_search.main_tab.widget(index).objectName() + '"'
+        form_search += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
+        form_search_add += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
         if combo_list:
             combo = combo_list[0]
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
-            extras_search += '"'+combo.property('column_id')+'":{"id":"' + str(id) + '", "name":"' + name + '"}, '
-            extras_search_add += '"' + combo.property('column_id') + '":{"id":"' + str(id) + '", "name":"' + name + '"}, '
+            extras_search += f'"{combo.property("column_id")}":{{"id":"{id}", "name":"{name}"}}, '
+            # extras_search += '"'+combo.property('column_id')+'":{"id":"' + str(id) + '", "name":"' + name + '"}, '
+            extras_search_add += f'"{combo.property("column_id")}":{{"id":"{id}", "name":"{name}"}}, '
         if line_list:
             line_edit = line_list[0]
             # If current tab have more than one QLineEdit, clear second QLineEdit
@@ -264,10 +265,10 @@ class ApiSearch(ApiParent):
             if str(value) == '':
                 return
 
-            extras_search += '"' + line_edit.property('column_id') + '":{"text":"' + value + '"}'
-            extras_search_add += '"' + line_edit.property('column_id') + '":{"text":"' + value + '"}'
+            extras_search += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
+            extras_search_add += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
-            sql = ("SELECT gw_api_setsearch($${" +body + "}$$)")
+            sql = f"SELECT gw_api_setsearch($${{{body}}}$$)"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if row:
                 self.result_data = row[0]
@@ -296,9 +297,9 @@ class ApiSearch(ApiParent):
             if str(value) == 'null':
                 return
 
-            extras_search_add += ', "' + line_edit_add.property('column_id') + '":{"text":"' + value + '"}'
+            extras_search_add += f', "{line_edit_add.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
-            sql = ("SELECT gw_api_setsearch_add($${" + body + "}$$)")
+            sql = f"SELECT gw_api_setsearch_add($${{{body}}}$$)"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if row:
                 self.result_data = row[0]
@@ -355,9 +356,9 @@ class ApiSearch(ApiParent):
 
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
-        feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
+        feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         body = self.create_body(feature=feature)
-        sql = ("SELECT gw_api_getinfofromid($${" + body + "}$$)")
+        sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -442,23 +443,23 @@ class ApiSearch(ApiParent):
         """ Active exploitations are compared with workcat farms.
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
 
-        sql = ("SELECT a.expl_id, a.expl_name FROM "
-               "  (SELECT expl_id, expl_name FROM v_ui_workcat_x_feature "
-               "   WHERE workcat_id='" + str(workcat_id) + "' "
-               "   UNION SELECT expl_id, expl_name FROM v_ui_workcat_x_feature_end "
-               "   WHERE workcat_id='" + str(workcat_id) + "'"
-               "   ) AS a "
-               " WHERE expl_id NOT IN "
-               "  (SELECT expl_id FROM selector_expl "
-               "   WHERE cur_user=current_user)")
+        sql = (f"SELECT a.expl_id, a.expl_name FROM "
+               f"  (SELECT expl_id, expl_name FROM v_ui_workcat_x_feature "
+               f"   WHERE workcat_id='{workcat_id}' "
+               f"   UNION SELECT expl_id, expl_name FROM v_ui_workcat_x_feature_end "
+               f"   WHERE workcat_id='{workcat_id}'"
+               f"   ) AS a "
+               f" WHERE expl_id NOT IN "
+               f"  (SELECT expl_id FROM selector_expl "
+               f"   WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
         if not rows:
             return
 
         if len(rows) > 0:
             for row in rows:
-                sql = ("INSERT INTO selector_expl(expl_id, cur_user) "
-                       " VALUES('" + str(row[0]) + "', current_user)")
+                sql = (f"INSERT INTO selector_expl(expl_id, cur_user) "
+                       f" VALUES('{row[0]}', current_user)")
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
             self.controller.show_warning(msg)
@@ -469,15 +470,15 @@ class ApiSearch(ApiParent):
 
         sql = ("DELETE FROM selector_workcat "
                " WHERE cur_user = current_user;\n")
-        sql += ("INSERT INTO selector_workcat(workcat_id, cur_user) "
-                " VALUES('" + workcat_id + "', current_user);\n")
+        sql += (f"INSERT INTO selector_workcat(workcat_id, cur_user) "
+                f" VALUES('{workcat_id}', current_user);\n")
         self.controller.execute_sql(sql)
 
 
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
-        sql = ("SELECT state_id FROM selector_state "
-               " WHERE cur_user = current_user AND state_id ='" + str(_id) + "'")
+        sql = (f"SELECT state_id FROM selector_state "
+               f" WHERE cur_user = current_user AND state_id ='{_id}'")
         row = self.controller.get_row(sql)
         if row is None:
             qtable.setEnabled(False)
@@ -506,15 +507,15 @@ class ApiSearch(ApiParent):
     def force_state(self, qbutton, state, qtable):
         """ Force selected state and set qtable enabled = True """
 
-        sql = ("SELECT state_id "
-               "FROM selector_state "
-               "WHERE cur_user = current_user AND state_id = '" + str(state) + "'")
+        sql = (f"SELECT state_id "
+               f"FROM selector_state "
+               f"WHERE cur_user = current_user AND state_id = '{state}'")
         row = self.controller.get_row(sql)
         if row:
             return
         
-        sql = ("INSERT INTO selector_state(state_id, cur_user) "
-               "VALUES('" + str(state) + "', current_user)")
+        sql = (f"INSERT INTO selector_state(state_id, cur_user) "
+               f"VALUES('{state}', current_user)")
         self.controller.execute_sql(sql)
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
@@ -587,10 +588,10 @@ class ApiSearch(ApiParent):
 
         result_select = utils_giswater.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
-            expr = ("workcat_id = '" + str(workcat_id) + "'"
-                    " and " + str(field_id) + " ILIKE '%" + str(result_select) + "%'")
+            expr = (f"workcat_id = '{workcat_id}'"
+                    f" and {field_id} ILIKE '%{result_select}%'")
         else:
-            expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+            expr = f"workcat_id ILIKE '%{workcat_id}%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
         self.set_table_columns(dialog, qtable, table_name)
 
@@ -664,17 +665,17 @@ class ApiSearch(ApiParent):
 
         features = ['NODE', 'CONNEC', 'GULLY', 'ELEMENT', 'ARC']
         for feature in features:
-            sql = ("SELECT feature_id "
-                   " FROM " + str(table_name) + "")
-            sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            sql = (f"SELECT feature_id "
+                   f" FROM {table_name}")
+            sql += f" WHERE workcat_id = '{workcat_id}' AND feature_type = '{feature}'"
             rows = self.controller.get_rows(sql)
             if not rows:
                 return
 
             if extension is not None:
-                widget_name = "lbl_total_" + str(feature.lower()) + str(extension)
+                widget_name = f"lbl_total_{feature.lower()}{extension}"
             else:
-                widget_name = "lbl_total_" + str(feature.lower())
+                widget_name = f"lbl_total_{feature.lower()}"
 
             widget = self.items_dialog.findChild(QLabel, str(widget_name))
 
@@ -687,9 +688,9 @@ class ApiSearch(ApiParent):
             if feature == 'ARC':
                 for row in rows:
                     arc_id = str(row[0])
-                    sql = ("SELECT st_length2d(the_geom)::numeric(12,2) "
-                           " FROM arc"
-                           " WHERE arc_id = '" + arc_id + "'")
+                    sql = (f"SELECT st_length2d(the_geom)::numeric(12,2) "
+                           f" FROM arc"
+                           f" WHERE arc_id = '{arc_id}'")
                     row = self.controller.get_row(sql)
                     if row:
                         length = length + row[0]

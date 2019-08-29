@@ -212,7 +212,7 @@ class ManageVisit(ParentManage, QObject):
         # load feature if in tbl_relation
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, self.locked_feature_id)
+        expr_filter = f'"{self.geom_type}_id" IN ({self.locked_feature_id})'
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
@@ -252,9 +252,9 @@ class ManageVisit(ParentManage, QObject):
         """ Update geometry field """
 
         srid = self.controller.plugin_settings_value('srid')
-        sql = ("UPDATE om_visit"
-               " SET the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) + ")"
-               " WHERE id = " + str(self.current_visit.id))
+        sql = (f"UPDATE om_visit"
+               f" SET the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
+               f" WHERE id = {self.current_visit.id})")
         self.controller.execute_sql(sql)
 
 
@@ -299,7 +299,7 @@ class ManageVisit(ParentManage, QObject):
             self.fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
 
         # C) load all related events in the relative table
-        self.filter = "visit_id = '" + str(text) + "'"
+        self.filter = f"visit_id = '{text}'"
         table_name = self.schema_name + ".om_visit_event"
         self.fill_table_object(self.tbl_event, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_event, table_name)
@@ -327,8 +327,7 @@ class ManageVisit(ParentManage, QObject):
             # it will contain all the geometry type allows basing on project type
             geometry_type = self.feature_type.itemText(index).lower()
             table_name = 'om_visit_x_' + geometry_type
-            sql = ("SELECT id FROM {0}.{1} WHERE visit_id = '{2}'".format(
-                self.schema_name, table_name, self.current_visit.id))
+            sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
             rows = self.controller.get_rows(sql, commit=self.autocommit)
             if not rows or not rows[0]:
                 continue
@@ -393,7 +392,7 @@ class ManageVisit(ParentManage, QObject):
                 db_record = OmVisitXGully(self.controller)
 
             # remove all actual saved records related with visit_id
-            where_clause = "visit_id = '{}'".format(self.visit_id.text())
+            where_clause = f"visit_id = '{self.visit_id.text()}'"
 
             db_record.delete(where_clause=where_clause, commit=self.autocommit)
 
@@ -474,10 +473,10 @@ class ManageVisit(ParentManage, QObject):
     def set_parameter_id_combo(self, dialog):
         """set parameter_id combo basing on current selections."""
         dialog.parameter_id.clear()
-        sql = ("SELECT id, descript"
-               " FROM om_visit_parameter"
-               " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
-               " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
+        sql = (f"SELECT id, descript"
+               f" FROM om_visit_parameter"
+               f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
+               f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'")
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, commit=True)
 
@@ -509,7 +508,7 @@ class ManageVisit(ParentManage, QObject):
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
-        fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
+        fake_filter = f'{self.geom_type}_id IN ("-1")'
         self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
         # set the callback to setup all events later
@@ -522,8 +521,8 @@ class ManageVisit(ParentManage, QObject):
             return
 
         table_name = 'om_visit_x_' + self.geom_type
-        sql = ("SELECT {0}_id FROM {1}.{2} WHERE visit_id = '{3}'".format(
-            self.geom_type, self.schema_name, table_name, int(self.visit_id.text())))
+        sql = f"SELECT {self.geom_type}_id FROM {table_name} WHERE visit_id = '{int(self.visit_id.text())}'"
+        
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
@@ -531,7 +530,7 @@ class ManageVisit(ParentManage, QObject):
 
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, ','.join(ids))
+        expr_filter = f'"{self.geom_type}_id" IN ({",".join(ids)})'
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
@@ -569,7 +568,7 @@ class ManageVisit(ParentManage, QObject):
             utils_giswater.setWidgetText(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by code')
             filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
-            expr_filter = geom_type + "_id = '" + feature_id + "'"
+            expr_filter = f"{geom_type}_id = '{feature_id}'"
             # Refresh model with selected filter            
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
@@ -613,17 +612,16 @@ class ManageVisit(ParentManage, QObject):
         # Create interval dates
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            visit_start.toString(format_low), visit_end.toString(format_high))
+        interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
 
         if table_object == "v_ui_om_visit":
-            expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
+            expr_filter += f"(startdate BETWEEN {interval}) AND (enddate BETWEEN {interval})"
             if object_id != 'null':
-                expr_filter += " AND "+filed_to_filter+"::TEXT ILIKE '%" + str(object_id) + "%'"
+                expr_filter += f" AND {filed_to_filter}::TEXT ILIKE '%{object_id}%'"
         else:
-            expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
+            expr_filter += f"AND (visit_start BETWEEN {interval}) AND (visit_end BETWEEN {interval})"
             if object_id != 'null':
-                expr_filter += " AND "+filed_to_filter+"::TEXT ILIKE '%" + str(object_id) + "%'"
+                expr_filter += f" AND {filed_to_filter}::TEXT ILIKE '%{object_id}%'"
 
         # Refresh model with selected filter
         widget_table.model().setFilter(expr_filter)
@@ -662,14 +660,14 @@ class ManageVisit(ParentManage, QObject):
                 except ValueError:
                     pass
             elif visit_id is not None:
-                sql = ("SELECT visitcat_id"
-                       " FROM om_visit"
-                       " WHERE id ='" + str(visit_id) + "' ")
+                sql = (f"SELECT visitcat_id"
+                       f" FROM om_visit"
+                       f" WHERE id ='{visit_id}' ")
                 id_visitcat = self.controller.get_row(sql)
-                sql = ("SELECT id, name"
-                       " FROM om_visit_cat"
-                       " WHERE active is true AND id ='"+str(id_visitcat[0])+"' "
-                       " ORDER BY name")
+                sql = (f"SELECT id, name"
+                       f" FROM om_visit_cat"
+                       f" WHERE active is true AND id ='{id_visitcat[0]}' "
+                       f" ORDER BY name")
                 row = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
@@ -678,9 +676,9 @@ class ManageVisit(ParentManage, QObject):
         if rows:
             utils_giswater.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             if visit_id is not None:
-                sql = ("SELECT status "
-                       "FROM om_visit "
-                       "WHERE id ='" + str(visit_id) + "' ")
+                sql = (f"SELECT status "
+                       f"FROM om_visit "
+                       f"WHERE id ='{visit_id}' ")
                 status = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
 
@@ -771,9 +769,9 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # get form associated
-        sql = ("SELECT form_type"
-               " FROM om_visit_parameter"
-               " WHERE id = '" + str(parameter_id) + "'")
+        sql = (f"SELECT form_type"
+               f" FROM om_visit_parameter"
+               f" WHERE id = '{parameter_id}'")
         row = self.controller.get_row(sql, commit=True)
         form_type = str(row[0])
 
@@ -883,8 +881,8 @@ class ManageVisit(ParentManage, QObject):
 
         # Get values in order to populate model
         visit_id = utils_giswater.getWidgetText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
-        sql = ("SELECT value, filetype, fextension FROM " + self.schema_name + ".om_visit_event_photo "
-               "WHERE visit_id='" + str(visit_id) + "' AND event_id='" + str(event_id) + "'")
+        sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
+               f"WHERE visit_id='{visit_id}' AND event_id='{event_id}'")
         rows = self.controller.get_rows(sql)
         if rows is None:
             return
@@ -911,12 +909,12 @@ class ManageVisit(ParentManage, QObject):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
-        sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
+        sql = "SELECT filetype, fextension FROM  om_visit_filetype_x_extension"
         rows = self.controller.get_rows(sql, commit=True)
         f_types = rows
         file_types = ""
         for row in rows:
-            file_types += row[0] + " (*."+row[1]+");;"
+            file_types += f"{row[0]} (*.{row[1]});;"
         file_types += "All (*.*)"
         new_files, filter_ = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
 
@@ -951,7 +949,7 @@ class ManageVisit(ParentManage, QObject):
     def save_files_added(self, visit_id, event_id):
         """ Save new files into DataBase """
         if self.files_added:
-            sql = ("SELECT filetype, fextension FROM  " + self.schema_name + ".om_visit_filetype_x_extension")
+            sql = ("SELECT filetype, fextension FROM om_visit_filetype_x_extension")
             f_types = self.controller.get_rows(sql, commit=True)
             sql = ""
             for path in self.files_added:
@@ -964,10 +962,10 @@ class ManageVisit(ParentManage, QObject):
                         file_type = _types[0]
                         break
 
-                sql += ("INSERT INTO " + self.schema_name + ".om_visit_event_photo "
-                        "(visit_id, event_id, value, filetype, fextension) "
-                        " VALUES('" + str(visit_id) + "', '" + str(event_id) + "', '" + str(path) + "', "
-                        "'" + str(file_type) + "', ' " + str(file_extension) + "'); \n")
+                sql += (f"INSERT INTO om_visit_event_photo "
+                        f"(visit_id, event_id, value, filetype, fextension) "
+                        f" VALUES('{visit_id}', '{event_id}', '{path}', "
+                        f"'{file_type}', ' {file_extension}'); \n")
             self.controller.execute_sql(sql)
 
 
@@ -999,10 +997,10 @@ class ManageVisit(ParentManage, QObject):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, list_values)
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + ".om_visit_event_photo "
-                   "WHERE visit_id='" + str(visit_id) + "' "
-                   "AND event_id='" + str(event_id) + "' "
-                   "AND value IN (" + list_values + ")")
+            sql = (f"DELETE FROM om_visit_event_photo "
+                   f"WHERE visit_id='{visit_id}' "
+                   f"AND event_id='{event_id}' "
+                   f"AND value IN ({list_values})")
             self.controller.execute_sql(sql)
             self.populate_tbl_docs_x_event(event_id)
         else:
@@ -1169,9 +1167,9 @@ class ManageVisit(ParentManage, QObject):
         any_docs = False
         for index in selected_list:
             selected_id.append(str(index.data()))
-            list_id += "Event_id: " + str(index.data()) + ""
-            sql = ("SELECT value FROM " + self.schema_name + ".om_visit_event_photo "
-                   "WHERE event_id='" + str(index.data()) + "'")
+            list_id += "Event_id: " + str(index.data())
+            sql = (f"SELECT value FROM om_visit_event_photo "
+                   f"WHERE event_id='{index.data()}'")
             rows = self.controller.get_rows(sql)
             if rows:
                 any_docs = True
@@ -1247,8 +1245,8 @@ class ManageVisit(ParentManage, QObject):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, ','.join(selected_id))
         if answer:
-            sql = ("DELETE FROM doc_x_visit"
-                   " WHERE id IN ({})".format(','.join(selected_id)))
+            sql = (f"DELETE FROM doc_x_visit"
+                   f" WHERE id IN ({','.join(selected_id)})")
             status = self.controller.execute_sql(sql)
             if not status:
                 message = "Error deleting data"
@@ -1275,8 +1273,8 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # Insert into new table
-        sql = ("INSERT INTO doc_x_visit (doc_id, visit_id)"
-               " VALUES ('" + str(doc_id) + "', " + str(visit_id) + ")")
+        sql = (f"INSERT INTO doc_x_visit (doc_id, visit_id)"
+               f" VALUES ('{doc_id}', {visit_id})")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"
@@ -1294,10 +1292,10 @@ class ManageVisit(ParentManage, QObject):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = ("SELECT column_index, width, alias, status"
-               " FROM config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
-               " ORDER BY column_index")
+        sql = (f"SELECT column_index, width, alias, status"
+               f" FROM config_client_forms"
+               f" WHERE table_id = '{table_name}'"
+               f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
         if not rows:
             return
