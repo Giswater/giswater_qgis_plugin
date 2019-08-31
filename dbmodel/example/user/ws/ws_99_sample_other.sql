@@ -108,7 +108,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Shtvalve param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval FROM man_addfields_cat_combo WHERE parameter_id=6"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='shtvalve_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF-VALVE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_2", "datatype":"string", 
@@ -154,7 +154,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Pressmeter param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=24"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='pressmeter_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE-METER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_2", "datatype":"date", 
@@ -185,27 +185,34 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Hydrant param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=36"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='hydrant_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_2", "datatype":"integer", 
 "widgettype":"text", "label":"Hydrant param_2","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo3','combo3');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('hydrant_param_1','combo4','combo4');
 
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('pressmeter_param_1','3','combo3');
 
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo1',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo2',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo3',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo4',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo5',NULL FROM man_addfields_parameter where param_name='shtvalve_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo1',NULL FROM man_addfields_parameter where param_name='pressmeter_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo2',NULL FROM man_addfields_parameter where param_name='pressmeter_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo3',NULL FROM man_addfields_parameter where param_name='pressmeter_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo1',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo2',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo3',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
-INSERT INTO man_addfields_cat_combo SELECT id, 'combo4',NULL FROM man_addfields_parameter where param_name='hydrant_param_1';
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','combo3');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='hydrant_param_1';
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='shtvalve_param_1';
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='pressmeter_param_1';
+
 
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('SHUTOFF-VALVE', 've_node_shutoffvalve');
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CHECK-VALVE', 've_node_checkvalve');

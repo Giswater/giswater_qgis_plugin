@@ -101,7 +101,7 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]}]' WHERE id ='cat_arc';
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify');
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
 ------
 
 
@@ -178,3 +178,5 @@ INSERT INTO audit_cat_table VALUES ('ve_lot_x_arc', 'O&M', 'View that relates ar
 INSERT INTO audit_cat_table VALUES ('ve_lot_x_node', 'O&M', 'View that relates nodes and lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('ve_lot_x_connec', 'O&M', 'View that relates connecs and lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('v_visit_lot_user', 'O&M', 'View for lots and users', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('plan_typevalue', 'psector_status', 'plan_psector', 'status');

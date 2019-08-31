@@ -21,7 +21,7 @@ DECLARE
 	v_list TEXT[];
 	v_new_field text;
 	v_new_data json;
-
+	v_new_param integer;
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
@@ -32,7 +32,9 @@ BEGIN
 	
 	--insert new fields values into json
 	v_new_data := row_to_json(NEW.*);
-
+	v_new_param = (v_new_data ->>'parameter_id')::text;
+	RAISE NOTICE 'v_new_data,%',v_new_data;
+	RAISE NOTICE 'v_new_param,%',v_new_param;
 	IF v_typevalue_fk IS NOT NULL THEN
 	
 		--loop over defined typevalues
@@ -40,21 +42,23 @@ BEGIN
 			
 			--capture new value of a target field
 			v_new_field = (v_new_data ->>rec.target_field)::text;
+		
 
 			RAISE NOTICE 'v_new_field,%',v_new_field;
-			
+		
+			IF  v_new_param = rec.parameter_id THEN
 				--create a list of possible values of the field
-				EXECUTE 'SELECT array_agg('||rec.typevalue_field||') FROM '||rec.typevalue_table||' WHERE typevalue='''||rec.typevalue_name||''';'
+				EXECUTE 'SELECT array_agg(id) FROM '||rec.typevalue_table||' 
+				WHERE typevalue='''||rec.typevalue_name||''';'
 				INTO v_list;		
 				
 				IF  v_new_field = ANY(v_list) OR v_new_field IS NULL  THEN
 					CONTINUE;
-
-				ELSE 
+								ELSE 
 					PERFORM audit_function(3022,2744,concat(rec.typevalue_table,', ',rec.target_field));
 
 				END IF;
-
+			END IF;
 		END LOOP;
 		
 	END IF;

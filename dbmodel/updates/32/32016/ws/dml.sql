@@ -93,3 +93,65 @@ INSERT INTO audit_cat_table VALUES ('vi_parent_hydrometer', 'Hydraulic input dat
 INSERT INTO audit_cat_table VALUES ('vi_parent_dma', 'Hydraulic input data', 'Parent table of dmas', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_inp_inlet', 'Hydraulic input data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('v_arc_x_vnode', 'Auxiliar', 'Shows the relation between arc and vnodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+
+
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_noneall');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_hyd');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_demandtype');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_ampm');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_status_valve');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_options_networkmode');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_qual');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_param_energy');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_times');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_yesnofull');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_iterative_function');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_patternmethod');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_typevalue_source');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_options_dscenario_priority');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_typevalue_energy');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_reactions');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_curve');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_status_pipe');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_headloss');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_typevalue_valve');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_unbal');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_yesno');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_status_pump');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_rtc_coef');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_units');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_mixing');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_valvemode');
+
+
+
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_reactions','inp_reactions_el', 'parameter');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_reactions','inp_reactions_gl', 'parameter');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_status_pump','inp_pump', 'status');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_typevalue_energy','inp_energy_gl', 'energ_type');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_typevalue_source','inp_source', 'sourc_type');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_typevalue_valve','inp_valve', 'valv_type');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_status_valve','inp_valve', 'status');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_status_pump','inp_pump_additional', 'status');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_status_pipe','inp_pipe', 'status');
+/*INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_options_networkmode',NULL, NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_options_dscenario_priority',NULL, NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_iterative_function',NULL, NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_ampm',NULL, NULL);*/
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_curve','inp_curve_id', 'curve_type');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_demandtype','inp_demand', 'deman_type');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_mixing','inp_mixing', 'mix_type');
+--INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_noneall',NULL, NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_opti_headloss','inp_options', 'headloss');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_opti_hyd','inp_options', 'hydraulics');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_opti_qual','inp_options', 'quality');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_opti_rtc_coef','inp_options', 'rtc_coefficient');
+/*INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesnofull',NULL, NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesno',NULL, NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_times',NULL, NULL);*/
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_opti_units','inp_options', 'units');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_opti_valvemode','inp_options', 'valve_mode');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_opti_unbal','inp_options', 'unbalanced');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_energy_gl', 'parameter');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_energy_el', 'parameter');
+--INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_patternmethod',NULL, NULL);

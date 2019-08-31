@@ -82,11 +82,18 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", 
 
 CREATE TABLE typevalue_fk(
   id serial NOT NULL  PRIMARY KEY,
-  typevalue_table text,
-  typevalue_name text,
-  typevalue_field text,
-  target_table text,
-  target_field text
+  typevalue_table character varying(50),
+  typevalue_name character varying(50),
+  target_table character varying(50),
+  target_field character varying(50),
+  parameter_id integer
+);
+
+CREATE TABLE sys_typevalue_cat(
+	id serial NOT NULL PRIMARY KEY,
+	typevalue_table character varying(50),
+	typevalue_name character varying(50)
 );
 
 ALTER TABLE audit_cat_table ADD COLUMN notify_action json;
+

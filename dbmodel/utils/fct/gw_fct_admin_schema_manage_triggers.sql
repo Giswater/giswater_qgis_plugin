@@ -8,13 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 --drop function SCHEMA_NAME.gw_fct_admin_schema_manage_triggers();
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_triggers(p_action text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_triggers(p_action text, p_table text)
  RETURNS void AS
 $BODY$
 /*
 EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify');
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk');
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk',null);
 */
 DECLARE
 	v_action text;
@@ -62,17 +62,12 @@ BEGIN
 			
 	 	END LOOP;
 
-	ELSIF p_action = 'fk' THEN
-			
 
-			FOR rec IN (SELECT * FROM typevalue_fk ) LOOP
-			
-				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||rec.target_table||';';
-				EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||rec.target_table||'
-				FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('''||rec.target_table||''');';
-	 			
-			END LOOP;	
+	ELSIF p_action = 'fk' AND p_table IS NOT NULL THEN
 
+				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||p_table||';';
+				EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||p_table||'
+				FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('''||p_table||''');';
 
 	END IF;
 END;
