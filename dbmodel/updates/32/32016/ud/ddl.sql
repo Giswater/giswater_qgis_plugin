@@ -11,3 +11,46 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_control
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timser_id", "column":"idval", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"outfallparam", "dataType":"json"}}$$);
+
+--2019/09/02
+ALTER TABLE om_psector_x_gully RENAME TO _om_psector_x_gully_;
+
+ALTER TABLE inp_typevalue_divider RENAME TO _inp_typevalue_divider_;
+ALTER TABLE inp_typevalue_evap RENAME TO _inp_typevalue_evap_;
+ALTER TABLE inp_typevalue_orifice RENAME TO _inp_typevalue_orifice_;
+ALTER TABLE inp_typevalue_outfall RENAME TO _inp_typevalue_outfall_;
+ALTER TABLE inp_typevalue_outlet RENAME TO _inp_typevalue_outlet_;
+ALTER TABLE inp_typevalue_pattern RENAME TO _inp_typevalue_pattern_;
+ALTER TABLE inp_typevalue_raingage RENAME TO _inp_typevalue_raingage_;
+ALTER TABLE inp_typevalue_storage RENAME TO _inp_typevalue_storage_;
+ALTER TABLE inp_typevalue_temp RENAME TO _inp_typevalue_temp_;
+ALTER TABLE inp_typevalue_timeseries RENAME TO _inp_typevalue_timeseries_;
+ALTER TABLE inp_typevalue_windsp RENAME TO _inp_typevalue_windsp_;
+ALTER TABLE inp_value_allnone RENAME TO _inp_value_allnone_;
+ALTER TABLE inp_value_buildup RENAME TO _inp_value_buildup_;
+ALTER TABLE inp_value_catarc RENAME TO _inp_value_catarc_;
+ALTER TABLE inp_value_curve RENAME TO _inp_value_curve_;
+ALTER TABLE inp_value_files_actio RENAME TO _inp_value_files_actio_;
+ALTER TABLE inp_value_files_type RENAME TO _inp_value_files_type_;
+ALTER TABLE inp_value_inflows RENAME TO _inp_value_inflows_;
+ALTER TABLE inp_value_lidcontrol RENAME TO _inp_value_lidcontrol_;
+ALTER TABLE inp_value_mapunits RENAME TO _inp_value_mapunits_;
+ALTER TABLE inp_value_options_fme RENAME TO _inp_value_options_fme_;
+ALTER TABLE inp_value_options_fr RENAME TO _inp_value_options_fr_;
+ALTER TABLE inp_value_options_fu RENAME TO _inp_value_options_fu_;
+ALTER TABLE inp_value_options_id RENAME TO _inp_value_options_id_;
+ALTER TABLE inp_value_options_in RENAME TO _inp_value_options_in_;
+ALTER TABLE inp_value_options_lo RENAME TO _inp_value_options_lo_;
+ALTER TABLE inp_value_options_nfl RENAME TO _inp_value_options_nfl_;
+ALTER TABLE inp_value_orifice RENAME TO _inp_value_orifice_;
+ALTER TABLE inp_value_pollutants RENAME TO _inp_value_pollutants_;
+ALTER TABLE inp_value_raingage RENAME TO _inp_value_raingage_;
+ALTER TABLE inp_value_routeto RENAME TO _inp_value_routeto_;
+ALTER TABLE inp_value_status RENAME TO _inp_value_status_;
+ALTER TABLE inp_value_timserid RENAME TO _inp_value_timserid_;
+ALTER TABLE inp_value_treatment RENAME TO _inp_value_treatment_;
+ALTER TABLE inp_value_washoff RENAME TO _inp_value_washoff_;
+ALTER TABLE inp_value_weirs RENAME TO _inp_value_weirs_;
+ALTER TABLE inp_value_yesno RENAME TO _inp_value_yesno_;
+
+

@@ -537,3 +537,13 @@ CREATE OR REPLACE VIEW v_edit_plan_psector AS
    FROM selector_expl,
     plan_psector
   WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  
+--2019/09/02  
+DROP VIEW IF EXISTS v_om_current_psector;
+DROP VIEW IF EXISTS v_om_current_psector_budget;
+DROP VIEW IF EXISTS v_om_current_psector_budget_detail_rec;
+DROP VIEW IF EXISTS v_om_psector;
+DROP VIEW IF EXISTS v_om_psector_x_arc;
+DROP VIEW IF EXISTS v_om_psector_x_node;
+DROP VIEW IF EXISTS v_om_psector_x_other;
+

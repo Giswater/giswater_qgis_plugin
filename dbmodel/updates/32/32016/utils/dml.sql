@@ -186,3 +186,11 @@ INSERT INTO audit_cat_table VALUES ('ve_lot_x_connec', 'O&M', 'View that relates
 INSERT INTO audit_cat_table VALUES ('v_visit_lot_user', 'O&M', 'View for lots and users', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('plan_typevalue', 'psector_status', 'plan_psector', 'status');
+
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_cat_type';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_selector';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_arc';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_connec';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_node';
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_other';
