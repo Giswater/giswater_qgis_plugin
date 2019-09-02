@@ -149,7 +149,7 @@ BEGIN
         END IF;
 
         IF v_id IS NOT NULL THEN 
-	    RAISE NOTICE 'Founded (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
+	    RAISE NOTICE 'Found (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
             exit;
         ELSE 
             RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    

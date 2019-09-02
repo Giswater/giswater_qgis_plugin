@@ -180,11 +180,11 @@ BEGIN
 
     END LOOP;
 
-    RAISE NOTICE 'Founded (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
+    RAISE NOTICE 'Found (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
     
 --    Control NULL's
     IF v_id IS NULL THEN
-	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature founded"}, "results":0, "apiVersion":'|| api_version ||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "apiVersion":'|| api_version ||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
     END IF;
 
     IF v_toolbar IS NULL THEN
