@@ -90,10 +90,15 @@ WHERE function_name = 'gw_fct_plan_audit_check_data';
 UPDATE audit_cat_function SET isparametric = TRUE, istoolbox = TRUE,
 return_type = '[{"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]'
 WHERE function_name = 'gw_fct_anl_arc_intersection';
-------
---TEMPORARY SAMPLE VALUES PARA NOTIFY
+
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["arc"]},
-{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":[]}]' WHERE id ='arc' OR id = 'node';
+{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["arc"]}]' WHERE id ='arc';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["node"]},
+{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["node"]}]' WHERE id = 'node';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["connec"]},
+{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["connec"]}]' WHERE id = 'connec';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]}]' WHERE id ='cat_node';
@@ -101,9 +106,10 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]}]' WHERE id ='cat_arc';
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
-------
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]}]' WHERE id ='cat_connec';
 
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type,descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2746, 'gw_fct_admin_manage_visit', 'utils', 'function', 'Create new visit class with parameters and form configuration',

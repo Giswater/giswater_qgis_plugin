@@ -35,3 +35,60 @@ INSERT INTO audit_cat_table VALUES ('plan_psector_x_gully', 'masterplan', 'Table
 INSERT INTO audit_cat_table VALUES ('v_arc_x_vnode', 'Auxiliar', 'Shows the relation between arc and vnodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_event_x_gully', 'User interface view', 'User interface view for gullys related to its events', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('ve_lot_x_gully', 'O&M', 'View that relates gullys and lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["gully"]},
+{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["gully"]}]' WHERE id = 'gully';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]' WHERE id ='cat_grate';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]}]' WHERE id ='arc_type';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]}]' WHERE id ='node_type';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]}]' WHERE id ='connec_type';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]' WHERE id ='gully_type';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_builder';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_owner';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_soil';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_work';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='dma';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='exploitation';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_address';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_municipality';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_plot';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_streetaxis';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='sector';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_state_type';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_verified';

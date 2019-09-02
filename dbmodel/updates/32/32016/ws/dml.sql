@@ -155,3 +155,49 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_energy_gl', 'parameter');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_energy_el', 'parameter');
 --INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_patternmethod',NULL, NULL);
+
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_builder';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_owner';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_presszone';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_soil';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_work';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id","featureType":["arc", "node", "connec"]}]' WHERE id ='dma';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec"]}]' WHERE id ='exploitation';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_address';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_plot';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_municipality';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_streetaxis';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec"]}]' WHERE id ='sector';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='value_verified';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='value_state_type';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dqa_id","featureType":["arc", "node", "connec"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dqa_id","featureType":["arc", "node", "connec"]}]' WHERE id ='dqa';
