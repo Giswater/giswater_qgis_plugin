@@ -521,6 +521,12 @@ BEGIN
 	END IF;
 
 	ELSE
+		IF (SELECT distinct formname from config_api_form_fields WHERE formname=v_table_parent) IS NOT NULL THEN 
+			v_configtabledefined  = TRUE;
+		ELSE 
+			v_configtabledefined  = FALSE;
+		END IF;
+		
 		-- call info form function for parent layer
 		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5)'
 		INTO v_fields
@@ -540,7 +546,7 @@ BEGIN
 	
 	-- message for null
 	IF v_tablename IS NULL THEN
-		v_message='{"priority":0, "text":"No feature founded on that point", "results":0}';
+		v_message='{"priority":0, "text":"No feature found on that point", "results":0}';
 	END IF;
 
     
