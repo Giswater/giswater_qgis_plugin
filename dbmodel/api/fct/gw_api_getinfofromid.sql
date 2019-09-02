@@ -1,4 +1,4 @@
-/*
+	/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -498,7 +498,6 @@ BEGIN
 
 	-- call fields function
 	-------------------
-
 	IF v_editable THEN
 		RAISE NOTICE 'User has permissions to edit table and table';
 		-- call edit form function
@@ -520,6 +519,12 @@ BEGIN
 		INTO v_fields
 		USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined;
 	END IF;
+
+	ELSE
+		-- call info form function for parent layer
+		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5)'
+		INTO v_fields
+		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined;
 
     END IF;
 
