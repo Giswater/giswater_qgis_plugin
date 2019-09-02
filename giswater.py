@@ -803,11 +803,19 @@ class Giswater(QObject):
 
         #Save toolbar position when save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
+
         # Set config layer fields when open attribute table
-        self.iface.actionOpenTable().triggered.connect(self.open_table)
+        # self.iface.actionOpenTable().triggered.connect(self.open_table)
+
+        # Set config layer fields when when user add new layer into the TOC
+        # QgsProject.instance().layersAdded.connect(self.get_new_layers_name)
+
+    def get_new_layers_name(self, layers_list):
+        layers_name = [layer.name() for layer in layers_list]
+        self.set_layer_config(layers_name)
 
     def open_table(self):
-        table_name = self.iface.activeLayer().name()
+        table_name = [self.iface.activeLayer().name()]
         self.set_layer_config(table_name)
 
 
@@ -1187,12 +1195,14 @@ class Giswater(QObject):
                 ValueMap as combos and alias"""
         layers_list = []
         if table_name:
-            sql = (f"SELECT child_layer FROM cat_feature WHERE child_layer ='{table_name}'")
-            row = self.controller.get_row(sql, commit=True)
-            if row:
-                layers_list.append(table_name)
+            for t_name in table_name:
+                sql = (f"SELECT child_layer FROM cat_feature WHERE child_layer ='{t_name}'")
+                row = self.controller.get_row(sql, commit=True, log_sql=True)
+                if row:
+                    layers_list.append(t_name)
         else:
             layers_list = self.settings.value('system_variables/set_layer_config')
+
         if not layers_list:
             return
         for layer_name in layers_list:
