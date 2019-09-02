@@ -478,7 +478,6 @@ class Giswater(QObject):
         project_type in ('ws', 'ud')
         """
 
-        self.enable_python_console()
         parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         path = os.path.dirname(__file__) + '/config/ui_config.config'
         parser.read(path)
@@ -804,6 +803,12 @@ class Giswater(QObject):
 
         #Save toolbar position when save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
+        # Set config layer fields when open attribute table
+        self.iface.actionOpenTable().triggered.connect(self.open_table)
+
+    def open_table(self):
+        table_name = self.iface.activeLayer().name()
+        self.set_layer_config(table_name)
 
 
     def manage_layers(self):
@@ -1176,12 +1181,18 @@ class Giswater(QObject):
             return value
 
 
-    def set_layer_config(self):
+    def set_layer_config(self, table_name=None):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 ValueMap as combos and alias"""
-
-        layers_list = self.settings.value('system_variables/set_layer_config')
+        layers_list = []
+        if table_name:
+            sql = (f"SELECT child_layer FROM cat_feature WHERE child_layer ='{table_name}'")
+            row = self.controller.get_row(sql, commit=True)
+            if row:
+                layers_list.append(table_name)
+        else:
+            layers_list = self.settings.value('system_variables/set_layer_config')
         if not layers_list:
             return
         for layer_name in layers_list:

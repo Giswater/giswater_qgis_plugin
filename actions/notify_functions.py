@@ -162,10 +162,10 @@ class NotifyFunctions(ParentAction):
 
 
         # layers_list = self.settings.value('system_variables/set_layer_config')
-        layers_list = kwargs['tableName']
-        if not layers_list:
+        layers_name_list = kwargs['tableName']
+        if not layers_name_list:
             return
-        for layer_name in layers_list:
+        for layer_name in layers_name_list:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
                 msg = f"Layer {layer_name} does not found, therefore, not configured"
@@ -192,6 +192,7 @@ class NotifyFunctions(ParentAction):
                     continue
 
             complet_result = row[0]
+            print(f"{complet_result['body']['data']['fields']}")
             for field in complet_result['body']['data']['fields']:
                 if field['widgettype'] != 'combo':
                     continue
@@ -207,6 +208,7 @@ class NotifyFunctions(ParentAction):
 
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                 layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+            print(f'LAYER: {layer.name()}')
 
 
     def getinfofromid(self, *argv):
