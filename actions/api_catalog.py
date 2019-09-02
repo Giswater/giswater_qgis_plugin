@@ -102,9 +102,9 @@ class ApiCatalog(ApiParent):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         if self.controller.get_project_type() == 'ws':
-            extras = f'"fields":{"matcat_id":"{matcat_id_value}", "pnom":"{pn_value}", "dnom":"{dn_value}"}'
+            extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "pnom":"{pn_value}", "dnom":"{dn_value}"}}'
         elif self.controller.get_project_type() == 'ud':
-            extras = f'"fields":{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}'
+            extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
         body = self.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
