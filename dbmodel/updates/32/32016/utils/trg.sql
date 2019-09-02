@@ -24,7 +24,7 @@ ON om_visit_lot_x_node FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('
 
 CREATE TRIGGER gw_trg_om_lot_x_connec_geom AFTER INSERT OR UPDATE OR DELETE
 ON om_visit_lot_x_connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('lot');
-/*
+
 CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE ON typevalue_fk
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_config_fk('typevalue_fk');
 
@@ -38,4 +38,4 @@ CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON in
   EXECUTE PROCEDURE gw_trg_typevalue_config_fk('inp_typevalue');
 
 CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON om_typevalue FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_typevalue_config_fk('om_typevalue');*/
+  EXECUTE PROCEDURE gw_trg_typevalue_config_fk('om_typevalue');

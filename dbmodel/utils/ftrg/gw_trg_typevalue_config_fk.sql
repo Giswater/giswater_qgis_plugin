@@ -78,16 +78,16 @@ BEGIN
 				IF v_count > 0 THEN
 					RAISE EXCEPTION 'CANT DELETE. VALUE IS BEING USED';
 				END IF;
+				--check if the value is the last one defined for the typevalue, if so delete the configuration from typevalue_fk
+				EXECUTE 'SELECT count(typevalue) FROM '||v_typevalue_fk.typevalue_table||' WHERE typevalue = '''||v_typevalue_fk.typevalue_name||''''
+				INTO v_count;
+				
+				IF v_count = 0 THEN
+					EXECUTE 'DELETE FROM typevalue_fk WHERE typevalue_table = '''||v_typevalue_fk.typevalue_table||''' and typevalue_name = '''||v_typevalue_fk.typevalue_name||''';';
+				END IF;
+
 			END LOOP; 
 			
-			--check if the value is the last one defined for the typevalue, if so delete the configuration from typevalue_fk
-			EXECUTE 'SELECT count(typevalue) FROM '||v_typevalue_fk.typevalue_table||' WHERE typevalue = '''||v_typevalue_fk.typevalue_name||''''
-			INTO v_count;
-			
-			IF v_count = 0 THEN
-				EXECUTE 'DELETE FROM typevalue_fk WHERE typevalue_table = '''||v_typevalue_fk.typevalue_table||''' and typevalue_name = '''||v_typevalue_fk.typevalue_name||''';';
-			END IF;
-
 		END IF;
 		
 	END IF;
