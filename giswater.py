@@ -368,6 +368,9 @@ class Giswater(QObject):
         self.toolbar_utils()
 
     def toolbar_basic(self, x=None, y=None):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
             list_actions = ['37', '41', '48', '86', '32']
@@ -381,6 +384,9 @@ class Giswater(QObject):
 
 
     def toolbar_utils(self, x=None, y=None):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "utils"
         if self.controller.get_project_type() in ('ws', 'ud'):
             list_actions = ['206', '99', '83', '58']
@@ -397,46 +403,64 @@ class Giswater(QObject):
 
 
     def toolbar_om_ws(self, x=0, y=0):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "om_ws"
         list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
     def toolbar_om_ud(self, x=0, y=0):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "om_ud"
         list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
     def toolbar_edit(self, x=0, y=0):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "edit"
         list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '39', '34', '66', '33', '67', '69']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
     def toolbar_cad(self, x=0, y=0):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "cad"
         list_actions = ['71', '72']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
     def toolbar_epa(self, x=0, y=0):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "epa"
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
     def toolbar_master(self, x=0, y=0):
+        """ Function called in def manage_toolbars(...)
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+        """
         toolbar_id = "master"
         list_actions = ['45', '46', '47', '38', '49', '50']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
+
     def get_all_actions(self):
         actions_list = self.iface.mainWindow().findChildren(QActionGroup)
         for action in actions_list:
             action.triggered.connect(partial(self.show_action_name, action))
-
 
     def show_action_name(self, action):
         self.controller.log_info(str(action.objectName()))
@@ -486,7 +510,6 @@ class Giswater(QObject):
             toolbar_id = parser.get("toolbars_position", 'pos_'+str(x)).split(',')
             if toolbar_id:
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
