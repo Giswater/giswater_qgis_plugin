@@ -804,19 +804,12 @@ class Giswater(QObject):
         #Save toolbar position when save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
 
-        # Set config layer fields when open attribute table
-        # self.iface.actionOpenTable().triggered.connect(self.open_table)
-
-        # Set config layer fields when when user add new layer into the TOC
-        # QgsProject.instance().layersAdded.connect(self.get_new_layers_name)
+        # Set config layer fields when user add new layer into the TOC
+        QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
 
     def get_new_layers_name(self, layers_list):
         layers_name = [layer.name() for layer in layers_list]
         self.set_layer_config(layers_name)
-
-    def open_table(self):
-        table_name = [self.iface.activeLayer().name()]
-        self.set_layer_config(table_name)
 
 
     def manage_layers(self):
