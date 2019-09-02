@@ -135,6 +135,7 @@ class ApiDimensioning(ApiParent):
             layer.select([feature_id])
 
             # Get depth of the feature
+            self.project_type = self.controller.get_project_type()
             if self.project_type == 'ws':
                 fieldname = "depth"
             elif self.project_type == 'ud' and feat_type == 'node':
@@ -157,6 +158,7 @@ class ApiDimensioning(ApiParent):
     def orientation(self):
 
         self.emit_point.canvasClicked.connect(self.click_button_orientation)
+
 
     def click_button_orientation(self, point):
 
@@ -188,6 +190,7 @@ class ApiDimensioning(ApiParent):
         self.timer_map_tips.timeout.connect(self.show_map_tip)
         self.timer_map_tips_clear = QTimer(self.canvas)
         self.timer_map_tips_clear.timeout.connect(self.clear_map_tip)
+
 
     def map_tip_changed(self, point):
         """ SLOT. Initialize the Timer to show MapTips on the map """
