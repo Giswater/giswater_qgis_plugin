@@ -617,7 +617,7 @@ CREATE OR REPLACE VIEW v_edit_inp_inlet AS
 	 
    
 CREATE OR REPLACE VIEW v_edit_inp_valve AS 
- SELECT v_node.node_id,
+ SELECT DISTINCT ON (node_id) v_node.node_id,
     v_node.elevation,
     v_node.depth,
     v_node.nodecat_id,
