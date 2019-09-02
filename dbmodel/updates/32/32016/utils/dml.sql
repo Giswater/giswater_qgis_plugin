@@ -119,12 +119,24 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type,de
 VALUES (2748, 'gw_fct_admin_manage_visit_view', 'utils', 'function', 'Create view for a new multievent visit class',
 'role_om', FALSE, FALSE, FALSE);
 
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type,descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2750, 'gw_trg_typevalue_config_fk', 'utils', 'trigger function', 'Control foreign keys created in typevalue tables from the side of configuration',
+'role_edit', FALSE, FALSE, FALSE);
+
 INSERT INTO audit_cat_error(id, error_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3024, 'Can''t delete the parameter. There is at least one event related to it', 2, true,'utils',false);
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3026, 'Can''t delete the class. There is at least one visit related to it','The class will be set to unactive.', 
-1, true,'utils',false);
+2, true,'utils',false);
+
+INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3028, 'Can''t modify typevalue:','It''s impossible to change system values.', 
+2, true,'utils',false);
+
+INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3030, 'Can''t delete typevalue:','It''s being used in a table.', 
+2, true,'utils',false);
 
 
 INSERT INTO audit_cat_table VALUES ('om_visit_type', 'O&M', 'Catalog of visit types', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
