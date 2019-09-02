@@ -254,7 +254,7 @@ class ApiCF(ApiParent):
             visible_layer = self.get_visible_layers(as_list=True)
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
-            extras += f', "coordinates":{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":1000}'
+            extras += f', "coordinates":{{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":1000}}'
             body = self.create_body(extras=extras)
             sql = f"SELECT gw_api_getinfofromcoordinates($${{{body}}}$$)"
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
