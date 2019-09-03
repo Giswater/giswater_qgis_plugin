@@ -208,10 +208,11 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
         btn_info.clicked.connect(partial(self.show_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
-        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui, parent=False))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_schema_name, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
+        self.cmb_project_type.currentIndexChanged.connect(partial(self.update_manage_ui))
         self.dlg_readsql.btn_custom_select_file.clicked.connect(
             partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
@@ -270,7 +271,7 @@ class UpdateSQL(ApiParent):
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
-        self.update_manage_ui(parent=False)
+        self.update_manage_ui()
 
 
     def gis_create_project(self):
@@ -2321,7 +2322,7 @@ class UpdateSQL(ApiParent):
         utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
 
-    def update_manage_ui(self, parent=False):
+    def update_manage_ui(self):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
