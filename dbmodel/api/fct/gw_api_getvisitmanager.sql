@@ -225,7 +225,7 @@ BEGIN
 			IF v_activedatatab THEN
 
 				-- Check if exist some other workday opened, and close
-				EXECUTE 'SELECT user_id, endtime FROM (SELECT * FROM ud.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_record;
+				EXECUTE 'SELECT user_id, endtime FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_record;
 				
 				IF v_record.endtime IS NULL AND v_record.user_id IS NOT NULL THEN
 					v_disable_widget_name = '{data_startbutton}';
