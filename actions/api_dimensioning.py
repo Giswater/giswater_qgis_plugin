@@ -19,13 +19,15 @@ else:
     from qgis.core import QgsPointXY
     from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
-
+import json
+from collections import OrderedDict
 from functools import partial
 
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 
 from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QAction, QLineEdit, QPushButton
+from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
+    QSpacerItem
 
 from .api_parent import ApiParent
 from ..ui_manager import ApiDimensioningUi
@@ -53,7 +55,7 @@ class ApiDimensioning(ApiParent):
         self.snapper = self.snapper_manager.get_snapper()
 
 
-    def open_form(self, new_feature=None):
+    def open_form(self, new_feature=None, new_feature_id=None):
         self.dlg_dim = ApiDimensioningUi()
         self.load_settings(self.dlg_dim)
 
@@ -75,6 +77,37 @@ class ApiDimensioning(ApiParent):
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
         self.create_map_tips()
+        body = self.create_body()
+        # Get layers under mouse clicked
+        sql = f"SELECT gw_api_getdimensioning($${{{body}}}$$)::text"
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if row is None or row[0] is None:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        # Parse string to order dict into List
+        complet_result = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
+        # complet_result = row[0]
+        layout_list = []
+        for field in complet_result[0]['body']['data']['fields']:
+            label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
+            if widget.objectName() == 'data_id':
+                utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature.attribute('id'))
+            layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
+           # Take the QGridLayout with the intention of adding a QSpacerItem later
+            if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+                layout_list.append(layout)
+
+            # Add widgets into layout
+            if field['layoutname'] in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+                layout.addWidget(label, 0, field['layout_order'])
+                layout.addWidget(widget, 1, field['layout_order'])
+            else:
+                self.put_widgets(self.dlg_dim, field, label, widget)
+
+        # Add a QSpacerItem into each QGridLayout of the list
+        for layout in layout_list:
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            layout.addItem(vertical_spacer1)
 
         self.open_dialog(self.dlg_dim)
         return False, False
@@ -220,3 +253,59 @@ class ApiDimensioning(ApiParent):
         self.timer_map_tips_clear.stop()
         self.map_tip_node.clear(self.canvas)
         self.map_tip_connec.clear(self.canvas)
+
+
+    def set_widgets(self, dialog, complet_result, field):
+
+        widget = None
+        label = None
+        if field['label']:
+            label = QLabel()
+            label.setObjectName('lbl_' + field['widgetname'])
+            label.setText(field['label'].capitalize())
+            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+                label = self.set_setStyleSheet(field, label)
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['label'].capitalize())
+        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+            completer = QCompleter()
+            widget = self.add_lineedit(field)
+            widget = self.set_widget_size(widget, field)
+            widget = self.set_data_type(field, widget)
+            if field['widgettype'] == 'typeahead':
+                widget = self.manage_lineedit(field, dialog, widget, completer)
+            # if widget.property('column_id') == self.field_id:
+            #     self.feature_id = widget.text()
+            #     # Get selected feature
+            #     self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+        elif field['widgettype'] == 'combo':
+            widget = self.add_combobox(field)
+            widget = self.set_widget_size(widget, field)
+        elif field['widgettype'] == 'check':
+            widget = self.add_checkbox(dialog, field)
+        elif field['widgettype'] == 'datepickertime':
+            widget = self.add_calendar(dialog, field)
+        elif field['widgettype'] == 'button':
+            widget = self.add_button(dialog, field)
+            widget = self.set_widget_size(widget, field)
+        elif field['widgettype'] == 'hyperlink':
+            widget = self.add_hyperlink(dialog, field)
+            widget = self.set_widget_size(widget, field)
+        elif field['widgettype'] == 'hspacer':
+            widget = self.add_horizontal_spacer()
+        elif field['widgettype'] == 'vspacer':
+            widget = self.add_verical_spacer()
+        elif field['widgettype'] == 'textarea':
+            widget = self.add_textarea(field)
+        elif field['widgettype'] in ('spinbox', 'doubleSpinbox'):
+            widget = self.add_spinbox(field)
+        elif field['widgettype'] == 'tableView':
+            widget = self.add_tableview(complet_result, field)
+            widget = self.set_headers(widget, field)
+            widget = self.populate_table(widget, field)
+            widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+            utils_giswater.set_qtv_config(widget)
+
+        return label, widget

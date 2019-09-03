@@ -29,10 +29,16 @@ class Dimensioning(ParentMapTool):
         self.layer.updateFeature(feature)
         self.layer.commitChanges()
 
-
-
+        idx = self.layer.fields().indexFromName("id")
+        new_feature_id = self.layer.maximumValue(idx)
+        features = self.layer.getFeatures()
+        for feature in features:
+            if feature.attribute('id') == new_feature_id:
+                new_feature = feature
+        
+        print(f"FEATURE {feature.attribute('id')}")
         self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
-        result, dialog = self.api_dim.open_form(new_feature=feature)
+        result, dialog = self.api_dim.open_form(new_feature=new_feature, new_feature_id=new_feature_id)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
@@ -79,7 +85,7 @@ class Dimensioning(ParentMapTool):
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
             # TODO uncomment nex line to manage new api tool
-            # self.layer.featureAdded.connect(self.open_new_dimensioning)
+            self.layer.featureAdded.connect(self.open_new_dimensioning)
 
     def deactivate(self):
 
