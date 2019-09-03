@@ -26,7 +26,7 @@ only 32
 SELECT "SCHEMA_NAME".gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
 SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT SCHEMA_NAME.gw_api_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
+SELECT "SCHEMA_NAME".gw_api_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
 
 */
 
@@ -56,7 +56,7 @@ DECLARE
     v_orderby text;
     v_dv_querytext_child text;
     v_dv_querytext text;
-	v_dv_querytext_filterc text;
+    v_dv_querytext_filterc text;
     v_image json;
     v_bmapsclient boolean;
     v_array text[];
@@ -165,10 +165,10 @@ BEGIN
 			v_dv_querytext_filterc=(aux_json->>'dv_querytext_filterc');
 
 			IF (aux_json->>'widgettype') = 'combo' THEN
-
+				
 				-- Get combo id's
 				-- If widget is combo, parent or not child, execute if exist "dv_querytext_filterc" anyway.
-				IF v_dv_querytext_filterc IS NOT NULL THEN
+				IF v_dv_querytext_filterc IS NOT NULL AND p_id IS NOT NULL THEN
 					EXECUTE 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext || v_dv_querytext_filterc ||' '||quote_literal(p_tablename)||') ORDER BY '||v_orderby||')a'
 					INTO v_array;
 				ELSE
@@ -186,7 +186,7 @@ BEGIN
 
 				-- Get combo values
 				-- If widget is combo, parent or not child, execute if exist "dv_querytext_filterc" anyway.
-				IF v_dv_querytext_filterc IS NOT NULL THEN
+				IF v_dv_querytext_filterc IS NOT NULL AND p_id IS NOT NULL THEN
 					EXECUTE 'SELECT (array_agg(idval)) FROM ('|| v_dv_querytext || v_dv_querytext_filterc ||' '||quote_literal(p_tablename)||') ORDER BY '||v_orderby||')a'
 					INTO v_array;
 				ELSE
@@ -255,7 +255,7 @@ BEGIN
 						v_dv_querytext_child=(aux_json_child->>'dv_querytext');
 						
 						-- Get combo id's
-						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN		
+						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL AND p_id IS NOT NULL THEN		
 							query_text= 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext_child || (aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY '||v_orderby_child||') a';
 							execute query_text INTO v_array_child;									
 						ELSE 	
@@ -272,7 +272,7 @@ BEGIN
 						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
 						
 						-- Get combo values
-						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN
+						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL AND p_id IS NOT NULL THEN
 							query_text= 'SELECT (array_agg(idval)) FROM ('|| v_dv_querytext_child ||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY '||v_orderby_child||') a';
 							execute query_text INTO v_array_child;
 						ELSE 	
