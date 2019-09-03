@@ -1504,9 +1504,15 @@ class ApiParent(ParentAction):
                 grbox.setVisible(False)
 
 
+    def set_setStyleSheet(self, field, widget, wtype='label'):
+
+        if field['stylesheet'] is not None:
+            if wtype in field['stylesheet']:
+                widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
+        return widget
+
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
-
 
     # def no_function_asociated(self, widget=None, message_level=1):
     #     self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)

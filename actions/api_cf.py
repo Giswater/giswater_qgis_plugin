@@ -588,14 +588,6 @@ class ApiCF(ApiParent):
         self.iface.actionRollbackEdits().trigger()
 
 
-    def set_setStyleSheet(self, field, widget, wtype='label'):
-
-        if field['stylesheet'] is not None:
-            if wtype in field['stylesheet']:
-                widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
-        return widget
-
-
     def set_widgets(self, dialog, complet_result, field):
 
         widget = None
