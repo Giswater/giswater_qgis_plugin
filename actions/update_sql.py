@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 try:
-    from qgis.core import Qgis, QgsVectorLayer
+    from qgis.core import Qgis, QgsVectorLayer, QgsProject
 except ImportError:
     from qgis.core import QGis as Qgis
 
@@ -298,9 +298,20 @@ class UpdateSQL(ApiParent):
 
         # Generate QGIS project
         gis = CreateGisProject(self.controller, self.plugin_dir)
-        gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
+        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
+        print(str(result))
+        print(str(qgs_path))
+
         self.close_dialog(self.dlg_create_gis_project)
         self.close_dialog(self.dlg_readsql)
+        if result is True:
+            self.open_project(qgs_path)
+
+
+    def open_project(self, qgs_path):
+
+        project = QgsProject.instance()
+        project.read(qgs_path)
 
 
     def open_form_create_gis_project(self):

@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
-from qgis.core import QgsProject
+
 
 import os
 import shutil
@@ -119,16 +119,11 @@ class CreateGisProject():
             message = "Do you want to open GIS project?"
             answer = self.controller.ask_question(message, "GIS file generated successfully")
             if answer:
-                self.open_project(qgs_path)
+                return True, qgs_path
+            return False, qgs_path
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=qgs_path)
-
-
-    def open_project(self, qgs_path):
-
-        project = QgsProject.instance()
-        project.read(qgs_path)
 
 
     def connect_sqlite(self):
