@@ -51,7 +51,16 @@ BEGIN
 	v_feature_type = lower(((p_data ->>'data')::json->>'feature_type')::text);
 
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
-	
+
+	--insert configuration into config_api_layer_child and config_api_tableinfo_x_infotype if there is none for the featurecat
+	IF v_cat_feature NOT IN (SELECT featurecat_id FROM config_api_layer_child) THEN
+		INSERT INTO config_api_layer_child VALUES (v_cat_feature,v_view_name);
+	END IF;
+
+	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_api_tableinfo_x_infotype) THEN
+		INSERT INTO config_api_tableinfo_x_infotype(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,100,v_view_name);
+	END IF;
+
 	--select list of fields different than id from config_api_form_fields
 	EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 	FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
@@ -153,7 +162,7 @@ BEGIN
 			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
 				label, ismandatory,isparent,iseditable,isautoupdate,field_length,num_decimals) 
 			VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,
-				rec.form_label, rec.is_mandatory, false,rec.iseditable,false,rec.numeric_precision, rec.numeric_scale);
+				rec.form_label, rec.is_mandatory, false,rec.iseditable,false,rec.field_length, rec.num_decimals);
 		ELSE
 			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
 				label, ismandatory,isparent,iseditable,isautoupdate) 
