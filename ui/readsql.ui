@@ -939,7 +939,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox_6">
+         <widget class="QGroupBox" name="grb_manage_childviews">
           <property name="title">
            <string>Manage child views</string>
           </property>

@@ -2335,32 +2335,49 @@ class UpdateSQL(ApiParent):
 
             utils_giswater.getWidget(self.dlg_readsql,self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
+
+            self.dlg_readsql.cmb_feature_name_view.clear()
+            self.dlg_readsql.cmb_formname_fields.clear()
+            self.dlg_readsql.cmb_formname_ui.clear()
+
             return
 
         else:
 
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
 
             sql = ("SELECT wsoftware FROM " + str(schema_name) + ".version")
             wsoftware = self.controller.get_row(sql)
 
             if wsoftware[0].upper() == 'WS':
-                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM cat_feature JOIN "
-                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM " + schema_name + ".cat_feature JOIN "
+                       " (SELECT id,active FROM " + schema_name + ".node_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".arc_type"
+                       " UNION SELECT id,active FROM " + schema_name + ".connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
             elif wsoftware[0].upper() == 'UD':
-                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM cat_feature JOIN "
-                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM " + schema_name + ".cat_feature JOIN "
+                       " (SELECT id,active FROM " + schema_name + ".node_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".arc_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".connec_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
 
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
             if wsoftware[0].upper() == 'WS':
-                sql = ("SELECT cat_feature.id, cat_feature.id FROM cat_feature JOIN "
-                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = ("SELECT cat_feature.id, cat_feature.id FROM " + schema_name + ".cat_feature JOIN "
+                       " (SELECT id,active FROM " + schema_name + ".node_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".arc_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
             elif wsoftware[0].upper() == 'UD':
-                sql = ("SELECT cat_feature.id, cat_feature.id FROM cat_feature JOIN "
-                       "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = ("SELECT cat_feature.id, cat_feature.id FROM " + schema_name + ".cat_feature JOIN "
+                       " (SELECT id,active FROM " + schema_name + ".node_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".arc_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".connec_type "
+                       " UNION SELECT id,active FROM " + schema_name + ".gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
 
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
