@@ -506,6 +506,7 @@ class Giswater(QObject):
         path = os.path.dirname(__file__) + '/config/ui_config.config'
         parser.read(path)
 
+        # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, x=0, y=0):'
         for x in range(0,8):
             toolbar_id = parser.get("toolbars_position", 'pos_'+str(x)).split(',')
             if toolbar_id:
@@ -1209,22 +1210,31 @@ class Giswater(QObject):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 ValueMap as combos and alias"""
+
+        sql =("SELECT DISTINCT(parent_layer) FROM cat_feature " 
+              "UNION " 
+              "SELECT DISTINCT(child_layer) FROM cat_feature ")
+        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        available_layers = [layer[0] for layer in rows]
         layers_list = []
         if table_name:
             for t_name in table_name:
-                sql = (f"SELECT child_layer FROM cat_feature WHERE child_layer ='{t_name}'")
-                row = self.controller.get_row(sql, commit=True, log_sql=True)
-                if row:
+                if t_name in available_layers:
                     layers_list.append(t_name)
         else:
             layers_list = self.settings.value('system_variables/set_layer_config')
 
         if not layers_list:
             return
+        
         for layer_name in layers_list:
+            if layer_name not in available_layers:
+                msg = f"Layer {layer_name} not allowed to be configured"
+                self.controller.show_warning(msg)
+                continue
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
-                msg = "Layer {} does not found, therefore, not configured".format(layer_name)
+                msg = f"Layer {layer_name} does not found, therefore, not configured"
                 self.controller.show_warning(msg)
                 continue
                 
