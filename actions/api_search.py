@@ -160,6 +160,7 @@ class ApiSearch(ApiParent):
                 print("FAIL")
                 return
             self.draw(complet_result)
+            self.resetRubberbands()
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'search':
             # TODO
@@ -369,6 +370,7 @@ class ApiSearch(ApiParent):
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
         field_id = str(row[0]['body']['feature']['idName'])
         self.populate_basic_info(self.hydro_info_dlg, row, field_id)
 

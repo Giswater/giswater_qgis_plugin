@@ -989,7 +989,6 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
-        self.resetRubberbands()
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
         if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
