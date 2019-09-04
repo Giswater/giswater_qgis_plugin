@@ -158,21 +158,31 @@ class NotifyFunctions(ParentAction):
     def refresh_attribute_table(self, **kwargs):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
-                ValueMap as combos and alias"""
+                Column names as alias, combos and typeahead as ValueMap"""
 
+        sql =("SELECT DISTINCT(parent_layer) FROM cat_feature " 
+              "UNION " 
+              "SELECT DISTINCT(child_layer) FROM cat_feature ")
+        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        available_layers = [layer[0] for layer in rows]
 
-        # layers_list = self.settings.value('system_variables/set_layer_config')
+        # Get list of layer names
         layers_name_list = kwargs['tableName']
         if not layers_name_list:
             return
+
         for layer_name in layers_name_list:
+            if layer_name not in available_layers:
+                msg = f"Layer {layer_name} not allowed to be configured"
+                # TODO show_warning use self.iface.messageBar().pushMessage("", msg, message_level, duration)
+                # TODO mysteriously that leaves the system locked
+                # self.controller.show_warning(msg, duration=0)
+                print(msg)
+                continue
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
                 msg = f"Layer {layer_name} does not found, therefore, not configured"
                 print(msg)
-                # TODO show_warning use self.iface.messageBar().pushMessage("", msg, message_level, duration)
-                # TODO mysteriously that leaves the system locked
-                # self.controller.show_warning(msg, duration=0)
                 continue
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
@@ -192,23 +202,30 @@ class NotifyFunctions(ParentAction):
                     continue
 
             complet_result = row[0]
-            print(f"{complet_result['body']['data']['fields']}")
             for field in complet_result['body']['data']['fields']:
-                if field['widgettype'] != 'combo':
-                    continue
-
                 fieldIndex = layer.fields().indexFromName(field['column_id'])
+                _values = {}
+
+                # Set alias column
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
-                _values = {}
-                if 'comboIds' in field:
-                    for i in range(0, len(field['comboIds'])):
-                        _values[field['comboNames'][i]] = field['comboIds'][i]
+                # Get values
+                if field['widgettype'] == 'combo':
+                    if 'comboIds' in field:
+                        for i in range(0, len(field['comboIds'])):
+                            _values[field['comboNames'][i]] = field['comboIds'][i]
+                elif field['widgettype'] == 'typeahead':
+                    rows = self.controller.get_rows(field['queryText'], commit=True)
+                    if rows:
+                        for row in rows:
+                            _values[row[1]] = row[0]
+                else:
+                    continue
 
+                # Set values into valueMap
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                 layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-            print(f'LAYER: {layer.name()}')
 
 
     def getinfofromid(self, *argv):
