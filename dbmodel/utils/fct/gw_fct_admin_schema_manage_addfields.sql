@@ -16,14 +16,14 @@ $BODY$
 
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pump_test", "datatype":"string", "widgettype":"text", "label":"pump_test","ismandatory":"False",
-"fieldLength":"50", "numDecimals" :null, "defaultValue":null,  "active":"True", "iseditable":"True"}}}$$);
+"data":{"action":"CREATE", "multi_create":"true", "parameters":{"column_id":"pump_test22", "datatype":"string", "widgettype":"text", "label":"pump_test22","ismandatory":"False",
+"fieldLength":"50", "numDecimals" :null,"active":"True", "iseditable":"True","v_isenabled":"True"}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
-"client":{"lang":"ES"}, 
-"feature":{"catFeature":"PUMP"},
-"data":{"action":"UPDATE","multi_create":"false", "parameters":{"column_id":"pump_test", "datatype":"string", "widgettype":"combo", "label":"pump_test2","ismandatory":"False",
-"fieldLength":"50", "numDecimals" :null, "defaultValue":null, "active":"True","iseditable":"True"}}}$$);
+	SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
+	"client":{"lang":"ES"}, 
+	"feature":{"catFeature":"PUMP"},
+	"data":{"action":"UPDATE","multi_create":"false", "parameters":{"column_id":"pump_test", "datatype":"string", "widgettype":"combo", "label":"pump_test2","ismandatory":"False",
+	"fieldLength":"50", "numDecimals" :null, "active":"True","iseditable":"True"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "client":{"lang":"ES"}, 
@@ -41,7 +41,6 @@ DECLARE
 	v_config_datatype text;
 	v_field_length integer;
 	v_num_decimals integer;
-	v_default_value text;
 	v_label text;
 	v_add_widgettype text;
 	v_config_widgettype text;
@@ -83,7 +82,11 @@ DECLARE
 	v_editability json;
 	v_update_old_datatype text;
 	v_project_type text;
-
+	v_param_user_id integer;
+	v_audit_datatype text;
+	v_audit_widgettype text;
+	v_active_feature text;
+	v_created_addfields record;
 BEGIN
 
 	
@@ -102,11 +105,10 @@ BEGIN
 	v_config_datatype = (((p_data ->>'data')::json->>'parameters')::json->>'datatype')::text;
 	v_field_length = (((p_data ->>'data')::json->>'parameters')::json->>'field_length')::text;
 	v_num_decimals = (((p_data ->>'data')::json->>'parameters')::json->>'num_decimals')::text;
-	v_default_value = (((p_data ->>'data')::json->>'parameters')::json->>'defaultValue')::text;
 	v_label = (((p_data ->>'data')::json->>'parameters')::json->>'label')::text;
 	v_config_widgettype = (((p_data ->>'data')::json->>'parameters')::json->>'widgettype')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
-	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'active')::text;
+	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'addfield_active')::text;
 	v_iseditable = (((p_data ->>'data')::json->>'parameters')::json ->>'iseditable')::text;
 
 -- get input parameters - config_api_form_fields
@@ -136,10 +138,13 @@ BEGIN
 	--Assign config widget types 
 	IF v_config_widgettype = 'combo' THEN
 		v_add_widgettype = 'QComboBox';
+
 	ELSIF v_config_widgettype = 'check' THEN
 		v_add_widgettype = 'QCheckBox';
+
 	ELSIF v_config_widgettype = 'datepickertime' THEN
 		v_add_widgettype='QDateTimeEdit';
+
 	ELSIF v_config_widgettype = 'textarea' THEN
 		v_add_widgettype = 'QTextEdit';
 	ELSE 
@@ -151,7 +156,22 @@ BEGIN
 	ELSE 
 		v_add_datatype = v_config_datatype;
 	END IF;
+
+	IF v_config_datatype='numeric' THEN
+		v_audit_datatype = 'double';
+	ELSE
+		v_audit_datatype=v_config_datatype;
+	END IF; 
+
+	IF v_config_widgettype='doubleSpinbox' THEN
+		v_audit_widgettype = 'spinbox';
+	ELSE
+		v_audit_widgettype = v_config_widgettype;
+	END IF;
+
 raise notice 'v_multi_create,%',v_multi_create;
+
+PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
 
 IF v_multi_create IS TRUE THEN
 	
@@ -159,7 +179,18 @@ IF v_multi_create IS TRUE THEN
 		v_update_old_datatype = (SELECT datatype_id FROM man_addfields_parameter WHERE param_name=v_param_name);
 	END IF;
 
-	FOR rec IN (SELECT * FROM cat_feature WHERE active IS TRUE ORDER BY id) LOOP
+	IF  v_project_type='WS' THEN
+		v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
+															UNION SELECT id,active FROM arc_type 
+															UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
+	ELSE 
+		v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
+															UNION SELECT id,active FROM arc_type 
+															UNION SELECT id,active FROM connec_type 
+															UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
+	END IF;
+	
+	FOR rec IN EXECUTE v_active_feature LOOP
 
 		IF v_action='UPDATE' THEN
 			UPDATE man_addfields_parameter SET datatype_id=v_update_old_datatype where param_name=v_param_name AND cat_feature_id IS NULL;
@@ -220,17 +251,28 @@ IF v_multi_create IS TRUE THEN
 		
 	RAISE NOTICE 'v_orderby,%',v_orderby;
 		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, 
-		default_value, form_label, widgettype_id, active, orderby, iseditable)
+		form_label, widgettype_id, active, orderby, iseditable)
 		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
-		v_default_value, v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
-	
+		v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
+		
+		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=9;
+
+		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
+      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc)
+		VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
+		v_isenabled, 9, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
+		v_dv_querytext, v_dv_querytext_filterc);
+
 		raise notice '2/INSERT ADD';
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_add_widgettype,
+		field_length=v_field_length, form_label=v_label, widgettype_id=v_add_widgettype,
 		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals, iseditable=v_iseditable 
 		WHERE param_name=v_param_name and cat_feature_id IS NULL;
+
+		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
+		dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_vdefault');
 
 	ELSIF v_action = 'DELETE' THEN
 
@@ -240,18 +282,19 @@ IF v_multi_create IS TRUE THEN
 
 	IF v_action = 'CREATE' THEN
 		raise notice '2/INSERT CONFIG';
+
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
 		AND layout_name = ''layout_data_1'';'
 		INTO v_layout_order;
 
-		EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields;'
-		INTO v_form_fields_id;
+		--EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields;'
+		--INTO v_form_fields_id;
 
-		INSERT INTO config_api_form_fields (id, formname, formtype, column_id, layout_id, layout_order, isenabled, 
+		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, 
 		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
 		isautoupdate, isreload, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
-		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
+		VALUES (v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
 		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_isreload, 'layout_data_1',
 		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
@@ -298,53 +341,36 @@ raise notice '4/';
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
 	raise notice '4/addfields=1,v_man_fields,%',v_man_fields;		
 		
-			
+			SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
+				string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
+				string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
+				string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
+				INTO v_created_addfields
+				FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+				
 			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 				( v_feature_type='arc' OR v_feature_type='node')) THEN
-		
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			a.'||v_param_name||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
-			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
-			WHERE cat_feature_id='''''||rec.id||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_add_datatype||' )) a 
-			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id
-			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
-
+			
+			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, v_cat_feature,4,v_created_addfields.a_param, v_created_addfields.ct_param, 
+			v_created_addfields.id_param, v_created_addfields.datatype);
 
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
 
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			a.'||v_param_name||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
-			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
-			WHERE cat_feature_id='''''||rec.id||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_add_datatype||' )) a 
-			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
+			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
 
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, v_cat_feature,5,v_created_addfields.a_param, v_created_addfields.ct_param, 
+			v_created_addfields.id_param, v_created_addfields.datatype);
 
 		ELSE
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			'||v_man_fields||',
-			a.'||v_param_name||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
-			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
-			WHERE cat_feature_id='''''||rec.id||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_add_datatype||' )) a 
-			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
+
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			v_man_fields, v_cat_feature,6,v_created_addfields.a_param, v_created_addfields.ct_param, 
+			v_created_addfields.id_param, v_created_addfields.datatype);
 		
 		END IF;
 
@@ -356,31 +382,22 @@ raise notice '4/';
 			( v_feature_type='arc' OR v_feature_type='node')) THEN
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';	
+
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, rec.id,1,null, null, null, null);
 
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
 
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, rec.id,2,null, null, null, null);
 		ELSE
 		
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			'||v_man_fields||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||rec.id||''' ;';
+
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			v_man_fields, rec.id,3,null, null, null, null);
 
 		END IF;
 
@@ -419,7 +436,7 @@ raise notice '4/';
 	
 	ELSIF v_action='UPDATE' THEN 
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_add_widgettype ,
+		field_length=v_field_length, form_label=v_label, widgettype_id=v_add_widgettype ,
 		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals WHERE param_name=v_param_name;
 		
 	raise notice '2/update ADD,%',v_config_datatype;		
@@ -476,9 +493,9 @@ ELSE
 	--modify the configuration of the parameters and fields in config_api_form_fields
 	IF v_action = 'CREATE' THEN
 		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, 
-		default_value, form_label, widgettype_id, active, orderby, iseditable)
+		form_label, widgettype_id, active, orderby, iseditable)
 		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
-		v_default_value, v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
+		v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
 	
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
 		AND layout_name = ''layout_data_1'';'
@@ -496,9 +513,19 @@ ELSE
 		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
 
+
+		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=9;
+		
+		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
+      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc)
+		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
+		concat('Default value of addfield ',v_param_name, 'for', v_cat_feature), 
+		'role_edit', v_param_name, v_isenabled, 9, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
+		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc);
+
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		field_length=v_field_length, default_value=v_default_value, form_label=v_label, widgettype_id=v_add_widgettype ,
+		field_length=v_field_length, form_label=v_label, widgettype_id=v_add_widgettype ,
 		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals,iseditable=v_iseditable 
 		WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
 		
@@ -512,6 +539,9 @@ ELSE
 			dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,action_function=v_action_function,editability=v_editability 
 			WHERE column_id=v_param_name AND formname=v_viewname;
 		END IF;
+
+		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
+		dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
 
 	ELSIF v_action = 'DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
@@ -538,52 +568,37 @@ ELSE
 		--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) = 1 
 	AND v_action = 'CREATE' THEN
-		
+			
+			SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
+				string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
+				string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
+				string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
+				INTO v_created_addfields
+				FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+
 		IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 			( v_feature_type='arc' OR v_feature_type='node')) THEN
 
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			a.'||v_param_name||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
-			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
-			WHERE cat_feature_id='''''||v_cat_feature||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_add_datatype||' )) a 
-			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id
-			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
-		
+			
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, v_cat_feature,4,v_created_addfields.a_param, v_created_addfields.ct_param, 
+			v_created_addfields.id_param, v_created_addfields.datatype);
+
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN			
 	
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			a.'||v_param_name||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
-			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
-			WHERE cat_feature_id='''''||v_cat_feature||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_add_datatype||' )) a 
-			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id
-			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
+
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, v_cat_feature,5,v_created_addfields.a_param, v_created_addfields.ct_param, 
+			v_created_addfields.id_param, v_created_addfields.datatype);
 
 		ELSE
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			'||v_man_fields||',
-			a.'||v_param_name||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
-			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
-			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
-			WHERE cat_feature_id='''''||v_cat_feature||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
-			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_add_datatype||' )) a 
-			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
+
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			v_man_fields, v_cat_feature,6,v_created_addfields.a_param, v_created_addfields.ct_param, 
+			v_created_addfields.id_param, v_created_addfields.datatype);
 		
 		END IF;
 		
@@ -594,31 +609,23 @@ ELSE
 			( v_feature_type='arc' OR v_feature_type='node')) THEN
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
+
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, v_cat_feature,1,null, null, null, null);
 
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN	
-
+			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
+	
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			null, v_cat_feature,2,null, null, null, null);
 
 		ELSE
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-			SELECT ve_'||v_feature_type||'.*,
-			'||v_man_fields||'
-			FROM '||v_schemaname||'.ve_'||v_feature_type||'
-			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
-			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id 
-			WHERE '||v_feature_type||'_type ='''||v_cat_feature||''' ;';
+
+			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
+			v_man_fields, v_cat_feature,3,null, null, null, null);
 
 		END IF;
 		

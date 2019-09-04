@@ -73,6 +73,9 @@ BEGIN
 	AND column_name!=''id'' AND column_name!=''formname'';'
 	INTO v_insert_fields;
 
+	PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+	
+
 	--insert configuration copied from the parent view config
 	FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname=concat('ve_',v_feature_type))
 	LOOP
