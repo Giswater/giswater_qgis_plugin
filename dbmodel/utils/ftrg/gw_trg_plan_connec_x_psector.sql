@@ -10,18 +10,20 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_connec()
 $BODY$
 DECLARE 
     v_stateaux smallint;	
-	v_link_geom public.geometry;
-	v_vnode_geom public.geometry;
+    v_arcaux text;	
+
 
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	SELECT connec.state INTO v_stateaux FROM connec WHERE connec_id=NEW.connec_id;
+	SELECT connec.state, connec.arc_id INTO v_stateaux, v_arcaux FROM connec WHERE connec_id=NEW.connec_id;
 		
 	IF v_stateaux=1	THEN 
 		NEW.state=0;
 		NEW.doable=false;
+		NEW.arc_id=v_arcaux;
+		
 	ELSIF v_stateaux=2 THEN
 		NEW.state=1;
 		NEW.doable=true;
