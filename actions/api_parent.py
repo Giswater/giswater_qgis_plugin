@@ -1169,7 +1169,7 @@ class ApiParent(ParentAction):
             date = QDate.fromString(field['value'], 'yyyy-MM-dd')
             utils_giswater.setCalendarDate(dialog, widget, date)
         else:
-            widget.setEmpty()
+            widget.clear()
         btn_calendar = widget.findChild(QToolButton)
 
         if field['isautoupdate']:
