@@ -17,7 +17,7 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QGridLayout" name="main_layout">
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QGroupBox" name="grb_distance">
         <property name="title">
          <string>Distance</string>
@@ -29,7 +29,7 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QGroupBox" name="grb_depth">
         <property name="title">
          <string>Depth</string>
@@ -41,7 +41,7 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QGroupBox" name="grb_symbology">
         <property name="title">
          <string>Circle symbology</string>
@@ -52,6 +52,9 @@
          </item>
         </layout>
        </widget>
+      </item>
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="top_layout"/>
       </item>
      </layout>
     </item>
