@@ -852,41 +852,44 @@ LEFT JOIN ext_municipality ON anl_mincut_result_cat.muni_id = ext_municipality.m
 	WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
     
 
-    
+DROP VIEW IF EXISTS v_ui_anl_mincut_result_cat;
 CREATE OR REPLACE VIEW v_ui_anl_mincut_result_cat AS
 SELECT
 anl_mincut_result_cat.id,
-anl_mincut_result_cat.id as name,
+anl_mincut_result_cat.id AS name,
 work_order,
-anl_mincut_cat_state.name as state,
-anl_mincut_cat_class.name as class,
+anl_mincut_cat_state.name AS state,
+anl_mincut_cat_class.name AS class,
 mincut_type,
 received_date,
-expl_id,
-macroexpl_id,
-muni_id,
+exploitation.name AS exploitation,
+macroexploitation.name AS macroexploitation,
+ext_municipality.name AS municipality,
 postcode,
-streetaxis_id,
+ext_streetaxis.name AS streetaxis,
 postnumber,
 anl_cause,
-anl_tstamp ,
+anl_tstamp,
 anl_user,
 anl_descript,
 anl_feature_id,
 anl_feature_type,
-anl_the_geom,
 forecast_start,
 forecast_end,
-assigned_to,
+cat_users.name AS assigned_to,
 exec_start,
 exec_end,
 exec_user,
 exec_descript,
-exec_the_geom,
 exec_from_plot,
 exec_depth,
 exec_appropiate,
 notified
 FROM anl_mincut_result_cat
 LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = mincut_class
-LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state;
+LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state
+LEFT JOIN exploitation ON exploitation.expl_id = anl_mincut_result_cat.expl_id
+LEFT JOIN macroexploitation ON macroexploitation.macroexpl_id = anl_mincut_result_cat.macroexpl_id
+LEFT JOIN ext_municipality ON ext_municipality.muni_id = anl_mincut_result_cat.muni_id
+LEFT JOIN ext_streetaxis ON ext_streetaxis.id = anl_mincut_result_cat.streetaxis_id
+LEFT JOIN cat_users ON cat_users.id = anl_mincut_result_cat.assigned_to;
