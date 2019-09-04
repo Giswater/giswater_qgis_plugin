@@ -144,7 +144,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
     om_visit.class_id,
     om_visit.lot_id,
     om_visit.status,
-    a.param_1 AS sendiments_arc,
+    a.param_1 AS sediments_arc,
     a.param_2 AS defect_arc,
     a.param_3 AS clean_arc
    FROM om_visit
@@ -158,7 +158,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
       FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       JOIN om_visit_class on om_visit_class.id=om_visit.class_id
       JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sendiments_arc''),(''defect_arc''),(''clean_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
+      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''defect_arc''),(''clean_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
 
