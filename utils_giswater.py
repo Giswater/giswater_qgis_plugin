@@ -21,7 +21,8 @@ from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QSortFilterProxyModel, QDate, QDateTime, QTime, Qt, QRegExp
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
-from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit
+from qgis.PyQt.QtWidgets import QPushButton, QPlainTextEdit
 
 from functools import partial
 import os
@@ -110,6 +111,10 @@ def setText(dialog, widget, text):
         if value == 'None':
             value = ""
         widget.setText(value)
+    elif type(widget) is QPlainTextEdit:
+        if value == 'None':
+            value = ""
+        widget.insertPlainText(value)
     elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
         if value == 'None' or value == 'null':
             value = 0
@@ -210,12 +215,15 @@ def setWidgetText(dialog, widget, text):
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel \
+            or type(widget) is QPlainTextEdit:
         setText(dialog, widget, text)
     elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
         setText(dialog, widget, text)
     elif type(widget) is QComboBox:
         setSelectedItem(dialog, widget, text)
+    elif type(widget) is QCheckBox:
+        setChecked(dialog, widget, text)
 
 
 def isChecked(dialog, widget):
@@ -229,6 +237,11 @@ def isChecked(dialog, widget):
 
 
 def setChecked(dialog, widget, checked=True):
+
+    if str(checked) in ('true', 't', 'True'):
+        checked = True
+    elif str(checked) in ('false', 'f', 'False'):
+        checked = False
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)

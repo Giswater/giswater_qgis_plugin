@@ -96,7 +96,11 @@
                  </widget>
                 </item>
                 <item row="4" column="1">
-                 <widget class="QSpinBox" name="field_length"/>
+                 <widget class="QSpinBox" name="field_length">
+                  <property name="maximum">
+                   <number>999999999</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="13" column="1">
                  <widget class="QCheckBox" name="active">
@@ -175,7 +179,11 @@
                  </widget>
                 </item>
                 <item row="5" column="1">
-                 <widget class="QSpinBox" name="num_decimals"/>
+                 <widget class="QSpinBox" name="num_decimals">
+                  <property name="maximum">
+                   <number>999999999</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="4" column="0">
                  <widget class="QLabel" name="lbl_60">
@@ -429,7 +437,11 @@
                  </widget>
                 </item>
                 <item row="9" column="1">
-                 <widget class="QSpinBox" name="widgetdim"/>
+                 <widget class="QSpinBox" name="widgetdim">
+                  <property name="maximum">
+                   <number>999999999</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>

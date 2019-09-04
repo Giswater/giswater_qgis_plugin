@@ -300,8 +300,6 @@ class UpdateSQL(ApiParent):
         # Generate QGIS project
         gis = CreateGisProject(self.controller, self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
-        print(str(result))
-        print(str(qgs_path))
 
         self.close_dialog(self.dlg_create_gis_project)
         self.close_dialog(self.dlg_readsql)
@@ -2667,7 +2665,8 @@ class UpdateSQL(ApiParent):
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"DELETE", "parameters":{"column_id":"' + field_value + '"}'
+            extras = '"action":"DELETE", "multi_create":' + str(
+                self.chk_multi_insert).lower() + ',"parameters":{"column_id":"' + field_value + '"}'
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
