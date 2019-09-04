@@ -77,7 +77,7 @@ class NotifyFunctions(ParentAction):
 
     def stop_listening(self, channel_name):
         self.controller.execute_sql(f"UNLISTEN {channel_name};")
-        # self.thread._stop()
+        self.thread._stop()
 
     def wait_notifications(self, conn):
         while True:
