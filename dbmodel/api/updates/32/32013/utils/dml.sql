@@ -207,3 +207,9 @@ INSERT INTO config_api_typevalue VALUES ('widgettype', 'doubleSpinbox', 'doubleS
 INSERT INTO config_api_typevalue VALUES ('widgettype', 'check', 'check', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('widgettype', 'hyperlink', 'hyperlink', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('widgettype', 'combo', 'combo', NULL, NULL);
+
+UPDATE config_api_form_fields SET layout_name='top_layout' WHERE formname='dimensioning' AND column_id='id';
+UPDATE config_api_form_fields SET layout_name='distance_layout' WHERE formname='dimensioning' AND column_id='distance';
+UPDATE config_api_form_fields SET layout_name='depth_layout' WHERE formname='dimensioning' AND (column_id='depth' OR column_id='feature_type' OR column_id='feature_id');
+UPDATE config_api_form_fields SET layout_name='symbology_layout' WHERE formname='dimensioning' AND (column_id='x_symbol' OR column_id='y_symbol');
+
