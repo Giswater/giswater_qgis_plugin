@@ -33,6 +33,8 @@ DECLARE
 	v_created_addfields record;
 	v_project_type text;
 	v_querytext text;
+	v_orderby integer;
+	rec_orderby record;
 
 BEGIN
 
@@ -64,119 +66,125 @@ IF v_multi_create IS TRUE THEN
 	END IF;
 
 	
-	FOR rec IN EXECUTE v_querytext 
-	LOOP
-	RAISE NOTICE 'rec.id,%',rec.id;
-	--set view definition to null
-	v_definition = null;
-	
-	--get the system type and system_id of the feature and view name
-	v_feature_type = (SELECT type FROM cat_feature where id=rec.id);
-	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
-	v_cat_feature = rec.id;
-	
-	--create a child view name if doesnt exist
-	IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
-		UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=rec.id;
-	END IF;
-	v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
-
-	IF v_viewname ilike '%-%' OR v_viewname ilike '% %' THEN
-		v_viewname = replace(replace(v_viewname,'-','_'),' ','_');
-		UPDATE cat_feature SET child_layer=v_viewname WHERE id=rec.id;
-	END IF;
-
-	--check if the defined view exists and create it id it doesn't
-	IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
-			EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
-			INTO v_definition;
-	END IF;
-	
-RAISE NOTICE 'v_definition,%',v_definition;
-
-	IF v_definition IS NULL THEN
-
-		--select columns from man_* table without repeating the identifier
-		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
-		and column_name!='''||v_feature_type||'_id'''
-		INTO v_man_fields;	
-
-raise notice '4/addfields=1,v_man_fields,%',v_man_fields;	
-		--check and select the addfields if are already created
-		IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
+	FOR rec IN EXECUTE v_querytext LOOP
+		RAISE NOTICE 'rec.id,%',rec.id;
+		--set view definition to null
+		v_definition = null;
 		
-			
-				SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
-				string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
-				string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
-				string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
-				INTO v_created_addfields
-				FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;		
-			
-			--create views with fields from parent table,man table and addfields 	
-			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-				( v_feature_type='arc' OR v_feature_type='node')) THEN
+		--get the system type and system_id of the feature and view name
+		v_feature_type = (SELECT type FROM cat_feature where id=rec.id);
+		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
+		v_cat_feature = rec.id;
 		
-			--view for WS and UD features that only have feature_id in man table and have defined addfields
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, rec.id, 4, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-				v_created_addfields.datatype);
+		--create a child view name if doesnt exist
+		IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
+			UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=rec.id;
+		END IF;
+		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
 
-			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
-				--view for ud connec y gully which dont have man_type table and have defined addfields
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, rec.id, 5, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-				v_created_addfields.datatype);
-			ELSE
-
-				--view for WS and UD features that have many fields in man table and have defined addfields
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				v_man_fields, rec.id, 6, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-				v_created_addfields.datatype);
-				
-			END IF;
-			
-		ELSE
-			--create views with fields from parent table and man table
-			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-				( v_feature_type='arc' OR v_feature_type='node')) THEN
-
-				--view for WS and UD features that only have feature_id in man table
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, rec.id, 1, null, null, null, null);
-
-			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
-				--view for ud connec y gully which dont have man_type table
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, rec.id, 2, null, null, null, null);
-			ELSE
-
-				--view for WS and UD features that have many fields in man table
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				v_man_fields, rec.id, 3, null, null, null, null);
-
-			END IF;
-
+		IF v_viewname ilike '%-%' OR v_viewname ilike '% %' THEN
+			v_viewname = replace(replace(v_viewname,'-','_'),' ','_');
+			UPDATE cat_feature SET child_layer=v_viewname WHERE id=rec.id;
 		END IF;
 
-		--create trigger on view 
-		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+		--check if the defined view exists and create it id it doesn't
+		IF (SELECT EXISTS ( SELECT 1 FROM  information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
+				EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
+				INTO v_definition;
+		END IF;
+		
+		RAISE NOTICE 'v_definition,%',v_definition;
 
-		EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||'
-		INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-		FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
-	ELSE
-		CONTINUE;
-	END IF;
+		IF v_definition IS NULL THEN
 
-	IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
-		EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
-		"feature":{"catFeature":"'||v_cat_feature||'"}, 
-		"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
-	END IF;
+			--select columns from man_* table without repeating the identifier
+			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
+			FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+			and column_name!='''||v_feature_type||'_id'''
+			INTO v_man_fields;	
+
+			raise notice '4/addfields=1,v_man_fields,%',v_man_fields;	
+			--check and select the addfields if are already created
+			IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
+				
+					IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=rec.id limit 1) IS NULL THEN
+						v_orderby = 1;
+						FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id=rec.id ORDER BY id) LOOP
+							UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+							v_orderby = v_orderby+1;
+						END LOOP;
+					END IF;
+
+					SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
+					string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
+					string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
+					string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
+					INTO v_created_addfields
+					FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;		
+				
+				--create views with fields from parent table,man table and addfields 	
+				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+					( v_feature_type='arc' OR v_feature_type='node')) THEN
+			
+				--view for WS and UD features that only have feature_id in man table and have defined addfields
+					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
+					null, rec.id, 4, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
+					v_created_addfields.datatype);
+
+				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+
+					--view for ud connec y gully which dont have man_type table and have defined addfields
+					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
+					null, rec.id, 5, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
+					v_created_addfields.datatype);
+				ELSE
+
+					--view for WS and UD features that have many fields in man table and have defined addfields
+					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
+					v_man_fields, rec.id, 6, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
+					v_created_addfields.datatype);
+					
+				END IF;
+				
+			ELSE
+				--create views with fields from parent table and man table
+				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+					( v_feature_type='arc' OR v_feature_type='node')) THEN
+
+					--view for WS and UD features that only have feature_id in man table
+					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
+					null, rec.id, 1, null, null, null, null);
+
+				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+
+					--view for ud connec y gully which dont have man_type table
+					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
+					null, rec.id, 2, null, null, null, null);
+				ELSE
+
+					--view for WS and UD features that have many fields in man table
+					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
+					v_man_fields, rec.id, 3, null, null, null, null);
+
+				END IF;
+
+			END IF;
+
+			--create trigger on view 
+			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+
+			EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||'
+			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
+			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
+		ELSE
+			CONTINUE;
+		END IF;
+
+		IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
+			EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+			"feature":{"catFeature":"'||v_cat_feature||'"}, 
+			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
+		END IF;
 	
 	END LOOP;
 ELSE
@@ -210,11 +218,19 @@ ELSE
 		and column_name!='''||v_feature_type||'_id'''
 		INTO v_man_fields;	
 
-RAISE NOTICE 'v_man_fields,%',v_man_fields;
+		RAISE NOTICE 'v_man_fields,%',v_man_fields;
 		--check and select the addfields if are already created
 		IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) != 0 THEN
 		raise notice '4/addfields=1,v_man_fields,%',v_man_fields;		
 			
+				IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=rec.id LIMIT 1) IS NULL THEN
+					v_orderby = 1;
+					FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id=rec.id ORDER BY id) LOOP
+						UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+						v_orderby = v_orderby+1;
+					END LOOP;
+				END IF;
+
 				SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
 				string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
 				string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
