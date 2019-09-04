@@ -1009,7 +1009,9 @@ class ApiParent(ParentAction):
 
             
     def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
-
+        """
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+        """
         rb = self.rubber_point
         rb.setColor(color)
         rb.setWidth(width)
@@ -1021,7 +1023,9 @@ class ApiParent(ParentAction):
 
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
-        """ Draw 'line' over canvas following list of points """
+        """ Draw 'line' over canvas following list of points
+         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+         """
 
         rb = self.rubber_polygon
         if Qgis.QGIS_VERSION_INT < 29900:
@@ -1041,7 +1045,9 @@ class ApiParent(ParentAction):
 
 
     def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
-        """ Draw 'polygon' over canvas following list of points """
+        """ Draw 'polygon' over canvas following list of points
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+        """
 
         rb = self.rubber_polygon
         if Qgis.QGIS_VERSION_INT < 29900:

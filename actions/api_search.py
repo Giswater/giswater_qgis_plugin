@@ -181,7 +181,7 @@ class ApiSearch(ApiParent):
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
 
-            self.draw_point(point)
+            self.draw_point(point, duration_time=5000)
             self.zoom_to_rectangle(x1, y1, x1, y1)
 
             # textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
@@ -207,6 +207,7 @@ class ApiSearch(ApiParent):
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             points = self.get_points(list_coord)
+            self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
@@ -216,10 +217,12 @@ class ApiSearch(ApiParent):
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             points = self.get_points(list_coord)
+            self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
+            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
@@ -229,6 +232,7 @@ class ApiSearch(ApiParent):
             self.draw_point(point)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
+            self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
             return
 
         self.lbl_visible = False
@@ -411,6 +415,7 @@ class ApiSearch(ApiParent):
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.rejected.connect(partial(self.resetRubberbands))
         self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
         self.items_dialog.export_to_csv.clicked.connect(
