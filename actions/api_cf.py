@@ -1893,6 +1893,11 @@ class ApiCF(ApiParent):
     def open_selected_doc(self):
 
         # Selected item from list
+        if self.tbl_list_doc.currentItem() is None:
+            msg = "No document selected."
+            self.controller.show_message(msg, 1)
+            return
+
         selected_document = self.tbl_list_doc.currentItem().text()
 
         # Get path of selected document
