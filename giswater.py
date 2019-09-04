@@ -604,6 +604,9 @@ class Giswater(QObject):
             # Unlisten notify channel and stop thread
             self.notify.stop_listening('watchers')
 
+            # Disconnect signal legendLayersAdded
+            QgsProject.instance().legendLayersAdded.disconnect(self.get_new_layers_name)
+
             # Remove icon of action 'Info'
             self.iface.removeToolBarIcon(self.action_info)
 
