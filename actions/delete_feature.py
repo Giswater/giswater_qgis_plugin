@@ -172,7 +172,7 @@ class DeleteFeature(ApiParent):
         # Get feature_type and feature_id
         feature_type = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_type).lower()
         layer_name = 'v_edit_' + feature_type
-        layer = self.controller.get_layer_by_layername(layer_name)
+        layer = self.controller.get_layer_by_tablename(layer_name)
         field_id = feature_type + "_id"
 
         # Iterate over layer
@@ -182,8 +182,6 @@ class DeleteFeature(ApiParent):
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
-                print(str(selected_id))
-            print(str(selected_id))
             utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id, str(selected_id))
 
     def set_active_layer(self):
