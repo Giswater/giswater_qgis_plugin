@@ -47,7 +47,7 @@ BEGIN
 		END IF;
 		--if there is a value - error message, if not create a trigger for the defined typevalue 
 		IF v_count > 0 THEN
-			PERFORM audit_function(3032,2750,rec.typevalue_name);
+			PERFORM audit_function(3032,2750);
 		ELSE 
 			PERFORM SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk', NEW.target_table);
 		END IF;
