@@ -90,95 +90,95 @@ SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100,
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"chamber_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Chamber param_1","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
 "isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=2"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"chamber_param_2", "datatype":"date", 
 "widgettype":"datepickertime", "label":"Chamber param_2","ismandatory":"False",
-"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CIRC-MANHOLE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"cirmanhole_param_1", "datatype":"integer", 
 "widgettype":"text", "label":"Cmanhole param_1","ismandatory":"False",
-"fieldLength":"10", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"10", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CIRC-MANHOLE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"cirmanhole_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Cmanhole param_2","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PGULLY"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"grate_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Grate param_1","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
 "isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=10"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PGULLY"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"grate_param_2", "datatype":"boolean", 
 "widgettype":"check", "label":"Grate param_2","ismandatory":"False",
-"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OWERFLOW-STORAGE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"owestorage_param_1", "datatype":"integer", 
 "widgettype":"text", "label":"Owstorage param_1","ismandatory":"False",
-"fieldLength":"10", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"10", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OWERFLOW-STORAGE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"owestorage_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Owstorage param_2","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP-PIPE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pumpipe_param_1", "datatype":"boolean", 
 "widgettype":"check", "label":"Ppipe param_1","ismandatory":"False",
-"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP-PIPE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pumpipe_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Ppipe param_2","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"RECT-MANHOLE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"recmanhole_param_1", "datatype":"string", 
 "widgettype":"text", "label":"Rect. mhole param_1","ismandatory":"False",
-"fieldLength":"500", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"500", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"RECT-MANHOLE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"recmanhole_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Rect. mhole param_2","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"REGISTER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"register_param_1", "datatype":"string", 
 "widgettype":"text", "label":"Register param_1","ismandatory":"False",
-"fieldLength":"500", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"500", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"REGISTER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"register_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Register param_2","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SEWER-STORAGE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"sewstorage_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Sstorage param_1","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", 
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
 "isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=30"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SEWER-STORAGE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"sewstorage_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Sstorage param_1","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"WEIR"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"weir_param_1", "datatype":"integer", 
 "widgettype":"text", "label":"Weir param_1","ismandatory":"False",
-"fieldLength":null, "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"WEIR"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"weir_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Weir param_2","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 
 
