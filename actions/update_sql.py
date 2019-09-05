@@ -1235,8 +1235,10 @@ class UpdateSQL(ApiParent):
     def create_project_data_schema(self):
 
         # Save user values
+        project_name_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_title_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_title')
         inp_file_path = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        self.controller.plugin_settings_set_value('project_name_schema', project_name_schema)
         self.controller.plugin_settings_set_value('project_title_schema', project_title_schema)
         self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
 
@@ -1886,6 +1888,7 @@ class UpdateSQL(ApiParent):
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         #Load user values
+        self.project_name.setText(str(self.controller.plugin_settings_value('project_name_schema')))
         self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
         if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
             self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
