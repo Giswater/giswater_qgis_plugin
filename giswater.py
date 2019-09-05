@@ -457,15 +457,6 @@ class Giswater(QObject):
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def get_all_actions(self):
-        actions_list = self.iface.mainWindow().findChildren(QActionGroup)
-        for action in actions_list:
-            action.triggered.connect(partial(self.show_action_name, action))
-
-    def show_action_name(self, action):
-        self.controller.log_info(str(action.objectName()))
-
-
     def save_toolbars_position(self):
         parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         path = os.path.dirname(__file__) + '/config/ui_config.config'
@@ -822,7 +813,6 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
-        self.get_all_actions()
 
         # Create a thread and start listen
         self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
