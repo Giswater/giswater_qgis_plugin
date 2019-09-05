@@ -91,7 +91,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"chamber_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Chamber param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=2"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='chamber_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"chamber_param_2", "datatype":"date", 
@@ -112,7 +112,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"grate_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Grate param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=10"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='grate_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PGULLY"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"grate_param_2", "datatype":"boolean", 
@@ -163,7 +163,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"sewstorage_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Sstorage param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
-"isenabled":"True","dv_querytext":"SELECT value as id, value as idval  FROM man_addfields_cat_combo WHERE parameter_id=30"}}}$$);
+"isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='sewstorage_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SEWER-STORAGE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"sewstorage_param_2", "datatype":"string", 
@@ -181,18 +181,23 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo3','combo3');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('sewstorage_param_1','combo4','combo4');
 
-INSERT INTO man_addfields_cat_combo VALUES (10, 'combo1', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (10, 'combo2', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (10, 'combo3', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (10, 'combo4', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (10, 'combo5', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (2, 'combo1', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (2, 'combo2', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (2, 'combo3', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (30, 'combo1', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (30, 'combo2', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (30, 'combo3', NULL);
-INSERT INTO man_addfields_cat_combo VALUES (30, 'combo4', NULL);
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('grate_param_1','1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('grate_param_1','2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('grate_param_1','3','combo3');
 
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','1','combo1');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','2','combo2');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','3','combo3');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','4','combo4');
 
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+SELECT 'edit_typevalue','sewstorage_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='sewstorage_param_1';
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+SELECT 'edit_typevalue','grate_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='grate_param_1';
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+SELECT 'edit_typevalue','chamber_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='chamber_param_1';
