@@ -131,7 +131,7 @@ class NotifyFunctions(ParentAction):
 
 
     def refreshCanvas(self, **kwargs):
-        self.canvas.refreshAllLayers()
+
         self.all_layers = []
         root = QgsProject.instance().layerTreeRoot()
         self.get_all_layers(root)
@@ -150,7 +150,9 @@ class NotifyFunctions(ParentAction):
 
 
     def refresh_canvas(self, **kwargs):
-        self.canvas.refreshAllLayers()
+        # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
+        # self.canvas.refreshAllLayers()
+
         all_layers = self.controller.get_layers()
         for layer in all_layers:
             layer.triggerRepaint()
@@ -174,8 +176,8 @@ class NotifyFunctions(ParentAction):
         for layer_name in layers_name_list:
             if layer_name not in available_layers:
                 msg = f"Layer {layer_name} not allowed to be configured"
-                # TODO show_warning use self.iface.messageBar().pushMessage("", msg, message_level, duration)
-                # TODO mysteriously that leaves the system locked
+                # Note: show_warning use self.iface.messageBar().pushMessage("", msg, message_level, duration)
+                #       mysteriously that leaves the system locked
                 # self.controller.show_warning(msg, duration=0)
                 print(msg)
                 continue
