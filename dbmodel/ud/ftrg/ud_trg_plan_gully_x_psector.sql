@@ -21,7 +21,7 @@ BEGIN
 	IF v_stateaux=1	THEN 
 		NEW.state=0;
 		NEW.doable=false;
-		EW.arc_id=v_arcaux;
+		NEW.arc_id=v_arcaux;
 		
 	ELSIF v_stateaux=2 THEN
 		NEW.state=1;
