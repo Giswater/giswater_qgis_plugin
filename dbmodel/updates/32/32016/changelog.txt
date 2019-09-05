@@ -5,6 +5,7 @@
 - New function csv2pg_import_omvisitlot
 - Add notified column to mincut table and views
 - Create typevalue_fk table
-- New function gw_trg_typevalue_fk
-- New function gw_fct_admin_manage_visit
-- New function gw_fct_admin_manage_visit_view
+- New function (2744) gw_trg_typevalue_fk
+- New function (2750) gw_trg_typevalue_config_fk
+- New function (2746) gw_fct_admin_manage_visit
+- New function (2748) gw_fct_admin_manage_visit_view

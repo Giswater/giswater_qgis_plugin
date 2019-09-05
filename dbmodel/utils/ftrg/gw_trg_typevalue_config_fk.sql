@@ -34,30 +34,56 @@ BEGIN
 	raise notice 'v_table,%',v_table;
 	--on insert of a new typevalue creat a trigger for the table
 	IF TG_OP = 'INSERT' AND v_table = 'typevalue_fk' THEN
-	
-		PERFORM SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk', NEW.target_table);
+		--check if there are values on the defined fileds that already have a value that is not present in a catalog
+		IF NEW.parameter_id IS NULL THEN
+			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE '||NEW.target_field||' is not null 
+				AND '||NEW.target_field||' NOT IN (SELECT id FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
+			into v_count;
+		ELSE
+			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE parameter_id = '||NEW.parameter_id||	' AND  '||NEW.target_field||' is not null 
+				AND '||NEW.target_field||' NOT IN (SELECT id FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
+
+			into v_count;
+		END IF;
+		--if there is a value - error message, if not create a trigger for the defined typevalue 
+		IF v_count > 0 THEN
+			PERFORM audit_function(3032,2750,rec.typevalue_name);
+		ELSE 
+			PERFORM SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk', NEW.target_table);
+		END IF;
 
 	--in case of update on one of the defined typevalue table
 	ELSIF TG_OP = 'UPDATE' and v_table IN (SELECT DISTINCT typevalue_table FROM typevalue_fk) THEN
 		
 		--select configuration from the typevalue_fk and related typevalue for the selected value
-		
-		v_query =  'SELECT *  FROM typevalue_fk JOIN '||v_table||' ON '||v_table||'.typevalue = typevalue_name 
-		and '||v_table||'.id = '''||NEW.id||''';';
+		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue_cat) THEN
+			IF NEW.typevalue != OLD.typevalue OR NEW.id != OLD.id THEN
 
-		raise notice 'v_query,%',v_query;	
-		
-			FOR rec IN EXECUTE v_query LOOP
-				--if typevalue is a system typevalue - error, cant modify value, else update values of fields where it's used
-				IF rec.typevalue_name IN (SELECT typevalue_name FROM sys_typevalue_cat) THEN
+					PERFORM audit_function(3028,2750,OLD.typevalue);
+			END IF;
+		ELSE
+			v_query =  'SELECT *  FROM typevalue_fk JOIN '||v_table||' ON '||v_table||'.typevalue = typevalue_name 
+			and typevalue_name = '''||NEW.typevalue||''';';
+
+			raise notice 'v_query,%',v_query;	
+
+			IF NEW.id!= OLD.id THEN
+				
+				
+				FOR rec IN EXECUTE v_query LOOP
+				
+					RAISE NOTICE 'rec,%',rec;
 					
-					PERFORM audit_function(3028,2750,rec.typevalue_name);
-				ELSE
-
+					EXECUTE 'ALTER TABLE '||rec.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
+					
 					EXECUTE 'UPDATE '||rec.target_table||' SET '||rec.target_field||' = '''||NEW.id||''' 
 					WHERE '||rec.target_field||' = '''||OLD.id||''';';
-				END IF;
-			END LOOP;
+					
+					EXECUTE 'ALTER TABLE '||rec.target_table||' ENABLE TRIGGER gw_trg_typevalue_fk';
+				END LOOP;
+			END IF;
+		END IF;
+
 
 	ELSIF TG_OP = 'DELETE' then --and v_table IN (SELECT typevalue_table FROM typevalue_fk) THEN
 
