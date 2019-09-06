@@ -53,7 +53,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="idval"/>
+         <widget class="QLineEdit" name="class_name"/>
         </item>
        </layout>
       </item>
@@ -385,7 +385,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="id">
+         <widget class="QLineEdit" name="class_id">
           <property name="enabled">
            <bool>false</bool>
           </property>
