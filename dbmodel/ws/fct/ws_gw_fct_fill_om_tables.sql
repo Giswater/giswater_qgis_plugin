@@ -41,7 +41,7 @@ BEGIN
 
 
         --node
-        FOR rec_node IN SELECT * FROM node
+        FOR rec_node IN SELECT * FROM node WHERE state=1
         LOOP
 
             --Insert visit
@@ -66,7 +66,7 @@ BEGIN
 
 
 	-- arc
-	FOR rec_arc IN SELECT * FROM arc
+	FOR rec_arc IN SELECT * FROM arc WHERE state=1
         LOOP
 
             --Insert visit
@@ -100,7 +100,7 @@ BEGIN
 
 
         --connec
-        FOR rec_connec IN SELECT * FROM connec
+        FOR rec_connec IN SELECT * FROM connec WHERE state=1
         LOOP
 
             --Insert visit
