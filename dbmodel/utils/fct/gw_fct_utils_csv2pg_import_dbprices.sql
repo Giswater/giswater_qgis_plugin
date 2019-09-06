@@ -25,6 +25,7 @@ DECLARE
 	v_project_type text;
 	v_version text;
 	v_count integer;
+	label_aux text;
 
 BEGIN
 
@@ -33,7 +34,9 @@ BEGIN
 
 	-- get system parameters
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
-   
+
+   	label_aux = ((p_data ->>'data')::json->>'importParam')::text;
+   	
 	-- manage log (fprocesscat = 42)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND user_name=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT DB PRICES FILE'));
