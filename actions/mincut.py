@@ -1469,7 +1469,7 @@ class MincutParent(ParentAction):
                f" '{elem_type}', '{real_mincut_id}');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
-        if not row:
+        if not row[0]:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
 
