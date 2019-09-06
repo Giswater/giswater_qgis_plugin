@@ -161,7 +161,9 @@ BEGIN
 	WHERE class_id=v_class_id;
 
 	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
-	
+
+	PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+
 IF v_action = 'CREATE' THEN
 	--insert new class and parameter
 	IF v_action_type = 'class' THEN
