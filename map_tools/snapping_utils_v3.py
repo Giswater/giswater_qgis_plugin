@@ -143,6 +143,7 @@ class SnappingConfigManager(object):
         if snappings_options:
             QgsProject.instance().setSnappingConfig(snappings_options)
         QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
 
     def recover_snapping_options(self):

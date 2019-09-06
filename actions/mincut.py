@@ -95,6 +95,7 @@ class MincutParent(ParentAction):
 
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
         self.snapper = self.snapper_manager.get_snapper()
 
         # Refresh canvas, remove all old selections
@@ -1344,7 +1345,17 @@ class MincutParent(ParentAction):
         # On inserting work order
         self.action_add_connec.setDisabled(True)
         self.action_add_hydrometer.setDisabled(True)
-            
+
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Disable snapping
+        self.snapper_manager.enable_snapping()
+        # Set snapping to 'arc' and 'node'
+        self.snapper_manager.set_snapping_layers()
+        self.snapper_manager.snap_to_arc()
+        self.snapper_manager.snap_to_node()
+
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
         self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
@@ -1377,6 +1388,8 @@ class MincutParent(ParentAction):
             layer.select([feature_id])
             self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
             self.set_visible_mincut_layers()
+            self.snapper_manager.recover_snapping_options()
+
 
 
     def set_visible_mincut_layers(self, zoom=False):
