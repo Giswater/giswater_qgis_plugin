@@ -27,7 +27,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
-    QSpacerItem
+    QSpacerItem, QWidget
 
 from .api_parent import ApiParent
 from ..ui_manager import ApiDimensioningUi
@@ -180,12 +180,13 @@ class ApiDimensioning(ApiParent):
                    f"FROM {feat_type} "
                    f"WHERE {feat_type}_id = '{element_id}'")
             row = self.controller.get_row(sql)
+
             if not row:
                 return
 
-            utils_giswater.setText(self.dlg_dim, "depth", row[0])
-            utils_giswater.setText(self.dlg_dim, "feature_id", element_id)
-            utils_giswater.setText(self.dlg_dim, "feature_type", feat_type.upper())
+            utils_giswater.setText(self.dlg_dim, "data_depth", row[0])
+            utils_giswater.setText(self.dlg_dim, "data_feature_id", element_id)
+            utils_giswater.setText(self.dlg_dim, "data_feature_type", feat_type.upper())
 
 
     def orientation(self):
@@ -198,11 +199,11 @@ class ApiDimensioning(ApiParent):
         if not self.layer_dimensions:
             return
 
-        self.x_symbol = self.dlg_dim.findChild(QLineEdit, "x_symbol")
+        self.x_symbol = self.dlg_dim.findChild(QLineEdit, "data_x_symbol")
 
         self.x_symbol.setText(str(int(point.x())))
 
-        self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
+        self.y_symbol = self.dlg_dim.findChild(QLineEdit, "data_y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
 

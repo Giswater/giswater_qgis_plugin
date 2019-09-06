@@ -538,6 +538,7 @@ class ApiCF(ApiParent):
             self.enable_actions(self.layer.isEditable())
             self.layer.editingStarted.connect(partial(self.enable_actions, True))
             self.layer.editingStopped.connect(partial(self.enable_actions, False))
+            self.layer.editingStopped.connect(partial(self.get_last_value))
 
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(partial(self.start_editing, self.layer))
@@ -561,19 +562,38 @@ class ApiCF(ApiParent):
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
+        self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition, self.layer))
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
         self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
 
+    def set_vdefault_edition(self, layer):
+        print(str("TEST1"))
+        sql = ("SELECT value FROM config_param_user "
+               "WHERE cur_user = current_user AND parameter = 'cf_keep_opened_edition'")
+        row = self.controller.get_row(sql)
+        print(str(row))
+        if not row or row[0].lower() != 'true':
+            return
+        print(str("TEST2"))
+        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+
+    def get_last_value(self):
+        widgets = self.dlg_cf.tab_data.findChildren(QWidget)
+        for widget in widgets:
+            if widget.hasFocus():
+                value = utils_giswater.getWidgetText(self.dlg_cf, widget)
+                self.my_json[str(widget.property('column_id'))] = str(value)
+
 
     def start_editing(self, layer):
         """ start or stop the edition based on your current status """
-
         self.iface.setActiveLayer(layer)
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
+
         # If the json is empty, we simply activate/deactivate the editing
         # else if editing is active, deactivate edition and save changes
         if self.my_json == '' or str(self.my_json) == '{}':
@@ -2335,7 +2355,7 @@ class ApiCF(ApiParent):
             fields += 'workid_key2, '
             values += f"'{workid_key_2}', "
         builtdate = builtdate.dateTime().toString('yyyy-MM-dd')
-        if builtdate != "null":
+        if builtdate != "null" and builtdate != '':
             fields += 'builtdate, '
             values += f"'{builtdate}', "
 
@@ -2362,6 +2382,7 @@ class ApiCF(ApiParent):
                         completer = QCompleter()
                         self.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
                         utils_giswater.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
+                        self.my_json[str(cmb_workcat_id.property('column_id'))] = str(cat_work_id)
                     self.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "This workcat already exists"
