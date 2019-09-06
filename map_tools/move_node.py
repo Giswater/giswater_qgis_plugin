@@ -232,7 +232,7 @@ class MoveNodeMapTool(ParentMapTool):
 
                 # Move selected node to the released point
                 # Show message before executing
-                message = ("The procedure will delete features on database. "
+                message = ("The procedure will delete features on database unless it is a node that doesn't divide arc. "
                            "Please ensure that features has no undelete value on true. "
                            "On the other hand you must know that traceability table will storage precedent information.")
                 title = "Info"
