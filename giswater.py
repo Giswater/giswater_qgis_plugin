@@ -815,8 +815,9 @@ class Giswater(QObject):
         self.controller.log_info(message)
 
         # Create a thread and start listen
-        self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.notify.start_listening('watchers', 'wait_notifications', (self.controller.dao.conn, ))
+        if  self.settings.value('system_variables/use_notify').upper() == 'TRUE' :
+            self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.notify.start_listening('watchers', 'wait_notifications', (self.controller.dao.conn, ))
 
         #Save toolbar position when save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
