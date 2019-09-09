@@ -893,3 +893,33 @@ LEFT JOIN macroexploitation ON macroexploitation.macroexpl_id = anl_mincut_resul
 LEFT JOIN ext_municipality ON ext_municipality.muni_id = anl_mincut_result_cat.muni_id
 LEFT JOIN ext_streetaxis ON ext_streetaxis.id = anl_mincut_result_cat.streetaxis_id
 LEFT JOIN cat_users ON cat_users.id = anl_mincut_result_cat.assigned_to;
+
+DROP VIEW IF EXISTS v_edit_dqa;
+CREATE OR REPLACE VIEW v_edit_dqa AS 
+ SELECT dqa.dqa_id,
+    dqa.name,
+    dqa.expl_id,
+    dqa.macrodqa_id,
+    dqa.descript,
+    dqa.undelete,
+    dqa.the_geom,
+    dqa.pattern_id,
+    dqa.nodeparent,
+    dqa.dqa_type,
+    dqa.link
+   FROM selector_expl,
+    dqa
+  WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+  
+DROP VIEW IF EXISTS v_edit_presszone;
+CREATE OR REPLACE VIEW v_edit_presszone AS 
+ SELECT cat_presszone.id,
+    cat_presszone.descript,
+    cat_presszone.expl_id,
+    cat_presszone.nodeparent,
+    cat_presszone.the_geom
+   FROM selector_expl,
+    cat_presszone
+  WHERE cat_presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  
