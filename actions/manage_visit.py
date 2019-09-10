@@ -254,7 +254,7 @@ class ManageVisit(ParentManage, QObject):
         srid = self.controller.plugin_settings_value('srid')
         sql = (f"UPDATE om_visit"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
-               f" WHERE id = {self.current_visit.id})")
+               f" WHERE id = {self.current_visit.id}")
         self.controller.execute_sql(sql)
 
 
