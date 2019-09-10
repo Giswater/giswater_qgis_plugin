@@ -162,25 +162,12 @@ class NotifyFunctions(ParentAction):
             At the moment manage:
                 Column names as alias, combos and typeahead as ValueMap"""
 
-        sql =("SELECT DISTINCT(parent_layer) FROM cat_feature " 
-              "UNION " 
-              "SELECT DISTINCT(child_layer) FROM cat_feature ")
-        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
-        available_layers = [layer[0] for layer in rows]
-
         # Get list of layer names
         layers_name_list = kwargs['tableName']
         if not layers_name_list:
             return
 
         for layer_name in layers_name_list:
-            if layer_name not in available_layers:
-                msg = f"Layer {layer_name} not allowed to be configured"
-                # Note: show_warning use self.iface.messageBar().pushMessage("", msg, message_level, duration)
-                #       mysteriously that leaves the system locked
-                # self.controller.show_warning(msg, duration=0)
-                print(msg)
-                continue
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
                 msg = f"Layer {layer_name} does not found, therefore, not configured"
