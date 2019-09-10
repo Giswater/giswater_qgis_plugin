@@ -77,7 +77,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
 
         sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'workcat_vdefault'")
+               "WHERE cur_user = current_user AND parameter = 'workcat_id_end_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])

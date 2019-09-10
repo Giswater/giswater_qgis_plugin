@@ -21,6 +21,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 
 from functools import partial
+from datetime import datetime
 
 from .. import utils_giswater
 from .parent_manage import ParentManage
@@ -126,7 +127,8 @@ class ManageWorkcatEnd(ParentManage):
                "WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
-            enddate = QDate.fromString(row[0], 'yyyy-MM-dd')
+            enddate = self.manage_dates(row[0]).date()
+            self.dlg_work_end.enddate.setDate(enddate)
         else:
             enddate = QDate.currentDate()
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
@@ -136,10 +138,24 @@ class ManageWorkcatEnd(ParentManage):
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
         sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
+               "WHERE parameter = 'workcat_id_end_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
+
+
+    def manage_dates(self, date_value):
+        """ Manage dates """
+
+        date_result = None
+        try:
+            date_result = str(date_value)
+            date_result = date_result.replace("-", "/")
+            date_result = datetime.strptime(date_result, '%Y/%m/%d')
+        except Exception as e:
+            self.controller.log_warning(str(e))
+        finally:
+            return date_result
 
 
     def fill_workids(self):
