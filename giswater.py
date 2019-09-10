@@ -593,10 +593,8 @@ class Giswater(QObject):
         """ Removes plugin menu items and icons from QGIS GUI """
         try:
             # Unlisten notify channel and stop thread
-            self.notify.stop_listening('watchers')
-
-            # Disconnect signal legendLayersAdded
-            QgsProject.instance().legendLayersAdded.disconnect(self.get_new_layers_name)
+            if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and  hasattr(self, 'notify'):
+                self.notify.stop_listening('watchers')
 
             # Remove icon of action 'Info'
             self.iface.removeToolBarIcon(self.action_info)
