@@ -2763,10 +2763,10 @@ class UpdateSQL(ApiParent):
                 values = values[:-2] + ");\n"
                 sql += values
 
-        if progress % 500 == 0:
-            # TODO:: Use dev_commit or dev_user?
-            self.controller.execute_sql(sql, commit=self.dev_user)
-            sql = ""
+            if progress % 500 == 0:
+                # TODO:: Use dev_commit or dev_user?
+                self.controller.execute_sql(sql, commit=self.dev_user)
+                sql = ""
 
         if sql != "":
             # TODO:: Use dev_commit or dev_user?
