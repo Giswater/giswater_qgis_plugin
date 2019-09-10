@@ -16,11 +16,11 @@ else:
     import configparser
     from qgis.core import QgsSnappingUtils, QgsPointLocator, QgsTolerance
 
-from qgis.core import QgsExpressionContextUtils, QgsProject, QgsEditorWidgetSetup
-from qgis.PyQt.QtCore import QObject, QSettings, Qt
+from qgis.core import QgsExpressionContextUtils, QgsProject, QgsEditorWidgetSetup, QgsDataSourceUri, QgsVectorLayer
+from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
 from qgis.PyQt.QtWidgets import QToolBar
-from qgis.PyQt.QtGui import QIcon, QKeySequence
+from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel
 
 import os.path
@@ -822,6 +822,84 @@ class Giswater(QObject):
 
         # Set config layer fields when user add new layer into the TOC
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
+        # QgsProject.instance().legendLayersAdded.connect(self.add_layers_button)
+
+        # Put add layers button into toc
+        self.enable_python_console()
+        self.add_layers_button()
+
+
+    def add_layers_button(self):
+        icon_path = self.plugin_dir + '/icons/27.png'
+        dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
+        toolbar = dockwidget.findChildren(QToolBar)[0]
+        btn_exist = toolbar.findChild(QToolButton, 'gw_add_layers')
+        print(f'BTNEXIST: {btn_exist}')
+        if btn_exist is None:
+            btn = QToolButton()
+            btn.setIcon(QIcon(icon_path))
+            btn.setObjectName('gw_add_layers')
+            toolbar.addWidget(btn)
+            btn.clicked.connect(partial(self.test, btn))
+            btn.clicked.connect(partial(self.create_add_layer_menu))
+
+
+    def test(self, btn):
+        print(f'NAME: {btn.objectName()}')
+    def create_add_layer_menu(self):
+
+        # Create main menu and get cursor click position
+        main_menu = QMenu()
+        cursor = QCursor()
+        x = cursor.pos().x()
+        y = cursor.pos().y()
+        click_point = QPoint(x + 5, y + 5)
+        schema_name = self.schema_name.replace('"', '')
+        # Get parent layers
+        sql = ("SELECT DISTINCT(parent_layer) FROM cat_feature")
+        parent_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
+        for parent_layer in parent_layers:
+            # Create sub menu
+            sub_menu = main_menu.addMenu(str(parent_layer[0]))
+
+            # Get child layers
+            sql = (f"SELECT DISTINCT(child_layer), type FROM cat_feature "
+                   f"WHERE parent_layer = '{parent_layer[0]}' "
+                   f"AND child_layer IN ("
+                   f"   SELECT table_name FROM information_schema.tables"
+                   f"   WHERE table_schema = '{schema_name}')")
+            child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
+            for child_layer in child_layers:
+                # Create actions
+                action = QAction(str(child_layer[0]), sub_menu, checkable=True)
+
+                # Get load layers and create child layers menu (actions)
+                layers_list = []
+                layers = self.iface.mapCanvas().layers()
+                for layer in layers:
+                    layers_list.append(str(layer.name()))
+
+                if str(child_layer[0]) in layers_list:
+                    action.setChecked(True)
+
+                sub_menu.addAction(action)
+                action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1], action))
+        main_menu.exec_(click_point)
+
+
+    def put_layer_into_toc(self, tablename, type, action):
+        layer = self.controller.get_layer_by_tablename('v_edit_node')
+        if not layer:
+            return
+        layer_source = self.controller.get_layer_source(layer)
+        schema_name = layer_source['schema'].replace('"', '')
+        uri = QgsDataSourceUri()
+        uri.setConnection(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'], layer_source['password'])
+        uri.setDataSource(schema_name, f'{tablename}', "the_geom", None, type + "_id")
+        vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
+        QgsProject.instance().addMapLayer(vlayer)
+        self.iface.mapCanvas().refresh()
+
 
     def get_new_layers_name(self, layers_list):
         layers_name = [layer.name() for layer in layers_list]
