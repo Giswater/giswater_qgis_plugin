@@ -288,6 +288,8 @@ IF v_multi_create IS TRUE THEN
 
 		DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
 
+		DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_vdefault');
+
 	END IF;
 
 	IF v_action = 'CREATE' THEN
@@ -559,6 +561,8 @@ ELSE
 	ELSIF v_action = 'DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
 
+		DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+
 		DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
 
 	END IF;
@@ -582,10 +586,10 @@ ELSE
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) = 1 
 	AND v_action = 'CREATE' THEN
 			
-			SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
-				string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
-				string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
-				string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
+			SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 				INTO v_created_addfields
 				FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
 
@@ -654,10 +658,10 @@ ELSE
 		END IF;
 		
 		--update the current view defintion
-		v_definition = regexp_replace(v_definition,v_old_parameters.ct_param,v_new_parameters.ct_param);
-		v_definition = regexp_replace(v_definition,v_old_parameters.a_param,v_new_parameters.a_param);
-		v_definition = regexp_replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
-		v_definition = regexp_replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
+		v_definition = replace(v_definition,v_old_parameters.ct_param,v_new_parameters.ct_param);
+		v_definition = replace(v_definition,v_old_parameters.a_param,v_new_parameters.a_param);
+		v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
+		v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
 		
 		--replace the existing view and create the trigger
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
