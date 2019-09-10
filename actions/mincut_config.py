@@ -6,6 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+import os
+import subprocess
+
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QStringListModel, QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
@@ -17,13 +20,6 @@ from functools import partial
 from giswater.ui_manager import Multirow_selector
 from giswater.ui_manager import Mincut_edit
 from giswater.actions.parent import ParentAction
-
-show_button = True
-try:
-    from giswater.actions.sms_sender.notification import CutNotification
-except:
-    show_button = False
-
 
 
 class MincutConfig(ParentAction):
@@ -77,7 +73,7 @@ class MincutConfig(ParentAction):
         self.set_icon(self.btn_notify, "307")
 
         btn_visible = self.settings.value('customized_actions/show_mincut_sms', 'FALSE')
-        if btn_visible.upper() == 'TRUE' and show_button:
+        if btn_visible.upper() == 'TRUE':
             self.btn_notify.setVisible(True)
         else:
             self.btn_notify.setVisible(False)
@@ -137,13 +133,17 @@ class MincutConfig(ParentAction):
 
 
     def call_sms_script(self, qtable):
+        path = self.settings.value('customized_actions/path_sms_script')
+        if path is None or not os.path.exists(path):
+            self.controller.show_warning("File not found", parameter=path)
+            return
         field_code = self.settings.value('customized_actions/field_code', 'code')
         selected_list = qtable.selectionModel().selectedRows()
         list_mincut_id = []
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause "
+            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause, notified "
                    "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
                    "JOIN " + self.schema_name + ".ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    "JOIN " + self.schema_name + ".anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
@@ -173,8 +173,7 @@ class MincutConfig(ParentAction):
                 list_clients.append(client)
 
             # Call script
-            notification = CutNotification(_cause, from_date, to_date, list_clients)
-            status_code = notification.send_notification()
+            status_code = subprocess.call([path, _cause, from_date, to_date, list_clients])
 
             # Update table with results
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
