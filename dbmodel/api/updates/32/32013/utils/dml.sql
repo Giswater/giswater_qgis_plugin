@@ -75,15 +75,14 @@ UPDATE config_api_visit SET formname='unexpected_noinfra' WHERE formname= 'unspe
 
 -- 10/06/2019
 
-UPDATE config_api_form_fields SET dv_querytext = 'SELECT id, id as idval FROM om_visit_lot WHERE active IS TRUE' WHERE id = 28490;
-UPDATE config_api_form_fields SET dv_querytext = 'SELECT id, id as idval FROM om_visit_lot WHERE active IS TRUE' WHERE id = 28240;
+UPDATE config_api_form_fields SET dv_querytext = 'SELECT id, id as idval FROM om_visit_lot WHERE active IS TRUE' WHERE formtype='visit' and column_id = 'lot_id';
 
 UPDATE config_api_list SET query_text = 'SELECT DISTINCT ON (a.id) a.id AS sys_id, a.id AS lot_id, ''om_visit_lot'' as sys_table_id, ''id'' as sys_idname FROM om_visit_lot a' WHERE id = 28240;
 
 UPDATE config_api_form_fields SET layout_order = 6 WHERE id = 30040;
 UPDATE config_api_form_fields SET layout_order = 7 WHERE id = 30050;
 
-UPDATE config_api_form_fields SET dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue=''listlimit''' WHERE id='102718';
+UPDATE config_api_form_fields SET dv_querytext='SELECT id, idval FROM config_api_typevalue WHERE typevalue=''listlimit''' WHERE id='102718';
 
 -- 04/07/2019
 

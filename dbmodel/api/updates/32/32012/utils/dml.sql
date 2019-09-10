@@ -114,20 +114,12 @@ WHERE id=564;
 -- value type values
 -----------------------
 
-INSERT INTO edit_typevalue VALUES ('verified', '1', 'SI', NULL);
-INSERT INTO edit_typevalue VALUES ('verified', '2', 'NO', NULL);
-INSERT INTO edit_typevalue VALUES ('yesno', '2', 'NO', NULL);
-INSERT INTO edit_typevalue VALUES ('verified', '3', 'PENDIENTE', NULL);
-INSERT INTO edit_typevalue VALUES ('yesno', '1', 'SI', NULL);
-INSERT INTO edit_typevalue VALUES ('priority', '1', 'ALTA', NULL);
-INSERT INTO edit_typevalue VALUES ('priority', '2', 'MEDIA', NULL);
-INSERT INTO edit_typevalue VALUES ('priority', '3', 'BAJA', NULL);
-INSERT INTO edit_typevalue VALUES ('listlimit', '1', '10', NULL);
-INSERT INTO edit_typevalue VALUES ('listlimit', '2', '50', NULL);
-INSERT INTO edit_typevalue VALUES ('listlimit', '3', '100', NULL);
-INSERT INTO edit_typevalue VALUES ('listlimit', '4', '500', NULL);
-INSERT INTO edit_typevalue VALUES ('listlimit', '5', '1000', NULL);
-INSERT INTO edit_typevalue VALUES ('nullvalue', '0', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '1', '10', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '2', '50', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '3', '100', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '4', '500', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '5', '1000', NULL);
+
 
 
 

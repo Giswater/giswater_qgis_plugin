@@ -218,3 +218,6 @@ UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_arc';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_connec';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_node';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_other';
+
+
+INSERT INTO edit_typevalue VALUES ('nullvalue', '0', NULL, NULL);
