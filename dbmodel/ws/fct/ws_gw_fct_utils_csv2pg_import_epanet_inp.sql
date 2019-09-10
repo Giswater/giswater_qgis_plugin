@@ -141,7 +141,6 @@ BEGIN
 		DELETE FROM inp_curve_id;
 		DELETE FROM inp_curve;
 		DELETE FROM inp_controls_x_arc;
-		DELETE FROM inp_controls_x_node;
 		DELETE FROM inp_rules_x_arc;
 		DELETE FROM inp_rules_x_node;
 		DELETE FROM inp_emitter;
