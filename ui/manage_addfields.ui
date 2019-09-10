@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>577</width>
-            <height>1139</height>
+            <width>565</width>
+            <height>1322</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -88,10 +88,10 @@
                 <item row="2" column="1">
                  <widget class="QLineEdit" name="label"/>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="lbl_70">
+                <item row="5" column="0">
+                 <widget class="QLabel" name="lbl_58">
                   <property name="text">
-                   <string>Form type:</string>
+                   <string>Num. Decimals:</string>
                   </property>
                  </widget>
                 </item>
@@ -102,43 +102,36 @@
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="1">
-                 <widget class="QCheckBox" name="active">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="lbl_default_value">
-                  <property name="text">
-                   <string>Default value:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="lbl_58">
-                  <property name="text">
-                   <string>Num. Decimals:</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="12" column="1">
-                 <widget class="QCheckBox" name="ismandatory">
+                 <widget class="QCheckBox" name="addfield_active">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="0">
+                <item row="1" column="0">
+                 <widget class="QLabel" name="lbl_70">
+                  <property name="text">
+                   <string>Form type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="12" column="0">
                  <widget class="QLabel" name="lbl_89">
                   <property name="text">
                    <string>Active:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="1">
+                <item row="10" column="1">
                  <widget class="QCheckBox" name="iseditable">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="11" column="1">
+                 <widget class="QCheckBox" name="ismandatory">
                   <property name="text">
                    <string/>
                   </property>
@@ -151,15 +144,19 @@
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="0">
+                <item row="9" column="0">
                  <widget class="QLabel" name="lbl_74">
                   <property name="text">
                    <string>Enabled:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
-                 <widget class="QComboBox" name="datatype"/>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="lbl_73">
+                  <property name="text">
+                   <string>Data type:</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="1">
                  <widget class="QLineEdit" name="formtype">
@@ -171,12 +168,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="lbl_73">
-                  <property name="text">
-                   <string>Data type:</string>
-                  </property>
-                 </widget>
+                <item row="3" column="1">
+                 <widget class="QComboBox" name="datatype"/>
                 </item>
                 <item row="5" column="1">
                  <widget class="QSpinBox" name="num_decimals">
@@ -192,23 +185,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="1">
-                 <widget class="QCheckBox" name="isenabled">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="11" column="0">
-                 <widget class="QLabel" name="lbl_56">
-                  <property name="text">
-                   <string>Editable:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="1">
-                 <widget class="QComboBox" name="widgettype"/>
-                </item>
                 <item row="0" column="0">
                  <widget class="QLabel" name="lbl_2">
                   <property name="text">
@@ -219,15 +195,29 @@
                 <item row="0" column="1">
                  <widget class="QLineEdit" name="column_id"/>
                 </item>
-                <item row="12" column="0">
+                <item row="9" column="1">
+                 <widget class="QCheckBox" name="isenabled">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1">
+                 <widget class="QComboBox" name="widgettype"/>
+                </item>
+                <item row="10" column="0">
+                 <widget class="QLabel" name="lbl_56">
+                  <property name="text">
+                   <string>Editable:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="11" column="0">
                  <widget class="QLabel" name="lbl_59">
                   <property name="text">
                    <string>Mandatory:</string>
                   </property>
                  </widget>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QLineEdit" name="default_value"/>
                 </item>
                </layout>
               </item>
