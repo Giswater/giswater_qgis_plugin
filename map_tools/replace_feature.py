@@ -290,6 +290,12 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
+        # Check null values
+        if self.workcat_id_end_aux in (None, 'null'):
+            message = "Workcat_id field is mandatory."
+            self.controller.show_warning(message)
+            return
+
         feature_type_new = utils_giswater.getWidgetText(dialog, dialog.feature_type_new)
         featurecat_id = utils_giswater.getWidgetText(dialog, dialog.featurecat_id)
 
