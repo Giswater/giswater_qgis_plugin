@@ -43,6 +43,12 @@ VALUES (2738, 'gw_fct_utils_csv2pg_import_timeseries', 'utils', 'function', 'Imp
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2740, 'gw_api_get_visit', 'api', 'function', 'FUnction to build the form of visits', 'role_om',false,false,false);
 
+UPDATE audit_cat_function SET return_type='[{"widgetname":"exploitation", "label":"Exploitation ( id ):", "widgettype":"text", "datatype":"integer","layoutname":"grl_option_parameters","layout_order":1,"value":null},
+											{"widgetname":"insertIntoNode", "label":"Direct insert into node table:", "widgettype":"check", "datatype":"boolean","layoutname":"grl_option_parameters","layout_order":2,"value":"true"},
+											{"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layout_order":3,"value":0.01},
+											{"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]'
+where id=2118;
+
 
 UPDATE audit_cat_function SET isdeprecated=TRUE where id=2688;
 UPDATE audit_cat_function SET isdeprecated=TRUE where id=1108;

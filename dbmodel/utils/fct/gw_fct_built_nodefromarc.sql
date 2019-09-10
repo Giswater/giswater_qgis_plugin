@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_built_nodefromarc($${"client":{"device":9, "infoType":100, "lang":"ES"},
-"form":{}, "feature":{"tableName":"v_edit_arc", "id":[]},
+"form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"exploitation":"1", "inserIntoNode":"true", "nodeTolerance":"0.01", "saveOnDatabase":"true"}}}$$)::text
 */
@@ -59,9 +59,9 @@ BEGIN
 
 	-- inserting all extrem nodes on temp_node
 	INSERT INTO temp_table (fprocesscat_id, geom_point)
-	SELECT 	16, ST_StartPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl
+	SELECT 	16, ST_StartPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl and (state=1 or state=2)
 	UNION 
-	SELECT 	16, ST_EndPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl;
+	SELECT 	16, ST_EndPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl and (state=1 or state=2);
 	
 	
 	-- inserting into node table
