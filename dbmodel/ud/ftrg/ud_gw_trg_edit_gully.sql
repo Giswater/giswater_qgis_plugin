@@ -285,12 +285,11 @@ BEGIN
 			EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
 				p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 				INTO v_the_geom_pol;
-			--EXECUTE 'SELECT (ST_makePolygon(St_setsrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' || p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||'))'
-			--	INTO v_the_geom_pol;
+			
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
-			INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('GULLY', v_the_geom_pol,v_new_pol_id);-- RETURNING pol_id INTO v_new_pol_id;
+			INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('GULLY', v_the_geom_pol,v_new_pol_id);
 		END IF;
 
 		INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, pol_id, sector_id,
@@ -393,12 +392,48 @@ BEGIN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
-		-- UPDATE values
+		-- double geometry catalog update
+		IF v_doublegeometry AND NEW.gratecat_id != OLD.gratecat_id THEN
 
+			-- get grate dimensions
+			v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
+			v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
+			v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;	
+
+			-- calculate center coordinates
+			v_x = st_x(NEW.the_geom);
+			v_y = st_y(NEW.the_geom);
+    
+			-- calculate dx & dy to fix extend from center
+			dx = v_length/2;
+			dy = v_width/2;
+
+			-- calculate the extend polygon
+			p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
+			p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
+	
+			p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
+			p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
+
+			p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
+			p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
+
+			p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
+			p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
+			
+			-- generating the geometry
+			EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
+				p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
+				INTO v_the_geom_pol;
+
+			UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = NEW.pol_id;
+		END IF;
+
+		-- UPDATE values
 		UPDATE gully 
 		SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
 		connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
-		annotation=NEW.annotation, "observ"=NEW."observ", 	"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
+		annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
 		fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
 		ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
 		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, arc_id=NEW.arc_id,
