@@ -22,3 +22,12 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_dqa('dqa');
 DROP TRIGGER IF EXISTS gw_trg_edit_presszone ON v_edit_presszone;
 CREATE TRIGGER gw_trg_edit_presszone INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_presszone 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_presszone('presszone');  
+
+DROP TRIGGER IF EXISTS gw_trg_vi_patterns ON SCHEMA_NAME.vi_patterns;
+CREATE TRIGGER gw_trg_vi_patterns INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_patterns FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_patterns');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_title ON SCHEMA_NAME.vi_title;
+CREATE TRIGGER gw_trg_vi_title INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_title FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_title');
+
+DROP TRIGGER IF EXISTS gw_trg_vi_curves ON SCHEMA_NAME.vi_curves;
+CREATE TRIGGER gw_trg_vi_curves INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_curves FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_curves');
