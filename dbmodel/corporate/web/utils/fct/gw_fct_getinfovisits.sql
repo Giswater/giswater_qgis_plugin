@@ -10,7 +10,9 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_getinfovisits('arc', '2078', 3,'2014-03-26T00:00:00.000Z','2019-03-27T00:00:00.000Z','INSPECTION','desperfectes_arc',NULL) AS result
-            SELECT SCHEMA_NAME.gw_fct_getinfovisits('arc', '139', 3,'2014-05-24T00:00:00.000Z','',NULL,'10',NULL) AS result
+SELECT SCHEMA_NAME.gw_fct_getinfovisits('arc', '139', 3,'2014-05-24T00:00:00.000Z','',NULL,'10',NULL) AS result
+SELECT SCHEMA_NAME.gw_fct_getinfovisits('node', '1111', 3,'2014-10-00:00.000Z','',NULL,NULL,NULL) AS result
+SELECT SCHEMA_NAME.gw_fct_getinfovisits('node', '1111', 3,'','',NULL,NULL,NULL) AS result
 */
 
 DECLARE
@@ -46,15 +48,6 @@ BEGIN
         p_element_type := reverse(substring(reverse(p_element_type) from 2 for 99));
     END IF;
 
---  get parameter vdefault
-       -- IF p_parameter_type ISNULL THEN
-        --    SELECT value INTO p_parameter_type FROM config_param_user WHERE parameter='om_param_type_vdefault' and cur_user=current_user AND parameter IN 
-        --(SELECT parameter_type FROM om_visit_parameter WHERE p_element_type=lower(feature_type)) LIMIT 1;
-        --    IF p_parameter_type IS NULL THEN
-         --    SELECT parameter_type INTO p_parameter_type FROM om_visit_parameter WHERE p_element_type=lower(feature_type) LIMIT 1;
-         -- END IF;
-        --END IF;
-
 --    Get query for visits
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_visit'') AND device = $2'
         INTO query_result
@@ -69,9 +62,9 @@ BEGIN
     END IF;
 
 --    Add visit_end filter
-   /*IF visit_end IS NOT NULL THEN
+   IF visit_end IS NOT NULL THEN
         query_result := query_result || ' AND visit_end < ' || quote_literal(visit_end);
-    END IF;*/
+    END IF;
 
 --    Query with dates filter
     query_result_dates := query_result;
@@ -115,25 +108,20 @@ raise notice 'applied filters p_parameter_type % p_parameter_id %', p_parameter_
         USING id;
     END IF;
 
+
 --    Get parameter_type_options
     IF query_result_visits_dates ISNULL THEN
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT DISTINCT id, name FROM 
-        (SELECT parameter_type AS "id", parameter_type AS "name" FROM om_visit_parameter      
-        LEFT JOIN (VALUES ($2, 1)) AS x(value, order_number) ON om_visit_parameter.parameter_type = x.value 
-        WHERE feature_type = UPPER($1)
-        ORDER BY x.order_number) b) a'      
-            INTO parameter_type_options
-            USING p_element_type, p_parameter_type;
+        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT '''' as id,'''' as name) a'      
+            INTO parameter_type_options;
    ELSE
-        EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT sys_parameter_type AS "id", sys_parameter_type AS "name" FROM (
-        SELECT DISTINCT sys_parameter_type FROM ( ' || (query_result_dates) || ' ) c) b
-        LEFT JOIN (VALUES ($1, 1)) AS x(value, order_number) ON sys_parameter_type = x.value 
-        ORDER BY x.order_number) a')
+        EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM 
+		( SELECT '''' as id ,'''' as name UNION SELECT sys_parameter_type AS "id", sys_parameter_type AS "name" FROM 
+			(SELECT DISTINCT sys_parameter_type FROM ( ' || (query_result_dates) || ' ) c ) b ORDER BY name) a')
             INTO parameter_type_options
                     USING p_parameter_type;
                     
     END IF;
-        
+    
 --    Get query_result_parameter_id_options
     IF query_result_visits_dates ISNULL THEN
    
