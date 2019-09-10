@@ -806,7 +806,7 @@ class Giswater(QObject):
         self.manage_expl_id()
 
         # Manage layer fields
-        self.set_layer_config()
+        self.get_layers_to_config()
 
         # Log it
         message = "Project read successfully"
@@ -825,7 +825,7 @@ class Giswater(QObject):
 
     def get_new_layers_name(self, layers_list):
         layers_name = [layer.name() for layer in layers_list]
-        self.set_layer_config(layers_name)
+        self.get_layer_added(layers_name)
 
 
     def manage_layers(self):
@@ -1197,38 +1197,46 @@ class Giswater(QObject):
         finally:
             return value
 
+    def get_layer_added(self, table_name):
+        layer_list = []
+        if table_name:
+            for t_name in table_name:
+                layer_list.append(t_name)
+        if not layer_list:
+            return
+        self.set_layer_config(layer_list)
 
-    def set_layer_config(self, table_name=None):
+
+    def get_layers_to_config(self):
+        """ Get available layers to be configured """
+        schema_name = self.schema_name.replace('"','')
+        sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature " 
+              f"UNION " 
+              f"SELECT DISTINCT(child_layer) FROM cat_feature "
+              f"WHERE child_layer IN ("
+              f"     SELECT table_name FROM information_schema.tables"
+              f"     WHERE table_schema = '{schema_name}')")
+        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        available_layers = [layer[0] for layer in rows]
+
+        layers_list = self.settings.value('system_variables/set_layer_config')
+        for layer in layers_list:
+            available_layers.append(layer)
+        if not available_layers:
+            return
+        self.set_layer_config(available_layers)
+
+
+    def set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 Column names as alias, combos and typeahead as ValueMap"""
 
-        sql =("SELECT DISTINCT(parent_layer) FROM cat_feature " 
-              "UNION " 
-              "SELECT DISTINCT(child_layer) FROM cat_feature ")
-        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
-        available_layers = [layer[0] for layer in rows]
-        layers_list = []
-
-        # Create list of layer names
-        if table_name:
-            for t_name in table_name:
-                if t_name in available_layers:
-                    layers_list.append(t_name)
-        else:
-            layers_list = self.settings.value('system_variables/set_layer_config')
-        if not layers_list:
-            return
-
-        for layer_name in layers_list:
-            if layer_name not in available_layers:
-                msg = f"Layer {layer_name} not allowed to be configured"
-                self.controller.show_warning(msg)
-                continue
+        for layer_name in layers:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
-                msg = f"Layer {layer_name} does not found, therefore, not configured"
-                self.controller.show_warning(msg)
+                # msg = f"Layer {layer_name} does not found, therefore, not configured."
+                # self.controller.show_warning(msg)
                 continue
                 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
