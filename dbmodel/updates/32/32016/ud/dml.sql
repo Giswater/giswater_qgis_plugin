@@ -144,3 +144,5 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_catarc', 'cat_arc_shape', 'epa', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_inflows', 'inp_inflows_pol_x_node', 'form_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_in', 'cat_hydrology', 'infiltration', NULL);
+
+DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_gully';

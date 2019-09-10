@@ -219,5 +219,29 @@ UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_connec';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_node';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_other';
 
-
 INSERT INTO edit_typevalue VALUES ('nullvalue', '0', NULL, NULL);
+
+DELETE FROM config_param_system WHERE parameter='api_search_visit_modificat';
+DELETE FROM config_param_system WHERE parameter='api_search_exploitation';
+
+DELETE FROM audit_cat_param_user WHERE id='psector_type_vdefault';
+DELETE FROM audit_cat_param_user WHERE id='edit_arc_division_dsbl';
+DELETE FROM audit_cat_param_user WHERE id='plan_arc_vdivision_dsbl';
+DELETE FROM audit_cat_param_user WHERE id='from_date_vdefault';
+DELETE FROM audit_cat_param_user WHERE id='to_date_vdefault';
+DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_connec';
+DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_node';
+DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_arc';
+DELETE FROM audit_cat_param_user WHERE id='visit_duration_vdef';
+
+INSERT INTO audit_cat_param_user VALUES ('visitparametervalue_vdefault', 'config', 'Default value of parameter', 'role_om', NULL, NULL, 'Visit parameter value:', NULL, NULL, TRUE, 2, 12, 'utils', false, NULL, NULL, NULL, false, 'string', 'linetext', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+
+UPDATE audit_cat_param_user SET formname='config', dv_querytext='SELECT id AS id, descript as idval  FROM om_visit_parameter WHERE id IS NOT NULL', isenabled=TRUE, layout_id=2, layout_order=11, 
+isparent=FALSE, datatype='string', widgettype='combo' WHERE id='visitparameter_vdefault';
+
+UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='om_mincut_analysis_dinletsector';
+UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='om_mincut_analysis_dminsector';
+UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='om_mincut_analysis_pipehazard';
+
+UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitextcode_vdefault';
+UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitclass_vdefault';
