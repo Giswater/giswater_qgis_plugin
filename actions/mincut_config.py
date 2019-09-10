@@ -19,19 +19,14 @@ from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QComp
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import datetime
+import os
+import subprocess
 from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import Multirow_selector
 from ..ui_manager import Mincut_edit
 from .parent import ParentAction
-
-
-show_button = True
-try:
-    from giswater.actions.sms_sender.notification import CutNotification
-except:
-    show_button = False
 
 
 class MincutConfig(ParentAction):
@@ -98,7 +93,7 @@ class MincutConfig(ParentAction):
         self.set_icon(self.btn_notify, "307")
 
         btn_visible = self.settings.value('customized_actions/show_mincut_sms', 'FALSE')
-        if btn_visible.upper() == 'TRUE' and show_button:
+        if btn_visible.upper() == 'TRUE':
             self.btn_notify.setVisible(True)
         else:
             self.btn_notify.setVisible(False)
@@ -152,6 +147,10 @@ class MincutConfig(ParentAction):
 
 
     def call_sms_script(self, qtable):
+        path = self.settings.value('customized_actions/path_sms_script')
+        if path is None or not os.path.exists(path):
+            self.controller.show_warning("File not found", parameter=path)
+            return
         selected_list = qtable.selectionModel().selectedRows()
         field_code = self.settings.value('customized_actions/field_code', 'code')
         list_mincut_id = []
@@ -187,14 +186,13 @@ class MincutConfig(ParentAction):
                 client = str(row[0])
                 list_clients.append(client)
 
-            notification = CutNotification(_cause, from_date, to_date, list_clients)
-            status_code = notification.send_notification()
+            # Call script
+            status_code = subprocess.call([path, _cause, from_date, to_date, list_clients])
 
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
-            print(row[4])
             if row[4] is None:
-                sql += f"SET notified = ('[{{\"code\":\"{status_code}\",\"date\":\"{date_sended}\"}}]') "
+                sql += f"SET notified = ('[{{\"code\":\"{status_code}\",\"date\":\"{_date_sended}\"}}]') "
             else:
                 sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{status_code}\",\"date\":\"{_date_sended}\"}}]')::json "
             sql += f"WHERE id = '{id_}'"
