@@ -109,21 +109,6 @@ tabactions='[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"a
 WHERE id=564;
 
 
-
------------------------
--- value type values
------------------------
-
-INSERT INTO config_api_typevalue VALUES ('listlimit', '1', '10', NULL);
-INSERT INTO config_api_typevalue VALUES ('listlimit', '2', '50', NULL);
-INSERT INTO config_api_typevalue VALUES ('listlimit', '3', '100', NULL);
-INSERT INTO config_api_typevalue VALUES ('listlimit', '4', '500', NULL);
-INSERT INTO config_api_typevalue VALUES ('listlimit', '5', '1000', NULL);
-
-
-
-
-
 -- 14/05/2019
 
 UPDATE cat_feature SET type = 'arc', parent_layer = 'v_edit_arc', child_layer = concat('ve_',lower(cat_feature.feature_type),'_', REPLACE(REPLACE(lower(id), '.', ''), '-','')) WHERE feature_type = 'ARC';

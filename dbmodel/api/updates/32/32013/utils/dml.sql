@@ -184,7 +184,15 @@ DELETE FROM config_api_form_tabs WHERE tabname='tab_connections' AND formname='v
 
 
 --2019/08/01
+-----------------------
+-- value type values
+-----------------------
 
+INSERT INTO config_api_typevalue VALUES ('listlimit', '1', '10', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '2', '50', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '3', '100', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '4', '500', NULL);
+INSERT INTO config_api_typevalue VALUES ('listlimit', '5', '1000', NULL);
 INSERT INTO config_api_typevalue VALUES ('datatype', 'text', 'text', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('datatype', 'string', 'string', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('datatype', 'date', 'date', NULL, NULL);
