@@ -245,3 +245,5 @@ UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='om_mincut_analysis_pip
 
 UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitextcode_vdefault';
 UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitclass_vdefault';
+
+UPDATE audit_cat_function SET istoolbox = FALSE WHERE function_name = 'gw_fct_edit_check_data' OR function_name = 'gw_fct_om_check_data';
