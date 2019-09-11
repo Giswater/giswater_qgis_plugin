@@ -18,14 +18,18 @@ DECLARE
 	v_plan_table text;
 	v_plan_table_id text;
 	rec record;
-	
-
+	v_state_done_planified integer;
+	v_state_done_ficticious integer;
+	v_state_canceled_planified integer;
+	v_state_canceled_ficticious integer;
+	v_plan_statetype_ficticious integer;
+	v_current_state_type integer;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     om_aux:= TG_ARGV[0];
-    
+
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
 		
@@ -64,10 +68,7 @@ BEGIN
 				NEW.psector_id:= (SELECT nextval('om_psector_id_seq'));
 			ELSIF (NEW.psector_id IS NULL and om_aux='plan') THEN
 				NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
-			END IF;
-			
-			
-          
+			END IF;   
 	
 	IF om_aux='om' THEN
 	               
@@ -105,6 +106,59 @@ BEGIN
 		text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
 		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, ext_code=NEW.ext_code, status=NEW.status
 		WHERE psector_id=OLD.psector_id;
+
+		--if the status of a psector had changed to 3 or 0 proceed with changes of feature states
+		IF (OLD.status != NEW.status) AND (NEW.status = 0 OR NEW.status = 3)  THEN
+
+			--get the values of future state_types 
+			SELECT ((value::json)->>'done_planified') INTO v_state_done_planified FROM config_param_system WHERE parameter='plan_psector_statetype';
+			SELECT ((value::json)->>'done_ficticius') INTO v_state_done_ficticious FROM config_param_system WHERE parameter='plan_psector_statetype';
+			SELECT ((value::json)->>'canceled_planified') INTO v_state_canceled_planified FROM config_param_system WHERE parameter='plan_psector_statetype';
+			SELECT ((value::json)->>'canceled_ficticius') INTO v_state_canceled_ficticious FROM config_param_system WHERE parameter='plan_psector_statetype';
+			SELECT value::integer INTO v_plan_statetype_ficticious FROM config_param_system WHERE parameter = 'plan_statetype_ficticius';
+
+			--temporary remove topology control
+			UPDATE config_param_system set value = 'false' WHERE parameter='state_topocontrol';
+
+			--loop over network feature types in order to get the data from each plan_psector_x_* table 
+			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category = 1) LOOP
+
+				v_sql = 'SELECT '||rec_type.id||'_id as id FROM plan_psector_x_'||lower(rec_type.id)||' WHERE state = 1 AND psector_id = '||OLD.psector_id||';';
+
+				--loop over each feature in plan_psector_x_* table in order to update state values
+				FOR rec IN EXECUTE v_sql LOOP
+					--get the current state_type of a feature
+					EXECUTE 'SELECT state_type FROM v_edit_'||lower(rec_type.id)||' WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';'
+					INTO v_current_state_type;
+
+					--set planned features to obsolete and update state_type depending on the new status and current state_type
+					IF NEW.status = 0 THEN	
+						IF v_current_state_type = v_plan_statetype_ficticious THEN
+							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_done_ficticious||'
+							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+							
+						ELSE
+							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_done_planified||'
+							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+						END IF;
+					ELSIF NEW.status = 3 THEN
+						IF v_current_state_type = v_plan_statetype_ficticious THEN
+							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_canceled_ficticious||'
+							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+							
+						ELSE
+							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_canceled_planified||'
+							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+							
+						END IF;
+					END IF;
+				END LOOP;
+				--reestablish topology control
+				UPDATE config_param_system set value = 'true' WHERE parameter='state_topocontrol';	
+			END LOOP;
+			
+		END IF;
+
 	END IF;
 
                
@@ -138,6 +192,8 @@ BEGIN
 			
 
 		END LOOP;
+
+		DELETE FROM config_param_user WHERE parameter = 'psector_vdefault' and value = OLD.psector_id::text;
 
 		DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
 
