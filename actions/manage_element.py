@@ -29,7 +29,7 @@ class ManageElement(ParentManage):
         # Create the dialog and signals
         self.dlg_add_element = AddElement()
         self.load_settings(self.dlg_add_element)
-        self.element_id = None        
+        self.element_id = None
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -67,6 +67,41 @@ class ManageElement(ParentManage):
         # self.controller.translate_form(self.dlg, 'element')
 
         utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept)
+
+        # Get layer element and save if is visible or not for restore when finish process
+        layer_element = self.controller.get_layer_by_tablename("v_edit_element")
+        layer_is_visible = False
+        if layer_element:
+            layer_is_visible = self.controller.is_layer_visible(layer_element)
+
+        # Adding auto-completion to a QLineEdit
+        table_object = "element"
+        self.set_completer_object(self.dlg_add_element, table_object)
+
+        # Set signals
+        self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
+        self.dlg_add_element.btn_accept.clicked.connect(
+            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+        self.dlg_add_element.btn_cancel.clicked.connect(
+            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
+        self.dlg_add_element.btn_cancel.clicked.connect(
+            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+        self.dlg_add_element.rejected.connect(
+            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
+        self.dlg_add_element.rejected.connect(
+            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+        self.dlg_add_element.tab_feature.currentChanged.connect(
+            partial(self.tab_feature_changed, self.dlg_add_element, table_object))
+        self.dlg_add_element.element_id.textChanged.connect(
+            partial(self.exist_object, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_insert.clicked.connect(
+            partial(self.insert_feature, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_delete.clicked.connect(
+            partial(self.delete_records, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_snapping.clicked.connect(
+            partial(self.selection_init, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
+        self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
@@ -107,33 +142,9 @@ class ManageElement(ParentManage):
         self.set_combo(self.dlg_add_element, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
         self.set_combo(self.dlg_add_element, 'verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
 
-        # Adding auto-completion to a QLineEdit
-        table_object = "element"        
-        self.set_completer_object(self.dlg_add_element, table_object)
-
         # Adding auto-completion to a QLineEdit for default feature
         self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
 
-        # Get layer element and save if is visible or not for restore when finish process
-        layer_element = self.controller.get_layer_by_tablename("v_edit_element")
-        layer_is_visible = False
-        if layer_element:
-            layer_is_visible = self.controller.is_layer_visible(layer_element)
-
-        # Set signals
-        self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
-        self.dlg_add_element.btn_accept.clicked.connect(partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
-        self.dlg_add_element.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
-        self.dlg_add_element.btn_cancel.clicked.connect(partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
-        self.dlg_add_element.rejected.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
-        self.dlg_add_element.rejected.connect(partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
-        self.dlg_add_element.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_element, table_object))
-        self.dlg_add_element.element_id.textChanged.connect(partial(self.exist_object, self.dlg_add_element, table_object))
-        self.dlg_add_element.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_element, table_object))
-        self.dlg_add_element.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_element, table_object))
-        self.dlg_add_element.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_element, table_object))
-        self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
-        self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
 
