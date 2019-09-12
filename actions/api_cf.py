@@ -562,23 +562,21 @@ class ApiCF(ApiParent):
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
-        self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition, self.layer))
+        self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
         self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
 
-    def set_vdefault_edition(self, layer):
-        print(str("TEST1"))
+    def set_vdefault_edition(self, force=False):
         sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'cf_keep_opened_edition'")
         row = self.controller.get_row(sql)
-        print(str(row))
-        if not row or row[0].lower() != 'true':
-            return
-        print(str("TEST2"))
-        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+
+        if (not row or row[0].lower() != 'true') and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+
 
     def get_last_value(self):
         widgets = self.dlg_cf.tab_data.findChildren(QWidget)
