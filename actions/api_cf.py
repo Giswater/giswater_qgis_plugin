@@ -302,7 +302,10 @@ class ApiCF(ApiParent):
             return result, dialog
 
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type)
+            sub_tag = None
+            if feature_cat:
+                sub_tag = feature_cat.feature_type.lower()
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
 
@@ -352,10 +355,10 @@ class ApiCF(ApiParent):
         return result, self.hydro_info_dlg
 
 
-    def open_custom_form(self, feature_id, complet_result, tab_type=None):
+    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None):
 
         # Dialog
-        self.dlg_cf = ApiCfUi()
+        self.dlg_cf = ApiCfUi(sub_tag)
         self.load_settings(self.dlg_cf)
         self.draw(complet_result, zoom=False)
 
