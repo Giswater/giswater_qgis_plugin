@@ -569,7 +569,7 @@ class ApiCF(ApiParent):
         self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
 
-    def set_vdefault_edition(self, force=False):
+    def set_vdefault_edition(self):
         sql = ("SELECT value FROM config_param_user "
                "WHERE cur_user = current_user AND parameter = 'cf_keep_opened_edition'")
         row = self.controller.get_row(sql)
