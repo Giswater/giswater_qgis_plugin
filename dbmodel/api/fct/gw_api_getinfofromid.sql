@@ -147,6 +147,9 @@ BEGIN
 		v_toolbar := 'basic';
 	END IF;
 
+	IF v_id = '' THEN
+		v_id = NULL;
+	END IF;
 	
 --      Get values from config
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -260,7 +263,7 @@ BEGIN
            
 --     Get geometry (to feature response)
 ------------------------------------------
-	IF v_the_geom IS NOT NULL THEN
+	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 		INTO v_geometry;
 	END IF;

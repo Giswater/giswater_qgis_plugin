@@ -47,7 +47,7 @@ SELECT SCHEMA_NAME.gw_api_get_featureinfo('ve_arc_pipe', '2001', 3, 100, 'true')
     aux_json_child json;  
     v_tabname text = 'data';
     v_idname text;
-
+    v_formtype text;
 
 
 BEGIN
@@ -79,8 +79,10 @@ BEGIN
 
        raise notice 'Configuration fields are defined on config_api_layer_field, calling gw_api_get_formfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
 
+    SELECT formtype INTO v_formtype FROM config_api_form_fields WHERE formname = p_table_id;
+
        	-- Call the function of feature fields generation      	
-	SELECT gw_api_get_formfields( p_table_id, 'feature', 'data', p_table_id, null, p_id, null, 'SELECT',null, p_device) INTO fields_array;
+	SELECT gw_api_get_formfields( p_table_id, v_formtype, 'data', p_table_id, null, p_id, null, 'SELECT',null, p_device) INTO fields_array;
 	
     ELSE
 
