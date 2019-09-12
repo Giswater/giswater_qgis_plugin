@@ -206,10 +206,11 @@ class ManageNewPsector(ParentManage):
                                 set_edit_triggers=QTableView.DoubleClicked)
                 self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
-                   f"observ, atlas_id, scale, rotation, active, ext_code "
+                   f"observ, atlas_id, scale, rotation, active, ext_code, status "
                    f"FROM {self.plan_om}_psector "
                    f"WHERE psector_id = {psector_id}")
             row = self.controller.get_row(sql, log_sql=True)
+
             if not row:
                 return
 
@@ -225,10 +226,24 @@ class ManageNewPsector(ParentManage):
                    f"WHERE expl_id = {row['expl_id']}")
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_expl_id, str(result['name']), 1)
+
+            # Check if expl_id already exists in expl_selector
+            sql = ("SELECT DISTINCT(id, cur_user)"
+                   " FROM selector_expl"
+                   f" WHERE expl_id = '{row['expl_id']}' AND cur_user = current_user")
+            exist = self.controller.get_row(sql)
+            if exist is None:
+                sql = ("INSERT INTO selector_expl (expl_id, cur_user) "
+                       f" VALUES ({str(row['expl_id'])}, current_user)")
+                self.controller.execute_sql(sql)
+                msg = "Your exploitation selector has been updated"
+                self.controller.show_warning(msg, 1)
+
             sql = (f"SELECT name FROM sector "
                    f"WHERE sector_id = {row['sector_id']}")
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_sector_id, str(result['name']), 1)
+            utils_giswater.set_combo_itemData(self.cmb_status, str(row['status']), 0)
 
             utils_giswater.setChecked(self.dlg_plan_psector, "active", row['active'])
             utils_giswater.fillWidget(self.dlg_plan_psector, "name", row)
