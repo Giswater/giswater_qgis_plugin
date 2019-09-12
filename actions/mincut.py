@@ -1500,6 +1500,11 @@ class MincutParent(ParentAction):
             polygon = complet_result['geometry']
             polygon = polygon[9:len(polygon)-2]
             polygon = polygon.split(',')
+            if polygon[0] == '':
+                message = "Error on create auto mincut, you need to review data"
+                self.controller.show_warning(message)
+                self.set_cursor_restore()
+                return
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
             self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
@@ -1563,7 +1568,7 @@ class MincutParent(ParentAction):
 
         # Set active layer
         viewname = 'v_anl_mincut_result_valve'
-        layer = self.controller.get_layer_by_tablename(viewname, log_info=True)       
+        layer = self.controller.get_layer_by_tablename(viewname, log_info=True)
         if layer:
             self.iface.setActiveLayer(layer)
             self.controller.set_layer_visible(layer)
