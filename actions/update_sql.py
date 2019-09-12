@@ -117,9 +117,6 @@ class UpdateSQL(ApiParent):
 
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
-        # TODO:: remove this harcorded
-        utils_giswater.setWidgetText(self.dlg_readsql, 'tpath', 'C:/Users/Usuari/Desktop/test.ui')
-
         self.message_update = ''
 
         # Error counter variable
@@ -2241,13 +2238,12 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         tpath = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
-        # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
-        # ui_path = tpath.document().toPlainText()
         form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
-
+        print(str("TEST1"))
+        print(str(tpath))
         # Control if ui path is invalid or null
-        if tpath is None:
+        if tpath is None or tpath == '' or tpath == 'null':
             msg = "Please, select a valid UI Path."
             self.controller.show_info_box(msg, "Info")
             return
