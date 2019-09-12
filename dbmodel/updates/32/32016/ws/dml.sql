@@ -215,3 +215,10 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dqa_id","featureType":["arc", "node", "connec"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dqa_id","featureType":["arc", "node", "connec"]}]' WHERE id ='dqa';
+
+
+UPDATE sys_csv2pg_config SET target='Node Results, MINIMUM Node' WHERE tablename='rpt_node';
+UPDATE sys_csv2pg_config SET target='MINIMUM Link, Link Results' WHERE tablename='rpt_arc';
+UPDATE sys_csv2pg_config SET target='Pump Factor' WHERE tablename='rpt_energy_usage';
+UPDATE sys_csv2pg_config SET target='Hydraulic Status:' WHERE tablename='rpt_hydraulic_status';
+UPDATE sys_csv2pg_config SET target='Input Data' WHERE tablename='rpt_cat_result';
