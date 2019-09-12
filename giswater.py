@@ -834,18 +834,14 @@ class Giswater(QObject):
         dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
         toolbar = dockwidget.findChildren(QToolBar)[0]
         btn_exist = toolbar.findChild(QToolButton, 'gw_add_layers')
-        print(f'BTNEXIST: {btn_exist}')
         if btn_exist is None:
             btn = QToolButton()
             btn.setIcon(QIcon(icon_path))
             btn.setObjectName('gw_add_layers')
             toolbar.addWidget(btn)
-            btn.clicked.connect(partial(self.test, btn))
             btn.clicked.connect(partial(self.create_add_layer_menu))
 
 
-    def test(self, btn):
-        print(f'NAME: {btn.objectName()}')
     def create_add_layer_menu(self):
 
         # Create main menu and get cursor click position
