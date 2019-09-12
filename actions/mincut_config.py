@@ -173,7 +173,7 @@ class MincutConfig(ParentAction):
                 list_clients.append(client)
 
             # Call script
-            status_code = subprocess.call([path, _cause, from_date, to_date, list_clients])
+            status_code = subprocess.call([path, _cause, from_date, to_date, str(list_clients)])
 
             # Update table with results
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
