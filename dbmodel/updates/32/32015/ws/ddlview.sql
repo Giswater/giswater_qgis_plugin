@@ -565,7 +565,8 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
     vnode.state,
     vnode.annotation,
     case when plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom ELSE plan_psector_x_connec.vnode_geom END AS the_geom, 
-    vnode.expl_id
+    vnode.expl_id,
+    vnode.rotation
    FROM vnode 
    JOIN v_edit_link ON exit_id::integer=vnode_id AND exit_type='VNODE'
    join v_edit_connec ON v_edit_link.feature_id=connec_id

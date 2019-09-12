@@ -219,3 +219,7 @@ INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_f
 SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='shtvalve_param_1';
 INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='pressmeter_param_1';
+
+-- rotate vnodes and connec labels
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
+UPDATE link SET the_geom=the_geom;

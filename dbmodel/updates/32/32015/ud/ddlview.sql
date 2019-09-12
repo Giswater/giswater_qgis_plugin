@@ -306,7 +306,8 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
             WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
             ELSE plan_psector_x_connec.vnode_geom
         END AS the_geom,
-    vnode.expl_id
+    vnode.expl_id,
+    vnode.rotation
    FROM vnode
      JOIN v_edit_link ON v_edit_link.exit_id::integer = vnode.vnode_id AND v_edit_link.exit_type::text = 'VNODE'::text
      JOIN v_edit_connec ON v_edit_link.feature_id::text = v_edit_connec.connec_id::text
@@ -324,7 +325,8 @@ UNION
             WHEN plan_psector_x_gully.vnode_geom IS NULL THEN vnode.the_geom
             ELSE plan_psector_x_gully.vnode_geom
         END AS the_geom,
-    vnode.expl_id
+    vnode.expl_id,
+    vnode.rotation
    FROM vnode
      JOIN v_edit_link ON v_edit_link.exit_id::integer = vnode.vnode_id AND v_edit_link.exit_type::text = 'VNODE'::text
      JOIN v_edit_gully ON v_edit_link.feature_id::text = v_edit_gully.gully_id::text

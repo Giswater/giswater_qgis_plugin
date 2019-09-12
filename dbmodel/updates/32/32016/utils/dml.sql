@@ -236,6 +236,8 @@ DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_connec';
 DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_node';
 DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_arc';
 DELETE FROM audit_cat_param_user WHERE id='visit_duration_vdef';
+DELETE FROM audit_cat_param_user WHERE id='psector_rotation_vdefault';
+DELETE FROM audit_cat_param_user WHERE id='psector_scale_vdefault';
 
 INSERT INTO audit_cat_param_user VALUES ('visitparametervalue_vdefault', 'config', 'Default value of parameter', 'role_om', NULL, NULL, 'Visit parameter value:', NULL, NULL, TRUE, 2, 12, 'utils', false, NULL, NULL, NULL, false, 'string', 'linetext', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
 
@@ -254,3 +256,6 @@ UPDATE audit_cat_function SET istoolbox = FALSE WHERE function_name = 'gw_fct_ed
 INSERT INTO config_param_system(parameter, value, data_type, context, descript, label,   project_type, isdeprecated)
 VALUES ('plan_psector_statetype', '{"done_planified":"98", "done_ficticious":"97", "canceled_planified":"96", "canceled_ficticious":"95"}', 'json', 'plan', 
 'Psector statetype assigned to features after executing or canceling planification', 'Psector state type:', 'utils', false);
+
+UPDATE audit_cat_param_user SET description='If true, connec''s label and vnode symbol will be rotated using the angle of link. You need to have label symbol configurated with "CASE WHEN label_x = 5 THEN ''    '' ||  "connec_id"  
+ELSE  "connec_id"  || ''    ''  END", label_x as quadrant and label_rotation as rotation', label='Automatic rotation for connec labels and vnodes:' WHERE id='edit_link_connecrotation_update';
