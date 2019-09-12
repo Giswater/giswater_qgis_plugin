@@ -112,9 +112,9 @@ BEGIN
 
 			--get the values of future state_types 
 			SELECT ((value::json)->>'done_planified') INTO v_state_done_planified FROM config_param_system WHERE parameter='plan_psector_statetype';
-			SELECT ((value::json)->>'done_ficticius') INTO v_state_done_ficticious FROM config_param_system WHERE parameter='plan_psector_statetype';
+			SELECT ((value::json)->>'done_ficticious') INTO v_state_done_ficticious FROM config_param_system WHERE parameter='plan_psector_statetype';
 			SELECT ((value::json)->>'canceled_planified') INTO v_state_canceled_planified FROM config_param_system WHERE parameter='plan_psector_statetype';
-			SELECT ((value::json)->>'canceled_ficticius') INTO v_state_canceled_ficticious FROM config_param_system WHERE parameter='plan_psector_statetype';
+			SELECT ((value::json)->>'canceled_ficticious') INTO v_state_canceled_ficticious FROM config_param_system WHERE parameter='plan_psector_statetype';
 			SELECT value::integer INTO v_plan_statetype_ficticious FROM config_param_system WHERE parameter = 'plan_statetype_ficticius';
 
 			--temporary remove topology control
@@ -155,6 +155,8 @@ BEGIN
 				END LOOP;
 				--reestablish topology control
 				UPDATE config_param_system set value = 'true' WHERE parameter='state_topocontrol';	
+				--show information about performed state update
+				PERFORM audit_function(3034,2446);
 			END LOOP;
 			
 		END IF;

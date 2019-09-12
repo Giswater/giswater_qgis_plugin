@@ -151,6 +151,9 @@ INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user
 VALUES (3032, 'Can''t apply the foreign key','there are values already inserted that are not present in the catalog', 
 2, true,'utils',false);
 
+INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3034, 'Inventory state and state type of planified features has been updated',null, 1, true,'utils',false);
+
 INSERT INTO audit_cat_table VALUES ('om_visit_type', 'O&M', 'Catalog of visit types', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_class', 'O&M', 'Catalog of visit classes', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_class_x_parameter', 'O&M', 'Table that relates visit parameters with visit classes', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
@@ -247,3 +250,7 @@ UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitextcode_
 UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitclass_vdefault';
 
 UPDATE audit_cat_function SET istoolbox = FALSE WHERE function_name = 'gw_fct_edit_check_data' OR function_name = 'gw_fct_om_check_data';
+
+INSERT INTO config_param_system(parameter, value, data_type, context, descript, label,   project_type, isdeprecated)
+VALUES ('plan_psector_statetype', '{"done_planified":"98", "done_ficticious":"97", "canceled_planified":"96", "canceled_ficticious":"95"}', 'json', 'plan', 
+'Psector statetype assigned to features after executing or canceling planification', 'Psector state type:', 'utils', false);
