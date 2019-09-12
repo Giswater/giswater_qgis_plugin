@@ -187,7 +187,7 @@ class MincutConfig(ParentAction):
                 list_clients.append(client)
 
             # Call script
-            status_code = subprocess.call([path, _cause, from_date, to_date, list_clients])
+            status_code = subprocess.call([path, _cause, from_date, to_date, str(list_clients)])
 
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
