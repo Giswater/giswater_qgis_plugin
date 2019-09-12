@@ -24,6 +24,7 @@ import json
 import os
 import re
 import subprocess
+import time
 from collections import OrderedDict
 from functools import partial
 
@@ -489,7 +490,6 @@ class Go2Epa(ApiParent):
 
         _file = open(folder_path, "r+")
         full_file = _file.readlines()
-        sql = ""
         progress = 0
         self.dlg_go2epa.progressBar.setFormat("The RPT file is begin imported...")
         self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
@@ -505,9 +505,9 @@ class Go2Epa(ApiParent):
             for i in item:
                 sources[i.strip()]=row[0].strip()
 
-
-        # While we don't find a match with the source, this must be null
+        # While we don't find a match with the source, source and csv40 must be null
         source = "null"
+        csv40 = "null"
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
@@ -546,17 +546,25 @@ class Go2Epa(ApiParent):
             for k, v  in sources.items():
                 try:
                     if k == f'{sp_n[0]} {sp_n[1]}':
-                        print(f'{sp_n[0]} {sp_n[1]}')
                         source = "'" + v + "'"
+                        try:
+                            x = time.strptime(sp_n[3], '%H:%M:%S')
+                            csv40 = "'" + sp_n[3] + "'"
+                        except ValueError:
+                            if sp_n[3][:2].isnumeric():
+                                csv40 = "'" + sp_n[3] + "'"
+                            else:
+                                csv40 = "null"
+                        except Exception as e:
+                            print(type(e).__name__)
                 except IndexError:
                     pass
                 except Exception as e:
                     print(type(e).__name__)
-                    pass
 
             if len(sp_n) > 0:
-                sql += f"INSERT INTO temp_csv2pg (csv2pgcat_id, source, "
-                values = f"VALUES(11, {source}, "
+                sql += f"INSERT INTO temp_csv2pg (csv2pgcat_id, source, csv40, "
+                values = f"VALUES(11, {source}, {csv40}, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += f"csv{x + 1}, "
