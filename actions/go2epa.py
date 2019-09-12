@@ -495,6 +495,20 @@ class Go2Epa(ApiParent):
         self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
         self.dlg_go2epa.progressBar.setValue(progress)
 
+        # Create dict with sources
+        sql = (f"SELECT tablename, target FROM sys_csv2pg_config "
+               f"WHERE pg2csvcat_id = '11';")
+        rows = self.controller.get_rows(sql, commit=True)
+        sources = {}
+        for row in rows:
+            item = row[1].split(',')
+            for i in item:
+                sources[i.strip()]=row[0].strip()
+
+
+        # While we don't find a match with the source, this must be null
+        source = "null"
+        sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
         for row in full_file:
@@ -507,9 +521,11 @@ class Go2Epa(ApiParent):
             else:
                 dirty_list = row.split(' ')
 
+            # Clean unused items
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
                     dirty_list.pop(x)
+
             sp_n = []
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
@@ -526,9 +542,21 @@ class Go2Epa(ApiParent):
                     else:
                         sp_n.append(dirty_list[x])
 
+            # Find strings into dict and set source column
+            for k, v  in sources.items():
+                try:
+                    if k == f'{sp_n[0]} {sp_n[1]}':
+                        print(f'{sp_n[0]} {sp_n[1]}')
+                        source = "'" + v + "'"
+                except IndexError:
+                    pass
+                except Exception as e:
+                    print(type(e).__name__)
+                    pass
+
             if len(sp_n) > 0:
-                sql += "INSERT INTO temp_csv2pg (csv2pgcat_id, "
-                values = "VALUES(11, "
+                sql += f"INSERT INTO temp_csv2pg (csv2pgcat_id, source, "
+                values = f"VALUES(11, {source}, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += f"csv{x + 1}, "
