@@ -22,8 +22,8 @@ DECLARE
     line1        geometry;
     line2        geometry;
     rec_aux        record;
-    rec_aux1	"SCHEMA_NAME".v_edit_arc;
-    rec_aux2    "SCHEMA_NAME".v_edit_arc;
+    rec_aux1	"SCHEMA_NAME".arc;
+    rec_aux2    "SCHEMA_NAME".arc;
     intersect_loc    double precision;
     numArcs    integer;
     rec_doc record;
@@ -113,8 +113,8 @@ BEGIN
 			END IF;
 		
 			-- Get arc data
-			SELECT * INTO rec_aux1 FROM v_edit_arc WHERE arc_id = arc_id_aux;
-			SELECT * INTO rec_aux2 FROM v_edit_arc WHERE arc_id = arc_id_aux;
+			SELECT * INTO rec_aux1 FROM arc WHERE arc_id = arc_id_aux;
+			SELECT * INTO rec_aux2 FROM arc WHERE arc_id = arc_id_aux;
 
 			-- Update values of new arc_id (1)
 			rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
@@ -132,8 +132,8 @@ BEGIN
 			IF (state_aux=1 AND state_node_arg=1) THEN 
 			
 				-- Insert new records into arc table
-				INSERT INTO v_edit_arc SELECT rec_aux1.*;
-				INSERT INTO v_edit_arc SELECT rec_aux2.*;
+				INSERT INTO arc SELECT rec_aux1.*;
+				INSERT INTO arc SELECT rec_aux2.*;
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
@@ -293,8 +293,8 @@ BEGIN
 				
 				-- Insert new records into arc table
 				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
-				INSERT INTO v_edit_arc SELECT rec_aux1.*;
-				INSERT INTO v_edit_arc SELECT rec_aux2.*;
+				INSERT INTO arc SELECT rec_aux1.*;
+				INSERT INTO arc SELECT rec_aux2.*;
 				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
@@ -323,8 +323,8 @@ BEGIN
 			
 				-- Insert new records into arc table
 				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
-				INSERT INTO v_edit_arc SELECT rec_aux1.*;
-				INSERT INTO v_edit_arc SELECT rec_aux2.*;
+				INSERT INTO arc SELECT rec_aux1.*;
+				INSERT INTO arc SELECT rec_aux2.*;
 				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
 
 
