@@ -285,24 +285,8 @@
       <zorder>lbl_project_name</zorder>
       <zorder>project_title</zorder>
       <zorder>lbl_filter</zorder>
-      <zorder></zorder>
-      <zorder>tbl_srid</zorder>
-      <zorder>project_name</zorder>
-      <zorder>lbl_author</zorder>
-      <zorder>cmb_locale</zorder>
-      <zorder>lbl_date</zorder>
-      <zorder>lbl_project_title</zorder>
-      <zorder>srid_id</zorder>
-      <zorder>author</zorder>
-      <zorder>label_2</zorder>
-      <zorder>date</zorder>
-      <zorder>lbl_project_name</zorder>
-      <zorder>project_title</zorder>
-      <zorder>lbl_filter</zorder>
       <zorder>label</zorder>
       <zorder>cmb_create_project_type</zorder>
-      <zorder>horizontalLayoutWidget</zorder>
-      <zorder>horizontalLayoutWidget_2</zorder>
      </widget>
     </item>
     <item row="3" column="2">
@@ -327,6 +311,21 @@
   </action>
  </widget>
  <tabstops>
+  <tabstop>cmb_create_project_type</tabstop>
+  <tabstop>cmb_locale</tabstop>
+  <tabstop>project_name</tabstop>
+  <tabstop>project_title</tabstop>
+  <tabstop>author</tabstop>
+  <tabstop>date</tabstop>
+  <tabstop>srid_id</tabstop>
+  <tabstop>tbl_srid</tabstop>
+  <tabstop>rdb_data</tabstop>
+  <tabstop>rdb_sample</tabstop>
+  <tabstop>rdb_import_data</tabstop>
+  <tabstop>rdb_sample_dev</tabstop>
+  <tabstop>data_file</tabstop>
+  <tabstop>btn_push_file</tabstop>
+  <tabstop>btn_accept</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>

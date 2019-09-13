@@ -72,7 +72,7 @@
        <string/>
       </property>
       <property name="pixmap">
-       <pixmap>../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
+       <pixmap>../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
       </property>
       <property name="scaledContents">
        <bool>false</bool>
@@ -1043,15 +1043,48 @@
  </widget>
  <tabstops>
   <tabstop>cmb_connection</tabstop>
+  <tabstop>cmb_project_type</tabstop>
+  <tabstop>project_schema_name</tabstop>
+  <tabstop>btn_info</tabstop>
+  <tabstop>software_version_info</tabstop>
+  <tabstop>btn_schema_rename</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_copy</tabstop>
+  <tabstop>btn_schema_create</tabstop>
+  <tabstop>btn_gis_create</tabstop>
+  <tabstop>btn_task_example</tabstop>
   <tabstop>btn_close</tabstop>
   <tabstop>btn_update_schema</tabstop>
-  <tabstop>tab_main</tabstop>
-  <tabstop>software_version_info</tabstop>
+  <tabstop>chk_schema_funcion</tabstop>
+  <tabstop>btn_constrains</tabstop>
   <tabstop>btn_schema_file_to_db</tabstop>
   <tabstop>btn_update_api</tabstop>
   <tabstop>chk_api_funcion</tabstop>
   <tabstop>btn_api_file_to_db</tabstop>
   <tabstop>btn_api_create</tabstop>
+  <tabstop>custom_path_folder</tabstop>
+  <tabstop>btn_custom_select_file</tabstop>
+  <tabstop>btn_custom_load_file</tabstop>
+  <tabstop>cmb_feature_name_view</tabstop>
+  <tabstop>btn_create_view</tabstop>
+  <tabstop>chk_multi_create</tabstop>
+  <tabstop>cmb_formname_fields</tabstop>
+  <tabstop>chk_multi_insert</tabstop>
+  <tabstop>btn_create_field</tabstop>
+  <tabstop>btn_update_field</tabstop>
+  <tabstop>btn_delete_field</tabstop>
+  <tabstop>cmb_formname_ui</tabstop>
+  <tabstop>chk_multi_update</tabstop>
+  <tabstop>tpath</tabstop>
+  <tabstop>btn_path</tabstop>
+  <tabstop>btn_import_ui</tabstop>
+  <tabstop>btn_export_ui</tabstop>
+  <tabstop>btn_create_qgis_template</tabstop>
+  <tabstop>btn_visit_create</tabstop>
+  <tabstop>cmb_visit_class</tabstop>
+  <tabstop>btn_visit_update</tabstop>
+  <tabstop>btn_visit_delete</tabstop>
+  <tabstop>tab_main</tabstop>
  </tabstops>
  <resources/>
  <connections/>

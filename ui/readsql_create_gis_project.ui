@@ -192,6 +192,15 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>cmb_roletype</tabstop>
+  <tabstop>txt_gis_file</tabstop>
+  <tabstop>txt_gis_folder</tabstop>
+  <tabstop>btn_gis_folder</tabstop>
+  <tabstop>chk_export_passwd</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
