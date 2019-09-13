@@ -46,8 +46,3 @@ DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_gully_control ON gully;
 
 CREATE TRIGGER gw_trg_edit_foreignkey AFTER UPDATE OF gully_id OR DELETE ON gully
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_foreignkey('gully_id');
-
-DROP TRIGGER IF EXISTS gw_trg_unique_field ON plan_psector_x_gully ;
-CREATE TRIGGER gw_trg_unique_field
-AFTER INSERT OR UPDATE OF gully_id, state
-ON plan_psector_x_gully FOR EACH ROW EXECUTE PROCEDURE gw_trg_unique_field('plan_x_gully');
