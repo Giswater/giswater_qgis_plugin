@@ -366,8 +366,10 @@ BEGIN
 			IF (aux_json->>'column_id') = quote_ident(v_idname) THEN
 				field_value = v_id;
 			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'_type')  THEN
-				EXECUTE 'SELECT ' || v_catfeature.type || '_type FROM ' || p_table_id ||' LIMIT 1' INTO field_value;	
+				
+				EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
 				v_type = field_value;
+				
 			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'cat_id') OR (aux_json->>'column_id') = concat(lower(v_catfeature.type),'at_id') THEN
 				IF v_project_type ='UD' THEN
 					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||'  LIMIT 1' INTO field_value;
