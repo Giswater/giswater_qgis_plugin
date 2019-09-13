@@ -51,12 +51,18 @@ DECLARE
     v_psector integer;
 	v_ficticius int2;
 	isarcdivide_arg boolean;
+	v_querytext text;
+	v_querytext1 text;
+	v_querytext2 text;
+	v_mantable text;
+	v_schemaname text;
 	
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-	
+    v_schemaname = 'SCHEMA_NAME';
+
 	-- Get project type
 	SELECT wsoftware, epsg INTO project_type_aux, v_srid FROM version LIMIT 1;
     
@@ -127,13 +133,27 @@ BEGIN
 			rec_aux2.code := rec_aux2.arc_id;
 			rec_aux2.node_1 := node_id_arg; -- rec_aux2.node_2 take values from original arc
 			rec_aux2.the_geom := line2;
-			
+
+			-- getting table child information (man_table)
+			v_mantable = (SELECT man_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=arc_id_aux);
+
+			-- building querytext for man_table
+			v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') FROM information_schema.columns WHERE table_name=v_mantable AND table_schema=v_schemaname AND column_name !='arc_id');
+			IF  v_querytext IS NULL THEN 
+				v_querytext='';
+			END IF;
+			v_querytext1 =  'INSERT INTO '||v_mantable||' SELECT rec_aux1.arc_id '||v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||arc_id_aux;
+			v_querytext2 =  'INSERT INTO '||v_mantable||' SELECT rec_aux2.arc_id '||v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||arc_id_aux;
+
 			-- In function of states and user's variables proceed.....
 			IF (state_aux=1 AND state_node_arg=1) THEN 
 			
 				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
+				EXECUTE v_querytext1;
+				
 				INSERT INTO arc SELECT rec_aux2.*;
+				EXECUTE v_querytext2;
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
@@ -294,7 +314,11 @@ BEGIN
 				-- Insert new records into arc table
 				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
 				INSERT INTO arc SELECT rec_aux1.*;
+				EXECUTE v_querytext1;
+				
 				INSERT INTO arc SELECT rec_aux2.*;
+				EXECUTE v_querytext2;
+				
 				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
@@ -324,7 +348,11 @@ BEGIN
 				-- Insert new records into arc table
 				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
 				INSERT INTO arc SELECT rec_aux1.*;
+				EXECUTE v_querytext1;
+
 				INSERT INTO arc SELECT rec_aux2.*;
+				EXECUTE v_querytext2;
+
 				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
 
 
