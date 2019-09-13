@@ -282,13 +282,13 @@ BEGIN
 
 		-- update arc table
 		v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
-				FROM anl_arc a join (SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text(nodeparent) as nodeparent from '
+				FROM anl_arc a join (SELECT '||quote_ident(v_fieldmp)||', unnest(nodeparent) as nodeparent from '
 				||quote_ident(v_table)||') b	ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 		EXECUTE v_querytext;
 
 		-- update node table with graf nodes
 		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
-				FROM anl_node a join (SELECT  '||quote_ident(v_fieldmp)||', json_array_elements_text(nodeparent) as nodeparent from '
+				FROM anl_node a join (SELECT  '||quote_ident(v_fieldmp)||', unnest(nodeparent) as nodeparent from '
 				||quote_ident(v_table)||') b ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.node_id=node.node_id AND cur_user=current_user';
 		EXECUTE v_querytext;
 		
@@ -324,7 +324,7 @@ BEGIN
 			-- update connec table
 			UPDATE v_edit_connec SET staticpressure = (b.elevation-v_edit_connec.elevation) FROM 
 				(SELECT connec_id, a.elevation FROM connec JOIN (SELECT a.sector_id, node_id, elevation FROM 
-					(SELECT json_array_elements_text(nodeparent) as node_id, sector_id FROM sector)a JOIN node USING (node_id))a
+					(SELECT unnest(nodeparent) as node_id, sector_id FROM sector)a JOIN node USING (node_id))a
 				USING (sector_id)) b
 				WHERE v_edit_connec.connec_id=b.connec_id;
 		END IF;

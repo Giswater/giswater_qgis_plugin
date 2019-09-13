@@ -10,15 +10,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER SEQUENCE anl_mincut_result_cat_seq MINVALUE -1;
 
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_mincut_inlet_x_exploitation", "column":"to_arc", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_mincut_inlet_x_exploitation", "column":"to_arc", "dataType":"text[]"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_presszone", "column":"nodeparent", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_presszone", "column":"nodeparent", "dataType":"text[]"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_type", "column":"graf_delimiter", "dataType":"varchar(20)"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"nodeparent", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"nodeparent", "dataType":"text[]"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"nodeparent", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"nodeparent", "dataType":"text[]"}}$$);
 
 
 CREATE TABLE IF NOT EXISTS macrodqa(
