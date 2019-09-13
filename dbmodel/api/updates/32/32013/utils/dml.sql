@@ -177,8 +177,6 @@ INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, l
 INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('dimensioning', 'catalog', 'feature_id', 1, 5, true, 'string', 'text', 'feature id:', NULL, NULL, NULL, NULL, NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
 INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('dimensioning', 'catalog', 'x_symbol', 1, 8, true, 'numeric', 'text', 'x symbol:', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
 INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('dimensioning', 'catalog', 'y_symbol', 1, 9, true, 'numeric', 'text', 'y symbol:', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
-INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('dimensioning', 'catalog', 'depth_btn', 1, 3, true, NULL, 'button', 'Circle symbology', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, 'gw_api_get_coordinates', NULL, true, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
-INSERT INTO config_api_form_fields ( formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('dimensioning', 'catalog', 'symbol_btn', 1, 7, true, NULL, 'button', 'Capture depth', NULL, NULL, NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, 'gw_api_get_depth', NULL, true, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL);
 
 DELETE FROM config_api_form_tabs WHERE tabname='tab_connections' AND formname='v_edit_connec';
 
@@ -220,3 +218,85 @@ UPDATE config_api_form_fields SET layout_name='distance_layout' WHERE formname='
 UPDATE config_api_form_fields SET layout_name='depth_layout' WHERE formname='dimensioning' AND (column_id='depth' OR column_id='feature_type' OR column_id='feature_id');
 UPDATE config_api_form_fields SET layout_name='symbology_layout' WHERE formname='dimensioning' AND (column_id='x_symbol' OR column_id='y_symbol');
 
+--zones
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_dma','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_dma','form', 'macrodma_id', null, null, true, 'integer',  'combo', false, 'SELECT macrodma_id as id, name as idval FROM macrodma WHERE macrodma_id IS NOT NULL','macrodma_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('exploitation','form', 'macroexpl_id', null, null, true, 'integer',  'combo', false, 'SELECT macroexpl_id as id, name as idval FROM macroexploitation WHERE macroexpl_id IS NOT NULL','macroexpl_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_sector','form', 'macrosector_id', null, null, true, 'integer',  'combo', false, 'SELECT macrosector_id as id, name as idval FROM macrosector WHERE macrosector_id IS NOT NULL','macrosector_id');
+
+
+--link
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'dma_id', null, null, true, 'integer',  'combo', true, 'SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL', 'dma_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'state', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL', 'state');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'macrosector_id', null, null, true, 'integer',  'combo', false, 'SELECT macrosector_id as id, name as idval FROM macrosector WHERE macrosector_id IS NOT NULL','macrosector_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'macrodma_id', null, null, true, 'integer',  'combo', false, 'SELECT macrodma_id as id, name as idval FROM macrodma WHERE macrodma_id IS NOT NULL','macrodma_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'sector_id', null, null, true, 'integer',  'combo', true, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL','sector_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'feature_type', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM sys_feature_type WHERE id IS NOT NULL', 'feature_type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_link','form', 'exit_type', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM sys_feature_type WHERE id IS NOT NULL', 'exit_type');
+
+--element
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'elementcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_element WHERE id IS NOT NULL','elementcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'dma_id', null, null, true, 'integer',  'combo', true, 'SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL', 'dma_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'state', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL', 'state');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'state_type', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL','state_type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'workcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'workcat_id_end', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'ownercat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_owner WHERE id IS NOT NULL','ownercat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'buildercat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_builder WHERE id IS NOT NULL','buildercat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'verified', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM value_verified WHERE id IS NOT NULL', 'verified');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'function_type', null, null, true, 'string',  'combo', true, 'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type = ''ELEMENT''', 'function_type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'category_type', null, null, true, 'string',  'combo', true, 'SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type = ''ELEMENT''', 'category_type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'location_type', null, null, true, 'string',  'combo', true, 'SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type = ''ELEMENT''', 'location_type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'fluid_type', null, null, true, 'string',  'combo', true, 'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type = ''ELEMENT''', 'fluid_type');
+
+--samplepoint
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'featurecat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_feature WHERE id IS NOT NULL','featurecat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'dma_id', null, null, true, 'integer',  'combo', true, 'SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL', 'dma_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, isparent, isreload)
+VALUES ('v_edit_samplepoint','form', 'state', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL', 'state', true, true);
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'workcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'workcat_id_end', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'muni_id', null, null, true, 'string',  'combo', true, 'SELECT muni_id as id, name as idval FROM ext_municipality WHERE muni_id IS NOT NULL', 'muni_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'streetaxis_id', null, null, true, 'string',  'combo', true, 'SELECT id, name as idval FROM v_ext_streetaxis WHERE id IS NOT NULL','streetaxis_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'streetaxis2_id', null, null, true, 'string',  'combo', true, 'SELECT id, name as idval FROM v_ext_streetaxis WHERE id IS NOT NULL','streetaxis2_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'macrodma_id', null, null, true, 'integer',  'combo', false, 'SELECT macrodma_id as id, name as idval FROM macrodma WHERE macrodma_id IS NOT NULL','macrodma_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'verified', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM value_verified WHERE id IS NOT NULL', 'verified');

@@ -193,7 +193,9 @@ CREATE OR REPLACE VIEW v_arc AS
     a.nodetype_id AS nodetype_1,
     a.staticpressure AS staticpress1,
     b.nodetype_id AS nodetype_2,
-    b.staticpressure AS staticpress2
+    b.staticpressure AS staticpress2,
+    arc.lastupdate,
+    arc.lastupdate_user
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
      JOIN v_state_arc ON arc.arc_id::text = v_state_arc.arc_id::text
@@ -273,7 +275,9 @@ CREATE OR REPLACE VIEW v_edit_arc AS
     v_arc.nodetype_2,
     v_arc.elevation2,
     v_arc.depth2,
-    v_arc.staticpress2
+    v_arc.staticpress2,
+    v_arc.lastupdate,
+    v_arc.lastupdate_user
    FROM v_arc;
 	 
 	 
@@ -340,7 +344,9 @@ CREATE OR REPLACE VIEW v_node AS
 	dqa.macrodqa_id,
 	node.staticpressure,
 	cat_node.label,
-    cat_node.nodetype_id AS node_type
+    cat_node.nodetype_id AS node_type,
+    node.lastupdate,
+    node.lastupdate_user
    FROM node
      JOIN v_state_node ON v_state_node.node_id::text = node.node_id::text
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
@@ -414,7 +420,9 @@ CREATE OR REPLACE VIEW v_edit_node AS
 	v_node.dqa_id,
 	v_node.macrodqa_id,
 	v_node.staticpressure,
-    v_node.node_type
+    v_node.node_type,
+    v_node.lastupdate,
+    v_node.lastupdate_user
    FROM v_node;
 
 
@@ -508,7 +516,9 @@ CREATE OR REPLACE VIEW v_edit_connec AS
 	connec.featurecat_id,
 	connec.feature_id,
 	connec.pjoint_type,
-	connec.pjoint_id
+	connec.pjoint_id,
+    connec.lastupdate,
+    connec.lastupdate_user
 	FROM connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -675,7 +685,9 @@ CREATE OR REPLACE VIEW ve_arc AS
     v_arc.nodetype_2,
     v_arc.elevation2,
     v_arc.depth2,
-    v_arc.staticpress2
+    v_arc.staticpress2,
+    v_arc.lastupdate,
+    v_arc.lastupdate_user
    FROM v_arc;
 
 	 
@@ -742,7 +754,9 @@ CREATE OR REPLACE VIEW ve_node AS
 	v_node.dqa_id,
 	v_node.macrodqa_id,
 	v_node.staticpressure,
-    v_node.node_type
+    v_node.node_type,
+    v_node.lastupdate,
+    v_node.lastupdate_user
    FROM v_node;
 
    
@@ -809,7 +823,9 @@ CREATE OR REPLACE VIEW ve_connec AS
     dqa.macrodqa_id,
     connec.staticpressure,
     connec.pjoint_type,
-    connec.pjoint_id
+    connec.pjoint_id,
+    connec.lastupdate,
+    connec.lastupdate_user
    FROM connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text

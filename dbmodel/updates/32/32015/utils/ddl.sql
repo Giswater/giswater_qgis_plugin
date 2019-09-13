@@ -78,3 +78,15 @@ INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable)
 VALUES (new.connec_id, (SELECT value::integer FROM config_param_user WHERE parameter='psector_vdefault' and cur_user="current_user"()LIMIT 1),1,TRUE);
 
 ALTER TABLE vnode ADD COLUMN rotation numeric(6,3);
+
+ALTER TABLE node ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
+ALTER TABLE node ADD COLUMN lastupdate_user character varying(50);
+
+ALTER TABLE arc ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
+ALTER TABLE arc ADD COLUMN lastupdate_user character varying(50);
+
+ALTER TABLE connec ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
+ALTER TABLE connec ADD COLUMN lastupdate_user character varying(50);
+
+ALTER TABLE element ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
+ALTER TABLE element ADD COLUMN lastupdate_user character varying(50);
