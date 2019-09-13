@@ -183,7 +183,7 @@ class MincutConfig(ParentAction):
             list_clients = []
             list_mincut_id.append(id_)
             for row in rows:
-                client = str(row[0])
+                client = row[0]
                 list_clients.append(client)
 
             # Call script
