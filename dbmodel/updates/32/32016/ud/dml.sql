@@ -94,7 +94,6 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_verified';
 
 
---INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_allnone', NULL, NULL, NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_temp', 'inp_temperature', 'temp_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_timeseries', 'inp_timser_id', 'times_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_timserid', 'inp_timser_id', 'timser_type', NULL);
@@ -113,25 +112,15 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_report', 'controls', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_report', 'input', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_report', 'continuity', NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_allnone', 'inp_report', 'subcatchments', NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_allnone', 'inp_report', 'nodes', NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_allnone', 'inp_report', 'links', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_weirs', 'inp_weir', 'weir_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_weir', 'flap', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_lidcontrol', 'inp_lid_control', 'lidco_type', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_options', 'allow_ponding', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_options', 'ignore_groundwater', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_options', 'ignore_quality', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_options', 'ignore_rainfall', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_options', 'ignore_routing', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_options', 'ignore_snowmelt', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_options', 'skip_steady_state', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_status', 'inp_flwreg_pump', 'status', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_outlet', 'inp_flwreg_outlet', 'outlet_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_weirs', 'inp_flwreg_weir', 'weir_type', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_fme', 'inp_options', 'force_main_equation', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_nfl', 'inp_options', 'normal_flow_limited', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_lo', 'inp_options', 'link_offsets', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_id', 'inp_options', 'inertial_damping', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_fu', 'inp_options', 'flow_units', NULL);
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_fr', 'inp_options', 'flow_routing', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_status', 'inp_pump', 'status', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_mapunits', 'inp_mapunits', 'type_units', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_pollutants', 'inp_pollutant', 'units_type', NULL);
@@ -140,9 +129,11 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_washoff', 'inp_washoff_land_x_pol', 'funcw_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_routeto', 'subcatchment', 'routeto', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_buildup', 'inp_buildup_land_x_pol', 'funcb_type', NULL);
---INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_treatment', NULL, NULL, NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_catarc', 'cat_arc_shape', 'epa', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_inflows', 'inp_inflows_pol_x_node', 'form_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_options_in', 'cat_hydrology', 'infiltration', NULL);
 
 DELETE FROM audit_cat_param_user WHERE id='visitclass_vdefault_gully';
+
+
+UPDATE inp_typevalue SET id = 'RECT-CLOSED' WHERE typevalue = 'inp_value_orifice' AND idval = 'RECT-CLOSED';
