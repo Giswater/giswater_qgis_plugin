@@ -304,7 +304,10 @@ class ApiCF(ApiParent):
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
             sub_tag = None
             if feature_cat:
-                sub_tag = feature_cat.feature_type.lower()
+                if feature_cat == 'arc':
+                    sub_tag = 'arc'
+                else:
+                    sub_tag = 'node'
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
