@@ -339,6 +339,14 @@ FORM_CLASS = get_ui_class('manage_addfields.ui')
 class ManageFields(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = get_ui_class('manage_visit_class.ui')
+class ManageVisitClass(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('manage_visit_param.ui')
+class ManageVisitParam(GwDialog, FORM_CLASS):
+    pass
+
 
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(GwMainWindow, FORM_CLASS):

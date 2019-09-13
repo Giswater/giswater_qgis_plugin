@@ -38,7 +38,7 @@ import xml.etree.cElementTree as ET
 from .. import utils_giswater
 from .api_parent import ApiParent
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ApiImportInp, ManageFields
+    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam
 from .create_gis_project import CreateGisProject
 
 
@@ -266,9 +266,11 @@ class UpdateSQL(ApiParent):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
+        # Manage widgets tabs
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
         self.update_manage_ui()
+        self.visit_manager()
 
 
     def gis_create_project(self):
@@ -1622,6 +1624,79 @@ class UpdateSQL(ApiParent):
 
 
     """ Other functions """
+
+    def visit_manager(self):
+
+        # Populate visit class
+        sql = ("SELECT id, idval FROM om_visit_class")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
+
+        # Set listeners
+        self.dlg_readsql.btn_visit_create.clicked.connect(partial(self.create_visit_param))
+        self.dlg_readsql.btn_visit_update.clicked.connect(partial(self.update_visit))
+        self.dlg_readsql.btn_visit_delete.clicked.connect(partial(self.delete_visit))
+
+
+    def create_visit_class(self):
+
+        # Create the dialog and signals
+        self.dlg_manage_visit_class = ManageVisitClass()
+        self.load_settings(self.dlg_manage_visit_class)
+
+        # Manage widgets
+        sql = ("SELECT id, id as idval FROM sys_feature_type WHERE net_category=1")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
+
+        sql = ("SELECT id, id as idval FROM om_visit_type")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
+
+        # Set listeners
+
+        # Open dialog
+        self.open_dialog(self.dlg_manage_visit_class)
+        return
+
+    def create_visit_param(self):
+        return
+        # Create the dialog and signals
+        self.dlg_manage_visit_param = ManageVisitParam()
+        self.load_settings(self.dlg_manage_visit_param)
+
+        # Manage widgets
+        sql = ("SELECT id, id as idval FROM om_visit_parameter_type")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
+
+        sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
+
+        sql = ("SELECT id, id as idval FROM om_visit_parameter_form_type")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
+
+        sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
+
+        # Set listeners
+
+        # Open dialog
+        self.open_dialog(self.dlg_manage_visit_param)
+        return
+
+
+    def update_visit(self):
+
+        return
+
+
+    def delete_visit(self):
+
+        return
 
     def show_info(self):
 
