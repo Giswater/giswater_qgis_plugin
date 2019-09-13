@@ -200,7 +200,9 @@ CREATE OR REPLACE VIEW v_edit_gully AS
     gully.uncertain,
     gully.num_value,
 	pjoint_type,
-	pjoint_id
+	pjoint_id,
+    gully.lastupdate,
+    gully.lastupdate_user
    FROM gully
      JOIN v_state_gully ON gully.gully_id::text = v_state_gully.gully_id::text
      LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text

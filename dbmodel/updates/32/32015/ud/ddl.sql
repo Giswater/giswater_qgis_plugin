@@ -64,3 +64,6 @@ DROP RULE IF EXISTS insert_plan_psector_x_gully ON gully;
 CREATE OR REPLACE RULE insert_plan_psector_x_gully AS ON INSERT TO gully WHERE NEW.state=2 DO 
 INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable) 
 VALUES (new.gully_id, (SELECT value::integer FROM config_param_user WHERE parameter='psector_vdefault' and cur_user="current_user"()LIMIT 1),1,TRUE);
+
+ALTER TABLE gully ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
+ALTER TABLE gully ADD COLUMN lastupdate_user character varying(50);
