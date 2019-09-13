@@ -355,6 +355,9 @@ INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, la
 SELECT 'v_edit_connec', formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols 
 FROM config_api_form_fields WHERE formname = 've_connec'; 
 
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_samplepoint','form', 'presszonecat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript as idval FROM cat_presszone WHERE id IS NOT NULL','presszonecat_id');
+
 --zones
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_dqa','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');

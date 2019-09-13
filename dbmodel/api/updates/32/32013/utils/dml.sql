@@ -293,8 +293,6 @@ VALUES ('v_edit_samplepoint','form', 'workcat_id', null, null, true, 'string',  
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_samplepoint','form', 'workcat_id_end', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_samplepoint','form', 'presszonecat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript as idval FROM cat_presszone WHERE id IS NOT NULL','presszonecat_id');
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_samplepoint','form', 'muni_id', null, null, true, 'string',  'combo', true, 'SELECT muni_id as id, name as idval FROM ext_municipality WHERE muni_id IS NOT NULL', 'muni_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_samplepoint','form', 'streetaxis_id', null, null, true, 'string',  'combo', true, 'SELECT id, name as idval FROM v_ext_streetaxis WHERE id IS NOT NULL','streetaxis_id');
