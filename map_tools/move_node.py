@@ -238,8 +238,8 @@ class MoveNodeMapTool(ParentMapTool):
                 title = "Info"
                 answer = self.controller.ask_question(message, title)
                 if answer:
-                    self.iface.activeLayer().updateFeature(self.snapped_feat)
                     self.move_node(node_id, point)
+                    self.refresh_legend()
 
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
