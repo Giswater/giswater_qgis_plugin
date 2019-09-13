@@ -547,16 +547,9 @@ class Go2Epa(ApiParent):
                 try:
                     if k == f'{sp_n[0]} {sp_n[1]}':
                         source = "'" + v + "'"
-                        try:
-                            x = time.strptime(sp_n[3], '%H:%M:%S')
+                        _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
+                        if _time.search(sp_n[3]):
                             csv40 = "'" + sp_n[3] + "'"
-                        except ValueError:
-                            if sp_n[3][:2].isnumeric():
-                                csv40 = "'" + sp_n[3] + "'"
-                            else:
-                                csv40 = "null"
-                        except Exception as e:
-                            print(type(e).__name__)
                 except IndexError:
                     pass
                 except Exception as e:
