@@ -33,6 +33,10 @@ class ApiCatalog(ApiParent):
 
     def api_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
 
+        # Manage if geom_type is gully and set grate
+        if geom_type == 'gully':
+            geom_type == 'grate'
+
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
