@@ -192,7 +192,8 @@ class MincutParent(ParentAction):
         self.show_notified.setVisible(True) if action_visible.upper() == 'TRUE' else self.show_notified.setVisible(False)
 
         # Show future id of mincut
-        self.set_id_val()
+        if self.is_new:
+            self.set_id_val()
 
         # Set state name
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
@@ -222,16 +223,14 @@ class MincutParent(ParentAction):
     def set_id_val(self):
 
         # Show future id of mincut
-        sql = "SELECT last_value FROM anl_mincut_result_cat_seq"
-        row = self.controller.get_row(sql, log_sql=True)
-        result_mincut_id = row[0] + 1
         sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) "
                "FROM anl_mincut_result_cat), true)")
-        row = self.controller.get_row(sql, log_sql=True)
-        if row:
-            if row[0]:
-                if self.is_new:
-                    result_mincut_id = str(int(row[0])+1)
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if not row or row[0] is None:
+            result_mincut_id = '1'
+        elif row[0]:
+            result_mincut_id = str(int(row[0])+1)
+
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
 
