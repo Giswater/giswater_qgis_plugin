@@ -934,7 +934,7 @@ class ParentManage(ParentAction, object):
         expr = f"psector_id = '{value}'"
         qtable = utils_giswater.getWidget(dialog, f'tbl_psector_x_{geom_type}')
         self.fill_table_by_expr(qtable, f"{plan_om}_psector_x_{geom_type}", expr)
-        # self.set_table_columns(dialog, qtable, f"{plan_om}_psector_x_{geom_type}")
+        self.set_table_columns(dialog, qtable, f"{plan_om}_psector_x_{geom_type}")
         self.refresh_map_canvas()
 
 
