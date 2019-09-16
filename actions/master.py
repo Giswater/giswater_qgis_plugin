@@ -52,7 +52,7 @@ class Master(ParentAction):
         self.dlg_psector_mng = Psector_management()
 
         self.load_settings(self.dlg_psector_mng)
-        table_name = "plan_psector"
+        table_name = "v_edit_plan_psector"
         column_id = "psector_id"
 
         # Tables
