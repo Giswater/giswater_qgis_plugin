@@ -163,7 +163,7 @@ class MincutConfig(ParentAction):
                    f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
 
-            rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+            rows = self.controller.get_rows(sql, commit=True)
             if not rows:
                 print("NOT ROWS")
                 continue
@@ -184,8 +184,7 @@ class MincutConfig(ParentAction):
             for row in rows:
                 client = row[0]
                 list_clients.append(client)
-            print(list_clients)
-            self.controller.log_info(str(list_clients))
+
             # Call script
             status_code = subprocess.call([path, _cause, from_date, to_date, str(list_clients)])
 
@@ -196,7 +195,7 @@ class MincutConfig(ParentAction):
             else:
                 sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{status_code}\",\"date\":\"{_date_sended}\"}}]')::json "
             sql += f"WHERE id = '{id_}'"
-            row = self.controller.execute_sql(sql, commit=True, log_sql=True)
+            row = self.controller.execute_sql(sql, commit=True)
 
             # Set a model with selected filter. Attach that model to selected table
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
