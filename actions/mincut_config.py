@@ -139,11 +139,10 @@ class MincutConfig(ParentAction):
             return
         field_code = self.settings.value('customized_actions/field_code', 'code')
         selected_list = qtable.selectionModel().selectedRows()
-        list_mincut_id = []
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            sql = ("SELECT t3." + str(field_code) + ", t2.forecast_start, t2.forecast_end, anl_cause, notified "
+            sql = ("SELECT DISTINCT(t3." + str(field_code) + "), t2.forecast_start, t2.forecast_end, anl_cause, notified "
                    "FROM " + self.schema_name + ".anl_mincut_result_hydrometer AS t1 "
                    "JOIN " + self.schema_name + ".ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    "JOIN " + self.schema_name + ".anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
@@ -167,7 +166,6 @@ class MincutConfig(ParentAction):
                 _cause = rows[0][3]
 
             list_clients = []
-            list_mincut_id.append(id_)
             for row in rows:
                 client = row[0]
                 list_clients.append(client)
