@@ -89,7 +89,7 @@ BEGIN
 
 			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction", widgetfunction,
 			(CASE WHEN layout_id=0 THEN ''header'' WHEN layout_id=9 THEN ''footer'' ELSE ''body'' END) AS "position",
-			(CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,
+			(CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled, hidden,
 
 			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
 			layout_name as layoutname, layout_order, dv_parent_id, isparent, action_function, dv_querytext, dv_querytext_filterc, 
@@ -101,7 +101,7 @@ BEGIN
 		EXECUTE 'SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layout_order, (row_number()over(ORDER BY 1)) AS orderby,* FROM 
 			(SELECT ''individual'' as widtget_context, concat(unit, ''. '', descript) AS label, identif AS column_id, ''label'' AS widgettype, concat ('||quote_literal(p_tabname)||',''_'',identif) AS widgetname, ''string'' AS datatype, 
-			NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as ordby, 1 AS layout_id,  NULL AS dv_parent_id, NULL AS isparent, NULL AS button_function, NULL AS dv_querytext, 
+			NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, hidden, orderby as ordby, 1 AS layout_id,  NULL AS dv_parent_id, NULL AS isparent, NULL AS button_function, NULL AS dv_querytext, 
 			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , '' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet
 			FROM ' ||p_tablename|| ' WHERE ' ||p_idname|| ' = $2
 			UNION
