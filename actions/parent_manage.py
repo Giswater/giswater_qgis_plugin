@@ -931,13 +931,31 @@ class ParentManage(ParentAction, object):
         """ Reload QtableView """
         
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
-        sql = (f"SELECT * FROM {plan_om}_psector_x_{geom_type} "
-               f"WHERE psector_id = '{value}'")
+        expr = f"psector_id = '{value}'"
         qtable = utils_giswater.getWidget(dialog, f'tbl_psector_x_{geom_type}')
-        self.fill_table_by_query(qtable, sql)
-        self.set_table_columns(dialog, qtable, f"{plan_om}_psector_x_{geom_type}")
+        self.fill_table_by_expr(qtable, f"{plan_om}_psector_x_{geom_type}", expr)
+        # self.set_table_columns(dialog, qtable, f"{plan_om}_psector_x_{geom_type}")
         self.refresh_map_canvas()
 
+
+    def fill_table_by_expr(self, qtable, table_name, expr):
+        """
+        :param qtable: QTableView to show
+        :param expr: expression to set model
+        """
+
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setFilter(expr)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        qtable.setEditTriggers(QTableView.DoubleClicked)
+        model.select()
+        qtable.setModel(model)
+        qtable.show()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
 
     def disconnect_snapping(self):
         """ Select 'Pan' as current map tool and disconnect snapping """
