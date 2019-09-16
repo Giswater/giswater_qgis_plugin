@@ -62,10 +62,10 @@ class Master(ParentAction):
         # Set signals
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
-        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, "v_edit_plan_psector", column_id))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id))
         self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
-        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, "plan_psector"))
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table_psector(self.qtbl_psm, table_name)
         self.set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
