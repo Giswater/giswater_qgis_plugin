@@ -412,7 +412,7 @@ BEGIN
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,  postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, 
 			undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end,
-			code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, lastupdate=now(), lastupdate_user=current_user
+			code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user
 			WHERE arc_id=OLD.arc_id;	
 		   
 		IF v_man_table='man_conduit' THEN
