@@ -24,6 +24,7 @@ DECLARE
 	v_state_canceled_ficticious integer;
 	v_plan_statetype_ficticious integer;
 	v_current_state_type integer;
+    v_id text;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -173,7 +174,11 @@ BEGIN
 
 	ELSIF om_aux='plan' THEN
 	
-		FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category=1) LOOP
+		FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category=1 ORDER BY CASE 
+		WHEN id='CONNEC' THEN 1 
+		WHEN id='GULLY' THEN 2
+		WHEN id='ARC' THEN 3 
+		WHEN id='NODE' THEN 4 END) LOOP
 		
 			v_plan_table=concat('plan_psector_x_',lower(rec_type.id));
 			v_plan_table_id=concat(lower(rec_type.id),'_id');
@@ -182,14 +187,17 @@ BEGIN
 			and '||v_plan_table_id||' not IN (SELECT '||v_plan_table_id||' FROM '||v_plan_table||' WHERE psector_id != '||OLD.psector_id||')' LOOP
 	
 				IF rec_type.id='NODE' THEN
-					EXECUTE 'DELETE FROM '||lower(rec_type.id)||' WHERE state=2 and '||v_plan_table_id||' =  '''||rec.node_id||'''';
+					v_id = rec.node_id;		
 				ELSIF rec_type.id='ARC' THEN
-					EXECUTE 'DELETE FROM '||lower(rec_type.id)||' WHERE state=2 and '||v_plan_table_id||' =  '''||rec.arc_id||'''';
+					v_id = rec.arc_id;	
 				ELSIF rec_type.id='GULLY' THEN
-					EXECUTE 'DELETE FROM '||lower(rec_type.id)||' WHERE state=2 and '||v_plan_table_id||' =  '''||rec.gully_id||'''';
+					v_id = rec.gully_id;
 				ELSIF rec_type.id='CONNEC' THEN
-					EXECUTE 'DELETE FROM '||lower(rec_type.id)||' WHERE state=2 and '||v_plan_table_id||' =  '''||rec.connec_id||'''';
+					v_id = rec.connec_id;
 				END IF;
+
+				EXECUTE 'DELETE FROM '||lower(rec_type.id)||' WHERE state=2 and '||v_plan_table_id||' =  '''||v_id||'''';
+					
 			END LOOP;
 			
 
