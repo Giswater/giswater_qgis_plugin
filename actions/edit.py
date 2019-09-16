@@ -78,7 +78,9 @@ class Edit(ParentAction):
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
-        result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat, new_feature_id=feature_id, layer_new_feature=self.layer, tab_type='data', new_feature=feature)
+        result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
+                                               new_feature_id=feature_id, layer_new_feature=self.layer,
+                                               tab_type='data', new_feature=feature)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
