@@ -157,13 +157,13 @@ class MincutConfig(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
-            sql = (f"SELECT DISTINCT(t3.{field_code}), t2.forecast_start, t2.forecast_end, anl_cause, notified  "
+            sql = (f"SELECT t3.{field_code}, t2.forecast_start, t2.forecast_end, anl_cause, notified  "
                    f"FROM anl_mincut_result_hydrometer AS t1 "
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
 
-            rows = self.controller.get_rows(sql, commit=True)
+            rows = self.controller.get_rows(sql, commit=True, log_sql=True)
             if not rows:
                 print("NOT ROWS")
                 continue
@@ -180,13 +180,14 @@ class MincutConfig(ParentAction):
             if rows[0][3] is not None:
                 _cause = rows[0][3]
 
-            list_clients = []
+            list_clients = ""
             for row in rows:
-                client = row[0]
-                list_clients.append(client)
+                list_clients += str(row[0]) + ", "
+            if len(list_clients) != 0:
+                list_clients = list_clients[:-2]
 
             # Call script
-            status_code = subprocess.call([path, _cause, from_date, to_date, str(list_clients)])
+            status_code = subprocess.call([path, _cause, from_date, to_date, list_clients])
 
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
@@ -349,8 +350,6 @@ class MincutConfig(ParentAction):
             visit_start = self.dlg_min_edit.date_from.date()
             visit_end = self.dlg_min_edit.date_to.date()
             date_from = visit_start.toString('yyyyMMdd 00:00:00')
-            print(type(date_from))
-            self.controller.log_info(str(date_from))
             date_to = visit_end.toString('yyyyMMdd 23:59:59')
             if date_from > date_to:
                 message = "Selected date interval is not valid"
