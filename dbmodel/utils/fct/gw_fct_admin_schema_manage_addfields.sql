@@ -534,7 +534,7 @@ ELSE
 		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
       	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc)
 		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
-		concat('Default value of addfield ',v_param_name, 'for', v_cat_feature), 
+		concat('Default value of addfield ',v_param_name, 'for ', v_cat_feature), 
 		'role_edit', v_param_name, v_isenabled, 9, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
 		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc);
 
