@@ -1330,7 +1330,13 @@ class Giswater(QObject):
 
             complet_result = row[0]
             for field in complet_result['body']['data']['fields']:
+
+                # Get column index
                 fieldIndex = layer.fields().indexFromName(field['column_id'])
+
+                # Hide selected fields according table config_api_form_fields.hidden
+                self.set_column_visibility(layer, field['column_id'], field['hidden'])
+
                 _values = {}
 
                 # Set alias column
@@ -1353,6 +1359,18 @@ class Giswater(QObject):
                 # Set values into valueMap
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                 layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+
+    def set_column_visibility(self, layer, col_name, hidden):
+        """ Hide selected fields according table config_api_form_fields.hidden """
+        config = layer.attributeTableConfig()
+        columns = config.columns()
+        for column in columns:
+            if column.name == str(col_name):
+                column.hidden = hidden
+                break
+        config.setColumns(columns)
+        layer.setAttributeTableConfig(config)
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
