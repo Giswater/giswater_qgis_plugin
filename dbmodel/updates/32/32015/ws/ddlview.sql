@@ -772,7 +772,7 @@ CREATE OR REPLACE VIEW ve_connec AS
     connec.code,
     connec.elevation,
     connec.depth,
-    cat_connec.connectype_id,
+    cat_connec.connectype_id as connec_type,
     connec_type.type AS sys_type,
     connec.connecat_id,
     connec.sector_id,
@@ -829,11 +829,8 @@ CREATE OR REPLACE VIEW ve_connec AS
     connec.dqa_id,
     dqa.macrodqa_id,
     connec.staticpressure,
-    connec.featurecat_id,
-    connec.feature_id,
     connec.pjoint_type,
     connec.pjoint_id,
-    cat_connec.connectype_id as connec_type,
     connec.lastupdate,
     connec.lastupdate_user
    FROM connec
