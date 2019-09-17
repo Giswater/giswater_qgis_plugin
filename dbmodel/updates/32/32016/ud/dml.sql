@@ -120,7 +120,7 @@ WHERE id='inp_snowpack_id';
 
 UPDATE audit_cat_table SET notify_action = 
 '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"hydrology_id,name","featureType":["v_edit_subcatchment"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"hydrology_id,name","featureType":["v_edit_subcatchment"]}' 
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"hydrology_id,name","featureType":["v_edit_subcatchment"]}]' 
 WHERE id='cat_hydrology';
 
 UPDATE audit_cat_table SET notify_action = 
@@ -129,7 +129,7 @@ UPDATE audit_cat_table SET notify_action =
 WHERE id='inp_aquifer';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["inp_lidusage_subc_x_lidco]},
+'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["inp_lidusage_subc_x_lidco"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["inp_lidusage_subc_x_lidco"]}]' 
 WHERE id='inp_lid_control';	
 
@@ -149,8 +149,8 @@ UPDATE audit_cat_table SET notify_action =
 WHERE id='inp_transects_id';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":[""inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve""]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":[""inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve""]}]'
+'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve"]}]'
  WHERE id='inp_curve_id';	
 
  UPDATE audit_cat_table SET notify_action = 
