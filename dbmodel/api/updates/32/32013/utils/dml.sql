@@ -218,6 +218,18 @@ UPDATE config_api_form_fields SET layout_name='distance_layout' WHERE formname='
 UPDATE config_api_form_fields SET layout_name='depth_layout' WHERE formname='dimensioning' AND (column_id='depth' OR column_id='feature_type' OR column_id='feature_id');
 UPDATE config_api_form_fields SET layout_name='symbology_layout' WHERE formname='dimensioning' AND (column_id='x_symbol' OR column_id='y_symbol');
 
+--common catalogs
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_connec','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_node WHERE id IS NOT NULL', 'matcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_arc WHERE id IS NOT NULL', 'matcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_node','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_node WHERE id IS NOT NULL', 'matcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_element','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_element WHERE id IS NOT NULL', 'matcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_element','form', 'elementtype_id', null, null, true, 'string',  'combo', true, 'SELECT id, id AS idval FROM element_type WHERE id IS NOT NULL', 'elementtype_id');
+
 --zones
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_dma','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
