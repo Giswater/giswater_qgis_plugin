@@ -807,7 +807,7 @@ class Giswater(QObject):
 
         # Manage layer fields
         self.get_layers_to_config()
-
+        self.set_layer_config(self.available_layers)
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
@@ -898,8 +898,9 @@ class Giswater(QObject):
 
 
     def get_new_layers_name(self, layers_list):
+        self.get_layers_to_config()
         layers_name = [layer.name() for layer in layers_list]
-        self.get_layer_added(layers_name)
+        self.get_layer_added(layers_name, self.available_layers)
 
 
     def manage_layers(self):
@@ -1271,11 +1272,12 @@ class Giswater(QObject):
         finally:
             return value
 
-    def get_layer_added(self, table_name):
+    def get_layer_added(self, table_name, available_layers):
         layer_list = []
         if table_name:
             for t_name in table_name:
-                layer_list.append(t_name)
+                if t_name in available_layers:
+                    layer_list.append(t_name)
         if not layer_list:
             return
         self.set_layer_config(layer_list)
@@ -1291,14 +1293,13 @@ class Giswater(QObject):
               f"     SELECT table_name FROM information_schema.tables"
               f"     WHERE table_schema = '{schema_name}')")
         rows = self.controller.get_rows(sql, commit=True, log_sql=True)
-        available_layers = [layer[0] for layer in rows]
+        self.available_layers = [layer[0] for layer in rows]
 
         layers_list = self.settings.value('system_variables/set_layer_config')
         for layer in layers_list:
-            available_layers.append(layer)
-        if not available_layers:
-            return
-        self.set_layer_config(available_layers)
+            self.available_layers.append(layer)
+
+
 
 
     def set_layer_config(self, layers):
@@ -1320,22 +1321,26 @@ class Giswater(QObject):
 
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
-                return
+                continue
 
             # When info is nothing
             if 'results' in row[0]:
                 if row[0]['results'] == 0:
                     self.controller.show_message(row[0]['message']['text'], 1)
-                    return
+                    continue
 
             complet_result = row[0]
-            for field in complet_result['body']['data']['fields']:
+            # Don't configure GENERIC forms
+            if complet_result['body']['form']['template'] == 'GENERIC':
+                continue
 
+            for field in complet_result['body']['data']['fields']:
                 # Get column index
                 fieldIndex = layer.fields().indexFromName(field['column_id'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
-                self.set_column_visibility(layer, field['column_id'], field['hidden'])
+                if 'hidden' in field:
+                    self.set_column_visibility(layer, field['column_id'], field['hidden'])
 
                 _values = {}
 
