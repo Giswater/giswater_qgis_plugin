@@ -216,7 +216,8 @@ CREATE OR REPLACE VIEW v_node AS
     node.expl_id,
     node.num_value,
     node.lastupdate,
-    node.lastupdate_user
+    node.lastupdate_user,
+    node.insert_user
    FROM node
      JOIN v_state_node ON node.node_id::text = v_state_node.node_id::text
      LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
@@ -1154,7 +1155,7 @@ CREATE OR REPLACE VIEW ve_arc AS
     v_arc_x_node.expl_id,
     v_arc_x_node.num_value,
     v_arc_x_node.lastupdate,
-    v_arc_x_node.lastupdate_user
+    v_arc_x_node.lastupdate_user,
     v_arc_x_node.insert_user
    FROM v_arc_x_node;
 
