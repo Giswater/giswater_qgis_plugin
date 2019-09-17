@@ -27,3 +27,6 @@ CREATE TABLE config_api_typevalue
   addparam json,
   CONSTRAINT config_api_typevalue_pkey PRIMARY KEY (typevalue, id)
 );
+
+-- -- 2019/09/17
+ALTER TABLE config_api_form_fields ADD COLUMN hidden boolean NOT NULL DEFAULT FALSE;
