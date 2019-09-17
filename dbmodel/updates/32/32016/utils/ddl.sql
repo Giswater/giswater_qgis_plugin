@@ -106,3 +106,15 @@ ALTER TABLE om_psector_x_connec RENAME TO _om_psector_x_connec_;
 ALTER TABLE om_psector_x_node RENAME TO _om_psector_x_node_;
 ALTER TABLE om_psector_x_other RENAME TO _om_psector_x_other_;
 
+
+CREATE TABLE cat_manager
+(
+  id serial NOT NULL PRIMARY KEY,
+  idval text,
+  expl_id integer[],
+  username text[],
+  active boolean DEFAULT true);
+  
+  
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation_x_user", "column":"manager_id", "dataType":"integer"}}$$);
+

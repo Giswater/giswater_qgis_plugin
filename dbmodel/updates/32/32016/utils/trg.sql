@@ -39,3 +39,7 @@ CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON in
 
 CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON om_typevalue FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_typevalue_config_fk('om_typevalue');
+  
+CREATE TRIGGER gw_trg_cat_manager AFTER INSERT OR UPDATE OR DELETE ON cat_manager FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_cat_manager();
+  

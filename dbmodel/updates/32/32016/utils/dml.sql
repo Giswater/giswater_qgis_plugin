@@ -28,6 +28,9 @@ VALUES (2736, 'gw_fct_set_delete_feature', 'utils', 'function', 'Delete feature 
 INSERT INTO audit_cat_function 
 VALUES (2728, 'gw_fct_pg2epa_vnodetrimarcs', 'ws', 'function', NULL, NULL, NULL, 'Function to trim arcs on model using vnodes', 'role_epa', false, false, NULL, false);
 
+INSERT INTO audit_cat_function 
+VALUES (2730, 'trg_edit_inp_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'Trigger to edit v_edit_inp_connec view', 'role_epa', false, false, NULL, false);
+
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2732, 'gw_trg_connect_update', 'utils', 'trigger function', 'Manage capabilities after update fields on connect (connec & gullt)', 'role_edit',false,false,false);
 
@@ -141,6 +144,11 @@ VALUES (2750, 'gw_trg_typevalue_config_fk', 'utils', 'trigger function', 'Contro
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type,descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2752, 'gw_fct_admin_manage_child_views_view', 'utils', 'function', 'Create child custom views','role_admin', FALSE, FALSE, FALSE);
 
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type,descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2754, 'gw_trg_cat_manager', 'utils', 'trigger function', 'Propagate changes on cat_manager to exploitation_x_user table','role_admin', FALSE, FALSE, FALSE);
+
+
+
 INSERT INTO audit_cat_error(id, error_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3024, 'Can''t delete the parameter. There is at least one event related to it', 2, true,'utils',false);
 
@@ -220,6 +228,8 @@ INSERT INTO audit_cat_table VALUES ('ve_lot_x_arc', 'O&M', 'View that relates ar
 INSERT INTO audit_cat_table VALUES ('ve_lot_x_node', 'O&M', 'View that relates nodes and lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('ve_lot_x_connec', 'O&M', 'View that relates connecs and lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('v_visit_lot_user', 'O&M', 'View for lots and users', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('cat_manager', 'admin', 'Catalog of management divisions', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+
 
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('plan_typevalue', 'psector_status', 'plan_psector', 'status');
 

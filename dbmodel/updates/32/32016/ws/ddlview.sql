@@ -931,7 +931,6 @@ CREATE OR REPLACE VIEW v_edit_macrodqa AS
     macrodqa.descript,
     macrodqa.undelete,
     macrodqa.the_geom
-   FROM ws_sample32.selector_expl,
-    ws_sample32.macrodqa
+   FROM selector_expl, macrodqa
   WHERE macrodqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
   

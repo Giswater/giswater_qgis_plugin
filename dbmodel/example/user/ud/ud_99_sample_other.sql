@@ -12,11 +12,13 @@ INSERT INTO cat_dwf_scenario VALUES (1, 'scenario1', '2017-01-01', '2017-12-31')
 UPDATE inp_dwf SET dwfscenario_id=1;
 
 
-INSERT INTO cat_users VALUES (1,'user1');
-INSERT INTO cat_users VALUES (2,'user2');
-INSERT INTO cat_users VALUES (3,'user3');
-INSERT INTO cat_users VALUES (4,'user4');
+INSERT INTO cat_users VALUES ('user1','user1');
+INSERT INTO cat_users VALUES ('user2','user2');
+INSERT INTO cat_users VALUES ('user3','user3');
+INSERT INTO cat_users VALUES ('user4','user4');
 
+INSERT INTO exploitation_x_user VALUES (1, current_user);
+INSERT INTO exploitation_x_user VALUES (2, current_user);
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
 	

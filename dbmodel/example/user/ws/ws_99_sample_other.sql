@@ -11,10 +11,13 @@ UPDATE inp_shortpipe SET to_arc='2092' WHERE node_id='1080';
 UPDATE inp_shortpipe SET to_arc=null WHERE node_id='114254';
 
 
-INSERT INTO cat_users VALUES (1,'user1');
-INSERT INTO cat_users VALUES (2,'user2');
-INSERT INTO cat_users VALUES (3,'user3');
-INSERT INTO cat_users VALUES (4,'user4');
+INSERT INTO cat_users VALUES ('user1','user1');
+INSERT INTO cat_users VALUES ('user2','user2');
+INSERT INTO cat_users VALUES ('user3','user3');
+INSERT INTO cat_users VALUES ('user4','user4');
+
+INSERT INTO exploitation_x_user (expl_id, username) VALUES (1, current_user);
+INSERT INTO exploitation_x_user (expl_id, username) VALUES (2, current_user);
 
 
 INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1, '{113906}');

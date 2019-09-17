@@ -65,9 +65,6 @@ INSERT INTO audit_cat_table VALUES ('v_rtc_period_pjointpattern', 'Hydraulic dat
 INSERT INTO audit_cat_table VALUES ('v_inp_pjointpattern', 'Hydraulic data', NULL, 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_connec', 'Hydraulic input data', 'Table that relates connecs with its pattern and demand', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 
-
-INSERT INTO audit_cat_function VALUES (2730, 'trg_edit_inp_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'Trigger to edit v_edit_inp_connec view', 'role_epa', false, false, NULL, false);
-
 DELETE FROM inp_typevalue WHERE typevalue='inp_value_opti_valvemode';
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 1, 'EPA TABLES', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 2, 'INVENTORY VALUES', NULL);
