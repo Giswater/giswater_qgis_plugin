@@ -1626,7 +1626,8 @@ class UpdateSQL(ApiParent):
     """ Other functions """
 
     def visit_manager(self):
-
+        # TODO:: Remove tab visitclas. WIP
+        utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "visitclass")
         return
         # Populate visit class
         # TODO:: Populate combo from visitclass manager and wip

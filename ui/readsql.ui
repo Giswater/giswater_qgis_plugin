@@ -960,7 +960,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="visitclass">
        <attribute name="title">
         <string>Visitclass manager</string>
        </attribute>
