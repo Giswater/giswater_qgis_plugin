@@ -135,7 +135,8 @@ CREATE OR REPLACE VIEW v_arc AS
     arc.expl_id,
     arc.num_value,
     arc.lastupdate,
-    arc.lastupdate_user
+    arc.lastupdate_user,
+    arc.insert_user
    FROM selector_expl,
     arc
      JOIN v_state_arc ON arc.arc_id::text = v_state_arc.arc_id::text
@@ -888,7 +889,8 @@ CREATE OR REPLACE VIEW vu_node AS
     node.expl_id,
     node.num_value,
     node.lastupdate,
-    node.lastupdate_user
+    node.lastupdate_user,
+    node.insert_user
    FROM node
      LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
      LEFT JOIN node_type ON node_type.id::text = node.node_type::text
@@ -980,7 +982,8 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
 	a.node_type as nodetype_2,
     cat_arc.label,
     v_arc.lastupdate,
-    v_arc.lastupdate_user
+    v_arc.lastupdate_user,
+    v_arc.insert_user
    FROM v_arc
      JOIN sector ON sector.sector_id = v_arc.sector_id
      JOIN arc_type ON v_arc.arc_type::text = arc_type.id::text
@@ -1069,7 +1072,8 @@ CREATE OR REPLACE VIEW v_edit_arc AS
 	nodetype_1,
 	nodetype_2,
     lastupdate,
-    lastupdate_user
+    lastupdate_user,
+    insert_user
    FROM v_arc_x_node;
    
  
@@ -1151,6 +1155,7 @@ CREATE OR REPLACE VIEW ve_arc AS
     v_arc_x_node.num_value,
     v_arc_x_node.lastupdate,
     v_arc_x_node.lastupdate_user
+    v_arc_x_node.insert_user
    FROM v_arc_x_node;
 
 
@@ -1222,7 +1227,8 @@ CREATE OR REPLACE VIEW ve_connec AS
     pjoint_type,
     pjoint_id,
     connec.lastupdate,
-    connec.lastupdate_user
+    connec.lastupdate_user,
+    connec.insert_user
    FROM connec
      JOIN v_state_connec ON connec.connec_id::text = v_state_connec.connec_id::text
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
@@ -1298,7 +1304,8 @@ CREATE OR REPLACE VIEW v_edit_node AS
     v_node.expl_id,
     v_node.num_value,
     v_node.lastupdate,
-    v_node.lastupdate_user
+    v_node.lastupdate_user,
+    v_node.insert_user
    FROM v_node
      JOIN cat_node ON v_node.nodecat_id::text = cat_node.id::text;
 
@@ -1368,7 +1375,8 @@ CREATE OR REPLACE VIEW ve_node AS
     v_node.expl_id,
     v_node.num_value,
     v_node.lastupdate,
-    v_node.lastupdate_user
+    v_node.lastupdate_user,
+    v_node.insert_user
    FROM v_node;
 
 
@@ -1437,7 +1445,8 @@ CREATE OR REPLACE VIEW ve_gully AS
     gully.uncertain,
     gully.num_value,
     gully.lastupdate,
-    gully.lastupdate_user
+    gully.lastupdate_user,
+    gully.insert_user
    FROM gully
      JOIN v_state_gully ON gully.gully_id::text = v_state_gully.gully_id::text
      LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text

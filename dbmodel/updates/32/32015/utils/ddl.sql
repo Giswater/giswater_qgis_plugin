@@ -77,16 +77,20 @@ CREATE OR REPLACE RULE insert_plan_psector_x_connec AS ON INSERT TO connec WHERE
 INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable) 
 VALUES (new.connec_id, (SELECT value::integer FROM config_param_user WHERE parameter='psector_vdefault' and cur_user="current_user"()LIMIT 1),1,TRUE);
 
-ALTER TABLE vnode ADD COLUMN rotation numeric(6,3);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"vnode", "column":"rotation", "dataType":"numeric(6,3)"}}$$);
 
-ALTER TABLE node ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
-ALTER TABLE node ADD COLUMN lastupdate_user character varying(50);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
 
-ALTER TABLE arc ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
-ALTER TABLE arc ADD COLUMN lastupdate_user character varying(50);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
 
-ALTER TABLE connec ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
-ALTER TABLE connec ADD COLUMN lastupdate_user character varying(50);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
 
-ALTER TABLE element ADD COLUMN lastupdate timestamp without time zone DEFAULT now();
-ALTER TABLE element ADD COLUMN lastupdate_user character varying(50);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
