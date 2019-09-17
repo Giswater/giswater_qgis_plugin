@@ -1627,10 +1627,12 @@ class UpdateSQL(ApiParent):
 
     def visit_manager(self):
 
+        return
         # Populate visit class
-        sql = ("SELECT id, idval FROM om_visit_class")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
+        # TODO:: Populate combo from visitclass manager and wip
+        # sql = ("SELECT id, idval FROM om_visit_class")
+        # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        # utils_giswater.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
 
         # Set listeners
         self.dlg_readsql.btn_visit_create.clicked.connect(partial(self.create_visit_param))
