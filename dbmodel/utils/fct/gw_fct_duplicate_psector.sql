@@ -121,7 +121,11 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Copy features with state 0 -> Done' ));
 
 	--insert copy of the planified feature in the corresponding v_edit_* view and insert it into plan_psector_x_* table
-	FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category=1 ORDER BY id DESC) LOOP
+	FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category=1 ORDER BY CASE 
+		WHEN id='NODE' THEN 1 
+		WHEN id='ARC' THEN 2
+		WHEN id='CONNEC' THEN 3 
+		WHEN id='GULLY' THEN 4 END) LOOP
 	raise notice ' rec_type,%', rec_type;
 
 		EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
