@@ -274,11 +274,11 @@ class Go2Epa(ApiParent):
 
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name'))
+            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp'))
+            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt'))
+            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
         self.controller.plugin_settings_set_value('go2epa_chk_RECURSIVE' + cur_user,
@@ -586,7 +586,9 @@ class Go2Epa(ApiParent):
 
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
-
+        # Save user values
+        self.save_user_values()
+        
         self.dlg_go2epa.txt_infolog.clear()
         self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
         status = self.check_fields()
@@ -768,8 +770,6 @@ class Go2Epa(ApiParent):
         if message is not None and self.imports_canceled is False:
             self.controller.show_info_box(message)
 
-        # Save user values
-        self.save_user_values()
 
         self.show_widgets(False)
         self.check_result_id()
