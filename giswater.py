@@ -25,6 +25,7 @@ from qgis.PyQt.QtSql import QSqlQueryModel
 
 import os.path
 import sys
+import webbrowser
 from collections import OrderedDict
 from functools import partial
 
@@ -73,6 +74,7 @@ class Giswater(QObject):
         self.map_tools = {}
         self.srid = None  
         self.plugin_toolbars = {}
+        self.available_layers = []
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -252,18 +254,26 @@ class Giswater(QObject):
             
         return action
       
-      
     def manage_dropdown_menu(self, action, index_action):
         """ Create dropdown menu for insert management of nodes and arcs """
 
         # Get list of different node and arc types
         menu = QMenu()
-
         # List of nodes from node_type_cat_type - nodes which we are using
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
+        help_added = False
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
                     index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
+                if not help_added:
+                    obj_action = QAction(f'Insert {feature_cat.feature_type.lower()} \t ?', self)
+                    font = obj_action.font()
+                    font.setItalic(True)
+                    obj_action.setFont(font)
+                    menu.addAction(obj_action)
+                    menu.addSeparator()
+                    obj_action.triggered.connect(partial(self.open_browser, f'insert-{feature_cat.feature_type.lower()}'))
+                    help_added = True
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 obj_action.setShortcutVisibleInContextMenu(True)
@@ -287,10 +297,9 @@ class Giswater(QObject):
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 obj_action.setShortcutVisibleInContextMenu(True)
-                menu.addSeparator()
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
-
+        menu.addSeparator()
         action.setMenu(menu)
 
         return action
@@ -319,6 +328,11 @@ class Giswater(QObject):
             action = self.create_action(index_action, text_action, toolbar, True, function_name, action_group)
         
         return action         
+
+
+    def open_browser(self, web_tag):
+        """ Open the web browser according to the drop down menu of the feature to insert """
+        webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
 
 
     def manage_map_tool(self, index_action, function_name):
@@ -825,7 +839,6 @@ class Giswater(QObject):
         # QgsProject.instance().legendLayersAdded.connect(self.add_layers_button)
 
         # Put add layers button into toc
-        self.enable_python_console()
         self.add_layers_button()
 
 
