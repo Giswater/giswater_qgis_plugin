@@ -25,9 +25,6 @@ DECLARE
 	v_child_layer text;
 	v_parent_layer text;
 BEGIN
-	RAISE NOTICE 'test 10';
-
-
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
 	v_table = TG_ARGV[0];
@@ -45,9 +42,10 @@ BEGIN
 		
 			--transform notifications with layer name as input parameters
 			IF rec_notify_action.featureType != '[]' THEN
-
+				
 				--loop over input featureType in order to capture the layers related to feature type
 				FOR rec_layers IN SELECT * FROM json_array_elements_text(rec_notify_action.featureType::json) LOOP
+				raise notice'rec_layers,%',rec_layers;
 					--select only child and parent layers of active features
 					IF v_project_type ='WS' THEN
 						EXECUTE 'SELECT json_agg(child_layer) FROM cat_feature where id IN (SELECT id FROM node_type WHERE active IS TRUE
@@ -69,24 +67,34 @@ BEGIN
 
 					EXECUTE ' SELECT  json_agg(DISTINCT parent_layer) FROM cat_feature WHERE type = '''||(rec_layers)||''''
 					INTO v_parent_layer;
-					
-					v_parent_layer = replace(replace(v_parent_layer,'[',''),']','');
-					v_child_layer = replace(replace(v_child_layer,'[',''),']','');
-					
-					raise notice 'v_parent_layer ,%',v_parent_layer ;
-					raise notice 'v_child_layer ,%',v_child_layer ;
-					
-					v_parameters = v_parent_layer ||','|| v_child_layer;
-					
 					--concatenate the notification out of parameters
-						IF v_notification_data IS NULL THEN
-							v_notification_data = v_parameters;
+					--concatenation for arc,node,connec,gully which have child layers
+					IF v_parent_layer IS NOT NULL THEN
+						v_parent_layer = replace(replace(v_parent_layer,'[',''),']','');
+						v_child_layer = replace(replace(v_child_layer,'[',''),']','');
+						
+						raise notice 'v_parent_layer ,%',v_parent_layer ;
+						raise notice 'v_child_layer ,%',v_child_layer ;
+						
+						v_parameters = v_parent_layer ||','|| v_child_layer;
+						
+						
+							IF v_notification_data IS NULL THEN
+								v_notification_data = v_parameters;
+							ELSE
+								v_notification_data = concat(v_notification_data,',',v_parameters);
+							END IF;
+					ELSE 
+					--concatenation for other layers
+						IF v_notification_data IS NOT NULL THEN
+							v_notification_data = concat(v_notification_data,',',replace(replace(rec_notify_action.featureType,'[',''),']',''));
 						ELSE
-							v_notification_data = concat(v_notification_data,',',v_parameters);
+							v_notification_data = replace(replace(rec_notify_action.featureType,'[',''),']','');
 						END IF;
-					
+					END IF;
 										
 				END LOOP;
+				
 				v_notification_data = '"parameters":{"tableName":['|| v_notification_data||']}';
 				v_notification_data = '{"name":"'||rec_notify_action.name||'",'||v_notification_data||'}';
 						raise notice 'v_notification_data ,%',v_notification_data ;
