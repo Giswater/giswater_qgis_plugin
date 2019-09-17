@@ -923,3 +923,15 @@ CREATE OR REPLACE VIEW v_edit_presszone AS
     cat_presszone
   WHERE cat_presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
   
+DROP VIEW IF EXISTS v_edit_macrodqa;
+CREATE OR REPLACE VIEW v_edit_macrodqa AS 
+ SELECT macrodqa.macrodqa_id,
+    macrodqa.name,
+    macrodqa.expl_id,
+    macrodqa.descript,
+    macrodqa.undelete,
+    macrodqa.the_geom
+   FROM ws_sample32.selector_expl,
+    ws_sample32.macrodqa
+  WHERE macrodqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  

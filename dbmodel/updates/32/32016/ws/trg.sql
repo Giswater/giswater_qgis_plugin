@@ -19,6 +19,10 @@ DROP TRIGGER IF EXISTS gw_trg_edit_dqa ON v_edit_dqa;
 CREATE TRIGGER gw_trg_edit_dqa INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_dqa 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_dqa('dqa');
 
+DROP TRIGGER IF EXISTS gw_trg_edit_macrodqa ON v_edit_macrodqa;
+CREATE TRIGGER gw_trg_edit_macrodqa INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_macrodqa 
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_macrodqa('macrodqa');
+
 DROP TRIGGER IF EXISTS gw_trg_edit_presszone ON v_edit_presszone;
 CREATE TRIGGER gw_trg_edit_presszone INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_presszone 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_presszone('presszone');  
