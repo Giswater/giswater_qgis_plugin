@@ -590,6 +590,9 @@ SELECT 'v_edit_gully', formtype, column_id, layout_id, layout_order, isenabled, 
 FROM config_api_form_fields WHERE formname = 've_gully'; 
 
 
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_grate','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_grate WHERE id IS NOT NULL', 'matcat_id');
+
 --INP
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('inp_files','form', 'actio_type', null, null, true, 'string',  'combo', true, 'SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_files_actio''', 'actio_type');

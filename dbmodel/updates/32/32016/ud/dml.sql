@@ -36,6 +36,16 @@ INSERT INTO audit_cat_table VALUES ('v_arc_x_vnode', 'Auxiliar', 'Shows the rela
 INSERT INTO audit_cat_table VALUES ('v_ui_event_x_gully', 'User interface view', 'User interface view for gullys related to its events', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('ve_lot_x_gully', 'O&M', 'View that relates gullys and lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_grate"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, descript","featureType":["cat_grate"]}]' WHERE id ='cat_mat_grate';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_divider","v_edit_inp_junction",  "v_edit_inp_outfall"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_divider","v_edit_inp_junction",  "v_edit_inp_outfall"]}]' WHERE id ='cat_node';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "v_edit_inp_outlet", "v_edit_inp_orifice", "v_edit_inp_conduit", "v_edit_inp_pump",  "v_edit_inp_weir"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "v_edit_inp_outlet", "v_edit_inp_orifice", "v_edit_inp_conduit", "v_edit_inp_pump",  "v_edit_inp_weir"]}]' WHERE id ='cat_arc';
+
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["gully"]},
 {"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["gully"]}]' WHERE id = 'gully';
 
@@ -43,10 +53,10 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]' WHERE id ='cat_grate';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]}]' WHERE id ='arc_type';
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]}]' WHERE id ='arc_type';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]}]' WHERE id ='node_type';
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]}]' WHERE id ='node_type';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]}]' WHERE id ='connec_type';
@@ -67,10 +77,11 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_work';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id,name name","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='dma';
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id,name","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='dma';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec", "gully","v_edit_raingage"]}]' WHERE id ='exploitation';
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec", "gully","v_edit_raingage", "v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec", "gully","v_edit_raingage", "v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual"]}]' 
+WHERE id ='exploitation';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_address';
@@ -84,15 +95,16 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_att
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_streetaxis';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id, name","featureType":["arc", "node", "connec", "gully","v_edit_subcatchment"]}]' WHERE id ='sector';
+UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec", "gully","v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual",
+"v_edit_inp_conduit", "v_edit_inp_divider","v_edit_inp_junction", "v_edit_inp_outfall","v_edit_inp_storage"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id, name","featureType":["arc", "node", "connec", "gully","v_edit_subcatchment","v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual",
+"v_edit_inp_conduit", "v_edit_inp_divider","v_edit_inp_junction", "v_edit_inp_outfall","v_edit_inp_storage"]}]' WHERE id ='sector';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_state_type';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_verified';
-
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"rg_id","featureType":["v_edit_subcatchment"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"rg_id","featureType":["v_edit_subcatchment"]}]' 
@@ -149,8 +161,8 @@ UPDATE audit_cat_table SET notify_action =
 WHERE id='inp_transects_id';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve"]}]'
+'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve", "v_edit_inp_divider","v_edit_inp_storage"]},
+{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve","v_edit_inp_divider","v_edit_inp_storage"]}]'
  WHERE id='inp_curve_id';	
 
  UPDATE audit_cat_table SET notify_action = 
@@ -162,6 +174,9 @@ UPDATE audit_cat_table SET notify_action =
 '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"landus_id","featureType":["inp_coverage_land_x_subc", "inp_buildup_land_x_pol", "inp_washoff_land_x_pol"]},
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"landus_id","featureType":["inp_coverage_land_x_subc", "inp_buildup_land_x_pol", "inp_washoff_land_x_pol"]}]' 
 WHERE id='inp_landuses';	
+
+
+SELECT gw_fct_admin_schema_manage_triggers('notify',null);
 
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_temp', 'inp_temperature', 'temp_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_timeseries', 'inp_timser_id', 'times_type', NULL);

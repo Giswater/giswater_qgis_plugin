@@ -362,6 +362,13 @@ FROM config_api_form_fields WHERE formname = 've_connec';
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_samplepoint','form', 'presszonecat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript as idval FROM cat_presszone WHERE id IS NOT NULL','presszonecat_id');
 
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_node','form', 'nodetype_id', null, null, true, 'string',  'combo', true, 'SELECT id, id AS idval FROM node_type WHERE id IS NOT NULL', 'nodetype_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc','form', 'arctype_id', null, null, true, 'string',  'combo', true, 'SELECT id, id AS idval FROM arc_type WHERE id IS NOT NULL', 'arctype_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_connec','form', 'connectype_id', null, null, true, 'string',  'combo', true, 'SELECT id, id AS idval FROM arc_type WHERE id IS NOT NULL', 'connectype_id');
+
 --zones
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_dqa','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
