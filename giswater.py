@@ -1305,7 +1305,7 @@ class Giswater(QObject):
               f"WHERE child_layer IN ("
               f"     SELECT table_name FROM information_schema.tables"
               f"     WHERE table_schema = '{schema_name}')")
-        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        rows = self.controller.get_rows(sql, commit=True)
         self.available_layers = [layer[0] for layer in rows]
 
         layers_list = self.settings.value('system_variables/set_layer_config')
@@ -1329,8 +1329,8 @@ class Giswater(QObject):
                 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            sql = ("SELECT gw_api_getinfofromid($${" + body + "}$$)")
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            sql = (f"SELECT gw_api_getinfofromid($${{{body}}}$$)")
+            row = self.controller.get_row(sql, commit=True)
 
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -1346,6 +1346,14 @@ class Giswater(QObject):
             # Don't configure GENERIC forms
             if complet_result['body']['form']['template'] == 'GENERIC':
                 continue
+
+            # Take the columns configured in table config_api_form_fields where isenabled is False
+            sql =(f"SELECT column_id, hidden FROM config_api_form_fields "
+                  f"WHERE formname = '{layer_name}' AND isenabled=False AND hidden = True")
+            cols_to_hide = self.controller.get_rows(sql, commit=True)
+            if cols_to_hide:
+                for col in cols_to_hide:
+                    self.set_column_visibility(layer, col[1], col[2])
 
             for field in complet_result['body']['data']['fields']:
                 # Get column index
