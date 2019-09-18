@@ -114,7 +114,7 @@ BEGIN
 	v_notification = '{"functions":['||v_notification_data||']}';
 	raise notice 'v_notification,%',v_notification;
 
-	PERFORM pg_notify('watchers', '{"functionAction":'||v_notification||'}');
+	PERFORM pg_notify('desktop', '{"functionAction":'||v_notification||'}');
 	
 	RAISE NOTICE 'test rais %', TG_ARGV[0];
 	RETURN new;
