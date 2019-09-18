@@ -259,6 +259,16 @@ VALUES ('v_edit_link','form', 'feature_type', null, null, true, 'string',  'comb
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_link','form', 'exit_type', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM sys_feature_type WHERE id IS NOT NULL', 'exit_type');
 
+--vnode
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_vnode','form', 'sector_id', null, null, true, 'integer',  'combo', true, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL','sector_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_vnode','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_vnode','form', 'dma_id', null, null, true, 'integer',  'combo', true, 'SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL', 'dma_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_vnode','form', 'state', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL', 'state');
+
 --element
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_element','form', 'elementcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_element WHERE id IS NOT NULL','elementcat_id');
