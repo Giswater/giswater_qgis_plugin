@@ -1343,9 +1343,6 @@ class Giswater(QObject):
                     continue
 
             complet_result = row[0]
-            # Don't configure GENERIC forms
-            if complet_result['body']['form']['template'] == 'GENERIC':
-                continue
 
             # Take the columns configured in table config_api_form_fields where isenabled is False
             sql =(f"SELECT column_id, hidden FROM config_api_form_fields "
