@@ -267,13 +267,14 @@ class Giswater(QObject):
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
                     index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
                 if not help_added:
-                    obj_action = QAction(f'Insert {feature_cat.feature_type.lower()} \t ?', self)
-                    font = obj_action.font()
-                    font.setItalic(True)
-                    obj_action.setFont(font)
+                    if feature_cat.feature_type.lower() == 'node':
+                        obj_action = QAction(f'Insert point \t           ?', self)
+                    else:
+                        obj_action = QAction(f'Insert arc \t           ?', self)
+
+                    obj_action.triggered.connect(partial(self.open_browser, f'insert-{feature_cat.feature_type.lower()}'))
                     menu.addAction(obj_action)
                     menu.addSeparator()
-                    obj_action.triggered.connect(partial(self.open_browser, f'insert-{feature_cat.feature_type.lower()}'))
                     help_added = True
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))

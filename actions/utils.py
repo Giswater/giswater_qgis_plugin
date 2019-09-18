@@ -155,11 +155,11 @@ class Utils(ParentAction):
         path = utils_giswater.getWidgetText(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
-            self.controller.show_warning(message)
+            self.controller.show_message(message, message_level=0)
             return None
         if path.find('.csv') == -1:
             message = "Please choose a csv file"
-            self.controller.show_warning(message)
+            self.controller.show_message(message, message_level=0)
             return None
 
         return path

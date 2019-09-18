@@ -62,7 +62,7 @@ class Basic(ParentAction):
         if row[0].lower() == 'true':
             query = f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
 
-        self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, add_query_left=query)
+        self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, aql=query)
 
         # Open dialog
         self.open_dialog(self.dlg_expoitation, maximize_button=False)
