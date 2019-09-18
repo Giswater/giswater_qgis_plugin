@@ -51,7 +51,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
      LEFT JOIN config_api_form_fields ON config_api_form_fields.column_id::text = man_addfields_parameter.param_name::text;
 
 
-    CREATE OR REPLACE VIEW ve_config_feature_fields as
+    CREATE OR REPLACE VIEW ve_config_sys_fields as
     SELECT id, 
     formname, 
     column_id,
@@ -64,8 +64,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
     widgetdim, 
     tooltip, 
     placeholder, 
-    dv_orderby_id,
-    dv_isnullvalue, 
-    editability
+    editability,
+    stylesheet,
+    hidden
       FROM config_api_form_fields
-      WHERE formtype='feature' and (formname!='ve_arc' and formname!='ve_node' and formname!='ve_connec'and formname!='ve_gully');
+      WHERE formtype='feature' and (formname!='ve_arc' and formname!='ve_node' and formname!='ve_connec'and formname!='ve_gully')
+      AND column_id NOT IN (SELECT param_name FROM man_addfields_parameter);

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2742
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_config_feature_fields()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_config_sys_fields()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -18,9 +18,10 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     UPDATE config_api_form_fields SET label = NEW.label, layout_name = NEW.layout_name, layout_order = NEW.layout_order, 
-    isenabled = NEW.isenabled, iseditable = NEW.iseditable, ismandatory = NEW.ismandatory, dv_isnullvalue = NEW.dv_isnullvalue, 
-    tooltip = NEW.tooltip, widgetdim = NEW.widgetdim, placeholder = NEW.placeholder, dv_orderby_id = NEW.dv_orderby_id,  
-    editability = NEW.editability WHERE formname = OLD	.formname AND column_id=OLD.column_id;
+    isenabled = NEW.isenabled, iseditable = NEW.iseditable, ismandatory = NEW.ismandatory, 
+    tooltip = NEW.tooltip, widgetdim = NEW.widgetdim, placeholder = NEW.placeholder, 
+    editability = NEW.editability, stylesheet = NEW.stylesheet, hidden = NEW.hidden
+    WHERE formname = OLD.formname AND column_id=OLD.column_id;
 
     RETURN NEW;
 END;

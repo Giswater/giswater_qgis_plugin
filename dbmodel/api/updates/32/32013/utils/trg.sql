@@ -8,6 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_config_feature_fields ON "SCHEMA_NAME".ve_config_feature_fields;
-CREATE TRIGGER gw_trg_edit_config_feature_fields INSTEAD OF UPDATE ON "SCHEMA_NAME".ve_config_feature_fields 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_config_feature_fields();
+DROP TRIGGER IF EXISTS gw_trg_edit_config_sys_fields ON "SCHEMA_NAME".ve_config_sys_fields;
+CREATE TRIGGER gw_trg_edit_config_sys_fields INSTEAD OF UPDATE ON "SCHEMA_NAME".ve_config_sys_fields 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_config_sys_fields();
