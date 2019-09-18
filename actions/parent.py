@@ -228,8 +228,19 @@ class ParentAction(object):
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
                            hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3]):
-        
+                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=None):
+        """
+        :param dialog:
+        :param tableleft: Table to consult and load on the left side
+        :param tableright: Table to consult and load on the right side
+        :param field_id_left: ID field of the left table
+        :param field_id_right: ID field of the right table
+        :param name: field name (used in add_lot.py)
+        :param hide_left: Columns to hide from the left table
+        :param hide_right: Columns to hide from the right table
+        :param aql: (add query left) Query added to the left side (used in basic.py def basic_exploitation_selector())
+        :return:
+        """
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -240,12 +251,8 @@ class ParentAction(object):
         query_left += f" WHERE cur_user = current_user)"
         query_left += f" AND  {field_id_left} > -1"
 
-        # Check config_param_system
-        sql = ("SELECT value FROM config_param_system "
-               " WHERE parameter ='sys_exploitation_x_user'")
-        row = self.controller.get_row(sql, commit=True)
-        if row[0].lower() == 'true':
-            query_left += f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
+        if aql:
+            query_left += aql
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)

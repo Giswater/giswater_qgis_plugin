@@ -53,7 +53,16 @@ class Basic(ParentAction):
         tableright = "selector_expl"
         field_id_left = "expl_id"
         field_id_right = "expl_id"
-        self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right)
+
+        # Check config_param_system
+        sql = ("SELECT value FROM config_param_system "
+               " WHERE parameter ='sys_exploitation_x_user'")
+        row = self.controller.get_row(sql, commit=True)
+        query = None
+        if row[0].lower() == 'true':
+            query = f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
+
+        self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, add_query_left=query)
 
         # Open dialog
         self.open_dialog(self.dlg_expoitation, maximize_button=False)
