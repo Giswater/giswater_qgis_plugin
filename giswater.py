@@ -267,11 +267,12 @@ class Giswater(QObject):
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
                     index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
                 if not help_added:
+                    icon_path = self.plugin_dir + '/icons/308.png'
+                    icon = QIcon(icon_path)
                     if feature_cat.feature_type.lower() == 'node':
-                        obj_action = QAction(f'Insert point \t           ?', self)
+                        obj_action = QAction(icon, f'Insert point \t           ?', self)
                     else:
-                        obj_action = QAction(f'Insert arc \t           ?', self)
-
+                        obj_action = QAction(icon, f'Insert arc \t           ?', self)
                     obj_action.triggered.connect(partial(self.open_browser, f'insert-{feature_cat.feature_type.lower()}'))
                     menu.addAction(obj_action)
                     menu.addSeparator()
