@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 -- DROP FUNCTION SCHEMA_NAME.gw_api_getdimensioning(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getdimensioning(p_data json)
+CREATE OR REPLACE FUNCTION gw_api_getdimensioning(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -36,6 +36,7 @@ DECLARE
 	v_project_type text;
 	aux_json json;
 	v_fields json;
+	field json;
 
 BEGIN
 
@@ -56,9 +57,17 @@ BEGIN
 
 	EXECUTE 'SELECT gw_api_get_formfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)'
 	INTO v_fields_array
-	USING 'dimensioning', 'catalog', 'data', NULL, NULL, NULL, NULL, 'SELECT', null, 3;
+	USING 'dimensioning', 'catalog', '', NULL, NULL, NULL, NULL, 'SELECT', null, 3;
+
+	-- Set widget_name without tabname for widgets
+	FOREACH field IN ARRAY v_fields_array
+	LOOP
+		v_fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(field->>'orderby')::INT], 'widgetname', field->>'column_id');
+	END LOOP;
 
 	v_fields := array_to_json(v_fields_array);
+
+	
 
 --    Control NULL's
 ----------------------
