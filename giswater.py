@@ -1349,7 +1349,7 @@ class Giswater(QObject):
 
             # Take the columns configured in table config_api_form_fields where isenabled is False
             sql =(f"SELECT column_id, hidden FROM config_api_form_fields "
-                  f"WHERE formname = '{layer_name}' AND isenabled=False AND hidden = True")
+                  f"WHERE formname = '{layer_name}' AND isenabled=False")
             cols_to_hide = self.controller.get_rows(sql, commit=True)
             if cols_to_hide:
                 for col in cols_to_hide:
