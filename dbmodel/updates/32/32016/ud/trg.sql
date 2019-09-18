@@ -5,7 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog
+
+
+DROP TRIGGER gw_trg_topocontrol_arc ON arc;
+CREATE TRIGGER gw_trg_topocontrol_arc  BEFORE INSERT OR UPDATE OF the_geom, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, state, inverted_slope
+ON arc  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_topocontrol_arc();
 
 DROP TRIGGER gw_trg_gully_update ON gully;
 DROP TRIGGER gw_trg_update_link_arc_id ON gully;

@@ -98,6 +98,7 @@ CREATE TABLE sys_typevalue_cat(
 ALTER TABLE audit_cat_table ADD COLUMN notify_action json;
 
 --2019/09/02
+ALTER TABLE om_psector RENAME TO _inp_options_;
 ALTER TABLE om_psector RENAME TO _om_psector_;
 ALTER TABLE om_psector_cat_type RENAME TO _om_psector_cat_type_;
 ALTER TABLE om_psector_selector RENAME TO _om_psector_selector_;

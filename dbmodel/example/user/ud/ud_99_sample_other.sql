@@ -38,6 +38,7 @@ INSERT INTO plan_psector_x_arc VALUES (11, '178', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL);
 
+-- redo values
 
 
 TRUNCATE plan_psector_x_node;
@@ -208,3 +209,11 @@ SELECT 'edit_typevalue','chamber_param_1','man_addfields_value','value_param',id
 -- rotate vnodes and connec labels
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
 UPDATE link SET the_geom=the_geom;
+
+-- redo missed values for some arcs
+UPDATE arc SET sys_elev1=56.76 , sys_elev2=56.45 WHERE arc_id='100003';
+UPDATE arc SET sys_elev1=56.45 , sys_elev2=53.15 WHERE arc_id='100004';
+UPDATE arc SET sys_elev1=53.15 , sys_elev2=53 WHERE arc_id='100005';
+UPDATE arc SET sys_elev1=53 , sys_elev2=51.15 WHERE arc_id='100009';
+UPDATE arc SET sys_elev1=51.15 , sys_elev2=48.95 WHERE arc_id='100010';
+UPDATE arc SET sys_elev1=46.92 , sys_elev2=48.95 WHERE arc_id='100011';
