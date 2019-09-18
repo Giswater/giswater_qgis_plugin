@@ -103,8 +103,8 @@ BEGIN
 				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
 
 				-- looking for all the arcs (1 and 2) using existing node
-				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=node_rec.node_id 
-				AND state >0 UNION SELECT arc_id, node_2 FROM arc WHERE node_2=node_rec.node_id AND state >0)
+				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM v_edit_arc WHERE node_1=node_rec.node_id 
+				AND state >0 UNION SELECT arc_id, node_2 FROM v_edit_arc WHERE node_2=node_rec.node_id AND state >0)
 				LOOP
 
 					-- if exists some arc planified on same alternative attached to that existing node
