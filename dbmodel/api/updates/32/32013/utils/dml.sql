@@ -280,10 +280,10 @@ INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, lay
 VALUES ('v_edit_element','form', 'state', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL', 'state');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_element','form', 'state_type', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL','state_type');
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'workcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id');
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'workcat_id_end', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, typeahead)
+VALUES ('v_edit_element','form', 'workcat_id', null, null, true, 'string',  'typeahead', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id', '{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, typeahead)
+VALUES ('v_edit_element','form', 'workcat_id_end', null, null, true, 'string',  'typeahead', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end','{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_element','form', 'ownercat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_owner WHERE id IS NOT NULL','ownercat_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
@@ -308,10 +308,10 @@ INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, lay
 VALUES ('v_edit_samplepoint','form', 'dma_id', null, null, true, 'integer',  'combo', true, 'SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL', 'dma_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, isparent, isreload)
 VALUES ('v_edit_samplepoint','form', 'state', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL', 'state', true, true);
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_samplepoint','form', 'workcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id');
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_samplepoint','form', 'workcat_id_end', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, typeahead)
+VALUES ('v_edit_samplepoint','form', 'workcat_id', null, null, true, 'string',  'typeahead', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id', '{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, typeahead)
+VALUES ('v_edit_samplepoint','form', 'workcat_id_end', null, null, true, 'string',  'typeahead', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end', '{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_samplepoint','form', 'muni_id', null, null, true, 'string',  'combo', true, 'SELECT muni_id as id, name as idval FROM ext_municipality WHERE muni_id IS NOT NULL', 'muni_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
