@@ -1353,7 +1353,7 @@ class Giswater(QObject):
             cols_to_hide = self.controller.get_rows(sql, commit=True)
             if cols_to_hide:
                 for col in cols_to_hide:
-                    self.set_column_visibility(layer, col[1], col[2])
+                    self.set_column_visibility(layer, col[0], col[1])
 
             for field in complet_result['body']['data']['fields']:
                 # Get column index
