@@ -610,7 +610,8 @@ class Giswater(QObject):
         if self.btn_add_layers:
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
             toolbar = dockwidget.findChildren(QToolBar)[0]
-            toolbar.removeAction(toolbar.actions()[8])
+            # TODO improve this, now remove last action
+            toolbar.removeAction(toolbar.actions()[len(toolbar.actions())-1])
             self.btn_add_layers = None
 
         try:
