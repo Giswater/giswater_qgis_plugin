@@ -68,6 +68,7 @@ class ApiDimensioning(ApiParent):
         actionOrientation.triggered.connect(self.orientation)
         self.set_icon(actionOrientation, "133")
 
+        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature))
         self.dlg_dim.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
 
@@ -81,16 +82,17 @@ class ApiDimensioning(ApiParent):
         # Get layers under mouse clicked
         sql = f"SELECT gw_api_getdimensioning($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
+
         if row is None or row[0] is None:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
         # Parse string to order dict into List
         complet_result = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
-        # complet_result = row[0]
+
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
             label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
-            if widget.objectName() == 'data_id':
+            if widget.objectName() == 'id':
                 utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature.attribute('id'))
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
            # Take the QGridLayout with the intention of adding a QSpacerItem later
@@ -111,6 +113,30 @@ class ApiDimensioning(ApiParent):
 
         self.open_dialog(self.dlg_dim)
         return False, False
+
+
+    def save_dimensioning(self, new_feature):
+        # Create body
+        fields = ''
+        list_widgets = self.dlg_dim.findChildren(QLineEdit)
+        for widget in list_widgets:
+            widget_name = widget.objectName()
+            widget_value = utils_giswater.getWidgetText(self.dlg_dim, widget)
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":"{widget_value}",'
+
+        srid = self.controller.plugin_settings_value('srid')
+        sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
+        the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+        fields += f'"the_geom":"{the_geom[0]}"'
+
+        feature = '"tableName":"v_edit_dimensions"'
+        body = self.create_body(feature=feature, filter_fields=fields)
+
+        # Execute query
+        sql = f"SELECT gw_api_setdimensioning($${{{body}}}$$)::text"
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
 
     def snapping(self):
@@ -184,9 +210,9 @@ class ApiDimensioning(ApiParent):
             if not row:
                 return
 
-            utils_giswater.setText(self.dlg_dim, "data_depth", row[0])
-            utils_giswater.setText(self.dlg_dim, "data_feature_id", element_id)
-            utils_giswater.setText(self.dlg_dim, "data_feature_type", feat_type.upper())
+            utils_giswater.setText(self.dlg_dim, "depth", row[0])
+            utils_giswater.setText(self.dlg_dim, "feature_id", element_id)
+            utils_giswater.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
 
     def orientation(self):
@@ -199,11 +225,11 @@ class ApiDimensioning(ApiParent):
         if not self.layer_dimensions:
             return
 
-        self.x_symbol = self.dlg_dim.findChild(QLineEdit, "data_x_symbol")
+        self.x_symbol = self.dlg_dim.findChild(QLineEdit, "x_symbol")
 
         self.x_symbol.setText(str(int(point.x())))
 
-        self.y_symbol = self.dlg_dim.findChild(QLineEdit, "data_y_symbol")
+        self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
 
