@@ -17,8 +17,9 @@ INSERT INTO cat_users VALUES ('user2','user2');
 INSERT INTO cat_users VALUES ('user3','user3');
 INSERT INTO cat_users VALUES ('user4','user4');
 
-INSERT INTO exploitation_x_user VALUES (1, current_user);
-INSERT INTO exploitation_x_user VALUES (2, current_user);
+INSERT INTO exploitation_x_user (expl_id, username) VALUES (1, current_user);
+INSERT INTO exploitation_x_user (expl_id, username) VALUES (2, current_user);
+
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
 	
