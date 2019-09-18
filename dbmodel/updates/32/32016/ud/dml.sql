@@ -42,142 +42,103 @@ INSERT INTO audit_cat_table VALUES ('ve_lot_x_gully', 'O&M', 'View that relates 
 INSERT INTO audit_cat_table VALUES ('cat_mat_grate', 'Catalog', 'Material''s grate catalog', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_grate"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, descript","featureType":["cat_grate"]}]' WHERE id ='cat_mat_grate';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, descript","featureType":["cat_grate"]}]' WHERE id ='cat_mat_grate';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_divider","v_edit_inp_junction",  "v_edit_inp_outfall"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_divider","v_edit_inp_junction",  "v_edit_inp_outfall"]}]' WHERE id ='cat_node';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_divider","v_edit_inp_junction",  "v_edit_inp_outfall"]}]' WHERE id ='cat_node';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "v_edit_inp_outlet", "v_edit_inp_orifice", "v_edit_inp_conduit", "v_edit_inp_pump",  "v_edit_inp_weir"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "v_edit_inp_outlet", "v_edit_inp_orifice", "v_edit_inp_conduit", "v_edit_inp_pump",  "v_edit_inp_weir"]}]' WHERE id ='cat_arc';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "v_edit_inp_outlet", "v_edit_inp_orifice", "v_edit_inp_conduit", "v_edit_inp_pump",  "v_edit_inp_weir"]}]' WHERE id ='cat_arc';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["gully"]},
-{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["gully"]}]' WHERE id = 'gully';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["gully"]}]' WHERE id = 'gully';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]' WHERE id ='cat_grate';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]' WHERE id ='cat_grate';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]}]' WHERE id ='arc_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]}]' WHERE id ='arc_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]}]' WHERE id ='node_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node"]}]' WHERE id ='node_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]}]' WHERE id ='connec_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["connec"]}]' WHERE id ='connec_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]' WHERE id ='gully_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]' WHERE id ='gully_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_builder';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_builder';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_owner';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_owner';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_soil';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_soil';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_work';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='cat_work';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id,name","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='dma';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id,name","featureType":["arc", "node", "connec", "gully","v_edit_link", "v_edit_vnode","v_edit_element", "v_edit_samplepoint"]}]' WHERE id ='dma';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec", "gully","v_edit_raingage", "v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec", "gully","v_edit_raingage", "v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual"]}]' 
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec", "gully","v_edit_link", "v_edit_vnode","v_edit_element", "v_edit_samplepoint","v_edit_raingage", "v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual"]}]' 
 WHERE id ='exploitation';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_address';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_address';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id, name","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_municipality';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id, name","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_municipality';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_plot';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_plot';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_streetaxis';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='ext_streetaxis';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec", "gully","v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual",
-"v_edit_inp_conduit", "v_edit_inp_divider","v_edit_inp_junction", "v_edit_inp_outfall","v_edit_inp_storage"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id, name","featureType":["arc", "node", "connec", "gully","v_edit_subcatchment","v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual",
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id, name","featureType":["arc", "node", "connec", "gully","v_edit_link", 
+"v_edit_vnode","v_edit_element", "v_edit_samplepoint","v_edit_subcatchment","v_edit_inp_outlet", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_orifice", "v_edit_inp_virtual",
 "v_edit_inp_conduit", "v_edit_inp_divider","v_edit_inp_junction", "v_edit_inp_outfall","v_edit_inp_storage"]}]' WHERE id ='sector';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_state_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_state_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_verified';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "gully"]}]' WHERE id ='value_verified';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"rg_id","featureType":["v_edit_subcatchment"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"rg_id","featureType":["v_edit_subcatchment"]}]' 
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"rg_id","featureType":["v_edit_subcatchment"]}]' 
 WHERE id ='raingage';
 
-UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_aquifer", "inp_inflows", "inp_inflows_pol_x_node",  "inp_dwf_pol_x_node"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_aquifer", "inp_inflows", "inp_inflows_pol_x_node",  "inp_dwf_pol_x_node"]}]' 
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_aquifer", "inp_inflows", "inp_inflows_pol_x_node",  "inp_dwf_pol_x_node"]}]' 
 WHERE id='inp_pattern';
 
-UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["v_edit_raingage", "inp_inflows", "inp_inflows_pol_x_node","inp_timeseries"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["v_edit_raingage", "inp_inflows", "inp_inflows_pol_x_node","inp_timeseries"]}]' 
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["v_edit_raingage", "inp_inflows", "inp_inflows_pol_x_node","inp_timeseries"]}]' 
 WHERE id='inp_timser_id';
 
-UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"arc_id","featureType":["v_edit_subcatchment"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"arc_id","featureType":["v_edit_subcatchment"]}]' 
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"arc_id","featureType":["v_edit_subcatchment"]}]' 
 WHERE id='inp_outlet';
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"snow_id","featureType":["v_edit_subcatchment", "inp_snowpack"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"snow_id","featureType":["v_edit_subcatchment", "inp_snowpack"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"snow_id","featureType":["v_edit_subcatchment", "inp_snowpack"]}]' 
 WHERE id='inp_snowpack_id';
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"hydrology_id,name","featureType":["v_edit_subcatchment"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"hydrology_id,name","featureType":["v_edit_subcatchment"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"hydrology_id,name","featureType":["v_edit_subcatchment"]}]' 
 WHERE id='cat_hydrology';
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"aquif_id","featureType":["inp_groundwater"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"aquif_id","featureType":["inp_groundwater"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"aquif_id","featureType":["inp_groundwater"]}]' 
 WHERE id='inp_aquifer';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["inp_lidusage_subc_x_lidco"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["inp_lidusage_subc_x_lidco"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"lidco_id","featureType":["inp_lidusage_subc_x_lidco"]}]' 
 WHERE id='inp_lid_control';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, idval","featureType":["inp_dwf","inp_dwf_pol_x_node"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, idval","featureType":["inp_dwf","inp_dwf_pol_x_node"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, idval","featureType":["inp_dwf","inp_dwf_pol_x_node"]}]' 
 WHERE id='cat_dwf_scenario';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_rdii"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_rdii"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_rdii"]}]' 
 WHERE id='inp_hydrograph_id';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_transects"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_transects"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_transects"]}]' 
 WHERE id='inp_transects_id';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve", "v_edit_inp_divider","v_edit_inp_storage"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve","v_edit_inp_divider","v_edit_inp_storage"]}]'
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_flwreg_pump", "v_edit_inp_pump", "inp_flwreg_outlet", "v_edit_inp_outlet", "inp_curve","v_edit_inp_divider","v_edit_inp_storage"]}]'
  WHERE id='inp_curve_id';	
 
  UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"poll_id","featureType":["inp_pollutant", "inp_buildup_land_x_pol", "inp_loadings_pol_x_subc", "inp_washoff_land_x_pol", "inp_inflows_pol_x_node","inp_dwf_pol_x_node", "inp_treatment_node_x_pol"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"poll_id","featureType":["inp_pollutant", "inp_buildup_land_x_pol", "inp_loadings_pol_x_subc", "inp_washoff_land_x_pol", "inp_inflows_pol_x_node","inp_dwf_pol_x_node", "inp_treatment_node_x_pol"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"poll_id","featureType":["inp_pollutant", "inp_buildup_land_x_pol", "inp_loadings_pol_x_subc", "inp_washoff_land_x_pol", "inp_inflows_pol_x_node","inp_dwf_pol_x_node", "inp_treatment_node_x_pol"]}]' 
 WHERE id='inp_pollutant';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"landus_id","featureType":["inp_coverage_land_x_subc", "inp_buildup_land_x_pol", "inp_washoff_land_x_pol"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"landus_id","featureType":["inp_coverage_land_x_subc", "inp_buildup_land_x_pol", "inp_washoff_land_x_pol"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"landus_id","featureType":["inp_coverage_land_x_subc", "inp_buildup_land_x_pol", "inp_washoff_land_x_pol"]}]' 
 WHERE id='inp_landuses';	
 
 

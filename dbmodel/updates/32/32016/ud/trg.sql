@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 DROP TRIGGER gw_trg_topocontrol_arc ON arc;

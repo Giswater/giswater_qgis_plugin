@@ -122,10 +122,7 @@ INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_type
 
 
 
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_reactions','inp_reactions_el', 'parameter');
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_reactions','inp_reactions_gl', 'parameter');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_status_pump','inp_pump', 'status');
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_typevalue_energy','inp_energy_gl', 'energ_type');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_typevalue_source','inp_source', 'sourc_type');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_typevalue_valve','inp_valve', 'valv_type');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_status_valve','inp_valve', 'status');
@@ -152,94 +149,68 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesno','inp_report', 'quality');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesno','inp_report', 'velocity');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_times','inp_times', 'statistic');
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_energy_gl', 'parameter');
-INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_energy_el', 'parameter');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_pump', 'energyparam');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_pump_additional', 'energyparam');
 
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node"]}]' WHERE id ='node_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node"]}]' WHERE id ='node_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node", "cat_connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, descript","featureType":["cat_node", "cat_connec"]}]' WHERE id ='cat_mat_node';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, descript","featureType":["cat_node", "cat_connec"]}]' WHERE id ='cat_mat_node';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_arc"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_arc"]}]' WHERE id ='arc_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_arc"]}]' WHERE id ='arc_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_arc"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_connec"]}]' WHERE id ='connec_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_connec"]}]' WHERE id ='connec_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_arc"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, descript","featureType":["cat_arc"]}]' WHERE id ='cat_mat_arc';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id, descript","featureType":["cat_arc"]}]' WHERE id ='cat_mat_arc';
 
 
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_tank", "v_edit_inp_shortpipe", "v_edit_inp_junction","v_edit_inp_pump","v_edit_inp_valve", "v_edit_inp_reservoir"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_tank", "v_edit_inp_shortpipe", "v_edit_inp_junction","v_edit_inp_pump","v_edit_inp_valve", "v_edit_inp_reservoir"]}]' WHERE id ='cat_node';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["node","v_edit_inp_tank", "v_edit_inp_shortpipe", "v_edit_inp_junction","v_edit_inp_pump","v_edit_inp_valve", "v_edit_inp_reservoir"]}]' WHERE id ='cat_node';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc","v_edit_inp_pipe"]},
+UPDATE audit_cat_table SET notify_action = '[
 {"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc","v_edit_inp_pipe"]}]' WHERE id ='cat_arc';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_builder';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_builder';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_owner';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_owner';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_presszone';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_presszone';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_soil';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_soil';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_work';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_work';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id, name","featureType":["arc", "node", "connec"]}]' WHERE id ='dma';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dma_id, name","featureType":["arc", "node", "connec","v_edit_link", "v_edit_vnode","v_edit_element", "v_edit_samplepoint","v_edit_pond", "v_edit_pool"]}]' WHERE id ='dma';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec"]}]' WHERE id ='exploitation';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec","v_edit_link", "v_edit_vnode","v_edit_element", "v_edit_samplepoint","v_edit_pond", "v_edit_pool"]}]' WHERE id ='exploitation';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_address';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_address';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_plot';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_plot';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id, name","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_municipality';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id, name","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_municipality';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_streetaxis';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='ext_streetaxis';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id","featureType":["arc", "node", "connec","v_edit_inp_tank", "v_edit_inp_shortpipe", "v_edit_inp_junction","v_edit_inp_pump","v_edit_inp_valve", "v_edit_inp_reservoir","v_edit_inp_pipe"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id, name","featureType":["arc", "node", "connec","v_edit_inp_tank", "v_edit_inp_shortpipe", "v_edit_inp_junction","v_edit_inp_pump","v_edit_inp_valve", "v_edit_inp_reservoir","v_edit_inp_pipe"]}]' WHERE id ='sector';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"sector_id, name","featureType":["arc", "node", "connec","v_edit_link", "v_edit_vnode", "v_edit_inp_tank", "v_edit_inp_shortpipe", "v_edit_inp_junction","v_edit_inp_pump","v_edit_inp_valve", "v_edit_inp_reservoir","v_edit_inp_pipe"]}]' WHERE id ='sector';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='value_verified';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='value_verified';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='value_state_type';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='value_state_type';
 
-UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dqa_id","featureType":["arc", "node", "connec"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dqa_id, name","featureType":["arc", "node", "connec"]}]' WHERE id ='dqa';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dqa_id, name","featureType":["arc", "node", "connec"]}]' WHERE id ='dqa';
 
 --inp
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_pump_additional", "inp_curve","v_edit_inp_valve","v_edit_inp_tank","v_edit_inp_pump"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_pump_additional", "inp_curve","v_edit_inp_valve","v_edit_inp_tank","v_edit_inp_pump"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_pump_additional", "inp_curve","v_edit_inp_valve","v_edit_inp_tank","v_edit_inp_pump"]}]' 
 WHERE id='inp_curve_id';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_pump_additional", "inp_source", "inp_pattern_value", "v_edit_inp_demand","v_edit_inp_pump","v_edit_inp_reservoir","v_edit_inp_junction"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_pump_additional", "inp_source", "inp_pattern_value", "v_edit_inp_demand","v_edit_inp_pump","v_edit_inp_reservoir","v_edit_inp_junction"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"pattern_id","featureType":["inp_pump_additional", "inp_source", "inp_pattern_value", "v_edit_inp_demand","v_edit_inp_pump","v_edit_inp_reservoir","v_edit_inp_junction"]}]' 
 WHERE id='inp_pattern';	
 
 UPDATE audit_cat_table SET notify_action = 
-'[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dscenario_id","featureType":["v_edit_inp_demand"]},
-{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dscenario_id","featureType":["v_edit_inp_demand"]}]' 
+'[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dscenario_id","featureType":["v_edit_inp_demand"]}]' 
 WHERE id='cat_dscenario';	
 
 
