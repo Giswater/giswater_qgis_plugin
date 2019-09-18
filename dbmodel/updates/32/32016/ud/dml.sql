@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+INSERT INTO cat_mat_grate
+SELECT DISTINCT matcat_id FROM cat_grate;
+
+
 UPDATE audit_cat_function SET isdeprecated=TRUE where id=1248;
 
 UPDATE audit_cat_param_user SET vdefault='NO' WHERE id='inp_report_input';
@@ -35,6 +39,7 @@ INSERT INTO audit_cat_table VALUES ('plan_psector_x_gully', 'masterplan', 'Table
 INSERT INTO audit_cat_table VALUES ('v_arc_x_vnode', 'Auxiliar', 'Shows the relation between arc and vnodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_event_x_gully', 'User interface view', 'User interface view for gullys related to its events', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('ve_lot_x_gully', 'O&M', 'View that relates gullys and lots', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
+INSERT INTO audit_cat_table VALUES ('cat_mat_grate', 'Catalog', 'Material''s grate catalog', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"web","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_grate"]},

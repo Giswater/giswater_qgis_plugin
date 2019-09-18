@@ -38,6 +38,16 @@ INSERT INTO cat_mat_node VALUES ('FD', 'FD');
 INSERT INTO cat_mat_node VALUES ('Iron', 'Iron');
 
 
+INSERT INTO cat_mat_grate VALUES ('Brick', 'Brick');
+INSERT INTO cat_mat_grate VALUES ('Concret', 'Concret');
+INSERT INTO cat_mat_grate VALUES ('PEAD', 'PEAD');
+INSERT INTO cat_mat_grate VALUES ('PVC', 'PVC');
+INSERT INTO cat_mat_grate VALUES ('N/I', 'N/I');
+INSERT INTO cat_mat_grate VALUES ('FD', 'FD');
+INSERT INTO cat_mat_grate VALUES ('Iron', 'Iron');
+
+
+
 INSERT INTO cat_mat_gully VALUES ('N/I', 'N/I');
 INSERT INTO cat_mat_gully VALUES ('FD', 'FD');
 INSERT INTO cat_mat_gully VALUES ('Iron', 'Iron');

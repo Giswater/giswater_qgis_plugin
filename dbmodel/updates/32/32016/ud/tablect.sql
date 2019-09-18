@@ -9,3 +9,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE om_visit_lot_x_gully ADD CONSTRAINT om_visit_lot_x_gully_lot_id_fkey FOREIGN KEY (lot_id)
 REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+ALTER TABLE cat_grate DROP CONSTRAINT cat_grate_matcat_id_fkey;
+
+ALTER TABLE cat_grate  ADD CONSTRAINT cat_grate_matcat_id_fkey FOREIGN KEY (matcat_id)
+REFERENCES cat_mat_grate (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

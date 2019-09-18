@@ -54,3 +54,9 @@ ALTER TABLE inp_value_weirs RENAME TO _inp_value_weirs_;
 ALTER TABLE inp_value_yesno RENAME TO _inp_value_yesno_;
 
 
+CREATE TABLE cat_mat_grate(
+  id character varying(30) PRIMARY KEY,
+  descript character varying(512),
+  link character varying(512));
+
+
