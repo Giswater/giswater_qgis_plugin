@@ -55,7 +55,7 @@ class ApiDimensioning(ApiParent):
         self.snapper = self.snapper_manager.get_snapper()
 
 
-    def open_form(self, new_feature=None, new_feature_id=None):
+    def open_form(self, new_feature=None, layer=None, new_feature_id=None):
         self.dlg_dim = ApiDimensioningUi()
         self.load_settings(self.dlg_dim)
 
@@ -68,8 +68,9 @@ class ApiDimensioning(ApiParent):
         actionOrientation.triggered.connect(self.orientation)
         self.set_icon(actionOrientation, "133")
 
-        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature))
-        self.dlg_dim.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_dim))
+        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature, layer))
+        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
 
         # Set layers dimensions, node and connec
@@ -92,8 +93,9 @@ class ApiDimensioning(ApiParent):
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
             label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
+
             if widget.objectName() == 'id':
-                utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature.attribute('id'))
+                utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature_id)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
            # Take the QGridLayout with the intention of adding a QSpacerItem later
             if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
@@ -115,7 +117,17 @@ class ApiDimensioning(ApiParent):
         return False, False
 
 
-    def save_dimensioning(self, new_feature):
+    def cancel_dimensioning(self):
+
+        self.iface.actionRollbackEdits().trigger()
+        self.close_dialog(self.dlg_dim)
+
+    def save_dimensioning(self, new_feature, layer):
+
+        # Insert new feature into db
+        layer.updateFeature(new_feature)
+        layer.commitChanges()
+
         # Create body
         fields = ''
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
@@ -137,6 +149,9 @@ class ApiDimensioning(ApiParent):
         # Execute query
         sql = f"SELECT gw_api_setdimensioning($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        # Close dialog
+        self.close_dialog(self.dlg_dim)
 
 
     def snapping(self):
