@@ -239,7 +239,14 @@ class ParentAction(object):
         query_left += f" RIGHT JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
         query_left += f" WHERE cur_user = current_user)"
         query_left += f" AND  {field_id_left} > -1"
-        
+
+        # Check config_param_system
+        sql = ("SELECT value FROM config_param_system "
+               " WHERE parameter ='sys_exploitation_x_user'")
+        row = self.controller.get_row(sql, commit=True)
+        if row[0].lower() == 'true':
+            query_left += f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
+
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
