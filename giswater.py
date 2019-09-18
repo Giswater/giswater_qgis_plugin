@@ -75,6 +75,7 @@ class Giswater(QObject):
         self.srid = None  
         self.plugin_toolbars = {}
         self.available_layers = []
+        self.btn_add_layers = None
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -605,6 +606,13 @@ class Giswater(QObject):
 
     def unload(self, remove_modules=True):
         """ Removes plugin menu items and icons from QGIS GUI """
+
+        if self.btn_add_layers:
+            dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
+            toolbar = dockwidget.findChildren(QToolBar)[0]
+            toolbar.removeAction(toolbar.actions()[8])
+            self.btn_add_layers = None
+
         try:
             # Unlisten notify channel and stop thread
             if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and  hasattr(self, 'notify'):
@@ -847,12 +855,13 @@ class Giswater(QObject):
         dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
         toolbar = dockwidget.findChildren(QToolBar)[0]
         btn_exist = toolbar.findChild(QToolButton, 'gw_add_layers')
+
         if btn_exist is None:
-            btn = QToolButton()
-            btn.setIcon(QIcon(icon_path))
-            btn.setObjectName('gw_add_layers')
-            toolbar.addWidget(btn)
-            btn.clicked.connect(partial(self.create_add_layer_menu))
+            self.btn_add_layers = QToolButton()
+            self.btn_add_layers.setIcon(QIcon(icon_path))
+            self.btn_add_layers.setObjectName('gw_add_layers')
+            toolbar.addWidget(self.btn_add_layers)
+            self.btn_add_layers.clicked.connect(partial(self.create_add_layer_menu))
 
 
     def create_add_layer_menu(self):
