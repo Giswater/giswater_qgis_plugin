@@ -853,7 +853,7 @@ class Giswater(QObject):
 
 
     def add_layers_button(self):
-        icon_path = self.plugin_dir + '/icons/27.png'
+        icon_path = self.plugin_dir + '/icons/306.png'
         dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
         toolbar = dockwidget.findChildren(QToolBar)[0]
         btn_exist = toolbar.findChild(QToolButton, 'gw_add_layers')
