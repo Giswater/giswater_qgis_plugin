@@ -107,7 +107,8 @@ UPDATE cat_feature SET child_layer='ve_node_controlregister' WHERE id='CONTROL-R
 UPDATE cat_feature SET child_layer='ve_node_genpurpvalve' WHERE id='GEN-PURP.VALVE';
 UPDATE cat_feature SET child_layer='ve_node_greenvalve' WHERE id='GREEN-VALVE';
 UPDATE cat_feature SET child_layer='ve_node_outfallvalve' WHERE id='OUTFALL-VALVE';
-UPDATE cat_feature SET child_layer='ve_node_greenvalve' WHERE id='PR-REDUC.VALVE';
+UPDATE cat_feature SET child_layer='ve_node_prreducvalve' WHERE id='PR-REDUC.VALVE';
 UPDATE cat_feature SET child_layer='ve_node_prsustavalve' WHERE id='PR-SUSTA.VALVE';
 UPDATE cat_feature SET child_layer='ve_node_pressuremeter' WHERE id='PRESSURE-METER';
 UPDATE cat_feature SET child_layer='ve_node_shutoffvalve' WHERE id='SHUTOFF-VALVE';
+UPDATE cat_feature SET child_layer='ve_node_adaptation' WHERE id='ADAPTATION';
