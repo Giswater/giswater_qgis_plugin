@@ -131,7 +131,7 @@ CREATE TABLE om_vehicle_x_parameters(
     team_id integer,
     image text,
     load character varying(50),
-    cur_user character varying(50) DEFAULT current_user(),
+    cur_user character varying(50) DEFAULT current_user,
 	tstamp timestamp without time zone
 );
 
