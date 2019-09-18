@@ -77,5 +77,9 @@ ALTER TABLE inp_value_status_pump RENAME TO _inp_value_status_pump_;
 ALTER TABLE inp_value_status_valve RENAME TO _inp_value_status_valve_;
 ALTER TABLE inp_value_times RENAME TO _inp_value_times_;
 ALTER TABLE inp_value_yesno RENAME TO _inp_value_yesno_;
-ALTER TABLE inp_value_yesnofull RENAME TO _inp_value_yesnofull_;
+ALTER TABLE inp_reactions_el RENAME TO _inp_reactions_el_;
+ALTER TABLE inp_reactions_gl RENAME TO _inp_reactions_gl_;
+ALTER TABLE inp_energy_el RENAME TO _inp_energy_el_;
+ALTER TABLE inp_energy_gl RENAME TO _inp_energy_gl_;
+
 
