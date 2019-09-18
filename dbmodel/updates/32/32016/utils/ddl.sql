@@ -118,3 +118,27 @@ CREATE TABLE cat_manager
   
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation_x_user", "column":"manager_id", "dataType":"integer"}}$$);
 
+CREATE TABLE ext_cat_vehicle(
+	id character varying(50) NOT NULL PRIMARY KEY,
+	idval character varying(50),
+	descript character varying(50)
+);
+
+CREATE TABLE om_vehicle_x_parameters(
+	id serial NOT NULL PRIMARY KEY,
+	vehicle_id character varying(50),
+    lot_id integer,
+    team_id integer,
+    image text,
+    load character varying(50),
+    cur_user character varying(50) DEFAULT current_user(),
+	tstamp timestamp without time zone
+);
+
+CREATE TABLE om_team_x_vehicle(
+	id serial NOT NULL PRIMARY KEY,
+	team_id integer,
+	vehicle_id character varying(50)
+);
+
+

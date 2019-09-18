@@ -42,3 +42,19 @@ REFERENCES om_visit_class (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 
 
 ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_customer_code_key CASCADE;
+
+ALTER TABLE om_vehicle_x_parameters ADD CONSTRAINT om_vehicle_x_parameters_vehicle_id_fkey FOREIGN KEY (vehicle_id)
+REFERENCES ext_cat_vehicle (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_vehicle_x_parameters ADD CONSTRAINT om_vehicle_x_parameters_lot_id_fkey FOREIGN KEY (lot_id)
+REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_vehicle_x_parameters ADD CONSTRAINT om_vehicle_x_parameters_team_id_fkey FOREIGN KEY (team_id)
+REFERENCES cat_team (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_team_x_vehicle ADD CONSTRAINT om_team_x_vehicle_team_id_fkey FOREIGN KEY (team_id)
+REFERENCES cat_team (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_team_x_vehicle ADD CONSTRAINT om_team_x_vehicle_vehicle_id_fkey FOREIGN KEY (vehicle_id)
+REFERENCES ext_cat_vehicle (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
