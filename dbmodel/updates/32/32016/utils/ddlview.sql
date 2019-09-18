@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DROP VIEW IF EXISTS v_rtc_hydrometer_period;
-DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period;
+
 DROP VIEW IF EXISTS v_rtc_dma_parameter_period;
 DROP VIEW IF EXISTS v_rtc_dma_hydrometer_period;
-
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period;
+DROP VIEW IF EXISTS v_rtc_hydrometer_period;
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.vi_parent_arc AS 
 SELECT ve_arc.*
