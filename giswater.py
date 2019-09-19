@@ -863,6 +863,7 @@ class Giswater(QObject):
             self.btn_add_layers = QToolButton()
             self.btn_add_layers.setIcon(QIcon(icon_path))
             self.btn_add_layers.setObjectName('gw_add_layers')
+            self.btn_add_layers.setToolTip('Load giswater layer')
             toolbar.addWidget(self.btn_add_layers)
             self.btn_add_layers.clicked.connect(partial(self.create_add_layer_menu))
 
@@ -877,19 +878,21 @@ class Giswater(QObject):
         click_point = QPoint(x + 5, y + 5)
         schema_name = self.schema_name.replace('"', '')
         # Get parent layers
-        sql = ("SELECT DISTINCT(parent_layer) FROM cat_feature")
+        sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' END ), parent_layer FROM cat_feature")
         parent_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
+
         for parent_layer in parent_layers:
             # Create sub menu
             sub_menu = main_menu.addMenu(str(parent_layer[0]))
 
             # Get child layers
             sql = (f"SELECT DISTINCT(child_layer), type FROM cat_feature "
-                   f"WHERE parent_layer = '{parent_layer[0]}' "
+                   f"WHERE parent_layer = '{parent_layer[1]}' "
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
                    f"   WHERE table_schema = '{schema_name}')")
             child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
+
             for child_layer in child_layers:
                 # Create actions
                 action = QAction(str(child_layer[0]), sub_menu, checkable=True)
