@@ -300,7 +300,7 @@ VALUES ('feature_location_vdefault', 'config', 'Featurecat for which location is
 true, false, 'string','combo',false,true,false);
 
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
-VALUES ('featureval__location_vdefault', 'config', 'Featurecat for which location is defined', 'role_edit', 'Featurecat location:', 
+VALUES ('featureval_location_vdefault', 'config', 'Featurecat for which location is defined', 'role_edit', 'Featurecat location:', 
 'SELECT location_type as id, location_type as idval FROM man_type_location WHERE location_type IS NOT NULL',true, 19,6,'utils',
 false, false, 'string','combo',false,true,false,'feature_location_vdefault', ' AND featurecat_id = ');
 
@@ -325,7 +325,7 @@ VALUES ('feature_category_vdefault', 'config', 'Featurecat for which category is
 true, false, 'string','combo',false,true,false);
 
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
-VALUES ('featureval__category_vdefault', 'config', 'Featurecat for which category is defined', 'role_edit', 'Featurecat category:', 
+VALUES ('featureval_category_vdefault', 'config', 'Featurecat for which category is defined', 'role_edit', 'Featurecat category:', 
 'SELECT category_type as id, category_type as idval FROM man_type_category WHERE category_type IS NOT NULL',true, 20,6,'utils',
 false, false, 'string','combo',false,true,false,'feature_category_vdefault', ' AND featurecat_id = ');
 
@@ -350,7 +350,7 @@ VALUES ('feature_fluid_vdefault', 'config', 'Featurecat for which fluid is defin
 true, false, 'string','combo',false,true,false);
 
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
-VALUES ('featureval__fluid_vdefault', 'config', 'Featurecat for which fluid is defined', 'role_edit', 'Featurecat fluid:', 
+VALUES ('featureval_fluid_vdefault', 'config', 'Featurecat for which fluid is defined', 'role_edit', 'Featurecat fluid:', 
 'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE fluid_type IS NOT NULL',true, 18,6,'utils',
 false, false, 'string','combo',false,true,false,'feature_fluid_vdefault', ' AND featurecat_id = ');
 
@@ -375,6 +375,6 @@ VALUES ('feature_function_vdefault', 'config', 'Featurecat for which function is
 true, false, 'string','combo',false,true,false);
 
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
-VALUES ('featureval__function_vdefault', 'config', 'Featurecat for which function is defined', 'role_edit', 'Featurecat function:', 
+VALUES ('featureval_function_vdefault', 'config', 'Featurecat for which function is defined', 'role_edit', 'Featurecat function:', 
 'SELECT function_type as id, function_type as idval FROM man_type_function WHERE function_type IS NOT NULL',true, 21,6,'utils',
 false, false, 'string','combo',false,true,false,'feature_function_vdefault', ' AND featurecat_id = ');

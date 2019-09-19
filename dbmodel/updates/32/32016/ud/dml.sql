@@ -191,22 +191,22 @@ UPDATE inp_typevalue SET id = 'RECT-CLOSED' WHERE typevalue = 'inp_value_orifice
 --vdefaults for man_type
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
 VALUES ('gully_location_vdefault', 'config', 'Default value of location type for gully', 'role_edit', 'Gully location:', 
-'SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 19,4,'utils',
+'SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 19,4,'ud',
 false, false, 'string','combo',false,true,false);
 
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
 VALUES ('gully_category_vdefault', 'config', 'Default value of category type for gully', 'role_edit', 'Gully category:', 
-'SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 20,4,'utils',
+'SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 20,4,'ud',
 false, false, 'string','combo',false,true,false);
 
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
 VALUES ('gully_fluid_vdefault', 'config', 'Default value of fluid type for gully', 'role_edit', 'Gully fluid:', 
-'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 18,4,'utils',
+'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 18,4,'ud',
 false, false, 'string','combo',false,true,false);
 
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
 VALUES ('gully_function_vdefault', 'config', 'Default value of function type for gully', 'role_edit', 'Gully function:', 
-'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 21,4,'utils',
+'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 21,4,'ud',
 false, false, 'string','combo',false,true,false);
 
 INSERT INTO config_param_system ( parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype,tooltip) VALUES ('api_search_gully', '{"sys_table_id":"v_edit_gully", "sys_id_field":"gully_id", "sys_search_field":"code", "alias":"Gullys", "cat_field":"gratecat_id", "orderby":"3", "feature_type":"gully_id"}', NULL, 'api_search_network', NULL, 'api_search_gully:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT (parameter) DO NOTHING;
