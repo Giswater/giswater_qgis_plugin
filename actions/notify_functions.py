@@ -95,60 +95,6 @@ class NotifyFunctions(ParentAction):
                     getattr(self, function_name)(**params)
 
 
-
-    def test(self, **kwargs):
-        print("TESTTESTTEST")
-    def test0(self, **kwargs):
-        print("IN TEST0")
-        for k, v in kwargs.items():
-            print(f'TEST 0 KEY: {k}, VALUE: {v}')
-        print("OUT TEST 0")
-    # params = {'param11':'test1'}
-    def test1(self, param11):
-        # **params in call need to be in this format {'param11':'test1'}
-        print("IN TEST 1")
-        print(param11)
-
-    # params = {'param11':'test1'}
-    def test2(self, param21, param22):
-        print("IN TEST 2")
-        print(f'{param21}, {param22}')
-        print("OUT TEST 2")
-
-    def test3(self, **kwargs):
-        print("IN TEST 3")
-        print(kwargs['param'])
-        list_name = kwargs['param']
-        print(list_name)
-        for x in list_name:
-            print(x)
-        # for k, v in kwargs.items():
-        #     print(f'TEST 3 KEY: {k}, VALUE: {v}')
-        print("OUT TEST 3")
-
-
-
-
-
-    def refreshCanvas(self, **kwargs):
-
-        self.all_layers = []
-        root = QgsProject.instance().layerTreeRoot()
-        self.get_all_layers(root)
-        print(self.all_layers)
-        for layer_name in self.all_layers:
-            layer = self.controller.get_layer_by_tablename(layer_name)
-            layer.triggerRepaint()
-
-    def get_all_layers(self, group):
-        for child in group.children():
-            if isinstance(child, QgsLayerTreeLayer):
-                self.all_layers.append(child.layer().name())
-                child.layer().name()
-            else:
-                self.get_all_layers(child)
-
-
     def refresh_canvas(self, **kwargs):
         # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
         # self.canvas.refreshAllLayers()
@@ -192,8 +138,13 @@ class NotifyFunctions(ParentAction):
 
             complet_result = row[0]
             for field in complet_result['body']['data']['fields']:
-                fieldIndex = layer.fields().indexFromName(field['column_id'])
                 _values = {}
+                # Get column index
+                fieldIndex = layer.fields().indexFromName(field['column_id'])
+
+                # Hide selected fields according table config_api_form_fields.hidden
+                if 'hidden' in field:
+                    self.set_column_visibility(layer, field['column_id'], field['hidden'])
 
                 # Set alias column
                 if field['label']:
@@ -204,50 +155,71 @@ class NotifyFunctions(ParentAction):
                     if 'comboIds' in field:
                         for i in range(0, len(field['comboIds'])):
                             _values[field['comboNames'][i]] = field['comboIds'][i]
-                elif field['widgettype'] == 'typeahead':
-                    rows = self.controller.get_rows(field['queryText'], commit=True)
-                    if rows:
-                        for row in rows:
-                            _values[row[1]] = row[0]
-                else:
-                    continue
-
-                # Set values into valueMap
-                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-
-
-    def getinfofromid(self, *argv):
-        for arg in argv:
-            print(arg)
+                    # Set values into valueMap
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
 
 
-#--insert into api_ws_sample.v_edit_node (node_id, sector_id, dma_id, muni_id, expl_id)VALUES(999999, 2, 2, 1, 1)
-# --DELETE FROM api_ws_sample.node WHERE node_id ='999999'
-# SELECT * FROM api_ws_sample.node  WHERE node_id ='999999999'
-#
-# /*
-# CREATE TRIGGER bmaps_trg_notify_trigger_api_ws_sample
-#  AFTER INSERT
-#  ON api_ws_sample.node
-#  FOR EACH ROW
-#  EXECUTE PROCEDURE api_ws_sample.bmaps_trg_notify_trigger('node');
-# */
-#
-# CREATE OR REPLACE FUNCTION api_ws_sample.bmaps_trg_notify_trigger()
-# RETURNS trigger AS
-# $BODY$
-# DECLARE
-#
-# BEGIN
-# RAISE NOTICE 'test 10';
-# PERFORM pg_notify('watchers', '{"functionAction":{"name":"getinfofromid", "param":{"tableName":"'||TG_ARGV[0]||'"}}}');
-# --EXECUTE 'insert into api_ws_sample.v_edit_node (node_id, sector_id, dma_id, muni_id, expl_id)VALUES(999999999, 2, 2, 1, 1)';
-# RAISE NOTICE 'test rais %', TG_ARGV[0];
-# RETURN new;
-# END;
-# $BODY$
-#  LANGUAGE plpgsql VOLATILE
-#  COST 100;
+    # TODO unused functions atm
+    def set_column_visibility(self, layer, col_name, hidden):
+        """ Hide selected fields according table config_api_form_fields.hidden """
+        config = layer.attributeTableConfig()
+        columns = config.columns()
+        for column in columns:
+            if column.name == str(col_name):
+                column.hidden = hidden
+                break
+        config.setColumns(columns)
+        layer.setAttributeTableConfig(config)
+
+
+
+    def refreshCanvas(self, **kwargs):
+
+        self.all_layers = []
+        root = QgsProject.instance().layerTreeRoot()
+        self.get_all_layers(root)
+        print(self.all_layers)
+        for layer_name in self.all_layers:
+            layer = self.controller.get_layer_by_tablename(layer_name)
+            layer.triggerRepaint()
+
+    def get_all_layers(self, group):
+        for child in group.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                self.all_layers.append(child.layer().name())
+                child.layer().name()
+            else:
+                self.get_all_layers(child)
+
+    def test(self, **kwargs):
+        print("TESTTESTTEST")
+    def test0(self, **kwargs):
+        print("IN TEST0")
+        for k, v in kwargs.items():
+            print(f'TEST 0 KEY: {k}, VALUE: {v}')
+        print("OUT TEST 0")
+    # params = {'param11':'test1'}
+    def test1(self, param11):
+        # **params in call need to be in this format {'param11':'test1'}
+        print("IN TEST 1")
+        print(param11)
+
+    # params = {'param11':'test1'}
+    def test2(self, param21, param22):
+        print("IN TEST 2")
+        print(f'{param21}, {param22}')
+        print("OUT TEST 2")
+
+    def test3(self, **kwargs):
+        print("IN TEST 3")
+        print(kwargs['param'])
+        list_name = kwargs['param']
+        print(list_name)
+        for x in list_name:
+            print(x)
+        # for k, v in kwargs.items():
+        #     print(f'TEST 3 KEY: {k}, VALUE: {v}')
+        print("OUT TEST 3")

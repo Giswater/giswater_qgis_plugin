@@ -1365,14 +1365,13 @@ class Giswater(QObject):
                     self.set_column_visibility(layer, col[0], col[1])
 
             for field in complet_result['body']['data']['fields']:
+                _values = {}
                 # Get column index
                 fieldIndex = layer.fields().indexFromName(field['column_id'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['column_id'], field['hidden'])
-
-                _values = {}
 
                 # Set alias column
                 if field['label']:
@@ -1383,17 +1382,9 @@ class Giswater(QObject):
                     if 'comboIds' in field:
                         for i in range(0, len(field['comboIds'])):
                             _values[field['comboNames'][i]] = field['comboIds'][i]
-                elif field['widgettype'] == 'typeahead':
-                    rows = self.controller.get_rows(field['queryText'], commit=True)
-                    if rows:
-                        for row in rows:
-                            _values[row[1]] = row[0]
-                else:
-                    continue
-
-                # Set values into valueMap
-                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                    # Set values into valueMap
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
     def set_column_visibility(self, layer, col_name, hidden):
