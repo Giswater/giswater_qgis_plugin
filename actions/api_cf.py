@@ -271,7 +271,7 @@ class ApiCF(ApiParent):
         # When info is nothing
         if 'results' in row[0]:
             if row[0]['results'] == 0:
-                self.controller.show_message(row[0]['message']['text'], 0)
+                self.controller.show_message(row[0]['message']['text'], 1)
                 return False, None
 
         # When insert feature failed
@@ -400,9 +400,7 @@ class ApiCF(ApiParent):
         # Get tableParent and select layer
         self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
         self.layer = self.controller.get_layer_by_tablename(self.table_parent)
-        if self.layer:
-            self.iface.setActiveLayer(self.layer)
-        else:
+        if self.layer is None:
             self.controller.show_message("Layer not found: " + self.table_parent, 2)
             return False, self.dlg_cf
 
