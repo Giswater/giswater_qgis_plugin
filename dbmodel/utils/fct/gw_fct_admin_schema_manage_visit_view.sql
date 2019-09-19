@@ -137,7 +137,7 @@ SET search_path = "SCHEMA_NAME", public;
 
 		EXECUTE 'CREATE TRIGGER gw_trg_om_visit_multievent
 		INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-		FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_om_visit_multievent('||lower(v_feature_system_id)||');';
+		FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_om_visit_multievent('||v_class_id||');';
 		
 END;
 $BODY$

@@ -162,7 +162,11 @@ BEGIN
 
 	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
 
+	--reset the value of sequence for tables where data will be inserted
 	PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+	PERFORM setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
+--	PERFORM setval('SCHEMA_NAME.config_api_visit_id_seq', (SELECT max(id) FROM config_api_visit), true);
+	PERFORM setval('SCHEMA_NAME.om_visit_class_x_parameter_id_seq', (SELECT max(id) FROM om_visit_class_x_parameter), true);
 
 IF v_action = 'CREATE' THEN
 	--insert new class and parameter
@@ -210,7 +214,20 @@ IF v_action = 'CREATE' THEN
 
 			UPDATE config_api_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') 
 			WHERE column_id = 'feature_id' and formname = v_viewname;
-
+			
+			IF v_feature_system_id = 'connec' THEN
+				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND 
+				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+				WHERE formname=v_viewname AND column_id='class_id';
+			ELSIF v_feature_system_id = 'node' THEN
+				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''NODE'' AND 
+				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+				WHERE formname=v_viewname AND column_id='class_id';
+			ELSIF v_feature_system_id = 'gully' THEN
+				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''GULLY'' AND 
+				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+				WHERE formname=v_viewname AND column_id='class_id';
+			END IF;
 		END IF;
 		
 	ELSIF v_action_type = 'parameter' THEN
