@@ -277,3 +277,104 @@ VALUES ('plan_psector_statetype', '{"done_planified":"98", "done_ficticious":"97
 
 UPDATE audit_cat_param_user SET description='If true, connec''s label and vnode symbol will be rotated using the angle of link. You need to have label symbol configurated with "CASE WHEN label_x = 5 THEN ''    '' ||  "connec_id"  
 ELSE  "connec_id"  || ''    ''  END", label_x as quadrant and label_rotation as rotation', label='Automatic rotation for connec labels and vnodes:' WHERE id='edit_link_connecrotation_update';
+
+--vdefaults for man_type
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('arc_location_vdefault', 'config', 'Default value of location type for arc', 'role_edit', 'Arc location:', 
+'SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''ARC'' and featurecat_id IS NULL',true, 19,1,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('node_location_vdefault', 'config', 'Default value of location type for node', 'role_edit', 'Node location:', 
+'SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''NODE'' and featurecat_id IS NULL',true, 19,2,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('connec_location_vdefault', 'config', 'Default value of location type for connec', 'role_edit', 'Connec location:', 
+'SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''CONNEC'' and featurecat_id IS NULL',true, 19,3,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('feature_location_vdefault', 'config', 'Featurecat for which location is defined', 'role_edit', 'Featurecat:', 
+'SELECT id, id as idval FROM cat_feature WHERE id IS NOT NULL ',true, 19,5,'utils',
+true, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
+VALUES ('featureval__location_vdefault', 'config', 'Featurecat for which location is defined', 'role_edit', 'Featurecat location:', 
+'SELECT location_type as id, location_type as idval FROM man_type_location WHERE location_type IS NOT NULL',true, 19,6,'utils',
+false, false, 'string','combo',false,true,false,'feature_location_vdefault', ' AND featurecat_id = ');
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('arc_category_vdefault', 'config', 'Default value of category type for arc', 'role_edit', 'Arc category:', 
+'SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type=''ARC'' and featurecat_id IS NULL',true, 20,1,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('node_category_vdefault', 'config', 'Default value of category type for node', 'role_edit', 'Node category:', 
+'SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type=''NODE'' and featurecat_id IS NULL',true, 20,2,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('connec_category_vdefault', 'config', 'Default value of category type for connec', 'role_edit', 'Connec category:', 
+'SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type=''CONNEC'' and featurecat_id IS NULL',true, 20,3,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('feature_category_vdefault', 'config', 'Featurecat for which category is defined', 'role_edit', 'Featurecat:', 
+'SELECT id, id as idval FROM cat_feature WHERE id IS NOT NULL ',true, 20,5,'utils',
+true, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
+VALUES ('featureval__category_vdefault', 'config', 'Featurecat for which category is defined', 'role_edit', 'Featurecat category:', 
+'SELECT category_type as id, category_type as idval FROM man_type_category WHERE category_type IS NOT NULL',true, 20,6,'utils',
+false, false, 'string','combo',false,true,false,'feature_category_vdefault', ' AND featurecat_id = ');
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('arc_fluid_vdefault', 'config', 'Default value of fluid type for arc', 'role_edit', 'Arc fluid:', 
+'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''ARC'' and featurecat_id IS NULL',true, 18,1,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('node_fluid_vdefault', 'config', 'Default value of fluid type for node', 'role_edit', 'Node fluid:', 
+'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''NODE'' and featurecat_id IS NULL',true, 18,2,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('connec_fluid_vdefault', 'config', 'Default value of fluid type for connec', 'role_edit', 'Connec fluid:', 
+'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''CONNEC'' and featurecat_id IS NULL',true, 18,3,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('feature_fluid_vdefault', 'config', 'Featurecat for which fluid is defined', 'role_edit', 'Featurecat:', 
+'SELECT id, id as idval FROM cat_feature WHERE id IS NOT NULL ',true, 18,5,'utils',
+true, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
+VALUES ('featureval__fluid_vdefault', 'config', 'Featurecat for which fluid is defined', 'role_edit', 'Featurecat fluid:', 
+'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE fluid_type IS NOT NULL',true, 18,6,'utils',
+false, false, 'string','combo',false,true,false,'feature_fluid_vdefault', ' AND featurecat_id = ');
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('arc_function_vdefault', 'config', 'Default value of function type for arc', 'role_edit', 'Arc function:', 
+'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''ARC'' and featurecat_id IS NULL',true, 21,1,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('node_function_vdefault', 'config', 'Default value of function type for node', 'role_edit', 'Node function:', 
+'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''NODE'' and featurecat_id IS NULL',true, 21,2,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('connec_function_vdefault', 'config', 'Default value of function type for connec', 'role_edit', 'Connec function:', 
+'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''CONNEC'' and featurecat_id IS NULL',true, 21,3,'utils',
+false, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated)
+VALUES ('feature_function_vdefault', 'config', 'Featurecat for which function is defined', 'role_edit', 'Featurecat:', 
+'SELECT id, id as idval FROM cat_feature WHERE id IS NOT NULL ',true, 21,5,'utils',
+true, false, 'string','combo',false,true,false);
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, dv_querytext, isenabled, layout_id, layout_order,project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_isnullvalue, isdeprecated, dv_parent_id, dv_querytext_filterc)
+VALUES ('featureval__function_vdefault', 'config', 'Featurecat for which function is defined', 'role_edit', 'Featurecat function:', 
+'SELECT function_type as id, function_type as idval FROM man_type_function WHERE function_type IS NOT NULL',true, 21,6,'utils',
+false, false, 'string','combo',false,true,false,'feature_function_vdefault', ' AND featurecat_id = ');

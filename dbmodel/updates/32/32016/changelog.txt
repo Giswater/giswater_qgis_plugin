@@ -9,3 +9,4 @@
 - New function (2750) gw_trg_typevalue_config_fk
 - New function (2746) gw_fct_admin_manage_visit
 - New function (2748) gw_fct_admin_manage_visit_view
+- Manage man_type vdefault
