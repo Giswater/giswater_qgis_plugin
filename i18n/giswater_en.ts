@@ -99,8 +99,8 @@
     </message>
     <message>
         <source>01_text</source>
-        <translation>Node,connec insert (WS) / Node,connec,gully insert (UD)</translation>
-    </message>      
+        <translation>Insert node, connec (WS) / Insert node, connec, gully (UD)</translation>
+    </message>
     <message>
         <source>02_text</source>
         <translation>Arc insert</translation>
@@ -144,7 +144,11 @@
     <message>
         <source>68_text</source>
         <translation>End feature</translation>
-    </message>	
+    </message>
+    <message>
+        <source>69_text</source>
+        <translation>Delete feature</translation>
+    </message>
     <message>
         <source>34_text</source>
         <translation>Add document</translation>

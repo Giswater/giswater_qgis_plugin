@@ -142,10 +142,14 @@
         <source>67_text</source>
         <translation>Gestor d'elements</translation>
     </message>
-    <!--message>
+    <message>
         <source>68_text</source>
         <translation>Donar de baixa</translation>
-    </message-->		
+    </message>
+    <message>
+        <source>69_text</source>
+        <translation>Eliminar element de xarxa</translation>
+    </message>
     <message>
         <source>34_text</source>
         <translation>Afegir document</translation>

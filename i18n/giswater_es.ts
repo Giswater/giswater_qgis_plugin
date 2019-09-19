@@ -135,6 +135,10 @@
         <translation>Dar de baja</translation>
     </message>
     <message>
+        <source>69_text</source>
+        <translation>Eliminar elemento de red</translation>
+    </message>
+    <message>
         <source>81_text</source>
         <translation> Nuevo sector de planificación OM</translation>
     </message>
