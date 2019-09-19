@@ -89,10 +89,10 @@ class ApiConfig(ApiParent):
         groupBox_16 = QGroupBox("Analysis")
         groupBox_17 = QGroupBox("System")
 
-        groupBox_18 = QGroupBox("Node")
-        groupBox_19 = QGroupBox("Arc")
-        groupBox_20 = QGroupBox("Connec")
-        groupBox_21 = QGroupBox("Gully")
+        groupBox_18 = QGroupBox("Fluid type")
+        groupBox_19 = QGroupBox("Location type")
+        groupBox_20 = QGroupBox("Category type")
+        groupBox_21 = QGroupBox("Function type")
 
         groupBox_22 = QGroupBox("Addfields")
 
