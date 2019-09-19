@@ -43,6 +43,7 @@ class DaoController(object):
         self.logger = None
         self.schema_name = None
         self.dao = None
+        self.credentials = None
         if create_logger:
             self.set_logger(logger_name)
                 
@@ -201,7 +202,7 @@ class DaoController(object):
                 self.log_warning("Error getting default connection (settings)")
                 self.last_error = self.tr("Error getting default connection")
                 return None, not_version
-
+        self.credentials = credentials
         return credentials, not_version
 
 
