@@ -267,12 +267,16 @@ IF v_multi_create IS TRUE THEN
 		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
 		v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
 		
-		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=9;
+		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
+
+		IF v_param_user_id IS NULL THEN
+			v_param_user_id=1;
+		END IF;
 
 		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
       	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc)
 		VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
-		v_isenabled, 9, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
+		v_isenabled, 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
 		v_dv_querytext, v_dv_querytext_filterc);
 
 	ELSIF v_action = 'UPDATE' THEN
@@ -529,13 +533,17 @@ ELSE
 		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
 
 
-		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=9;
+		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
 		
+		IF v_param_user_id IS NULL THEN
+			v_param_user_id=1;
+		END IF;
+
 		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
       	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc)
 		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
 		concat('Default value of addfield ',v_param_name, 'for ', v_cat_feature), 
-		'role_edit', v_param_name, v_isenabled, 9, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
+		'role_edit', v_param_name, v_isenabled, 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
 		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc);
 
 	ELSIF v_action = 'UPDATE' THEN

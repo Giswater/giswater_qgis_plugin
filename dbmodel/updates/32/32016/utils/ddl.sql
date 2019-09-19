@@ -142,4 +142,6 @@ CREATE TABLE om_team_x_vehicle(
 	vehicle_id character varying(50)
 );
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_users", "column":"sys_role", "dataType":"varchar(30)"}}$$);
+
 

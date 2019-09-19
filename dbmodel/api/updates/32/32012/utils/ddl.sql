@@ -91,14 +91,6 @@ CREATE TABLE config_api_layer
 
 
 
-CREATE TABLE config_api_layer_child
-(  featurecat_id character varying(30) NOT NULL,
-  tableinfo_id text,
-  CONSTRAINT config_api_layer_child_pkey PRIMARY KEY (featurecat_id)
-);
-
-
-
 CREATE TABLE config_api_tableinfo_x_infotype
 (  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.config_api_tableinfo_x_inforole_id_seq'::regclass),
   tableinfo_id character varying(50),

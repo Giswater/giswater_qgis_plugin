@@ -28,7 +28,7 @@ CREATE OR REPLACE VIEW ve_lot_x_gully AS
 
   
 CREATE OR REPLACE VIEW v_edit_inp_junction AS
-SELECT 
+SELECT DISTINCT ON (node_id) 
 v_node.node_id, 
 top_elev,
 custom_top_elev,
@@ -118,7 +118,7 @@ UNION
   
 
 CREATE OR REPLACE VIEW v_edit_inp_divider AS
-SELECT 
+SELECT DISTINCT ON (node_id) 
 v_node.node_id, 
 top_elev,
 custom_top_elev,
@@ -149,7 +149,7 @@ FROM inp_selector_sector, v_node
 
 
 CREATE OR REPLACE VIEW v_edit_inp_outfall AS
-SELECT 
+SELECT DISTINCT ON (node_id)
 v_node.node_id, 
 top_elev,
 custom_top_elev,
@@ -176,7 +176,7 @@ FROM inp_selector_sector, v_node
 
 
 CREATE OR REPLACE VIEW v_edit_inp_storage AS
-SELECT 
+SELECT DISTINCT ON (node_id) 
 v_node.node_id, 
 top_elev,
 custom_top_elev,

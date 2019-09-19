@@ -11,6 +11,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE config_api_form_fields SET formtype='form' WHERE formname='printGeneric';
 
+Delete from config_api_form_fields where formname='infoplan' and column_id IN ('frame2','intermediate_cost', 'other_cost');
+DELETE FROM config_api_form_tabs WHERE tabname='tab_rpt';
+
 
 UPDATE sys_feature_cat SET shortcut_key = 'P' WHERE id = 'PUMP' AND tablename = 'v_edit_man_pump';
 UPDATE cat_feature SET shortcut_key = concat('Alt+',sys_feature_cat.shortcut_key) FROM sys_feature_cat WHERE sys_feature_cat.id = cat_feature.id and cat_feature.feature_type = 'NODE';
