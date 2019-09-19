@@ -31,7 +31,7 @@ INSERT INTO config_api_form_tabs VALUES (640,'v_edit_node','tab_data','Data','Da
 INSERT INTO config_api_form_tabs VALUES (650,'v_edit_connec','tab_data','Data','Data','role_basic','data',NULL,NULL);
 INSERT INTO config_api_form_tabs VALUES (660,'v_edit_arc','tab_data','Data','Data','role_basic','data',NULL,NULL);
 
-INSERT INTO config_api_form_tabs VALUES (640,'v_edit_node','tab_connections','Connections','Connections','role_basic','connections',NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (645,'v_edit_node','tab_connections','Connections','Connections','role_basic','connections',NULL,NULL);
 
 INSERT INTO config_api_form_tabs VALUES (670,'v_edit_gully','tab_om','OM','Lista de eventos del elemento','role_basic','OM',NULL,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false},{"actionName":"actionSection", "actionFunction":"", "actionTooltip":"Show Section", "disabled":false}]');
 

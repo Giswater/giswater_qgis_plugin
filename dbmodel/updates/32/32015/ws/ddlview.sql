@@ -530,8 +530,14 @@ CREATE OR REPLACE VIEW v_edit_connec AS
 	connec.pjoint_id,
     connec.lastupdate,
     connec.lastupdate_user,
-    connec.insert_user
+    connec.insert_user,
+    a.n_hydrometer
 	FROM connec
+	   LEFT JOIN (SELECT connec.connec_id,
+	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		FROM ext_rtc_hydrometer
+		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		GROUP BY connec.connec_id) a USING (connec_id)
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
      JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text     
@@ -843,8 +849,14 @@ CREATE OR REPLACE VIEW ve_connec AS
     cat_connec.connectype_id as connec_type,
     connec.lastupdate,
     connec.lastupdate_user,
-    connec.insert_user
+    connec.insert_user,
+    a.n_hydrometer	
    FROM connec
+	   LEFT JOIN (SELECT connec.connec_id,
+	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		FROM ext_rtc_hydrometer
+		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		GROUP BY connec.connec_id) a USING (connec_id)
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
      JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
@@ -852,5 +864,320 @@ CREATE OR REPLACE VIEW ve_connec AS
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
      LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id;
+	 
+	 
+CREATE OR REPLACE VIEW v_edit_man_fountain AS 
+ SELECT connec.connec_id,
+    connec.code,
+    connec.elevation,
+    connec.depth,
+    cat_connec.connectype_id,
+    connec.connecat_id,
+    cat_connec.matcat_id,
+    cat_connec.pnom,
+    cat_connec.dnom,
+    connec.sector_id,
+    sector.macrosector_id,
+    connec.customer_code,
+    a.n_hydrometer,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    connec.observ,
+    connec.comment,
+    connec.dma_id,
+    connec.presszonecat_id,
+    connec.soilcat_id,
+    connec.function_type,
+    connec.category_type,
+    connec.fluid_type,
+    connec.location_type,
+    connec.workcat_id,
+    connec.workcat_id_end,
+    connec.buildercat_id,
+    connec.builtdate,
+    connec.enddate,
+    connec.ownercat_id,
+    connec.muni_id,
+    connec.postcode,
+    connec.streetaxis_id,
+    connec.postnumber,
+    connec.postcomplement,
+    connec.streetaxis2_id,
+    connec.postnumber2,
+    connec.postcomplement2,
+    connec.descript,
+    connec.arc_id,
+    cat_connec.svg,
+    connec.rotation,
+    connec.label_x,
+    connec.label_y,
+    connec.label_rotation,
+    concat(connec_type.link_path, connec.link) AS link,
+    connec.connec_length,
+    connec.verified,
+    connec.the_geom,
+    connec.undelete,
+    connec.publish,
+    connec.inventory,
+    dma.macrodma_id,
+    connec.expl_id,
+    connec.num_value,
+    man_fountain.pol_id,
+    man_fountain.linked_connec,
+    man_fountain.vmax,
+    man_fountain.vtotal,
+    man_fountain.container_number,
+    man_fountain.pump_number,
+    man_fountain.power,
+    man_fountain.regulation_tank,
+    man_fountain.chlorinator,
+    man_fountain.arq_patrimony,
+    man_fountain.name
+   FROM connec
+	 LEFT JOIN (SELECT connec.connec_id,
+	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		FROM ext_rtc_hydrometer
+		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		GROUP BY connec.connec_id) a USING (connec_id)    
+   LEFT JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+   JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+   JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
+   JOIN dma ON connec.dma_id = dma.dma_id
+   LEFT JOIN sector ON connec.sector_id = sector.sector_id
+   JOIN man_fountain ON man_fountain.connec_id::text = connec.connec_id::text;
+
+
+
+
+CREATE OR REPLACE VIEW v_edit_man_greentap AS 
+ SELECT connec.connec_id,
+    connec.code,
+    connec.elevation,
+    connec.depth,
+    cat_connec.connectype_id,
+    connec.connecat_id,
+    cat_connec.matcat_id,
+    cat_connec.pnom,
+    cat_connec.dnom,
+    connec.sector_id,
+    sector.macrosector_id,
+    connec.customer_code,
+    a.n_hydrometer,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    connec.observ,
+    connec.comment,
+    connec.dma_id,
+    connec.presszonecat_id,
+    connec.soilcat_id,
+    connec.function_type,
+    connec.category_type,
+    connec.fluid_type,
+    connec.location_type,
+    connec.workcat_id,
+    connec.workcat_id_end,
+    connec.buildercat_id,
+    connec.builtdate,
+    connec.enddate,
+    connec.ownercat_id,
+    connec.muni_id,
+    connec.postcode,
+    connec.streetaxis_id,
+    connec.postnumber,
+    connec.postcomplement,
+    connec.streetaxis2_id,
+    connec.postnumber2,
+    connec.postcomplement2,
+    connec.descript,
+    connec.arc_id,
+    cat_connec.svg,
+    connec.rotation,
+    connec.label_x,
+    connec.label_y,
+    connec.label_rotation,
+    concat(connec_type.link_path, connec.link) AS link,
+    connec.connec_length,
+    connec.verified,
+    connec.the_geom,
+    connec.undelete,
+    connec.publish,
+    connec.inventory,
+    dma.macrodma_id,
+    connec.expl_id,
+    connec.num_value,
+    man_greentap.linked_connec
+   FROM connec
+	 LEFT JOIN (SELECT connec.connec_id,
+	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		FROM ext_rtc_hydrometer
+		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		GROUP BY connec.connec_id) a USING (connec_id)    
+     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+     JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
+     LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id
+     JOIN man_greentap ON man_greentap.connec_id::text = connec.connec_id::text;
+
+
+CREATE OR REPLACE VIEW v_edit_man_tap AS 
+ SELECT connec.connec_id,
+    connec.code,
+    connec.elevation,
+    connec.depth,
+    cat_connec.connectype_id,
+    connec.connecat_id,
+    cat_connec.matcat_id,
+    cat_connec.pnom,
+    cat_connec.dnom,
+    connec.sector_id,
+    sector.macrosector_id,
+    connec.customer_code,
+    a.n_hydrometer,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    connec.observ,
+    connec.comment,
+    connec.dma_id,
+    connec.presszonecat_id,
+    connec.soilcat_id,
+    connec.function_type,
+    connec.category_type,
+    connec.fluid_type,
+    connec.location_type,
+    connec.workcat_id,
+    connec.workcat_id_end,
+    connec.buildercat_id,
+    connec.builtdate,
+    connec.enddate,
+    connec.ownercat_id,
+    connec.muni_id,
+    connec.postcode,
+    connec.streetaxis_id,
+    connec.postnumber,
+    connec.postcomplement,
+    connec.streetaxis2_id,
+    connec.postnumber2,
+    connec.postcomplement2,
+    connec.descript,
+    connec.arc_id,
+    cat_connec.svg,
+    connec.rotation,
+    connec.label_x,
+    connec.label_y,
+    connec.label_rotation,
+    concat(connec_type.link_path, connec.link) AS link,
+    connec.connec_length,
+    connec.verified,
+    connec.the_geom,
+    connec.undelete,
+    connec.publish,
+    connec.inventory,
+    dma.macrodma_id,
+    connec.expl_id,
+    connec.num_value,
+    man_tap.linked_connec,
+    man_tap.cat_valve,
+    man_tap.drain_diam,
+    man_tap.drain_exit,
+    man_tap.drain_gully,
+    man_tap.drain_distance,
+    man_tap.arq_patrimony,
+    man_tap.com_state
+   FROM connec
+	 LEFT JOIN (SELECT connec.connec_id,
+	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		FROM ext_rtc_hydrometer
+		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		GROUP BY connec.connec_id) a USING (connec_id)  
+     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+     JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
+     LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id
+     JOIN man_tap ON man_tap.connec_id::text = connec.connec_id::text;
+
+
+
+CREATE OR REPLACE VIEW v_edit_man_wjoin AS 
+ SELECT connec.connec_id,
+    connec.code,
+    connec.elevation,
+    connec.depth,
+    cat_connec.connectype_id,
+    connec.connecat_id,
+    cat_connec.matcat_id,
+    cat_connec.pnom,
+    cat_connec.dnom,
+    connec.sector_id,
+    sector.macrosector_id,
+    connec.customer_code,
+    a.n_hydrometer,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    connec.observ,
+    connec.comment,
+    connec.dma_id,
+    connec.presszonecat_id,
+    connec.soilcat_id,
+    connec.function_type,
+    connec.category_type,
+    connec.fluid_type,
+    connec.location_type,
+    connec.workcat_id,
+    connec.workcat_id_end,
+    connec.buildercat_id,
+    connec.builtdate,
+    connec.enddate,
+    connec.ownercat_id,
+    connec.muni_id,
+    connec.postcode,
+    connec.streetaxis_id,
+    connec.postnumber,
+    connec.postcomplement,
+    connec.streetaxis2_id,
+    connec.postnumber2,
+    connec.postcomplement2,
+    connec.descript,
+    connec.arc_id,
+    cat_connec.svg,
+    connec.rotation,
+    connec.label_x,
+    connec.label_y,
+    connec.label_rotation,
+    concat(connec_type.link_path, connec.link) AS link,
+    connec.connec_length,
+    connec.verified,
+    connec.the_geom,
+    connec.undelete,
+    connec.publish,
+    connec.inventory,
+    dma.macrodma_id,
+    connec.expl_id,
+    connec.num_value,
+    man_wjoin.top_floor,
+    man_wjoin.cat_valve
+   FROM connec
+	 LEFT JOIN (SELECT connec.connec_id,
+	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		FROM ext_rtc_hydrometer
+		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		GROUP BY connec.connec_id) a USING (connec_id)    
+     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+     JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
+     JOIN man_wjoin ON man_wjoin.connec_id::text = connec.connec_id::text
+     LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id;
+	 
+	 
+	 DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+	 
+	
+
 
 
