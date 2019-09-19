@@ -241,7 +241,7 @@ UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_other';
 INSERT INTO edit_typevalue VALUES ('nullvalue', '0', NULL, NULL);
 
 DELETE FROM config_param_system WHERE parameter='api_search_visit_modificat';
-DELETE FROM config_param_system WHERE parameter='api_search_exploitation';
+UPDATE config_param_system SET context = NULL WHERE parameter='api_search_exploitation';
 
 DELETE FROM audit_cat_param_user WHERE id='psector_type_vdefault';
 DELETE FROM audit_cat_param_user WHERE id='edit_arc_division_dsbl';
