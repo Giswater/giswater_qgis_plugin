@@ -229,9 +229,6 @@ BEGIN
 
 			If label_side_aux>=0 and label_side_aux<=180 THEN
 				label_side=3;
-			ELSIF label_side_aux>270 and label_side_aux<=360 and label_rotation_aux>0 then
-				label_side=3;
-				
 			ELSE
 				label_side=5;
 			END IF;

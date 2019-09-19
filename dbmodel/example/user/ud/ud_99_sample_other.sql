@@ -51,11 +51,24 @@ INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descrip
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (5, '91', 1, 0, false, NULL);
 	
 TRUNCATE plan_psector_x_connec;
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3029', NULL, 2, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3174', '178', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3175', '339', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3181', '339', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3182', '179', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3183', '179', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3184', '179', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3080', '157', 2, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3029', '158', 2, 0, false, NULL, NULL, NULL);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('100018', '251', 2, 1, true, NULL, '0102000020E76400000200000002A4D88FD6931941A9D45FDE6A755141736891EDB39319413333334363755141', '0101000020E7640000736891EDB39319413333334363755141');
 
-INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30110', NULL, 2, 0, false, NULL, NULL, NULL);
-INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30072', NULL, 2, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30053', '179', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30056', '339', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30057', '178', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30058', '178', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30059', '177', 1, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30070', '157', 2, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30110', '157', 2, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_gully (gully_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('30072', '20608', 2, 0, false, NULL, NULL, NULL);
 UPDATE plan_psector_x_gully set arc_id  = '252', psector_id=2 WHERE gully_id = '100012';
 UPDATE plan_psector_x_gully set arc_id  = '156', psector_id=2 WHERE gully_id = '100013';
 
@@ -63,8 +76,14 @@ INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater
 INSERT INTO doc VALUES ('Demo document 3', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762257', current_user, '2018-03-14 17:09:59.762257');
 INSERT INTO doc VALUES ('Demo document 2', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Readme.txt', NULL, '2018-03-14 17:09:19.852804', current_user, '2018-03-14 17:09:19.852804');
 
+TRUNCATE selector_psector;
+
 select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'CONNEC');
-select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'GULLY');
+select gw_fct_connect_to_network((select array_agg(gully_id)from gully ), 'GULLY');
+
+-- rotate vnodes and connec labels
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
+UPDATE link SET the_geom=the_geom;
 
 SELECT gw_fct_plan_result($${"client":{"device":3, "infoType":100, "lang":"ES"},
 							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
@@ -206,9 +225,6 @@ SELECT 'edit_typevalue','grate_param_1','man_addfields_value','value_param',id F
 INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','chamber_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='chamber_param_1';
 
--- rotate vnodes and connec labels
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
-UPDATE link SET the_geom=the_geom;
 
 -- redo missed values for some arcs
 UPDATE arc SET sys_elev1=56.76 , sys_elev2=56.45 WHERE arc_id='100003';
@@ -217,3 +233,16 @@ UPDATE arc SET sys_elev1=53.15 , sys_elev2=53 WHERE arc_id='100005';
 UPDATE arc SET sys_elev1=53 , sys_elev2=51.15 WHERE arc_id='100009';
 UPDATE arc SET sys_elev1=51.15 , sys_elev2=48.95 WHERE arc_id='100010';
 UPDATE arc SET sys_elev1=46.92 , sys_elev2=48.95 WHERE arc_id='100011';
+
+-- calculate values for connecs and gullys
+-- connec y1 & y2
+UPDATE connec c SET y1=vnode_ymax FROM v_arc_x_vnode v WHERE v.feature_id=c.connec_id;
+UPDATE connec c SET y2=vnode_ymax-0.4 FROM v_arc_x_vnode v WHERE v.feature_id=c.connec_id AND c.y1>1.2;
+UPDATE connec c SET y2=vnode_ymax-0.2 FROM v_arc_x_vnode v WHERE v.feature_id=c.connec_id AND c.y1<1.2;
+-- connec_length
+UPDATE connec SET connec_length=ST_Length(link.the_geom) FROM link WHERE link.feature_id=connec_id AND link.feature_type='CONNEC';
+UPDATE gully SET connec_length=ST_Length(link.the_geom) FROM link WHERE link.feature_id=gully_id AND link.feature_type='GULLY';
+
+-- gully connec_depth
+UPDATE gully SET connec_depth='1.2';
+

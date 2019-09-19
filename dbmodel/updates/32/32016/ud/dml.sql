@@ -208,3 +208,5 @@ INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, d
 VALUES ('gully_function_vdefault', 'config', 'Default value of function type for gully', 'role_edit', 'Gully function:', 
 'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''GULLY'' and featurecat_id IS NULL',true, 21,4,'utils',
 false, false, 'string','combo',false,true,false);
+
+INSERT INTO config_param_system ( parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype,tooltip) VALUES ('api_search_gully', '{"sys_table_id":"v_edit_gully", "sys_id_field":"gully_id", "sys_search_field":"code", "alias":"Gullys", "cat_field":"gratecat_id", "orderby":"3", "feature_type":"gully_id"}', NULL, 'api_search_network', NULL, 'api_search_gully:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT (parameter) DO NOTHING;
