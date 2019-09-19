@@ -17,7 +17,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    UPDATE config_api_form_fields SET label = NEW.label, layout_name = NEW.layout_name, layout_order = NEW.layout_order, 
+    UPDATE config_api_form_fields SET label = NEW.label, widgetcontrols = NEW.widgetcontrols,
     isenabled = NEW.isenabled, iseditable = NEW.iseditable, ismandatory = NEW.ismandatory, 
     tooltip = NEW.tooltip, widgetdim = NEW.widgetdim, placeholder = NEW.placeholder, 
     editability = NEW.editability, stylesheet = NEW.stylesheet, hidden = NEW.hidden
