@@ -878,7 +878,7 @@ class Giswater(QObject):
         click_point = QPoint(x + 5, y + 5)
         schema_name = self.schema_name.replace('"', '')
         # Get parent layers
-        sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' END ), parent_layer FROM cat_feature")
+        sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature")
         parent_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
 
         for parent_layer in parent_layers:
