@@ -1317,14 +1317,14 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-    """ FUNCTIONS RELATED WITH TAB CONECTIONS """
+    """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """
-
-        self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream")
+        filter_ = f"node_id='{self.feature_id}'"
+        self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream", filter_)
         self.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
-        self.fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream")
+        self.fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream", filter_)
         self.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
