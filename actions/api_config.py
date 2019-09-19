@@ -64,6 +64,11 @@ class ApiConfig(ApiParent):
         admin_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'admin_layout1')
         admin_layout2 = self.dlg_config.tab_main.findChild(QGridLayout, 'admin_layout2')
 
+        man_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'man_layout1')
+        man_layout2 = self.dlg_config.tab_main.findChild(QGridLayout, 'man_layout2')
+
+        addfields_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'addfields_layout1')
+
         groupBox_1 = QGroupBox("Basic")
         groupBox_2 = QGroupBox("Om")
         groupBox_3 = QGroupBox("Workcat")
@@ -72,15 +77,25 @@ class ApiConfig(ApiParent):
         groupBox_6 = QGroupBox("Epa")
         groupBox_7 = QGroupBox("MasterPlan")
         groupBox_8 = QGroupBox("Other")
+
         groupBox_9 = QGroupBox("Node")
         groupBox_10 = QGroupBox("Arc")
         groupBox_11 = QGroupBox("Utils")
         groupBox_12 = QGroupBox("Connec&Gully")
+
         groupBox_13 = QGroupBox("Topology")
         groupBox_14 = QGroupBox("Builder")
         groupBox_15 = QGroupBox("Review")
         groupBox_16 = QGroupBox("Analysis")
         groupBox_17 = QGroupBox("System")
+
+        groupBox_18 = QGroupBox("Node")
+        groupBox_19 = QGroupBox("Arc")
+        groupBox_20 = QGroupBox("Connec")
+        groupBox_21 = QGroupBox("Gully")
+
+        groupBox_22 = QGroupBox("Addfields")
+
 
         self.basic_form = QGridLayout()
         self.om_form = QGridLayout()
@@ -90,15 +105,24 @@ class ApiConfig(ApiParent):
         self.epa_form = QGridLayout()
         self.masterplan_form = QGridLayout()
         self.other_form = QGridLayout()
+
         self.node_type_form = QGridLayout()
         self.cat_form = QGridLayout()
         self.utils_form = QGridLayout()
         self.connec_form = QGridLayout()
+
         self.topology_form = QGridLayout()
         self.builder_form = QGridLayout()
         self.review_form = QGridLayout()
         self.analysis_form = QGridLayout()
         self.system_form = QGridLayout()
+
+        self.node_mantype_form = QGridLayout()
+        self.arc_mantype_form = QGridLayout()
+        self.connec_mantype_form = QGridLayout()
+        self.gully_mantype_form = QGridLayout()
+
+        self.addfields_form = QGridLayout()
 
         # Construct form for config and admin
         self.construct_form_param_user(complet_list[0]['body']['form']['formTabs'], 0)
@@ -112,15 +136,24 @@ class ApiConfig(ApiParent):
         groupBox_6.setLayout(self.epa_form)
         groupBox_7.setLayout(self.masterplan_form)
         groupBox_8.setLayout(self.other_form)
+
         groupBox_9.setLayout(self.node_type_form)
         groupBox_10.setLayout(self.cat_form)
         groupBox_11.setLayout(self.utils_form)
         groupBox_12.setLayout(self.connec_form)
+
         groupBox_13.setLayout(self.topology_form)
         groupBox_14.setLayout(self.builder_form)
         groupBox_15.setLayout(self.review_form)
         groupBox_16.setLayout(self.analysis_form)
         groupBox_17.setLayout(self.system_form)
+
+        groupBox_18.setLayout(self.node_mantype_form)
+        groupBox_19.setLayout(self.arc_mantype_form)
+        groupBox_20.setLayout(self.connec_mantype_form)
+        groupBox_21.setLayout(self.gully_mantype_form)
+
+        groupBox_22 .setLayout(self.addfields_form)
 
         page1_layout1.addWidget(groupBox_1)
         page1_layout1.addWidget(groupBox_2)
@@ -130,29 +163,36 @@ class ApiConfig(ApiParent):
         page1_layout2.addWidget(groupBox_6)
         page1_layout2.addWidget(groupBox_7)
         page1_layout2.addWidget(groupBox_8)
+
         page2_layout1.addWidget(groupBox_9)
         page2_layout1.addWidget(groupBox_10)
         page2_layout2.addWidget(groupBox_11)
         page2_layout2.addWidget(groupBox_12)
+
         admin_layout1.addWidget(groupBox_13)
-        admin_layout2.addWidget(groupBox_17)
         admin_layout2.addWidget(groupBox_14)
         admin_layout2.addWidget(groupBox_15)
         admin_layout2.addWidget(groupBox_16)
+        admin_layout2.addWidget(groupBox_17)
+
+        man_layout1.addWidget(groupBox_18)
+        man_layout2.addWidget(groupBox_19)
+        man_layout2.addWidget(groupBox_20)
+        man_layout2.addWidget(groupBox_21)
+
+        addfields_layout1.addWidget(groupBox_22)
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        verticalSpacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        verticalSpacer3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        verticalSpacer4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        verticalSpacer5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        verticalSpacer6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         page1_layout1.addItem(verticalSpacer1)
-        page1_layout2.addItem(verticalSpacer2)
-        page2_layout1.addItem(verticalSpacer3)
-        page2_layout2.addItem(verticalSpacer4)
-        admin_layout1.addItem(verticalSpacer5)
-        admin_layout2.addItem(verticalSpacer6)
+        page1_layout2.addItem(verticalSpacer1)
+        page2_layout1.addItem(verticalSpacer1)
+        page2_layout2.addItem(verticalSpacer1)
+        admin_layout1.addItem(verticalSpacer1)
+        admin_layout2.addItem(verticalSpacer1)
+        man_layout1.addItem(verticalSpacer1)
+        man_layout2.addItem(verticalSpacer1)
+        addfields_layout1.addItem(verticalSpacer1)
 
         # Event on change from combo parent
         self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
@@ -271,6 +311,17 @@ class ApiConfig(ApiParent):
                     self.order_widgets(field, self.analysis_form, lbl, chk, widget)
                 elif field['layout_id'] == 17:
                     self.order_widgets(field, self.system_form, lbl, chk, widget)
+                elif field['layout_id'] == 18:
+                    self.order_widgets(field, self.node_mantype_form, lbl, chk, widget)
+                elif field['layout_id'] == 19:
+                    self.order_widgets(field, self.arc_mantype_form, lbl, chk, widget)
+                elif field['layout_id'] == 20:
+                    self.order_widgets(field, self.connec_mantype_form, lbl, chk, widget)
+                elif field['layout_id'] == 21:
+                    self.order_widgets(field, self.gully_mantype_form, lbl, chk, widget)
+                elif field['layout_id'] == 22:
+                    self.order_widgets(field, self.addfields_form, lbl, chk, widget)
+
 
 
     def construct_form_param_system(self, row, pos):
