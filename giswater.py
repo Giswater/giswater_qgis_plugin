@@ -904,18 +904,17 @@ class Giswater(QObject):
                     action.setChecked(True)
 
                 sub_menu.addAction(action)
-                action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1], action))
+                action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1]))
         main_menu.exec_(click_point)
 
 
-    def put_layer_into_toc(self, tablename, type, action):
-        layer = self.controller.get_layer_by_tablename('v_edit_node')
-        if not layer:
-            return
-        layer_source = self.controller.get_layer_source(layer)
-        schema_name = layer_source['schema'].replace('"', '')
+    def put_layer_into_toc(self, tablename, type):
+        """ Put selected layer into TOC"""
+        schema_name = self.controller.credentials['schema'].replace('"', '')
         uri = QgsDataSourceUri()
-        uri.setConnection(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'], layer_source['password'])
+        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
+                          self.controller.credentials['db'], self.controller.credentials['user'],
+                          self.controller.credentials['password'])
         uri.setDataSource(schema_name, f'{tablename}', "the_geom", None, type + "_id")
         vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
         QgsProject.instance().addMapLayer(vlayer)
