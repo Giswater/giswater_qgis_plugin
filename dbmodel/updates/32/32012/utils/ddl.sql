@@ -31,36 +31,26 @@ CREATE TABLE edit_typevalue
 -----------------------
 -- create new fields
 ----------------------
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"param_options", "dataType":"json"}}$$);
 
-ALTER TABLE om_visit_class ADD COLUMN param_options json;
-
-ALTER TABLE om_visit ADD COLUMN visit_type integer;
-
-ALTER TABLE cat_feature ADD COLUMN type character varying(30);
-ALTER TABLE cat_feature ADD COLUMN shortcut_key character varying(100);
-ALTER TABLE cat_feature ADD COLUMN parent_layer character varying(100);
-ALTER TABLE cat_feature ADD COLUMN child_layer character varying(100);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"visit_type", "dataType":"integer"}}$$);
 
 
---rename instead of add column?
-/*
-ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydrometer_id character varying(16);
-ALTER TABLE ext_rtc_hydrometer ADD COLUMN client_name text;
-ALTER TABLE ext_rtc_hydrometer ADD COLUMN instalation_date date;
-ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydrometer_number integer;
-ALTER TABLE ext_rtc_hydrometer ADD COLUMN state smallint;
-ALTER TABLE ext_rtc_hydrometer ADD COLUMN connec_customer_code character varying(30);
-*/
-
-ALTER TABLE om_visit_cat ADD COLUMN extusercat_id integer;
-ALTER TABLE om_visit_cat ADD COLUMN duration text;
-
-ALTER TABLE sys_feature_type ADD COLUMN icon character varying(30);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"type", "dataType":"varchar(30)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"shortcut_key", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"parent_layer", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"child_layer", "dataType":"varchar(100)"}}$$);
 
 
---24/05/2019
-ALTER TABLE man_addfields_parameter ADD COLUMN orderby integer;
-ALTER TABLE man_addfields_parameter ADD COLUMN active boolean;
-ALTER TABLE man_addfields_parameter ADD COLUMN  iseditable boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_cat", "column":"extusercat_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_cat", "column":"duration", "dataType":"text"}}$$);
 
---ALTER TABLE ext_municipality ADD COLUMN active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_feature_type", "column":"icon", "dataType":"varchar(30)"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_addfields_parameter", "column":"orderby", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_addfields_parameter", "column":"active", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_addfields_parameter", "column":"iseditable", "dataType":"boolean"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"active", "dataType":"boolean"}}$$);
+

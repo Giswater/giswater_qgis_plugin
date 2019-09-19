@@ -58,3 +58,13 @@ REFERENCES cat_team (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE om_team_x_vehicle ADD CONSTRAINT om_team_x_vehicle_vehicle_id_fkey FOREIGN KEY (vehicle_id)
 REFERENCES ext_cat_vehicle (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+
+
+ALTER TABLE exploitation_x_user ADD CONSTRAINT exploitation_x_user_manager_id_fkey FOREIGN KEY (manager_id)
+REFERENCES cat_manager (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE cat_users ADD CONSTRAINT cat_users_sys_role_fkey FOREIGN KEY (sys_role)
+REFERENCES sys_role (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+

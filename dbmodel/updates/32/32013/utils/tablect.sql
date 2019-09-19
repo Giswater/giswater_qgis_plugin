@@ -5,8 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-ALTER TABLE inp_rules_x_arc DROP CONSTRAINT inp_rules_x_arc_id_fkey;
-ALTER TABLE inp_rules_x_node DROP CONSTRAINT inp_rules_x_node_id_fkey;
+ALTER TABLE ext_cat_period ADD CONSTRAINT ext_cat_period_period_type_fkey FOREIGN KEY (period_type)
+REFERENCES ext_cat_period_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

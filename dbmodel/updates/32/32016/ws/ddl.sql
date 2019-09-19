@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS inp_inlet
   minsector_id SERIAL PRIMARY KEY,
   dma_id integer,
   dqa_id integer,
-  presszonecat_id integer,
+  presszonecat_id varchar(30),
   sector_id integer,
   expl_id integer,
   the_geom geometry (POLYGON, SRID_VALUE)

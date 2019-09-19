@@ -6,9 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE inp_pattern ADD COLUMN pattern_type character varying(16);
-ALTER TABLE inp_pattern ADD COLUMN tscode text;
-ALTER TABLE inp_pattern ADD COLUMN tsparameters json;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"pattern_type", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"tscode", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"tsparameters", "dataType":"json"}}$$);
+
 
 
 CREATE TABLE rpt_inp_pattern_value

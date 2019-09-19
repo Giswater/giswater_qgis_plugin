@@ -7,6 +7,24 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+
+INSERT INTO sys_typevalue_cat (typevalue_table, typevalue_name) VALUES ('edit_typevalue','sector_type');
+INSERT INTO sys_typevalue_cat (typevalue_table, typevalue_name) VALUES ('edit_typevalue','dqa_type');
+
+
+INSERT INTO edit_typevalue VALUES ('sector_type', 'distribution', 'distribution');
+INSERT INTO edit_typevalue VALUES ('sector_type', 'undefined', 'undefined');
+INSERT INTO edit_typevalue VALUES ('sector_type', 'source', 'source');
+
+INSERT INTO edit_typevalue VALUES ('dqa_type', 'chlorine', 'chlorine');
+INSERT INTO edit_typevalue VALUES ('dqa_type', 'undefined', 'undefined');
+INSERT INTO edit_typevalue VALUES ('dqa_type', 'other', 'other');
+
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue', 'sector_type', 'sector', 'sector_type');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue', 'dqa_type', 'dqa', 'dqa_type');
+
+
 UPDATE audit_cat_table SET isdeprecated = TRUE where id='inp_controls_x_node';
 
 INSERT INTO inp_node_type VALUES ('INLET');

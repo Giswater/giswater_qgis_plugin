@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE subcatchment DROP CONSTRAINT IF EXISTS subcatchment_parent_id_fkey;
 ALTER TABLE subcatchment DROP CONSTRAINT IF EXISTS subcatchment_node_id_fkey;
 
+ALTER TABLE gully ADD CONSTRAINT gully_pjoint_type_ckeck 
+CHECK (pjoint_type::text = ANY (ARRAY['NODE'::character varying, 'VNODE'::character varying]::text[]));
+

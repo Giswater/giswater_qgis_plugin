@@ -16,3 +16,23 @@ ALTER TABLE inp_pattern_value ALTER COLUMN _factor_21 DROP DEFAULT;
 ALTER TABLE inp_pattern_value ALTER COLUMN _factor_22 DROP DEFAULT;
 ALTER TABLE inp_pattern_value ALTER COLUMN _factor_23 DROP DEFAULT;
 ALTER TABLE inp_pattern_value ALTER COLUMN _factor_24 DROP DEFAULT;
+
+
+ALTER TABLE dqa ADD CONSTRAINT dqa_expl_id_fkey FOREIGN KEY (expl_id)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE dqa ADD CONSTRAINT dqa_macrodqa_id_fkey FOREIGN KEY (macrodqa_id)
+REFERENCES macrodqa (macrodqa_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE dqa ADD CONSTRAINT dqa_pattern_id_fkey FOREIGN KEY (pattern_id)
+REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE dma ADD CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id)
+REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+ALTER TABLE inp_connec ADD CONSTRAINT inp_connec_connec_id_fkey FOREIGN KEY (connec_id)
+REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_connec ADD CONSTRAINT inp_connec_pattern_id_fkey FOREIGN KEY (pattern_id)
+REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

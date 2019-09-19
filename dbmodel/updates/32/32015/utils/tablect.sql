@@ -22,3 +22,7 @@ ALTER TABLE audit_price_simple ADD CONSTRAINT audit_price_simple_pkey PRIMARY KE
 ALTER TABLE price_compost_value DROP CONSTRAINT price_compost_value_simple_id_fkey;
 ALTER TABLE price_compost_value ADD CONSTRAINT price_compost_value_compost_id_fkey2 FOREIGN KEY (simple_id)
 REFERENCES price_compost (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_ckeck 
+CHECK (pjoint_type::text = ANY (ARRAY['NODE'::character varying, 'VNODE'::character varying]::text[]));
+
