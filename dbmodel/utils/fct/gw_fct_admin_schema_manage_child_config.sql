@@ -52,10 +52,6 @@ BEGIN
 
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
-	--insert configuration into config_api_layer_child and config_api_tableinfo_x_infotype if there is none for the featurecat
-	IF v_cat_feature NOT IN (SELECT featurecat_id FROM config_api_layer_child) THEN
-		INSERT INTO config_api_layer_child VALUES (v_cat_feature,v_view_name);
-	END IF;
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_api_tableinfo_x_infotype) THEN
 		INSERT INTO config_api_tableinfo_x_infotype(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,100,v_view_name);

@@ -342,9 +342,9 @@ BEGIN
 		raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
 
 		-- Identify tableinfotype_id		
-		EXECUTE' SELECT tableinfotype_id FROM config_api_layer_child
-			JOIN config_api_tableinfo_x_infotype ON config_api_layer_child.tableinfo_id=config_api_tableinfo_x_infotype.tableinfo_id 
-			WHERE featurecat_id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
+		EXECUTE' SELECT tableinfotype_id FROM cat_feature
+			JOIN config_api_tableinfo_x_infotype ON child_layer=tableinfo_id 
+			WHERE cat_feature.id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 			AND infotype_id=$2'
 			INTO v_tablename
 			USING v_id, v_infotype;
@@ -385,9 +385,9 @@ BEGIN
 
                 
 				-- Identify tableinfotype_id		
-			EXECUTE' SELECT tableinfotype_id FROM config_api_layer_child
-				JOIN config_api_tableinfo_x_infotype ON config_api_layer_child.tableinfo_id=config_api_tableinfo_x_infotype.tableinfo_id 
-				WHERE featurecat_id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
+			EXECUTE' SELECT tableinfotype_id FROM cat_feature
+				JOIN config_api_tableinfo_x_infotype ON child_layer.tableinfo_id 
+				WHERE cat_feature.id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 				AND infotype_id=$2'
 				INTO v_tablename
 				USING v_id, v_infotype;	
