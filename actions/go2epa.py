@@ -529,8 +529,13 @@ class Go2Epa(ApiParent):
             sp_n = []
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
-                    if bool(re.search('[[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
-                        # 0.00-2.56e+007-2.56e+007
+                    if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
+                        # when -> 0.00-2.56e+007-2.56e+007 cut into -> 0.00 -2.56e+007 -2.56e+007
+
+                        # sp_n.append(dirty_list[x][:4])
+                        # sp_n.append(dirty_list[x][4:14])
+                        # sp_n.append(dirty_list[x][14:])
+
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
@@ -539,6 +544,12 @@ class Go2Epa(ApiParent):
                                 sp_n.append(aux)
                         aux = dirty_list[x][last_index:i]
                         sp_n.append(aux)
+
+                    elif bool(re.search('\d[.]\d{8}[.]]*', str(dirty_list[x]))):
+                        # when -> 0.00859373.7500 cut into ->0.00 859373.7500
+                        sp_n.append(dirty_list[x][:4])
+                        sp_n.append(dirty_list[x][4:])
+
                     else:
                         sp_n.append(dirty_list[x])
 
