@@ -113,7 +113,7 @@ SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100,
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"chamber_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Chamber param_1","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True",  "dv_isnullvalue":"True",
 "isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='chamber_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
@@ -134,7 +134,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PGULLY"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"grate_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Grate param_1","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True",  "dv_isnullvalue":"True",
 "isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='grate_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PGULLY"},
@@ -185,7 +185,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SEWER-STORAGE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"sewstorage_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Sstorage param_1","ismandatory":"False",
-"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", 
+"fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True",  "dv_isnullvalue":"True",
 "isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='sewstorage_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SEWER-STORAGE"},
