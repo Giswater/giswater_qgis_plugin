@@ -45,7 +45,7 @@ DECLARE
     v_new_pol_id varchar(16);
     v_codeautofill boolean;
     v_srid integer;
-
+    v_featurecat text;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -233,6 +233,44 @@ BEGIN
 			NEW.link=NEW.gully_id;
 		END IF;
 
+
+		v_featurecat = NEW.gully_type;
+
+		--Location type
+		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.location_type IS NULL THEN
+			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'gully_location_vdefault' AND cur_user = current_user);
+		END IF;
+
+		--Fluid type
+		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_fluid_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.fluid_type IS NULL THEN
+			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'gully_fluid_vdefault' AND cur_user = current_user);
+		END IF;
+
+		--Category type
+		IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_category_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.category_type IS NULL THEN
+			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'gully_category_vdefault' AND cur_user = current_user);
+		END IF;	
+
+		--Function type
+		IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_function_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.function_type IS NULL THEN
+			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'gully_function_vdefault' AND cur_user = current_user);
+		END IF;
 
 		--set rotation field
 		WITH index_query AS(
