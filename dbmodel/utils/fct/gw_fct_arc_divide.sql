@@ -16,50 +16,54 @@ $BODY$
 SELECT "SCHEMA_NAME".gw_fct_arc_divide('1079');
 */
 DECLARE
-    node_geom    geometry;
-    arc_id_aux    varchar;
-    arc_geom    geometry;
-    line1        geometry;
-    line2        geometry;
-    rec_aux        record;
-    rec_aux1	"SCHEMA_NAME".arc;
-    rec_aux2    "SCHEMA_NAME".arc;
-    intersect_loc    double precision;
-    numArcs    integer;
-    rec_doc record;
-    rec_visit record;
-    project_type_aux text;
-    state_aux integer;
-    state_node_arg integer;
-    gully_id_aux varchar;
-    connec_id_aux varchar;
-    count_aux1 smallint;
-    count_aux2 smallint;
-    return_aux smallint;
-	arc_divide_tolerance_aux float =0.05;
-	array_agg_connec varchar [];
-	array_agg_gully varchar [];
-	v_arc_searchnodes float;
-    rec_node record;
-    rec_event record;
-    v_newarc varchar;
-    v_visitlocation float;
-    v_eventlocation float;
-    v_srid integer;
-    v_newvisit1 int8;
-    v_newvisit2 int8;
-    v_psector integer;
-	v_ficticius int2;
-	isarcdivide_arg boolean;
-	v_querytext text;
-	v_querytext1 text;
-	v_querytext2 text;
-	v_mantable text;
-	v_schemaname text;
+node_geom	geometry;
+arc_id_aux    	varchar;
+arc_geom	geometry;
+line1		geometry;
+line2		geometry;
+rec_aux		record;
+rec_aux1	"SCHEMA_NAME".arc;
+rec_aux2	"SCHEMA_NAME".arc;
+intersect_loc	double precision;
+numArcs		integer;
+rec_doc 	record;
+rec_visit 	record;
+project_type_aux text;
+state_aux 	integer;
+state_node_arg 	integer;
+gully_id_aux 	varchar;
+connec_id_aux 	varchar;
+count_aux1 	smallint;
+count_aux2 	smallint;	
+return_aux 	smallint;
+arc_divide_tolerance_aux float =0.05;
+array_agg_connec varchar [];
+array_agg_gully varchar [];
+v_arc_searchnodes float;
+rec_node	record;
+rec_event	record;
+v_newarc	varchar;
+v_visitlocation	float;	
+v_eventlocation	float;
+v_srid		integer;
+v_newvisit1	int8;
+v_newvisit2 	int8;
+v_psector	integer;
+v_ficticius	int2;
+isarcdivide_arg boolean;
+v_manquerytext	text;
+v_manquerytext1	text;
+v_manquerytext2	text;
+v_epaquerytext 	text;
+v_epaquerytext1	text;
+v_epaquerytext2	text;
+v_mantable 	text;
+v_epatable 	text;
+v_schemaname 	text;
 	
 BEGIN
 
-    -- Search path
+-- Search path
     SET search_path = "SCHEMA_NAME", public;
     v_schemaname = 'SCHEMA_NAME';
 
@@ -136,24 +140,38 @@ BEGIN
 
 			-- getting table child information (man_table)
 			v_mantable = (SELECT man_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=arc_id_aux);
+			v_epatable = (SELECT epa_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=arc_id_aux);
 
 			-- building querytext for man_table
-			v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') FROM information_schema.columns WHERE table_name=v_mantable AND table_schema=v_schemaname AND column_name !='arc_id');
-			IF  v_querytext IS NULL THEN 
-				v_querytext='';
+			v_manquerytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') FROM information_schema.columns WHERE table_name=v_mantable AND table_schema=v_schemaname AND column_name !='arc_id');
+			IF  v_manquerytext IS NULL THEN 
+				v_manquerytext='';
 			END IF;
-			v_querytext1 =  'INSERT INTO '||v_mantable||' SELECT ';
-			v_querytext2 =  v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||arc_id_aux||'::text';
+			v_manquerytext1 =  'INSERT INTO '||v_mantable||' SELECT ';
+			v_manquerytext2 =  v_manquerytext||' FROM '||v_mantable||' WHERE arc_id= '||arc_id_aux||'::text';
+
+			-- building querytext for epa_table
+			v_epaquerytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') FROM information_schema.columns WHERE table_name=v_epatable AND table_schema=v_schemaname AND column_name !='arc_id');
+			IF  v_epaquerytext IS NULL THEN 
+				v_epaquerytext='';
+			END IF;
+			v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
+			v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||arc_id_aux||'::text';
 
 			-- In function of states and user's variables proceed.....
 			IF (state_aux=1 AND state_node_arg=1) THEN 
 			
 				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
-				EXECUTE v_querytext1||rec_aux1.arc_id::text||v_querytext2;
-				
 				INSERT INTO arc SELECT rec_aux2.*;
-				EXECUTE v_querytext1||rec_aux2.arc_id::text||v_querytext2;
+
+				-- insert new records into man_table
+				EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
+				EXECUTE v_manquerytext1||rec_aux2.arc_id::text||v_manquerytext2;
+
+				-- insert new records into epa_table
+				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
+				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
@@ -311,13 +329,19 @@ BEGIN
 				rec_aux2.state=2;
 				rec_aux2.state_type=v_ficticius;
 				
-				-- Insert new records into arc table
 				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
+
+				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
-				EXECUTE v_querytext1||rec_aux1.arc_id::text||v_querytext2;
-				
 				INSERT INTO arc SELECT rec_aux2.*;
-				EXECUTE v_querytext1||rec_aux2.arc_id::text||v_querytext2;
+
+				-- Insert new records into man table		
+				EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
+				EXECUTE v_manquerytext1||rec_aux2.arc_id::text||v_manquerytext2;
+
+				-- Insert new records into epa table
+				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
+				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 				
 				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
 
@@ -345,16 +369,21 @@ BEGIN
 					
 			ELSIF (state_aux=2 AND state_node_arg=2) THEN 
 			
-				-- Insert new records into arc table
 				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
-				INSERT INTO arc SELECT rec_aux1.*;
-				EXECUTE v_querytext1||rec_aux1.arc_id::text||v_querytext2;
 
+				-- Insert new records into arc table
+				INSERT INTO arc SELECT rec_aux1.*;
 				INSERT INTO arc SELECT rec_aux2.*;
-				EXECUTE v_querytext1||rec_aux2.arc_id::text||v_querytext2;
+
+				-- Insert new records into man table		
+				EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
+				EXECUTE v_manquerytext1||rec_aux2.arc_id::text||v_manquerytext2;
+
+				-- Insert new records into epa table
+				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
+				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
 				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
-
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
