@@ -400,5 +400,4 @@ INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', 4, 'Minor');
 
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue', 'visit_parameter_criticity', 'om_visit_parameter', 'criticity');
 
-
-
+UPDATE config_param_system SET value = '{"LPS":1, "LPM":60, "MLD":0.216, "CMH":3.6, "CMD":86.4, "CFS":0.03531466, "GPM":15.85037248, "MGD":22.82453637, "AFD":0.07}' WHERE parameter = 'epa_units_factor';
