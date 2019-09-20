@@ -1,0 +1,27 @@
+3.3.000 - LTR
+*************
+- Migration to QGIS3
+- Creation of API with more than 60 methods in its first version
+- Movie capabilities and code from Java to python and SQL. Java is deprecated
+- Use a graph algorithm contributed by @fisersa that has greatly improved the performance in these types of processes
+- Normalization of criteria for water network zonification with the incorporation of minsector and dqa to the existing presszone, sector and dma
+- Implementation of a permanent communication channel between @PostgreSQL and @QGIS with the use of the NOTIFY option of PostgreSQL
+- Refactor of python code and sql code
+- On qgis project, reduction of the number of layers in the ToC: You no longer need to have loads loaded solely for valuable domains, since these are loaded directly from the bbdd and are kept up to date with the use of the channel of NOTIFY
+- 'System' layers are now deprecated, it have been replaced by 'custom' layers. 
+- Custom forms strategy of QGIS is now deprecated. New info button of Giswater with total control over what is shown to the user.
+- New button to directly load 'custom' layers from the ToC, automatically stitching all widget properties by selecting from the form and from the attribute table
+- New functions on toolbox with the incorporation of very interesting graphic functions such as graf_analytics or minsector analytics
+- Enable manage work teams for large companies with different work teams (management)
+- New button to force the deletion of an item included if it has dependencies
+- Enable insert double-geometric gullys using the sizes of the catalog
+- Enable the exportation of drinking water network files by breaking down the sections in each connection
+- Ehance the demand propierties before exportation and the type of pattern to be used
+- Creation of a new EPA_TYPE (inlet) for drinking water networks that has the virtue that it can behave as a reservoir if it is a system head or as a tank if you enter water by switching automatically
+- Enable on UD projects that subcatchments may have a parent array (either nodes or other subcatchments), given that depending on the planned alternative, an automatic switch is made so that the subcatchment is always exported
+- Enable that the UD junctions are automatically transformed into outfall if they only have inlet pipes without outlet pipes, all automatically without the engineer having to do anything
+- Improvements the partial export of network. In the case of border nodes, it is no longer necessary to create fictitious sectors, since the border nodes will always be exported with the corresponding arc (arcs) to never leave any arch without an extremal node
+- Enhance the detection of inconsistencies of hydraulic model previous the exportation
+- Enhance the plan psector management adding connec and gully, enabling the option that a same element can have in different links for each alternative to which it belongs. All the geometries are managed and stored but only one is showed
+- Improvement the management and visualization of planned mincuts, such as being able to visualize specific mincuts in a space of time, manage the possibility of canceling them and being able to send notifications to customers
+- Add management featues for admin with new 'custom' fields and visitor class management system
