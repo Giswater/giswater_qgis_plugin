@@ -45,7 +45,7 @@ from .manage_element import ManageElement
 from .manage_visit import ManageVisit
 from .manage_gallery import ManageGallery
 from .api_catalog import ApiCatalog
-from ..ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments, Sections, ApiBasicInfo
+from ..ui_manager import ApiCfUi, EventFull, LoadDocuments, Sections, ApiBasicInfo
 
 
 class ApiCF(ApiParent):
@@ -611,7 +611,22 @@ class ApiCF(ApiParent):
 
 
     def set_widgets(self, dialog, complet_result, field):
-
+        """
+        functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field):
+            def manage_text(self, dialog, complet_result, field)
+            def manage_typeahead(self, dialog, complet_result, field)
+            def manage_combo(self, dialog, complet_result, field)
+            def manage_check(self, dialog, complet_result, field)
+            def manage_datepickertime(self, dialog, complet_result, field)
+            def manage_button(self, dialog, complet_result, field)
+            def manage_hyperlink(self, dialog, complet_result, field)
+            def manage_hspacer(self, dialog, complet_result, field)
+            def manage_vspacer(self, dialog, complet_result, field)
+            def manage_textarea(self, dialog, complet_result, field)
+            def manage_spinbox(self, dialog, complet_result, field)
+            def manage_doubleSpinbox(self, dialog, complet_result, field)
+            def manage_tableView(self, dialog, complet_result, field)
+         """
         widget = None
         label = None
         if field['label']:
@@ -624,51 +639,93 @@ class ApiCF(ApiParent):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
-            completer = QCompleter()
-            widget = self.add_lineedit(field)
-            widget = self.set_widget_size(widget, field)
-            widget = self.set_auto_update_lineedit(field, dialog, widget)
-            widget = self.set_data_type(field, widget)
-            if field['widgettype'] == 'typeahead':
-                widget = self.manage_lineedit(field, dialog, widget, completer)
-            if widget.property('column_id') == self.field_id:
-                self.feature_id = widget.text()
-                # Get selected feature
-                self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
-        elif field['widgettype'] == 'combo':
-            widget = self.add_combobox(field)
-            widget = self.set_widget_size(widget, field)
-            widget = self.set_auto_update_combobox(field, dialog, widget)
-        elif field['widgettype'] == 'check':
-            widget = self.add_checkbox(dialog, field)
-            widget = self.set_auto_update_checkbox(field, dialog, widget)
-        elif field['widgettype'] == 'datepickertime':
-            widget = self.add_calendar(dialog, field)
-            widget = self.set_auto_update_dateedit(field, dialog, widget)
-        elif field['widgettype'] == 'button':
-            widget = self.add_button(dialog, field)
-            widget = self.set_widget_size(widget, field)
-        elif field['widgettype'] == 'hyperlink':
-            widget = self.add_hyperlink(dialog, field)
-            widget = self.set_widget_size(widget, field)
-        elif field['widgettype'] == 'hspacer':
-            widget = self.add_horizontal_spacer()
-        elif field['widgettype'] == 'vspacer':
-            widget = self.add_verical_spacer()
-        elif field['widgettype'] == 'textarea':
-            widget = self.add_textarea(field)
-        elif field['widgettype'] in ('spinbox', 'doubleSpinbox'):
-            widget = self.add_spinbox(field)
-            widget = self.set_auto_update_spinbox(field, dialog, widget)
-        elif field['widgettype'] == 'tableView':
-            widget = self.add_tableview(complet_result, field)
-            widget = self.set_headers(widget, field)
-            widget = self.populate_table(widget, field)
-            widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-            utils_giswater.set_qtv_config(widget)
-
+        widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         return label, widget
+
+
+    def manage_text(self, dialog, complet_result, field):
+        widget = self.add_lineedit(field)
+        widget = self.set_widget_size(widget, field)
+        widget = self.set_auto_update_lineedit(field, dialog, widget)
+        widget = self.set_data_type(field, widget)
+        return widget
+
+
+    def manage_typeahead(self, dialog, complet_result, field):
+        completer = QCompleter()
+        widget = self.manage_text(dialog, complet_result, field)
+        widget = self.manage_lineedit(field, dialog, widget, completer)
+        if widget.property('column_id') == self.field_id:
+            self.feature_id = widget.text()
+            # Get selected feature
+            self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+        return widget
+
+
+    def manage_combo(self, dialog, complet_result, field):
+        widget = self.add_combobox(field)
+        widget = self.set_widget_size(widget, field)
+        widget = self.set_auto_update_combobox(field, dialog, widget)
+        return widget
+
+
+    def manage_check(self, dialog, complet_result, field):
+        widget = self.add_checkbox(dialog, field)
+        widget = self.set_auto_update_checkbox(field, dialog, widget)
+        return widget
+
+
+    def manage_datepickertime(self, dialog, complet_result, field):
+        widget = self.add_calendar(dialog, field)
+        widget = self.set_auto_update_dateedit(field, dialog, widget)
+        return widget
+
+
+    def manage_button(self, dialog, complet_result, field):
+        widget = self.add_button(dialog, field)
+        widget = self.set_widget_size(widget, field)
+        return widget
+
+
+    def manage_hyperlink(self, dialog, complet_result, field):
+        widget = self.add_hyperlink(dialog, field)
+        widget = self.set_widget_size(widget, field)
+        return widget
+
+
+    def manage_hspacer(self, dialog, complet_result, field):
+        widget = self.add_horizontal_spacer()
+        return widget
+
+
+    def manage_vspacer(self, dialog, complet_result, field):
+        widget = self.add_verical_spacer()
+        return widget
+
+
+    def manage_textarea(self, dialog, complet_result, field):
+        widget = self.add_textarea(field)
+        return widget
+
+
+    def manage_spinbox(self, dialog, complet_result, field):
+        widget = self.add_spinbox(field)
+        widget = self.set_auto_update_spinbox(field, dialog, widget)
+        return widget
+
+
+    def manage_doubleSpinbox(self, dialog, complet_result, field):
+        widget = self.manage_spinbox(dialog, complet_result, field)
+        return widget
+
+
+    def manage_tableView(self, dialog, complet_result, field):
+        widget = self.add_tableview(complet_result, field)
+        widget = self.set_headers(widget, field)
+        widget = self.populate_table(widget, field)
+        widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+        utils_giswater.set_qtv_config(widget)
+        return widget
 
 
     def open_section_form(self):
