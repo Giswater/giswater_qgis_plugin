@@ -292,13 +292,15 @@ class UpdateSQL(ApiParent):
         # Get roletype and export password
         roletype = utils_giswater.getWidgetText(self.dlg_create_gis_project, 'cmb_roletype')
         export_passwd = utils_giswater.isChecked(self.dlg_create_gis_project, 'chk_export_passwd')
+        sample = self.dlg_create_gis_project.chk_is_sample.isChecked()
+
         if export_passwd:
             msg = "Credentials will be stored in GIS project file"
             self.controller.show_info_box(msg, "Warning")
 
         # Generate QGIS project
         gis = CreateGisProject(self.controller, self.plugin_dir)
-        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
+        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
 
         self.close_dialog(self.dlg_create_gis_project)
         self.close_dialog(self.dlg_readsql)
@@ -324,14 +326,30 @@ class UpdateSQL(ApiParent):
         users_home = os.path.expanduser("~")
         utils_giswater.setWidgetText(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
 
+        # Manage widgets
+        if str(self.is_sample) == 'True':
+            self.dlg_create_gis_project.lbl_is_sample.setVisible(True)
+            self.dlg_create_gis_project.chk_is_sample.setVisible(True)
+        else:
+            self.dlg_create_gis_project.lbl_is_sample.setVisible(False)
+            self.dlg_create_gis_project.chk_is_sample.setVisible(False)
+
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
             partial(self.get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self.gis_create_project))
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_create_gis_project))
+        self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self.sample_state_changed))
 
         # Open MainWindow
         self.open_dialog(self.dlg_create_gis_project)
+
+
+    def sample_state_changed(self):
+
+        checked = self.dlg_create_gis_project.chk_is_sample.isChecked()
+        self.dlg_create_gis_project.cmb_roletype.setEnabled(not checked)
+        utils_giswater.setWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype, 'admin')
 
 
     def btn_constrains_changed(self, button, call_function=False):
@@ -809,6 +827,10 @@ class UpdateSQL(ApiParent):
 
 
     def load_sample_data(self, project_type=False):
+
+        sql = 'UPDATE ' + self.schema + '.version SET sample=True ' \
+              'WHERE id = (SELECT id FROM ' + self.schema + '.version ORDER BY id DESC LIMIT 1)'
+        self.controller.execute_sql(sql)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep+project_type
@@ -1311,6 +1333,8 @@ class UpdateSQL(ApiParent):
                     self.filter_srid_value = '25831'
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', '25831')
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', 'EN')
+
+
                 else:
                     return
 
@@ -1361,7 +1385,7 @@ class UpdateSQL(ApiParent):
             self.controller.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=schema_type)
             return
-        
+
         elif self.rdb_sample.isChecked():
             self.load_sample_data(project_type=project_type)
 
@@ -1834,6 +1858,7 @@ class UpdateSQL(ApiParent):
 
         # Set default lenaguage EN
         self.project_data_language = 'EN'
+        self.is_sample = None
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
@@ -1842,15 +1867,23 @@ class UpdateSQL(ApiParent):
             self.project_data_schema_version = "Version not found"
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
         else:
-            sql = "SELECT giswater FROM " + schema_name + ".version order by id desc LIMIT 1"
-            row = self.controller.get_row(sql)
-            if row:
-                self.project_data_schema_version = str(row[0])
-            sql = "SELECT language FROM " + schema_name + ".version order by id desc LIMIT 1"
-            row = self.controller.get_row(sql)
-            if row:
-                self.project_data_language = str(row[0])
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
+            # Check if exist column sample in table version
+            sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + schema_name +"';"
+            result = self.controller.get_row(sql)
+
+            if result is None:
+                sql = "SELECT giswater, language FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
+                result = self.controller.get_row(sql)
+            else:
+                sql = "SELECT giswater, language, sample FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
+                result = self.controller.get_row(sql)
+                self.is_sample = result[2]
+            self.project_data_schema_version = result[0]
+            self.project_data_language = result[1]
+
+            if self.is_sample is None:
+                self.is_sample = 'False'
+
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -1888,7 +1921,9 @@ class UpdateSQL(ApiParent):
                'Language: ' + self.project_data_language + ' \n' + ''
                'Title: ' + str(result[0]['title']) + '\n' + ''
                'Author: ' + str(result[0]['author']) + '\n' + ''
-               'Date: ' + str(result[0]['date']))
+               'Date: ' + str(result[0]['date']) + '\n' + ''
+               'Is sample: ' + str(self.is_sample))
+
         self.software_version_info.setText(msg)
 
         # Update windowTitle

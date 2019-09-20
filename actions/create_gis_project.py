@@ -22,7 +22,7 @@ class CreateGisProject():
 
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
-                             export_passwd=False, roletype='admin'):
+                             export_passwd=False, roletype='admin', chk_sample=False):
 
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
@@ -46,6 +46,10 @@ class CreateGisProject():
             gis_locale_path = gis_folder + os.sep + "en"
 
         # Check if template_path and folder_path exists
+        # Set default project for type sample
+        if chk_sample:
+            roletype = 'admin_sample'
+
         template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
         if not os.path.exists(template_path):
             self.controller.show_warning("Template GIS file not found", parameter=template_path, duration=20)
