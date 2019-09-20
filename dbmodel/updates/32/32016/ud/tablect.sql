@@ -15,3 +15,6 @@ ALTER TABLE cat_grate DROP CONSTRAINT cat_grate_matcat_id_fkey;
 
 ALTER TABLE cat_grate  ADD CONSTRAINT cat_grate_matcat_id_fkey FOREIGN KEY (matcat_id)
 REFERENCES cat_mat_grate (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE gully ADD CONSTRAINT gully_pjoint_type_fkey FOREIGN KEY (pjoint_type)
+REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

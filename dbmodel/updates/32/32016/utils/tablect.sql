@@ -67,4 +67,13 @@ ALTER TABLE cat_users ADD CONSTRAINT cat_users_sys_role_fkey FOREIGN KEY (sys_ro
 REFERENCES sys_role (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
+ALTER TABLE cat_feature ADD CONSTRAINT type_check CHECK (type IN ('arc','node','connec','gully'));
 
+ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_fkey FOREIGN KEY (pjoint_type)
+REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE cat_manager ADD CONSTRAINT cat_manager_expl_id_fkey FOREIGN KEY (expl_id)
+REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE cat_users ADD CONSTRAINT cat_users_sys_role_fkey FOREIGN KEY (sys_role)
+REFERENCES sys_role (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
