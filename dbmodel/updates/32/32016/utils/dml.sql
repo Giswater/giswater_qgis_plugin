@@ -391,4 +391,14 @@ ON CONFLICT (parameter) DO nothing;
 
 UPDATE config_param_system SET descript = 'To enable or disable state topology rules for arcs' WHERE parameter='state_topocontrol';
 
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('om_typevalue', 'visit_parameter_criticity');
+
+INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', 1, 'Urgent');
+INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', 2, 'High');
+INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', 3, 'Normal');
+INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', 4, 'Minor');
+
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue', 'visit_parameter_criticity', 'om_visit_parameter', 'criticity');
+
+
 
