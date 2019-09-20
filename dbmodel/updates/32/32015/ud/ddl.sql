@@ -16,22 +16,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "co
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"pjoint_id", "dataType":"varchar(16)"}}$$);
 
 
-CREATE TABLE IF NOT EXISTS om_psector_x_gully(
-  id serial NOT NULL,
-  gully_id character varying(16),
-  arc_id character varying(16),
-  psector_id integer,
-  descript character varying(254),
-  CONSTRAINT om_psector_x_gully_pkey PRIMARY KEY (id),
-  CONSTRAINT om_psector_x_gully_gully_id_fkey FOREIGN KEY (gully_id)
-      REFERENCES gully (gully_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT om_psector_x_gully_psector_id_fkey FOREIGN KEY (psector_id)
-      REFERENCES om_psector (psector_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-  
 CREATE TABLE IF NOT EXISTS plan_psector_x_gully(
   id serial NOT NULL,
   gully_id character varying(16) NOT NULL,

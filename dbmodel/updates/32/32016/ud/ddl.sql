@@ -13,7 +13,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_timser_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_junction", "column":"outfallparam", "dataType":"json"}}$$);
 
 --2019/09/02
-ALTER TABLE om_psector_x_gully RENAME TO _om_psector_x_gully_;
 
 ALTER TABLE inp_typevalue_divider RENAME TO _inp_typevalue_divider_;
 ALTER TABLE inp_typevalue_evap RENAME TO _inp_typevalue_evap_;

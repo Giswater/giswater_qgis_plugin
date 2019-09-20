@@ -31,22 +31,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"price_compo
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_csv2pg_cat", "column":"readheader", "dataType":"boolean"}}$$);
 
 
-CREATE TABLE IF NOT EXISTS om_psector_x_connec (
-  id serial NOT NULL,
-  connec_id character varying(16) NOT NULL,
-  arc_id character varying(16),
-  psector_id integer,
-  descript character varying(254),
-  CONSTRAINT om_psector_x_connec_pkey PRIMARY KEY (id),
-  CONSTRAINT om_psector_x_connec_connec_id_fkey FOREIGN KEY (connec_id)
-      REFERENCES connec (connec_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT om_psector_x_connec_psector_id_fkey FOREIGN KEY (psector_id)
-      REFERENCES om_psector (psector_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE);
-
-
-  
 CREATE TABLE IF NOT EXISTS plan_psector_x_connec(
   id serial NOT NULL,
   connec_id character varying(16) NOT NULL,

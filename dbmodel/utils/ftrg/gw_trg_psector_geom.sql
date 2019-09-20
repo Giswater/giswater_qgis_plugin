@@ -47,12 +47,6 @@ BEGIN
 				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
 		
-			ELSIF psector_type_aux='om' THEN
-				SELECT st_collect(f.the_geom) INTO collect_aux 
-				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
-				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
-
 			ELSIF psector_type_aux='lot' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_visit_lot_x_arc ON om_visit_lot_x_arc.arc_id=arc.arc_id where lot_id=NEW.lot_id 
@@ -71,13 +65,6 @@ BEGIN
 				select the_geom from gully join plan_psector_x_gully ON plan_psector_x_gully.gully_id=gully.gully_id where psector_id=NEW.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
 		
-			ELSIF psector_type_aux='om' THEN
-				SELECT st_collect(f.the_geom) INTO collect_aux 
-				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=NEW.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=NEW.psector_id UNION
-				select the_geom from gully join om_psector_x_gully ON om_psector_x_gully.gully_id=gully.gully_id where psector_id=NEW.psector_id UNION
-				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=NEW.psector_id) f;
-
 			ELSIF psector_type_aux='lot' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_visit_lot_x_arc ON om_visit_lot_x_arc.arc_id=arc.arc_id where lot_id=NEW.lot_id 
@@ -138,18 +125,6 @@ BEGIN
 			-- Update geometry field
 			UPDATE plan_psector SET the_geom=polygon_aux WHERE psector_id=NEW.psector_id;
 		
-		ELSIF psector_type_aux='om' THEN
-			
-			--update rotation field
-			IF (x1-x2)<(y1-y2) then 
-				UPDATE om_psector SET rotation=90 where psector_id=NEW.psector_id;
-			ELSE 
-				UPDATE om_psector SET rotation=0 where psector_id=NEW.psector_id;
-			END IF;
-			
-			-- Update geometry field
-			UPDATE om_psector SET the_geom=polygon_aux WHERE psector_id=NEW.psector_id;
-
 		ELSIF psector_type_aux='lot' THEN
 			
 			--update rotation field
@@ -178,12 +153,6 @@ BEGIN
 				select the_geom from node join plan_psector_x_node ON plan_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
 		
-			ELSIF psector_type_aux='om' THEN
-				SELECT st_collect(f.the_geom) INTO collect_aux 
-				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id UNION
-				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
-
 			ELSIF psector_type_aux='lot' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_visit_lot_x_arc ON om_visit_lot_x_arc.arc_id=arc.arc_id where lot_id=OLD.lot_id 
@@ -202,13 +171,6 @@ BEGIN
 				select the_geom from gully join plan_psector_x_gully ON plan_psector_x_gully.gully_id=gully.gully_id where psector_id=OLD.psector_id UNION
 				select the_geom from connec join plan_psector_x_connec ON plan_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
 		
-			ELSIF psector_type_aux='om' THEN
-				SELECT st_collect(f.the_geom) INTO collect_aux 
-				FROM ( select the_geom from arc join om_psector_x_arc ON om_psector_x_arc.arc_id=arc.arc_id where psector_id=OLD.psector_id UNION
-				select the_geom from node join om_psector_x_node ON om_psector_x_node.node_id=node.node_id where psector_id=OLD.psector_id UNION
-				select the_geom from gully join om_psector_x_gully ON om_psector_x_gully.gully_id=gully.gully_id where psector_id=OLD.psector_id UNION
-				select the_geom from connec join om_psector_x_connec ON om_psector_x_connec.connec_id=connec.connec_id where psector_id=OLD.psector_id) f;
-
 			ELSIF psector_type_aux='lot' THEN
 				SELECT st_collect(f.the_geom) INTO collect_aux 
 				FROM ( select the_geom from arc join om_visit_lot_x_arc ON om_visit_lot_x_arc.arc_id=arc.arc_id where lot_id=OLD.lot_id 
@@ -268,18 +230,6 @@ BEGIN
 			
 			-- Update geometry field
 			UPDATE plan_psector SET the_geom=polygon_aux WHERE psector_id=OLD.psector_id;
-		
-		ELSIF psector_type_aux='om' THEN
-			
-			--update rotation field
-			IF (x1-x2)<(y1-y2) then 
-				UPDATE om_psector SET rotation=90 where psector_id=OLD.psector_id;
-			ELSE 
-				UPDATE om_psector SET rotation=0 where psector_id=OLD.psector_id;
-			END IF;
-			
-			-- Update geometry field
-			UPDATE om_psector SET the_geom=polygon_aux WHERE psector_id=OLD.psector_id;
 
 		ELSIF psector_type_aux='lot' THEN
 			

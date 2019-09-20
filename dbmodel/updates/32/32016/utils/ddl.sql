@@ -103,7 +103,6 @@ ALTER TABLE om_psector RENAME TO _om_psector_;
 ALTER TABLE om_psector_cat_type RENAME TO _om_psector_cat_type_;
 ALTER TABLE om_psector_selector RENAME TO _om_psector_selector_;
 ALTER TABLE om_psector_x_arc RENAME TO _om_psector_x_arc_;
-ALTER TABLE om_psector_x_connec RENAME TO _om_psector_x_connec_;
 ALTER TABLE om_psector_x_node RENAME TO _om_psector_x_node_;
 ALTER TABLE om_psector_x_other RENAME TO _om_psector_x_other_;
 

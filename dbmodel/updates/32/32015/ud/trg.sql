@@ -20,11 +20,7 @@ CREATE TRIGGER gw_trg_vi_gwf INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAM
 CREATE TRIGGER gw_trg_edit_subcatchment INSTEAD OF INSERT OR UPDATE OR DELETE  ON SCHEMA_NAME.v_edit_subcatchment  
 FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_subcatchment('subcatchment');
 
-
-CREATE TRIGGER gw_trg_om_psector_x_gully AFTER INSERT OR UPDATE OR DELETE ON om_psector_x_gully
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('om');
-  
-  
+ 
 CREATE TRIGGER gw_trg_plan_psector_x_gully BEFORE INSERT OR UPDATE OF gully_id ON plan_psector_x_gully 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_x_gully();
 

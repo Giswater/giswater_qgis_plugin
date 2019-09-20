@@ -236,7 +236,6 @@ UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_cat_type';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_selector';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_arc';
-UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_connec';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_node';
 UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='om_psector_x_other';
 

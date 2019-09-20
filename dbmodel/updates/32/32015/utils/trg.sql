@@ -7,12 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-
-CREATE TRIGGER gw_trg_om_psector_x_connec AFTER INSERT OR UPDATE OR DELETE ON om_psector_x_connec
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('om');
-  
-  
+ 
 CREATE TRIGGER gw_trg_plan_psector_x_connec BEFORE INSERT OR UPDATE OF connec_id ON plan_psector_x_connec 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_x_connec();
 
