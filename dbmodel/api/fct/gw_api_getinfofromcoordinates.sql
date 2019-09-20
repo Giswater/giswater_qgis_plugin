@@ -103,7 +103,7 @@ BEGIN
 		v_config_layer='config_web_layer';
 
     ELSIF  v_device=9 THEN
-	EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_web'''
+	EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_desktop'''
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility
 		v_sensibility = ((v_zoomratio/5000) * 10 * v_sensibility_f);

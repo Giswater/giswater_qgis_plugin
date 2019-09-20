@@ -380,3 +380,11 @@ false, false, 'string','combo',false,true,false,'feature_function_vdefault', ' A
 
 INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('om_typevalue', 'visit_cat_status');
 INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('plan_typevalue', 'psector_status');
+
+UPDATE config_param_system SET value = '99' WHERE parameter='plan_statetype_ficticius' AND value = '1'; 
+
+SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('api_sensibility_factor_desktop','1','integer', 'api', 'Variable to set the sensibility of info for desktop calls')
+ON CONFLICT (parameter) DO nothing;
+
