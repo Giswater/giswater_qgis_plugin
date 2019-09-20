@@ -190,6 +190,14 @@ UPDATE audit_cat_table SET notify_action = '[
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_builder';
 
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"category_type, feature_type","featureType":["arc", "node", "connec"]}]' WHERE id ='man_type_category';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"fluid_type, feature_type","featureType":["arc", "node", "connec"]}]' WHERE id ='man_type_fluid';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"function_type, feature_type","featureType":["arc", "node", "connec"]}]' WHERE id ='man_type_function';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"location_type, feature_type","featureType":["arc", "node", "connec"]}]' WHERE id ='man_type_location';
+
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_owner';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec"]}]' WHERE id ='cat_presszone';

@@ -142,6 +142,14 @@ UPDATE audit_cat_table SET notify_action =
 WHERE id='inp_landuses';	
 
 
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"category_type, feature_type","featureType":["arc", "node", "connec","gully"]}]' WHERE id ='man_type_category';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"fluid_type, feature_type","featureType":["arc", "node", "connec","gully"]}]' WHERE id ='man_type_fluid';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"function_type, feature_type","featureType":["arc", "node", "connec","gully"]}]' WHERE id ='man_type_function';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"location_type, feature_type","featureType":["arc", "node", "connec","gully"]}]' WHERE id ='man_type_location';
+
 SELECT gw_fct_admin_schema_manage_triggers('notify',null);
 
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_temp', 'inp_temperature', 'temp_type', NULL);
