@@ -13,7 +13,7 @@ UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_options';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_dma_parameter_period';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_dma_hydrometer_period';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_hydrometer_x_connec';
-
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='config';
 
 
 UPDATE sys_csv2pg_cat SET functionname='gw_fct_utils_csv2pg_import_timeseries', name='Import timeseries', name_i18n='Import timeseries', sys_role='role_edit'

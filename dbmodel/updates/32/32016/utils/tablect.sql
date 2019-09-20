@@ -71,3 +71,26 @@ ALTER TABLE cat_feature ADD CONSTRAINT type_check CHECK (type IN ('arc','node','
 
 ALTER TABLE connec ADD CONSTRAINT connec_pjoint_type_fkey FOREIGN KEY (pjoint_type)
 REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_visit_class ADD CONSTRAINT om_visit_class_feature_type_fkey FOREIGN KEY (feature_type)
+REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_visit_class ADD CONSTRAINT om_visit_class_sys_role_id_fkey FOREIGN KEY (sys_role_id)
+REFERENCES sys_role (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_visit_class ADD CONSTRAINT om_visit_class_visit_type_fkey FOREIGN KEY (visit_type)
+REFERENCES om_visit_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_visit_event_photo ADD CONSTRAINT om_visit_event_photo_event_id_fkey FOREIGN KEY (event_id)
+REFERENCES om_visit_event (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE om_visit_parameter DROP CONSTRAINT IF EXISTS om_visit_parameter_criticity_fkey;
+
+ALTER TABLE om_visit_parameter_x_parameter ADD CONSTRAINT om_visit_parameter_x_parameter_parameter_id1_fkey FOREIGN KEY (parameter_id1)
+REFERENCES om_visit_parameter (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_visit_parameter_x_parameter ADD CONSTRAINT om_visit_parameter_x_parameter_parameter_id2_fkey FOREIGN KEY (parameter_id2)
+REFERENCES om_visit_parameter (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_visit_team_x_user ADD CONSTRAINT om_visit_team_x_user_team_id_fkey FOREIGN KEY (team_id)
+REFERENCES cat_team (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
