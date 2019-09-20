@@ -30,9 +30,15 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_mantable:= TG_ARGV[0];
-
-	v_link_searchbuffer=0.25; 	-- This variable it is very important because it keeps to prevent connect links to nod2arc elements. 
-								-- Acts in combination of nod2arc variable. Newer nodarc variable must be > 2*v_link_searchbuffer
+	
+	/*
+	link_searchbuffer
+	This variable it is very important because it keeps to prevent connect links to nod2arc elements (in trimed arcs advanced model of go2epa). 
+	It acts in combination of nod2arc variable. Never nodarc variable must be > 2*v_link_searchbuffer
+	The problem is that nod2arc is managed by user at moment of simulations and v_link_searchbuffer it's managed by user at moment to edit network.
+	As a result simple way it is that variable must be harcoded 0.25 and nod2arc never higher that 0.5
+	*/
+	v_link_searchbuffer=0.25; 	
 
 	-- control of project type
 	SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
