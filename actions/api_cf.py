@@ -229,7 +229,6 @@ class ApiCF(ApiParent):
             self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
 
         visible_layers = self.get_visible_layers()
-        scale_zoom = self.iface.mapCanvas().scale()
         is_project_editable = self.get_editable_project()
 
         if tab_type == 'inp':
@@ -252,9 +251,10 @@ class ApiCF(ApiParent):
         # IF click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
+            scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
-            extras += f', "coordinates":{{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":1000}}'
+            extras += f', "coordinates":{{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             sql = f"SELECT gw_api_getinfofromcoordinates($${{{body}}}$$)"
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
