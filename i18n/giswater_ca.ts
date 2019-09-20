@@ -100,7 +100,7 @@
     </message>
     <message>
         <source>01_text</source>
-        <translation>Inserir node, connect (WS) / Inserir node, connect, gully (UD)</translation>
+        <translation>Inserir punt</translation>
     </message>      
     <message>
         <source>02_text</source>
@@ -172,7 +172,7 @@
     </message>
     <message>
         <source>72_text</source>
-        <translation>Insertar punt</translation>
+        <translation>Crear punt</translation>
     </message>
     <message>
         <source>23_text</source>

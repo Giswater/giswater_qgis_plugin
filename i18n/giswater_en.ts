@@ -99,11 +99,11 @@
     </message>
     <message>
         <source>01_text</source>
-        <translation>Insert node, connec (WS) / Insert node, connec, gully (UD)</translation>
+        <translation>Insert point</translation>
     </message>
     <message>
         <source>02_text</source>
-        <translation>Arc insert</translation>
+        <translation>Insert arc</translation>
     </message>   
 	<message>
         <source>16_text</source>
@@ -171,7 +171,7 @@
     </message>
     <message>
         <source>72_text</source>
-        <translation>Insert point</translation>
+        <translation>Create point</translation>
     </message>	
     <message>
         <source>23_text</source>

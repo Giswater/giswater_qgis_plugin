@@ -88,7 +88,7 @@
     </message>
     <message>
         <source>01_text</source>
-        <translation>Insertar nodo, connect (WS) / Insertar nodo, connect, gully (UD)</translation>
+        <translation>Insertar punto</translation>
     </message>      
     <message>
         <source>02_text</source>
@@ -172,7 +172,7 @@
     </message>
     <message>
         <source>72_text</source>
-        <translation>Insertar punto</translation>
+        <translation>Crear punto</translation>
     </message>
     <message>
         <source>23_text</source>
