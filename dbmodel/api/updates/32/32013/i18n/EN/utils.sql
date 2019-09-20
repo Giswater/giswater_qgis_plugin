@@ -8,6 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+INSERT INTO config_api_form_tabs VALUES(570, 'v_edit_node', 'tab_elements', 'Elem', 'List of related elements', 'role_basic', 'Elements', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":" Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(571, 'v_edit_node', 'tab_om', 'OM', 'List of events', 'role_basic', 'OM', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(572, 'v_edit_node', 'tab_documents', 'Doc', 'List of documents', 'role_basic', 'Doc', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(573, 'v_edit_node', 'tab_plan', 'Cost', 'List of costs', 'role_basic', 'Cos', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false},{"actionName":"actionSection", "actionFunction":"", "actionTooltip":"Show Section", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(680, 'v_edit_connec', 'tab_om', 'OM', 'List of events', 'role_basic', 'OM', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+
 UPDATE config_api_form_tabs SET tablabel = 'Network', tabtext = 'Network' WHERE formname ='search' AND tabname = 'tab_network';
 UPDATE config_api_form_tabs SET tablabel = 'Visit', tabtext = 'Visit' WHERE formname ='search' AND tabname = 'tab_visit';
 UPDATE config_api_form_tabs SET tablabel = 'Address', tabtext = 'Address' WHERE formname ='search' AND tabname = 'tab_address';
@@ -21,20 +28,28 @@ UPDATE config_api_form_tabs SET tablabel = 'Hydrometer', tabtext = 'Hydrometer' 
 
 UPDATE config_api_form_tabs SET tablabel = 'Data', tabtext = 'Data' WHERE formname ='lot' AND tabname = 'tabData';
 
-UPDATE config_api_form_tabs SET tablabel = 'Data', tabtext = 'Data' WHERE formname ='visit' AND tabname = 'tabData';
+UPDATE config_api_form_tabs SET tablabel = 'Data', tabtext = 'Data'  WHERE formname ='visit' AND tabname = 'tabData';
 
-UPDATE config_api_form_tabs SET tablabel = 'General data', tabtext = 'Data' WHERE formname ='visitManager' AND tabname = 'tabData';
-UPDATE config_api_form_tabs SET tablabel = 'Executed visits', tabtext = 'Visit' WHERE formname ='visitManager' AND tabname = 'tabData';
-UPDATE config_api_form_tabs SET tablabel = 'Work orders', tabtext = 'Lot' WHERE formname ='visitManager' AND tabname = 'tabData';
+UPDATE config_api_form_tabs SET tablabel = 'General data', tabtext = 'Data' , tooltip ='Data' WHERE formname ='visitManager' AND tabname = 'tabData';
+UPDATE config_api_form_tabs SET tablabel = 'Executed visits', tabtext = 'Visit' WHERE formname ='visitManager' AND tabname = 'tabDone';
+UPDATE config_api_form_tabs SET tablabel = 'Work orders', tabtext = 'Lot', tooltip='Work orders' WHERE formname ='visitManager' AND tabname='tabLots';
 
 UPDATE config_api_form_tabs SET tabtext = 'List of documents' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_documents';
 UPDATE config_api_form_tabs SET tabtext = 'List of hydrometers' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_hydrometer';
-UPDATE config_api_form_tabs SET tabtext = 'List of events' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_visit';
-UPDATE config_api_form_tabs SET tabtext = 'List of events' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_om';
+UPDATE config_api_form_tabs SET tabtext = 'List of events', tooltip='Events' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_visit';
+UPDATE config_api_form_tabs SET tabtext = 'List of events', tooltip='Events' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_om';
 UPDATE config_api_form_tabs SET tabtext = 'List of consumption values' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_hydrometer_val';
-UPDATE config_api_form_tabs SET tabtext = 'List of costs' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_plan';
+UPDATE config_api_form_tabs SET tabtext = 'List of costs', tablabel='Cost', tooltip='Cost' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_plan';
 UPDATE config_api_form_tabs SET tabtext = 'List of related elements' WHERE formname ilike 'v_edit_%' AND tabname = 'tab_elements';
 
+UPDATE config_api_form_tabs SET tooltip ='Files'  WHERE tabname = 'tabFiles';
+
+UPDATE config_api_form_tabs SET tablabel ='Subscriber'  WHERE tabname = 'tab_hydrometer';
+UPDATE config_api_form_tabs SET tablabel ='Consumption'  WHERE tabname = 'tab_hydrometer_val';
+UPDATE config_api_form_tabs SET tabtext='List of relations', tablabel ='Relations'  WHERE tabname = 'tab_relations';
+UPDATE config_api_form_tabs SET tabtext='Searcher API web', tablabel ='Search'  WHERE tabname = 'tab_search';
+UPDATE config_api_form_tabs SET tabtext='Executed visits', tablabel ='Executed visits', tooltip='Visit'  WHERE tabname = 'tabDone' and formname='visitManager';
+UPDATE config_api_form_tabs SET tooltip = 'Data' WHERE tablabel = 'Data';
 --basic visit configuration
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('visit_multievent', 'visit', 'user_name', 1, 10, true, 'string', 'text', 'User:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, NULL);
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('visit_multievent', 'visit', 'class_id', 1, 1, true, 'integer', 'combo', 'Visit type:', NULL, NULL, NULL, NULL, NULL, true, NULL, true, NULL, 'SELECT id, idval FROM om_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, NULL, NULL, NULL, 'gwGetVisit', NULL, true, NULL, true, NULL, NULL, 'data_1', NULL, NULL);

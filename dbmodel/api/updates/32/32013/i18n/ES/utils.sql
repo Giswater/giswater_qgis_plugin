@@ -7,6 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+INSERT INTO config_api_form_tabs VALUES(570, 'v_edit_node', 'tab_elements', 'Elem', 'Lista de elementos relacionados', 'role_basic', 'Elements', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":" Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(571, 'v_edit_node', 'tab_om', 'OM', 'Lista de eventos del elemento', 'role_basic', 'OM', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(572, 'v_edit_node', 'tab_documents', 'Doc', 'Lista de documentos', 'role_basic', 'Doc', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(573, 'v_edit_node', 'tab_plan', 'Cost', 'Partidas del elemento', 'role_basic', 'Cos', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false},{"actionName":"actionSection", "actionFunction":"", "actionTooltip":"Show Section", "disabled":false}]', null);
+INSERT INTO config_api_form_tabs VALUES(680, 'v_edit_connec', 'tab_om', 'OM', 'Lista de eventos del elemento', 'role_basic', 'OM', null,'[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"Edit", "disabled":false},{"actionName":"actionZoomIn", "actionFunction":"", "actionTooltip":"Zoom In", "disabled":false},{"actionName":"actionZoomOut", "actionFunction":"", "actionTooltip":"Zoom Out", "disabled":false},{"actionName":"actionCentered", "actionFunction":"", "actionTooltip":"Center", "disabled":false},{"actionName":"actionLink", "actionFunction":"", "actionTooltip":"Open Link", "disabled":false}]', null);
+
+UPDATE config_api_form_tabs SET tabtext ='Lista de eventos del elemento' WHERE tabname='tab_visit' and formname = 'v_edit_gully';
 UPDATE config_api_form_tabs SET tablabel = 'Red', tabtext = 'Red' WHERE formname ='search' AND tabname = 'tab_network';
 UPDATE config_api_form_tabs SET tablabel = 'Visita', tabtext = 'Visita' WHERE formname ='search' AND tabname = 'tab_visit';
 UPDATE config_api_form_tabs SET tablabel = 'Dirección', tabtext = 'Dirección' WHERE formname ='search' AND tabname = 'tab_address';
@@ -19,15 +26,20 @@ UPDATE config_api_form_tabs SET tablabel = 'Red', tabtext = 'Elementos de red' W
 UPDATE config_api_form_tabs SET tablabel = 'Explotación', tabtext = 'Explotaciones activas' WHERE formname ='filters' AND tabname = 'tabExploitation';
 UPDATE config_api_form_tabs SET tablabel = 'Abonado', tabtext = 'Abonado' WHERE formname ='filters' AND tabname = 'tabHydroState';
 
-UPDATE config_api_form_tabs SET tablabel = 'Datos', tabtext = 'Datos' WHERE formname ='lot' AND tabname = 'tabData';
-
-UPDATE config_api_form_tabs SET tablabel = 'Datos', tabtext = 'Datos' WHERE formname ='visit' AND tabname = 'tabData';
-
 UPDATE config_api_form_tabs SET tablabel = 'Datos generales', tabtext = 'Datos' WHERE formname ='visitManager' AND tabname = 'tabData';
 UPDATE config_api_form_tabs SET tablabel = 'Visitas realizadas', tabtext = 'Visita' WHERE formname ='visitManager' AND tabname = 'tabData';
 UPDATE config_api_form_tabs SET tablabel = 'Orden de trabajo', tabtext = 'Lot' WHERE formname ='visitManager' AND tabname = 'tabData';
 
-
+UPDATE config_api_form_tabs SET tablabel = 'Datos', tabtext = 'Datos', tooltip= 'Datos' WHERE tabname = 'tab_data' OR tabname = 'tabData';;
+UPDATE config_api_form_tabs SET tablabel = 'Conexiones', tabtext = 'Conexiones', tooltip= 'Conexiones' WHERE tabname = 'tab_connections';
+UPDATE config_api_form_tabs SET tablabel = 'Visita', tooltip= 'Visita' WHERE tabname = 'tab_visit';
+UPDATE config_api_form_tabs SET tablabel = 'Coste', tooltip= 'Coste' WHERE tabname = 'tab_plan';
+UPDATE config_api_form_tabs SET tabtext='Lista de relaciones', tablabel ='Relaciones', tooltip='Relaciones'  WHERE tabname = 'tab_relations';
+UPDATE config_api_form_tabs SET tooltip='Documentos'  WHERE tabname = 'tab_documents';
+UPDATE config_api_form_tabs SET tabtext='Visitas realizadas', tablabel ='Visitas realizadas', tooltip='Visita'  WHERE tabname = 'tabDone' and formname='visitManager';
+UPDATE config_api_form_tabs SET tablabel = 'Expediente', tabtext = 'Orden de trabajo', tooltip='Expediente' WHERE (formname ='visitManager' AND tabname='tabLots') or tabname ='tab_workcat';
+UPDATE config_api_form_tabs SET tabtext='Buscador API web', tablabel ='Buscador'  WHERE tabname = 'tab_search';
+UPDATE config_api_form_tabs SET tablabel = 'Archivos', tabtext = 'Archivos', tooltip= 'Archivos' WHERE tabname = 'tabFiles';
 --basic visit configuration
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('visit_multievent', 'visit', 'image1', 1, 2, true, 'bytea', 'image', NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, true, NULL, 'SELECT row_to_json(res) FROM (SELECT encode(image, ''base64'') AS image FROM config_api_images WHERE id=1) res;', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, NULL);
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, widgetdim, tooltip, placeholder, field_length, num_decimals, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, typeahead, listfilterparam, layout_name, editability, widgetcontrols) VALUES ('visit_multievent', 'visit', 'lot_id', 1, 5, true, 'integer', 'combo', 'Lot id:', NULL, NULL, NULL, NULL, NULL, true, NULL, false, NULL, 'SELECT id, id as idval FROM om_visit_lot WHERE active IS TRUE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, NULL);
