@@ -378,3 +378,6 @@ INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id,label, d
 VALUES ('featureval_function_vdefault', 'config', 'Featurecat for which function is defined', 'role_edit', 'Featurecat function:', 
 'SELECT function_type as id, function_type as idval FROM man_type_function WHERE function_type IS NOT NULL',true, 21,6,'utils',
 false, false, 'string','combo',false,true,false,'feature_function_vdefault', ' AND featurecat_id = ');
+
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('om_typevalue', 'visit_cat_status');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('plan_typevalue', 'psector_status');

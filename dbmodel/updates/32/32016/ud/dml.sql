@@ -210,3 +210,42 @@ VALUES ('gully_function_vdefault', 'config', 'Default value of function type for
 false, false, 'string','combo',false,true,false);
 
 INSERT INTO config_param_system ( parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype,tooltip) VALUES ('api_search_gully', '{"sys_table_id":"v_edit_gully", "sys_id_field":"gully_id", "sys_search_field":"code", "alias":"Gullys", "cat_field":"gratecat_id", "orderby":"3", "feature_type":"gully_id"}', NULL, 'api_search_network', NULL, 'api_search_gully:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT (parameter) DO NOTHING;
+
+
+
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_storage');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_fme');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_orifice');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_inflows');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_lidcontrol');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_id');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_weirs');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_routeto');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_pattern');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_catarc');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_files_type');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_outlet');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_timeseries');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_files_actio');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_raingage');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_yesno');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_divider');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_washoff');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_lo');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_temp');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_curve');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_pollutants');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_timserid');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_allnone');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_fu');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_in');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_treatment');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_nfl');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_status');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_raingage');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_evap');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_orifice');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_mapunits');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_buildup');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_outfall');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_fr');

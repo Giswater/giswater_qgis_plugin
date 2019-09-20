@@ -202,6 +202,7 @@ INSERT INTO config_api_typevalue VALUES ('datatype_typevalue', 'character varyin
 INSERT INTO config_api_typevalue VALUES ('datatype_typevalue', 'boolean', 'boolean', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('datatype_typevalue', 'double', 'double', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('datatype_typevalue', 'integer', 'integer', NULL, NULL);
+INSERT INTO config_api_typevalue VALUES ('datatype_typevalue', 'smallint', 'smallint', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('datatype_typevalue', 'numeric', 'numeric', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('widgettype_typevalue', 'nowidget', 'nowidget', NULL, NULL);
 INSERT INTO config_api_typevalue VALUES ('widgettype_typevalue', 'text', 'text', NULL, NULL);
@@ -412,6 +413,7 @@ INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typeval
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue','tabExploitation','tabExploitation');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue','tab_hydrometer','tab_hydrometer');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue','tab_address','tab_address');
+INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue','tab_connections','tab_connections');
 
 INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','tabname_typevalue','config_api_form_tabs','tabname');
