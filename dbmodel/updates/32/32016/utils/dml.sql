@@ -264,6 +264,7 @@ isparent=FALSE, datatype='string', widgettype='combo' WHERE id='visitparameter_v
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='om_mincut_analysis_dinletsector';
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='om_mincut_analysis_dminsector';
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='om_mincut_analysis_pipehazard';
+UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='edit_arc_downgrade_force';
 
 UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitextcode_vdefault';
 UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitclass_vdefault';
@@ -387,4 +388,7 @@ SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM con
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('api_sensibility_factor_desktop','1','integer', 'api', 'Variable to set the sensibility of info for desktop calls')
 ON CONFLICT (parameter) DO nothing;
+
+UPDATE config_param_system SET descript = 'To enable or disable state topology rules for arcs' WHERE parameter='state_topocontrol';
+
 
