@@ -192,6 +192,7 @@ BEGIN
 		-- Disable topocontrol triggers
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
 		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
+		ALTER TABLE node DISABLE TRIGGER gw_trg_node_statecontrol;
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_update;
@@ -203,20 +204,22 @@ BEGIN
 	ELSIF v_action = 'DISABLE TOPO-TRIGGERS' THEN
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
 		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
+		ALTER TABLE node DISABLE TRIGGER gw_trg_node_statecontrol;
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_update;
 
-		v_return = '{"Triggers disabled":"5"}';	
+		v_return = '{"Triggers disabled":"6"}';	
 
 	ELSIF v_action = 'ENABLE TOPO-TRIGGERS' THEN
 		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
+		ALTER TABLE node ENABLE TRIGGER gw_trg_node_statecontrol;
 		ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_update;
 
-		v_return = '{"Triggers enabled":"5"}';	
+		v_return = '{"Triggers enabled":"6"}';	
 
 	ELSIF v_action = 'ADD' THEN
 

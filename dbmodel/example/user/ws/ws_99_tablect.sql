@@ -54,10 +54,10 @@ INSERT INTO dma VALUES (5, 'source', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
 
 delete from dqa;
-INSERT INTO dqa VALUES (1, 'dqa1-1d', NULL, NULL, NULL, NULL, NULL, NULL,'{113766}', 'chlorine');
-INSERT INTO dqa VALUES (2, 'dqa2-1d', NULL, NULL, NULL, NULL, NULL, NULL,'{113952}', 'chlorine');
-INSERT INTO dqa VALUES (3, 'source', 1, NULL, NULL, NULL, NULL, NULL, '{1097,1101}','chlorine');
-INSERT INTO dqa VALUES (4, 'source', 2, NULL, NULL, NULL, NULL, NULL, '{111111}','chlorine');
+INSERT INTO dqa VALUES (1, 'dqa1-1d', 1, NULL, NULL, NULL, NULL, NULL,'{113766}', 'chlorine');
+INSERT INTO dqa VALUES (2, 'dqa2-1d', 2, NULL, NULL, NULL, NULL, NULL,'{113952}', 'chlorine');
+INSERT INTO dqa VALUES (3, 'dqa1-1s', 1, NULL, NULL, NULL, NULL, NULL, '{1097,1101}','chlorine');
+INSERT INTO dqa VALUES (4, 'dqa2-1s', 2, NULL, NULL, NULL, NULL, NULL, '{111111}','chlorine');
 
 
 delete from sector;

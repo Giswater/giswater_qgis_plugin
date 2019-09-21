@@ -24,17 +24,17 @@ BEGIN
 		DELETE FROM exploitation_x_user WHERE manager_id=NEW.id;
 		INSERT INTO exploitation_x_user (expl_id, username, manager_id)
 		SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
-		(SELECT reverse(substring(reverse(substring((unnest(username)) from 2)),2)) usern FROM cat_manager WHERE id=NEW.id) q;
+		(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q;
 
 		RETURN NEW;
 	
 	ELSIF TG_OP = 'DELETE' THEN
 
 		--Upsert values on exploitation_x_user according exploitation_x_user info
-		DELETE FROM exploitation_x_user WHERE manager_id=NEW.id;
+		DELETE FROM exploitation_x_user WHERE manager_id=OLD.id;
 		INSERT INTO exploitation_x_user (expl_id, username, manager_id)
-		SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
-		(SELECT reverse(substring(reverse(substring((unnest(username)) from 2)),2)) usern FROM cat_manager WHERE id=NEW.id) q;
+		SELECT expl, usern, OLD.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=OLD.id) p CROSS JOIN 
+		(SELECT reverse(substring(reverse(substring((unnest(username)) from 2)),2)) usern FROM cat_manager WHERE id=OLD.id) q;
 		
 		RETURN OLD;
 

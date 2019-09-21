@@ -4,10 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:XXXX
+--FUNCTION CODE:2522
+
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_data json)
   RETURNS json AS
+
+$BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
@@ -15,8 +18,8 @@ SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
 "feature":{},
 "data":{"parameters":{"useNod2arc":true}}}$$)
 */
- 
-$BODY$
+
+
 	DECLARE
 	rpt_rec record;
 	v_epsg integer;
@@ -98,6 +101,8 @@ BEGIN
 		DELETE FROM exploitation;
 		DELETE FROM sector;
 		DELETE FROM dma;
+		DELETE FROM dqa;
+		DELETE FROM cat_presszone;
 		DELETE FROM ext_municipality;
 		DELETE FROM selector_expl;
 		DELETE FROM selector_state;
@@ -146,10 +151,6 @@ BEGIN
 		DELETE FROM inp_emitter;
 		DELETE FROM inp_quality;
 		DELETE FROM inp_source;
-		DELETE FROM inp_reactions_el;
-		DELETE FROM inp_reactions_gl;
-		DELETE FROM inp_energy_gl;
-		DELETE FROM inp_energy_el;
 		DELETE FROM inp_mixing;
 		DELETE FROM config_param_user;
 		DELETE FROM inp_label;
@@ -208,10 +209,20 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating map zones and catalogs -> Done');
 	
 	-- MAPZONES
+	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(0,'undefined');
+	INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(0,'undefined',1);
+	INSERT INTO sector(sector_id,name) VALUES(0,'undefined');
+	INSERT INTO dma(dma_id,name,expl_id) VALUES(0,'undefined',0);
+	INSERT INTO dqa(dqa_id,name,expl_id) VALUES(0,'undefined',0);
+	INSERT INTO cat_presszone(id,descript,expl_id) VALUES(0,'undefined',0);
+
+	
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
 	INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
 	INSERT INTO sector(sector_id,name) VALUES(1,'sector1');
-	INSERT INTO dma(dma_id,name) VALUES(1,'dma1');
+	INSERT INTO dma(dma_id,name,expl_id) VALUES(1,'dma1',1);
+	INSERT INTO dqa(dqa_id,name,expl_id) VALUES(1,'dqa1',1);
+	INSERT INTO cat_presszone(id,descript,expl_id) VALUES(1,'presszone1',1);
 	INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1');
 
 	-- SELECTORS
@@ -490,7 +501,6 @@ BEGIN
 
 	-- Enable constraints
 	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
-
 
 	IF v_arc2node_reverse THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
 	
