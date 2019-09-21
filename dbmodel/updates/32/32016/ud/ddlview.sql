@@ -46,7 +46,7 @@ v_node.annotation,
 inp_junction.y0, 
 inp_junction.ysur,
 inp_junction.apond,
-inp_junction.outfallparam
+inp_junction.outfallparam::text
 FROM inp_selector_sector, v_node
      JOIN inp_junction ON inp_junction.node_id = v_node.node_id
      JOIN vi_parent_arc a ON (a.node_1=v_node.node_id OR a.node_2=v_node.node_id)

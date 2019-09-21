@@ -11,7 +11,7 @@ INSERT INTO audit_cat_param_user VALUES ('edit_gully_force_automatic_connect2net
 			NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL);
 			
 INSERT INTO audit_cat_param_user VALUES ('edit_gully_doublegeom', 'config', 'Parameter to configure automatic insert of polygon geometry for gully', 'role_edit', NULL, NULL, 
-			'Gully double geometry:', NULL, NULL, true, 8, 10, 'ud', false, NULL, NULL, NULL, false, 'json', 'linetext', true, NULL, '{"status":"false","unitsFactor":"2"}', NULL, NULL, NULL, NULL, 
+			'Gully double geometry:', NULL, NULL, true, 8, 10, 'ud', false, NULL, NULL, NULL, false, 'float', 'spinbox', true, NULL, '2', NULL, NULL, NULL, NULL, 
 			NULL, NULL, NULL, false, NULL, NULL);
 
 INSERT INTO audit_cat_param_user VALUES ('edit_gully_automatic_update_polgeom', 'config', 'Parameter to configure automatic update (translate) of polygon geometry when point geometry have been updated', 

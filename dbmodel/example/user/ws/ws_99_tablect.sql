@@ -106,3 +106,7 @@ SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR
 
 SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", 
 "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
+
+-- lastprocess
+UPDATE connec SET pjoint_type='VNODE', pjoint_id='478', label_rotation=24.5, label_x=3
+WHERE connec_id='3014';

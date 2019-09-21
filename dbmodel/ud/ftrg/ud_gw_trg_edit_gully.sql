@@ -58,8 +58,12 @@ BEGIN
 
 	-- get values
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	v_doublegeometry = (SELECT value::json->>'status' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
-	v_unitsfactor = (SELECT value::json->>'unitsFactor' FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	IF v_unitsfactor IS NULL THEN
+		v_doublegeometry = FALSE;
+	ELSE 
+		v_doublegeometry = TRUE;
+	END IF;
 
 	v_srid = (SELECT epsg FROM version limit 1);
 	
@@ -93,7 +97,7 @@ BEGIN
 		END IF;
 				
 		-- grate Catalog ID
-		IF (NEW.gratecat_id IS NULL) THEN
+		IF (NEW.gratecat_id IS NULL OR NEW.gratecat_id = '') THEN
 				NEW.gratecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='gratecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.gratecat_id IS NULL) THEN
 				NEW.gratecat_id:=(SELECT id FROM cat_grate LIMIT 1);

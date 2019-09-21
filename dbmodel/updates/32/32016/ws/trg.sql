@@ -35,3 +35,7 @@ CREATE TRIGGER gw_trg_vi_title INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_N
 
 DROP TRIGGER IF EXISTS gw_trg_vi_curves ON SCHEMA_NAME.vi_curves;
 CREATE TRIGGER gw_trg_vi_curves INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_curves FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_curves');
+
+DROP TRIGGER IF EXISTS gw_trg_ui_mincut_result_cat ON SCHEMA_NAME.v_ui_anl_mincut_result_cat;
+CREATE TRIGGER gw_trg_ui_mincut_result_cat  INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_ui_anl_mincut_result_cat  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_ui_mincut_result_cat();

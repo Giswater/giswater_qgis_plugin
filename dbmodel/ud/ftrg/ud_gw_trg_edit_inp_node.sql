@@ -48,7 +48,7 @@ BEGIN
 
         IF node_table = 'inp_junction' THEN
             UPDATE inp_junction 
-			SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, outfallparam = NEW.outfallparam
+			SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, outfallparam = NEW.outfallparam::json
 			WHERE node_id=OLD.node_id;
 			
         ELSIF node_table = 'inp_divider' THEN

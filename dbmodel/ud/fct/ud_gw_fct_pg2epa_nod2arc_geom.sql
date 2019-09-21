@@ -40,10 +40,7 @@ BEGIN
 
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
-
---  Looking for parameters
-    SELECT * INTO rec_options FROM inp_options;
-    
+   
 --  Move valves to arc
     RAISE NOTICE 'Starting process of nodarcs';
 
