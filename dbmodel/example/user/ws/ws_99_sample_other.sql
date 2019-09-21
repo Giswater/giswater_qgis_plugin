@@ -18,9 +18,6 @@ INSERT INTO cat_users VALUES ('user4','user4');
 
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
-INSERT INTO exploitation_x_user (expl_id, username) VALUES (1, current_user);
-INSERT INTO exploitation_x_user (expl_id, username) VALUES (2, current_user);
-
 
 INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1, '{113906}');
 INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2, '{114146}');
@@ -102,7 +99,6 @@ select gw_fct_audit_check_project(1);
 
 SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"PIPE"},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
-
 
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL-VALVE"},

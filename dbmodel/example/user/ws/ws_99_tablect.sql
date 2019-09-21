@@ -87,12 +87,8 @@ INSERT INTO dqa VALUES (0, 'Undefined', 0);
 INSERT INTO sector VALUES (0, 'Undefined', 0);
 INSERT INTO cat_presszone VALUES (0, 'Undefined',0);
 
--- drop constraints
+-- add constraints
 SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
-
-
-
-
 
 
 -- sectorization
@@ -108,5 +104,5 @@ SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
 "updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
-
-
+SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", 
+"updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');

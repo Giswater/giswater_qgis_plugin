@@ -351,7 +351,7 @@ BEGIN
 				', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
 				v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
 				ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
-				)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' > 0';
+				)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||'::text != 0::text';
 
 		EXECUTE v_querytext;	
 

@@ -8,20 +8,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE arc ADD CONSTRAINT arc_minsector_id_fkey FOREIGN KEY (minsector_id)
-REFERENCES minsector (minsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
 ALTER TABLE arc ADD CONSTRAINT arc_dqa_id_fkey FOREIGN KEY (dqa_id)
 REFERENCES dqa (dqa_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE node ADD CONSTRAINT node_minsector_id_fkey FOREIGN KEY (minsector_id)
-REFERENCES minsector (minsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
 ALTER TABLE node ADD CONSTRAINT node_dqa_id_fkey FOREIGN KEY (dqa_id)
 REFERENCES dqa (dqa_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-ALTER TABLE connec ADD CONSTRAINT connec_minsector_id_fkey FOREIGN KEY (minsector_id)
-REFERENCES minsector (minsector_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE connec ADD CONSTRAINT connec_dqa_id_fkey FOREIGN KEY (dqa_id)
 REFERENCES dqa (dqa_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
