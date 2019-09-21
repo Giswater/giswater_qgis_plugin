@@ -7,7 +7,16 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE audit_cat_function SET return_type=replace (return_type, ']', ',{"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]') where return_type is not null;
+UPDATE audit_cat_function SET return_type=replace (return_type, ']', ',{"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]') 
+WHERE return_type is not null AND id NOT IN (2522,2524);
+
+UPDATE audit_cat_function SET descript = 'Function imports network data from epanet inp file into database. 
+Create node2arc transforms epanet valves and pumps to node2arc giswater elements, enabling to use this doublegemoetry capability (node on gis tables, arc on epanet tables)' 
+WHERE id=2522;
+
+UPDATE audit_cat_function SET descript = 'Function imports network data from swmm inp file into database. 
+Create subcatchment geometry will store on database all information related hydrological model of SWMM' 
+WHERE id=2524;
 
 UPDATE audit_cat_function SET isdeprecated=true WHERE function_name='gw_trg_arc_orphannode_delete';
 
