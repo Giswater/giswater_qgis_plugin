@@ -590,8 +590,23 @@ SELECT 'v_edit_gully', formtype, column_id, layout_id, layout_order, isenabled, 
 FROM config_api_form_fields WHERE formname = 've_gully'; 
 
 
+-- catalogs
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('cat_grate','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_grate WHERE id IS NOT NULL', 'matcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_grate', 'form', 'brand', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand WHERE id IS NOT NULL', 'brand');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_grate', 'form', 'model', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand_model WHERE id IS NOT NULL', 'model');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_grate', 'form', 'cost_ut', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'cost_ut');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_node','form', 'shape', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_node_shape WHERE id IS NOT NULL', 'shape');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'tsect_id', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM inp_transects_id WHERE id IS NOT NULL', 'tsect_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'curve_id', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM inp_curve_id WHERE id IS NOT NULL', 'curve_id');
 
 --INP
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
@@ -615,7 +630,7 @@ VALUES ('v_edit_raingage','form', 'timser_id', null, null, true, 'string',  'com
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_raingage','form', 'expl_id', null, null, true, 'string',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL ', 'expl_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, placeholder)
-VALUES ('v_edit_subcatchment','form', 'outlet_id', null, null, true, 'string',  'combo', true, 'SELECT arc_id as id, arc_id as idval FROM inp_outlet WHERE arc_id IS NOT NULL ', 'outlet_id','{1,2,3} or 1');
+VALUES ('v_edit_subcatchment','form', 'outlet_id', null, null, true, 'string',  'text', true, 'SELECT arc_id as id, arc_id as idval FROM inp_outlet WHERE arc_id IS NOT NULL ', 'outlet_id','{1,2,3} or 1');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_subcatchment','form', 'rg_id', null, null, true, 'string',  'combo', true, 'SELECT rg_id as id, rg_id as idval FROM raingage WHERE rg_id IS NOT NULL ', 'rg_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)

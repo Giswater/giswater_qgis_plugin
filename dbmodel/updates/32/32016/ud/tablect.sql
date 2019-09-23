@@ -18,3 +18,15 @@ REFERENCES cat_mat_grate (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE gully ADD CONSTRAINT gully_pjoint_type_fkey FOREIGN KEY (pjoint_type)
 REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE cat_connec ADD CONSTRAINT cat_connec_cost_ut_fkey FOREIGN KEY (cost_ut) 
+REFERENCES price_compost (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE cat_connec ADD CONSTRAINT cat_connec_cost_ml_fkey FOREIGN KEY (cost_ml) 
+REFERENCES price_compost (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE cat_connec ADD CONSTRAINT cat_connec_cost_m3_fkey FOREIGN KEY (cost_m3) 
+REFERENCES price_compost (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE cat_grate ADD CONSTRAINT cat_connec_cost_ut_fkey FOREIGN KEY (cost_ut) 
+REFERENCES price_compost (id) ON DELETE CASCADE ON UPDATE CASCADE;

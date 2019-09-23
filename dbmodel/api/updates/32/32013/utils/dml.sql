@@ -217,13 +217,70 @@ UPDATE config_api_form_fields SET layout_name='symbology_layout' WHERE formname=
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('cat_connec','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_node WHERE id IS NOT NULL', 'matcat_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_connec', 'form', 'brand', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand WHERE id IS NOT NULL', 'brand');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_connec', 'form', 'model', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand_model WHERE id IS NOT NULL', 'model');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_connec', 'form', 'cost_ut', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'cost_ut');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_connec', 'form', 'cost_ml', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'cost_ml');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_connec', 'form', 'cost_m3', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'cost_m3');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('cat_arc','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_arc WHERE id IS NOT NULL', 'matcat_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'brand', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand WHERE id IS NOT NULL', 'brand');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'model', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand_model WHERE id IS NOT NULL', 'model');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'cost_unit', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_value_unit WHERE id IS NOT NULL', 'cost_unit');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'cost');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'm2bottom_cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'm2bottom_cost');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'm3protec_cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'm3protec_cost');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_arc', 'form', 'shape', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_arc_shape WHERE id IS NOT NULL', 'shape');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('cat_node','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_node WHERE id IS NOT NULL', 'matcat_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_node', 'form', 'brand', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand WHERE id IS NOT NULL', 'brand');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_node', 'form', 'model', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand_model WHERE id IS NOT NULL', 'model');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_node', 'form', 'cost_unit', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_value_unit WHERE id IS NOT NULL', 'cost_unit');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_node', 'form', 'cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'cost');
+
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('cat_element','form', 'matcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, descript AS idval FROM cat_mat_element WHERE id IS NOT NULL', 'matcat_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('cat_element','form', 'elementtype_id', null, null, true, 'string',  'combo', true, 'SELECT id, id AS idval FROM element_type WHERE id IS NOT NULL', 'elementtype_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_element', 'form', 'brand', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand WHERE id IS NOT NULL', 'brand');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_element', 'form', 'model', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand_model WHERE id IS NOT NULL', 'model');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_soil', 'form', 'm3exc_cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'm3exc_cost');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_soil', 'form', 'm3fill_cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'm3fill_cost');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_soil', 'form', 'm3excess_cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'm3excess_cost');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_soil', 'form', 'm2trenchl_cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'm2trenchl_cost');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_pavement', 'form', 'm2_cost', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM price_compost WHERE id IS NOT NULL', 'm2_cost');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_brand_model', 'form', 'catbrand_id', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM cat_brand WHERE id IS NOT NULL', 'catbrand_id');
+
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('cat_users', 'form', 'sys_role', null, null, true, 'string', 'combo', true, 'SELECT id, id AS idval FROM sys_role WHERE id IS NOT NULL', 'sys_role');
 
 --zones
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
@@ -234,7 +291,8 @@ INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, lay
 VALUES ('exploitation','form', 'macroexpl_id', null, null, true, 'integer',  'combo', false, 'SELECT macroexpl_id as id, name as idval FROM macroexploitation WHERE macroexpl_id IS NOT NULL','macroexpl_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_sector','form', 'macrosector_id', null, null, true, 'integer',  'combo', false, 'SELECT macrosector_id as id, name as idval FROM macrosector WHERE macrosector_id IS NOT NULL','macrosector_id');
-
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_macrodma', 'form', 'expl_id', null, null, true, 'string', 'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
 
 --link
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
