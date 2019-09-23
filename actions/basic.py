@@ -58,9 +58,10 @@ class Basic(ParentAction):
         sql = ("SELECT value FROM config_param_system "
                " WHERE parameter ='sys_exploitation_x_user'")
         row = self.controller.get_row(sql, commit=True)
-        query = None
+        query = ""
         if row[0].lower() == 'true':
             query = f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
+        query += f" AND expl_id != 0"
 
         self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, aql=query)
 

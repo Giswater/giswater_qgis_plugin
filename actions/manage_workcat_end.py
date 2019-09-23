@@ -134,7 +134,7 @@ class ManageWorkcatEnd(ParentManage):
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
         sql = "SELECT id FROM cat_work"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
         sql = ("SELECT value FROM config_param_user "
@@ -446,7 +446,7 @@ class ManageWorkcatEnd(ParentManage):
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
                    "WHERE  fprocesscat_id = '28' AND user_name = current_user")
-            rows = self.controller.get_rows(sql, log_sql=False)
+            rows = self.controller.get_rows(sql, commit=True, log_sql=False)
             ids_ = ""
             if rows:
                 for row in rows:
@@ -537,7 +537,7 @@ class ManageWorkcatEnd(ParentManage):
                 sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                 self.controller.execute_sql(sql, log_sql=True)
                 sql = "SELECT id FROM cat_work ORDER BY id"
-                rows = self.controller.get_rows(sql)
+                rows = self.controller.get_rows(sql, commit=True)
                 if rows:
                     utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))

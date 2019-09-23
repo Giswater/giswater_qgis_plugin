@@ -108,13 +108,13 @@ class ManageElement(ParentManage):
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id) FROM cat_element ORDER BY elementtype_id"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_add_element, "element_type", rows, False)
         self.populate_combo(self.dlg_add_element, "expl_id", "exploitation", "name")
 
         # Combo state
         sql = "SELECT DISTINCT(id), name FROM value_state"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
 
         # Combo state type
@@ -171,7 +171,7 @@ class ManageElement(ParentManage):
         state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
 
 
@@ -429,7 +429,7 @@ class ManageElement(ParentManage):
         sql = (f"SELECT DISTINCT(id) FROM cat_element"
                f" WHERE elementtype_id = '{utils_giswater.getWidgetText(self.dlg_add_element, 'element_type')}'"
                f" ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_add_element, "elementcat_id", rows, False)
 
 

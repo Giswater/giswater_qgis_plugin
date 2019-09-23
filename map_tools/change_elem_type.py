@@ -142,7 +142,7 @@ class ChangeElemType(ParentMapTool):
         elif project_type == 'ud':
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
-            rows = self.controller.get_rows(sql)
+            rows = self.controller.get_rows(sql, commit=True)
             utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
@@ -155,7 +155,7 @@ class ChangeElemType(ParentMapTool):
         sql = ("SELECT DISTINCT(id) FROM node_type "
                "WHERE active is True "
                "ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
@@ -172,7 +172,7 @@ class ChangeElemType(ParentMapTool):
 
         # Populate catalog_id
         sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 

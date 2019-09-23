@@ -216,7 +216,7 @@ class ParentManage(ParentAction, object):
         sql = (f"SELECT {geom_type}_id "
                f"FROM {table_relation} "
                f"WHERE {table_object}_id = '{object_id}'")
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = self.controller.get_rows(sql, commit=True, log_info=False)
         if rows:
             for row in rows:
                 self.list_ids[geom_type].append(str(row[0]))
@@ -462,7 +462,7 @@ class ParentManage(ParentAction, object):
         sql = (f"SELECT DISTINCT({field_id})"
                f" FROM {tablename}"
                f" ORDER BY {field_id}")
-        row = self.controller.get_rows(sql)
+        row = self.controller.get_rows(sql, commit=True)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])

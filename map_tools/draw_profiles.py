@@ -199,7 +199,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_load.btn_delete_profile.clicked.connect(self.delete_profile)
         
         sql = "SELECT DISTINCT(profile_id) FROM anl_arc_profile_value"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if rows:
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
@@ -240,7 +240,7 @@ class DrawProfiles(ParentMapTool):
         sql = ("SELECT arc_id"
                " FROM anl_arc_profile_value"
                " WHERE profile_id = '" + selected_profile + "'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return
 
@@ -1225,7 +1225,7 @@ class DrawProfiles(ParentMapTool):
             return
         sql += ")"
 
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         for i in range(0, len(rows)):
             if self.version == '2':
                 self.rnode_id.append(str(rows[i][1]))
@@ -1603,7 +1603,7 @@ class DrawProfiles(ParentMapTool):
                 return
             sql += ")"
 
-            rows = self.controller.get_rows(sql)
+            rows = self.controller.get_rows(sql, commit=True)
             for i in range(0, len(rows)):
                 if self.version == '2':
                     self.rnode_id.append(str(rows[i][1]))
@@ -1725,7 +1725,7 @@ class DrawProfiles(ParentMapTool):
             # Get rotation vdefaut if exist
             sql = ("SELECT value FROM config_param_user "
                    "WHERE parameter = 'rotation_vdefault' AND cur_user = current_user")
-            rows = self.controller.get_rows(sql)
+            rows = self.controller.get_rows(sql, commit=True)
             if rows:
                 row = rows[0]
                 if row:

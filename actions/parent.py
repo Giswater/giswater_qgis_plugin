@@ -504,7 +504,7 @@ class ParentAction(object):
                f" FROM config_client_forms"
                f" WHERE table_id = '{table_name}'"
                f" ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = self.controller.get_rows(sql, commit=True, log_info=False)
         if not rows:
             return
 
@@ -655,7 +655,7 @@ class ParentAction(object):
         sql = (f"SELECT DISTINCT({field_search})"
                f" FROM {tablename}"
                f" ORDER BY {field_search}")
-        row = self.controller.get_rows(sql)
+        row = self.controller.get_rows(sql, commit=True)
 
         for i in range(0, len(row)):
             aux = row[i]

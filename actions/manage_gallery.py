@@ -42,7 +42,7 @@ class ManageGallery(ParentManage):
         # Get all pictures for event_id | visit_id
         sql = (f"SELECT value FROM om_visit_event_photo"
                f" WHERE event_id = '{event_id}' AND visit_id = '{visit_id}'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         num = len(rows)
 
         # Get doc_absolute_path from config_param_system

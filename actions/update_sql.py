@@ -1291,7 +1291,7 @@ class UpdateSQL(ApiParent):
             return
 
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         available = False
         for row in rows:
             if str(project_name) == str(row[0]):
@@ -1819,7 +1819,7 @@ class UpdateSQL(ApiParent):
 
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if rows is None:
             return
 

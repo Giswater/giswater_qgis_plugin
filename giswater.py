@@ -590,7 +590,7 @@ class Giswater(QObject):
             sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
                    "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
 
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
 
         if not rows:
             return False
@@ -1178,7 +1178,7 @@ class Giswater(QObject):
             if answer:
                 sql = ("SELECT * FROM audit_check_project"
                        " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
-                rows = self.controller.get_rows(sql)
+                rows = self.controller.get_rows(sql, commit=True)
                 if rows:
                     self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
                     self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)

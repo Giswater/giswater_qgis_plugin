@@ -117,7 +117,7 @@ class ManageNewPsector(ParentManage):
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.cmb_status, rows, 1)
 
         if self.plan_om == 'om':
@@ -327,7 +327,7 @@ class ManageNewPsector(ParentManage):
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         self.all_states = rows
         self.delete_psector_selector('selector_state')
         self.insert_psector_selector('selector_state', 'state_id', '1')
@@ -642,7 +642,7 @@ class ManageNewPsector(ParentManage):
                f" WHERE table_name = '{viewname}'"
                f" AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                f" ORDER BY ordinal_position")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         columns = []
 
         if not rows or rows is None or rows == '':
@@ -655,7 +655,7 @@ class ManageNewPsector(ParentManage):
 
         sql = (f"SELECT * FROM {viewname}"
                f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)}'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         all_rows = []
         all_rows.append(columns)
         if not rows or rows is None or rows == '':
@@ -672,7 +672,7 @@ class ManageNewPsector(ParentManage):
         
         sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
                f" WHERE table_name = 'v_{self.plan_om}_current_psector'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -804,7 +804,7 @@ class ManageNewPsector(ParentManage):
         
         sql = (f"SELECT name FROM {tablename} "
                f" WHERE LOWER(name) = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)}'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
                 self.enable_tabs(True)
@@ -866,7 +866,7 @@ class ManageNewPsector(ParentManage):
         index = self.dlg_plan_psector.psector_type.itemData(self.dlg_plan_psector.psector_type.currentIndex())
         sql = (f"SELECT result_type, name FROM {table_name}"
                f" WHERE result_type = {index[0]} ORDER BY name DESC")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return False
 

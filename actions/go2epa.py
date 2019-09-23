@@ -929,9 +929,9 @@ class Go2Epa(ApiParent):
         # Set values from widgets of type QComboBox
         sql = ("SELECT DISTINCT(result_id), result_id "
                "FROM v_ui_rpt_cat_result ORDER BY result_id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
-        rows = self.controller.get_rows(sql, add_empty_row=True)
+        rows = self.controller.get_rows(sql, commit=True, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
         if self.project_type == 'ws':
@@ -954,7 +954,7 @@ class Go2Epa(ApiParent):
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id}' "
                    f"ORDER BY resultdate")
-            rows = self.controller.get_rows(sql)
+            rows = self.controller.get_rows(sql, commit=True)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
                 selector_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
