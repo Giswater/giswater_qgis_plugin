@@ -224,11 +224,13 @@ class ParentAction(object):
                 self.iface.actionPan().trigger() 
         except AttributeError:
             pass
+        except Exception as e:
+            print(type(e).__name__)
         
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
                            hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=None):
+                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
         """
         :param dialog:
         :param tableleft: Table to consult and load on the left side
@@ -250,9 +252,9 @@ class ParentAction(object):
         query_left += f" RIGHT JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
         query_left += f" WHERE cur_user = current_user)"
         query_left += f" AND  {field_id_left} > -1"
+        query_left += aql
 
-        if aql:
-            query_left += aql
+
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
