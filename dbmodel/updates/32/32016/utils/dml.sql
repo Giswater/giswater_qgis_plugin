@@ -147,7 +147,6 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type,de
 VALUES (2754, 'gw_trg_cat_manager', 'utils', 'trigger function', 'Propagate changes on cat_manager to exploitation_x_user table','role_admin', FALSE, FALSE, FALSE);
 
 
-
 INSERT INTO audit_cat_error(id, error_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3024, 'Can''t delete the parameter. There is at least one event related to it', 2, true,'utils',false);
 
@@ -169,6 +168,9 @@ VALUES (3032, 'Can''t apply the foreign key','there are values already inserted 
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3034, 'Inventory state and state type of planified features has been updated',null, 1, true,'utils',false);
+
+INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3036, 'Selected state type doesn''t correspond with state','Modify the value of state or state type.', 2, true,'utils',false);
 
 INSERT INTO audit_cat_table VALUES ('om_visit_type', 'O&M', 'Catalog of visit types', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_class', 'O&M', 'Catalog of visit classes', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);

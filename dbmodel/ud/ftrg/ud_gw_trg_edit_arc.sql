@@ -142,7 +142,11 @@ BEGIN
 			IF (NEW.state_type IS NULL) THEN
 				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-			
+
+			--check relation state - state_type
+	        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+	        	RETURN audit_function(3036,1212,NEW.state::text);
+	       	END IF;			
    
 			-- Exploitation
 			IF (NEW.expl_id IS NULL) THEN
@@ -361,7 +365,12 @@ BEGIN
 					END IF;
 				END IF;
 			END IF;
-				
+
+			--check relation state - state_type
+	        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+	        	RETURN audit_function(3036,1212,NEW.state::text);
+	       	END IF;		
+	       					
 			-- The geom
 			IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
 				UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;

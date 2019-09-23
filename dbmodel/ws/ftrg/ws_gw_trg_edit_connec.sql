@@ -154,6 +154,11 @@ BEGIN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
+		--check relation state - state_type
+        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+        	RETURN audit_function(3036,1318,NEW.state::text);
+       	END IF;
+
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
@@ -403,7 +408,7 @@ BEGIN
 					END IF;
 				END IF;
 			END IF;
-			
+
 			-- Control of automatic downgrade of associated link/vnode
 			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_downgrade_linkvnode' 
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN	
@@ -412,6 +417,11 @@ BEGIN
 			END IF;
 		END IF;
 		
+		--check relation state - state_type
+        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+        	RETURN audit_function(3036,1318,NEW.state::text);
+       	END IF;			
+       	
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN
 			UPDATE connec SET rotation=NEW.rotation WHERE connec_id = OLD.connec_id;

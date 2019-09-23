@@ -203,6 +203,11 @@ BEGIN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 
+        --check relation state - state_type
+        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+        	RETURN audit_function(3036,1318,NEW.state::text);
+       	END IF;
+
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
@@ -535,11 +540,15 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					RETURN audit_function(2110,1318);
+						RETURN audit_function(2110,1318);
 					END IF;
 				END IF;
 			END IF;
 		END IF;
+		--check relation state - state_type
+        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+        	RETURN audit_function(3036,1318,NEW.state::text);
+       	END IF;
 
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN

@@ -146,7 +146,12 @@ BEGIN
 		IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;		
-						
+
+		--check relation state - state_type
+        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+	       	RETURN audit_function(3036,1212,NEW.state::text);
+	    END IF;		
+
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
@@ -472,6 +477,11 @@ BEGIN
 			END IF;
 		END IF;
 		
+		--check relation state - state_type
+        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+	       	RETURN audit_function(3036,1212,NEW.state::text);
+	    END IF;		
+
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN
 			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;

@@ -102,7 +102,7 @@ BEGIN
 	-- Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_feature := COALESCE(v_feature, '{}');
-	v_geometry := COALESCE(v_geometry, '');
+	v_geometry := COALESCE(v_geometry, '{}');
 
   
 	-- Return
