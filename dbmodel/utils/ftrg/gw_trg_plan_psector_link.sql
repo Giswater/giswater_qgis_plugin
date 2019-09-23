@@ -16,17 +16,29 @@ DECLARE
 	v_feature_geom public.geometry;
 BEGIN 
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    v_table_name:= TG_ARGV[0];
+	v_table_name:= TG_ARGV[0];
 
-    IF v_table_name = 'connec' THEN
-    	SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
-    ELSIF v_table_name = 'gully' THEN
-    	SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
-    END IF;
+	IF v_table_name = 'connec' THEN
+		SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
+	ELSIF v_table_name = 'gully' THEN
+		SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
+	END IF;
+	
+	-- create link if not exists for connect, because it's mandatory to have links created for connect when it has an arc_id defined on some alternative
+	IF NEW.arc_id IS NOT NULL AND v_table_name = 'connec' THEN
+			IF (SELECT link FROM link WHERE feature_type='CONNEC' and feature_id=NEW.connec_id) IS NULL THEN
+				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');	
+			END IF;
+	
+	ELSIF NEW.arc_id IS NOT NULL AND v_table_name = 'gully' THEN
+			IF (SELECT link FROM link WHERE feature_type='GULLY' and feature_id=NEW.gully_id) IS NULL THEN
+				PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
+			END IF;
+	END IF;
 
-	-- update geometry
+	-- update geometry on plan psector table
 	v_link_geom := ST_ShortestLine(v_feature_geom, (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id));
 	v_vnode_geom = ST_EndPoint(v_link_geom);
 	
@@ -35,6 +47,7 @@ BEGIN
 	ELSIF v_table_name = 'gully' THEN
 		UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom WHERE id=NEW.id;
 	END IF;
+
 
 RETURN NEW;
 
