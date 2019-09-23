@@ -59,6 +59,9 @@ class UpdateSQL(ApiParent):
 
     def init_sql(self):
         """ Button 100: Execute SQL. Info show info """
+        # Create extension postgis if not exist
+        sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
+        self.controller.execute_sql(sql)
 
         # Check if connection is still False
         connection_status, not_version = self.controller.set_database_connection()
