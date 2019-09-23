@@ -400,6 +400,10 @@ class GwToolBox(ApiParent):
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
         main_parent = QStandardItem('{}'.format('Giswater'))
+        font = main_parent.font()
+        font.setPointSize(8)
+        main_parent.setFont(font)
+
         self.icon_folder = self.plugin_dir + os.sep + 'icons'
         path_icon_blue = self.icon_folder + os.sep + '36.png'
         path_icon_red = self.icon_folder + os.sep + '100.png'
@@ -414,6 +418,9 @@ class GwToolBox(ApiParent):
             for function in functions:
                 func_name = QStandardItem(str(function['functionname']))
                 label = QStandardItem(str(function['alias']))
+                font = label.font()
+                font.setPointSize(8)
+                label.setFont(font)
                 row = self.controller.check_function(function['functionname'])
                 if not row:
                     if os.path.exists(path_icon_red):
