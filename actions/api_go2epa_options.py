@@ -62,7 +62,7 @@ class Go2EpaOptions(ApiParent):
                     grl.addItem(spacer)
 
         # Event on change from combo parent
-        self.get_event_combo_parent('fields', complet_result[0]['body']['form']['formTabs'])
+        self.get_event_combo_parent(complet_result)
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
         self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
 
@@ -83,13 +83,12 @@ class Go2EpaOptions(ApiParent):
         self.close_dialog(self.dlg_options)
 
 
-    def get_event_combo_parent(self, fields, row):
-
-        if fields == 'fields':
-            for field in row[0]["fields"]:
-                if field['isparent']:
-                    widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
-                    widget.currentIndexChanged.connect(partial(self.fill_child, widget))
+    def get_event_combo_parent(self, complet_result):
+        # complet_result[0]['body']['form']['formTabs']
+        for field in complet_result[0]['body']['form']['formTabs'][0]["fields"]:
+            if field['isparent']:
+                widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
+                widget.currentIndexChanged.connect(partial(self.fill_child, widget))
 
 
     def fill_child(self, widget):
@@ -100,11 +99,20 @@ class Go2EpaOptions(ApiParent):
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
-                self.populate_child(combo_child)
+                self.manage_child(widget, combo_child)
 
 
-    def populate_child(self, combo_child):
-
+    def manage_child(self, combo_parent, combo_child):
         child = self.dlg_options.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
+            child.setEnabled(True)
             self.populate_combo(child, combo_child)
+            utils_giswater.set_combo_itemData(child, combo_child['selectedId'], 1)
+            if 'editability' not in combo_child:
+                return
+            if int(utils_giswater.get_item_data(self.dlg_options, combo_parent, 0)) in combo_child['editability']['trueWhenParentIn']:
+                child.setEnabled(True)
+            else:
+                child.setEnabled(False)
+
+
