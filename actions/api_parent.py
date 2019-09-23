@@ -1270,7 +1270,7 @@ class ApiParent(ParentAction):
             if row[pos]['return_type'] not in ('', None):
                 self.controller.log_info(str(row[pos]['return_type']))
                 field_id = 'return_type'
-        self.controller.log_info(str(field_id))
+
         if field_id == '':
             return
 
@@ -1282,7 +1282,7 @@ class ApiParent(ParentAction):
                 lbl.setText(field['label'])
                 lbl.setMinimumSize(160, 0)
                 lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-                if 'tooltip' in field['label']:
+                if 'tooltip' in field:
                     lbl.setToolTip(field['tooltip'])
 
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
