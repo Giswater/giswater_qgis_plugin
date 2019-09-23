@@ -878,7 +878,9 @@ class Giswater(QObject):
         click_point = QPoint(x + 5, y + 5)
         schema_name = self.schema_name.replace('"', '')
         # Get parent layers
-        sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature")
+        sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' "
+               "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
+               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature")
         parent_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
 
         for parent_layer in parent_layers:
@@ -891,8 +893,9 @@ class Giswater(QObject):
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
                    f"   WHERE table_schema = '{schema_name}')")
-            child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
 
+            child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
+            child_layers.insert(0, ['ALL', 'ALL'])
             for child_layer in child_layers:
                 # Create actions
                 action = QAction(str(child_layer[0]), sub_menu, checkable=True)
@@ -907,20 +910,30 @@ class Giswater(QObject):
                     action.setChecked(True)
 
                 sub_menu.addAction(action)
-                action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1]))
+                if child_layer[0] == 'ALL':
+                    action.triggered.connect(partial(self.put_layer_into_toc, child_layers=child_layers))
+                else:
+                    action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1]))
+
         main_menu.exec_(click_point)
 
 
-    def put_layer_into_toc(self, tablename, type):
+    def put_layer_into_toc(self, tablename=None, type=None, child_layers=None):
         """ Put selected layer into TOC"""
         schema_name = self.controller.credentials['schema'].replace('"', '')
         uri = QgsDataSourceUri()
         uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
                           self.controller.credentials['db'], self.controller.credentials['user'],
                           self.controller.credentials['password'])
-        uri.setDataSource(schema_name, f'{tablename}', "the_geom", None, type + "_id")
-        vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
-        QgsProject.instance().addMapLayer(vlayer)
+        if child_layers is not None:
+            for layer in child_layers:
+                uri.setDataSource(schema_name, f'{layer[0]}', "the_geom", None, layer[1] + "_id")
+                vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
+                QgsProject.instance().addMapLayer(vlayer)
+        else:
+            uri.setDataSource(schema_name, f'{tablename}', "the_geom", None, type + "_id")
+            vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
+            QgsProject.instance().addMapLayer(vlayer)
         self.iface.mapCanvas().refresh()
 
 
