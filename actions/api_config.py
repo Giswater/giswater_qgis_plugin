@@ -195,7 +195,7 @@ class ApiConfig(ApiParent):
         addfields_layout1.addItem(verticalSpacer1)
 
         # Event on change from combo parent
-        self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
+        self.get_event_combo_parent(complet_list[0]['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
         chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
@@ -424,13 +424,12 @@ class ApiConfig(ApiParent):
                     self.order_widgets_system(field, self.system_form, lbl,  widget)
 
 
-    def get_event_combo_parent(self, fields, row):
+    def get_event_combo_parent(self, row):
 
-        if fields == 'fields':
-            for field in row[0]["fields"]:
-                if field['isparent']:
-                    widget = self.dlg_config.findChild(QComboBox, field['widgetname'])
-                    widget.currentIndexChanged.connect(partial(self.fill_child, widget))
+        for field in row[0]["fields"]:
+            if field['isparent']:
+                widget = self.dlg_config.findChild(QComboBox, field['widgetname'])
+                widget.currentIndexChanged.connect(partial(self.fill_child, widget))
 
 
     def populate_combo(self, widget, field):
