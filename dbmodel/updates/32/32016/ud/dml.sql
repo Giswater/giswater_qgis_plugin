@@ -257,3 +257,26 @@ INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_type
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_buildup');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_outfall');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_fr');
+
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_gully_force_automatic_connect2network', TRUE, current_user);
+
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_node_elevation_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_node_depth_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_arc_y1_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_arc_y2_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_arc_geom1_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_arc_geom2_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_node_top_elev_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_node_ymax_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_node_geom1_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_node_geom2_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_connec_y1_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_connec_y2_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_connec_geom1_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_connec_geom2_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_top_elev_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_ymax_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_sandbox_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_connec_geom1_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_connec_geom2_tol';
+UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_units_tol';

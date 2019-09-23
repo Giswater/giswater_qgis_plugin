@@ -68,7 +68,7 @@ UPDATE config_param_system SET isenabled=FALSE where parameter='inventory_update
 UPDATE config_param_system SET layout_id=17, layout_order=1 , label='Mincut use pgrouting' WHERE parameter='om_mincut_use_pgrouting';
 UPDATE config_param_system SET isenabled=TRUE, datatype='boolean', widgettype='check', iseditable=true, label='Mincut use valveunaccess button to change valve status:', layout_id=17, layout_order=2 WHERE parameter='om_mincut_valvestat_using_valveunaccess';
 UPDATE config_param_system SET isenabled=TRUE, datatype='text', widgettype='text', iseditable=true, label='System currency:', layout_id=17, layout_order=6 WHERE parameter='sys_currency';
-UPDATE config_param_system SET isenabled=TRUE, datatype='boolean', widgettype='check', iseditable=true, label='Enable system exploitation x user constrains:', layout_id=17, layout_order=3 WHERE parameter='sys_exploitation_x_user';
+UPDATE config_param_system SET isenabled=TRUE, datatype='boolean', widgettype='check', iseditable=true, label='Enable exploitation x user constrains:', layout_id=17, layout_order=3 WHERE parameter='sys_exploitation_x_user';
 UPDATE config_param_system SET layout_order=7 WHERE parameter='scale_zoom';
 UPDATE config_param_system SET isenabled=TRUE, datatype='boolean', widgettype='check', iseditable=true, label='Publish system value default:', layout_id=14, layout_order=1 WHERE parameter='edit_publish_sysvdefault';
 UPDATE config_param_system SET isenabled=TRUE, datatype='boolean', widgettype='check', iseditable=true, label='Inventory system value default:', layout_id=14, layout_order=2 WHERE parameter='edit_inventory_sysvdefault';

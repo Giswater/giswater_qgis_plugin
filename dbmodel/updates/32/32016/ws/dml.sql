@@ -247,3 +247,5 @@ UPDATE sys_csv2pg_config SET target='MINIMUM Link, Link Results' WHERE tablename
 UPDATE sys_csv2pg_config SET target='Pump Factor' WHERE tablename='rpt_energy_usage';
 UPDATE sys_csv2pg_config SET target='Hydraulic Status:' WHERE tablename='rpt_hydraulic_status';
 UPDATE sys_csv2pg_config SET target='Input Data' WHERE tablename='rpt_cat_result';
+
+UPDATE config_param_system SET value='FALSE' WHERE parameter='om_mincut_use_pgrouting';
