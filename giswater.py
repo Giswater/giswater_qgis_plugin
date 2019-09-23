@@ -931,7 +931,7 @@ class Giswater(QObject):
                 if child_layer[0] == 'ALL':
                     action.triggered.connect(partial(self.put_layer_into_toc, child_layers=child_layers))
                 else:
-                    action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1]))
+                    action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1], None))
 
         main_menu.exec_(click_point)
 
