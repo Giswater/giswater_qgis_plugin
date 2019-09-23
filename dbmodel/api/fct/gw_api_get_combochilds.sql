@@ -54,6 +54,7 @@ BEGIN
 	IF (p_table_id = 'config') OR (p_table_id = 'epaoptions') THEN
 
 	--  Combo rows child CONFIG
+		
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as column_id, widgettype, datatype, id as widgetname,
 		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, editability
 		FROM audit_cat_param_user WHERE dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
@@ -90,7 +91,9 @@ BEGIN
 
 		-- Get combo child name
 		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'widgetname', (v_aux_json_child->>'widgetname'));
-		
+
+		-- Get combo editability
+		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'editability', (v_aux_json_child->>'editability')::json, '[]');
 		-- Get combo id's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND p_combovalue IS NOT NULL THEN
 			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(p_combovalue)||'
@@ -134,7 +137,8 @@ BEGIN
 				END IF;
 			END LOOP;
 			
-			v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'selectedId', v_current_value);           		
+			v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'selectedId', v_current_value);
+			
 		END IF;
 
 
