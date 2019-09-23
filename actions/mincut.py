@@ -29,6 +29,7 @@ from qgis.PyQt.QtXml import QDomDocument
 
 import os
 import operator
+from datetime import datetime
 from functools import partial
 
 from .. import utils_giswater
@@ -201,8 +202,39 @@ class MincutParent(ParentAction):
         
         self.sql_connec = ""
         self.sql_hydro = ""
-        
+
+        self.dlg_mincut.cbx_date_start_predict.dateChanged.connect(partial(
+            self.check_dates_coherence, self.dlg_mincut.cbx_date_start_predict, self.dlg_mincut.cbx_date_end_predict,
+        self.dlg_mincut.cbx_hours_start_predict, self.dlg_mincut.cbx_hours_end_predict))
+        self.dlg_mincut.cbx_date_end_predict.dateChanged.connect(partial(
+            self.check_dates_coherence, self.dlg_mincut.cbx_date_start_predict, self.dlg_mincut.cbx_date_end_predict,
+        self.dlg_mincut.cbx_hours_start_predict, self.dlg_mincut.cbx_hours_end_predict))
+
+        self.dlg_mincut.cbx_date_start.dateChanged.connect(partial(
+            self.check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
+            self.dlg_mincut.cbx_hours_start, self.dlg_mincut.cbx_hours_end))
+        self.dlg_mincut.cbx_date_end.dateChanged.connect(partial(
+            self.check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
+            self.dlg_mincut.cbx_hours_start, self.dlg_mincut.cbx_hours_end))
+
         self.open_dialog(self.dlg_mincut)
+
+    def check_dates_coherence(self, date_from, date_to, time_from, time_to):
+        """
+        Chek if date_to.date() is >= than date_from.date()
+        :param date_from: QDateEdit.date from
+        :param date_to: QDateEdit.date to
+        :param widget_to_get: QDateEdit to get date in order to set widget_to_set
+        :param widget_to_set: QDateEdit to set coherence date
+        :return:
+        """
+        d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(), time_from.time().hour(), time_from.time().minute())
+        d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(), time_to.time().hour(), time_to.time().minute())
+
+        if d_from > d_to:
+            date_to.setDate(date_from.date())
+            time_to.setTime(time_from.time())
+
 
 
     def show_notified_list(self):
@@ -1892,9 +1924,9 @@ class MincutParent(ParentAction):
         """ Manage date of current field """
         
         if date_value:
-            datetime = (str(date_value))            
-            date = str(datetime.split()[0])
-            time = str(datetime.split()[1])
+            date_time = (str(date_value))
+            date = str(date_time.split()[0])
+            time = str(date_time.split()[1])
             qt_date = QDate.fromString(date, 'yyyy-MM-dd')
             qt_time = QTime.fromString(time, 'h:mm:ss')
             utils_giswater.setCalendarDate(self.dlg_mincut, widget_date, qt_date)
