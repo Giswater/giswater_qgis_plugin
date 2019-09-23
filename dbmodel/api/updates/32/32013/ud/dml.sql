@@ -614,8 +614,8 @@ INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, lay
 VALUES ('v_edit_raingage','form', 'timser_id', null, null, true, 'string',  'combo', true, 'SELECT  id, id as idval FROM inp_timser_id WHERE id IS NOT NULL ', 'timser_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_raingage','form', 'expl_id', null, null, true, 'string',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL ', 'expl_id');
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_subcatchment','form', 'outlet_id', null, null, true, 'string',  'combo', true, 'SELECT arc_id as id, arc_id as idval FROM inp_outlet WHERE arc_id IS NOT NULL ', 'outlet_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, placeholder)
+VALUES ('v_edit_subcatchment','form', 'outlet_id', null, null, true, 'string',  'combo', true, 'SELECT arc_id as id, arc_id as idval FROM inp_outlet WHERE arc_id IS NOT NULL ', 'outlet_id','{1,2,3} or 1');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_subcatchment','form', 'rg_id', null, null, true, 'string',  'combo', true, 'SELECT rg_id as id, rg_id as idval FROM raingage WHERE rg_id IS NOT NULL ', 'rg_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)

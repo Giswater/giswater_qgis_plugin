@@ -401,3 +401,10 @@ INSERT INTO om_typevalue VALUES ('visit_parameter_criticity', 4, 'Minor');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue', 'visit_parameter_criticity', 'om_visit_parameter', 'criticity');
 
 UPDATE config_param_system SET value = '{"LPS":1, "LPM":60, "MLD":0.216, "CMH":3.6, "CMD":86.4, "CFS":0.03531466, "GPM":15.85037248, "MGD":22.82453637, "AFD":0.07}' WHERE parameter = 'epa_units_factor';
+
+UPDATE audit_cat_function SET alias = 'Build nodes using arc''s start & end vertices' WHERE function_name = 'gw_fct_built_nodefromarc';
+UPDATE audit_cat_function SET alias = 'Repair link reconnecting to the closest features' WHERE function_name = 'gw_fct_repair_link';
+UPDATE audit_cat_function SET alias = 'Repair arcs reconnecting to the closest nodes' WHERE function_name = 'gw_fct_repair_arc';
+UPDATE audit_cat_function SET alias = 'Check nodes when exit-arcs are over entry-arcs' WHERE function_name = 'gw_fct_anl_node_exit_upper_intro';
+UPDATE audit_cat_function SET alias = 'Check prices looking for missing or wrong data' WHERE function_name = 'gw_fct_plan_audit_check_data';
+UPDATE audit_cat_function SET alias = 'Check data according to EPA rules' WHERE function_name = 'gw_fct_pg2epa_check_data';
