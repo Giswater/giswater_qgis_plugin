@@ -89,6 +89,7 @@ class Go2Epa(ApiParent):
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
+
             self.dlg_go2epa.btn_hs_ds.clicked.connect(
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
@@ -234,7 +235,8 @@ class Go2Epa(ApiParent):
         tableright = "inp_selector_sector"
         field_id_left = "sector_id"
         field_id_right = "sector_id"
-        self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
+        aql = f" AND sector_id != 0"
+        self.sector_selection(tableleft, tableright, field_id_left, field_id_right, aql)
 
 
     def load_user_values(self):
@@ -293,7 +295,7 @@ class Go2Epa(ApiParent):
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
         
 
-    def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
+    def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
         """ Load the tables in the selection form """
 
         dlg_psector_sel = Multirow_selector('dscenario')
@@ -315,7 +317,8 @@ class Go2Epa(ApiParent):
                                          self.controller.tr('Unselected dscenarios', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
                                          self.controller.tr('Selected dscenarios', context_name='labels'))
-        self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
+
+        self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
         
         self.open_dialog(dlg_psector_sel)
 
