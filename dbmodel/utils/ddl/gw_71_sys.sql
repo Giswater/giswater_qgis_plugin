@@ -21,7 +21,8 @@ CREATE TABLE "version" (
 "postgis" varchar(512)  ,
 "date" timestamp(6) DEFAULT now(),
 "language" varchar (50),
-"epsg" int4
+"epsg" int4,
+"sample" boolean
 );
 
 
