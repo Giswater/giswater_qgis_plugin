@@ -640,6 +640,10 @@ class ApiCF(ApiParent):
             else:
                 label.setToolTip(field['label'].capitalize())
         widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        if widget.property('column_id') == self.field_id:
+            self.feature_id = widget.text()
+            # Get selected feature
+            self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
         return label, widget
 
 
@@ -655,10 +659,6 @@ class ApiCF(ApiParent):
         completer = QCompleter()
         widget = self.manage_text(dialog, complet_result, field)
         widget = self.manage_lineedit(field, dialog, widget, completer)
-        if widget.property('column_id') == self.field_id:
-            self.feature_id = widget.text()
-            # Get selected feature
-            self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
         return widget
 
 
@@ -765,7 +765,6 @@ class ApiCF(ApiParent):
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
         parent_fields = complet_result['body']['data']['parentFields']
-
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -788,6 +787,7 @@ class ApiCF(ApiParent):
             sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
 
         else:
+            print(str("TEST3"))
             my_json = json.dumps(_json)
             feature = f'"featureType":"{self.feature_type}", '
             feature += f'"tableName":"{p_table_id}", '
