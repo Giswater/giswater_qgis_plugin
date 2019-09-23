@@ -392,7 +392,8 @@ class MincutParent(ParentAction):
 
     def accept_save_data(self):
         """ Slot function button 'Accept' """
-
+        
+        self.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
 
         # Manage 'address'
