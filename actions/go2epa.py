@@ -545,11 +545,15 @@ class Go2Epa(ApiParent):
                         aux = dirty_list[x][last_index:i]
                         sp_n.append(aux)
 
-                    elif bool(re.search('\d[.]\d{8}[.]]*', str(dirty_list[x]))):
-                        # when -> 0.00859373.7500 cut into ->0.00 859373.7500
-                        sp_n.append(dirty_list[x][:4])
-                        sp_n.append(dirty_list[x][4:])
-
+                    elif bool(re.search('(\d\.\d{1,9}\.)', str(dirty_list[x]))):
+                        # when -> 0.00859373.7500
+                        message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
+                              "Columns are overlaped one againts other, this is a not valid simulation. " 
+                              "Please ckeck and fix it before continue")
+                        self.controller.show_message(message, 1)
+                        _file.close()
+                        del _file
+                        return False
                     else:
                         sp_n.append(dirty_list[x])
 
@@ -588,6 +592,7 @@ class Go2Epa(ApiParent):
 
         _file.close()
         del _file
+        return True
 
 
     def show_widgets(self, visible=False):
@@ -734,7 +739,11 @@ class Go2Epa(ApiParent):
                     self.controller.execute_sql(sql)
 
                     # Importing file to temporal table
-                    self.insert_rpt_into_db(self.file_rpt)
+                    status = self.insert_rpt_into_db(self.file_rpt)
+                    if not status:
+                        self.show_widgets(False)
+                        self.check_result_id()
+                        return
 
                     # Call function gw_fct_rpt2pg_main
                     function_name = 'gw_fct_rpt2pg_main'
@@ -1051,7 +1060,7 @@ class Go2Epa(ApiParent):
             time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
             time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
 
-        if self.project_type == 'ud':
+        elif self.project_type == 'ud':
             date_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
             time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
             date_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
