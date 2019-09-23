@@ -484,11 +484,16 @@ class Giswater(QObject):
 
 
     def save_toolbars_position(self):
+
         parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         path = os.path.dirname(__file__) + '/config/ui_config.config'
+        if not os.path.exists(path):
+            self.controller.log_warning("File not found", parameter=path)
+            return
+
         parser.read(path)
 
-        #Get all QToolBar
+        # Get all QToolBar
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
 
         x=0
@@ -521,6 +526,10 @@ class Giswater(QObject):
 
         parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         path = os.path.dirname(__file__) + '/config/ui_config.config'
+        if not os.path.exists(path):
+            self.controller.log_warning("File not found", parameter=path)
+            return
+
         parser.read(path)
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, x=0, y=0):'
@@ -655,7 +664,7 @@ class Giswater(QObject):
             self.plugin_toolbars = {}
 
         except Exception as e:
-            print(str(e))
+            pass
         finally:
             # Reset instance attributes
             self.actions = {}
@@ -851,8 +860,8 @@ class Giswater(QObject):
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
             self.notify.start_listening('desktop', 'wait_notifications', (self.controller.dao.conn, ))
 
-        #Save toolbar position when save project
-        self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
+        # Save toolbar position after closing QGIS
+        self.iface.actionExit().triggered.connect(self.save_toolbars_position)
 
         # Set config layer fields when user add new layer into the TOC
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
@@ -1310,6 +1319,7 @@ class Giswater(QObject):
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return default_value
 
+        value = None
         try:
             metadata = configparser.ConfigParser()
             metadata.read(metadata_file)
