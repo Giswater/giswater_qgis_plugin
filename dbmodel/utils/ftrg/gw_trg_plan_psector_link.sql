@@ -27,12 +27,12 @@ BEGIN
 	END IF;
 	
 	-- create link if not exists for connect, because it's mandatory to have links created for connect when it has an arc_id defined on some alternative
-	IF NEW.arc_id IS NOT NULL AND v_table_name = 'connec' THEN
+	IF NEW.arc_id IS NOT NULL AND v_table_name = 'connec' AND NEW.state = 1 THEN
 			IF (SELECT link FROM link WHERE feature_type='CONNEC' and feature_id=NEW.connec_id) IS NULL THEN
 				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');	
 			END IF;
 	
-	ELSIF NEW.arc_id IS NOT NULL AND v_table_name = 'gully' THEN
+	ELSIF NEW.arc_id IS NOT NULL AND v_table_name = 'gully' AND NEW.state = 1 THEN
 			IF (SELECT link FROM link WHERE feature_type='GULLY' and feature_id=NEW.gully_id) IS NULL THEN
 				PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
 			END IF;
