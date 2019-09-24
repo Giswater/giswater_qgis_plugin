@@ -931,12 +931,12 @@ class Giswater(QObject):
                 if child_layer[0] == 'ALL':
                     action.triggered.connect(partial(self.put_layer_into_toc, child_layers=child_layers))
                 else:
-                    action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], child_layer[1], None))
+                    action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], "the_geom", child_layer[1]+"_id", None))
 
         main_menu.exec_(click_point)
 
 
-    def put_layer_into_toc(self, tablename=None, type=None, child_layers=None):
+    def put_layer_into_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None):
         """ Put selected layer into TOC"""
         schema_name = self.controller.credentials['schema'].replace('"', '')
         uri = QgsDataSourceUri()
@@ -945,11 +945,11 @@ class Giswater(QObject):
                           self.controller.credentials['password'])
         if child_layers is not None:
             for layer in child_layers:
-                uri.setDataSource(schema_name, f'{layer[0]}', "the_geom", None, layer[1] + "_id")
+                uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
                 vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
                 QgsProject.instance().addMapLayer(vlayer)
         else:
-            uri.setDataSource(schema_name, f'{tablename}', "the_geom", None, type + "_id")
+            uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
             vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
             QgsProject.instance().addMapLayer(vlayer)
         self.iface.mapCanvas().refresh()
