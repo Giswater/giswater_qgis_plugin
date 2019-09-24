@@ -23,6 +23,7 @@ from qgis.PyQt.QtCore import QSettings, Qt
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
+from qgis.utils import reloadPlugin
 
 import os
 import sys
@@ -326,6 +327,9 @@ class UpdateSQL(ApiParent):
 
         project = QgsProject.instance()
         project.read(qgs_path)
+
+        # Load Giswater plugin
+        reloadPlugin('giswater')
 
 
     def open_form_create_gis_project(self):
