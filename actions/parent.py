@@ -550,6 +550,8 @@ class ParentAction(object):
             self.canvas.selectionChanged.disconnect()  
         except Exception:                     
             pass
+        finally:
+            self.iface.actionPan().trigger()
 
 
     def set_label_current_psector(self, dialog):

@@ -66,6 +66,9 @@ class DeleteFeature(ApiParent):
 
         # Set listeners
         self.dlg_delete_feature.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_delete_feature))
+        self.dlg_delete_feature.rejected.connect(self.disconnect_signal_selection_changed)
+        self.dlg_delete_feature.rejected.connect(partial(self.save_settings, self.dlg_delete_feature))
+
         self.dlg_delete_feature.btn_relations.clicked.connect(partial(self.show_feature_relation))
         self.dlg_delete_feature.btn_delete.clicked.connect(partial(self.delete_feature_relation))
         self.dlg_delete_feature.feature_type.currentIndexChanged.connect(partial(self.set_active_layer))
@@ -164,6 +167,7 @@ class DeleteFeature(ApiParent):
             self.canvas.selectionChanged.connect(partial(self.manage_selection))
         except:
             pass
+
 
 
     def manage_selection(self):
