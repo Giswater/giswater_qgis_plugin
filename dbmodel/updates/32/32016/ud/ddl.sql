@@ -51,7 +51,7 @@ ALTER TABLE inp_value_treatment RENAME TO _inp_value_treatment_;
 ALTER TABLE inp_value_washoff RENAME TO _inp_value_washoff_;
 ALTER TABLE inp_value_weirs RENAME TO _inp_value_weirs_;
 ALTER TABLE inp_value_yesno RENAME TO _inp_value_yesno_;
-
+ALTER TABLE inp_windspeed  RENAME TO _inp_windspeed_;
 
 CREATE TABLE cat_mat_grate(
   id character varying(30) PRIMARY KEY,

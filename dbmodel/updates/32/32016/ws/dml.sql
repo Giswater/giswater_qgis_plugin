@@ -88,6 +88,9 @@ INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 1, 'EPA TABLES', N
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 2, 'INVENTORY VALUES', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_valvemode', 3, 'MINCUT RESULTS', NULL);
 
+INSERT INTO inp_typevalue VALUES ('inp_value_pattern_type', 'VOLUME', 'VOLUME', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_value_pattern_type', 'UNITARY', 'UNITARY', NULL);
+
 INSERT INTO cat_arc_shape VALUES ('CIRCULAR', 'CIRCULAR', 'ws_shape.png',null, true) ON CONFLICT ON CONSTRAINT cat_arc_shape_pkey DO NOTHING;
 
 INSERT INTO audit_cat_table VALUES ('cat_arc_shape', 'Catalog', 'Catalog of arc shapes', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
@@ -137,6 +140,7 @@ INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_type
 INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_units');
 INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_mixing');
 INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_opti_valvemode');
+INSERT INTO sys_typevalue_cat (typevalue_table,typevalue_name) VALUES ('inp_typevalue', 'inp_value_pattern_type');
 
 
 
@@ -169,6 +173,7 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_times','inp_times', 'statistic');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_pump', 'energyparam');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_pump_additional', 'energyparam');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_pattern_type','inp_pattern', 'pattern_type');
 
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node"]}]' WHERE id ='node_type';

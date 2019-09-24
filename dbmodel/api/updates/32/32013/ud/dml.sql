@@ -645,6 +645,8 @@ VALUES ('inp_groundwater','form', 'aquif_id', null, null, true, 'string',  'comb
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('inp_snowpack','form', 'snow_id', null, null, true, 'string',  'combo', true, 'SELECT snow_id as id, snow_id as idval FROM inp_snowpack_id WHERE snow_id IS NOT NULL ', 'snow_id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('inp_snowpack','form', 'snow_type', null, null, true, 'string',  'combo', true, 'SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_snow''', 'snow_type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('inp_lid_control','form', 'lidco_type', null, null, true, 'string',  'combo', true, 'SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_lidcontrol''', 'lidco_type');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('inp_lidusage_subc_x_lidco','form', 'lidco_id', null, null, true, 'string',  'combo', true, 'SELECT  lidco_id as id, lidco_id as idval FROM inp_lid_control WHERE lidco_id IS NOT NULL ', 'lidco_id');

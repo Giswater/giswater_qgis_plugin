@@ -464,3 +464,5 @@ INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, lay
 VALUES ('v_edit_inp_demand','form', 'deman_type', null, null, true, 'string',  'combo', true, 'SELECT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_demandtype''', 'deman_type');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
 VALUES ('v_edit_inp_demand','form', 'dscenario_id', null, null, true, 'string',  'combo', true, 'SELECT dscenario_id AS id,  name  AS idval FROM cat_dscenario WHERE dscenario_id IS NOT NULL', 'dscenario_id');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('inp_pattern','form', 'pattern_type', null, null, true, 'string',  'combo', true, 'SELECT (id) AS id,  idval  AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_pattern_type''', '`pattern_type');

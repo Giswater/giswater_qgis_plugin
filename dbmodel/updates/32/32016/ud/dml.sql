@@ -152,6 +152,19 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh
 
 SELECT gw_fct_admin_schema_manage_triggers('notify',null);
 
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'WINDSPEED MONTHLY', 'WINDSPEED MONTHLY');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'WINDSPEED FILE', 'WINDSPEED FILE');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'ADC IMPERVIOUS', 'ADC IMPERVIOUS');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'ADC PERVIUOS', 'ADC PERVIUOS');
+DELETE FROM inp_typevalue WHERE typevalue = 'inp_typevalue_temp' AND id = 'ADC';
+DELETE FROM inp_typevalue WHERE typevalue = 'inp_typevalue_temp' AND id = 'WINDSPEED';
+DELETE FROM inp_typevalue WHERE typevalue = 'inp_typevalue_temp' AND id = 'MONTHLY';
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_snow', 'PLOWABLE', 'PLOWABLE');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_snow', 'IMPERVIOUS', 'IMPERVIOUS');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_snow', 'PERVIOUS', 'PERVIOUS');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_snow', 'REMOVAL', 'REMOVAL	');
+
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_snow', 'inp_snowpack', 'snow_type ', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_temp', 'inp_temperature', 'temp_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_timeseries', 'inp_timser_id', 'times_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_timserid', 'inp_timser_id', 'timser_type', NULL);
@@ -222,11 +235,9 @@ INSERT INTO config_param_system ( parameter, value, data_type, context, descript
 
 
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_storage');
-INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_fme');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_orifice');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_inflows');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_lidcontrol');
-INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_id');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_weirs');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_routeto');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_pattern');
@@ -239,16 +250,12 @@ INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_type
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_yesno');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_divider');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_washoff');
-INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_lo');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_temp');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_curve');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_pollutants');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_timserid');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_allnone');
-INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_fu');
-INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_in');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_treatment');
-INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_nfl');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_status');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_raingage');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_evap');
@@ -256,7 +263,7 @@ INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_type
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_mapunits');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_buildup');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_outfall');
-INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_value_options_fr');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('inp_typevalue','inp_typevalue_snow');
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_gully_force_automatic_connect2network', TRUE, current_user);
 
@@ -280,3 +287,5 @@ UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_sandbo
 UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_connec_geom1_tol';
 UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_connec_geom2_tol';
 UPDATE config_param_system SET isenabled=FALSE WHERE parameter='rev_gully_units_tol';
+
+UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='inp_windspeed ';
