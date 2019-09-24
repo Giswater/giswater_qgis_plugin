@@ -448,6 +448,7 @@ class Psector_rapport(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('readsql.ui')
 class Readsql(GwMainWindow, FORM_CLASS):
+    dlg_closed = QtCore.pyqtSignal()
     pass
 
 
