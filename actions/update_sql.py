@@ -172,6 +172,7 @@ class UpdateSQL(ApiParent):
         if str(list_connections) != '[]':
             utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
 
+
         # Declare all file variables
         self.file_pattern_tablect = "tablect"
         self.file_pattern_ddl = "ddl"
@@ -225,6 +226,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_path.clicked.connect(partial(self.select_file_ui))
         self.dlg_readsql.btn_import_ui.clicked.connect(partial(self.execute_import_ui))
         self.dlg_readsql.btn_export_ui.clicked.connect(partial(self.execute_export_ui))
+        self.dlg_readsql.dlg_closed.connect(partial(self.save_selection))
 
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
@@ -274,6 +276,15 @@ class UpdateSQL(ApiParent):
         self.set_info_project()
         self.update_manage_ui()
         self.visit_manager()
+
+        # Load last schema name selected and project type
+        if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
+                                         str(self.controller.plugin_settings_value('last_project_type_selected')))
+
+        if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
+                                         str(self.controller.plugin_settings_value('last_schema_name_selected')))
 
 
     def gis_create_project(self):
@@ -1399,10 +1410,10 @@ class UpdateSQL(ApiParent):
         elif self.rdb_data.isChecked():
             pass
 
-        self.manage_process_result()
+        self.manage_process_result(project_name_schema)
 
 
-    def manage_process_result(self):
+    def manage_process_result(self, schema_name=None):
 
         self.set_arrow_cursor()
 
@@ -1413,6 +1424,8 @@ class UpdateSQL(ApiParent):
             self.close_dialog(self.dlg_readsql_create_project)
             # Referesh data main dialog
             self.event_change_connection()
+            if schema_name is not None:
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
             self.set_info_project()
         else:
             self.controller.dao.rollback()
@@ -1864,7 +1877,7 @@ class UpdateSQL(ApiParent):
         self.is_sample = None
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-
+        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         if schema_name is None:
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
@@ -2202,8 +2215,8 @@ class UpdateSQL(ApiParent):
                 msg = "Process finished successfully"
                 self.controller.show_info_box(msg, "Info", parameter="Delete schema")
 
-        self.populate_data_schema_name(self.cmb_project_type)
-        self.set_info_project()
+                self.populate_data_schema_name(self.cmb_project_type)
+                self.set_info_project()
 
 
     def execute_import_inp(self, accepted=False, schema_type=''):
@@ -2356,8 +2369,7 @@ class UpdateSQL(ApiParent):
         tpath = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
         form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
-        print(str("TEST1"))
-        print(str(tpath))
+
         # Control if ui path is invalid or null
         if tpath is None or tpath == '' or tpath == 'null':
             msg = "Please, select a valid UI Path."
@@ -2974,3 +2986,12 @@ class UpdateSQL(ApiParent):
                 msg_error = "Process finished with some errors"
             self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
 
+
+    def save_selection(self):
+
+        # Save last Project schema name and type selected
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+
+        self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
+        self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
