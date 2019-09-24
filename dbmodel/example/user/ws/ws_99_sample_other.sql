@@ -49,8 +49,8 @@ INSERT INTO doc VALUES ('Demo document 2', 'OTHER', 'https://github.com/Giswater
 select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'CONNEC');
 
 -- for connec 3014 that stays outside the selectors and doesn't connect to network with fct
-INSERT INTO vnode (vnode_type, annotation, sector_id, dma_id, state, expl_id, the_geom ) VALUES ('AUTO', NULL, 3, 2, 1, 1, '0101000020E7640000198F5EB77093194113A8AB6482755141');
-INSERT INTO link(feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom) VALUES ('3014', 'CONNEC', '478', 'VNODE', FALSE, 1, 1, '0102000020E7640000020000006CAAF3ACD4931941988F62837F755141198F5EB77093194113A8AB6482755141');
+INSERT INTO vnode VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', NULL, 3, 2, 1, 1, '0101000020E7640000198F5EB77093194113A8AB6482755141');
+INSERT INTO link VALUES ((SELECT nextval('link_link_id_seq')), '3014', 'CONNEC', 483, 'VNODE', FALSE, 1, 1, '0102000020E7640000020000006CAAF3ACD4931941988F62837F755141198F5EB77093194113A8AB6482755141');
 
 SELECT gw_fct_plan_result($${"client":{"device":3, "infoType":100, "lang":"ES"},
 							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
