@@ -226,11 +226,13 @@ class ApiSearch(ApiParent):
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
-            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-            self.resetRubberbands()
-            point = QgsPointXY(float(max_x), float(max_y))
-            self.draw_point(point)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            if list_coord:
+                max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+                self.resetRubberbands()
+                point = QgsPointXY(float(max_x), float(max_y))
+                self.draw_point(point)
+                self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
             return
