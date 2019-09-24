@@ -584,9 +584,6 @@ class ApiParent(ParentAction):
         widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
-        # widget.setStyleSheet("Text-align:left; Text-decoration:underline")
-        # widget.setFlat(True)
-        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
         function_name = 'no_function_associated'
         real_name = widget.objectName()[5:len(widget.objectName())]
