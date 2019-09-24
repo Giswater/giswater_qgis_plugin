@@ -35,7 +35,9 @@ DECLARE
 	v_querytext text;
 	v_orderby integer;
 	rec_orderby record;
-
+	v_data_view json;
+	v_view_type text;
+	
 BEGIN
 
 	
@@ -122,52 +124,60 @@ IF v_multi_create IS TRUE THEN
 					INTO v_created_addfields
 					FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;		
 				
+
 				--create views with fields from parent table,man table and addfields 	
 				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 					( v_feature_type='arc' OR v_feature_type='node')) THEN
-			
-				--view for WS and UD features that only have feature_id in man table and have defined addfields
-					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-					null, rec.id, 4, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-					v_created_addfields.datatype);
+					--view for WS and UD features that only have feature_id in man table and have defined addfields
+					v_view_type = 4;
 
 				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
 					--view for ud connec y gully which dont have man_type table and have defined addfields
-					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-					null, rec.id, 5, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-					v_created_addfields.datatype);
-				ELSE
+					v_view_type = 5;
 
+				ELSE
 					--view for WS and UD features that have many fields in man table and have defined addfields
-					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-					v_man_fields, rec.id, 6, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-					v_created_addfields.datatype);
+					v_view_type = 6;
 					
 				END IF;
+
+				RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
 				
+				v_man_fields := COALESCE(v_man_fields, 'null');
+
+				v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'", "view_type":"'||v_view_type||'",
+				"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
+				"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+				
+				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);			
 			ELSE
 				--create views with fields from parent table and man table
 				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 					( v_feature_type='arc' OR v_feature_type='node')) THEN
-
 					--view for WS and UD features that only have feature_id in man table
-					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-					null, rec.id, 1, null, null, null, null);
+					v_view_type = 1;
 
 				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
 					--view for ud connec y gully which dont have man_type table
-					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-					null, rec.id, 2, null, null, null, null);
+					v_view_type = 2;
+					
 				ELSE
-
 					--view for WS and UD features that have many fields in man table
-					PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-					v_man_fields, rec.id, 3, null, null, null, null);
-
+					v_view_type = 3;
+					
 				END IF;
 
+				RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
+
+				v_man_fields := COALESCE(v_man_fields, 'null');
+
+				v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'", "view_type":"'||v_view_type||'",
+				"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,"id_param":null,"datatype":null}}';
+					
+				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);			
+					
 			END IF;
 
 			--create trigger on view 
@@ -223,7 +233,7 @@ ELSE
 		IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) != 0 THEN
 		raise notice '4/addfields=1,v_man_fields,%',v_man_fields;		
 			
-				IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=rec.id LIMIT 1) IS NULL THEN
+				IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature LIMIT 1) IS NULL THEN
 					v_orderby = 1;
 					FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id=rec.id ORDER BY id) LOOP
 						UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
@@ -231,59 +241,71 @@ ELSE
 					END LOOP;
 				END IF;
 
-				SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
-				string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
+				SELECT string_agg(concat('a.',param_name),','order by orderby) as a_param,
+				string_agg(concat('ct.',param_name),',' order by orderby) as ct_param,
 				string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
 				string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
 				INTO v_created_addfields
 				FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
 
+			
 			--create views with fields from parent table,man table and addfields 	
 			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 				( v_feature_type='arc' OR v_feature_type='node')) THEN
-
 				--view for WS and UD features that only have feature_id in man table and have defined addfields
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, v_cat_feature, 4, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-				v_created_addfields.datatype);
+				v_view_type = 4;
 
 			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
 				--view for ud connec y gully which dont have man_type table and have defined addfields
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, v_cat_feature, 5, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-				v_created_addfields.datatype);
-			ELSE
+				v_view_type = 5;
 
+			ELSE
 				--view for WS and UD features that have many fields in man table and have defined addfields
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				v_man_fields, v_cat_feature,6, v_created_addfields.a_param,v_created_addfields.ct_param, v_created_addfields.id_param, 
-				v_created_addfields.datatype);
+				v_view_type = 6;
+
 			END IF;
 
+			RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
+
+			v_man_fields := COALESCE(v_man_fields, 'null');
+
+			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+			"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
+			"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
+			"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+
+			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
 		ELSE
+		
+			
 			--create views with fields from parent table and man table
 			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 				( v_feature_type='arc' OR v_feature_type='node')) THEN
-				
 				--view for WS and UD features that only have feature_id in man table	
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, v_cat_feature,1, null,null, null,null);
+				v_view_type = 1;
 
 			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-
 				--view for ud connec y gully which dont have man_type table
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				null, v_cat_feature,2, null,null, null,null);
-			ELSE
+				v_view_type = 2;
 
+			ELSE
 				--view for WS and UD features that have many fields in man table	
-				PERFORM gw_fct_admin_manage_child_views_view(v_schemaname, v_viewname, v_feature_type,v_feature_system_id, 
-				v_man_fields, v_cat_feature,3, null,null, null,null);
+				v_view_type = 3;
 
 			END IF;
-			
+
 		END IF;
+
+		RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
+
+		v_man_fields := COALESCE(v_man_fields, 'null');
+
+		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
+		"man_fields":"'||v_man_fields||'","a_param":"null","ct_param":"null","id_param":"null","datatype":"null"}}';
+
+		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
 	IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
 		EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 

@@ -29,15 +29,15 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 "isnotupdate": false, "isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
 "stylesheet": null, "widgetdim": null}}}$$)::text
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoType":100, "lang":"ES"}, 
-"form":{}, 
-"feature":{"catFeature":"PUMP"}, 
-"data":{"filterFields":{}, "pageInfo":{}, "action":"UPDATE", "multi_create":false, 
-"parameters":{"label": "pump111", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
-"datatype": "integer", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "text", "dv_isnullvalue": false, 
-"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "isreload": false, 
-"isnotupdate": false, "isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
-"stylesheet": null, "widgetdim": null}}}$$)::text
+	SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoType":100, "lang":"ES"}, 
+	"form":{}, 
+	"feature":{"catFeature":"PUMP"}, 
+	"data":{"filterFields":{}, "pageInfo":{}, "action":"UPDATE", "multi_create":false, 
+	"parameters":{"label": "pump111", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
+	"datatype": "integer", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "text", "dv_isnullvalue": false, 
+	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "isreload": false, 
+	"isnotupdate": false, "isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
+	"stylesheet": null, "widgetdim": null}}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "client":{"lang":"ES"}, 
@@ -73,7 +73,9 @@ DECLARE
 	rec record;
 	v_iseditable boolean;
 	v_add_datatype text;
-	
+	v_view_type integer;
+	v_data_view json;
+
 	v_formtype text;
 	v_placeholder text;
 	v_tooltip text;
@@ -354,8 +356,8 @@ IF v_multi_create IS TRUE THEN
 		--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
 
-			SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
-				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+			SELECT lower(string_agg(concat('a.',param_name),',' order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),',' order by orderby)) as ct_param,
 				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 				INTO v_created_addfields
@@ -365,32 +367,28 @@ IF v_multi_create IS TRUE THEN
 				( v_feature_type='arc' OR v_feature_type='node')) THEN
 			
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, v_cat_feature,4,v_created_addfields.a_param, v_created_addfields.ct_param, 
-			v_created_addfields.id_param, v_created_addfields.datatype);
-
-			raise notice 'multi 4';
+			v_view_type = 4;
 
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
 
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, v_cat_feature,5,v_created_addfields.a_param, v_created_addfields.ct_param, 
-			v_created_addfields.id_param, v_created_addfields.datatype);
-
-			raise notice 'multi 5';
+			v_view_type = 5;
 		ELSE
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			v_man_fields, v_cat_feature,6,v_created_addfields.a_param, v_created_addfields.ct_param, 
-			v_created_addfields.id_param, v_created_addfields.datatype);
-			
-			raise notice 'multi 6';
+			v_view_type = 6;
 
 		END IF;
+
+		RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
+
+		v_man_fields := COALESCE(v_man_fields, 'null');
+
+		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'","view_type":"'||v_view_type||'",
+		"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
+		"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+			
+		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
 	--CREATE VIEW when the addfields don't exist (after delete)
 	ELSIF v_new_parameters is null THEN 
@@ -400,29 +398,30 @@ IF v_multi_create IS TRUE THEN
 			( v_feature_type='arc' OR v_feature_type='node')) THEN
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, rec.id,1,null, null, null, null);
-
-			raise notice 'multi 1';
+			v_view_type = 1;
 
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			v_view_type = 2;
 
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, rec.id,2,null, null, null, null);
-
-			raise notice 'multi 2';
 		ELSE
 		
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			v_view_type = 3;
 
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			v_man_fields, rec.id,3,null, null, null, null);
-
-			raise notice 'multi 3';
 		END IF;
+
+		RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
+
+		v_man_fields := COALESCE(v_man_fields, 'null');
+
+		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'","view_type":"'||v_view_type||'",
+		"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,
+		"id_param":null,"datatype":null}}';
+			
+		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
 	ELSE	
 
@@ -501,8 +500,8 @@ ELSE
 
 	--get old values of addfields
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) != 0 THEN
-		SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
-		lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+		SELECT lower(string_agg(concat('a.',param_name),',' order by orderby)) as a_param,
+		lower(string_agg(concat('ct.',param_name),',' order by orderby)) as ct_param,
 		lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 		lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 		INTO v_old_parameters
@@ -605,32 +604,30 @@ ELSE
 			( v_feature_type='arc' OR v_feature_type='node')) THEN
 
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, v_cat_feature,4,v_created_addfields.a_param, v_created_addfields.ct_param, 
-			v_created_addfields.id_param, v_created_addfields.datatype);
-
-			raise notice 'simple 4';
+			v_view_type = 4;
 
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN			
 	
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			v_view_type = 5;
 
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, v_cat_feature,5,v_created_addfields.a_param, v_created_addfields.ct_param, 
-			v_created_addfields.id_param, v_created_addfields.datatype);
-
-			raise notice 'simple 5';
 		ELSE
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			v_view_type = 6;
 
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			v_man_fields, v_cat_feature,6,v_created_addfields.a_param, v_created_addfields.ct_param, 
-			v_created_addfields.id_param, v_created_addfields.datatype);
-			
-			raise notice 'simple 6';
 		END IF;
-		
+
+		RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
+
+		v_man_fields := COALESCE(v_man_fields, 'null');
+
+		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
+		"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
+		"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+			
+		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
 	--CREATE VIEW when the addfields don't exist (after delete)
 	ELSIF v_new_parameters is null THEN 
 	
@@ -638,28 +635,31 @@ ELSE
 			( v_feature_type='arc' OR v_feature_type='node')) THEN
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			v_view_type = 1;
 
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, v_cat_feature,1,null, null, null, null);
-
-			raise notice 'simple 1';
 		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN	
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-	
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			null, v_cat_feature,2,null, null, null, null);
-			raise notice 'simple 2';
+			v_view_type = 2;
+
 		ELSE
 			
 			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			v_view_type = 3;
 
-			PERFORM gw_fct_admin_manage_child_views_view (v_schemaname, v_viewname, v_feature_type, v_feature_system_id, 
-			v_man_fields, v_cat_feature,3,null, null, null, null);
-
-			raise notice 'simple 3';
 		END IF;
 		
+		RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
+
+		v_man_fields := COALESCE(v_man_fields, 'null');
+		
+		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
+		"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,
+		"id_param":null,"datatype":null}}';
+			
+		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);	
+
 	ELSE	
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';

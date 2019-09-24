@@ -52,6 +52,13 @@ BEGIN
 
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
+	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_api_tableinfo_x_infotype) THEN
+		INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_role_id, qgis_criticity, isdeprecated)
+	    VALUES (v_view_name, 'Editable view', concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, null,0,false);
+
+	    PERFORM SCHEMA_NAME.gw_fct_admin_role_permissions();
+	
+	END IF;
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_api_tableinfo_x_infotype) THEN
 		INSERT INTO config_api_tableinfo_x_infotype(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,100,v_view_name);
