@@ -46,14 +46,14 @@ BEGIN
 
 				IF (rec.id ILIKE 'v_%' OR rec.id ILIKE 've_%' OR rec.id ILIKE 'vi_%') AND rec.id not ilike 'value%' AND aux_json.action = 'desktop' THEN
 
-					EXECUTE 'DROP TRIGGER IF EXISTS  gw_trg_notify_'||aux_json.action||' ON '||rec.id||';';
-					EXECUTE  'CREATE TRIGGER gw_trg_notify_'||aux_json.action||' 
+					EXECUTE 'DROP TRIGGER IF EXISTS  gw_trg_notify ON '||rec.id||';';
+					EXECUTE  'CREATE TRIGGER gw_trg_notify 
 							INSTEAD OF INSERT OR UPDATE OF '||aux_json.trg_fields||' OR DELETE ON '||rec.id||'
 							FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('''||rec.id||''');';
 					
 				ELSE
-					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_notify_'||aux_json.action||' ON '||rec.id||';';
-					EXECUTE 'CREATE TRIGGER gw_trg_notify_'||aux_json.action||' 
+					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_notify ON '||rec.id||';';
+					EXECUTE 'CREATE TRIGGER gw_trg_notify 
 							AFTER INSERT OR UPDATE OF '||aux_json.trg_fields||' OR DELETE ON '||rec.id||'
 							FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('''||rec.id||''');';
 					
