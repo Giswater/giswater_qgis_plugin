@@ -765,7 +765,7 @@ class DrawProfiles(ParentMapTool):
 
         # Fill the fixed part of table with data - draw text
         # Called just with first node
-        self.data_fix_table(start_point)
+        self.data_fix_table(start_point, reverse)
 
 
     def draw_marks(self, start_point):
