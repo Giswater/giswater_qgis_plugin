@@ -857,11 +857,9 @@ class DrawProfiles(ParentMapTool):
         if node.node_id == prev_node.node_2:
             z1 = prev_node.z2
             reverse = False
-            self.controller.log_info(str("TEST1"))
         elif node.node_id == prev_node.node_1:
             z1 = prev_node.z1
             reverse = True
-            self.controller.log_info(str("TEST2"))
 
         if node.node_id == node.node_1:
             z2 = node.z1
