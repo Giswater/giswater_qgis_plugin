@@ -743,3 +743,6 @@ INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, la
 ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, action_function, isreload, stylesheet, isnotupdate, 
 typeahead, listfilterparam, layout_name, editability, widgetcontrols,hidden) VALUES ('v_edit_inp_junction', 'form', 'outfallparam', 1, 18, true, 'string', 'text', 'outfallparam', NULL, NULL,
 '{"outfall_type":"FREE", "stage":"", "curve_id":"", "timser_id":"", "gate":"YES"}', NULL, NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'layout_data_1', NULL, NULL, false);
+
+
+UPDATE config_api_form_fields SET ismandatory=true where column_id='gratecat_id'

@@ -297,7 +297,7 @@ BEGIN
 		v_rotation = -(v_rotation - pi()/2);
 
 		-- double geometry
-		IF v_doublegeometry THEN
+		IF v_doublegeometry AND NEW.gratecat_id IS NOT NULL THEN
 
 			-- get grate dimensions
 			v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
