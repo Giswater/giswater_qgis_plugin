@@ -14,3 +14,7 @@ UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_ui_scada_x_node_values'
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_edit_om_psector';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_edit_om_psector_x_other';
 
+
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='man_addfields_cat_combo';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='man_addfields_cat_datatype';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='man_addfields_cat_widgettype';
