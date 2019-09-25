@@ -225,3 +225,5 @@ UPDATE cat_feature SET shortcut_key='F' WHERE id = 'WEIR';
 UPDATE cat_feature SET shortcut_key='W' WHERE id = 'WWTP';
 UPDATE cat_feature SET shortcut_key='Alt+N' WHERE id = 'EMBORNAL_FICTICI';
 UPDATE cat_feature SET shortcut_key='Alt+Z' WHERE id = 'ESCOMESA_FICTICIA';
+UPDATE cat_feature SET shortcut_key='Alt+1' WHERE id = 'VGULLY';
+UPDATE cat_feature SET shortcut_key='Alt+2' WHERE id = 'VCONNEC';
