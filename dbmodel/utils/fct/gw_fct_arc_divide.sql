@@ -73,8 +73,12 @@ BEGIN
     -- Get node values
     SELECT the_geom INTO node_geom FROM node WHERE node_id = node_id_arg;
 	SELECT state INTO state_node_arg FROM node WHERE node_id=node_id_arg;
-	SELECT isarcdivide INTO isarcdivide_arg FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=node_id_arg;
-
+	
+	IF project_type_aux = 'WS' THEN
+		SELECT isarcdivide INTO isarcdivide_arg FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=node_id_arg;
+	ELSE
+		SELECT isarcdivide INTO isarcdivide_arg FROM node_type JOIN node ON node.node_type = node_type.id WHERE node.node_id=node_id_arg;
+	END IF;
 
     -- Get parameters from configs table
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
