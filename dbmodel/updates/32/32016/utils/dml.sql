@@ -439,3 +439,24 @@ DELETE FROM config_param_system WHERE parameter='node_duplicated_tolerance';
 DELETE FROM config_param_system WHERE parameter='connec_duplicated_tolerance';
 
 UPDATE config_param_system SET isenabled=FALSE WHERE parameter='link_searchbuffer';
+
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype','integer', 'integer');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype','text', 'text');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype','date', 'date');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype','boolean', 'boolean');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_datatype','numeric', 'numeric');
+
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_widgettype','QLineEdit', 'QLineEdit');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_widgettype','QComboBox', 'QComboBox');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_widgettype','QCheckBox', 'QCheckBox');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_widgettype','QDateEdit', 'QDateEdit');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_widgettype','QDateTimeEdit', 'QDateTimeEdit');
+INSERT INTO edit_typevalue VALUES ('man_addfields_cat_widgettype','QTextEdit', 'QTextEdit');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field) 
+VALUES ('edit_typevalue','man_addfields_cat_datatype','man_addfields_parameter', 'datatype_id');
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field) 
+VALUES ('edit_typevalue','man_addfields_cat_widgettype','man_addfields_parameter','widgettype_id');
+
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('edit_typevalue', 'man_addfields_cat_widgettype');
+INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('edit_typevalue', 'man_addfields_cat_datatype');
