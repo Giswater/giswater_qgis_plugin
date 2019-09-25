@@ -2279,60 +2279,64 @@ class UpdateSQL(ApiParent):
 
     def create_qgis_template(self):
 
-        # Get dev config file
-        setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
-        if not os.path.exists(setting_file):
-            message = "File not found"
-            self.controller.show_warning(message, parameter=setting_file)
-            return
+        msg = ("Warning: Are you shure to continue?. This button will update your plugin qgis templates file replacing "
+               "all strings defined on the config/dev.config file. Be shure your config file is OK before continue")
+        result = self.controller.ask_question(msg, "Info")
+        if result:
+            # Get dev config file
+            setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
+            if not os.path.exists(setting_file):
+                message = "File not found"
+                self.controller.show_warning(message, parameter=setting_file)
+                return
 
-        # Set plugin settings
-        self.dev_settings = QSettings(setting_file, QSettings.IniFormat)
-        self.dev_settings.setIniCodec(sys.getfilesystemencoding())
+            # Set plugin settings
+            self.dev_settings = QSettings(setting_file, QSettings.IniFormat)
+            self.dev_settings.setIniCodec(sys.getfilesystemencoding())
 
-        # Get values
-        self.folder_path = self.dev_settings.value('general_dev/folder_path')
-        self.text_replace_labels = self.dev_settings.value('text_replace/labels')
-        self.xml_set_labels = self.dev_settings.value('xml_set/labels')
-        if not os.path.exists(self.folder_path):
-            message = "Folder not found"
-            self.controller.show_warning(message, parameter=self.folder_path)
-            return
+            # Get values
+            self.folder_path = self.dev_settings.value('general_dev/folder_path')
+            self.text_replace_labels = self.dev_settings.value('text_replace/labels')
+            self.xml_set_labels = self.dev_settings.value('xml_set/labels')
+            if not os.path.exists(self.folder_path):
+                message = "Folder not found"
+                self.controller.show_warning(message, parameter=self.folder_path)
+                return
 
-        # Set wait cursor
-        self.set_wait_cursor()
+            # Set wait cursor
+            self.set_wait_cursor()
 
-        # Start read files
-        qgis_files = sorted(os.listdir(self.folder_path))
-        for file in qgis_files:
-            self.controller.log_info("Reading file", parameter=file)
-            # Open file for read
-            f = open(self.folder_path + os.sep + file, 'r')
-            if f:
-                f_to_read = str(f.read())
+            # Start read files
+            qgis_files = sorted(os.listdir(self.folder_path))
+            for file in qgis_files:
+                self.controller.log_info("Reading file", parameter=file)
+                # Open file for read
+                f = open(self.folder_path + os.sep + file, 'r')
+                if f:
+                    f_to_read = str(f.read())
 
-                # Replace into template text
-                for text_replace in self.text_replace_labels:
-                    self.text_replace = self.dev_settings.value('text_replace/' + text_replace)
-                    self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
-                    f_to_read = str(f_to_read.replace(self.text_replace[0], self.text_replace[1]))
+                    # Replace into template text
+                    for text_replace in self.text_replace_labels:
+                        self.text_replace = self.dev_settings.value('text_replace/' + text_replace)
+                        self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
+                        f_to_read = str(f_to_read.replace(self.text_replace[0], self.text_replace[1]))
 
-                # Close file
-                f.close()
+                    # Close file
+                    f.close()
 
-                # Open file for write
-                f = open(self.folder_path + os.sep + file, 'w')
-                f.write(f_to_read)
+                    # Open file for write
+                    f = open(self.folder_path + os.sep + file, 'w')
+                    f.write(f_to_read)
 
-                # Close file
-                f.close()
+                    # Close file
+                    f.close()
 
-        # Set arrow cursor
-        self.set_arrow_cursor()
+            # Set arrow cursor
+            self.set_arrow_cursor()
 
-        # Finish proces
-        msg = "The QGIS Projects templates was correctly created."
-        self.controller.show_info_box(msg, "Info")
+            # Finish proces
+            msg = "The QGIS Projects templates was correctly created."
+            self.controller.show_info_box(msg, "Info")
 
 
     """ Import / Export UI and manage fields """
