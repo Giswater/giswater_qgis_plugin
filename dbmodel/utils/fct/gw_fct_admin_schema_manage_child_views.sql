@@ -55,7 +55,7 @@ BEGIN
 
 --if the view should be created for all the features loop over the cat_features
 IF v_multi_create IS TRUE THEN
-
+raise notice 'MULTI';
 	IF v_project_type ='WS' THEN
 		v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
 						UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
@@ -198,7 +198,7 @@ IF v_multi_create IS TRUE THEN
 	
 	END LOOP;
 ELSE
-
+raise notice 'SIMPLE';
 	--get the system type and system_id of the feature and view name
 	v_feature_type = (SELECT type FROM cat_feature where id=v_cat_feature);
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
@@ -235,7 +235,7 @@ ELSE
 			
 				IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature LIMIT 1) IS NULL THEN
 					v_orderby = 1;
-					FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id=rec.id ORDER BY id) LOOP
+					FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature ORDER BY id) LOOP
 						UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
 						v_orderby = v_orderby+1;
 					END LOOP;
@@ -295,8 +295,6 @@ ELSE
 
 			END IF;
 
-		END IF;
-
 		RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
 
 		v_man_fields := COALESCE(v_man_fields, 'null');
@@ -306,6 +304,9 @@ ELSE
 		"man_fields":"'||v_man_fields||'","a_param":"null","ct_param":"null","id_param":"null","datatype":"null"}}';
 
 		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
+		END IF;
+
 
 	IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
 		EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
