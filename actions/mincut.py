@@ -16,7 +16,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from ..map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from qgis.core import QgsLayout
+    from qgis.core import QgsPrintLayout, QgsReadWriteContext
     from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
@@ -2284,14 +2284,19 @@ class MincutParent(ParentAction):
 
     def mincut_composer(self):
         """ Open Composer """
-
+        # Check if path exist
+        template_folder = self.settings.value('system_variables/composers_path')
+        try:
+            template_files = os.listdir(template_folder)
+        except FileNotFoundError as e:
+            message = "Your composer's path is bad configured. Please, modify it and try again."
+            self.controller.show_message(message, 1)
+            return
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()
         self.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt from ...system_variables/composers_path
-        template_folder = self.settings.value('system_variables/composers_path')
-        template_files = os.listdir(template_folder)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
         self.dlg_comp.cbx_template.clear()
         self.dlg_comp.cbx_template.addItem('')
@@ -2323,7 +2328,8 @@ class MincutParent(ParentAction):
             return
 
         # Check if template file exists
-        template_path = self.settings.value(f'system_variables/composers_path/{os.sep}{self.template}.qpt')
+        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
+
         if not os.path.exists(template_path):
             message = "File not found"
             self.controller.show_warning(message, parameter=template_path)
@@ -2349,8 +2355,9 @@ class MincutParent(ParentAction):
                 comp_view.composition().loadFromTemplate(document)
             else:
                 project = QgsProject.instance()
-                comp_view = QgsLayout(project)
-                comp_view.loadFromTemplate(document)
+                comp_view = QgsPrintLayout(project)
+                comp_view.loadFromTemplate(document,  QgsReadWriteContext())
+
                 layout_manager = project.layoutManager()
                 layout_manager.addLayout(comp_view)
 
@@ -2369,46 +2376,26 @@ class MincutParent(ParentAction):
             return
 
         title = self.dlg_comp.title.text()
-        rotation = float(self.dlg_comp.rotation.text())
+        try:
+            rotation = float(self.dlg_comp.rotation.text())
+        except ValueError as e:
+            rotation = 0
 
-        if Qgis.QGIS_VERSION_INT < 29900:
 
-            # Show layout
-            main_window = layout.composerWindow()
-            main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
-            main_window.show()
+        # Show layout
+        self.iface.openLayoutDesigner(layout)
 
-            # Zoom map to extent, rotation, title
-            composition = layout.composition()
-            map_item = composition.getComposerItemById('Mapa')
-            map_item.setMapCanvas(self.canvas)
-            map_item.zoomToExtent(self.canvas.extent())
-            map_item.setMapRotation(rotation)
-            profile_title = composition.getComposerItemById('title')
-            profile_title.setText(str(title))
+        # Zoom map to extent, rotation, title
+        map_item = layout.itemById('Mapa')
+        #map_item.setMapCanvas(self.canvas)
+        map_item.zoomToExtent(self.canvas.extent())
+        map_item.setMapRotation(rotation)
+        profile_title = layout.itemById('title')
+        profile_title.setText(str(title))
 
-            # Preview Atlas and refresh items
-            composition.setAtlasMode(QgsComposition.PreviewAtlas)
-            composition.refreshItems()
-            composition.update()
-
-        # TODO: Test it!
-        else:
-
-            # Show layout
-            self.iface.openLayoutDesigner(layout)
-
-            # Zoom map to extent, rotation, title
-            map_item = layout.itemById('Mapa')
-            #map_item.setMapCanvas(self.canvas)
-            map_item.zoomToExtent(self.canvas.extent())
-            map_item.setMapRotation(rotation)
-            profile_title = layout.itemById('title')
-            profile_title.setText(str(title))
-
-            # Refresh items
-            layout.refresh()
-            layout.updateBounds()
+        # Refresh items
+        layout.refresh()
+        layout.updateBounds()
 
 
     def enable_widgets(self, state):
