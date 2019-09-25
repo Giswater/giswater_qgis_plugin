@@ -170,6 +170,7 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesno','inp_report', 'summary');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesno','inp_report', 'quality');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesno','inp_report', 'velocity');
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_yesno','inp_report', 'headloss');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_times','inp_times', 'statistic');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_pump', 'energyparam');
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('inp_typevalue', 'inp_value_param_energy','inp_pump_additional', 'energyparam');

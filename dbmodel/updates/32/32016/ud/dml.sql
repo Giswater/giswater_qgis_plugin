@@ -192,6 +192,7 @@ INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_status', 'inp_flwreg_pump', 'status', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_typevalue_outlet', 'inp_flwreg_outlet', 'outlet_type', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_weirs', 'inp_flwreg_weir', 'weir_type', NULL);
+INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_yesno', 'inp_flwreg_weir', 'flap', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_status', 'inp_pump', 'status', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_mapunits', 'inp_mapunits', 'type_units', NULL);
 INSERT INTO typevalue_fk (typevalue_table, typevalue_name, target_table, target_field, parameter_id) VALUES ('inp_typevalue', 'inp_value_pollutants', 'inp_pollutant', 'units_type', NULL);
