@@ -13,7 +13,7 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('arccat_vdefa
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('connecat_vdefault', 'PVC-CC025_D', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('elementcat_vdefault', 'COVER70', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('nodecat_vdefault', 'C_MANHOLE-BR100', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gullycat_vdefault', 'SGRT1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gullycat_vdefault', 'GULLY', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitcat_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_param_type_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_scale_vdefault', '1000', current_user);

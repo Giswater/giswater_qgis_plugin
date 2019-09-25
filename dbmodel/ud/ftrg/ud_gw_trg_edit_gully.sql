@@ -89,9 +89,8 @@ BEGIN
 			END IF;
 		END IF;
 
-
 		--Copy id to code field
-		v_codeautofill = (SELECT code_autofill FROM node_type WHERE id=NEW.gully_type);
+		v_codeautofill = (SELECT code_autofill FROM gully_type WHERE id=NEW.gully_type);
 		IF (NEW.code IS NULL AND v_codeautofill) THEN 
 			NEW.code=NEW.gully_id;
 		END IF;
@@ -190,11 +189,6 @@ BEGIN
 		END IF;  
 
 		SELECT code_autofill INTO v_code_autofill_bool FROM gully_type WHERE id=NEW.gully_type;
-
-		--Copy id to code field
-		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
-			NEW.code=NEW.gully_id;
-		END IF;
 
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
