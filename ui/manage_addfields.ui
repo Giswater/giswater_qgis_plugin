@@ -64,7 +64,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-438</y>
             <width>565</width>
             <height>1322</height>
            </rect>
@@ -276,9 +276,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="1">
-                 <widget class="QLineEdit" name="widgetfunction"/>
-                </item>
                 <item row="10" column="0">
                  <widget class="QLabel" name="lbl_57">
                   <property name="text">
@@ -395,13 +392,25 @@
                  </widget>
                 </item>
                 <item row="16" column="1">
-                 <widget class="QPlainTextEdit" name="typeahead"/>
+                 <widget class="QPlainTextEdit" name="typeahead">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;fieldToSearch&amp;quot;: &amp;quot;arc_id&amp;quot;, &amp;quot;threshold&amp;quot;: 3, &amp;quot;noresultsMsg&amp;quot;: &amp;quot;No results&amp;quot;, &amp;quot;loadingMsg&amp;quot;: &amp;quot;Searching&amp;quot;}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="17" column="1">
-                 <widget class="QPlainTextEdit" name="listfilterparam"/>
+                 <widget class="QPlainTextEdit" name="listfilterparam">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;sign&amp;quot;:&amp;quot;&amp;gt;&amp;quot;,&amp;quot;vdefault&amp;quot;:&amp;quot;01-01-2014&amp;quot; }&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="18" column="1">
-                 <widget class="QPlainTextEdit" name="editability"/>
+                 <widget class="QPlainTextEdit" name="editability">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;trueWhenParentIn&amp;quot;:[3]}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="12" column="1">
                  <widget class="QPlainTextEdit" name="dv_querytext_filterc"/>
@@ -413,11 +422,12 @@
                   </property>
                  </widget>
                 </item>
-                <item row="14" column="1">
-                 <widget class="QLineEdit" name="action_function"/>
-                </item>
                 <item row="15" column="1">
-                 <widget class="QPlainTextEdit" name="stylesheet"/>
+                 <widget class="QPlainTextEdit" name="stylesheet">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;label&amp;quot;:&amp;quot;color:green; font-weight:bold;&amp;quot;,&amp;quot;widget&amp;quot;:{&amp;quot;enabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;,&amp;quot;disabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="9" column="0">
                  <widget class="QLabel" name="lbl_61">
@@ -432,6 +442,12 @@
                    <number>999999999</number>
                   </property>
                  </widget>
+                </item>
+                <item row="13" column="1">
+                 <widget class="QComboBox" name="widgetfunction"/>
+                </item>
+                <item row="14" column="1">
+                 <widget class="QComboBox" name="action_function"/>
                 </item>
                </layout>
               </item>
