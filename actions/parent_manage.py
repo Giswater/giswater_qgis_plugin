@@ -656,8 +656,14 @@ class ParentManage(ParentAction, object):
             self.controller.log_info(message)
             return
 
-        # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()
+        # Control when QTableView is void or has no model
+        try:
+            # Get selected rows
+            selected_list = widget.selectionModel().selectedRows()
+        except AttributeError as e:
+            selected_list = []
+
+
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
