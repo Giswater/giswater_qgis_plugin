@@ -708,8 +708,10 @@ class DrawProfiles(ParentMapTool):
 
         if node.node_id == node.node_1:
             z = node.z1
+            reverse = False
         else:
             z = node.z2
+            reverse = True
 
         # Get superior points
         s1x = -node.geom / 2
@@ -750,7 +752,7 @@ class DrawProfiles(ParentMapTool):
         self.first_top_y = node.top_elev
 
         # Draw fixed part of table
-        self.draw_fix_table(node.start_point)
+        self.draw_fix_table(node.start_point, reverse)
 
 
         # Save last points for first node
@@ -762,7 +764,7 @@ class DrawProfiles(ParentMapTool):
         self.ilast2 = [i3x, i3y]
 
 
-    def draw_fix_table(self, start_point):
+    def draw_fix_table(self, start_point, reverse):
         """ Draw fixed part of table """
 
         # DRAW TABLE - FIXED PART
@@ -786,7 +788,7 @@ class DrawProfiles(ParentMapTool):
 
         # Fill the fixed part of table with data - draw text
         # Called just with first node
-        self.data_fix_table(start_point)
+        self.data_fix_table(start_point, reverse)
 
 
     def draw_marks(self, start_point):
@@ -816,7 +818,7 @@ class DrawProfiles(ParentMapTool):
         plt.plot(x, y, 'black', zorder=100)
 
 
-    def data_fix_table(self, start_point):  #@UnusedVariable
+    def data_fix_table(self, start_point, reverse):  #@UnusedVariable
         """ FILL THE FIXED PART OF TABLE WITH DATA - DRAW TEXT """
 
         c = (self.fix_x - self.fix_x * Decimal(0.2)) / 2
@@ -846,7 +848,7 @@ class DrawProfiles(ParentMapTool):
                  horizontalalignment='center', verticalalignment='center')
 
         # Fill table with values
-        self.fill_data(0, 0)
+        self.fill_data(0, 0, reverse)
 
 
     def draw_nodes(self, node, prev_node, index):
@@ -854,8 +856,12 @@ class DrawProfiles(ParentMapTool):
 
         if node.node_id == prev_node.node_2:
             z1 = prev_node.z2
+            reverse = False
+            self.controller.log_info(str("TEST1"))
         elif node.node_id == prev_node.node_1:
             z1 = prev_node.z1
+            reverse = True
+            self.controller.log_info(str("TEST2"))
 
         if node.node_id == node.node_1:
             z2 = node.z1
@@ -914,7 +920,7 @@ class DrawProfiles(ParentMapTool):
         self.draw_marks(node.start_point)
 
         # Fill table
-        self.fill_data(node.start_point, index)
+        self.fill_data(node.start_point, index, reverse)
 
         # Save last points before the last node
         self.slast = [s5x, s5y]
@@ -926,7 +932,8 @@ class DrawProfiles(ParentMapTool):
         self.ilast2 = [i3x, i3y]
 
 
-    def fill_data(self, start_point, indx):
+    def fill_data(self, start_point, indx, reverse=False):
+
 
         # Fill top_elevation and node_id for all nodes
         plt.annotate(' ' + '\n' + str(round(self.nodes[indx].top_elev, 2)) + '\n' + ' ',
@@ -938,55 +945,106 @@ class DrawProfiles(ParentMapTool):
                  self.nodes[indx].code, fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
 
-        # Fill y_max and elevation
-        # 1st node : y_max,y2 and top_elev, elev2
-        if indx == 0:
-            # Fill y_max
-            plt.annotate(' ' + '\n' + str(round(self.nodes[0].ymax, 2)) + '\n' + str(round(self.nodes[0].y1, 2)),
-                         xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
-                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-            # Fill elevation
-            plt.annotate(' ' + '\n' + str(round(self.nodes[0].elev, 2)) + '\n' + str(round(self.nodes[0].elev1, 2)),
-                         xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
-                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-        # Last node : y_max,y1 and top_elev, elev1
-        elif indx == self.n - 1:
-            pass
-            # Fill y_max
-            plt.annotate(
-                str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + ' ',
-                xy=(Decimal(0 + start_point),
-                    self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-            # Fill elevation
-            plt.annotate(
-                str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(round(self.nodes[indx].elev, 2)) + '\n' + ' ',
-                xy=(Decimal(0 + start_point),
-                    self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
-        # Nodes between 1st and last node : y_max,y1,y2 and top_elev, elev1, elev2
-
+        # Manage variables elev and y (elev1, elev2, y1, y2) acoording flow trace
+        if reverse:
+            # Fill y_max and elevation
+            # 1st node : y_max,y2 and top_elev, elev2
+            if indx == 0:
+                # # Fill y_max
+                plt.annotate(' ' + '\n' + str(round(self.nodes[0].ymax, 2)) + '\n' + str(round(self.nodes[0].y2, 2)),
+                             xy=(Decimal(0 + start_point),
+                                 self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                # Fill elevation
+                plt.annotate(' ' + '\n' + str(round(self.nodes[0].elev, 2)) + '\n' + str(round(self.nodes[0].elev2, 2)),
+                             xy=(Decimal(0 + start_point),
+                                 self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            # Last node : y_max,y1 and top_elev, elev1
+            elif indx == self.n - 1:
+                pass
+                # Fill y_max
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].y1, 2)) + '\n' + str(
+                        round(self.nodes[indx].ymax, 2)) + '\n' + ' ',
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                # Fill elevation
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].elev1, 2)) + '\n' + str(
+                        round(self.nodes[indx].elev, 2)) + '\n' + ' ',
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            else:
+                # Fill y_max
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].y1, 2)) + '\n' + str(
+                        round(self.nodes[indx].ymax, 2)) + '\n' + str(
+                        round(self.nodes[indx].y1, 2)),
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                # Fill elevation
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].elev1, 2)) + '\n' + str(
+                        round(self.nodes[indx].elev, 2)) + '\n' + str(
+                        round(self.nodes[indx].elev1, 2)),
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
         else:
-            # Fill y_max
-            plt.annotate(
-                str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + str(
-                    round(self.nodes[indx].y1, 2)),
-                xy=(Decimal(0 + start_point),
-                    self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            # Fill y_max and elevation
+            # 1st node : y_max,y2 and top_elev, elev2
+            if indx == 0:
+                    # # Fill y_max
+                    plt.annotate(' ' + '\n' + str(round(self.nodes[0].ymax, 2)) + '\n' + str(round(self.nodes[0].y1, 2)),
+                                 xy=(Decimal(0 + start_point),
+                                     self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
-            # Fill elevation
-            plt.annotate(
-                str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(round(self.nodes[indx].elev, 2)) + '\n' + str(
-                    round(self.nodes[indx].elev1, 2)),
-                xy=(Decimal(0 + start_point),
-                    self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                    # Fill elevation
+                    plt.annotate(' ' + '\n' + str(round(self.nodes[0].elev, 2)) + '\n' + str(round(self.nodes[0].elev1, 2)),
+                                 xy=(Decimal(0 + start_point),
+                                     self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+            # Last node : y_max,y1 and top_elev, elev1
+            elif indx == self.n - 1:
+                pass
+                # Fill y_max
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + ' ',
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+                # Fill elevation
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(
+                        round(self.nodes[indx].elev, 2)) + '\n' + ' ',
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            # Nodes between 1st and last node : y_max,y1,y2 and top_elev, elev1, elev2
+            else:
+                # Fill y_max
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + str(
+                        round(self.nodes[indx].y1, 2)),
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+                # Fill elevation
+                plt.annotate(
+                    str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(
+                        round(self.nodes[indx].elev, 2)) + '\n' + str(
+                        round(self.nodes[indx].elev1, 2)),
+                    xy=(Decimal(0 + start_point),
+                        self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Fill diameter and slope / length for all nodes except last node
         if indx != self.n - 1:
@@ -1008,8 +1066,11 @@ class DrawProfiles(ParentMapTool):
 
         if node.node_id == prev_node.node_2:
             z = prev_node.z2
+            reverse = False
         else:
             z = prev_node.z1
+            reverse = True
+
 
         # TODO:: comentar lista slast i ilast
         s1x = self.slast[0]
@@ -1060,7 +1121,7 @@ class DrawProfiles(ParentMapTool):
         self.draw_marks(node.start_point)
 
         # Fill table
-        self.fill_data(node.start_point, index)
+        self.fill_data(node.start_point, index, reverse)
 
 
     def set_table_parameters(self):
