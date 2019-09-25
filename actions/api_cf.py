@@ -765,6 +765,22 @@ class ApiCF(ApiParent):
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
         parent_fields = complet_result['body']['data']['parentFields']
+
+        list_mandatory = []
+        for result in complet_result['body']['data']['fields']:
+            if result['ismandatory'] == True:
+                widget_name = 'data_' + result['column_id']
+                widget = self.dlg_cf.findChild(QWidget, widget_name)
+                widget.setStyleSheet("border: 1px solid gray")
+                value = utils_giswater.getWidgetText(self.dlg_cf, widget)
+                if value in ('null', None, ''):
+                    widget.setStyleSheet("border: 1px solid red")
+                    list_mandatory.append(widget_name)
+        if list_mandatory != []:
+            msg = "Some mandatory values are missing. Please check the widgets marked in red."
+            self.controller.show_warning(msg)
+            return
+
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -787,7 +803,6 @@ class ApiCF(ApiParent):
             sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
 
         else:
-            print(str("TEST3"))
             my_json = json.dumps(_json)
             feature = f'"featureType":"{self.feature_type}", '
             feature += f'"tableName":"{p_table_id}", '
