@@ -39,10 +39,15 @@ DECLARE
 	v_date text;
 	v_schema_info json;
 	v_superusers text;
+	v_tablename record;
+	v_schemaname text;
+
 
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
+
 
 	-- get input parameters
 	v_gwversion := (p_data ->> 'data')::json->> 'gwVersion';
@@ -75,6 +80,12 @@ BEGIN
 		v_date := COALESCE(v_date, '');
 
 		v_schema_info = '{"title":"'||v_title||'","author":"'||v_author||'","date":"'||v_date||'"}';
+		
+		-- drop deprecated tables
+		FOR v_tablename IN SELECT table_name FROM information_schema.tables WHERE table_schema=v_schemaname and substring(table_name,1 , 1) = '_' 
+		LOOP
+			EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name;
+		END LOOP;
 		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
