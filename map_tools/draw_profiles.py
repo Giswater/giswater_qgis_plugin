@@ -10,7 +10,17 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition, QgsVectorLayer
+import json
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsComposition
+else:
+    from qgis.core import QgsLayout
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition, QgsVectorLayer, QgsProject
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
@@ -26,6 +36,26 @@ import utils_giswater
 from parent import ParentMapTool
 from ui_manager import DrawProfile
 from ui_manager import LoadProfiles
+
+class NodeData:
+    def __init__(self):
+        self.start_point = None
+        self.top_elev = None
+        self.ymax = None
+        self.z1 = None
+        self.z2 = None
+        self.cat_geom = None
+        self.geom = None
+        self.slope = None
+        self.elev1 = None
+        self.elev2 = None
+        self.y1 = None
+        self.y2 = None
+        self.node_id = None
+        self.elev = None
+        self.code = None
+        self.node_1 = None
+        self.node_2 = None
 
 
 class DrawProfiles(ParentMapTool):
@@ -73,6 +103,7 @@ class DrawProfiles(ParentMapTool):
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
         self.start_end_node = [None, None]
+        self.rotation_vd_exist = False
 
         # Set signals
         self.dlg_draw_profile.rejected.connect(partial(self.close_dialog, self.dlg_draw_profile))
@@ -119,17 +150,17 @@ class DrawProfiles(ParentMapTool):
 
     def save_profile(self):
         """ Save profile """
-        
+
         profile_id = self.dlg_draw_profile.profile_id.text()
         start_point = self.widget_start_point.text()
         end_point = self.widget_end_point.text()
-        
+
         # Check if all data are entered
         if profile_id == '' or start_point == '' or end_point == '':
             message = "Some data is missing"
             self.controller.show_info_box(message, "Info")
             return
-        
+
         # Check if id of profile already exists in DB
         sql = ("SELECT DISTINCT(profile_id)"
                " FROM " + self.schema_name + ".anl_arc_profile_value"
@@ -149,18 +180,18 @@ class DrawProfiles(ParentMapTool):
         for i in range(n):
             sql += ("INSERT INTO " + self.schema_name + ".anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
                     " VALUES ('" + profile_id + "', '" + list_arc[i] + "', '" + start_point + "', '" + end_point + "');\n")
-        status = self.controller.execute_sql(sql) 
+        status = self.controller.execute_sql(sql)
         if not status:
             message = "Error inserting profile table, you need to review data"
             self.controller.show_warning(message)
             return
-      
+
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message)
         self.deactivate()
-        
-        
+
+
     def load_profile(self):
         """ Open dialog load_profiles.ui """
 
@@ -170,7 +201,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
         self.dlg_load.btn_open.clicked.connect(self.open_profile)
         self.dlg_load.btn_delete_profile.clicked.connect(self.delete_profile)
-        
+
         sql = "SELECT DISTINCT(profile_id) FROM " + self.schema_name + ".anl_arc_profile_value"
         rows = self.controller.get_rows(sql)
         if rows:
@@ -191,7 +222,7 @@ class DrawProfiles(ParentMapTool):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        # Selected item from list 
+        # Selected item from list
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
         # Get data from DB for selected item| profile_id, start_point, end_point
@@ -201,10 +232,10 @@ class DrawProfiles(ParentMapTool):
         row = self.controller.get_row(sql)
         if not row:
             return
-        
+
         start_point = row['start_point']
         end_point = row['end_point']
-        
+
         # Fill widgets of form draw_profile | profile_id, start_point, end_point
         self.widget_start_point.setText(str(start_point))
         self.widget_end_point.setText(str(end_point))
@@ -230,7 +261,7 @@ class DrawProfiles(ParentMapTool):
             row = self.controller.get_row(sql)
             if not row:
                 return
-            
+
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             viewname = "v_edit_man_" + str(sys_type)
@@ -271,7 +302,7 @@ class DrawProfiles(ParentMapTool):
             row = self.controller.get_row(sql)
             if not row:
                 return
-            
+
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             viewname = "v_edit_man_" + str(sys_type)
@@ -290,9 +321,9 @@ class DrawProfiles(ParentMapTool):
         for i in range(len(arc_id)):
             expr_filter += "'" + str(arc_id[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
-        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable
         if not is_valid:
-            return             
+            return
 
         # Build a list of feature id's from the previous result
         # Select features with these id's
@@ -328,7 +359,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.rotation.setDisabled(False)
 
         self.close_dialog(self.dlg_load)
-        
+
 
     def activate_snapping(self, emit_point):
 
@@ -340,7 +371,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def activate_snapping_node(self, widget):
-        
+
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -374,7 +405,7 @@ class DrawProfiles(ParentMapTool):
         # That's the snapped features
         if result:
             for snapped_point in result:
-                if snapped_point.layer == self.layer_node:                
+                if snapped_point.layer == self.layer_node:
                     point = QgsPoint(snapped_point.snappedVertex)
                     # Add marker
                     self.vertex_marker.setCenter(point)
@@ -424,7 +455,7 @@ class DrawProfiles(ParentMapTool):
                         self.exec_path()
 
                     sys_type = snapp_feature.attribute('sys_type').lower()
-                    # Select feature of v_edit_man_|feature 
+                    # Select feature of v_edit_man_|feature
                     viewname = "v_edit_man_" + str(sys_type)
                     self.layer_feature = self.controller.get_layer_by_tablename(viewname)
 
@@ -465,21 +496,20 @@ class DrawProfiles(ParentMapTool):
 
         # Start drawing
         # Draw first | start node
-        # Function self.draw_first_node(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1)
-        self.draw_first_node(self.memory[0][0], self.memory[0][1], self.memory[0][2], self.memory[0][3],
-                             self.memory[0][4], self.memory[0][5], self.memory[0][6], 0)
+        self.draw_first_node(self.nodes[0])
+
         # Draw nodes between first and last node
-        # Function self.draw_nodes(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, index)
         for i in range(1, self.n - 1):
-            self.draw_nodes(self.memory[i][0], self.memory[i][1], self.memory[i][2], self.memory[i][3],
-                            self.memory[i][4], self.memory[i][5], self.memory[i][6], i,self.memory[i-1][4], self.memory[i-1][5])
-            self.draw_arc()
+            self.draw_nodes(self.nodes[i], self.nodes[i - 1], i)
+
             self.draw_ground()
 
         # Draw last node
-        self.draw_last_node(self.memory[self.n - 1][0], self.memory[self.n - 1][1], self.memory[self.n - 1][2], self.memory[self.n - 2][3],
-                            self.memory[self.n - 2][4], self.memory[self.n - 2][5], self.memory[self.n - 1][6], self.n - 1,self.memory[self.n - 2][4], self.memory[self.n - 2][5])
-        self.draw_arc()
+        self.draw_last_node(self.nodes[self.n - 1], self.nodes[self.n - 2], self.n - 1)
+
+        # Set correct variable for draw ground (drawn centered)
+        self.first_top_x = self.first_top_x + self.nodes[self.n - 2].geom / 2
+
         self.draw_ground()
         self.draw_table_horizontals()
         self.set_properties()
@@ -489,7 +519,7 @@ class DrawProfiles(ParentMapTool):
 
         # If file profile.png exist overwrite
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        img_path = plugin_path + "\\templates\\profile.png"
+        img_path = plugin_path + os.sep + "templates" + os.sep + "profile.png"
         fig_size = plt.rcParams["figure.figsize"]
 
         # Set figure width to 10.4  and height to 4.8
@@ -519,8 +549,8 @@ class DrawProfiles(ParentMapTool):
         self.rect.set_facecolor('white')
 
         # Set axes
-        x_min = round(self.memory[0][0] - self.fix_x - self.fix_x * Decimal(0.15))
-        x_max = round(self.memory[self.n - 1][0] + self.fix_x * Decimal(0.15))
+        x_min = round(self.nodes[0].start_point - self.fix_x - self.fix_x * Decimal(0.15))
+        x_max = round(self.nodes[self.n - 1].start_point + self.fix_x * Decimal(0.15))
         self.axes.set_xlim([x_min, x_max])
 
         # Set y-axes
@@ -559,126 +589,177 @@ class DrawProfiles(ParentMapTool):
             i = i + 1
 
 
-    def fill_memory(self):
-        """ Get parameters from data base. Fill self.memory with parameters postgres """
+        # self.nodes.clear()
+        bad_nodes_id = []
 
-        self.memory = []
-        i = 0
-        # Get parameters and fill the memory
-        for node_id in self.node_id:
-            # self.parameters : list of parameters for one node
-            # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
-            parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+        # Get parameters and fill the nodes
+        for i, node_id in enumerate(self.node_id):
+
+            # parameters : list of parameters for one node
+            parameters = NodeData()
+            parameters.start_point = self.start_point[i]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
-            sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code"
-                   " FROM  " + self.schema_name + ".v_edit_node"
-                   " WHERE node_id = '" + str(node_id) + "'")
+            sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code "
+                   "FROM v_edit_node "
+                   "WHERE node_id = '" + node_id + "'")
+            # query for nodes
+            # SELECT elevation AS top_elev, depth AS ymax, top_elev-depth AS sys_elev, nodecat_id, code"
+
             row = self.controller.get_row(sql)
-
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
-
             if row:
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None:
-                    message = "Some parameters are missing for node (Values Defaults used for)"
-                    self.controller.show_info_box(message, "Info", node_id)
+                    bad_nodes_id.append(node_id)
                 # Check if we have all data for drawing
-                for x in range(0, len(columns)):
+                for x in range(len(columns)):
                     if row[x] is None:
-                        sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        sql = ("SELECT value::decimal(12,3) "
+                               "FROM config_param_system "
+                               "WHERE parameter = '" + columns[x]+ "_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
-
-                parameters[1] = row[0]
-                parameters[2] = row[1]
-                parameters[13] = row[2]
+                parameters.top_elev = row[0]
+                parameters.ymax = row[1]
+                parameters.elev = row[2]
                 nodecat_id = row[3]
-                parameters[14] = row[4]
-
+                parameters.code = row[4]
+                parameters.node_id = str(node_id)
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
             # Geom1 from cat_node
-            sql = ("SELECT geom1"
-                   " FROM " + self.schema_name + ".cat_node"
-                   " WHERE id = '" + str(nodecat_id) + "'")
+            sql = ("SELECT geom1 "
+                   "FROM cat_node "
+                   "WHERE id = '"+ nodecat_id + "'")
             row = self.controller.get_row(sql)
-
             columns = ['geom1']
-
             if row:
                 if row[0] is None:
-                    message = "Some parameters are missing for node catalog (Values Defaults used for)"
-                    self.controller.show_info_box(message, "Info", node_id)
+                    bad_nodes_id.append(node_id)
                 # Check if we have all data for drawing
                 for x in range(0, len(columns)):
                     if row[x] is None:
-                        sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        sql = ("SELECT value::decimal(12,3) "
+                               "FROM config_param_system "
+                               "WHERE parameter = '" + columns[x] +"_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
-                parameters[6] = row[0]
+                parameters.geom = row[0]
 
-            # Set node_id in memory
-            parameters[12] = node_id
-            self.memory.append(parameters)
-            i = i + 1
+            # Set node_id in nodes
+            parameters.node_id = node_id
+            self.nodes.append(parameters)
 
         n = 0
         for element_id in self.arc_id:
 
-            sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, sys_y1 AS y1, sys_y2 AS y2, slope"
-                   " FROM " + self.schema_name + ".v_edit_arc"
-                   " WHERE arc_id = '" + str(element_id) + "'")
+            sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, sys_y1 AS y1, sys_y2 AS y2, slope, node_1, node_2 "
+                   "FROM v_edit_arc "
+                   "WHERE arc_id = '" + element_id +"'")
             row = self.controller.get_row(sql)
 
+            # TODO:: v_nodes -> query for arcs
+            # SELECT 0 AS z1, 0 AS z2 , dnom/1000, NULL as  sys_elev1,  NULL as  sys_elev2,  NULL as  y1,  NULL as  y2,   NULL as  slope, node_1, node_2,
 
-            columns = ['z1','z2','cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
+            columns = ['z1', 'z2', 'cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
+
+            # Check if self.nodes[n] is out of range
+            if n >= len(self.nodes):
+                return
 
             if row:
                 # Check if we have all data for drawing
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
-                   row[5] is None or row[6] is None or row[7] is None:
-                    message = "Some parameters are missing for arc (Values Defaults used for)"
-                    self.controller.show_info_box(message, "Info", element_id)
+                        row[5] is None or row[6] is None or row[7] is None:
+                    bad_nodes_id.append(element_id)
                 for x in range(0, len(columns)):
                     if row[x] is None:
-                        sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        sql = ("SELECT value::decimal(12,3) "
+                               "FROM config_param_system "
+                               "WHERE parameter = '" + columns[x] + "_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
+                self.nodes[n].z1 = row[0]
+                self.nodes[n].z2 = row[1]
+                self.nodes[n].cat_geom = row[2]
+                self.nodes[n].elev1 = row[3]
+                self.nodes[n].elev2 = row[4]
+                self.nodes[n].y1 = row[5]
+                self.nodes[n].y2 = row[6]
+                self.nodes[n].slope = row[7]
+                self.nodes[n].node_1 = row[8]
+                self.nodes[n].node_2 = row[9]
+
+                n += 1
+
+        if not bad_nodes_id:
+            return
+
+        message = "Some parameters are missing (Values Defaults used for)"
+        self.controller.show_info_box(message, "Info", str(bad_nodes_id))
 
 
-                self.memory[n][3] = row[0]
-                self.memory[n][4] = row[1]
-                self.memory[n][5] = row[2]
-                self.memory[n][8] = row[3]
-                self.memory[n][9] = row[4]
-                self.memory[n][10] = row[5
-				]
-                self.memory[n][11] = row[6]
-                self.memory[n][7] = row[7]
-                n = n + 1
-
-
-    def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx): #@UnusedVariable
+    def draw_first_node(self, node):
         """ Draw first node """
 
-        # Draw first node
-        x = [0, -(geom1), -(geom1), (geom1), (geom1)]
-        y = [top_elev, top_elev, top_elev - ymax, top_elev - ymax, top_elev - ymax + z1]
+        if node.node_id == node.node_1:
+            z = node.z1
+        else:
+            z = node.z2
 
-        x1 = [geom1, geom1, 0]
-        y1 = [top_elev - ymax + z1 + cat_geom1, top_elev, top_elev]
-        plt.plot(x, y, 'black', zorder=100)
-        plt.plot(x1, y1, 'black', zorder=100)
+        # Get superior points
+        s1x = -node.geom / 2
+        s1y = node.top_elev
+        s2x = node.geom / 2
+        s2y = node.top_elev
+        s3x = node.geom / 2
+        s3y = node.top_elev - node.ymax + z + node.cat_geom
+
+        # Get inferior points
+        i1x = -node.geom / 2
+        i1y = node.top_elev - node.ymax
+        i2x = node.geom / 2
+        i2y = node.top_elev - node.ymax
+        i3x = node.geom / 2
+        i3y = node.top_elev - node.ymax + z
+
+        # Create list points
+        xinf = [s1x, i1x, i2x, i3x]
+        yinf = [s1y, i1y, i2y, i3y]
+        xsup = [s1x, s2x, s3x]
+        ysup = [s1y, s2y, s3y]
+
+        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if row is not None:
+            row = json.loads(row[0])
+            if 'color' in row:
+                # Draw lines acording list points
+                plt.plot(xinf, yinf, row['color'])
+                plt.plot(xsup, ysup, row['color'])
+        else:
+            plt.plot(xinf, yinf, 'black', zorder=100)
+            plt.plot(xsup, ysup, 'black', zorder=100)
+
 
         self.first_top_x = 0
-        self.first_top_y = top_elev
+        self.first_top_y = node.top_elev
 
         # Draw fixed part of table
-        self.draw_fix_table(start_point)
+        self.draw_fix_table(node.start_point)
+
+
+        # Save last points for first node
+        self.slast = [s3x, s3y]
+        self.ilast = [i3x, i3y]
+
+        # Save last points for first node
+        self.slast2 = [s3x, s3y]
+        self.ilast2 = [i3x, i3y]
 
 
     def draw_fix_table(self, start_point):
@@ -768,176 +849,242 @@ class DrawProfiles(ParentMapTool):
         self.fill_data(0, 0)
 
 
-    def draw_nodes(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx,z22, cat2):    #@UnusedVariable
+    def draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
 
-        ytop1 = ymax - z1 - cat_geom1
-        # cat_geom_1 from node before
-        ytop2 = ymax - z22 - cat2
+        if node.node_id == prev_node.node_2:
+            z1 = prev_node.z2
+        elif node.node_id == prev_node.node_1:
+            z1 = prev_node.z1
 
-        x = [start_point, start_point - (geom1), start_point - (geom1)]
-        y = [top_elev, top_elev, top_elev  - ymax + z22 + cat2]
-        x1 = [start_point - (geom1), start_point - (geom1), start_point + (geom1), start_point + (geom1)]
-        y1 = [top_elev - ymax + z22, top_elev - ymax, top_elev - ymax, top_elev - ymax + z1]
-        x2 = [start_point + (geom1),start_point + (geom1), start_point]
-        y2 = [top_elev - ytop1, top_elev, top_elev]
+        if node.node_id == node.node_1:
+            z2 = node.z1
+        elif node.node_id == node.node_2:
+            z2 = node.z2
 
-        plt.plot(x, y, 'black',zorder=100)
-        plt.plot(x1, y1, 'black',zorder=100)
-        plt.plot(x2, y2, 'black',zorder=100)
+        # Get superior points
+        s1x = self.slast[0]
+        s1y = self.slast[1]
+        s2x = node.start_point - node.geom / 2
+        s2y = node.top_elev - node.ymax + z1 + prev_node.cat_geom
+        s3x = node.start_point - node.geom / 2
+        s3y = node.top_elev
+        s4x = node.start_point + node.geom / 2
+        s4y = node.top_elev
+        s5x = node.start_point + node.geom / 2
+        s5y = node.top_elev -node.ymax + z2 + node.cat_geom
 
-        # Index -1 for node before
-        self.x = self.memory[indx - 1][6] + self.memory[indx - 1][0]
-        self.y = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3] + self.memory[indx - 1][5]
-        self.x1 = self.memory[indx - 1][6] + self.memory[indx - 1][0]
-        self.y1 = self.y1 = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3]
-        self.x2 = (start_point - (geom1))
-        self.y2 = top_elev - ytop2
-        self.x3 = (start_point - (geom1))
-        self.y3 = top_elev - ymax + z22
+        # Get inferior points
+        i1x = self.ilast[0]
+        i1y = self.ilast[1]
+        i2x = node.start_point - node.geom / 2
+        i2y = node.top_elev - node.ymax + z1
+        i3x = node.start_point - node.geom / 2
+        i3y = node.top_elev - node.ymax
+        i4x = node.start_point + node.geom / 2
+        i4y = node.top_elev - node.ymax
+        i5x = node.start_point + node.geom / 2
+        i5y = node.top_elev - node.ymax + z2
 
-        self.node_top_x = start_point
-        self.node_top_y = top_elev
+        # Create list points
+        xinf = [i1x, i2x, i3x, i4x, i5x]
+        yinf = [i1y, i2y, i3y, i4y, i5y]
+        xsup = [s1x, s2x, s3x, s4x, s5x]
+        ysup = [s1y, s2y, s3y, s4y, s5y]
 
-        self.first_top_x = self.memory[indx - 1][0]
-        self.first_top_y = self.memory[indx - 1][1]
+        sql = ("SELECT value FROM config_param_user "
+               "WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if row is not None:
+            row = json.loads(row[0])
+            if 'color' in row:
+                # Draw lines acording list points
+                plt.plot(xinf, yinf, row['color'])
+                plt.plot(xsup, ysup, row['color'])
+        else:
+            plt.plot(xinf, yinf, 'black', zorder=100)
+            plt.plot(xsup, ysup, 'black', zorder=100)
+
+        self.node_top_x = node.start_point
+        self.node_top_y = node.top_elev
+        self.first_top_x = prev_node.start_point
+        self.first_top_y = prev_node.top_elev
 
         # DRAW TABLE-MARKS
-        self.draw_marks(start_point)
+        self.draw_marks(node.start_point)
 
         # Fill table
-        self.fill_data(start_point,indx)
+        self.fill_data(node.start_point, index)
+
+        # Save last points before the last node
+        self.slast = [s5x, s5y]
+        self.ilast = [i5x, i5y]
 
 
-    def fill_data(self,start_point,indx):
+        # Save last points for draw ground
+        self.slast2 = [s3x, s3y]
+        self.ilast2 = [i3x, i3y]
+
+
+    def fill_data(self, start_point, indx):
 
         # Fill top_elevation and node_id for all nodes
-        # Fill top_elevation
-        plt.annotate(' ' + '\n' + str(round(self.memory[indx][1], 2)) + '\n' + ' ',
+        plt.annotate(' ' + '\n' + str(round(self.nodes[indx].top_elev, 2)) + '\n' + ' ',
                      xy=(Decimal(start_point), self.min_top_elev - Decimal(self.height_row * 2 + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Draw node_id
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
-                 self.memory[indx][14], fontsize=7.5,
+                 self.nodes[indx].code, fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
-
 
         # Fill y_max and elevation
         # 1st node : y_max,y2 and top_elev, elev2
         if indx == 0:
             # Fill y_max
-            plt.annotate(' ' + '\n' + str(round(self.memory[0][2], 2)) + '\n' + str(round(self.memory[0][10], 2)),
+            plt.annotate(' ' + '\n' + str(round(self.nodes[0].ymax, 2)) + '\n' + str(round(self.nodes[0].y1, 2)),
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
-            plt.annotate(' ' + '\n' + str(round(self.memory[0][13], 2)) + '\n' + str(round(self.memory[0][8], 2)),
+            plt.annotate(' ' + '\n' + str(round(self.nodes[0].elev, 2)) + '\n' + str(round(self.nodes[0].elev1, 2)),
                          xy=(Decimal(0 + start_point),
                              self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Last node : y_max,y1 and top_elev, elev1
-        elif (indx == self.n-1):
+        elif indx == self.n - 1:
             pass
             # Fill y_max
-            plt.annotate(str(round(self.memory[indx-1][11], 2)) + '\n' + str(round(self.memory[indx][2], 2)) + '\n' + ' ',
-                         xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
-                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            plt.annotate(
+                str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + ' ',
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
-            plt.annotate(str(round(self.memory[indx-1][9], 2)) + '\n' + str(round(self.memory[indx][13], 2)) + '\n' + ' ',
-                         xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
-                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            plt.annotate(
+                str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(round(self.nodes[indx].elev, 2)) + '\n' + ' ',
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
         # Nodes between 1st and last node : y_max,y1,y2 and top_elev, elev1, elev2
 
         else:
             # Fill y_max
-            plt.annotate(str(round(self.memory[indx-1][11], 2)) + '\n' + str(round(self.memory[indx][2], 2)) + '\n' + str(round(self.memory[indx][10], 2)),
-                         xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            plt.annotate(
+                str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].ymax, 2)) + '\n' + str(
+                    round(self.nodes[indx].y1, 2)),
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * 3 + self.height_row / 2)), fontsize=6,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
-            plt.annotate(str(round(self.memory[indx-1][9], 2)) + '\n' + str(round(self.memory[indx][13], 2)) + '\n' + str(round(self.memory[indx][8], 2)),
-                         xy=(Decimal(0 + start_point),
-                             self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            plt.annotate(
+                str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(round(self.nodes[indx].elev, 2)) + '\n' + str(
+                    round(self.nodes[indx].elev1, 2)),
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * 4 + self.height_row / 2)), fontsize=6,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Fill diameter and slope / length for all nodes except last node
-        if (indx != self.n - 1):
+        if indx != self.n - 1:
             # Draw diameter
             center = self.gis_length[indx + 1] / 2
-            plt.text(center + start_point, self.min_top_elev - 1*self.height_row - Decimal(0.45)*self.height_row, round(self.memory[indx][5], 2),
-                     fontsize=7.5,horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
+            plt.text(center + start_point, self.min_top_elev - 1 * self.height_row - Decimal(0.45) * self.height_row,
+                     round(self.nodes[indx].cat_geom, 2),
+                     fontsize=7.5, horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
             # Draw slope / length
-            slope = str(round((self.memory[indx][7]*100),2))
-            length = str(round(self.gis_length[indx+1],2))
+            slope = str(round((self.nodes[indx].slope * 100), 2))
+            length = str(round(self.gis_length[indx + 1], 2))
 
-            plt.text(center + start_point, self.min_top_elev - 1*self.height_row - Decimal(0.8)*self.height_row, slope + '%/' + length,
+            plt.text(center + start_point, self.min_top_elev - 1 * self.height_row - Decimal(0.8) * self.height_row,
+                     slope + '%/' + length,
                      fontsize=7.5, horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
 
 
-    def draw_last_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx, z22, cat2):  #@UnusedVariable
+    def draw_last_node(self, node, prev_node, index):
 
-        x = [start_point, start_point - (geom1), start_point - (geom1)]
-        y = [top_elev, top_elev, top_elev  - ymax + z22 + cat2]
-        x1 = [start_point - geom1, start_point - geom1, start_point + geom1, start_point + geom1, start_point]
-        y1 = [top_elev - ymax + z2, top_elev - ymax, top_elev - ymax, top_elev, top_elev]
+        if node.node_id == prev_node.node_2:
+            z = prev_node.z2
+        else:
+            z = prev_node.z1
 
-        plt.plot(x, y, 'black',zorder=100)
-        plt.plot(x1, y1, 'black',zorder=100)
+        # TODO:: comentar lista slast i ilast
+        s1x = self.slast[0]
+        s1y = self.slast[1]
+        s2x = node.start_point - node.geom / 2
+        s2y = node.top_elev - node.ymax + z + prev_node.cat_geom
+        s3x = node.start_point - node.geom / 2
+        s3y = node.top_elev
+        s4x = node.start_point + node.geom / 2
+        s4y = node.top_elev
 
-        self.x = self.memory[indx - 1][6] + self.memory[indx - 1][0]
-        self.y = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3] + self.memory[indx - 1][5]
-        self.x1 = self.memory[indx - 1][6] + self.memory[indx - 1][0]
-        self.y1 = self.y1 = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3]
+        # Get inferior points
+        i1x = self.ilast[0]
+        i1y = self.ilast[1]
+        i2x = node.start_point - node.geom / 2
+        i2y = node.top_elev - node.ymax + z
+        i3x = node.start_point - node.geom / 2
+        i3y = node.top_elev - node.ymax
+        i4x = node.start_point + node.geom / 2
+        i4y = node.top_elev - node.ymax
 
-        ytop2 = ymax - z22 - cat2
-        self.x2 = (start_point - (geom1))
-        self.y2 = top_elev - ytop2
-        self.x3 = (start_point - (geom1))
-        self.y3 = top_elev - ymax + z22
+        # Create list points
+        xinf = [i1x, i2x, i3x, i4x]
+        yinf = [i1y, i2y, i3y, i4y]
+        xsup = [s1x, s2x, s3x, s4x, i4x]
+        ysup = [s1y, s2y, s3y, s4y, i4y]
 
-        self.first_top_x = self.memory[indx - 1][0]
-        self.first_top_y = self.memory[indx - 1][1]
+        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if row is not None:
+            row = json.loads(row[0])
+            if 'color' in row:
+                # Draw lines acording list points
+                plt.plot(xinf, yinf, row['color'])
+                plt.plot(xsup, ysup, row['color'])
+        else:
+            plt.plot(xinf, yinf, 'black', zorder=100)
+            plt.plot(xsup, ysup, 'black', zorder=100)
 
-        self.node_top_x = start_point
-        self.node_top_y = top_elev
+        self.first_top_x = self.slast2[0]
+        self.first_top_y = self.slast2[1]
+
+        self.node_top_x = node.start_point
+        self.node_top_y = node.top_elev
 
         # DRAW TABLE
         # DRAW TABLE-MARKS
-        self.draw_marks(start_point)
+        self.draw_marks(node.start_point)
 
         # Fill table
-        self.fill_data(start_point, indx)
+        self.fill_data(node.start_point, index)
 
 
     def set_table_parameters(self):
 
         # Search y coordinate min_top_elev ( top_elev- ymax)
-        self.min_top_elev = self.memory[0][1] - self.memory[0][2]
+        self.min_top_elev = self.nodes[0].top_elev - self.nodes[0].ymax
         for i in range(1, self.n):
-            if (self.memory[i][1] - self.memory[i][2]) < self.min_top_elev:
-                self.min_top_elev = self.memory[i][1] - self.memory[i][2]
+            if (self.nodes[i].top_elev - self.nodes[i].ymax) < self.min_top_elev:
+                self.min_top_elev = self.nodes[i].top_elev - self.nodes[i].ymax
         # Search y coordinate max_top_elev
-        self.max_top_elev = self.memory[0][1]
+        self.max_top_elev = self.nodes[0].top_elev
         for i in range(1, self.n):
-            if (self.memory[i][1]) > self.max_top_elev:
-                self.max_top_elev = self.memory[i][1]
+            if self.nodes[i].top_elev > self.max_top_elev:
+                self.max_top_elev = self.nodes[i].top_elev
 
         # Calculating dimensions of x-fixed part of table
-        self.fix_x = Decimal(0.15) * self.memory[self.n - 1][0]
+        self.fix_x = Decimal(0.15) * self.nodes[self.n - 1].start_point
 
-        # Calculating dimensions of y-fixed part of table 
+        # Calculating dimensions of y-fixed part of table
         # Height y = height of table + height of graph
         self.z = self.max_top_elev - self.min_top_elev
         self.height_row = (self.z * Decimal(0.97)) / Decimal(5)
 
-        # Height of graph + table 
+        # Height of graph + table
         self.height_y = self.z * 2
 
 
@@ -947,106 +1094,108 @@ class DrawProfiles(ParentMapTool):
 
         # DRAWING TABLE
         # Draw horizontal lines
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - self.height_row, self.min_top_elev - self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x, y, 'black', zorder=100)
 
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - 2 * self.height_row, self.min_top_elev - 2 * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x, y, 'black', zorder=100)
 
         # Draw horizontal(shorter) lines
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 3 * self.height_row, self.min_top_elev - 3 * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
+        plt.plot(x, y, 'black', zorder=100)
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 4 * self.height_row, self.min_top_elev - 4 * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
-        
+        plt.plot(x, y, 'black', zorder=100)
+
         # Last two lines
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - 5 * self.height_row, self.min_top_elev - 5 * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
-        x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
+        plt.plot(x, y, 'black', zorder=100)
+        x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - 6 * self.height_row, self.min_top_elev - 6 * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x, y, 'black', zorder=100)
 
 
     def draw_coordinates(self):
 
-        start_point = self.memory[self.n - 1][0]
-        geom1 = self.memory[self.n - 1][6]
-        
+        start_point = self.nodes[self.n - 1].start_point
+        geom1 = self.nodes[self.n - 1].geom
+
         # Draw coocrdinates
         x = [0, 0]
-        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
-        plt.plot(x, y, 'black',zorder=100)
-        x = [start_point,start_point]
-        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
-        plt.plot(x, y, 'black',zorder=100)
-        x = [0,start_point]
-        y = [int(math.ceil(self.max_top_elev) + 1 ),int(math.ceil(self.max_top_elev) + 1 )]
-        plt.plot(x, y, 'black',zorder=100)
+        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
+        plt.plot(x, y, 'black', zorder=100)
+        x = [start_point, start_point]
+        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
+        plt.plot(x, y, 'black', zorder=100)
+        x = [0, start_point]
+        y = [int(math.ceil(self.max_top_elev) + 1), int(math.ceil(self.max_top_elev) + 1)]
+        plt.plot(x, y, 'black', zorder=100)
 
         # Loop till self.max_top_elev + height_row
         y = int(math.ceil(self.min_top_elev - 1 * self.height_row))
         x = int(math.floor(self.max_top_elev))
-        if x%2 == 0 :
+        if x % 2 == 0:
             x = x + 2
-        else :
+        else:
             x = x + 1
 
         for i in range(y, x):
-            if i%2 == 0:
+            if i % 2 == 0:
                 x1 = [0, start_point]
                 y1 = [i, i]
             else:
-                i = i+1
+                i = i + 1
                 x1 = [0, start_point]
                 y1 = [i, i]
             plt.plot(x1, y1, 'lightgray', zorder=1)
             # Values left y_ordinate_all
-            plt.text(0 - geom1 * Decimal(1.5), i,str(i), fontsize=7.5, horizontalalignment='right', verticalalignment='center')
+            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=7.5, horizontalalignment='right',
+                     verticalalignment='center')
 
 
     def draw_grid(self):
 
         # Values right y_ordinate_max
-        start_point = self.memory[self.n-1][0]
-        geom1 = self.memory[self.n-1][6]
-        plt.annotate('P.C. '+str(round(self.min_top_elev - 1 * self.height_row,2)) + '\n' + ' ',
-                     xy=(0 - geom1*Decimal(1.5) , self.min_top_elev - 1 * self.height_row),
+        start_point = self.nodes[self.n - 1].start_point
+        geom1 = self.nodes[self.n - 1].geom
+        plt.annotate('P.C. ' + str(round(self.min_top_elev - 1 * self.height_row, 2)) + '\n' + ' ',
+                     xy=(0 - geom1 * Decimal(1.5), self.min_top_elev - 1 * self.height_row),
                      fontsize=6.5, horizontalalignment='right', verticalalignment='center')
 
         # Values right x_ordinate_min
-        plt.annotate('0'+ '\n' + ' ',
-                     xy=(0,int(math.ceil(self.max_top_elev) + 1 )),
+        plt.annotate('0' + '\n' + ' ',
+                     xy=(0, int(math.ceil(self.max_top_elev) + 1)),
                      fontsize=6.5, horizontalalignment='center')
 
         # Values right x_ordinate_max
-        plt.annotate(str(round(start_point,2))+ '\n' + ' ',
-                     xy=(start_point, int(math.ceil(self.max_top_elev) + 1 ) ),
+        plt.annotate(str(round(start_point, 2)) + '\n' + ' ',
+                     xy=(start_point, int(math.ceil(self.max_top_elev) + 1)),
                      fontsize=6.5, horizontalalignment='center')
 
-        # Loop from 0 to start_point(of last node) 
+        # Loop from 0 to start_point(of last node)
         x = int(math.floor(start_point))
-        # First after 0 (first is drawn ,start from i(0)+1) 
+        # First after 0 (first is drawn ,start from i(0)+1)
         for i in range(50, x, 50):
             x1 = [i, i]
-            y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
-            plt.plot(x1, y1, 'lightgray',zorder=1 )
+            y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
+            plt.plot(x1, y1, 'lightgray', zorder=1)
             # values left y_ordinate_all
-            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=6.5, 
-                horizontalalignment='right', verticalalignment='center')
-            plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=6.5, 
-                horizontalalignment='left', verticalalignment='center')
+            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=6.5,
+                     horizontalalignment='right', verticalalignment='center')
+            plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=6.5,
+                     horizontalalignment='left', verticalalignment='center')
             # values right x_ordinate_all
-            plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1 )), 
-                fontsize=6.5, horizontalalignment='center')
+            plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),
+                         fontsize=6.5, horizontalalignment='center')
 
 
+    # TODO: Not used
     def draw_arc(self):
-        
+
         x = [self.x, self.x2]
         y = [self.y, self.y2]
         x1 = [self.x1, self.x3]
@@ -1058,16 +1207,16 @@ class DrawProfiles(ParentMapTool):
     def draw_ground(self):
 
         # Green triangle
-        plt.plot(self.first_top_x,self.first_top_y,'g^',linewidth=3.5)
-        plt.plot(self.node_top_x, self.node_top_y, 'g^',linewidth=3.5)
+        plt.plot(self.first_top_x, self.first_top_y, 'g^', linewidth=3.5)
+        plt.plot(self.node_top_x, self.node_top_y, 'g^', linewidth=3.5)
         x = [self.first_top_x, self.node_top_x]
         y = [self.first_top_y, self.node_top_y]
         plt.plot(x, y, 'green', linestyle='dashed')
 
-    
-    def shortest_path(self,start_point, end_point):
+
+    def shortest_path(self, start_point, end_point):
         """ Calculating shortest path using dijkstra algorithm """
-        
+
         self.arc_id = []
         self.node_id = []
         self.rnode_id = []
@@ -1076,15 +1225,15 @@ class DrawProfiles(ParentMapTool):
         rstart_point = None
         sql = ("SELECT rid"
                " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-               " WHERE node_id = '" + start_point + "'")
+                                             " WHERE node_id = '" + start_point + "'")
         row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])
 
         rend_point = None
         sql = ("SELECT rid"
-              " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-              " WHERE node_id = '" + end_point + "'")
+               " FROM " + self.schema_name + ".v_anl_pgrouting_node"
+                                             " WHERE node_id = '" + end_point + "'")
         row = self.controller.get_row(sql)
         if row:
             rend_point = int(row[0])
@@ -1092,9 +1241,9 @@ class DrawProfiles(ParentMapTool):
         # Check starting and end points | wait to select end_point
         if rstart_point is None or rend_point is None:
             return
-                    
+
         # Clear list of arcs and nodes - preparing for new profile
-        sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost" 
+        sql = ("SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost"
                " FROM " + self.schema_name + ".v_anl_pgrouting_arc', "
                + str(rstart_point) + ", " + str(rend_point) + ", false")
         if self.version == '2':
@@ -1119,21 +1268,21 @@ class DrawProfiles(ParentMapTool):
         self.rarc_id.pop()
         self.arc_id = []
         self.node_id = []
- 
+
         for n in range(0, len(self.rarc_id)):
             # convert arc_ids
             sql = ("SELECT arc_id"
                    " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
-                   " WHERE id = '" +str(self.rarc_id[n]) + "'")
+                                                 " WHERE id = '" + str(self.rarc_id[n]) + "'")
             row = self.controller.get_row(sql)
             if row:
                 self.arc_id.append(str(row[0]))
-        
+
         for m in range(0, len(self.rnode_id)):
             # convert node_ids
             sql = ("SELECT node_id"
                    " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-                   " WHERE rid = '" + str(self.rnode_id[m]) + "'")
+                                                 " WHERE rid = '" + str(self.rnode_id[m]) + "'")
             row = self.controller.get_row(sql)
             if row:
                 self.node_id.append(str(row[0]))
@@ -1142,11 +1291,11 @@ class DrawProfiles(ParentMapTool):
         for element_id in self.arc_id:
             sql = ("SELECT sys_type"
                    " FROM " + self.schema_name + ".v_edit_arc"
-                   " WHERE arc_id = '" + str(element_id) + "'")
+                                                 " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
-            
+
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             viewname = "v_edit_man_" + str(sys_type)
@@ -1164,11 +1313,11 @@ class DrawProfiles(ParentMapTool):
         for element_id in self.node_id:
             sql = ("SELECT sys_type"
                    " FROM " + self.schema_name + ".v_edit_node"
-                   " WHERE node_id = '" + str(element_id) + "'")
+                                                 " WHERE node_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
-            
+
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             viewname = "v_edit_man_" + str(sys_type)
@@ -1186,12 +1335,12 @@ class DrawProfiles(ParentMapTool):
         expr_filter = "\"arc_id\" IN ("
         for i in range(len(self.arc_id)):
             expr_filter += "'" + str(self.arc_id[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"        
-        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+        expr_filter = expr_filter[:-2] + ")"
+        (is_valid, expr) = self.check_expression(expr_filter, True)  # @UnusedVariable
         if not is_valid:
-            return              
+            return
 
-        # Build a list of feature id's from the previous result
+            # Build a list of feature id's from the previous result
         # Select features with these id's
         it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
         self.id_list = [i.id() for i in it]
@@ -1203,7 +1352,7 @@ class DrawProfiles(ParentMapTool):
         # Clear list
         list_arc = []
         self.dlg_draw_profile.tbl_list_arc.clear()
-        
+
         for i in range(len(self.arc_id)):
             item_arc = QListWidgetItem(self.arc_id[i])
             self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
@@ -1211,7 +1360,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def execute_profiles(self):
-        
+
         # Remove duplicated nodes
         singles_list = []
         for element in self.node_id:
@@ -1244,7 +1393,6 @@ class DrawProfiles(ParentMapTool):
         # Clear list of nodes and arcs
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
-        self.nodes = []
         self.arcs = []
         self.start_end_node = []
         self.start_end_node = [None, None]
@@ -1260,93 +1408,179 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.start_point.clear()
         self.dlg_draw_profile.end_point.clear()
         self.dlg_draw_profile.profile_id.clear()
-        
+
         # Get data from DB for selected item| tbl_list_arc
         self.dlg_draw_profile.tbl_list_arc.clear()
-        
-        # Clear selection 
+
+        # Clear selection
         self.remove_selection()
         self.deactivate()
 
 
     def generate_composer(self):
-        
-        # Plugin path
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        composers = self.iface.activeComposers()
 
         # Check if template is selected
         if str(self.dlg_draw_profile.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            self.controller.show_warning(str(message))
+            self.controller.show_warning(message)
             return
 
-        # Check if title
-        title = self.dlg_draw_profile.title.text()
+        # Check if template file exists
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
+        if not os.path.exists(template_path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=template_path)
+            return
 
         # Check if composer exist
-        index = 0
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
-            
-        if index == num_comp:
+        composers = self.get_composers_list()
+        index = self.get_composer_index(str(self.template))
+
+        # Composer not found
+        if index == len(composers):
+
             # Create new composer with template selected in combobox(self.template)
-            template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            template_file = file(template_path, 'rt')
+            template_file = open(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()
             document.setContent(template_content)
-            comp_view = self.iface.createNewComposer(str(self.template))
-            comp_view.composition().loadFromTemplate(document)
+
+            # TODO: Test it!
+            if Qgis.QGIS_VERSION_INT < 29900:
+                comp_view = self.iface.createNewComposer(str(self.template))
+                comp_view.composition().loadFromTemplate(document)
+            else:
+                project = QgsProject.instance()
+                comp_view = QgsLayout(project)
+                comp_view.loadFromTemplate(document)
+                layout_manager = project.layoutManager()
+                layout_manager.addLayout(comp_view)
+
+        else:
+            comp_view = composers[index]
+
+        # Manage profile layout
+        self.manage_profile_layout(comp_view, plugin_path)
+
+
+    def get_composers_list(self):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            active_composers = self.iface.activeComposers()
+        else:
+            layour_manager = QgsProject.instance().layoutManager().layouts()
+            active_composers = [layout for layout in layour_manager]
+
+        return active_composers
+
+
+    def get_composer_index(self, name):
+
         index = 0
-        composers = self.iface.activeComposers()
+        composers = self.get_composers_list()
         for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
+            composer_name = self.get_composer_name(comp_view)
+            if composer_name == name:
                 break
             index += 1
 
-        comp_view = self.iface.activeComposers()[index]
-        composition = comp_view.composition()
-        comp_view.composerWindow().show()
-        
-        # Set profile
-        picture_item = composition.getComposerItemById('profile')
-        profile = plugin_path + "\\templates\\profile.png"
-        picture_item.setPictureFile(profile)
+        return index
 
-        # Refresh map, zoom map to extent
-        map_item = composition.getComposerItemById('Mapa')
-        map_item.setMapCanvas(self.canvas)
-        map_item.zoomToExtent(self.canvas.extent())
 
+    def get_composer_name(self, composer):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            composer_name = composer.composerWindow().windowTitle()
+        else:
+            composer_name = composer.name()
+
+        return composer_name
+
+
+    def manage_profile_layout(self, layout, plugin_path):
+        """ Manage profile layout """
+
+        if layout is None:
+            self.controller.log_warning("Layout not found")
+            return
+
+        # Get values from dialog
+        profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
+        title = self.dlg_draw_profile.title.text()
+        if utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation) != 'null':
+            rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
+        else:
+            rotation = 0
         first_node = self.dlg_draw_profile.start_point.text()
         end_node = self.dlg_draw_profile.end_point.text()
 
-        # Fill data in composer template
-        first_node_item = composition.getComposerItemById('first_node')
-        first_node_item.setText(str(first_node))
-        end_node_item = composition.getComposerItemById('end_node')
-        end_node_item.setText(str(end_node))
-        length_item = composition.getComposerItemById('length')
-        length_item.setText(str(self.start_point[-1]))
-        profile_title = composition.getComposerItemById('title')
-        profile_title.setText(str(title))
+        if Qgis.QGIS_VERSION_INT < 29900:
 
-        composition.setAtlasMode(QgsComposition.PreviewAtlas)
-        # if self.dlg_draw_profile.rotation.text() == '':
+            # Show layout
+            main_window = layout.composerWindow()
+            # main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
+            main_window.show()
 
-        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
-        map_item.setMapRotation(rotation)
+            # Set profile
+            composition = layout.composition()
+            picture_item = composition.getComposerItemById('profile')
+            picture_item.setPictureFile(profile)
 
-        composition.refreshItems()
-        composition.update()
+            # Zoom map to extent, rotation
+            map_item = composition.getComposerItemById('Mapa')
+            map_item.setMapCanvas(self.canvas)
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+
+            # Fill data in composer template
+            first_node_item = composition.getComposerItemById('first_node')
+            first_node_item.setText(str(first_node))
+            end_node_item = composition.getComposerItemById('end_node')
+            end_node_item.setText(str(end_node))
+            length_item = composition.getComposerItemById('length')
+            length_item.setText(str(self.start_point[-1]))
+            profile_title = composition.getComposerItemById('title')
+            profile_title.setText(str(title))
+
+            # Preview Atlas and refresh items
+            composition.setAtlasMode(QgsComposition.PreviewAtlas)
+            composition.refreshItems()
+            composition.update()
+
+        # TODO: Test it!
+        else:
+
+            # Show layout
+            self.iface.openLayoutDesigner(layout)
+
+            # Set profile
+            picture_item = layout.itemById('profile')
+            picture_item.setPictureFile(profile)
+
+            # Zoom map to extent, rotation
+            map_item = layout.itemById('Mapa')
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+
+            # Fill data in composer template
+            first_node_item = layout.itemById('first_node')
+            first_node_item.setText(str(first_node))
+            end_node_item = layout.itemById('end_node')
+            end_node_item.setText(str(end_node))
+            length_item = layout.itemById('length')
+            length_item.setText(str(self.start_point[-1]))
+            profile_title = layout.itemById('title')
+            profile_title.setText(str(title))
+
+            # Refresh items
+            layout.refresh()
+            layout.updateBounds()
 
 
     def set_template(self):
+
         template = self.dlg_draw_profile.cbx_template.currentText()
         self.template = template[:-4]
 
@@ -1354,10 +1588,10 @@ class DrawProfiles(ParentMapTool):
     def export_pdf(self):
         """ Export PDF of selected template"""
 
-
         # Generate Composer
         self.execute_profiles_composer()
         self.generate_composer()
+
 
     def save_rotation_vdefault(self):
 
@@ -1366,23 +1600,21 @@ class DrawProfiles(ParentMapTool):
         rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation)
 
         if self.rotation_vd_exist:
-            self.controller.log_info(str("test1") + str(rotation))
             if str(rotation) != 'null':
-                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
-                       " SET value = '" + str(rotation) + "'"
-                       " WHERE parameter = 'rotation_vdefault'")
+                sql = ("UPDATE "+ tablename + " "
+                       "SET value = '" + rotation + "' "
+                       "WHERE parameter = 'rotation_vdefault'")
             else:
-                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
-                       " SET value = '0'"
-                       " WHERE parameter = 'rotation_vdefault'")
+                sql = ("UPDATE " + tablename + " "
+                       "SET value = '0' "
+                       "WHERE parameter = 'rotation_vdefault'")
         else:
             if str(rotation) != 'null':
-                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
-                       " VALUES ('rotation_vdefault', '" + str(
-                    rotation) + "', current_user)")
+                sql = ("INSERT INTO " + tablename + " (parameter, value, cur_user) "
+                       "VALUES ('rotation_vdefault', '" + rotation + "', current_user)")
             else:
-                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
-                       " VALUES ('rotation_vdefault', '0', current_user)")
+                sql = ("INSERT INTO " + tablename + " (parameter, value, cur_user) "
+                       "VALUES ('rotation_vdefault', '0', current_user)")
 
         if sql:
             self.controller.execute_sql(sql)
@@ -1393,11 +1625,11 @@ class DrawProfiles(ParentMapTool):
 
         self.arc_id = []
         self.node_id = []
-        for i in range(0, (len(list_points)-1)):
-            
+        for i in range(0, (len(list_points) - 1)):
+
             # return
             start_point = list_points[i]
-            end_point = list_points[i+1]
+            end_point = list_points[i + 1]
 
             self.rnode_id = []
             self.rarc_id = []
@@ -1405,7 +1637,7 @@ class DrawProfiles(ParentMapTool):
             rstart_point = None
             sql = ("SELECT rid"
                    " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-                   " WHERE node_id = '" + start_point + "'")
+                                                 " WHERE node_id = '" + start_point + "'")
             row = self.controller.get_row(sql)
             if row:
                 rstart_point = int(row[0])
@@ -1413,7 +1645,7 @@ class DrawProfiles(ParentMapTool):
             rend_point = None
             sql = ("SELECT rid"
                    " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-                   " WHERE node_id = '" + end_point + "'")
+                                                 " WHERE node_id = '" + end_point + "'")
             row = self.controller.get_row(sql)
             if row:
                 rend_point = int(row[0])
@@ -1451,7 +1683,7 @@ class DrawProfiles(ParentMapTool):
                 # Convert arc_ids
                 sql = ("SELECT arc_id"
                        " FROM " + self.schema_name + ".v_anl_pgrouting_arc"
-                       " WHERE id = '" + str(self.rarc_id[n]) + "'")
+                                                     " WHERE id = '" + str(self.rarc_id[n]) + "'")
                 row = self.controller.get_row(sql)
                 if row:
                     self.arc_id.append(str(row[0]))
@@ -1460,7 +1692,7 @@ class DrawProfiles(ParentMapTool):
                 # Convert node_ids
                 sql = ("SELECT node_id"
                        " FROM " + self.schema_name + ".v_anl_pgrouting_node"
-                       " WHERE rid = '" + str(self.rnode_id[m]) + "'")
+                                                     " WHERE rid = '" + str(self.rnode_id[m]) + "'")
                 row = self.controller.get_row(sql)
                 if row:
                     self.node_id.append(str(row[0]))
@@ -1469,11 +1701,11 @@ class DrawProfiles(ParentMapTool):
             for element_id in self.arc_id:
                 sql = ("SELECT sys_type"
                        " FROM " + self.schema_name + ".v_edit_arc"
-                       " WHERE arc_id = '" + str(element_id) + "'")
+                                                     " WHERE arc_id = '" + str(element_id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
-                
+
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
                 viewname = "v_edit_man_" + str(sys_type)
@@ -1491,11 +1723,11 @@ class DrawProfiles(ParentMapTool):
             for element_id in self.node_id:
                 sql = ("SELECT sys_type"
                        " FROM " + self.schema_name + ".v_edit_node"
-                       " WHERE node_id = '" + str(element_id) + "'")
+                                                     " WHERE node_id = '" + str(element_id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
                     return
-                
+
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
                 viewname = "v_edit_man_" + str(sys_type)
@@ -1514,11 +1746,11 @@ class DrawProfiles(ParentMapTool):
             for i in range(len(self.arc_id)):
                 expr_filter += "'" + str(self.arc_id[i]) + "', "
             expr_filter = expr_filter[:-2] + ")"
-            (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable       
+            (is_valid, expr) = self.check_expression(expr_filter, True)  # @UnusedVariable
             if not is_valid:
-                return                    
+                return
 
-            # Build a list of feature id's from the previous result
+                # Build a list of feature id's from the previous result
             # Select features with these id's
             it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
             self.id_list = [i.id() for i in it]
@@ -1567,7 +1799,6 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
             self.dlg_draw_profile.cbx_template.setDisabled(False)
 
-
         if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
             self.dlg_draw_profile.btn_delete_additional_point.setDisabled(False)
 
@@ -1586,6 +1817,7 @@ class DrawProfiles(ParentMapTool):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
+
         # Selected item from list
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
@@ -1593,8 +1825,8 @@ class DrawProfiles(ParentMapTool):
         answer = self.controller.ask_question(message, "Delete profile", selected_profile)
         if answer:
             # Delete selected profile
-            sql = ("DELETE FROM " + self.schema_name + ".anl_arc_profile_value"
-                   " WHERE profile_id = '" + str(selected_profile) + "'")
+            sql = ("DELETE FROM anl_arc_profile_value "
+                   "WHERE profile_id = '"+ selected_profile + "'")
             status = self.controller.execute_sql(sql)
             if not status:
                 message = "Error deleting profile"
@@ -1606,7 +1838,7 @@ class DrawProfiles(ParentMapTool):
 
         # Refresh list of arcs
         self.dlg_load.tbl_profiles.clear()
-        sql = "SELECT DISTINCT(profile_id) FROM " + self.schema_name + ".anl_arc_profile_value"
+        sql = "SELECT DISTINCT(profile_id) FROM anl_arc_profile_value"
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
@@ -1619,10 +1851,9 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_delete_additional_point.setDisabled(True)
         self.widget_additional_point.clear()
         self.start_end_node.pop(1)
-        # Reload path
         self.exec_path()
-        
-        
+
+
     def remove_selection(self):
         """ Remove selected features of all layers """
 
@@ -1630,6 +1861,125 @@ class DrawProfiles(ParentMapTool):
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()
         self.canvas.refresh()
-        
-                
-        
+
+
+    def manage_rejected(self):
+        self.close_dialog(self.dlg_draw_profile)
+        self.remove_vertex()
+
+
+    def fill_memory(self):
+        """ Get parameters from data base. Fill self.nodes with parameters postgres """
+
+        # self.nodes.clear()
+        bad_nodes_id = []
+
+        # Get parameters and fill the nodes
+        for i, node_id in enumerate(self.node_id):
+
+            # parameters : list of parameters for one node
+            parameters = NodeData()
+            parameters.start_point = self.start_point[i]
+            # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
+            # Change elev to sys_elev
+            sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code "
+                   "FROM v_edit_node "
+                   "WHERE node_id = '" + node_id + "'")
+            # query for nodes
+            # SELECT elevation AS top_elev, depth AS ymax, top_elev-depth AS sys_elev, nodecat_id, code"
+
+            row = self.controller.get_row(sql)
+            columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
+            if row:
+                if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None:
+                    bad_nodes_id.append(node_id)
+                # Check if we have all data for drawing
+                for x in range(len(columns)):
+                    if row[x] is None:
+                        sql = ("SELECT value::decimal(12,3) "
+                               "FROM config_param_system "
+                               "WHERE parameter = '" + columns[x] + "_vd'")
+                        result = self.controller.get_row(sql)
+                        row[x] = result[0]
+
+                parameters.top_elev = row[0]
+                parameters.ymax = row[1]
+                parameters.elev = row[2]
+                nodecat_id = row[3]
+                parameters.code = row[4]
+                parameters.node_id = str(node_id)
+
+            # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
+            # Change to elevmax1 and elevmax2
+            # Geom1 from cat_node
+            sql = ("SELECT geom1 "
+                   "FROM cat_node "
+                   "WHERE id = '" + nodecat_id + "'")
+            row = self.controller.get_row(sql)
+            columns = ['geom1']
+            if row:
+                if row[0] is None:
+                    bad_nodes_id.append(node_id)
+                # Check if we have all data for drawing
+                for x in range(0, len(columns)):
+                    if row[x] is None:
+                        sql = ("SELECT value::decimal(12,3) "
+                               "FROM config_param_system "
+                               "WHERE parameter = '" + columns[x] + "_vd'")
+                        result = self.controller.get_row(sql)
+                        row[x] = result[0]
+
+                parameters.geom = row[0]
+
+            # Set node_id in nodes
+            parameters.node_id = node_id
+            self.nodes.append(parameters)
+
+        n = 0
+        for element_id in self.arc_id:
+
+            sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, sys_y1 AS y1, sys_y2 AS y2, slope, node_1, node_2 "
+                   "FROM v_edit_arc "
+                   "WHERE arc_id = '" + element_id + "'")
+            row = self.controller.get_row(sql)
+
+            # TODO:: v_nodes -> query for arcs
+            # SELECT 0 AS z1, 0 AS z2 , dnom/1000, NULL as  sys_elev1,  NULL as  sys_elev2,  NULL as  y1,  NULL as  y2,   NULL as  slope, node_1, node_2,
+
+            columns = ['z1', 'z2', 'cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
+
+            # Check if self.nodes[n] is out of range
+            if n >= len(self.nodes):
+                return
+
+            if row:
+                # Check if we have all data for drawing
+                if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
+                        row[5] is None or row[6] is None or row[7] is None:
+                    bad_nodes_id.append(element_id)
+                for x in range(0, len(columns)):
+                    if row[x] is None:
+                        sql = ("SELECT value::decimal(12,3) "
+                               "FROM config_param_system "
+                               "WHERE parameter = '" + columns[x] + "_vd'")
+                        result = self.controller.get_row(sql)
+                        row[x] = result[0]
+
+                self.nodes[n].z1 = row[0]
+                self.nodes[n].z2 = row[1]
+                self.nodes[n].cat_geom = row[2]
+                self.nodes[n].elev1 = row[3]
+                self.nodes[n].elev2 = row[4]
+                self.nodes[n].y1 = row[5]
+                self.nodes[n].y2 = row[6]
+                self.nodes[n].slope = row[7]
+                self.nodes[n].node_1 = row[8]
+                self.nodes[n].node_2 = row[9]
+
+                n += 1
+
+        if not bad_nodes_id:
+            return
+
+        message = "Some parameters are missing (Values Defaults used for)"
+        self.controller.show_info_box(message, "Info", str(bad_nodes_id))
