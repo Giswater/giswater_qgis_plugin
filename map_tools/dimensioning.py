@@ -26,9 +26,12 @@ class Dimensioning(ParentMapTool):
     def open_new_dimensioning(self, feature_id):
         self.layer.featureAdded.disconnect(self.open_new_dimensioning)
         feature = self.get_feature_by_id(self.layer, feature_id)
-
         idx = self.layer.fields().indexFromName("id")
         new_feature_id = self.layer.maximumValue(idx)
+        
+        # Control when layer haven't rows
+        if not new_feature_id:
+            new_feature_id = 0
         new_feature_id = int(new_feature_id) + 1
         
         self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
