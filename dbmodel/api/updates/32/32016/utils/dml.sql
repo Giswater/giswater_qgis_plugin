@@ -23,3 +23,8 @@ INSERT INTO audit_cat_table VALUES ('config_api_visit_x_featuretable', 'System',
 
 INSERT INTO audit_cat_table VALUES ('ve_config_addfields', 'System', 'View which shows existent addfields and its configuration', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_table VALUES ('ve_config_sys_fields', 'System', 'Shows ', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+
+
+update config_api_form_fields set ismandatory=false where column_id = 'arc_id';
+update config_api_form_fields set ismandatory=false where column_id = 'node_id';
+update config_api_form_fields set ismandatory=false where column_id = 'connec_id';
