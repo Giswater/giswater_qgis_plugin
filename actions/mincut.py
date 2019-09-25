@@ -1939,7 +1939,7 @@ class MincutParent(ParentAction):
         self.params = {}
         sql = ("SELECT parameter, value FROM config_param_system"
                " WHERE context = 'searchplus' ORDER BY parameter")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if rows:
             for row in rows:
                 self.params[row['parameter']] = str(row['value'])
@@ -1952,7 +1952,7 @@ class MincutParent(ParentAction):
         self.scale_zoom = 2500
         sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'scale_zoom'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if row:
             self.scale_zoom = row['value']
             
@@ -2201,15 +2201,14 @@ class MincutParent(ParentAction):
             return
         sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'street_field_expl'")
-        self.street_field_expl = self.controller.get_row(sql)
+        self.street_field_expl = self.controller.get_row(sql, commit=True)
         if not self.street_field_expl:
             message = "Param street_field_expl not found"
             self.controller.show_warning(message)
             return
-
         sql = ("SELECT value FROM config_param_system"
                " WHERE parameter = 'portal_field_postal'")
-        portal_field_postal = self.controller.get_row(sql)
+        portal_field_postal = self.controller.get_row(sql, commit=True)
         if not portal_field_postal:
             message = "Param portal_field_postal not found"
             self.controller.show_warning(message)
@@ -2226,7 +2225,7 @@ class MincutParent(ParentAction):
             sql = (f"SELECT {self.params['expl_field_name']}"
                    f" FROM {self.params['expl_layer']}"
                    f" WHERE {self.params['expl_field_code']} = {expl_id}")
-            row = self.controller.get_row(sql, log_sql=False)
+            row = self.controller.get_row(sql, commit=True)
             if row:
                 utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
 
