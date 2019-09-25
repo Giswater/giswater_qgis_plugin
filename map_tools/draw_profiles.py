@@ -19,7 +19,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import QgsLayout
 
-from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject
+from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
@@ -126,8 +126,12 @@ class DrawProfiles(ParentMapTool):
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        template_folder = plugin_path + os.sep + "templates"
-        template_files = os.listdir(template_folder)
+        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
+        if not os.path.exists(template_path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=template_path)
+            return
+        template_files = os.listdir(template_path)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
 
         self.dlg_draw_profile.cbx_template.clear()
@@ -1466,7 +1470,11 @@ class DrawProfiles(ParentMapTool):
 
         # Check if template file exists
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
+        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
+        if not os.path.exists(template_path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=template_path)
+            return
         if not os.path.exists(template_path):
             message = "File not found"
             self.controller.show_warning(message, parameter=template_path)
@@ -1486,16 +1494,12 @@ class DrawProfiles(ParentMapTool):
             document = QDomDocument()
             document.setContent(template_content)
 
-            # TODO: Test it!
-            if Qgis.QGIS_VERSION_INT < 29900:
-                comp_view = self.iface.createNewComposer(str(self.template))
-                comp_view.composition().loadFromTemplate(document)
-            else:
-                project = QgsProject.instance()
-                comp_view = QgsLayout(project)
-                comp_view.loadFromTemplate(document)
-                layout_manager = project.layoutManager()
-                layout_manager.addLayout(comp_view)
+            project = QgsProject.instance()
+            comp_view = QgsPrintLayout(project)
+
+            comp_view.loadFromTemplate(document, QgsReadWriteContext())
+            layout_manager = project.layoutManager()
+            layout_manager.addLayout(comp_view)
 
         else:
             comp_view = composers[index]
@@ -1518,67 +1522,31 @@ class DrawProfiles(ParentMapTool):
         first_node = self.dlg_draw_profile.start_point.text()
         end_node = self.dlg_draw_profile.end_point.text()
 
-        if Qgis.QGIS_VERSION_INT < 29900:
+        # Show layout
+        self.iface.openLayoutDesigner(layout)
 
-            # Show layout
-            main_window = layout.composerWindow()
-            #main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
-            main_window.show()
+        # Set profile
+        picture_item = layout.itemById('profile')
+        picture_item.setPicturePath(profile)
 
-            # Set profile
-            composition = layout.composition()
-            picture_item = composition.getComposerItemById('profile')
-            picture_item.setPictureFile(profile)
+        # Zoom map to extent, rotation
+        map_item = layout.itemById('Mapa')
+        map_item.zoomToExtent(self.canvas.extent())
+        map_item.setMapRotation(rotation)
 
-            # Zoom map to extent, rotation
-            map_item = composition.getComposerItemById('Mapa')
-            map_item.setMapCanvas(self.canvas)
-            map_item.zoomToExtent(self.canvas.extent())
-            map_item.setMapRotation(rotation)
+        # Fill data in composer template
+        first_node_item = layout.itemById('first_node')
+        first_node_item.setText(str(first_node))
+        end_node_item = layout.itemById('end_node')
+        end_node_item.setText(str(end_node))
+        length_item = layout.itemById('length')
+        length_item.setText(str(self.start_point[-1]))
+        profile_title = layout.itemById('title')
+        profile_title.setText(str(title))
 
-            # Fill data in composer template
-            first_node_item = composition.getComposerItemById('first_node')
-            first_node_item.setText(str(first_node))
-            end_node_item = composition.getComposerItemById('end_node')
-            end_node_item.setText(str(end_node))
-            length_item = composition.getComposerItemById('length')
-            length_item.setText(str(self.start_point[-1]))
-            profile_title = composition.getComposerItemById('title')
-            profile_title.setText(str(title))
-
-            # Preview Atlas and refresh items
-            composition.setAtlasMode(QgsComposition.PreviewAtlas)
-            composition.refreshItems()
-            composition.update()
-
-        # TODO: Test it!
-        else:
-
-            # Show layout
-            self.iface.openLayoutDesigner(layout)
-
-            # Set profile
-            picture_item = layout.itemById('profile')
-            picture_item.setPictureFile(profile)
-
-            # Zoom map to extent, rotation
-            map_item = layout.itemById('Mapa')
-            map_item.zoomToExtent(self.canvas.extent())
-            map_item.setMapRotation(rotation)
-
-            # Fill data in composer template
-            first_node_item = layout.itemById('first_node')
-            first_node_item.setText(str(first_node))
-            end_node_item = layout.itemById('end_node')
-            end_node_item.setText(str(end_node))
-            length_item = layout.itemById('length')
-            length_item.setText(str(self.start_point[-1]))
-            profile_title = layout.itemById('title')
-            profile_title.setText(str(title))
-
-            # Refresh items
-            layout.refresh()
-            layout.updateBounds()
+        # Refresh items
+        layout.refresh()
+        layout.updateBounds()
 
 
     def set_template(self):
