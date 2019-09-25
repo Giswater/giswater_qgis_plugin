@@ -119,12 +119,13 @@ CREATE TRIGGER gw_trg_plan_psector_x_node_geom  AFTER INSERT OR UPDATE OR DELETE
 FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('plan');
 
 DROP TRIGGER IF EXISTS gw_trg_om_psector_x_arc ON "SCHEMA_NAME".om_psector_x_arc;
-CREATE TRIGGER gw_trg_om_psector_x_arc  AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".om_psector_x_arc 
-FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('om');
+--25/09 - create trg commented because om_psector disappears in 3.2 version (updates 32016)
+--CREATE TRIGGER gw_trg_om_psector_x_arc  AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".om_psector_x_arc 
+--FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('om');
  
 DROP TRIGGER IF EXISTS gw_trg_om_psector_x_node ON "SCHEMA_NAME".om_psector_x_node;
-CREATE TRIGGER gw_trg_om_psector_x_node AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".om_psector_x_node 
-FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('om');
+--CREATE TRIGGER gw_trg_om_psector_x_node AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".om_psector_x_node 
+--FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('om');
 
 DROP TRIGGER IF EXISTS gw_trg_topocontrol_node ON "SCHEMA_NAME".node;
 CREATE TRIGGER gw_trg_topocontrol_node BEFORE INSERT OR UPDATE OF the_geom, "state" ON "SCHEMA_NAME".node
