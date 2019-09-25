@@ -435,7 +435,6 @@ IF v_multi_create IS TRUE THEN
 		v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
 		v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
 
-		
 		--replace the existing view and create the trigger
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 		
@@ -500,8 +499,8 @@ ELSE
 
 	--get old values of addfields
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) != 0 THEN
-		SELECT lower(string_agg(concat('a.',param_name),',' order by orderby)) as a_param,
-		lower(string_agg(concat('ct.',param_name),',' order by orderby)) as ct_param,
+		SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+		lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
 		lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 		lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 		INTO v_old_parameters
@@ -582,7 +581,6 @@ ELSE
 		INTO v_new_parameters
 		FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
 		
-
 		--select columns from man_* table without repeating the identifier
 		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
 		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
@@ -670,7 +668,7 @@ ELSE
 		v_definition = replace(v_definition,v_old_parameters.a_param,v_new_parameters.a_param);
 		v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
 		v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
-		
+
 		--replace the existing view and create the trigger
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 		
@@ -684,6 +682,8 @@ ELSE
 	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
 
 END IF;
+
+PERFORM SCHEMA_NAME.gw_fct_admin_role_permissions();
 	--    Control NULL's
 	--v_message := COALESCE(v_message, '');
 	
