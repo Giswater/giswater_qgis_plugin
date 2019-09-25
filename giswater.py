@@ -913,7 +913,7 @@ class Giswater(QObject):
                    f"   WHERE table_schema = '{schema_name}')")
 
             child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
-            child_layers.insert(0, ['ALL', 'ALL'])
+            child_layers.insert(0, ['Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
                 action = QAction(str(child_layer[0]), sub_menu, checkable=True)
@@ -928,7 +928,7 @@ class Giswater(QObject):
                     action.setChecked(True)
 
                 sub_menu.addAction(action)
-                if child_layer[0] == 'ALL':
+                if child_layer[0] == 'Load all':
                     action.triggered.connect(partial(self.put_layer_into_toc, child_layers=child_layers))
                 else:
                     action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], "the_geom", child_layer[1]+"_id", None))
