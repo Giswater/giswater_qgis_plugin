@@ -73,9 +73,9 @@ INSERT INTO sys_fprocess_cat VALUES (47, 'Static pressure value', 'om', 'Static 
 
 -- 19/06/2019
 
-INSERT INTO config_client_forms VALUES(19065, 'update_fields', 'utils', 'config_api_form_fields', 'layout_id', 5, FALSE);
-INSERT INTO config_client_forms VALUES(19066, 'update_fields', 'utils', 'config_api_form_fields', 'layout_order', 6, FALSE);
-INSERT INTO config_client_forms VALUES(19067, 'update_fields', 'utils', 'config_api_form_fields', 'layout_name', 32, FALSE);
+INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) VALUES('update_fields', 'utils', 'config_api_form_fields', 'layout_id', 5, FALSE);
+INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) VALUES('update_fields', 'utils', 'config_api_form_fields', 'layout_order', 6, FALSE);
+INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) VALUES('update_fields', 'utils', 'config_api_form_fields', 'layout_name', 32, FALSE);
 
 -- deprecate variables due new approach of grafanalytics faster an simple
 UPDATE audit_cat_param_user SET isdeprecated = true WHERE id='om_mincut_analysis_dminsector';

@@ -71,3 +71,4 @@ INSERT INTO audit_cat_function VALUES (2726, 'gw_fct_rpt2pg_main', 'utils', 'fun
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('plan_statetype_reconstruct','4','integer', 'plan', 'Value used to identify reconstruct arcs in order to manage length of planified network') ON CONFLICT (parameter) DO NOTHING;
 							
+INSERT INTO price_compost SELECT id, unit, descript, text, price, pricecat_id FROM _price_simple_;
