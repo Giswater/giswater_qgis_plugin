@@ -478,7 +478,7 @@ INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('action_function
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('action_function_typevalue','action_catalog','action_catalog');
 
 INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('config_api_typevalue','action_function_typevalue','config_api_message','action_function');
+VALUES ('config_api_typevalue','action_function_typevalue','config_api_form_fields','action_function');
 
 DELETE FROM config_api_visit WHERE visitclass_id NOT IN (SELECT id FROM om_visit_class);
 DELETE FROM config_api_visit_x_featuretable WHERE visitclass_id NOT IN (SELECT id FROM om_visit_class);
