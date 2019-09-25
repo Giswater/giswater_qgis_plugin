@@ -1576,22 +1576,13 @@ class ApiCF(ApiParent):
         btn_open_visit_doc.clicked.connect(self.open_visit_doc)
         btn_open_visit_event.clicked.connect(self.open_visit_event)
 
-        feature_key = self.controller.get_layer_primary_key()
-        if feature_key == 'node_id':
-            feature_type = 'NODE'
-        if feature_key == 'connec_id':
-            feature_type = 'CONNEC'
-        if feature_key == 'arc_id':
-            feature_type = 'ARC'
-        if feature_key == 'gully_id':
-            feature_type = 'GULLY'
-
+        feature_type = {'arc_id': 'ARC', 'connec_id': 'CONNEC', 'gully_id': 'GULLY', 'node_id': 'NODE'}
         table_name_event_id = "om_visit_parameter"
 
         # Fill ComboBox event_id
         sql = (f"SELECT DISTINCT(id), id "
                f"FROM {table_name_event_id} "
-               f"WHERE feature_type = '{feature_type}' OR feature_type = 'ALL' "
+               f"WHERE feature_type = '{feature_type[self.field_id]}' OR feature_type = 'ALL' "
                f"ORDER BY id")
         rows = self.controller.get_rows(sql, commit=True)
         if rows:
@@ -1600,7 +1591,7 @@ class ApiCF(ApiParent):
         # Fill ComboBox event_type
         sql = (f"SELECT DISTINCT(parameter_type), parameter_type "
                f"FROM {table_name_event_id} "
-               f"WHERE feature_type = '{feature_type}' OR feature_type = 'ALL' "
+               f"WHERE feature_type = '{feature_type[self.field_id]}' OR feature_type = 'ALL' "
                f"ORDER BY parameter_type")
         rows = self.controller.get_rows(sql, commit=True)
         if rows:
@@ -1783,24 +1774,14 @@ class ApiCF(ApiParent):
         table_name_event_id = "om_visit_parameter"
         event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
 
-        # Get type of feature
-        feature_key = self.controller.get_layer_primary_key()
-        if feature_key == 'node_id':
-            feature_type = 'NODE'
-        if feature_key == 'connec_id':
-            feature_type = 'CONNEC'
-        if feature_key == 'arc_id':
-            feature_type = 'ARC'
-        if feature_key == 'gully_id':
-            feature_type = 'GULLY'
-
+        feature_type = {'arc_id': 'ARC', 'connec_id': 'CONNEC', 'gully_id': 'GULLY', 'node_id': 'NODE'}
         # Fill ComboBox event_id
         sql = (f"SELECT DISTINCT(id), id FROM {table_name_event_id}"
-               f" WHERE (feature_type = '{feature_type}' OR feature_type = 'ALL')")
+               f" WHERE (feature_type = '{feature_type[self.field_id]}' OR feature_type = 'ALL')")
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         rows.append(['', ''])
         utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
 
