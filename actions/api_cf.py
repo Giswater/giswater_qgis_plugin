@@ -271,11 +271,12 @@ class ApiCF(ApiParent):
         # When info is nothing
         if 'results' in row[0]:
             if row[0]['results'] == 0:
-                self.controller.show_message(row[0]['message']['text'], 1)
+                self.controller.show_message(row[0]['message']['text'], 0)
                 return False, None
 
         # When insert feature failed
         if row[0]['status'] == "Failed":
+            print(str("TEST3"))
             self.controller.show_message(row[0]['message']['text'], 2)
             return False, None
 
