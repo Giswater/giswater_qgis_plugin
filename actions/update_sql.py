@@ -2630,14 +2630,28 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgettype_typevalue'")
+        sql = ("SELECT null as id, null as idval UNION ALL "
+               " SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgettype_typevalue'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
-        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'datatype_typevalue'")
+        sql = ("SELECT null as id, null as idval UNION ALL "
+               " SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'datatype_typevalue'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
+
+        # Populate action_function combo
+        sql = ("SELECT null as id, null as idval UNION ALL "
+               " SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'action_function_typevalue'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_fields.action_function, rows, 1)
+
+        # Populate widgetfunction combo
+        sql = ("SELECT null as id, null as idval UNION ALL "
+               " SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgetfunction_typevalue'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
         utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
