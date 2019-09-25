@@ -14,11 +14,6 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsComposition
-else:
-    from qgis.core import QgsLayout
-
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt
