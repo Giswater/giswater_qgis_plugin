@@ -49,6 +49,6 @@ CREATE OR REPLACE RULE insert_plan_psector_x_gully AS ON INSERT TO gully WHERE N
 INSERT INTO plan_psector_x_gully (gully_id, psector_id, state, doable) 
 VALUES (new.gully_id, (SELECT value::integer FROM config_param_user WHERE parameter='psector_vdefault' and cur_user="current_user"()LIMIT 1),1,TRUE);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"lastupdate", "dataType":"timestamp without time zone"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);

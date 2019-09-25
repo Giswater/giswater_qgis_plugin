@@ -63,18 +63,18 @@ VALUES (new.connec_id, (SELECT value::integer FROM config_param_user WHERE param
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"vnode", "column":"rotation", "dataType":"numeric(6,3)"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"lastupdate", "dataType":"timestamp without time zone"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lastupdate", "dataType":"timestamp without time zone"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lastupdate", "dataType":"timestamp without time zone"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lastupdate", "dataType":"timestamp without time zone DEFAULT now()"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lastupdate", "dataType":"timestamp without time zone"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lastupdate_user", "dataType":"character varying(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"insert_user", "dataType":"character varying(50) DEFAULT current_user"}}$$);
