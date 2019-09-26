@@ -109,11 +109,6 @@ tabactions='[{"actionName":"actionEdit", "actionFunction":"", "actionTooltip":"a
 WHERE id=564;
 
 
--- 14/05/2019
-UPDATE cat_feature SET type = 'arc', parent_layer = 'v_edit_arc' WHERE feature_type = 'ARC';
-UPDATE cat_feature SET type = 'node', parent_layer = 'v_edit_node' WHERE feature_type = 'NODE';
-UPDATE cat_feature SET type = 'connec', parent_layer = 'v_edit_connec'  WHERE feature_type = 'CONNEC';
-
 
 INSERT INTO config_api_form_tabs VALUES (567, 've_arc', 'tab_data', 'Data', 'Data', 'role_basic', 'Dades',NULL, '[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false}]', 9);
 INSERT INTO config_api_form_tabs VALUES (568, 've_node', 'tab_data', 'Data', 'Data', 'role_basic', 'Dades',NULL, '[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false}]', 9);

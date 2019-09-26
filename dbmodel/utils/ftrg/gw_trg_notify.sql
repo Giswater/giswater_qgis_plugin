@@ -52,7 +52,7 @@ BEGIN
 										UNION SELECT id FROM arc_type  WHERE active IS TRUE
 										UNION SELECT id FROM connec_type  WHERE active IS TRUE
 										)
-										AND type = '''||(rec_layers)||''''
+										AND lower(feature_type) = '''||(rec_layers)||''''
 						INTO v_child_layer;
 						
 					ELSIF v_project_type ='UD' THEN
@@ -61,11 +61,11 @@ BEGIN
 										UNION SELECT id FROM connec_type  WHERE active IS TRUE
 										UNION SELECT id FROM gully_type  WHERE active IS TRUE
 										)
-										AND type = '''||(rec_layers)||''''
+										AND lower(feature_type) = '''||(rec_layers)||''''
 						INTO v_child_layer;
 					END IF;
 
-					EXECUTE ' SELECT  json_agg(DISTINCT parent_layer) FROM cat_feature WHERE type = '''||(rec_layers)||''''
+					EXECUTE ' SELECT  json_agg(DISTINCT parent_layer) FROM cat_feature WHERE lower(feature_type) = '''||(rec_layers)||''''
 					INTO v_parent_layer;
 					--concatenate the notification out of parameters
 					--concatenation for arc,node,connec,gully which have child layers
