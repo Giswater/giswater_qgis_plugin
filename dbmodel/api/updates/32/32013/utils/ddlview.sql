@@ -52,7 +52,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
     CREATE OR REPLACE VIEW ve_config_sys_fields as
-    SELECT id, 
+    SELECT config_api_form_fields.id, 
     formname, 
     column_id,
     label, 
@@ -67,7 +67,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
     placeholder, 
     editability,
     stylesheet,
-    hidden
+    hidden,
+    cat_feature.id as cat_feature_id
       FROM config_api_form_fields
+      LEFT JOIN cat_feature ON cat_feature.child_layer::text = config_api_form_fields.formname::text
       WHERE formtype='feature' and (formname!='ve_arc' and formname!='ve_node' and formname!='ve_connec'and formname!='ve_gully')
       AND column_id NOT IN (SELECT param_name FROM man_addfields_parameter);

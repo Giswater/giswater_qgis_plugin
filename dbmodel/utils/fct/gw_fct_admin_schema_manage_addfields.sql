@@ -276,10 +276,10 @@ IF v_multi_create IS TRUE THEN
 		END IF;
 
 		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
-      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc)
+      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id )
 		VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 		v_isenabled, 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
-		v_dv_querytext, v_dv_querytext_filterc);
+		v_dv_querytext, v_dv_querytext_filterc,v_param_name );
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
@@ -538,11 +538,11 @@ ELSE
 		END IF;
 
 		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
-      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc)
+      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id)
 		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
 		concat('Default value of addfield ',v_param_name, 'for ', v_cat_feature), 
 		'role_edit', v_param_name, v_isenabled, 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
-		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc);
+		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name);
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
