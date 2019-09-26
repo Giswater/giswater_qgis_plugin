@@ -324,33 +324,37 @@ VALUES ('v_edit_vnode','form', 'state', null, null, true, 'integer',  'combo', t
 
 --element
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'elementcat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_element WHERE id IS NOT NULL','elementcat_id');
+VALUES ('v_edit_element','form', 'element_id', 1, 1, true, 'string',  'text', true, NULL,'Element id');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'expl_id', null, null, true, 'integer',  'combo', true, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', 'expl_id');
+VALUES ('v_edit_element','form', 'code', 1, 2, true, 'string',  'text', true, NULL,'Code');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'dma_id', null, null, true, 'integer',  'combo', true, 'SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL', 'dma_id');
+VALUES ('v_edit_element','form', 'elementcat_id', 1, 3, true, 'string',  'text', true, NULL,'Catalog');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'state', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state WHERE id IS NOT NULL', 'state');
+VALUES ('v_edit_element','form', 'expl_id', 1, 4, true, 'integer',  'text', true, NULL, 'Exploitation');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'state_type', null, null, true, 'integer',  'combo', true, 'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL','state_type');
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, typeahead)
-VALUES ('v_edit_element','form', 'workcat_id', null, null, true, 'string',  'typeahead', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id', '{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}');
-INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label, typeahead)
-VALUES ('v_edit_element','form', 'workcat_id_end', null, null, true, 'string',  'typeahead', true, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL','workcat_id_end','{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}');
+VALUES ('v_edit_element','form', 'dma_id', 1, 5, true, 'integer',  'text', true, NULL, 'Dma');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'ownercat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_owner WHERE id IS NOT NULL','ownercat_id');
+VALUES ('v_edit_element','form', 'state', 1, 6, true, 'integer',  'text', true, NULL, 'State');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'buildercat_id', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM cat_builder WHERE id IS NOT NULL','buildercat_id');
+VALUES ('v_edit_element','form', 'state_type', 1, 7, true, 'integer',  'text', true, NULL,'State type');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'verified', null, null, true, 'string',  'combo', true, 'SELECT id, id as idval FROM value_verified WHERE id IS NOT NULL', 'verified');
+VALUES ('v_edit_element','form', 'workcat_id', 1, 8, true, 'string',  'text', true, NULL, 'Workcat');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'function_type', null, null, true, 'string',  'combo', true, 'SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type = ''ELEMENT''', 'function_type');
+VALUES ('v_edit_element','form', 'workcat_id_end', 1, 9, true, 'string',  'text', true, NULL, 'Workcat end');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'category_type', null, null, true, 'string',  'combo', true, 'SELECT category_type as id, category_type as idval FROM man_type_category WHERE feature_type = ''ELEMENT''', 'category_type');
+VALUES ('v_edit_element','form', 'ownercat_id', null, null, true, 'string',  'text', true, NULL,'Owner');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'location_type', null, null, true, 'string',  'combo', true, 'SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type = ''ELEMENT''', 'location_type');
+VALUES ('v_edit_element','form', 'buildercat_id', null, null, true, 'string',  'text', true, NULL,'Builder');
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
-VALUES ('v_edit_element','form', 'fluid_type', null, null, true, 'string',  'combo', true, 'SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type = ''ELEMENT''', 'fluid_type');
+VALUES ('v_edit_element','form', 'verified', null, null, true, 'string',  'text', true, NULL, 'Verified');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'function_type', null, null, true, 'string',  'text', true, NULL, 'Function type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'category_type', null, null, true, 'string',  'text', true, NULL, 'Category type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'location_type', null, null, true, 'string',  'text', true, NULL, 'Location type');
+INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)
+VALUES ('v_edit_element','form', 'fluid_type', null, null, true, 'string',  'text', true, NULL, 'Fluid type');
 
 --samplepoint
 INSERT INTO config_api_form_fields(formname, formtype, column_id, layout_id, layout_order, isenabled,datatype, widgettype, iseditable, dv_querytext, label)

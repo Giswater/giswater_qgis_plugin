@@ -14,8 +14,12 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"NETINIT"},
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"T"},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}$$);
+
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
+
 
 */
 
@@ -53,6 +57,12 @@ BEGIN
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
 
+	IF v_cat_feature IS NULL THEN
+
+	v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
+
+	END IF;
+
 --if the view should be created for all the features loop over the cat_features
 IF v_multi_create IS TRUE THEN
 raise notice 'MULTI';
@@ -74,8 +84,8 @@ raise notice 'MULTI';
 		v_definition = null;
 		
 		--get the system type and system_id of the feature and view name
-		v_feature_type = (SELECT type FROM cat_feature where id=rec.id);
-		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
+		v_feature_type = lower(rec.feature_type);
+		v_feature_system_id  = lower(rec.system_id);
 		v_cat_feature = rec.id;
 		
 		--create a child view name if doesnt exist
