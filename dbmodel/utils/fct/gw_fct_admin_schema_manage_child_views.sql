@@ -84,8 +84,8 @@ raise notice 'MULTI';
 		END IF;
 		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
 
-		IF v_viewname ilike '%-%' OR v_viewname ilike '% %' THEN
-			v_viewname = replace(replace(v_viewname,'-','_'),' ','_');
+		IF v_viewname ilike '%-%' OR v_viewname ilike '% %' OR v_viewname ilike '%.%' THEN
+			v_viewname = replace(replace(replace(v_viewname,'-','_'),' ','_'),'.','_');
 			UPDATE cat_feature SET child_layer=v_viewname WHERE id=rec.id;
 		END IF;
 
@@ -209,8 +209,8 @@ raise notice 'SIMPLE';
 	END IF;
 	v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
 
-	IF v_viewname ilike '%-%' OR v_viewname ilike '% %' THEN
-		v_viewname = replace(replace(v_viewname,'-','_'),' ','_');
+	IF v_viewname ilike '%-%' OR v_viewname ilike '% %' OR v_viewname ilike '%.%' THEN
+			v_viewname = replace(replace(replace(v_viewname,'-','_'),' ','_'),'.','_');
 		UPDATE cat_feature SET child_layer=v_viewname WHERE id=v_cat_feature;
 	END IF;
 	--check if the defined view exists
