@@ -2556,6 +2556,7 @@ class UpdateSQL(ApiParent):
 
         # Set listeners
         self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
         self.dlg_manage_sys_fields.tbl_update.doubleClicked.connect(
             partial(self.update_selected_sys_fild, self.dlg_manage_sys_fields.tbl_update))
         self.dlg_manage_sys_fields.btn_open.clicked.connect(
@@ -2630,7 +2631,7 @@ class UpdateSQL(ApiParent):
         # Set listeners
         self.dlg_manage_sys_fields.btn_accept.clicked.connect(
             partial(self.manage_sys_update, form_name_fields))
-        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.manage_close_dlg, self.dlg_manage_sys_fields))
 
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
@@ -2681,7 +2682,7 @@ class UpdateSQL(ApiParent):
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
             partial(self.manage_accept, 'Update', form_name_fields, self.model_update_table))
-        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
+        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.manage_close_dlg, self.dlg_manage_fields))
 
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
@@ -2799,6 +2800,14 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
+
+
+    def manage_close_dlg(self, dlg_to_close):
+        self.close_dialog(dlg_to_close)
+        if dlg_to_close.objectName() == 'dlg_man_sys_fields':
+            self.update_sys_fields()
+        elif dlg_to_close.objectName() == 'dlg_man_addfields':
+            self.open_manage_field('Update')
 
     def manage_sys_update(self, form_name):
         list_widgets = self.dlg_manage_sys_fields.Create.findChildren(QWidget)
