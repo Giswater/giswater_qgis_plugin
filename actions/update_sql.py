@@ -64,6 +64,9 @@ class UpdateSQL(ApiParent):
         sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
         self.controller.execute_sql(sql)
 
+        # Declare variable superusers
+        self.super_users = []
+        
         # Check if connection is still False
         connection_status, not_version = self.controller.set_database_connection()
 
@@ -247,7 +250,6 @@ class UpdateSQL(ApiParent):
         self.open_dialog(self.dlg_readsql)
 
         super_users = self.settings.value('system_variables/super_users')
-        self.super_users = []
         for super_user in super_users:
 
             self.super_users.append(str(super_user))
