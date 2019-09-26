@@ -906,7 +906,7 @@ class Giswater(QObject):
             sub_menu = main_menu.addMenu(str(parent_layer[0]))
 
             # Get child layers
-            sql = (f"SELECT DISTINCT(child_layer), type FROM cat_feature "
+            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type) as type FROM cat_feature "
                    f"WHERE parent_layer = '{parent_layer[1]}' "
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
