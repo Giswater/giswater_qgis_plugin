@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_man_addfields</class>
- <widget class="QDialog" name="dlg_man_addfields">
+ <class>dlg_man_sys_fields</class>
+ <widget class="QDialog" name="dlg_man_sys_fields">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -46,7 +46,7 @@
     </layout>
    </item>
    <item row="0" column="0">
-    <widget class="QTabWidget" name="tab_add_fields">
+    <widget class="QTabWidget" name="tab_sys_add_fields">
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>565</width>
-            <height>780</height>
+            <width>594</width>
+            <height>689</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">

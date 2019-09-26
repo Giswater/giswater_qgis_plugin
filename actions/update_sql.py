@@ -39,7 +39,7 @@ import xml.etree.cElementTree as ET
 from .. import utils_giswater
 from .api_parent import ApiParent
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam
+    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields
 from .create_gis_project import CreateGisProject
 
 
@@ -233,6 +233,8 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
         self.dlg_readsql.btn_create_view.clicked.connect(partial(self.create_child_view))
+
+        self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self.update_sys_fields))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -2474,7 +2476,7 @@ class UpdateSQL(ApiParent):
             self.dlg_readsql.cmb_feature_name_view.clear()
             self.dlg_readsql.cmb_formname_fields.clear()
             self.dlg_readsql.cmb_formname_ui.clear()
-
+            self.dlg_readsql.cmb_feature_sys_fields.clear()
             return
 
         else:
@@ -2516,7 +2518,7 @@ class UpdateSQL(ApiParent):
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
-
+            utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
 
     def create_child_view(self):
         """ Create child view """
@@ -2534,6 +2536,36 @@ class UpdateSQL(ApiParent):
         sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_child_views($${" + body + "}$$)::text")
         status = self.controller.execute_sql(sql, log_sql=True, commit=True)
         self.manage_result_message(status, parameter="Created child view")
+
+
+    def update_sys_fields(self):
+
+        # Create the dialog and signals
+        self.dlg_manage_sys_fields = ManageSysFields()
+        self.load_settings(self.dlg_manage_sys_fields)
+        self.model_update_table = None
+
+        # Remove unused tabs
+        for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
+            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'Update':
+                utils_giswater.remove_tab_by_tabName(
+                    self.dlg_manage_sys_fields.tab_sys_add_fields, self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
+
+        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
+
+
+        # Set listeners
+        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.tbl_update.doubleClicked.connect(
+            partial(self.update_selected_sys_fild, self.dlg_manage_sys_fields.tbl_update))
+        self.dlg_manage_sys_fields.btn_open.clicked.connect(
+            partial(self.update_selected_sys_fild, self.dlg_manage_sys_fields.tbl_update))
+
+        window_title = 'Update field on "' + str(form_name_fields) + '"'
+        self.dlg_manage_sys_fields.setWindowTitle(window_title)
+        self.manage_update_sys_field(form_name_fields)
+
+        self.open_dialog(self.dlg_manage_sys_fields)
 
 
     def open_manage_field(self, action):
@@ -2577,7 +2609,64 @@ class UpdateSQL(ApiParent):
         self.open_dialog(self.dlg_manage_fields)
 
 
+    # TODO:: Enhance this function and use parametric parameters
+    def update_selected_sys_fild(self, widget):
+
+        selected_list = widget.selectionModel().selectedRows()
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        # Create the dialog and signals
+        self.close_dialog(self.dlg_manage_sys_fields)
+        self.dlg_manage_sys_fields = ManageSysFields()
+        self.load_settings(self.dlg_manage_sys_fields)
+        self.model_update_table = None
+
+        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+
+        # Set listeners
+        self.dlg_manage_sys_fields.btn_accept.clicked.connect(
+            partial(self.manage_sys_update, form_name_fields))
+        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
+
+        # Remove unused tabs
+        for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
+            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('Create'):
+                utils_giswater.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields,
+                                                     self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
+
+        window_title = 'Update field on "' + str(form_name_fields) + '"'
+        self.dlg_manage_sys_fields.setWindowTitle(window_title)
+        row = selected_list[0].row()
+
+        for column in range(widget.model().columnCount()):
+            index = widget.model().index(row, column)
+
+            result = utils_giswater.getWidget(self.dlg_manage_sys_fields,
+                                              str(widget.model().headerData(column, Qt.Horizontal)))
+
+            if result is None:
+                continue
+
+            value = str(widget.model().data(index))
+
+            if value == 'NULL':
+                value = None
+            utils_giswater.setWidgetText(self.dlg_manage_sys_fields, result, value)
+
+        self.open_dialog(self.dlg_manage_sys_fields)
+
+
     def update_selected_addfild(self, widget):
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
 
         # Create the dialog and signals
         self.close_dialog(self.dlg_manage_fields)
@@ -2588,7 +2677,7 @@ class UpdateSQL(ApiParent):
         form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
         self.dlg_manage_fields.column_id.setEnabled(False)
-        
+
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
             partial(self.manage_accept, 'Update', form_name_fields, self.model_update_table))
@@ -2602,13 +2691,6 @@ class UpdateSQL(ApiParent):
         window_title = 'Update field on "' + str(form_name_fields) + '"'
         self.dlg_manage_fields.setWindowTitle(window_title)
         self.manage_create_field(form_name_fields)
-
-        selected_list = widget.selectionModel().selectedRows()
-
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
 
         row = selected_list[0].row()
 
@@ -2658,6 +2740,18 @@ class UpdateSQL(ApiParent):
         # Set default value for formtype widget
         utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
+    # TODO:: Enhance this function and use parametric parameters
+    def manage_update_sys_field(self, form_name):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        # Populate table update
+        qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
+        self.model_update_table = QSqlTableModel()
+        qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
+        expr_filter = "cat_feature_id = '" + form_name + "'"
+        self.fill_table(qtable, 've_config_sys_fields', self.model_update_table, expr_filter)
+        self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sys_fields', schema_name)
 
     def manage_update_field(self, form_name):
 
@@ -2694,18 +2788,51 @@ class UpdateSQL(ApiParent):
 
         # Populate widgettype combo
         if self.chk_multi_insert:
-
             sql = ("SELECT DISTINCT(column_id), column_id "
                    "FROM " + schema_name + ".ve_config_addfields "
                    "WHERE cat_feature_id IS NULL ")
         else:
-
             sql = ("SELECT DISTINCT(column_id), column_id "
                    "FROM " + schema_name + ".ve_config_addfields "
                    "WHERE cat_feature_id = '" + form_name + "'")
 
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
+
+
+    def manage_sys_update(self, form_name):
+        list_widgets = self.dlg_manage_sys_fields.Create.findChildren(QWidget)
+        column_id = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
+        sql = f"UPDATE ve_config_sys_fields SET "
+        for widget in list_widgets:
+            if type(widget) not in (
+                    QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView,
+                    QGroupBox, QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
+
+                if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
+                    value = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, widget, return_string_null=False)
+                elif type(widget) is QComboBox:
+                    value = utils_giswater.get_item_data(self.dlg_manage_sys_fields, widget, 0)
+                elif type(widget) is QCheckBox:
+                    value = utils_giswater.isChecked(self.dlg_manage_sys_fields, widget)
+                elif type(widget) is QgsDateTimeEdit:
+                    value = utils_giswater.getCalendarDate(self.dlg_manage_sys_fields, widget)
+                elif type(widget) is QPlainTextEdit:
+                    value = widget.document().toPlainText()
+
+                if value in ('null', None, ""):
+                    value = "null"
+                elif type(widget) is not QCheckBox:
+                    value = "'" + value + "'"
+                sql += f" {widget.objectName()} = {value},"
+
+        sql = sql[:-1]
+        sql += f" WHERE cat_feature_id = '{form_name}' and column_id = '{column_id}'"
+        self.controller.execute_sql(sql, commit=True)
+
+        # Close dialog
+        self.close_dialog(self.dlg_manage_sys_fields)
+        self.update_sys_fields()
 
 
     def manage_accept(self, action, form_name, model=None):
@@ -2794,8 +2921,10 @@ class UpdateSQL(ApiParent):
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"UPDATE", "multi_create":' + str(
-                self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
+            extras = '"action":"UPDATE"'
+
+
+            extras += ', "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
