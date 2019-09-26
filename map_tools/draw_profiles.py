@@ -1430,6 +1430,7 @@ class DrawProfiles(ParentMapTool):
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
         self.arcs = []
+        self.nodes = []
         self.start_end_node = []
         self.start_end_node = [None, None]
         self.dlg_draw_profile.list_additional_points.clear()
