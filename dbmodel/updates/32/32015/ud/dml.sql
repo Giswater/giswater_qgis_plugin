@@ -7,6 +7,3 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 27/06/2019
-
-UPDATE cat_feature SET parent_layer='v_edit_gully', type='gully' WHERE feature_type='GULLY';

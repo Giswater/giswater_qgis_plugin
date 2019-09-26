@@ -42,4 +42,4 @@ update config_api_form_tabs SET tabactions='[{"actionName":"actionEdit", "action
 "actionTooltip":"Show Section",  "disabled":false},{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},{"actionName":"actionHelp", 
 "actionTooltip":"Help",  "disabled":false}]' where formname='v_edit_gully' or formname='v_edit_arc' or formname='v_edit_connec' or formname='v_edit_node';
 
-UPDATE cat_feature SET type = 'gully', parent_layer = 'v_edit_gully'  WHERE feature_type = 'GULLY';
+UPDATE cat_feature SET parent_layer = 'v_edit_gully'  WHERE feature_type = 'GULLY';

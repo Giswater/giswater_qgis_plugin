@@ -28,5 +28,3 @@ INSERT INTO audit_cat_table VALUES ('ve_config_sys_fields', 'System', 'Shows ', 
 update config_api_form_fields set ismandatory=false where column_id = 'arc_id';
 update config_api_form_fields set ismandatory=false where column_id = 'node_id';
 update config_api_form_fields set ismandatory=false where column_id = 'connec_id';
-
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;

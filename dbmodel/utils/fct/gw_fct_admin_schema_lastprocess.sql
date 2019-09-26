@@ -41,7 +41,7 @@ DECLARE
 	v_superusers text;
 	v_tablename record;
 	v_schemaname text;
-
+    v_oldversion text;
 
 BEGIN 
 	-- search path
@@ -96,10 +96,13 @@ BEGIN
 		
 	ELSIF v_isnew IS FALSE THEN
 		
-		-- clean schema of all tables/views/triggers not used in this version
-		-- to do: stabilize before activate this
-		--IF v_gwversion > '3.2.002' AND v_gwversion < '3.2.004 AND upper(v_projecttype) = 'WS' THEN
-		--END IF;
+        v_oldversion = (SELECT giswater FROM version ORDER BY id DESC LIMIT 1);
+        
+
+        -- create child views for users from 3.2 to 3.3 updates
+		IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
+            PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
+		END IF;
 	
 		-- check project consistency
 		IF v_projecttype = 'WS' THEN
