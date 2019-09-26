@@ -428,12 +428,13 @@ class ManageNewPsector(ParentManage):
         """ Show description of product plan/om _psector as label """
 
         try:
-            selected_list = qtable.model()
-            if selected_list is None:
+            model = qtable.model()
+            if model is None:
                 return
+
             total = 0
             psector_id = utils_giswater.getWidgetText(dialog, 'psector_id')
-            for x in range(0, selected_list.rowCount()):
+            for x in range(0, model.rowCount()):
                 if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
                     if str(qtable.model().record(x).value('total_budget')) != 'NULL':
                         total += float(qtable.model().record(x).value('total_budget'))
@@ -1227,6 +1228,7 @@ class ManageNewPsector(ParentManage):
         """
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
