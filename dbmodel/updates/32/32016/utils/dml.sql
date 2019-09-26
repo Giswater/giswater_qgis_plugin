@@ -462,3 +462,23 @@ INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('edit_typ
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('edit_typevalue', 'man_addfields_cat_datatype');
 
 UPDATE man_addfields_parameter SET active = TRUE, iseditable = TRUE;
+
+
+
+UPDATE audit_cat_param_user SET feature_field_id = 'category_type' WHERE id ilike '%category_vdefault%';
+UPDATE audit_cat_param_user SET feature_field_id = 'fluid_type' WHERE id ilike '%fluid_vdefault%';
+UPDATE audit_cat_param_user SET feature_field_id = 'function_type' WHERE id ilike '%function_vdefault%';
+UPDATE audit_cat_param_user SET feature_field_id = 'location_type' WHERE id ilike '%location_vdefault%';
+
+UPDATE audit_cat_param_user SET feature_field_id = NULL WHERE id='feature_fluid_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = NULL WHERE id='feature_function_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = NULL WHERE id='feature_location_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = NULL WHERE id='feature_category_vdefault';
+         
+UPDATE audit_cat_param_user SET feature_field_id = 'ownercat_id' WHERE id='ownercat_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = 'sector_id' WHERE id='sector_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = 'verified' WHERE id='verified_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = 'connecat_id' WHERE id='connecat_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = 'nodecat_id' WHERE id='nodecat_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id = 'elementcat_id' WHERE id='elementcat_vdefault';
+
