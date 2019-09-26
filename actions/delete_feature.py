@@ -62,7 +62,7 @@ class DeleteFeature(ApiParent):
         # Set button snapping
         self.dlg_delete_feature.btn_snapping.clicked.connect(partial(self.set_active_layer))
         self.dlg_delete_feature.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_delete_feature))
-        self.set_icon(self.dlg_delete_feature.btn_snapping, "129")
+        self.set_icon(self.dlg_delete_feature.btn_snapping, "137")
 
         # Set listeners
         self.dlg_delete_feature.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_delete_feature))
