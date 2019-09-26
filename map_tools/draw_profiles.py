@@ -865,6 +865,16 @@ class DrawProfiles(ParentMapTool):
             z2 = node.z1
         elif node.node_id == node.node_2:
             z2 = node.z2
+        print(str("node.node_id) -> ") + str(node.node_id))
+        print(str("prev_node.node_2 -> ") + str(prev_node.node_2))
+        print(str("prev_node.node_1 -> ") + str(prev_node.node_1))
+
+        print(str(z1))
+
+        print(str("node.node_id) -> ") + str(node.node_id))
+        print(str("prev_node.node_2 -> ") + str(node.node_1))
+        print(str("prev_node.node_1 -> ") + str(node.node_2))
+        print(str(z2))
 
         # Get superior points
         s1x = self.slast[0]
@@ -1453,6 +1463,7 @@ class DrawProfiles(ParentMapTool):
         self.list_of_selected_nodes = []
         self.list_of_selected_arcs = []
         self.arcs = []
+        self.nodes = []
         self.start_end_node = []
         self.start_end_node = [None, None]
         self.dlg_draw_profile.list_additional_points.clear()
