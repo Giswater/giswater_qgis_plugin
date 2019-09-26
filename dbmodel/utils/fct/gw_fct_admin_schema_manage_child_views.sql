@@ -117,8 +117,17 @@ raise notice 'MULTI';
 						END LOOP;
 					END IF;
 
-					SELECT string_agg(concat('a.',param_name),E',\n    ' order by orderby) as a_param,
-					string_agg(concat('ct.',param_name),E',\n            ' order by orderby) as ct_param,
+					IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
+						v_orderby = 10000;
+						FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id IS NULL ORDER BY id) LOOP
+							UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+							v_orderby = v_orderby+1;
+						END LOOP;
+					END IF;
+
+
+					SELECT string_agg(concat('a.',param_name),',' order by orderby) as a_param,
+					string_agg(concat('ct.',param_name),',' order by orderby) as ct_param,
 					string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
 					string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
 					INTO v_created_addfields
@@ -149,7 +158,6 @@ raise notice 'MULTI';
 				"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'", "view_type":"'||v_view_type||'",
 				"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
 				"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
-				
 				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);			
 			ELSE
 				--create views with fields from parent table and man table
@@ -239,6 +247,15 @@ raise notice 'SIMPLE';
 						UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
 						v_orderby = v_orderby+1;
 					END LOOP;
+				END IF;
+
+				IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
+					v_orderby = 10000;
+					FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id IS NULL ORDER BY id) LOOP
+						UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+						v_orderby = v_orderby+1;
+					END LOOP;
+					raise notice 'v_orderby,%',v_orderby;
 				END IF;
 
 				SELECT string_agg(concat('a.',param_name),','order by orderby) as a_param,

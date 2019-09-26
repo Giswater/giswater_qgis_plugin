@@ -460,3 +460,5 @@ VALUES ('edit_typevalue','man_addfields_cat_widgettype','man_addfields_parameter
 
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('edit_typevalue', 'man_addfields_cat_widgettype');
 INSERT INTO sys_typevalue_cat(typevalue_table, typevalue_name) VALUES ('edit_typevalue', 'man_addfields_cat_datatype');
+
+UPDATE man_addfields_parameter SET active = TRUE, iseditable = TRUE;
