@@ -36,7 +36,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_cl
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit", "column":"visit_type", "dataType":"integer"}}$$);
 
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"type", "dataType":"varchar(30)"}}$$);
+--SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"type", "dataType":"varchar(30)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"shortcut_key", "dataType":"varchar(100)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"parent_layer", "dataType":"varchar(100)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature", "column":"child_layer", "dataType":"varchar(100)"}}$$);

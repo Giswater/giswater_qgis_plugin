@@ -213,7 +213,7 @@ IF v_multi_create IS TRUE THEN
 		END IF;
 		-- get view name
 		IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
-			UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=rec.id;
+			UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=rec.id;
 		END IF;
 
 		--remove spaces and dashs from view name
@@ -230,7 +230,7 @@ IF v_multi_create IS TRUE THEN
 			INTO v_definition;
 		END IF;
 		--get the system type and system_id of the feature
-		v_feature_type = (SELECT type FROM cat_feature where id=rec.id);
+		v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=rec.id);
 		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
 
 		--get old values of addfields
@@ -476,7 +476,7 @@ ELSE
 
 	-- get view definition
 	IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
-		UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=v_cat_feature;
+		UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=v_cat_feature;
 	END IF;
 
 	--remove spaces and dashes from view name
@@ -494,7 +494,7 @@ ELSE
 	END IF;
 
 	--get the system type and system_id of the feature
-	v_feature_type = (SELECT type FROM cat_feature where id=v_cat_feature);
+	v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 	--get old values of addfields
