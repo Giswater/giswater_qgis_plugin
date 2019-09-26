@@ -652,7 +652,7 @@ class ApiCF(ApiParent):
         widget = self.add_lineedit(field)
         widget = self.set_widget_size(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
-        widget = self.set_data_type(field, widget)
+        widget = self.set_data_type(field, widget, self.dlg_cf.btn_accept)
         return widget
 
 
@@ -777,6 +777,7 @@ class ApiCF(ApiParent):
                 if value in ('null', None, ''):
                     widget.setStyleSheet("border: 1px solid red")
                     list_mandatory.append(widget_name)
+
         if list_mandatory != []:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
@@ -910,6 +911,21 @@ class ApiCF(ApiParent):
                 _json[str(widget.property('column_id'))] = None
             else:
                 _json[str(widget.property('column_id'))] = str(value)
+
+            if widget.property('datatype') == 'double':
+                if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
+                    widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+                    dialog.btn_accept.setEnabled(True)
+                else:
+                    widget.setStyleSheet("border: 1px solid red")
+                    dialog.btn_accept.setEnabled(False)
+            elif widget.property('datatype') == 'integer':
+                if value is None or bool(re.search("^\d*$", value)):
+                    widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+                    dialog.btn_accept.setEnabled(True)
+                else:
+                    widget.setStyleSheet("border: 1px solid red")
+                    dialog.btn_accept.setEnabled(False)
         self.controller.log_info(str(_json))
 
 
@@ -940,24 +956,16 @@ class ApiCF(ApiParent):
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    widget.lostFocus.connect(partial(self.clean_my_json, widget))
-                    widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
-                    widget.lostFocus.connect(partial(
-                        self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
-                else:
-                    widget.editingFinished.connect(partial(self.clean_my_json, widget))
-                    widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
-                    widget.editingFinished.connect(partial(
-                        self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                widget.editingFinished.connect(partial(self.clean_my_json, widget))
+                widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
+                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
             else:
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
-                else:
-                    widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
-
+                widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+            widget.textChanged.connect(partial(self.enabled_accept, dialog))
         return widget
 
+    def enabled_accept(self, dialog):
+        dialog.btn_accept.setEnabled(True)
 
     def set_auto_update_combobox(self, field, dialog, widget):
 

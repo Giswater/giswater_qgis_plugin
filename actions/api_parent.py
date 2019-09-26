@@ -636,11 +636,12 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def set_data_type(self, field, widget):
-
+    def set_data_type(self, field, widget, button=None):
+        #TODO order this
+        widget.setProperty('datatype', field['datatype'])
         if 'datatype' in field:
             if field['datatype'] == 'integer':  # Integer
-                widget.setValidator(QIntValidator())
+                pass
             elif field['datatype'] == 'string':  # String
                 pass
             elif field['datatype'] == 'date':  # Date
@@ -650,10 +651,8 @@ class ApiParent(ParentAction):
             elif field['datatype'] == 'boolean':  # Boolean
                 pass
             elif field['datatype'] == 'double':  # Double
-                validator = QDoubleValidator()
-                validator.setRange(-9999999.0, 9999999.0, 3)
-                validator.setNotation(QDoubleValidator().StandardNotation)
-                widget.setValidator(validator)
+                pass
+
 
         return widget
 
