@@ -199,14 +199,14 @@ BEGIN
 		-- topology control (enabled without state topocontrol. Does not make sense to activate this because in this phase of workflow
 		IF v_topocontrol IS TRUE THEN 
 	
-			IF upper(v_catfeature.type) ='NODE' THEN
+			IF upper(v_catfeature.feature_type) ='NODE' THEN
 			
 				v_numnodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(p_reduced_geometry, node.the_geom, v_node_proximity) AND node.node_id != p_id AND node.state!=0);		
 				IF (v_numnodes >1) AND (v_node_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1096]:',error_message, v_id,'. ',hint_message) FROM audit_cat_error WHERE id=1096);
 					v_status = false;
 				END IF;
-			ELSIF upper(v_catfeature.type) ='ARC' THEN
+			ELSIF upper(v_catfeature.feature_type) ='ARC' THEN
 			
 				SELECT node_id INTO v_node1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
 				ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(p_reduced_geometry)) LIMIT 1;
@@ -230,14 +230,14 @@ BEGIN
 				--getting gis length
 				v_gislength = (SELECT st_length(p_reduced_geometry))::float;
 				
-			ELSIF upper(v_catfeature.type) ='CONNEC' THEN 
+			ELSIF upper(v_catfeature.feature_type) ='CONNEC' THEN 
 				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(p_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != p_id AND connec.state!=0);		
 				IF (v_numnodes >1) AND (v_connec_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1044]:',error_message, v_id,'. ',hint_message) FROM audit_cat_error WHERE id=1044);
 					v_status = false;
 				END IF;
 				
-			ELSIF upper(v_catfeature.type) ='GULLY' THEN
+			ELSIF upper(v_catfeature.feature_type) ='GULLY' THEN
 				v_numnodes := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(p_reduced_geometry, gully.the_geom, v_gully_proximity) AND gully.gully_id != p_id AND gully.state!=0);		
 				IF (v_numnodes >1) AND (v_gully_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1045]:',error_message, v_id,'. ',hint_message) FROM audit_cat_error WHERE id=1045);
@@ -327,17 +327,17 @@ BEGIN
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
 
 		IF v_project_type ='WS' THEN 
-			EXECUTE 'SELECT pnom::integer, dnom::integer, matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
+			EXECUTE 'SELECT pnom::integer, dnom::integer, matcat_id FROM cat_'||lower(v_catfeature.feature_type)||' WHERE id=$1'
 				USING v_catalog
 				INTO v_pnom, v_dnom, v_matcat_id;
 				
 		ELSIF v_project_type ='UD' THEN 
-			IF v_catfeature.type ='gully' THEN
+			IF v_catfeature.feature_type ='gully' THEN
 				EXECUTE 'SELECT matcat_id FROM cat_grate WHERE id=$1'
 					USING v_catalog
 					INTO v_matcat_id;
 			ELSE
-				EXECUTE 'SELECT shape, geom1, geom2, matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
+				EXECUTE 'SELECT shape, geom1, geom2, matcat_id FROM cat_'||lower(v_catfeature.feature_type)||' WHERE id=$1'
 					USING v_catalog
 					INTO v_shape, v_geom1, v_geom2, v_matcat_id;
 			END IF;
@@ -365,16 +365,16 @@ BEGIN
 			-- special values
 			IF (aux_json->>'column_id') = quote_ident(v_idname) THEN
 				field_value = v_id;
-			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'_type')  THEN
+			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.feature_type),'_type')  THEN
 				
 				EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
 				v_type = field_value;
 				
-			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.type),'cat_id') OR (aux_json->>'column_id') = concat(lower(v_catfeature.type),'at_id') THEN
+			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.feature_type),'cat_id') OR (aux_json->>'column_id') = concat(lower(v_catfeature.feature_type),'at_id') THEN
 				IF v_project_type ='UD' THEN
-					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||'  LIMIT 1' INTO field_value;
+					EXECUTE 'SELECT id FROM cat_' || v_catfeature.feature_type ||'  LIMIT 1' INTO field_value;
 				ELSE
-					EXECUTE 'SELECT id FROM cat_' || v_catfeature.type ||' WHERE ' || v_catfeature.type || 'type_id = ''' || v_catfeature.system_id || ''' LIMIT 1' INTO field_value;
+					EXECUTE 'SELECT id FROM cat_' || v_catfeature.feature_type ||' WHERE ' || v_catfeature.feature_type || 'type_id = ''' || v_catfeature.system_id || ''' LIMIT 1' INTO field_value;
 				END IF;
 			ELSIF (aux_json->>'column_id') = 'code' THEN
 				field_value = v_code;
@@ -385,7 +385,7 @@ BEGIN
 			ELSIF (aux_json->>'column_id') = 'gis_length' THEN
 				field_value = v_gislength;
 			ELSIF  (aux_json->>'column_id')='epa_type' THEN
-				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.type)||'_type WHERE id = $1'
+				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'
 					INTO field_value
 					USING v_catfeature.system_id;
 
