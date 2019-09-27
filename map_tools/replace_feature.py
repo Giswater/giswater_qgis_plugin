@@ -146,7 +146,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.controller.show_info_box(msg, "Info")
             return
 
-        sql = f"SELECT type FROM cat_feature WHERE id = '{feature_type}'"
+        sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
         row = self.controller.get_row(sql)
 
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)

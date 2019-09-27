@@ -147,6 +147,8 @@ class DeleteFeature(ApiParent):
         for k, v in list(data.items()):
             if str(k) == "info":
                 change_tab = self.populate_info_text(self.dlg_delete_feature, qtabwidget, qtextedit, data)
+
+        self.dlg_delete_feature.btn_cancel.setText('Accept')
         # Close dialog
         if not change_tab:
             self.close_dialog(self.dlg_delete_feature)
