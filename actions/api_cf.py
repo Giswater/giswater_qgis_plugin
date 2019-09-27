@@ -305,7 +305,7 @@ class ApiCF(ApiParent):
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
             sub_tag = None
             if feature_cat:
-                if feature_cat == 'arc':
+                if feature_cat.feature_type.lower() == 'arc':
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
@@ -479,7 +479,7 @@ class ApiCF(ApiParent):
                 parent_layer = self.feature_cat.parent_layer
             else:
                 parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
-            sql = "SELECT type FROM cat_feature WHERE  parent_layer = '" + str(parent_layer) + "' LIMIT 1"
+            sql = "SELECT lower(feature_type) FROM cat_feature WHERE  parent_layer = '" + str(parent_layer) + "' LIMIT 1"
             result = self.controller.get_row(sql, log_sql=True, commit=True)
             self.geom_type = result[0]
 

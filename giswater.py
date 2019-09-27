@@ -269,7 +269,7 @@ class Giswater(QObject):
                 if not help_added:
                     icon_path = self.plugin_dir + '/icons/308.png'
                     icon = QIcon(icon_path)
-                    if feature_cat.feature_type.lower() == 'node':
+                    if feature_cat.feature_type.upper() in ('NODE', 'CONNEC', 'GULLY'):
                         obj_action = QAction(icon, f'Insert point \t           ?', self)
                     else:
                         obj_action = QAction(icon, f'Insert arc \t           ?', self)
@@ -615,7 +615,7 @@ class Giswater(QObject):
 
         for row in rows:
             tablename = row['child_layer']
-            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
+            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['shortcut_key'],
                                  row['parent_layer'], row['child_layer'])
             self.feature_cat[tablename] = elem
 
@@ -906,7 +906,7 @@ class Giswater(QObject):
             sub_menu = main_menu.addMenu(str(parent_layer[0]))
 
             # Get child layers
-            sql = (f"SELECT DISTINCT(child_layer), type FROM cat_feature "
+            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type) FROM cat_feature "
                    f"WHERE parent_layer = '{parent_layer[1]}' "
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
