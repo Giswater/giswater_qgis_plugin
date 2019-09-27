@@ -649,14 +649,20 @@ class ApiCF(ApiParent):
 
 
     def manage_text(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_lineedit(field)
         widget = self.set_widget_size(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
-        widget = self.set_data_type(field, widget, self.dlg_cf.btn_accept)
+        widget = self.set_data_type(field, widget)
         return widget
 
 
     def manage_typeahead(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         completer = QCompleter()
         widget = self.manage_text(dialog, complet_result, field)
         widget = self.manage_lineedit(field, dialog, widget, completer)
@@ -664,6 +670,9 @@ class ApiCF(ApiParent):
 
 
     def manage_combo(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_combobox(field)
         widget = self.set_widget_size(widget, field)
         widget = self.set_auto_update_combobox(field, dialog, widget)
@@ -671,56 +680,86 @@ class ApiCF(ApiParent):
 
 
     def manage_check(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_checkbox(dialog, field)
         widget = self.set_auto_update_checkbox(field, dialog, widget)
         return widget
 
 
     def manage_datepickertime(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_calendar(dialog, field)
         widget = self.set_auto_update_dateedit(field, dialog, widget)
         return widget
 
 
     def manage_button(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_button(dialog, field)
         widget = self.set_widget_size(widget, field)
         return widget
 
 
     def manage_hyperlink(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_hyperlink(dialog, field)
         widget = self.set_widget_size(widget, field)
         return widget
 
 
     def manage_hspacer(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_horizontal_spacer()
         return widget
 
 
     def manage_vspacer(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_verical_spacer()
         return widget
 
 
     def manage_textarea(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_textarea(field)
         return widget
 
 
     def manage_spinbox(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_spinbox(field)
         widget = self.set_auto_update_spinbox(field, dialog, widget)
         return widget
 
 
     def manage_doubleSpinbox(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.manage_spinbox(dialog, complet_result, field)
         return widget
 
 
     def manage_tableView(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_tableview(complet_result, field)
         widget = self.set_headers(widget, field)
         widget = self.populate_table(widget, field)
@@ -911,22 +950,18 @@ class ApiCF(ApiParent):
                 _json[str(widget.property('column_id'))] = None
             else:
                 _json[str(widget.property('column_id'))] = str(value)
+            self.set_datatype_validator(value, widget, dialog.btn_accept)
 
-            if widget.property('datatype') == 'double':
-                if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
-                    widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
-                    dialog.btn_accept.setEnabled(True)
-                else:
-                    widget.setStyleSheet("border: 1px solid red")
-                    dialog.btn_accept.setEnabled(False)
-            elif widget.property('datatype') == 'integer':
-                if value is None or bool(re.search("^\d*$", value)):
-                    widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
-                    dialog.btn_accept.setEnabled(True)
-                else:
-                    widget.setStyleSheet("border: 1px solid red")
-                    dialog.btn_accept.setEnabled(False)
         self.controller.log_info(str(_json))
+
+    def set_datatype_validator(self, value, widget, btn):
+        """
+        functions called in ->  widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn):
+            def integer_validator(self, value, widget, btn_accept)
+            def double_validator(self, value, widget, btn_accept)
+         """
+        widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+        return widget
 
 
     def check_tab_data(self, dialog):

@@ -34,6 +34,7 @@ if 'nt' in sys.builtin_module_names:
 from .. import utils_giswater
 from ..ui_manager import GwDialog, GwMainWindow
 import os
+import re
 import webbrowser
 
 
@@ -855,3 +856,27 @@ class ParentAction(object):
         rows = self.controller.get_rows(sql, commit=True)
         return rows
 
+
+    def integer_validator(self, value, widget, btn_accept):
+        """ Check if the value is an integer or not.
+            This function is called in def set_datatype_validator(self, value, widget, btn)
+            widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+        """
+        if value is None or bool(re.search("^\d*$", value)):
+            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            btn_accept.setEnabled(True)
+        else:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)
+
+    def double_validator(self, value, widget, btn_accept):
+        """ Check if the value is double or not.
+            This function is called in def set_datatype_validator(self, value, widget, btn)
+            widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+        """
+        if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
+            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            btn_accept.setEnabled(True)
+        else:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)

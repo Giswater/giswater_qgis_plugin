@@ -636,24 +636,8 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def set_data_type(self, field, widget, button=None):
-        #TODO order this
+    def set_data_type(self, field, widget):
         widget.setProperty('datatype', field['datatype'])
-        if 'datatype' in field:
-            if field['datatype'] == 'integer':  # Integer
-                pass
-            elif field['datatype'] == 'string':  # String
-                pass
-            elif field['datatype'] == 'date':  # Date
-                pass
-            elif field['datatype'] == 'datetime':  # DateTime
-                pass
-            elif field['datatype'] == 'boolean':  # Boolean
-                pass
-            elif field['datatype'] == 'double':  # Double
-                pass
-
-
         return widget
 
 
