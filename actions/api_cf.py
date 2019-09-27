@@ -960,9 +960,11 @@ class ApiCF(ApiParent):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
          """
-        widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
-        return widget
-
+        try:
+            getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+        except AttributeError as e:
+            """If the function called by getattr don't exist raise this exception"""
+            pass
 
     def check_tab_data(self, dialog):
         """ Check if current tab name is tab_data """
