@@ -121,7 +121,10 @@
            <item row="6" column="1" colspan="3">
             <widget class="QTextEdit" name="software_version_info">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
