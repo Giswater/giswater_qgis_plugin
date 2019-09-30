@@ -166,14 +166,6 @@ class ManNodeDialog(ParentDialog):
             thread1 = Thread(self, self.controller, 3)
             thread1.start()  
 
-        self.filter = "node_id = '" + str(self.id) + "'"
-        table_name = self.controller.schema_name + ".v_ui_node_x_connection_upstream"
-        self.fill_table(self.tbl_upstream, table_name, self.filter)
-        self.set_configuration(self.tbl_upstream, "v_ui_node_x_connection_upstream")
-
-        table_name = self.controller.schema_name + ".v_ui_node_x_connection_downstream"
-        self.fill_table(self.tbl_downstream, table_name, self.filter)
-        self.set_configuration(self.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         # Manage tab signal
         self.tab_connections_loaded = False           
@@ -581,11 +573,17 @@ class ManNodeDialog(ParentDialog):
         
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """            
-            
-        self.fill_tables(self.tbl_upstream, "v_ui_node_x_connection_upstream")
-        self.fill_tables(self.tbl_downstream, "v_ui_node_x_connection_downstream")
-        
-        
+
+        self.filter = "node_id = '" + str(self.id) + "'"
+        table_name = self.controller.schema_name + ".v_ui_node_x_connection_upstream"
+        self.fill_table(self.tbl_upstream, table_name, self.filter)
+        self.set_configuration(self.tbl_upstream, "v_ui_node_x_connection_upstream")
+
+        table_name = self.controller.schema_name + ".v_ui_node_x_connection_downstream"
+        self.fill_table(self.tbl_downstream, table_name, self.filter)
+        self.set_configuration(self.tbl_downstream, "v_ui_node_x_connection_downstream")
+
+
     def fill_tab_element(self):
         """ Fill tab 'Element' """
         
