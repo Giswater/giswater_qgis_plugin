@@ -121,12 +121,9 @@ class DrawProfiles(ParentMapTool):
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
-        if not os.path.exists(template_path):
-            message = "File not found"
-            self.controller.show_warning(message, parameter=template_path)
-            return
+        template_path = self.settings.value('system_variables/composers_path')
         template_files = os.listdir(template_path)
+
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
 
         self.dlg_draw_profile.cbx_template.clear()
