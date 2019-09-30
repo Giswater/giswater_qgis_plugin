@@ -124,8 +124,7 @@ class DrawProfiles(ParentMapTool):
         template_path = self.settings.value('system_variables/composers_path')
         try:
             template_files = os.listdir(template_path)
-        except OSError as e:
-            # Control if 'os' fail
+        except FileNotFoundError as e:
             message = "File not found"
             self.controller.show_warning(message, parameter=template_path)
             return
