@@ -292,7 +292,11 @@ class MincutParent(ParentAction):
 
 
     def mincut_close(self):
-        
+        # If client don't touch nothing just rejected dialog or press cancel
+        if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
+            self.close_dialog(self.dlg_mincut)
+            return
+
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.mincutCanceled = True
 
