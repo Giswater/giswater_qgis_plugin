@@ -363,7 +363,12 @@ class Mincut(GwMainWindow, FORM_CLASS):
 
     def closeEvent(self, event):
         """ Overwrite closeEvent method """
-
+        # If client don't touch nothing just rejected dialog or press cancel
+        if not self.closeMainWin and self.mincutCanceled:
+            event.accept()
+            self.dlg_rejected.emit()
+            return super(Mincut, self).closeEvent(event)
+        
         if self.closeMainWin:
             event.accept()
             if self.mincutCanceled:
