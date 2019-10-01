@@ -1,3 +1,4 @@
 3.3.001 
 *************
 - Add link column to samplepoint
+- ALTER TABLE rpt_inp_node,rpt_inp_arc ALTER COLUMNS to length =30 for ws/ud projects
