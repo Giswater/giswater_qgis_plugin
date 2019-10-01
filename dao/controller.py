@@ -25,6 +25,9 @@ from functools import partial
 
 from .pg_dao import PgDao
 from .logger import Logger
+from ..models.cfg_user import CfgUser
+from ..models.cfg_system import CfgSystem
+
 
 
 class DaoController(object):
@@ -45,6 +48,8 @@ class DaoController(object):
         self.dao = None
         self.credentials = None
         self.cfgp_user = {}
+        self.cfgp_system = {}
+
         if create_logger:
             self.set_logger(logger_name)
                 
@@ -1376,4 +1381,13 @@ class DaoController(object):
                f" WHERE cur_user = current_user")
         rows = self.get_rows(sql)
         for row in rows:
-            self.cfgp_user[row['parameter']] = row['value']
+            self.cfgp_user[row['parameter']] = CfgUser(row['parameter'], row['value'])
+
+
+    def get_config_param_system(self):
+
+        self.cfgp_system={}
+        sql = f"SELECT parameter, value, data_type, context, descript, label FROM config_param_system "
+        rows = self.get_rows(sql)
+        for row in rows:
+            self.cfgp_system[row['parameter']] = CfgSystem(row['parameter'], row['value'], row['data_type'], row['context'], row['descript'], row['label'])

@@ -2,7 +2,7 @@
 
 
 class SysFeatureCat(object):
-    """ Class to serialize table 'sys_feature_cat' """
+    """ Class to serialize table 'cat_feature' """
 
     def __init__(self, id_, system_id, feature_type, shortcut_key, parent_layer, child_layer):
 

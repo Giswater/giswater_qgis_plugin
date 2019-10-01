@@ -2291,7 +2291,7 @@ class MincutParent(ParentAction):
         # Check if path exist
         template_folder = ""
         try:
-            template_folder = self.controller.cfgp_user['composers_path']
+            template_folder = self.controller.cfgp_user['composers_path'].value
         except  KeyError as e:
             pass
         try:
@@ -2338,7 +2338,7 @@ class MincutParent(ParentAction):
         # Check if template file exists
         template_path = ""
         try:
-            template_path = self.controller.cfgp_user['composers_path'] + f'{os.sep}{self.template}.qpt'
+            template_path = self.controller.cfgp_user['composers_path'].value + f'{os.sep}{self.template}.qpt'
         except  KeyError as e:
             pass
 
