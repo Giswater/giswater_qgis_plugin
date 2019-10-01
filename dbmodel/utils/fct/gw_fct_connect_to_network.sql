@@ -114,25 +114,25 @@ BEGIN
 		-- vnode
 		DELETE FROM vnode WHERE vnode_id=v_exit.vnode_id::integer;
 		IF v_exit.the_geom IS NOT NULL THEN
-		INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-		VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;
+			INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
+			VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;
 	
-		v_link.exit_id = v_exit_id;
-		v_link.exit_type = 'VNODE';
+			v_link.exit_id = v_exit_id;
+			v_link.exit_type = 'VNODE';
 
-		-- link
-		DELETE FROM link WHERE link_id=v_link.link_id;
-		INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id) 
-		VALUES ((SELECT nextval('link_link_id_seq')), v_link.the_geom, connect_id_aux, feature_type_aux, v_link.exit_type, v_link.exit_id, v_link.userdefined_geom, v_connect.state, v_connect.expl_id);
+			-- link
+			DELETE FROM link WHERE link_id=v_link.link_id;
+			INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id) 
+			VALUES ((SELECT nextval('link_link_id_seq')), v_link.the_geom, connect_id_aux, feature_type_aux, v_link.exit_type, v_link.exit_id, v_link.userdefined_geom, v_connect.state, v_connect.expl_id);
 
-		-- Update feaute arc_id and state_type
+			-- Update conntect attributes
 			IF feature_type_aux ='CONNEC' THEN          
 				UPDATE connec SET arc_id=v_connect.arc_id, dma_id=v_connect.dma_id, sector_id=v_connect.sector_id, pjoint_type=v_link.exit_type, pjoint_id=v_link.exit_id
 				WHERE connec_id = connect_id_aux;
 
 				-- update specific fields for ws projects
 				IF v_projecttype = 'WS' THEN
-					UPDATE connec SET dqa_id=v_connect.dqa_id, minsector_id=v_connect.minsector_id WHERE connec_id = connect_id_aux;
+					UPDATE connec SET dqa_id=v_connect.dqa_id, minsector_id=v_connect.minsector_id,presszonecat_id=v_connect.presszonecat_id WHERE connec_id = connect_id_aux;
 				END IF;
 			
 				-- Update state_type if edit_connect_update_statetype is TRUE
