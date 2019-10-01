@@ -121,13 +121,17 @@ class DrawProfiles(ParentMapTool):
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        template_path = self.settings.value('system_variables/composers_path')
+        template_path = ""
+        try:
+            template_path = self.controller.cfgp_user['composers_path']
+        except  KeyError as e:
+            pass
+
+        template_files = []
         try:
             template_files = os.listdir(template_path)
         except FileNotFoundError as e:
-            message = "File not found"
-            self.controller.show_warning(message, parameter=template_path)
-            return
+            pass
 
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
 
@@ -1468,11 +1472,12 @@ class DrawProfiles(ParentMapTool):
 
         # Check if template file exists
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
-        if not os.path.exists(template_path):
-            message = "File not found"
-            self.controller.show_warning(message, parameter=template_path)
-            return
+        template_path = ""
+        try:
+            template_path = self.controller.cfgp_user['composers_path'] + f'{os.sep}{self.template}.qpt'
+        except  KeyError as e:
+            pass
+
         if not os.path.exists(template_path):
             message = "File not found"
             self.controller.show_warning(message, parameter=template_path)
