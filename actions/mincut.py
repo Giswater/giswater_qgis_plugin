@@ -2289,7 +2289,11 @@ class MincutParent(ParentAction):
     def mincut_composer(self):
         """ Open Composer """
         # Check if path exist
-        template_folder = self.settings.value('system_variables/composers_path')
+        template_folder = ""
+        try:
+            template_folder = self.controller.cfgp_user['composers_path']
+        except  KeyError as e:
+            pass
         try:
             template_files = os.listdir(template_folder)
         except FileNotFoundError as e:
@@ -2332,7 +2336,11 @@ class MincutParent(ParentAction):
             return
 
         # Check if template file exists
-        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
+        template_path = ""
+        try:
+            template_path = self.controller.cfgp_user['composers_path'] + f'{os.sep}{self.template}.qpt'
+        except  KeyError as e:
+            pass
 
         if not os.path.exists(template_path):
             message = "File not found"
