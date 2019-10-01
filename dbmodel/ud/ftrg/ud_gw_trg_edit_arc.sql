@@ -62,7 +62,8 @@ BEGIN
 
 			IF v_man_table='parent' THEN
 				IF NEW.arc_type IS NULL THEN 
-					NEW.arc_type:=(SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					NEW.arc_type:=(SELECT "value" FROM config_param_user WHERE "parameter"='arctype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					
 				END IF;
 				
 			ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
