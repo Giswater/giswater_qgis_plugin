@@ -602,8 +602,8 @@ INSERT INTO inp_selector_hydrology VALUES ('1', '1', current_user);
 INSERT INTO inp_storage  VALUES ('18828', 'TABULAR', 'EBAR-02', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
 INSERT INTO inp_storage  VALUES ('238', 'TABULAR', 'EBAR-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
 
-INSERT INTO inp_timser_id VALUES ('T10-5m', 'Rainfall', 'RELATIVE');
-INSERT INTO inp_timser_id VALUES ('T5-5m', 'Rainfall', 'RELATIVE');
+INSERT INTO inp_timser_id VALUES ('T10-5m', 'Rainfall', 'RELATIVE', 'T10-5m');
+INSERT INTO inp_timser_id VALUES ('T5-5m', 'Rainfall', 'RELATIVE', 'T5-5m');
 
 INSERT INTO inp_timeseries VALUES (1, 'T5-5m', NULL, NULL, '0:00', 0.7800, NULL);
 INSERT INTO inp_timeseries VALUES (2, 'T5-5m', NULL, NULL, '0:05', 1.1500, NULL);
