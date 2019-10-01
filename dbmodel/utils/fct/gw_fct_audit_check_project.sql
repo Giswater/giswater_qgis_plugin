@@ -101,7 +101,7 @@ BEGIN
 	LOOP 
 		query_string:= 'SELECT max('||table_record.sys_sequence_field||') FROM '||table_record.id||';' ;
 		EXECUTE query_string INTO max_aux;	
-		IF max_aux IS NOT NULL THEN 
+		IF max_aux IS NOT NULL AND max_aux > 0 THEN 
 			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||table_record.sys_sequence||' '','||max_aux||', true)';
 		END IF;
 	END LOOP;
