@@ -221,7 +221,8 @@ class ApiConfig(ApiParent):
             utils_giswater.set_item_data(cad_combo, layers_list, 1)
             sql = f"SELECT value, value FROM config_param_user WHERE parameter = 'cad_tools_base_layer_vdefault'"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
-            utils_giswater.set_combo_itemData(cad_combo, str(row[0]), 0)
+            if row:
+                utils_giswater.set_combo_itemData(cad_combo, str(row[0]), 0)
 
         # Open form
         self.open_dialog(self.dlg_config)
