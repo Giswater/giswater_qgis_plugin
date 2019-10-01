@@ -394,14 +394,16 @@ BEGIN
 				v_min = (SELECT geom1 FROM cat_arc WHERE id=(SELECT arccat_id FROM arc WHERE arc_id=p_id));
 				v_max = (SELECT ymax FROM node WHERE node_id=(SELECT node_1 FROM arc WHERE arc_id=p_id));
 				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
+				field_value = '';
 			ELSIF (aux_json->>'column_id') = 'y2' THEN
 				v_min = (SELECT geom1 FROM cat_arc WHERE id=(SELECT arccat_id FROM arc WHERE arc_id=p_id));
 				v_max = (SELECT ymax FROM node WHERE node_id=(SELECT node_1 FROM arc WHERE arc_id=p_id));
 				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
+				field_value = '';
 			ELSIF (aux_json->>'column_id') = 'ymax' THEN
 				v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=p_id UNION SELECT y2 FROM arc WHERE node_2=p_id)a);
 				v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":999}';
-
+				field_value = '';
 					
 			-- mapzones values
 			ELSIF (aux_json->>'column_id') = 'sector_id' THEN
