@@ -826,8 +826,12 @@ class Giswater(QObject):
         self.manage_snapping_layers()
 
         # Get list of actions to hide and remove whitespace
-        self.list_to_hide = self.controller.cfgp_user['actions_to_hide'].split(",")
-        self.list_to_hide = [x.strip(' ') for x in self.list_to_hide]
+        try:
+            self.list_to_hide = self.controller.cfgp_user['actions_to_hide'].split(",")
+            self.list_to_hide = [x.strip(' ') for x in self.list_to_hide]
+        except  KeyError as e:
+            message = f"Parameter not found"
+            self.controller.show_message(message, parameter=e)
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
