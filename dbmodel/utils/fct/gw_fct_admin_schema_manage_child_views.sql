@@ -90,7 +90,7 @@ raise notice 'MULTI';
 		
 		--create a child view name if doesnt exist
 		IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
-			UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=rec.id;
+			UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=rec.id;
 		END IF;
 		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
 
@@ -218,12 +218,12 @@ raise notice 'MULTI';
 ELSE
 raise notice 'SIMPLE';
 	--get the system type and system_id of the feature and view name
-	v_feature_type = (SELECT type FROM cat_feature where id=v_cat_feature);
+	v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 	--create a child view name if doesnt exist
 	IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
-		UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=v_cat_feature;
+		UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=v_cat_feature;
 	END IF;
 	v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
 
