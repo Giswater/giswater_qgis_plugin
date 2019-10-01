@@ -10,3 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 01/10/2019
 UPDATE audit_cat_param_user SET label = 'Keep opened edition on update feature:' WHERE id = 'cf_keep_opened_edition';
+
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('composers_path', 'C:/Users/Usuari/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgiscomposer/en', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('actions_to_hide', '74,75,76,199', current_user);
+INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, isenabled, layout_id, layout_order, project_type, datatype, widgettype, isdeprecated) VALUES ('customized_actions_sms', '{"show_mincut_sms":false, "show_sms_info":false, "path_sms_script":"C:/Users/user/Desktop/script_test/dist/script/script.exe", "field_code":"code"}', 'json', 'system', 'Parameters for send sms on mincut', 'Action SMS:', TRUE, 17, 4, 'utils', 'string', 'linetext', false);
