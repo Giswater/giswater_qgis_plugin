@@ -96,7 +96,7 @@ class UpdateSQL(ApiParent):
         self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
         self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
 
-        # Check if user have dev permisions
+        # Check if user have dev permissions
         self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
         self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
         self.dev_commit = self.settings.value('system_variables/dev_commit').upper()
@@ -128,6 +128,11 @@ class UpdateSQL(ApiParent):
 
         # Error counter variable
         self.error_count = 0
+
+        super_users = self.settings.value('system_variables/super_users')
+        for super_user in super_users:
+
+            self.super_users.append(str(super_user))
 
         # Get locale of QGIS application
         self.locale = QSettings().value('locale/userLocale').lower()
@@ -248,11 +253,6 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.setWindowTitle(window_title)
 
         self.open_dialog(self.dlg_readsql)
-
-        super_users = self.settings.value('system_variables/super_users')
-        for super_user in super_users:
-
-            self.super_users.append(str(super_user))
 
         if connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
@@ -1634,13 +1634,13 @@ class UpdateSQL(ApiParent):
             self.username = self.get_user_connection(self.get_last_connection())
             role_admin = self.controller.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
-                self.controller.show_message("Connection Failed. You dont have permisions for this connection.", 1)
+                self.controller.show_message("Connection Failed. You dont have permissions for this connection.", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-
+                
 
     def set_last_connection(self, connection_name):
 
