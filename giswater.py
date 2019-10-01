@@ -767,6 +767,7 @@ class Giswater(QObject):
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
         self.controller.log_info("Set search_path")
         connection_status, not_version = self.controller.set_database_connection()
+        self.controller.get_config_param_user()
         self.set_info_button()
         if not connection_status or not_version:
             message = self.controller.last_error
