@@ -13,9 +13,8 @@ RETURNS json AS
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"status":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true" "}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},
+"data":{"status":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 */
 
 DECLARE
@@ -68,6 +67,9 @@ BEGIN
 		PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
 	
 	END IF;
+
+	-- Delete previous subcatchment polygons
+	DELETE FROM temp_table WHERE temp_table.fprocesscat_id = 17;
 	
 	IF v_dumpsubcatch THEN
 		-- Dump subcatchments
