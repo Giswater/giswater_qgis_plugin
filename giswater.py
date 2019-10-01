@@ -825,8 +825,9 @@ class Giswater(QObject):
         # Manage snapping layers
         self.manage_snapping_layers()
 
-        # Get list of actions to hide
-        self.list_to_hide = self.settings.value('system_variables/action_to_hide')
+        # Get list of actions to hide and remove whitespace
+        self.list_to_hide = self.controller.cfgp_user['actions_to_hide'].split(",")
+        self.list_to_hide = [x.strip(' ') for x in self.list_to_hide]
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
