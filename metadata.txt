@@ -3,7 +3,7 @@
 
 [general]
 name=giswater
-qgisMinimumVersion=2.18
+qgisMinimumVersion=3.4
 qgisMaximumVersion=3.99
 
 description=Plugin to enable additional features and capabilities of Giswater working together with QGIS and PostgreSQL
