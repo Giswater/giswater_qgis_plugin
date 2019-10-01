@@ -593,9 +593,9 @@ class Giswater(QObject):
 
 
     def manage_feature_cat(self):
-        """ Manage records from table 'sys_feature_type' """
+        """ Manage records from table 'cat_feature' """
 
-        # Dictionary to keep every record of table 'sys_feature_cat'
+        # Dictionary to keep every record of table 'cat_feature'
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
 
@@ -767,6 +767,7 @@ class Giswater(QObject):
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
         self.controller.log_info("Set search_path")
         connection_status, not_version = self.controller.set_database_connection()
+        self.controller.get_config_param_system()
         self.controller.get_config_param_user()
         self.set_info_button()
         if not connection_status or not_version:
@@ -827,7 +828,7 @@ class Giswater(QObject):
 
         # Get list of actions to hide and remove whitespace
         try:
-            self.list_to_hide = self.controller.cfgp_user['actions_to_hide'].split(",")
+            self.list_to_hide = self.controller.cfgp_user['actions_to_hide'].value.split(",")
             self.list_to_hide = [x.strip(' ') for x in self.list_to_hide]
         except  KeyError as e:
             pass
