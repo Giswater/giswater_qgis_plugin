@@ -29,12 +29,12 @@ INSERT INTO om_visit_parameter VALUES ('arc_rehabit_1', NULL, 'REHABIT', 'ARC', 
 INSERT INTO om_visit_parameter VALUES ('arc_rehabit_2', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Rehabilitation arc parameter 2', 'event_ud_arc_rehabit', NULL, 'FALSE');
 
 INSERT INTO om_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
-INSERT INTO om_visit_parameter VALUES ('leak_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'leak on arc', 'event_standard', 'defaultvalue', FALSE, 'arc_insp_des');
+INSERT INTO om_visit_parameter VALUES ('leak_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'leak on arc', 'event_ud_arc_standard', 'defaultvalue', FALSE, 'arc_insp_des');
 INSERT INTO om_visit_parameter VALUES ('leak_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'leak on node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_des');
 
-INSERT INTO om_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Sediments in arc', 'event_standard', 'defaultvalue',FALSE, 'arc_insp_sed');
-INSERT INTO om_visit_parameter VALUES ('clean_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Clean of arc', 'event_standard', 'defaultvalue', FALSE, 'arc_cln_exec');
-INSERT INTO om_visit_parameter VALUES ('defect_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Defects of arc', 'event_standard', 'defaultvalue', FALSE, 'arc_defect');
+INSERT INTO om_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Sediments in arc', 'event_ud_arc_standard', 'defaultvalue',FALSE, 'arc_insp_sed');
+INSERT INTO om_visit_parameter VALUES ('clean_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Clean of arc', 'event_ud_arc_standard', 'defaultvalue', FALSE, 'arc_cln_exec');
+INSERT INTO om_visit_parameter VALUES ('defect_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Defects of arc', 'event_ud_arc_standard', 'defaultvalue', FALSE, 'arc_defect');
 
 INSERT INTO om_visit_parameter VALUES ('sediments_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Sediments in connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_sed');
 INSERT INTO om_visit_parameter VALUES ('clean_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Clean of connec', 'event_standard', 'defaultvalue',FALSE, 'con_cln_exec');
