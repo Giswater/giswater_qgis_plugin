@@ -63,8 +63,9 @@ CREATE TRIGGER gw_trg_edit_om_visit INSTEAD OF INSERT OR DELETE OR UPDATE ON "SC
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_om_visit('om_visit');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_psector ON "SCHEMA_NAME".v_edit_om_psector;
-CREATE TRIGGER gw_trg_edit_psector INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".v_edit_om_psector  
-FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_psector('om');
+--01/10 - create trg commented because om_psector disappears in 3.2 version (updates 33001)
+--CREATE TRIGGER gw_trg_edit_psector INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".v_edit_om_psector  
+--FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_psector('om');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_psector ON "SCHEMA_NAME".v_edit_plan_psector;
 CREATE TRIGGER gw_trg_edit_psector  INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".v_edit_plan_psector  
@@ -75,8 +76,9 @@ CREATE TRIGGER gw_trg_edit_psector_x_other INSTEAD OF INSERT OR DELETE OR UPDATE
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_psector_x_other('plan');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_psector_x_other ON "SCHEMA_NAME".v_edit_om_psector_x_other;
-CREATE TRIGGER gw_trg_edit_psector_x_other INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_om_psector_x_other 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_psector_x_other('om');
+--01/10 - create trg commented because om_psector disappears in 3.2 version (updates 33001)
+--CREATE TRIGGER gw_trg_edit_psector_x_other INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_om_psector_x_other 
+--FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_psector_x_other('om');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_sector ON "SCHEMA_NAME".v_edit_sector;
 CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_sector 
