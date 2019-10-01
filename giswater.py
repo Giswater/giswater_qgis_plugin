@@ -951,9 +951,10 @@ class Giswater(QObject):
                           self.controller.credentials['password'])
         if child_layers is not None:
             for layer in child_layers:
-                uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
-                vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
-                QgsProject.instance().addMapLayer(vlayer)
+                if layer[0] != 'Load all':
+                    uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
+                    vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
+                    QgsProject.instance().addMapLayer(vlayer)
         else:
             uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
             vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
