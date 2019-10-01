@@ -105,7 +105,11 @@ BEGIN
 	SELECT
 	result_id_var,
 	v_arc_x_node.arc_id, node_1, node_2, v_arc_x_node.sys_elev1, v_arc_x_node.sys_elev2, v_arc_x_node.arc_type, arccat_id, epa_type, v_arc_x_node.sector_id, v_arc_x_node.state, 
-	v_arc_x_node.state_type, v_arc_x_node.annotation, st_length2d(v_arc_x_node.the_geom),
+	v_arc_x_node.state_type, v_arc_x_node.annotation, 
+	CASE
+		WHEN custom_length IS NOT NULL THEN custom_length
+		ELSE st_length2d(v_arc_x_node.the_geom)
+	END AS length,
 	CASE
 		WHEN custom_n IS NOT NULL THEN custom_n
 		ELSE n
