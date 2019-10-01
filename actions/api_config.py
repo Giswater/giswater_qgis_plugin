@@ -205,6 +205,24 @@ class ApiConfig(ApiParent):
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
         self.hide_void_groupbox(self.dlg_config)
 
+        #TODO:: Enhancement this with temporal table or somthing.
+        # Set additional values for combo Cad_tools
+        layers = self.iface.mapCanvas().layers()
+        layers_list = []
+
+        for layer in layers:
+            elem = []
+            elem.append(layer.name())
+            elem.append(layer.name())
+            layers_list.append(elem)
+        layers_list = sorted(layers_list, key=operator.itemgetter(0))
+        cad_combo = self.dlg_config.tab_main.findChild(QComboBox, 'cad_tools_base_layer_vdefault')
+        if cad_combo is not None:
+            utils_giswater.set_item_data(cad_combo, layers_list, 1)
+            sql = f"SELECT value, value FROM config_param_user WHERE parameter = 'cad_tools_base_layer_vdefault'"
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            utils_giswater.set_combo_itemData(cad_combo, str(row[0]), 0)
+
         # Open form
         self.open_dialog(self.dlg_config)
         
@@ -321,7 +339,6 @@ class ApiConfig(ApiParent):
                     self.order_widgets(field, self.gully_mantype_form, lbl, chk, widget)
                 elif field['layout_id'] == 22:
                     self.order_widgets(field, self.addfields_form, lbl, chk, widget)
-
 
 
     def construct_form_param_system(self, row, pos):
