@@ -44,6 +44,7 @@ class DaoController(object):
         self.schema_name = None
         self.dao = None
         self.credentials = None
+        self.cfgp_user = {}
         if create_logger:
             self.set_logger(logger_name)
                 
@@ -1369,3 +1370,10 @@ class DaoController(object):
         return function_name in object_functions
 
 
+    def get_config_param_user(self):
+        self.cfgp_user={}
+        sql = (f"SELECT parameter, value FROM config_param_user "
+               f" WHERE cur_user = current_user")
+        rows = self.get_rows(sql)
+        for row in rows:
+            self.cfgp_user[row['parameter']] = row['value']
