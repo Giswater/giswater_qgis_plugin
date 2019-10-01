@@ -65,6 +65,20 @@ BEGIN
             END IF;
         END IF;
         
+        -- Dma ID
+        IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                RETURN audit_function(1012,1116); 
+            END IF;
+			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			IF (NEW.dma_id IS NULL) THEN
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
+			END IF; 
+            IF (NEW.dma_id IS NULL) THEN
+                RETURN audit_function(1014,1116,NEW.link_id::text); 
+            END IF;
+        END IF;
+
 		-- State
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
