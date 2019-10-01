@@ -13,3 +13,5 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrodma_id, name","featureType":["v_edit_dma"]}]' WHERE id = 'macrodma';
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macroexpl_id, name","featureType":["exploitation"]}]' WHERE id = 'macroexploitation';
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrosectorid, name","featureType":["v_edit_sector"]}]' WHERE id = 'macrosector';
+
+UPDATE audit_cat_param_user SET dv_querytext = 'SELECT id as id, id as idval FROM api_ws_sample.cat_node WHERE id IS null', isenabled = TRUE, layout_id = 3, layout_order = 8 WHERE id = 'cad_tools_base_layer_vdefault';
