@@ -78,7 +78,9 @@ BEGIN
 		--remove scada and link related to node
 		EXECUTE 'DELETE FROM rtc_scada_node where node_id = '''||v_feature_id||''';';
 		EXECUTE 'DELETE FROM v_edit_link WHERE exit_type=''NODE'' and exit_id = '''||v_feature_id||''';';
-		EXECUTE 'UPDATE node SET parent_id=NULL WHERE node_id = '''||v_feature_id||''';';
+		IF v_project_type = 'WS' THEN
+			EXECUTE 'UPDATE node SET parent_id=NULL WHERE node_id = '''||v_feature_id||''';';
+		END IF;
 		
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Remove scada connection -> Done' ));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Remove link -> Done' ));

@@ -82,7 +82,10 @@ BEGIN
 		
 	ELSIF v_feature_type='node' THEN
 	--check nodes childs related to node
-		SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
+
+		IF v_project_type = 'WS' THEN
+		 		SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
+		END IF;
 	--check arcs related to node
 		SELECT string_agg(arc_id,',') INTO v_connect_arc FROM v_ui_arc_x_node WHERE (node_1 = v_feature_id OR node_2 = v_feature_id);
 		
@@ -109,8 +112,12 @@ BEGIN
 
 
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the feature -> ',v_connect_arc ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature -> ',v_connect_node ));
+
+IF v_project_type = 'WS' THEN
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature -> ',v_connect_node ));
+END IF;
 INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the feature -> ',v_connect_connec ));
+
 IF v_project_type = 'UD' THEN 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature -> ',v_connect_gully ));
 END IF;
