@@ -707,6 +707,7 @@ class AddNewLot(ParentManage):
             if id_ not in self.ids:
                 self.ids.append(id_)
 
+        self.check_for_ids()
 
     def get_table_values(self, qtable, geom_type):
 
@@ -751,6 +752,7 @@ class AddNewLot(ParentManage):
                 if selected_id not in self.ids:
                     self.ids.append(selected_id)
         self.reload_table_relations()
+        self.check_for_ids()
 
 
     def reload_table_relations(self):
@@ -810,6 +812,7 @@ class AddNewLot(ParentManage):
         if feature_id not in self.ids:
             self.ids.append(feature_id)
             self.reload_table_relations()
+        self.check_for_ids()
 
 
     def get_feature_by_id(self, layer, id_, field_id):
@@ -856,6 +859,8 @@ class AddNewLot(ParentManage):
             feature_id = index.sibling(row, column_index).data()
             self.ids.remove(feature_id)
             model.takeRow(row)
+
+        self.check_for_ids()
         self.hilight_features(self.rb_list)
         self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja',
                                'startdate', 'enddate')
@@ -891,7 +896,7 @@ class AddNewLot(ParentManage):
 
 
     def set_tab_dis_enabled(self):
-
+        self.ids = []
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         index = 0
         for x in range(0, self.dlg_lot.tab_widget.count()):
@@ -1218,7 +1223,7 @@ class AddNewLot(ParentManage):
             geometry = feature.geometry()
             rb = QgsRubberBand(self.canvas)
             rb.setToGeometry(geometry, None)
-            rb.setColor(QColor(0, 0, 240, 50))
+            rb.setColor(QColor(255, 0, 0, 100))
             rb.setWidth(5)
             rb.show()
             rb_list.append(rb)
@@ -1275,6 +1280,7 @@ class AddNewLot(ParentManage):
             layer.removeSelection()
         self.save_settings(self.dlg_lot)
         self.save_user_values(self.dlg_lot)
+        self.iface.actionPan().trigger()
         self.close_dialog(self.dlg_lot)
 
 
@@ -1691,3 +1697,13 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.tbl_lots.model().setFilter(expr_filter)
         self.dlg_lot_man.tbl_lots.model().select()
 
+
+    def check_for_ids(self):
+        if len(self.ids) !=0:
+            self.visit_class.setEnabled(False)
+        else:
+            layer = self.iface.activeLayer()
+            if layer:
+                layer.removeSelection()
+            self.iface.actionPan().trigger()
+            self.visit_class.setEnabled(True)

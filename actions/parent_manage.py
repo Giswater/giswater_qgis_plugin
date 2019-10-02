@@ -1130,6 +1130,7 @@ class ParentManage(ParentAction, object):
         
         try:
             self.canvas.selectionChanged.disconnect()  
+            self.iface.actionPan().trigger()
         except Exception:   
             pass
         
