@@ -617,7 +617,11 @@ BEGIN
 			DELETE FROM node WHERE node_id = OLD.node_id;
 			
 		END IF;
-	
+
+		--Delete addfields
+		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 
+		(SELECT id FROM man_addfields_parameter WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.node_type);
+
 		RETURN NULL;
 	
 	END IF;
