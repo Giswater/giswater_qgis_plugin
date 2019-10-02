@@ -912,17 +912,17 @@ class Giswater(QObject):
             sub_menu = main_menu.addMenu(str(parent_layer[0]))
 
             # Get child layers
-            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type) FROM cat_feature "
+            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), id as alias FROM cat_feature "
                    f"WHERE parent_layer = '{parent_layer[1]}' "
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
                    f"   WHERE table_schema = '{schema_name}')")
 
             child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
-            child_layers.insert(0, ['Load all', 'Load all'])
+            child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
-                action = QAction(str(child_layer[0]), sub_menu, checkable=True)
+                action = QAction(str(child_layer[2]), sub_menu, checkable=True)
 
                 # Get load layers and create child layers menu (actions)
                 layers_list = []
