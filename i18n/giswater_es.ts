@@ -1011,6 +1011,10 @@
         <source>Selected node</source>
         <translation>Nodo seleccionado</translation>
     </message>
+       <message>
+        <source>Parameter not found</source>
+        <translation>Parametro no encontrado</translation>
+    </message>
 
 </context>
 
