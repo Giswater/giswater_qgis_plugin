@@ -2769,7 +2769,7 @@ class UpdateSQL(ApiParent):
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel()
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = "cat_feature_id = '" + form_name + "'"
+        expr_filter = "cat_feature_id = '" + form_name + "'  ORDER BY id"
         self.fill_table(qtable, 've_config_sys_fields', self.model_update_table, expr_filter)
         self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sys_fields', schema_name)
 
