@@ -73,6 +73,7 @@ CREATE TABLE ext_workorder(
 	address character varying(50),
 	wotype_id character varying(50),
 	visitclass_id integer,
+    wotype_name character varying(120),
 	cost numeric,
 	ct text
 );

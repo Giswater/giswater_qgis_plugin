@@ -412,6 +412,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_lot AS
     om_visit_lot.exercice,
     om_visit_lot.serie,
     ext_workorder.wotype_id,
+    ext_workorder.wotype_name,
     om_visit_lot.adreca,
     om_visit_lot.feature_type
    FROM om_visit_lot
