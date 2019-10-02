@@ -560,11 +560,13 @@ class AddNewLot(ParentManage):
             sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM om_visit_class"
                    " INNER JOIN config_api_visit ON config_api_visit.visitclass_id = om_visit_class.id")
 
-
         visitclass_ids = self.controller.get_rows(sql, commit=True)
         if visitclass_ids:
             visitclass_ids.append(['', '', '', ''])
-            utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
+        else:
+            visitclass_ids = []
+            visitclass_ids.append(['', '', '', ''])
+        utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
 
         # Fill ComboBox cmb_assigned_to
         self.populate_cmb_team()
