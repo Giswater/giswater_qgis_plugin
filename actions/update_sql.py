@@ -82,6 +82,12 @@ class UpdateSQL(ApiParent):
         # Get database connection user and role
         self.username = self.get_user_connection(self.last_connection)
 
+        # Set label status connection
+        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
+        self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
+        self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
+        self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
+
         if self.project_type is not None and len(layers) != 0:
             self.info_show_info()
             return
@@ -90,11 +96,6 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql = Readsql()
         self.load_settings(self.dlg_readsql)
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
-
-        # Set label status connection
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
-        self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
-        self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
 
         # Check if user have dev permissions
         self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
@@ -262,8 +263,14 @@ class UpdateSQL(ApiParent):
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
             return
-
         else:
+
+            # Manage widgets tabs
+            self.populate_data_schema_name(self.cmb_project_type)
+            self.set_info_project()
+            self.update_manage_ui()
+            self.visit_manager()
+
             role_admin = self.controller.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
                 msg = "You don't have permissions to administrate project schemas on this connection"
@@ -272,15 +279,13 @@ class UpdateSQL(ApiParent):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             else:
+                if str(self.version_metadata) != str(self.project_data_schema_version):
+                    self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+                else:
+                    self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
-                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-
-        # Manage widgets tabs
-        self.populate_data_schema_name(self.cmb_project_type)
-        self.set_info_project()
-        self.update_manage_ui()
-        self.visit_manager()
 
         # Load last schema name selected and project type
         if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
@@ -1623,9 +1628,13 @@ class UpdateSQL(ApiParent):
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
         else:
+            if str(self.version_metadata) != str(self.project_data_schema_version):
+                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+            else:
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_last_connection(connection_name)
@@ -1908,7 +1917,6 @@ class UpdateSQL(ApiParent):
             if self.is_sample is None:
                 self.is_sample = 'False'
 
-
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
 
@@ -1954,6 +1962,13 @@ class UpdateSQL(ApiParent):
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
         self.dlg_readsql.setWindowTitle(window_title)
+
+        if str(self.version_metadata) != str(self.project_data_schema_version):
+            self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+        else:
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
 
     def process_folder(self, folderPath, filePattern):
@@ -3107,6 +3122,29 @@ class UpdateSQL(ApiParent):
                 self.populate_info_text(dialog, qtabwidget, qtextedit, data)
 
 
+    def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
+        """ Manage message depending result @status """
+
+        if status:
+            if msg_ok is None:
+                msg_ok = "Process finished successfully"
+            self.controller.show_info_box(msg_ok, "Info", parameter=parameter)
+        else:
+            if msg_error is None:
+                msg_error = "Process finished with some errors"
+            self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
+
+
+    def save_selection(self):
+
+        # Save last Project schema name and type selected
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+
+        self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
+        self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
+
+
     def info_show_info(self):
         """ Button 36: Info show info, open giswater and visit web page """
 
@@ -3130,28 +3168,31 @@ class UpdateSQL(ApiParent):
         self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
 
+        self.version_metadata = self.get_plugin_version()
+        # Check if exist column sample in table version
+        sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + self.schema_name + "';"
+        result = self.controller.get_row(sql)
+
+        if result is None:
+            sql = "SELECT giswater, language FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
+            result = self.controller.get_row(sql)
+        else:
+            sql = "SELECT giswater, language, sample FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
+            result = self.controller.get_row(sql)
+            self.is_sample = result[2]
+
+        self.project_data_schema_version = result[0]
+        self.project_data_language = result[1]
+
+        if str(self.version_metadata) != str(self.project_data_schema_version):
+            self.dlg_info.lbl_status.setPixmap(self.status_no_update)
+            utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.lbl_status_text,
+                                         '(Not is the same version as the last release)')
+        else:
+            self.dlg_info.lbl_status.setPixmap(self.status_ok)
+            utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.lbl_status_text, '')
+        utils_giswater.dis_enable_dialog(self.dlg_info, True)
+
         # Open dialog
         self.open_dialog(self.dlg_info, maximize_button=False)
 
-
-    def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
-        """ Manage message depending result @status """
-
-        if status:
-            if msg_ok is None:
-                msg_ok = "Process finished successfully"
-            self.controller.show_info_box(msg_ok, "Info", parameter=parameter)
-        else:
-            if msg_error is None:
-                msg_error = "Process finished with some errors"
-            self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
-
-
-    def save_selection(self):
-
-        # Save last Project schema name and type selected
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-
-        self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
-        self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
