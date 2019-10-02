@@ -2489,6 +2489,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql,self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
 
             self.dlg_readsql.cmb_feature_name_view.clear()
             self.dlg_readsql.cmb_formname_fields.clear()
@@ -2501,6 +2502,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = ("SELECT wsoftware FROM " + str(schema_name) + ".version")
             wsoftware = self.controller.get_row(sql)
