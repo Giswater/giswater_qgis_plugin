@@ -80,6 +80,13 @@ class NotifyFunctions(ParentAction):
         
 
     def wait_notifications(self, conn):
+        """
+        functions called in -> getattr(self, function_name)(**params):
+            def refresh_config_user_variables(self, **kwargs)
+            def refresh_config_system_variables(self, **kwargs)
+            def refresh_canvas(self, **kwargs)
+            def refresh_attribute_table(self, **kwargs)
+        """
         while True:
             conn.poll()
             while conn.notifies:
@@ -92,10 +99,29 @@ class NotifyFunctions(ParentAction):
                 for function in complet_result[0]['functionAction']['functions']:
                     function_name = function['name']
                     params = function['parameters']
-                    getattr(self, function_name)(**params)
+                    try:
+                        getattr(self, function_name)(**params)
+                    except AttributeError as e:
+                        # If function_name not exist as python function
+                        pass
+                        print( f"Exception error: {e}")
+
+
+
+
+
+    def refresh_config_user_variables(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+        self.controller.get_config_param_user()
+
+
+    def refresh_config_system_variables(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+        self.controller.get_config_param_system()
 
 
     def refresh_canvas(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
         # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
         # self.canvas.refreshAllLayers()
 
@@ -104,6 +130,7 @@ class NotifyFunctions(ParentAction):
             layer.triggerRepaint()
 
     def refresh_attribute_table(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 Column names as alias, combos and typeahead as ValueMap"""
