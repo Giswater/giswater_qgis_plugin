@@ -1379,7 +1379,7 @@ class DaoController(object):
         self.cfgp_user={}
         sql = (f"SELECT parameter, value FROM config_param_user "
                f" WHERE cur_user = current_user")
-        rows = self.get_rows(sql)
+        rows = self.get_rows(sql, commit=True)
         for row in rows:
             self.cfgp_user[row['parameter']] = CfgUser(row['parameter'], row['value'])
 
@@ -1388,6 +1388,6 @@ class DaoController(object):
 
         self.cfgp_system={}
         sql = f"SELECT parameter, value, data_type, context, descript, label FROM config_param_system "
-        rows = self.get_rows(sql)
+        rows = self.get_rows(sql, commit=True)
         for row in rows:
             self.cfgp_system[row['parameter']] = CfgSystem(row['parameter'], row['value'], row['data_type'], row['context'], row['descript'], row['label'])
