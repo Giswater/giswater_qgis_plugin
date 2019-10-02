@@ -19,8 +19,11 @@ from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QComp
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import datetime
+import json
 import os
 import subprocess
+
+from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -91,11 +94,10 @@ class MincutConfig(ParentAction):
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
         self.set_icon(self.btn_notify, "307")
-
-        btn_visible = self.settings.value('customized_actions/show_mincut_sms', 'FALSE')
-        if btn_visible.upper() == 'TRUE':
-            self.btn_notify.setVisible(True)
-        else:
+        try:
+            self.custom_action_sms = json.loads(self.controller.cfgp_system['custom_action_sms'].value, object_pairs_hook=OrderedDict)
+            self.btn_notify.setVisible(self.custom_action_sms['show_mincut_sms'])
+        except KeyError as e:
             self.btn_notify.setVisible(False)
 
         self.populate_combos()
@@ -118,7 +120,9 @@ class MincutConfig(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        field_code = self.settings.value('customized_actions/field_code', 'code')
+
+
+        field_code = self.custom_action_sms['field_code']
         inf_text = "Are you sure you want to send smd to this clients?"
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
@@ -147,12 +151,13 @@ class MincutConfig(ParentAction):
 
 
     def call_sms_script(self, qtable):
-        path = self.settings.value('customized_actions/path_sms_script')
+
+        path = self.custom_action_sms['path_sms_script']
         if path is None or not os.path.exists(path):
             self.controller.show_warning("File not found", parameter=path)
             return
         selected_list = qtable.selectionModel().selectedRows()
-        field_code = self.settings.value('customized_actions/field_code', 'code')
+        field_code = self.custom_action_sms['field_code']
 
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()

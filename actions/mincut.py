@@ -27,9 +27,11 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
+import json
 import os
 import operator
 from datetime import datetime
+from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -189,8 +191,12 @@ class MincutParent(ParentAction):
         action.triggered.connect(self.show_notified_list)
         # self.set_icon(action, "308")
         self.show_notified = action
-        action_visible = self.settings.value('customized_actions/show_sms_info', 'FALSE')
-        self.show_notified.setVisible(True) if action_visible.upper() == 'TRUE' else self.show_notified.setVisible(False)
+
+        try:
+            custom_action_sms = json.loads(self.controller.cfgp_system['custom_action_sms'].value, object_pairs_hook=OrderedDict)
+            self.show_notified.setVisible(custom_action_sms['show_sms_info'])
+        except KeyError as e:
+            self.show_notified.setVisible(False)
 
         # Show future id of mincut
         if self.is_new:
