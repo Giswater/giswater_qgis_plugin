@@ -584,6 +584,10 @@ class ApiConfig(ApiParent):
         # Close dialog
         self.close_dialog(self.dlg_config)
 
+        # Update self.controller.cfgp_user and self.controller.cfgp_system
+        self.controller.get_config_param_user()
+        self.controller.get_config_param_system()
+
 
     def check_child_to_parent(self, widget_child, widget_parent):
         if widget_child.isChecked():
