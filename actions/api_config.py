@@ -38,6 +38,12 @@ class ApiConfig(ApiParent):
     def api_config(self):
         """ Button 99: Dynamic config form """
 
+        # Remove layers name from temp_table
+        sql = "DELETE FROM temp_table WHERE fprocesscat_id = '63';"
+        self.controller.execute_sql(sql)
+        # Set layers name in temp_table
+        self.set_layers_name()
+
         self.list_update = []
 
         body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
@@ -204,25 +210,6 @@ class ApiConfig(ApiParent):
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
         self.hide_void_groupbox(self.dlg_config)
-
-        #TODO:: Enhancement this with temporal table or somthing.
-        # Set additional values for combo Cad_tools
-        layers = self.iface.mapCanvas().layers()
-        layers_list = []
-
-        for layer in layers:
-            elem = []
-            elem.append(layer.name())
-            elem.append(layer.name())
-            layers_list.append(elem)
-        layers_list = sorted(layers_list, key=operator.itemgetter(0))
-        cad_combo = self.dlg_config.tab_main.findChild(QComboBox, 'cad_tools_base_layer_vdefault')
-        if cad_combo is not None:
-            utils_giswater.set_item_data(cad_combo, layers_list, 1)
-            sql = f"SELECT value, value FROM config_param_user WHERE parameter = 'cad_tools_base_layer_vdefault'"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if row:
-                utils_giswater.set_combo_itemData(cad_combo, str(row[0]), 0)
 
         # Open form
         self.open_dialog(self.dlg_config)
@@ -611,13 +598,23 @@ class ApiConfig(ApiParent):
     # TODO:
     def remove_empty_groupBox(self, layout):
 
-        self.controller.log_info(str("TEST"))
         groupBox_list = layout.findChild(QWidget)
-        self.controller.log_info(str(layout.objectName()))
-        self.controller.log_info(str(groupBox_list))
         if groupBox_list is None:
             return
         for groupBox in groupBox_list:
             widget_list = groupBox.findChildren(QWidget)
             if not widget_list:
                 groupBox.setVisible(False)
+
+
+    def set_layers_name(self):
+        """ Insert the name of all the TOC layers, then populate the cad_combo_layers """
+        layers = self.iface.mapCanvas().layers()
+        if not layers:
+            return
+        layers_name = '{"list_layers_name":"{'
+        for layer in layers:
+            layers_name += f"{layer.name()}, "
+        layers_name = layers_name[:-2] + '}"}'
+        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (63, $${layers_name}$$);')
+        self.controller.execute_sql(sql)
