@@ -14,8 +14,8 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macroexpl_id, name","featureType":["exploitation"]}]' WHERE id = 'macroexploitation';
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrosector_id, name","featureType":["v_edit_sector"]}]' WHERE id = 'macrosector';
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node","cat_arc","cat_connec","cat_grate"]}]' WHERE id = 'price_compost';
-UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_user_variables", "enabled":"true", "trg_fields":"value","featureType":[""]}]' WHERE id = 'config_param_user';
-UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_system_variables", "enabled":"true", "trg_fields":"value","featureType":[""]}]' WHERE id = 'config_param_system';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_user_variables", "enabled":"true", "trg_fields":"parameter,value, cur_user","featureType":[""]}]' WHERE id = 'config_param_user';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_system_variables", "enabled":"true", "trg_fields":"parameter, value, data_type, context, descript, label","featureType":[""]}]' WHERE id = 'config_param_system';
 
 --create notify trg
 SELECT gw_fct_admin_schema_manage_triggers('notify',null);
