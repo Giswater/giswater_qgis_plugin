@@ -7,3 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_windsp';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_windspeed';
