@@ -104,7 +104,7 @@ BEGIN
 				END IF;
 				
 			END LOOP;
-			IF (SELECT wsoftware FROM version) = 'WS' THEN
+			IF (SELECT wsoftware FROM version LIMIT 1) = 'WS' THEN
 				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||'';
 			END IF;
 		END IF;
