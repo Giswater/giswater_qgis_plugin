@@ -10,5 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 03/10/2019
 
-UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_column::json->>'list_layers_name')::text[] from temp_table where fprocesscat_id = 63)) as id, UNNEST(ARRAY (select (text_column::json->>'list_layers_name')::text[] 
+UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_column::json->>''list_layers_name'')::text[] from temp_table where fprocesscat_id = 63)) as id, UNNEST(ARRAY (select (text_column::json->>''list_layers_name'')::text[] 
 FROM temp_table WHERE fprocesscat_id = 63)) as idval ' WHERE id = 'cad_tools_base_layer_vdefault';
