@@ -8,8 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 01/10/2019
-UPDATE audit_cat_param_user SET label = 'Keep opened edition on update feature:' WHERE id = 'cf_keep_opened_edition';
+-- 03/10/2019
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('composers_path', 'C:/Users/Usuari/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgiscomposer/en', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('actions_to_hide', '74,75,76,199', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
