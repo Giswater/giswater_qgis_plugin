@@ -332,7 +332,7 @@ BEGIN
 				INTO v_pnom, v_dnom, v_matcat_id;
 				
 		ELSIF v_project_type ='UD' THEN 
-			IF lower(v_catfeature.feature_type) ='gully' THEN
+			IF (v_catfeature.feature_type) ='GULLY' THEN
 				EXECUTE 'SELECT matcat_id FROM cat_grate WHERE id=$1'
 					USING v_catalog
 					INTO v_matcat_id;

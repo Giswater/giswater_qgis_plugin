@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO cat_mat_grate
-SELECT DISTINCT matcat_id FROM cat_grate;
+SELECT DISTINCT matcat_id FROM cat_grate WHERE matcat_id IS NOT NULL;
 
 
 UPDATE audit_cat_function SET isdeprecated=TRUE where id=1248;
