@@ -39,7 +39,7 @@ class ApiConfig(ApiParent):
         """ Button 99: Dynamic config form """
 
         # Remove layers name from temp_table
-        sql = "DELETE FROM temp_table WHERE fprocesscat_id = '63';"
+        sql = "DELETE FROM temp_table WHERE fprocesscat_id = '63' AND user_name = current_user;"
         self.controller.execute_sql(sql)
         # Set layers name in temp_table
         self.set_layers_name()
@@ -616,5 +616,5 @@ class ApiConfig(ApiParent):
         for layer in layers:
             layers_name += f"{layer.name()}, "
         layers_name = layers_name[:-2] + '}"}'
-        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (63, $${layers_name}$$);')
+        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, user_name) VALUES (63, $${layers_name}$$, current_user);')
         self.controller.execute_sql(sql)
