@@ -675,6 +675,31 @@ class ParentAction(object):
         model.setStringList(row)
         self.completer.setModel(model)
 
+    def get_max_rectangle_from_coords(self, list_coord):
+        """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
+        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+        """
+
+        coords = list_coord.group(1)
+        print(f"{(type(coords))} --> {coords}")
+        polygon = coords.split(',')
+        x, y = polygon[0].split(' ')
+        min_x = x  # start with something much higher than expected min
+        min_y = y
+        max_x = x  # start with something much lower than expected max
+        max_y = y
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
+            if x < min_x:
+                min_x = x
+            if x > max_x:
+                max_x = x
+            if y < min_y:
+                min_y = y
+            if y > max_y:
+                max_y = y
+
+        return max_x, max_y, min_x, min_y
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
 
