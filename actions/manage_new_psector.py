@@ -784,10 +784,9 @@ class ManageNewPsector(ParentManage):
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
                                                manage_new_psector=self, table_object=table_object)
-        self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
+        self.canvas.setMapTool(multiple_selection)
         self.connect_signal_selection_changed(dialog, table_object, query)
-
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
