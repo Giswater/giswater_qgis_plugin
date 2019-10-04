@@ -121,7 +121,8 @@ class UpdateSQL(ApiParent):
         self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
         btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
-        self.set_icon(btn_info, '73')
+        btn_info.setText('Update Project Schema')
+        self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
 
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
@@ -282,9 +283,11 @@ class UpdateSQL(ApiParent):
                 if str(self.version_metadata) != str(self.project_data_schema_version):
                     self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                     utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+                    self.dlg_readsql.btn_info.setEnabled(True)
                 else:
                     self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
                     utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                    self.dlg_readsql.btn_info.setEnabled(False)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
@@ -1631,9 +1634,11 @@ class UpdateSQL(ApiParent):
             if str(self.version_metadata) != str(self.project_data_schema_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+                self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                self.dlg_readsql.btn_info.setEnabled(False)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
 
         self.populate_data_schema_name(self.cmb_project_type)
@@ -1966,9 +1971,11 @@ class UpdateSQL(ApiParent):
         if str(self.version_metadata) != str(self.project_data_schema_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+            self.dlg_readsql.btn_info.setEnabled(True)
         else:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            self.dlg_readsql.btn_info.setEnabled(False)
 
 
     def process_folder(self, folderPath, filePattern):

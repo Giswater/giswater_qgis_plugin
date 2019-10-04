@@ -30,7 +30,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="4" column="13">
+    <item row="4" column="15">
      <widget class="QPushButton" name="btn_close">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -43,14 +43,7 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="3">
-     <widget class="QLabel" name="lbl_status_text">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="12">
+    <item row="4" column="14">
      <spacer name="horizontalSpacer_2">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -63,30 +56,7 @@
       </property>
      </spacer>
     </item>
-    <item row="4" column="2">
-     <widget class="QLabel" name="lbl_status">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="4">
-     <widget class="QLabel" name="lbl_schema_name">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="14">
+    <item row="3" column="0" colspan="16">
      <widget class="QTabWidget" name="tab_main">
       <property name="enabled">
        <bool>true</bool>
@@ -1052,12 +1022,42 @@
       </widget>
      </widget>
     </item>
+    <item row="4" column="3">
+     <widget class="QLabel" name="lbl_schema_name">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <widget class="QLabel" name="lbl_status_text">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QLabel" name="lbl_status">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
    <zorder>tab_main</zorder>
    <zorder>btn_close</zorder>
    <zorder>lbl_status</zorder>
-   <zorder>lbl_status_text</zorder>
    <zorder>lbl_schema_name</zorder>
+   <zorder>lbl_status_text</zorder>
   </widget>
   <action name="action_create_sample">
    <property name="text">
