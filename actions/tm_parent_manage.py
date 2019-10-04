@@ -288,9 +288,9 @@ class TmParentManage(TmParentAction, object):
         self.controller.log_info(str(self.visible_layers))
         multiple_selection = TmMultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
                                                  parent_manage=self, table_object=table_object)
+        self.disconnect_signal_selection_changed()
         self.previous_map_tool = self.canvas.mapTool()
         self.canvas.setMapTool(multiple_selection)
-        self.disconnect_signal_selection_changed()
         self.connect_signal_selection_changed(table_object)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
