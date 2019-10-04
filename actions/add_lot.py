@@ -1499,7 +1499,7 @@ class AddNewLot(ParentManage):
         """ Set visible lot layers """
 
         # Refresh extension of layer
-        layer = self.controller.get_layer_by_tablename("ve_lot_x_gully")
+        layer = self.controller.get_layer_by_tablename("v_lot")
         if layer:
             self.controller.set_layer_visible(layer)
             if zoom:
