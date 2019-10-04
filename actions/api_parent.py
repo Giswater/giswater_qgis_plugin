@@ -142,6 +142,9 @@ class ApiParent(ParentAction):
                f" FROM {table_object}")
 
         rows = self.controller.get_rows(sql, log_sql=True)
+        if rows is None:
+            return
+
         for i in range(0, len(rows)):
             aux = rows[i]
             rows[i] = str(aux[0])
