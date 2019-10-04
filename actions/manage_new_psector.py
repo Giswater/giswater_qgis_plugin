@@ -289,7 +289,7 @@ class ManageNewPsector(ParentManage):
             layer = None
             if not is_api:
                 layername = f'v_edit_{self.plan_om}_psector'
-                layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
+                layer = self.controller.get_layer_by_tablename(layername, show_warning=False)
             if layer:
 
                 expr_filter = f"psector_id = '{psector_id}'"
