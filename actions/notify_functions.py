@@ -6,13 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-
-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
 from qgis.core import QgsEditorWidgetSetup, QgsLayerTreeLayer, QgsProject, QgsTask, QgsApplication
 
 import json
@@ -31,9 +24,11 @@ class NotifyFunctions(ParentAction):
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir
-        
-
-    def start_listening(self, channel_name, target=None, args=()):
+    def start_developer_thread(self, channel_name, target=None, args=()):
+        self.controller.execute_sql(f"LISTEN {channel_name};")
+        self.developer_thread = threading.Thread(target=getattr(self, target), args=args)
+        self.developer_thread.start()
+    def start_desktop_thread(self, channel_name, target=None, args=()):
         """
         :param channel_name: Channel to be listened
         :param target:  is the callable object to be invoked by the run()
@@ -42,8 +37,20 @@ class NotifyFunctions(ParentAction):
         :return:
         """
         self.controller.execute_sql(f"LISTEN {channel_name};")
-        self.thread = threading.Thread(target=getattr(self, target), args=args)
-        self.thread.start()
+        self.desktop_thread = threading.Thread(target=getattr(self, target), args=args)
+        self.desktop_thread.start()
+
+    def start_user_thread(self, channel_name, target=None, args=()):
+        """
+        :param channel_name: Channel to be listened
+        :param target:  is the callable object to be invoked by the run()
+                        method. Defaults to None, meaning nothing is called.
+        :param args: is the argument tuple for the target invocation. Defaults to ().
+        :return:
+        """
+        self.controller.execute_sql(f"LISTEN {channel_name};")
+        self.user_thread = threading.Thread(target=getattr(self, target), args=args)
+        self.user_thread.start()
         # task1 = QgsTask.fromFunction('start listening', getattr(self, target)(args), on_finished=self.task_completed, wait_time=20)
         # QgsApplication.taskManager().addTask(task1)
 
@@ -94,20 +101,20 @@ class NotifyFunctions(ParentAction):
                 print(f"Got NOTIFY:{notify.pid}, {notify.channel}, {notify.payload}")
                 if not notify.payload:
                     continue
+                complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
+                self.execute_functions(complet_result)
 
-                complet_result = [json.loads(notify.payload, object_pairs_hook=OrderedDict)]
-                for function in complet_result[0]['functionAction']['functions']:
-                    function_name = function['name']
-                    params = function['parameters']
-                    try:
-                        getattr(self, function_name)(**params)
-                    except AttributeError as e:
-                        # If function_name not exist as python function
-                        pass
-                        print( f"Exception error: {e}")
-
-
-
+    def execute_functions(self, complet_result):
+        for function in complet_result['functionAction']['functions']:
+            function_name = function['name']
+            params = function['parameters']
+            try:
+                getattr(self, function_name)(**params)
+            except AttributeError as e:
+                # If function_name not exist as python function
+                print(f"Exception AttributeError: {e}")
+                pass
+                print(f"Exception error: {e}")
 
 
     def refresh_config_user_variables(self, **kwargs):

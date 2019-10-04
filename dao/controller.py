@@ -47,6 +47,7 @@ class DaoController(object):
         self.schema_name = None
         self.dao = None
         self.credentials = None
+        self.current_user = None
         self.cfgp_user = {}
         self.cfgp_system = {}
 
@@ -1151,7 +1152,7 @@ class DaoController(object):
         cur_user = ""
         if row:
             cur_user = str(row[0])
-            
+        self.current_user = cur_user
         return cur_user
     
     

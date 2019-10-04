@@ -757,7 +757,7 @@ class Giswater(QObject):
         if not layer:
             self.controller.show_warning("Layer not found", parameter="v_edit_node")
             return
-
+        self.controller.get_current_user()
         layer_source = self.controller.get_layer_source(layer)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
@@ -860,11 +860,13 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
-
+        self.enable_python_console()
         # Create a thread and start listen
         if  self.settings.value('system_variables/use_notify').upper() == 'TRUE' :
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.notify.start_listening('desktop', 'wait_notifications', (self.controller.dao.conn, ))
+            self.notify.start_user_thread('developer', 'wait_notifications', (self.controller.dao.conn,))
+            self.notify.start_desktop_thread('desktop', 'wait_notifications', (self.controller.dao.conn, ))
+            self.notify.start_user_thread(self.controller.current_user, 'wait_notifications', (self.controller.dao.conn, ))
 
         # Save toolbar position after closing QGIS
         self.iface.actionExit().triggered.connect(self.save_toolbars_position)
