@@ -29,7 +29,7 @@ BEGIN
 			IF v_link.feature_type='CONNEC' THEN
 
 				-- update connec, mandatory to use v_edit_connec because it's identified and managed when arc_id comes from plan psector tables
-				UPDATE v_edit_connec SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE connec_id=v_link.feature_id;
+				UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
 								
 				IF v_projecttype = 'WS' THEN
 
@@ -42,7 +42,7 @@ BEGIN
 			ELSIF v_link.feature_type='GULLY' THEN
  		
 				-- update gully, mandatory to use v_edit_gully because it's identified and managed when arc_id comes from plan psector tables
-				UPDATE v_edit_gully SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE gully_id=v_link.feature_id;
+				UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
 				
 			END IF;
 		END LOOP;
@@ -52,11 +52,11 @@ BEGIN
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 			
-				UPDATE v_edit_connec SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE connec_id=v_link.feature_id;
+				UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
 			
 			ELSIF v_link.feature_type='GULLY' THEN
 		
-				UPDATE v_edit_gully SET arc_id=NEW.arc_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id, expl_id=NEW.expl_id WHERE gully_id=v_link.feature_id;
+				UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
 			END IF;
 		END LOOP;
 		
