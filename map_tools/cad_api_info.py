@@ -64,6 +64,8 @@ class CadApiInfo(ParentMapTool):
             if point is False:
                 return
             complet_result, dialog = self.info_cf.open_form(point, tab_type=self.tab_type)
+        if dialog is None:
+            return
         if complet_result is False:
                 print("No point under mouse(LeftButton)")
                 return

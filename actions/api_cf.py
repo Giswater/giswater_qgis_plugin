@@ -498,6 +498,8 @@ class ApiCF(ApiParent):
 
         for field in complet_result[0]['body']['data']['fields']:
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
+            if widget is None:
+                return False, False
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
 
             # Take the QGridLayout with the intention of adding a QSpacerItem later
@@ -640,13 +642,22 @@ class ApiCF(ApiParent):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-        widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
-        if widget.property('column_id') == self.field_id:
-            self.feature_id = widget.text()
-            # Get selected feature
-            self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+
+        try :
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            if widget.property('column_id') == self.field_id:
+                self.feature_id = widget.text()
+                # Get selected feature
+                self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+        except AttributeError as e:
+            msg = "field widgettype is not configured for"
+            self.controller.show_message(msg, 2, parameter=field['column_id'])
+
         return label, widget
 
+
+    # def manage_None(self, dialog, complet_result, field):
+    #     print(f"field {field['column_id']} is not configured")
 
     def manage_text(self, dialog, complet_result, field):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
