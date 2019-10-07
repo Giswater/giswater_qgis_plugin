@@ -148,16 +148,16 @@ BEGIN
 			DELETE FROM link WHERE link_id=v_link.link_id;
 			INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id) 
 			VALUES ((SELECT nextval('link_link_id_seq')), v_link.the_geom, connect_id_aux, feature_type_aux, v_link.exit_type, v_link.exit_id, 
-			v_link.userdefined_geom, v_connect.state, v_connect.expl_id);
+			v_link.userdefined_geom, v_connect.state, v_arc.expl_id);
 
 			-- Update connect attributes
 			IF feature_type_aux ='CONNEC' THEN          
-				UPDATE connec SET arc_id=v_connect.arc_id, dma_id=v_connect.dma_id, sector_id=v_connect.sector_id, pjoint_type=v_pjointtype, pjoint_id=v_pjointid
+				UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type=v_pjointtype, pjoint_id=v_pjointid
 				WHERE connec_id = connect_id_aux;
 
 				-- update specific fields for ws projects
 				IF v_projecttype = 'WS' THEN
-					UPDATE connec SET dqa_id=v_connect.dqa_id, minsector_id=v_connect.minsector_id,presszonecat_id=v_connect.presszonecat_id WHERE connec_id = connect_id_aux;
+					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszonecat_id=v_arc.presszonecat_id WHERE connec_id = connect_id_aux;
 				END IF;
 			
 				-- Update state_type if edit_connect_update_statetype is TRUE
@@ -167,7 +167,7 @@ BEGIN
 				END IF;
 			
 			ELSIF feature_type_aux ='GULLY' THEN 
-				UPDATE gully SET arc_id=v_connect.arc_id, dma_id=v_connect.dma_id, sector_id=v_connect.sector_id, pjoint_type=v_pjointtype, pjoint_id=v_pjointid
+				UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type=v_pjointtype, pjoint_id=v_pjointid
 				WHERE gully_id = connect_id_aux;
 
 				-- Update state_type if edit_connect_update_statetype is TRUE
