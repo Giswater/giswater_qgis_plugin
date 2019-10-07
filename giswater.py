@@ -1420,13 +1420,17 @@ class Giswater(QObject):
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
-                # Get values
+                # Manage fields
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
+                        # Set values
                         for i in range(0, len(field['comboIds'])):
                             _values[field['comboNames'][i]] = field['comboIds'][i]
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'typeahead':
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
