@@ -377,7 +377,7 @@ BEGIN
 					INTO v_values_array_aux;
 					
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
-					WHERE (a->>'aux_param') = v_catfeature.system_id;
+					WHERE (a->>'aux_param') = v_catfeature.system_id AND ((a->>'param') = concat(lower(v_catfeature.feature_type),'cat_id') OR (a->>'param') = concat(lower(v_catfeature.feature_type),'at_id'));;
 
 			ELSIF (aux_json->>'column_id') = 'code' THEN
 				field_value = v_code;
