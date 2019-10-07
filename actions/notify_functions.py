@@ -91,6 +91,7 @@ class NotifyFunctions(ParentAction):
             def refresh_config_system_variables(self, **kwargs)
             def refresh_canvas(self, **kwargs)
             def refresh_attribute_table(self, **kwargs)
+            def raise_notice(self, **kwargs)
         """
         while True:
             conn.poll()
@@ -101,6 +102,7 @@ class NotifyFunctions(ParentAction):
                     continue
                 complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                 self.execute_functions(complet_result)
+
 
     def execute_functions(self, complet_result):
         for function in complet_result['functionAction']['functions']:
@@ -113,6 +115,15 @@ class NotifyFunctions(ParentAction):
                 print(f"Exception AttributeError: {e}")
                 pass
                 print(f"Exception error: {e}")
+
+
+    def raise_notice(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
+            Used to show raise notices sent by postgresql
+        """
+        msg_list = kwargs['msg']
+        for msg in msg_list:
+            print(f"{msg}")
 
 
     def refresh_config_user_variables(self, **kwargs):
@@ -133,6 +144,7 @@ class NotifyFunctions(ParentAction):
         all_layers = self.controller.get_layers()
         for layer in all_layers:
             layer.triggerRepaint()
+
 
     def refresh_attribute_table(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
