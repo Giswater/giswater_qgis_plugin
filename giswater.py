@@ -1405,6 +1405,13 @@ class Giswater(QObject):
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
+                # Set field constraints
+                if 'set_qgis_constraints' in field and field['set_qgis_constraints'] is True:
+                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
+                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
+                                             QgsFieldConstraints.ConstraintStrengthHard)
+
                 # Manage fields
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
