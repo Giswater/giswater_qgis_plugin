@@ -24,10 +24,8 @@ class NotifyFunctions(ParentAction):
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir
-    def start_developer_thread(self, channel_name, target=None, args=()):
-        self.controller.execute_sql(f"LISTEN {channel_name};")
-        self.developer_thread = threading.Thread(target=getattr(self, target), args=args)
-        self.developer_thread.start()
+
+
     def start_desktop_thread(self, channel_name, target=None, args=()):
         """
         :param channel_name: Channel to be listened

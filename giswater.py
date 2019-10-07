@@ -864,7 +864,6 @@ class Giswater(QObject):
         # Create a thread and start listen
         if  self.settings.value('system_variables/use_notify').upper() == 'TRUE' :
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.notify.start_user_thread('developer', 'wait_notifications', (self.controller.dao.conn,))
             self.notify.start_desktop_thread('desktop', 'wait_notifications', (self.controller.dao.conn, ))
             self.notify.start_user_thread(self.controller.current_user, 'wait_notifications', (self.controller.dao.conn, ))
 
