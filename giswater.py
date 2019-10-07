@@ -5,24 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    import ConfigParser as configparser
-else:
-    import configparser
-    from qgis.core import QgsSnappingUtils, QgsPointLocator, QgsTolerance
-
-from qgis.core import QgsExpressionContextUtils, QgsProject, QgsEditorWidgetSetup, QgsDataSourceUri, QgsVectorLayer
+from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
+from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
 from qgis.PyQt.QtWidgets import QToolBar
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel
 
+import configparser
 import os.path
 import sys
 import webbrowser
@@ -84,10 +76,7 @@ class Giswater(QObject):
 
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        if Qgis.QGIS_VERSION_INT < 29900:
-            QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)
-        else:
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
             
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -1032,17 +1021,13 @@ class Giswater(QObject):
         layer = self.controller.get_layer_by_tablename(layername)
         if not layer:
             return
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, snapping_type, 1, tolerance, False)
-        else:
-            if snapping_type == 0:
-                snapping_type = QgsPointLocator.Vertex
-            elif snapping_type == 1:
-                snapping_type = QgsPointLocator.Edge
-            elif snapping_type == 2:
-                snapping_type = QgsPointLocator.All
-            QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
+        if snapping_type == 0:
+            snapping_type = QgsPointLocator.Vertex
+        elif snapping_type == 1:
+            snapping_type = QgsPointLocator.Edge
+        elif snapping_type == 2:
+            snapping_type = QgsPointLocator.All
+        QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
 
     def manage_custom_forms(self):
@@ -1076,19 +1061,13 @@ class Giswater(QObject):
 
         if self.layer_node:
             display_field = 'depth : [% "' + fieldname_node + '" %]'
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.layer_node.setDisplayField(display_field)
-            else:
-                self.layer_node.setMapTipTemplate(display_field)
-                self.layer_node.setDisplayExpression(display_field)
+            self.layer_node.setMapTipTemplate(display_field)
+            self.layer_node.setDisplayExpression(display_field)
 
         if self.layer_connec:
             display_field = 'depth : [% "' + fieldname_connec + '" %]'
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.layer_connec.setDisplayField(display_field)
-            else:
-                self.layer_connec.setMapTipTemplate(display_field)
-                self.layer_connec.setDisplayExpression(display_field)
+            self.layer_connec.setMapTipTemplate(display_field)
+            self.layer_connec.setDisplayExpression(display_field)
 
     
     def manage_map_tools(self):
@@ -1149,10 +1128,7 @@ class Giswater(QObject):
         
         # Get project variable 'expl_id'
         try:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
-            else:
-                expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
+            expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
         except:
             pass
         
