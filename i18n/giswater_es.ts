@@ -1011,11 +1011,14 @@
         <source>Selected node</source>
         <translation>Nodo seleccionado</translation>
     </message>
-       <message>
+    <message>
         <source>Parameter not found</source>
         <translation>Parametro no encontrado</translation>
     </message>
-
+    <message>
+        <source>The field widgettype is not configured for</source>
+        <translation>El campo widgettype no esta configurado para </translation>
+    </message>
 </context>
 
 </TS>

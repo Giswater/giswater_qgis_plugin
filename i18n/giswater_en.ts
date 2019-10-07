@@ -1014,7 +1014,10 @@
         <source>Parameter not found</source>
         <translation>Parameter not found</translation>
     </message>
-
+    <message>
+        <source>The field widgettype is not configured for</source>
+        <translation>The field widgettype is not configured for</translation>
+    </message>
 </context>
 
 </TS>

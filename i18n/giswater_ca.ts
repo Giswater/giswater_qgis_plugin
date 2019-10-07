@@ -1016,6 +1016,10 @@
         <source>Parameter not found</source>
         <translation>Parametre no trobat</translation>
     </message>
+    <message>
+        <source>The field widgettype is not configured for</source>
+        <translation>El camp widgettype no esta configurat per </translation>
+    </message>
 </context>
 
 </TS>

@@ -650,14 +650,11 @@ class ApiCF(ApiParent):
                 # Get selected feature
                 self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
         except AttributeError as e:
-            msg = "field widgettype is not configured for"
-            self.controller.show_message(msg, 2, parameter=field['column_id'])
+            message = "The field widgettype is not configured for"
+            self.controller.show_message(message, 2, parameter=field['column_id'])
 
         return label, widget
 
-
-    # def manage_None(self, dialog, complet_result, field):
-    #     print(f"field {field['column_id']} is not configured")
 
     def manage_text(self, dialog, complet_result, field):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
