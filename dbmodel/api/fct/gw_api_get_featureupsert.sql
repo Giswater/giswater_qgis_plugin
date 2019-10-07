@@ -74,6 +74,7 @@ DECLARE
 	v_catfeature record;
 	v_codeautofill boolean=true;
 	v_values_array json;
+	v_values_array_aux json;
 	v_values_array_json json[];
 	v_record record;
 	v_gislength float;
@@ -350,7 +351,6 @@ BEGIN
 			(SELECT * FROM '||p_table_id||' WHERE '||quote_ident(v_idname)||' = CAST($1 AS '||(v_columntype)||'))a'
 			INTO v_values_array
 			USING p_id;
-			RAISE NOTICE 'UPDATE 222 %',v_values_array;
 	END IF;
 
 	
@@ -364,18 +364,21 @@ BEGIN
 		
 			-- special values
 			IF (aux_json->>'column_id') = quote_ident(v_idname) THEN
+				
 				field_value = v_id;
 			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.feature_type),'_type')  THEN
-				
 				EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
 				v_type = field_value;
 				
 			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.feature_type),'cat_id') OR (aux_json->>'column_id') = concat(lower(v_catfeature.feature_type),'at_id') THEN
-				IF v_project_type ='UD' THEN
-					EXECUTE 'SELECT id FROM cat_' || v_catfeature.feature_type ||'  LIMIT 1' INTO field_value;
-				ELSE
-					EXECUTE 'SELECT id FROM cat_' || v_catfeature.feature_type ||' WHERE ' || v_catfeature.feature_type || 'type_id = ''' || v_catfeature.system_id || ''' LIMIT 1' INTO field_value;
-				END IF;
+					
+				EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT feature_field_id as param, value::text AS vdef, feature_dv_parent_value as aux_param FROM audit_cat_param_user 
+					JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL)a'
+					INTO v_values_array_aux;
+					
+				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
+					WHERE (a->>'aux_param') = v_catfeature.system_id;
+
 			ELSIF (aux_json->>'column_id') = 'code' THEN
 				field_value = v_code;
 			ELSIF (aux_json->>'column_id') = 'node_1' THEN
@@ -436,10 +439,8 @@ BEGIN
 			-- rest of vaules
 			ELSE
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id');
-
-				raise notice 'field_value %', field_value;
 			END IF;
-				
+			
 		ELSIF  p_tg_op ='UPDATE' THEN 
 				
 			field_value := (v_values_array->>(aux_json->>'column_id'));
