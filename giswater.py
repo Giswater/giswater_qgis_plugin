@@ -1338,12 +1338,22 @@ class Giswater(QObject):
         rows = self.controller.get_rows(sql, commit=True)
         self.available_layers = [layer[0] for layer in rows]
 
+        self.set_form_suppress(self.available_layers)
+
         layers_list = self.settings.value('system_variables/set_layer_config')
         for layer in layers_list:
             self.available_layers.append(layer)
 
 
-
+    def set_form_suppress(self, layers_list):
+        # Set for suppress  on  "Hide form on add feature (global settings)"
+        for layer_name in layers_list:
+            print(layer_name)
+            layer = self.controller.get_layer_by_tablename(layer_name)
+            if layer is None: continue
+            config = layer.editFormConfig()
+            config.setSuppress(0)
+            layer.setEditFormConfig(config)
 
     def set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.
