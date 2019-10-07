@@ -1346,14 +1346,29 @@ class Giswater(QObject):
 
 
     def set_form_suppress(self, layers_list):
-        # Set for suppress  on  "Hide form on add feature (global settings)"
+        """ Set form suppress on "Hide form on add feature (global settings) """
         for layer_name in layers_list:
-            print(layer_name)
             layer = self.controller.get_layer_by_tablename(layer_name)
             if layer is None: continue
             config = layer.editFormConfig()
             config.setSuppress(0)
             layer.setEditFormConfig(config)
+
+
+    def set_read_only(self, layer, field, field_index):
+        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+        # Get layer config
+        config = layer.editFormConfig()
+        try:
+            # Set field editability
+            config.setReadOnly(field_index, not field['iseditable'])
+        except KeyError as e:
+            # Control if key 'iseditable' not exist
+            pass
+        finally:
+            # Set layer config
+            layer.setEditFormConfig(config)
+
 
     def set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.
@@ -1411,6 +1426,9 @@ class Giswater(QObject):
                                              QgsFieldConstraints.ConstraintStrengthSoft)
                     layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
                                              QgsFieldConstraints.ConstraintStrengthHard)
+
+                # Manage editability
+                self.set_read_only(layer, field, fieldIndex)
 
                 # Manage fields
                 if field['widgettype'] == 'combo':
