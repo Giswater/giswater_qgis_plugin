@@ -1970,7 +1970,7 @@ class UpdateSQL(ApiParent):
 
         if str(self.version_metadata) != str(self.project_data_schema_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Schema version is different than the last release)')
             self.dlg_readsql.btn_info.setEnabled(True)
         else:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
