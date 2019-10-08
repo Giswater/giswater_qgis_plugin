@@ -24,7 +24,15 @@ DECLARE
 	v_notification_data text;
 	v_child_layer text;
 	v_parent_layer text;
+	v_notify_for_all text;
+	v_schemaname text;
+	v_action text;
 BEGIN
+
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	v_schemaname = 'SCHEMA_NAME';
+
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
 	v_table = TG_ARGV[0];
@@ -32,13 +40,14 @@ BEGIN
 	EXECUTE 'SELECT notify_action FROM audit_cat_table WHERE id = '''||v_table||''''
 	INTO v_notify_action_json;
 	
-
+	SELECT (a)->>'action' INTO v_action  FROM json_array_elements(v_notify_action_json) a;
+	
 	--capture data from the input json
 	FOR rec_notify_action IN SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'enabled' as enabled, 
 	(a)->>'featureType' as featureType FROM json_array_elements(v_notify_action_json) a LOOP
 
 		--transform enabled notifications for desktop
-		IF rec_notify_action.action = 'desktop' AND rec_notify_action.enabled = 'true'  THEN
+		IF rec_notify_action.enabled = 'true'  THEN
 		
 			--transform notifications with layer name as input parameters
 			IF rec_notify_action.featureType != '[]' THEN
@@ -113,10 +122,16 @@ BEGIN
 	
 	v_notification = '{"functions":['||v_notification_data||']}';
 	raise notice 'v_notification,%',v_notification;
-
-	PERFORM pg_notify('desktop', '{"functionAction":'||v_notification||'}');
 	
-	RAISE NOTICE 'test rais %', TG_ARGV[0];
+	v_notification := COALESCE(v_notification, '{}');
+
+	IF v_action = 'user' THEN
+		v_action = current_user;
+	END IF;
+	
+	PERFORM pg_notify('||v_action||', '{"functionAction":'||v_notification||',"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
+	
+
 	RETURN new;
 
 END;
