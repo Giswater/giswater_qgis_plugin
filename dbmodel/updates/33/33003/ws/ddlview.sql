@@ -64,3 +64,42 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
      JOIN connec ON v_edit_link.feature_id::text = connec.connec_id::text
      JOIN arc USING (arc_id)
      LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id);
+	
+	
+	
+
+CREATE OR REPLACE VIEW vi_pipes AS 
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.length,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.roughness,
+        CASE
+            WHEN rpt_inp_arc.minorloss IS NULL THEN 0::numeric(12,6)
+            ELSE rpt_inp_arc.minorloss
+        END AS minorloss,
+    inp_typevalue.idval AS status
+   FROM inp_selector_result,
+    rpt_inp_arc
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = rpt_inp_arc.status::text
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text 
+  AND inp_typevalue.typevalue::text = 'inp_value_status_pipe'::text AND (rpt_inp_arc.epa_type::text = 'SHORTPIPE'::text OR rpt_inp_arc.epa_type::text = 'PIPE'::text)
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.length,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.roughness,
+        CASE
+            WHEN inp_shortpipe.minorloss IS NULL THEN 0::numeric(12,6)
+            ELSE inp_shortpipe.minorloss
+        END AS minorloss,
+    inp_typevalue.idval AS status
+   FROM inp_selector_result,
+    rpt_inp_arc
+     JOIN inp_shortpipe ON rpt_inp_arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_shortpipe.status::text
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND inp_typevalue.typevalue::text = 'inp_value_status_pipe'::text;
+

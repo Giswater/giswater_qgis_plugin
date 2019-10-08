@@ -34,7 +34,7 @@ BEGIN
 	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom
 	FROM v_node 
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=v_node.node_id OR node_2=v_node.node_id
+		JOIN v_edit_inp_pipe a ON node_1=v_node.node_id OR node_2=v_node.node_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL)) ;
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 	
@@ -53,7 +53,8 @@ BEGIN
 		ELSE roughness
 	END AS roughness,
 	length,
-	inp_pipe.status,
+	CASE WHEN inp_pipe.status IS NULL THEN 'OPEN'
+	ELSE inp_pipe.status END AS status,
 	v_arc.the_geom,
 	inp_pipe.minorloss
 	FROM inp_selector_sector, v_arc
