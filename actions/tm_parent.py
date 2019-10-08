@@ -247,7 +247,7 @@ class TmParentAction(object):
                f" FROM {tablename}"
                f" ORDER BY {field_search}")
         rows = self.controller.get_rows(sql)
-        if not rows:
+        if rows is None:
             return
 
         for i in range(0, len(rows)):

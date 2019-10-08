@@ -271,17 +271,20 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT({field_id}) "
                f"FROM {tablename} "
                f"ORDER BY {field_id}")
-        row = self.controller.get_rows(sql)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
+        rows = self.controller.get_rows(sql)
+        if rows is None:
+            return
+
+        for i in range(0, len(rows)):
+            aux = rows[i]
+            rows[i] = str(aux[0])
 
         # Set completer and model: add autocomplete in the widget
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
-        model.setStringList(row)
+        model.setStringList(rows)
         self.completer.setModel(model)
 
 
