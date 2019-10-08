@@ -17,7 +17,7 @@
 """
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker
-from qgis.core import QgsProject, QgsPoint, QgsFeatureRequest
+from qgis.core import QgsProject, QgsPoint, QgsFeatureRequest, QgsVectorLayer
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
 
@@ -108,6 +108,8 @@ class SnappingConfigManager(object):
         layers = self.controller.get_layers()
         # Loop through all the layers in the project
         for layer in layers:
+            if type(layer) != QgsVectorLayer:
+                continue
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), enable, snapping_mode, 0, 1, False)
 
         QgsProject.instance().blockSignals(False)
