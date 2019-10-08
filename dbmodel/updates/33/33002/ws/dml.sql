@@ -9,5 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 08/10/2019
-UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrodqa_id, name","featureType":["v_edit_dqa]}]' WHERE id='macrodqa';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrodqa_id, name","featureType":["v_edit_dqa"]}]' WHERE id='macrodqa';
 

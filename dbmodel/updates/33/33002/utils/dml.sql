@@ -22,8 +22,8 @@ UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (tex
 FROM temp_table WHERE fprocesscat_id = 63)) as idval ' WHERE id = 'cad_tools_base_layer_vdefault';
 
 -- 08/10/2019
-UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrodma_id, name","featureType":["v_edit_dma]}]' WHERE id='macrodma';
-UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrosector_id, name","featureType":["v_edit_sector]}]' WHERE id='macrosector';
-UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macroexpl_id, name","featureType":["v_edit_exploitation]}]' WHERE id='macroexploitation';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrodma_id, name","featureType":["v_edit_dma"]}]' WHERE id='macrodma';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macrosector_id, name","featureType":["v_edit_sector"]}]' WHERE id='macrosector';
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macroexpl_id, name","featureType":["v_edit_exploitation"]}]' WHERE id='macroexploitation';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"user","name":"refresh_config_system_variables", "enabled":"true", "trg_fields":"parameter, value, data_type, context, descript, label","featureType":[""]}]' WHERE id = 'config_param_system';
