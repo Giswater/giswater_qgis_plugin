@@ -50,6 +50,7 @@ class ApiSearch(ApiParent):
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.iface = iface
+        self.project_type = controller.get_project_type()
         self.json_search = {}
         self.lbl_visible = False
 
@@ -678,8 +679,7 @@ class ApiSearch(ApiParent):
                    f" FROM {table_name}")
             sql += f" WHERE workcat_id = '{workcat_id}' AND feature_type = '{feature}'"
             rows = self.controller.get_rows(sql)
-            if not rows:
-                return
+
 
             if extension is not None:
                 widget_name = f"lbl_total_{feature.lower()}{extension}"
@@ -688,11 +688,18 @@ class ApiSearch(ApiParent):
 
             widget = self.items_dialog.findChild(QLabel, str(widget_name))
 
-            if self.project_type == 'ws' and feature == 'GULLY':
-                widget.hide()
-            total = len(rows)
+            if not rows:
+                total = 0
+            else:
+                total = len(rows)
             # Add data to workcat search form
+
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
+            if self.project_type == 'ws' and feature == 'GULLY':
+                widget.setVisible(False)
+            
+            if not rows:
+                continue
             length = 0
             if feature == 'ARC':
                 for row in rows:
