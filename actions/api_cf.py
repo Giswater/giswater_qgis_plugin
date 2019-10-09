@@ -656,9 +656,10 @@ class ApiCF(ApiParent):
         """
         widget = self.add_lineedit(field)
         widget = self.set_widget_size(widget, field)
+        widget = self.set_min_max_values(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
         widget = self.set_data_type(field, widget)
-        widget = self.set_min_max_values(widget, field)
+
         return widget
 
     def set_min_max_values(self, widget, field):
@@ -983,12 +984,13 @@ class ApiCF(ApiParent):
     def check_min_max_value(self,dialog, widget, btn_accept):
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
-            if (widget.property('minValue') and float(value) < float(widget.property('minValue'))) or \
-                    (widget.property('maxValue') and float(value) > float(widget.property('maxValue'))):
+            if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or \
+                    (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
                 widget.setStyleSheet("border: 1px solid red")
                 btn_accept.setEnabled(False)
-            elif (widget.property('minValue') and float(value) >= float(widget.property('minValue'))) and \
-                    (widget.property('maxValue') and float(value) <= float(widget.property('maxValue'))):
+            # elif (widget.property('minValue') and float(value) >= float(widget.property('minValue'))) and \
+            #         (widget.property('maxValue') and float(value) <= float(widget.property('maxValue'))) or value == '':
+            else:
                 widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
                 btn_accept.setEnabled(True)
         except ValueError as e:
