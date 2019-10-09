@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 09/10/2019
-UPDATE config_api_form_fields SET datatype='double' WHERE datatype ='numeric'
+UPDATE config_api_form_fields SET datatype='double' WHERE datatype ='numeric';
