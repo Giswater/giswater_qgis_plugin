@@ -1,0 +1,3 @@
+3.3.004
+*************
+- Bug fix on config_form_fields on typeahead widgets for valves
