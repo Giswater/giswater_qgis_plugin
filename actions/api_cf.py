@@ -658,6 +658,16 @@ class ApiCF(ApiParent):
         widget = self.set_widget_size(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
         widget = self.set_data_type(field, widget)
+        widget = self.set_min_max_values(widget, field)
+        return widget
+
+    def set_min_max_values(self, widget, field):
+        # Set max and min values allowed
+        if field['widgetcontrols'] and 'minValue' in field['widgetcontrols']:
+            widget.setProperty('minValue', field['widgetcontrols']['minValue'])
+
+        if field['widgetcontrols'] and ('maxValue' in field['widgetcontrols']):
+            widget.setProperty('maxValue', field['widgetcontrols']['maxValue'])
         return widget
 
 
@@ -952,21 +962,38 @@ class ApiCF(ApiParent):
                 _json[str(widget.property('column_id'))] = None
             else:
                 _json[str(widget.property('column_id'))] = str(value)
-            self.set_datatype_validator(value, widget, dialog.btn_accept)
 
         self.controller.log_info(str(_json))
 
-    def set_datatype_validator(self, value, widget, btn):
+
+    def check_datatype_validator(self, dialog, widget, btn):
         """
         functions called in ->  widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
          """
+        value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         except AttributeError as e:
+            print(e)
             """If the function called by getattr don't exist raise this exception"""
             pass
+
+    def check_min_max_value(self,dialog, widget, btn_accept):
+        value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+        try:
+            if (widget.property('minValue') and float(value) < float(widget.property('minValue'))) or \
+                    (widget.property('maxValue') and float(value) > float(widget.property('maxValue'))):
+                widget.setStyleSheet("border: 1px solid red")
+                btn_accept.setEnabled(False)
+            elif (widget.property('minValue') and float(value) >= float(widget.property('minValue'))) and \
+                    (widget.property('maxValue') and float(value) <= float(widget.property('maxValue'))):
+                widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+                btn_accept.setEnabled(True)
+        except ValueError as e:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)
 
     def check_tab_data(self, dialog):
         """ Check if current tab name is tab_data """
@@ -1001,6 +1028,9 @@ class ApiCF(ApiParent):
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
+            widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
+            widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
+
         return widget
 
     def enabled_accept(self, dialog):
