@@ -12,4 +12,7 @@ UPDATE config_api_form_fields SET widgettype='typeahead', dv_querytext = 'SELECT
 typeahead='{"fieldToSearch": "pol_id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}' WHERE column_id = 'pol_id';
 
 UPDATE config_api_form_fields set dv_querytext='SELECT connec_id, connec_id as idval FROM connec WHERE connec_id IS NOT NULL',
-typeahead = '{"fieldToSearch": "connec_id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}' where  column_id = 'linked_connec'
+typeahead = '{"fieldToSearch": "connec_id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}' where  column_id = 'linked_connec';
+
+-- 09/10/2019
+UPDATE config_api_form_fields SET datatype='double' WHERE datatype ='numeric';
