@@ -1566,6 +1566,7 @@ class UpdateSQL(ApiParent):
 
         # Get current schema selected
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        self.schema = None
 
         self.set_wait_cursor()
         self.load_fct_ftrg(project_type=project_type)
@@ -2146,9 +2147,11 @@ class UpdateSQL(ApiParent):
         self.controller.log_info("Processing folder", parameter=filedir)
         filelist = sorted(os.listdir(filedir))
         status = True
-        
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        schema_name = schema_name.replace('"', '')
+        if self.schema is None:
+            schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+            schema_name = schema_name.replace('"', '')
+        else:
+            schema_name = self.schema.replace('"', '')
 
         filter_srid_value = str(self.filter_srid_value).replace('"', '')
         if i18n:
