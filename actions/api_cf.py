@@ -390,11 +390,12 @@ class ApiCF(ApiParent):
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
         utils_giswater.set_qtv_config(self.tbl_document)
 
-        # Get table name for use as title
+        # Get table name
         self.tablename = complet_result[0]['body']['feature']['tableName']
+
+        # Get feature type (Junction, manhole, valve, fountain...)
         pos_ini = complet_result[0]['body']['feature']['tableName'].rfind("_")
         pos_fi = len(str(complet_result[0]['body']['feature']['tableName']))
-        # Get feature type (Junction, manhole, valve, fountain...)
         self.feature_type = complet_result[0]['body']['feature']['tableName'][pos_ini + 1:pos_fi]
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
@@ -471,26 +472,20 @@ class ApiCF(ApiParent):
         self.set_icon(self.dlg_cf.btn_doc_new, "131b")
         self.set_icon(self.dlg_cf.btn_open_doc, "170b")
 
-        # Get feature type as geom_type (node, arc, connec)
+        # Get feature type as geom_type (node, arc, connec, gully)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
 
-        if self.geom_type == '[]':
+        if self.geom_type == '':
             if 'feature_cat' in globals():
                 parent_layer = self.feature_cat.parent_layer
             else:
                 parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
             sql = "SELECT lower(feature_type) FROM cat_feature WHERE  parent_layer = '" + str(parent_layer) + "' LIMIT 1"
-            result = self.controller.get_row(sql, log_sql=True, commit=True)
+            result = self.controller.get_row(sql, commit=True)
             self.geom_type = result[0]
 
         # Get field id name
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
-
-        # Get feature_type
-        sql = ("SELECT system_id "
-               "FROM " + self.schema_name + ".cat_feature "
-               "WHERE child_layer = '" + self.tablename + "'")
-        feature_type = self.controller.get_row(sql, log_sql=True, commit=True)
 
         self.feature_id = None
         result = complet_result[0]['body']['data']
@@ -549,7 +544,7 @@ class ApiCF(ApiParent):
 
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(partial(self.start_editing, self.layer))
-        action_catalog.triggered.connect(partial(self.open_catalog, tab_type, feature_type))
+        action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
