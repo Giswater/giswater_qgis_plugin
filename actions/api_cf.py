@@ -988,8 +988,6 @@ class ApiCF(ApiParent):
                     (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
                 widget.setStyleSheet("border: 1px solid red")
                 btn_accept.setEnabled(False)
-            # elif (widget.property('minValue') and float(value) >= float(widget.property('minValue'))) and \
-            #         (widget.property('maxValue') and float(value) <= float(widget.property('maxValue'))) or value == '':
             else:
                 widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
                 btn_accept.setEnabled(True)
