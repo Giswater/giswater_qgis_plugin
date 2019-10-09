@@ -276,7 +276,6 @@ class ApiCF(ApiParent):
 
         # When insert feature failed
         if row[0]['status'] == "Failed":
-            print(str("TEST3"))
             self.controller.show_message(row[0]['message']['text'], 2)
             return False, None
 
@@ -2126,7 +2125,7 @@ class ApiCF(ApiParent):
         doc_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
             expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
-        print(str(expr))
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()

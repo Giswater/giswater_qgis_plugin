@@ -681,7 +681,6 @@ class ParentAction(object):
         """
 
         coords = list_coord.group(1)
-        print(f"{(type(coords))} --> {coords}")
         polygon = coords.split(',')
         x, y = polygon[0].split(' ')
         min_x = x  # start with something much higher than expected min
