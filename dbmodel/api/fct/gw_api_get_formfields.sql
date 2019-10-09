@@ -93,7 +93,7 @@ BEGIN
 
 			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
 			layout_name as layoutname, layout_order, dv_parent_id, isparent, ismandatory, action_function, dv_querytext, dv_querytext_filterc, 
-			isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 
+			isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead, widgetcontrols FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 
 			AND isenabled IS TRUE ORDER BY orderby) a'
 				INTO fields_array
 				USING p_formname, p_formtype;
@@ -108,7 +108,7 @@ BEGIN
 			UNION
 			SELECT ''resumen'' as widtget_context, label AS form_label, column_id, widgettype, concat ('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, datatype, 
 			tooltip, placeholder, iseditable, layout_order AS ordby, layout_id,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,  NULL AS widgetfunction, NULL AS dv_querytext, 
-			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, null as value, null as stylesheet, hidden
+			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols, hidden
 			FROM config_api_form_fields WHERE formname  = ''infoplan'' AND isenabled IS TRUE ORDER BY 1,ordby) a
 			ORDER BY 1) b'
 				INTO fields_array
