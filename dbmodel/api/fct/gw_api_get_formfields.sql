@@ -103,12 +103,13 @@ BEGIN
 			SELECT (row_number()over(ORDER BY 1)) AS layout_order, (row_number()over(ORDER BY 1)) AS orderby,* FROM 
 			(SELECT ''individual'' as widtget_context, concat(unit, ''. '', descript) AS label, identif AS column_id, ''label'' AS widgettype, concat ('||quote_literal(p_tabname)||',''_'',identif) AS widgetname, ''string'' AS datatype, 
 			NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as ordby, 1 AS layout_id,  NULL AS dv_parent_id, NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
-			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , '' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet, null as hidden
+			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , '' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet,
+			null as widgetcontrols, null as hidden
 			FROM ' ||p_tablename|| ' WHERE ' ||p_idname|| ' = $2
 			UNION
 			SELECT ''resumen'' as widtget_context, label AS form_label, column_id, widgettype, concat ('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, datatype, 
 			tooltip, placeholder, iseditable, layout_order AS ordby, layout_id,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,  NULL AS widgetfunction, NULL AS dv_querytext, 
-			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols, hidden
+			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols::text, hidden
 			FROM config_api_form_fields WHERE formname  = ''infoplan'' AND isenabled IS TRUE ORDER BY 1,ordby) a
 			ORDER BY 1) b'
 				INTO fields_array
