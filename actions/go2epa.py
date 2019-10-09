@@ -548,15 +548,16 @@ class Go2Epa(ApiParent):
                         aux = dirty_list[x][last_index:i]
                         sp_n.append(aux)
 
-                    elif bool(re.search('(\d\.\d{1,9}\.)', str(dirty_list[x]))) and 'Version' not in dirty_list:
+                    elif bool(re.search('(\d\.\d{1,9}\.)', str(dirty_list[x]))):
                         # when -> 0.00859373.7500
-                        message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
-                              "Columns are overlaped one againts other, this is a not valid simulation. " 
-                              "Please ckeck and fix it before continue")
-                        self.controller.show_message(message, 1)
-                        _file.close()
-                        del _file
-                        return False
+                        if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
+                            message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
+                                  "Columns are overlaped one againts other, this is a not valid simulation. " 
+                                  "Please ckeck and fix it before continue")
+                            self.controller.show_message(message, 1)
+                            _file.close()
+                            del _file
+                            return False
                     else:
                         sp_n.append(dirty_list[x])
 
