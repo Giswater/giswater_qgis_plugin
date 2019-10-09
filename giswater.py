@@ -1421,10 +1421,11 @@ class Giswater(QObject):
                     layer.setFieldAlias(fieldIndex, field['label'])
 
                 # Set field constraints
-                if 'set_qgis_constraints' in field and field['set_qgis_constraints'] is True:
-                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
+                    if field['widgetcontrols']['setQgisConstraints'] is True:
+                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
                                              QgsFieldConstraints.ConstraintStrengthSoft)
-                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
+                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
                                              QgsFieldConstraints.ConstraintStrengthHard)
 
                 # Manage editability
