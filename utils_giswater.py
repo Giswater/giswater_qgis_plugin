@@ -423,7 +423,7 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     
     records = []
     if rows is None:
-        return
+        rows = [['', '']]
 
     if sort_by > len(rows[0])-1:
         sort_by = 1

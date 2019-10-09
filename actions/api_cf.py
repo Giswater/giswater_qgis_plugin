@@ -2120,7 +2120,8 @@ class ApiCF(ApiParent):
         # Fill ComboBox doc_type
         sql = "SELECT id, id FROM doc_type ORDER BY id"
         rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
+        if rows:
+            rows.append(['', ''])
         utils_giswater.set_item_data(doc_type, rows)
 
         # Adding auto-completion to a QLineEdit
