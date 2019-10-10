@@ -50,7 +50,6 @@ class GwDialog(QDialog):
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
-                print(type(e).__name__)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
             
             return True
@@ -90,7 +89,6 @@ class GwMainWindow(QMainWindow):
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
-                print(type(e).__name__)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
 
             return True
@@ -124,7 +122,6 @@ class ApiCfUi(GwMainWindow, FORM_CLASS):
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
-            print('event: {0}'.format(event))
             self.key_pressed.emit()
             return super(ApiCfUi, self).keyPressEvent(event)
 
