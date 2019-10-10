@@ -91,7 +91,7 @@ class Go2Epa(ApiParent):
             field_id_right = "dscenario_id"
 
             self.dlg_go2epa.btn_hs_ds.clicked.connect(
-                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right, aql=""))
 
         elif self.project_type == 'ud':
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
