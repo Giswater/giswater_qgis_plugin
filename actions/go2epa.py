@@ -229,6 +229,16 @@ class Go2Epa(ApiParent):
         return True
 
 
+    def go2epa_sector_selector(self):
+
+        tableleft = "sector"
+        tableright = "inp_selector_sector"
+        field_id_left = "sector_id"
+        field_id_right = "sector_id"
+        aql = f" AND sector_id != 0"
+        self.sector_selection(tableleft, tableright, field_id_left, field_id_right, aql)
+
+
     def load_user_values(self):
         """ Load QGIS settings related with file_manager """
 
