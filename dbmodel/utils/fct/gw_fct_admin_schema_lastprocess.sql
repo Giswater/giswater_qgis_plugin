@@ -42,7 +42,8 @@ DECLARE
 	v_tablename record;
 	v_schemaname text;
     v_oldversion text;
-
+	v_is_sample boolean;
+	
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -59,7 +60,7 @@ BEGIN
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 	v_superusers := (p_data ->> 'data')::json->> 'superUsers';
-
+	SELECT sample INTO v_is_sample FROM version ORDER BY id LIMIT 1;
 
 	-- last proccess
 	IF v_isnew IS TRUE THEN
@@ -69,9 +70,10 @@ BEGIN
 		
 		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
 		VALUES ('admin_superusers', v_superusers ,'json','system', 'Basic information about superusers for this schema','utils', 'Schema manager:', false);
-
+		
+		
 		-- inserting version table
-		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg);	
+		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg, v_is_sample);	
 		v_message='Project sucessfully created';
 		
 		-- create json info_schema
@@ -120,8 +122,8 @@ BEGIN
 		END IF;
 		-- inserting version table
 		SELECT * INTO v_version FROM version LIMIT 1;	
-		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) 
-		VALUES (v_gwversion, v_version.wsoftware, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
+		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) 
+		VALUES (v_gwversion, v_version.wsoftware, (select version()), (select postgis_version()), v_version.language, v_version.epsg, v_is_sample);
 
 		-- get return message
 		IF v_priority=0 THEN
