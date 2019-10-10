@@ -332,11 +332,7 @@ class ManageElement(ParentManage):
                 sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
-                print(str("TEST0"))
-                print(str(sql))
                 new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
-                print(str("TEST1"))
-                print(str(new_elem_id))
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])

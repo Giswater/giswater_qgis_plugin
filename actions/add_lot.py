@@ -1425,8 +1425,6 @@ class AddNewLot(ParentManage):
     def manage_accept(self, widget):
 
         model = widget.model()
-        print(str(widget))
-        print(str(model))
         status = model is not None and model.submitAll()
         if not status:
             return
@@ -1461,7 +1459,6 @@ class AddNewLot(ParentManage):
                        f"AND (endtime BETWEEN {interval} OR endtime IS NULL)")
 
         expr_filter += f" AND user_id LIKE '%{filter}%'"
-        print(str(expr_filter))
 
         self.dlg_user_manage.tbl_user.model().setFilter(expr_filter)
         self.dlg_user_manage.tbl_user.model().select()

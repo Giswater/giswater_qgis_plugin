@@ -225,7 +225,6 @@ class NotifyFunctions(ParentAction):
         self.all_layers = []
         root = QgsProject.instance().layerTreeRoot()
         self.get_all_layers(root)
-        print(self.all_layers)
         for layer_name in self.all_layers:
             layer = self.controller.get_layer_by_tablename(layer_name)
             layer.triggerRepaint()
