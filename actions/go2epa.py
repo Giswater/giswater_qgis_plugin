@@ -514,7 +514,7 @@ class Go2Epa(ApiParent):
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
-        for row in full_file:
+        for line_number, row in enumerate(full_file):
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
             row = row.rstrip()
@@ -548,9 +548,10 @@ class Go2Epa(ApiParent):
                         aux = dirty_list[x][last_index:i]
                         sp_n.append(aux)
 
-                    elif bool(re.search('(\d\.\d{1,9}\.)', str(dirty_list[x]))):
+                    elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         # when -> 0.00859373.7500
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
+                            print(f"Error near line {line_number+1} -> {dirty_list}")
                             message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
                                   "Columns are overlaped one againts other, this is a not valid simulation. " 
                                   "Please ckeck and fix it before continue")
