@@ -60,9 +60,6 @@ class UpdateSQL(ApiParent):
 
     def init_sql(self):
         """ Button 100: Execute SQL. Info show info """
-        # Create extension postgis if not exist
-        sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
-        self.controller.execute_sql(sql)
 
         # Declare variable superusers
         self.super_users = []
@@ -265,7 +262,9 @@ class UpdateSQL(ApiParent):
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
             return
         else:
-
+            # Create extension postgis if not exist
+            sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
+            self.controller.execute_sql(sql)
             # Manage widgets tabs
             self.populate_data_schema_name(self.cmb_project_type)
             self.set_info_project()
@@ -1642,8 +1641,8 @@ class UpdateSQL(ApiParent):
                 self.dlg_readsql.btn_info.setEnabled(False)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
 
-        self.populate_data_schema_name(self.cmb_project_type)
-        self.set_last_connection(connection_name)
+            self.populate_data_schema_name(self.cmb_project_type)
+            self.set_last_connection(connection_name)
 
         if self.logged:
             self.username = self.get_user_connection(self.get_last_connection())
@@ -1894,6 +1893,9 @@ class UpdateSQL(ApiParent):
 
 
     def set_info_project(self):
+
+        if self.dao is None:
+            return
 
         # Set default lenaguage EN
         self.project_data_language = 'EN'
