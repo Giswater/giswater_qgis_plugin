@@ -90,27 +90,11 @@ BEGIN
 	
 	v_hour=null;
 
-	----------------
-	-- to improve: 
-	--Read out file using python libraries and at same time set values for source and csv40 (hour). After this loop could be deleted.....
-	---------------
-	FOR v_rpt IN SELECT id, csv1, csv2, csv4 FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
-	LOOP
-	
-		SELECT tablename INTO v_type FROM (SELECT tablename, unnest(target::text[]) as target from sys_csv2pg_config WHERE pg2csvcat_id=11)a WHERE target=concat(v_rpt.csv1,' ',v_rpt.csv2);
-		v_hour=v_rpt.csv4;
-
-		IF v_type IS NOT NULL THEN
-			v_type_2=v_type;
-		END IF;
-		UPDATE temp_csv2pg SET source=v_type_2, csv40=v_hour WHERE id=v_rpt.id;
-		
-	END LOOP;
-
 	-- rpt_node
 	DELETE FROM temp_csv2pg WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM');
-	INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, other) 
-	SELECT csv1, v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6
+	UPDATE temp_csv2pg SET csv6=null WHERE source='rpt_node' AND (csv6='Reservoir' OR csv6='Tank'); -- delete Reservoir AND tank word when quality is not enabled
+	INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, quality) 
+	SELECT csv1, v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric
 	FROM temp_csv2pg WHERE source='rpt_node' AND csv2pgcat_id=11 AND user_name=current_user ORDER BY id;
 
 	-- rpt_arc
