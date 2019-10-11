@@ -55,20 +55,19 @@ class CadApiInfo(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-
         for rb in self.rubberband_list:
             rb.reset()
+
         complet_result = None
         if event.button() == Qt.LeftButton:
             point = self.create_point(event)
             if point is False:
                 return
             complet_result, dialog = self.info_cf.open_form(point, tab_type=self.tab_type)
-        if dialog is None:
-            return
+
         if complet_result is False:
-                print("No point under mouse(LeftButton)")
-                return
+            print("No point under mouse(LeftButton)")
+            return
         elif event.button() == Qt.RightButton:
             point = self.create_point(event)
             if point is False:
