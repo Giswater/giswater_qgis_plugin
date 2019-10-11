@@ -852,7 +852,7 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
-        self.enable_python_console()
+
         # Create a thread and start listen
         if  self.settings.value('system_variables/use_notify').upper() == 'TRUE' :
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
