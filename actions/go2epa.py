@@ -967,11 +967,12 @@ class Go2Epa(ApiParent):
                 rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
 
-            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_date))
-            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
-                        self.dlg_go2epa_result.cmb_sel_date, self.dlg_go2epa_result.cmb_sel_time))
+            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(self.populate_date_time,
+                        self.dlg_go2epa_result.cmb_sel_date))
+
+            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(partial(self.populate_time,
+                                   self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_time))
+
 
             # Populate GroupBox Selector compare
             result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result,
@@ -990,11 +991,10 @@ class Go2Epa(ApiParent):
                 rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
 
-            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_com_date))
-            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
-                        self.dlg_go2epa_result.cmb_com_date, self.dlg_go2epa_result.cmb_com_time))
+            self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
+                self.populate_date_time, self.dlg_go2epa_result.cmb_com_date))
+            self.dlg_go2epa_result.cmb_com_date.currentIndexChanged.connect(partial(self.populate_time,
+                self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM rpt_selector_result"
@@ -1010,18 +1010,13 @@ class Go2Epa(ApiParent):
         self.open_dialog(self.dlg_go2epa_result)
 
 
-    def populate_date_time(self, combo_result, combo_date, combo_time):
-
-        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
-        date = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_date)
-        sql = (f"SELECT DISTINCT(resulttime), resulttime "
-               f"FROM rpt_arc "
+    def populate_date_time(self, combo_date):
+        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id,0)
+        sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
-               f"AND resultdate = '{date}' "
-               f"ORDER BY resulttime")
-        rows = self.controller.get_rows(sql, add_empty_row=True)
-        utils_giswater.set_item_data(combo_time, rows)
-
+               f"ORDER BY resultdate")
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(combo_date, rows)
 
     def populate_time(self, combo_result, combo_time):
         """ Populate combo times """
