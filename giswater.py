@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+from json import JSONDecodeError
 
 from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
 from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
@@ -815,16 +817,20 @@ class Giswater(QObject):
         # Manage snapping layers
         self.manage_snapping_layers()
 
-        # Get list of actions to hide and remove whitespace
         self.list_to_hide = []
         try:
-            self.list_to_hide = self.controller.cfgp_user['actions_to_hide'].value.split(",")
+            #db format of value for parameter qgis_toolbar_hide_actions -> {"action_index":[199, 74,75]}
+            json_list = json.loads(self.controller.cfgp_user['qgis_toolbar_hide_actions'].value, object_pairs_hook=OrderedDict)
+            self.list_to_hide = [str(x) for x in json_list['action_index']]
         except  KeyError as e:
             pass
+        except JSONDecodeError as e:
+            # Control if json have a correct format
+            pass
         finally:
-            self.list_to_hide = [x.strip(' ') for x in self.list_to_hide]
-            # TODO remove this line when do you want enabled api info for epa
-            self.list_to_hide.append('199')
+             # TODO remove this line when do you want enabled api info for epa
+             self.list_to_hide.append('199')
+
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
 
