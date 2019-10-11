@@ -504,7 +504,8 @@ class Go2Epa(ApiParent):
         rows = self.controller.get_rows(sql, commit=True)
         sources = {}
         for row in rows:
-            item = row[1].split(',')
+            aux = row[1].replace('{','').replace('}', '')
+            item = aux.split(',')
             for i in item:
                 sources[i.strip()]=row[0].strip()
 
