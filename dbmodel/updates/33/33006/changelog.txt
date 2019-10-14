@@ -2,3 +2,4 @@
 *************
 - Views v_rpt_* filtered by time table
 - Recover 3.1 version mincut
+- Enhance epanet controls before exportation checking elevation, inlets and number of arcs for nodearcs features

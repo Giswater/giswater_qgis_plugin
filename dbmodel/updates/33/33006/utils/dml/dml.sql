@@ -13,3 +13,9 @@ UPDATE config_param_user SET parameter = 'qgis_toolbar_hide_actions', value = '{
 UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_column::json->>''list_layers_name'')::text[] from temp_table where fprocesscat_id = 63 and user_name = current_user)) as id, UNNEST(ARRAY (select (text_column::json->>''list_layers_name'')::text[] 
 FROM temp_table WHERE fprocesscat_id = 63 and user_name = current_user)) as idval ' WHERE id = 'cad_tools_base_layer_vdefault';
 
+-- 14/10/2019
+INSERT INTO sys_fprocess_cat VALUES (64, 'Nodes without elevation', 'epa', 'Nodes without elevation', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (65, 'Nodes with elevation=0', 'epa', 'Nodes with elevation=0', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (66, 'Node2arc with more than two arcs', 'epa', 'Node2arc with more than two arcs', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (67, 'Node2arc with less than two arcs', 'epa', 'Node2arc with less than two arcs', 'ws');
+

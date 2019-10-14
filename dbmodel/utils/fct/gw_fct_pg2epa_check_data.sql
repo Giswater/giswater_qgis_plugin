@@ -61,6 +61,8 @@ v_allowponding		text;
 v_florouting		text;
 v_flowunits		text;
 v_hydrologyscenario	text;
+v_qualitymode		text;
+v_qualmodeval		text;
 
 BEGIN
 
@@ -117,7 +119,8 @@ BEGIN
 		
 	-- UTILS
 	-- Check orphan nodes
-	FOR v_record IN SELECT * FROM rpt_inp_node WHERE result_id=v_result_id AND node_id NOT IN (SELECT node_1 FROM rpt_inp_arc WHERE result_id=v_result_id UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id=v_result_id)
+	FOR v_record IN SELECT * FROM rpt_inp_node WHERE result_id=v_result_id AND node_id NOT IN 
+	(SELECT node_1 FROM rpt_inp_arc WHERE result_id=v_result_id UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id=v_result_id)
 	LOOP
 		v_count=v_count+1;
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, state, expl_id, the_geom, result_id, descript)
@@ -126,7 +129,8 @@ BEGIN
 	END LOOP;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) orphan. Take a look on temporal table to know details'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) orphan. Take a look on temporal table to know details'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (14, v_result_id, 1, 'INFO: There is/are no nodes orphan');
@@ -146,7 +150,8 @@ BEGIN
 	EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, state, expl_id, the_geom, result_id, descript)'||v_querytext;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) without start/end nodes. Take a look on temporal table to know details'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) without start/end nodes. Take a look on temporal table to know details'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (14, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes');
@@ -440,30 +445,110 @@ BEGIN
 		SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
 		SELECT value INTO v_valvemode FROM config_param_user WHERE parameter = 'inp_options_valve_mode' AND cur_user=current_user;
 		SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
+		SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 
 		SELECT idval INTO v_demandtypeval FROM inp_typevalue WHERE id=v_demandtype::text AND typevalue ='inp_value_demandtype';
 		SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
 		SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
 		SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
+		SELECT idval INTO v_qualmodeval FROM inp_typevalue WHERE id=v_qualitymode::text AND typevalue ='inp_value_opti_qual';
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Demand type: ', v_demandtypeval));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Pattern method: ', v_patternmethodval));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Valve mode: ', v_valvemodeval));	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));	
 
 		SELECT dscenario_id INTO scenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
 
-		-- nod2arc control
+		-- nod2arc length control
 		v_nodearc_real = (SELECT st_length (the_geom) FROM rpt_inp_arc WHERE  arc_type='NODE2ARC' AND result_id=v_result_id LIMIT 1);
 		v_nodearc_user = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' AND cur_user=current_user);
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-			VALUES (14, v_result_id, 2, concat('WARNING: The node2arc parameter have been modified from ', v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts'));
+			VALUES (14, v_result_id, 2, concat('WARNING: The node2arc parameter have been modified from ', 
+			v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts'));
 		ELSE 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 			VALUES (14, v_result_id, 1, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value:', v_nodearc_user::numeric(12,3)));
 		END IF;
 
+		-- null elevation control
+		SELECT count(*) INTO v_count FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
+		IF v_count > 0 THEN
+			DELETE FROM anl_node WHERE fprocesscat_id=64 and cur_user=current_user;
+			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
+			SELECT 64, node_id, nodecat_id, the_geom FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s without elevation'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=64 AND cur_user=current_user'));
+		END IF;
+
+		-- 0 elevation control
+		SELECT count(*) INTO v_count FROM rpt_inp_node WHERE result_id=v_result_id AND elevation=0;
+		IF v_count > 0 THEN
+			DELETE FROM anl_node WHERE fprocesscat_id=65 and cur_user=current_user;
+			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
+			SELECT 65, node_id, nodecat_id, the_geom FROM rpt_inp_node WHERE result_id=v_result_id AND elevation=0;
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s with elevation=0'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=65 AND cur_user=current_user'));
+		END IF;
+
+		-- pg2epa_inlet_flowtrace control
+		PERFORM pg2epa_inlet_flowtrace (v_result_id);
+
+		SELECT count(*) FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc''s totally disconnected fron any reservoir'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user'));
+		END IF;
+
+
+		-- node2arcs with more than two arcs
+		DELETE FROM anl_node WHERE fprocesscat_id=66 and cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
+		SELECT 66, count(*) as count, a.node_id FROM (SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_1
+		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+		UNION ALL
+		SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_2
+		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+		GROUP by node_id
+		HAVING count(*) <> 2;
+
+		SELECT count(*) FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc''s with more than two arcs'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user'));
+		END IF;
+
+		-- node2arcs with less than two arcs
+		DELETE FROM anl_node WHERE fprocesscat_id=67 and cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
+		SELECT 66, count(*) as count, a.node_id FROM (SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_1
+		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+		UNION ALL
+		SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_2
+		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+		GROUP by node_id
+		HAVING count(*) <> 2;
+
+		SELECT count(*) FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',
+			v_count,' node2arc''s with less than mandatory two arcs. Perharps it is a border node2arc. Please review your data'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 2, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user'));
+		END IF;
+
+	
 		-- timestep control (patterns used againsts timesetep simulation)
 		--TODO
 		
