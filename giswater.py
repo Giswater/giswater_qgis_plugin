@@ -10,10 +10,15 @@ from qgis.core import QgsExpressionContextUtils, QgsProject
 from PyQt4.QtCore import QObject, QSettings, Qt
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView, QToolButton
 from PyQt4.QtSql import QSqlQueryModel
+
+import json
 import os.path
-import sys  
+import sys
+
+from collections import OrderedDict
 from functools import partial
 
+from simplejson import JSONDecodeError
 
 from actions.basic import Basic
 from actions.edit import Edit
@@ -1098,7 +1103,24 @@ class Giswater(QObject):
     def hide_actions(self):
         """ Function added in order to hide actions (by index_action) temporarily"""
         # Example list_to_hide = ['74', '75']
-        list_to_hide = ['74', '75', '76']
+
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               " WHERE parameter = 'qgis_toolbar_hidebuttons' "
+               " AND cur_user = current_user")
+        row = self.controller.get_row(sql, commit=True)
+        if not row or row[0] is None:
+            return
+        list_to_hide = []
+        try:
+            #db format of value for parameter qgis_toolbar_hidebuttons -> {"action_index":[199, 74,75]}
+            json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
+            list_to_hide = [str(x) for x in json_list['action_index']]
+        except KeyError as e:
+            pass
+        except JSONDecodeError as e:
+            # Control if json have a correct format
+            pass
+
         action_list = self.iface.mainWindow().findChildren(QAction)
         for action in action_list:
             _property = action.property('index_action')
