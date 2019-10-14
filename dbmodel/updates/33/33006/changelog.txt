@@ -1,3 +1,4 @@
 3.3.006
 *************
 - Views v_rpt_* filtered by time table
+- Recover 3.1 version mincut
