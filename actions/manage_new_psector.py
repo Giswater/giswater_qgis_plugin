@@ -110,10 +110,10 @@ class ManageNewPsector(ParentManage):
         atlas_id = self.dlg_plan_psector.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
 
-        self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
-        self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
-        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
-        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority', False)
+        self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type')
+        self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation',  " WHERE expl_id != '0' ")
+        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', " WHERE sector_id != '0' ")
+        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority')
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
