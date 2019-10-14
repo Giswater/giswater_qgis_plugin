@@ -112,7 +112,7 @@ BEGIN
 			IF rpt_rec.csv1 ='<<<' THEN 
 				v_id= rpt_rec.csv3;
 			END IF;
-			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Inflow' or  rpt_rec.csv2='Node' THEN 
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Inflow' or  rpt_rec.csv2='Node' or rpt_rec.csv1='Node' THEN 
 			ELSE
 				INSERT INTO rpt_node (result_id, node_id, resultdate, resulttime, flooding, depth, head) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv2, rpt_rec.csv3::float, rpt_rec.csv4::float, rpt_rec.csv5::float);
 			END IF;
