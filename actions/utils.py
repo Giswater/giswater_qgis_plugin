@@ -1275,7 +1275,7 @@ class Utils(ParentAction):
         for comp_view in composers:
             elem = [index, comp_view.composerWindow().windowTitle()]
             records.append(elem)
-            index = index +1
+            index = index + 1
         utils_giswater.set_item_data(combo, records, 1)
 
 
