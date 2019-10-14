@@ -20,11 +20,11 @@ else:
     from qgis.core import QgsPointXY, QgsLayoutExporter
 
 from qgis.core import QgsRectangle, QgsProject
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
-from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
-from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLabel
+from qgis.PyQt.QtWidgets import QLineEdit, QTableView
 
 import os
 import sys
@@ -608,13 +608,21 @@ class ManageNewPsector(ParentManage):
                     self.controller.show_warning(msg, parameter=path)
 
         else:
-
             # Get layout manager object
             layout_manager = QgsProject.instance().layoutManager()
 
             # Get our layout
             layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
             layout = layout_manager.layoutByName(layout_name)
+
+            # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
+            # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
+            # close the layout designer again (finally sentence)
+            designer = self.iface.openLayoutDesigner(layout)
+            layout_view = designer.view()
+            designer_window = layout_view.window()
+            action = designer_window.findChild(QAction, 'mActionAtlasPreview')
+            action.trigger()
 
             # Export to PDF file
             if layout:
@@ -632,6 +640,8 @@ class ManageNewPsector(ParentManage):
                     self.controller.log_warning(str(e))
                     msg = "Cannot create file, check if selected composer is the correct composer"
                     self.controller.show_warning(msg, parameter=path)
+                finally:
+                    designer_window.close()
             else:
                 self.controller.show_warning("Layout not found", parameter=layout_name)
 
@@ -884,17 +894,18 @@ class ManageNewPsector(ParentManage):
         combo.blockSignals(False)
 
 
-    def populate_combos(self, combo, field_name, field_id, table_name, allow_nulls=True):
+    def populate_combos(self, combo, field_name, field_id, table_name, where=None):
         
-        sql = (f"SELECT DISTINCT({field_id}), {field_name}"
-               f" FROM {table_name} ORDER BY {field_name}")
+        sql = f"SELECT DISTINCT({field_id}), {field_name}  FROM {table_name} "
+        if where:
+            sql += where
+        sql += f" ORDER BY {field_name}"
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return
         combo.blockSignals(True)
         combo.clear()
-        if allow_nulls:
-            combo.addItem("", "")
+
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
             combo.addItem(record[1], record)
