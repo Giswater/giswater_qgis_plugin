@@ -44,7 +44,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="General">
          <attribute name="title">
@@ -946,8 +946,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>146</width>
-                 <height>122</height>
+                 <width>504</width>
+                 <height>454</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1698,7 +1698,7 @@
                </size>
               </property>
               <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
+               <enum>Qt::TabFocus</enum>
               </property>
               <property name="text">
                <string>Generate rapports</string>
