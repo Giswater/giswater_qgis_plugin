@@ -118,7 +118,7 @@ BEGIN
 
 		-- Set current value
 		IF v_formtype != 'feature' THEN
-			v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'selectedId', combo_json_child->0);
+			v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'selectedId', COALESCE(combo_json_child->0, '[]'));
 		ELSE
 			--looping for the differents velues on audit_cat_param_user that are coincident with the child parameter
 			FOR v_config_param_user IN SELECT * FROM audit_cat_param_user WHERE feature_field_id = (v_aux_json_child->>'column_id')
