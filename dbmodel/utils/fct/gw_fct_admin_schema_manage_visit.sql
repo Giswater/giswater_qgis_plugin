@@ -59,6 +59,11 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature
 SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
 "data":{"action":"DELETE", "action_type":"parameter","parameters":{"class_id":"9","class_name":"LEAK_NODE","parameter_id":"param_leak_node4",
 "viewname":"aaa_ve_node_leak","ismultievent":"true"}}}$$);
+
+
+SELECT SCHEMA_NAME.gw_fct_admin_manage_visit($${"client":{"lang":"ES"}, "feature":{"feature_type":"NODE"},
+"data":{"action":"CONFIGURATION", "action_type":"null","parameters":{"class_id":"16", "viewname":"ve_visit_node_test"}}}$$);
+
 */
 
 DECLARE 
@@ -190,7 +195,8 @@ IF v_action = 'CREATE' THEN
 		END IF;
 		
 		IF (SELECT formname FROM config_api_form_fields WHERE formname = v_viewname) IS NULL THEN
-		
+			
+			--capture common fields names that need to be copied for the specific visit form
 			EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 			FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
 			AND column_name!=''id'' AND column_name!=''formname'';'
@@ -198,6 +204,7 @@ IF v_action = 'CREATE' THEN
 			
 			RAISE NOTICE 'v_config_fields,%',v_config_fields;
 
+			--insert common fields for the new formname (view)
 			IF v_ismultievent = TRUE THEN
 				FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname='visit_multievent')
 				LOOP
@@ -214,7 +221,8 @@ IF v_action = 'CREATE' THEN
 
 			UPDATE config_api_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') 
 			WHERE column_id = 'feature_id' and formname = v_viewname;
-			
+
+			--rename dv_querytext for class_id in order to look for defined feature_type
 			IF v_feature_system_id = 'connec' THEN
 				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND 
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
@@ -232,7 +240,7 @@ IF v_action = 'CREATE' THEN
 		
 	ELSIF v_action_type = 'parameter' THEN
 		
-		IF v_viewname NOT IN (SELECT id FROM audit_cat_table) THEN
+		IF v_viewname NOT IN (SELECT id FROM audit_cat_table) AND v_ismultievent iS TRUE THEN
 			INSERT INTO audit_cat_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
 			VALUES (v_viewname, 'O&M', 'Editable view that saves visits', 'role_om', 0, 0, false);
 		END IF;
@@ -246,6 +254,7 @@ IF v_action = 'CREATE' THEN
 		INSERT INTO om_visit_class_x_parameter (class_id, parameter_id)
 		VALUES (v_class_id, v_param_name);
 	    
+	    --add configuration of new parameters to config_api_form_fields
 		IF v_ismultievent = TRUE THEN
 			EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
 			AND layout_name = ''data_1'';'
@@ -389,7 +398,106 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 		END IF;
 
 		EXECUTE 'DROP VIEW IF EXISTS '||v_viewname||';';
+
+ELSIF v_action = 'CONFIGURATION' THEN
+	
+		v_ismultievent = (SELECT ismultievent FROM om_visit_class WHERE id=v_class_id);
+		v_feature_system_id = (SELECT lower(feature_type) FROM om_visit_class WHERE id=v_class_id);
+
+		--create configuration and views for the alread defined classes and parameters
+		IF  v_ismultievent = TRUE THEN
+			INSERT INTO config_api_visit (visitclass_id, formname, tablename) VALUES (v_class_id, v_viewname, v_viewname);
+
+			IF v_viewname NOT IN (SELECT id FROM audit_cat_table) AND v_ismultievent iS TRUE THEN
+				INSERT INTO audit_cat_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
+				VALUES (v_viewname, 'O&M', 'Editable view that saves visits', 'role_om', 0, 0, false);
+				raise notice 'multi -  audit_cat_table';
+			END IF;
+
+		ELSE 
+			INSERT INTO config_api_visit (visitclass_id, formname, tablename) VALUES (v_class_id, v_viewname, concat('ve_visit_',v_feature_system_id,'_singlevent'));
+		END IF;
+
+		INSERT INTO config_api_visit_x_featuretable (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
+	
+		IF (SELECT formname FROM config_api_form_fields WHERE formname = v_viewname) IS NULL THEN
+			--capture common fields names that need to be copied for the specific visit form
+			EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
+			FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
+			AND column_name!=''id'' AND column_name!=''formname'';'
+			INTO v_config_fields;
+
+			--insert common fields for the new formname (view)
+			IF v_ismultievent = TRUE THEN
+				FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname='visit_multievent')
+				LOOP
+					EXECUTE 'INSERT INTO config_api_form_fields(formname,'||v_config_fields||')
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
+					raise notice 'multi -  config_api_form_fields';
+				END LOOP;
+			ELSE
+				FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname='visit_singlevent')
+				LOOP
+					EXECUTE 'INSERT INTO config_api_form_fields(formname,'||v_config_fields||')
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
+				END LOOP;
+			END IF;
+
+			UPDATE config_api_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') 
+			WHERE column_id = 'feature_id' and formname = v_viewname;
+			
+			--rename dv_querytext for class_id in order to look for defined feature_type
+			IF v_feature_system_id = 'connec' THEN
+				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND 
+				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+				WHERE formname=v_viewname AND column_id='class_id';
+			ELSIF v_feature_system_id = 'node' THEN
+				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''NODE'' AND 
+				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+				WHERE formname=v_viewname AND column_id='class_id';
+			ELSIF v_feature_system_id = 'gully' THEN
+				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''GULLY'' AND 
+				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+				WHERE formname=v_viewname AND column_id='class_id';
+			END IF;
+		END IF;
+
+		--add configuration of parameters related to the class to config_api_form_fields
+		IF v_ismultievent = TRUE THEN
+
+			FOR rec IN 
+			(SELECT class_id, parameter_id, data_type  FROM om_visit_class_x_parameter JOIN om_visit_parameter ON om_visit_parameter.id = om_visit_class_x_parameter.parameter_id
+			WHERE class_id = v_class_id ) LOOP
+
+				EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
+				AND layout_name = ''data_1'';'
+				INTO v_layout_order;
+				
+				IF lower(rec.data_type) = 'text' THEN
+					v_data_type = 'string';
+					v_widgettype = 'text';
+				ELSIF lower(rec.data_type) = 'boolean' THEN
+					v_widgettype = 'check';
+				ELSE
+					v_data_type=lower(rec.data_type);
+					v_widgettype = 'text';
+				END IF;
+				
+				INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, layout_name,
+				iseditable, ismandatory)
+				VALUES (v_viewname, 'visit', rec.parameter_id,1,v_layout_order, true, v_data_type, v_widgettype, rec.parameter_id, 'data_1',
+				true, false);
+			END LOOP;
+			
+			--create a new class view
+			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+			"feature_system_id":"'||v_feature_system_id||'","class_id":"'||v_class_id||'","old_a_param":"null", "old_ct_param":"null",
+			"old_id_param":"null","old_datatype":"null"}}';
+			
+			PERFORM gw_fct_admin_manage_visit_view(v_data_view);	
 		
+		END IF;
+
 END IF;
 
 PERFORM gw_fct_admin_role_permissions();
