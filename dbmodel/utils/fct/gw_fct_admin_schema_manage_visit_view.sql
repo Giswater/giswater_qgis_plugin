@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2748
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_visit_view(p_class_id integer,p_schemaname text,p_old_a_param text,
-p_old_ct_param text, p_old_id_param text,p_old_datatype text,p_feature_system_id text,p_viewname text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_visit_view(p_data json)
   RETURNS void AS
 $BODY$
 
@@ -54,17 +53,19 @@ SET search_path = "SCHEMA_NAME", public;
  	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
 	-- get input parameters
+
+	v_schemaname = (p_data ->> 'schema');
+	v_class_id = ((p_data ->> 'body')::json->>'class_id')::text;
+	v_old_a_param = ((p_data ->> 'body')::json->>'old_a_param')::text;
+	v_old_ct_param = ((p_data ->> 'body')::json->>'old_ct_param')::text;
+	v_old_id_param = ((p_data ->> 'body')::json->>'old_id_param')::text;
+	v_old_datatype = ((p_data ->> 'body')::json->>'old_datatype')::text;
+	v_feature_system_id = ((p_data ->> 'body')::json->>'feature_system_id')::text;
+	v_viewname = ((p_data ->> 'body')::json->>'viewname')::text;
 	
-	v_schemaname = p_schemaname;
-	v_class_id = p_class_id;
-	v_old_a_param = p_old_a_param;
-	v_old_ct_param = p_old_ct_param;
-	v_old_ct_param = p_old_ct_param;
-	v_old_id_param = p_old_id_param;
-	v_old_datatype = p_old_datatype;
-	v_feature_system_id = p_feature_system_id;
-	v_viewname = p_viewname;
-		
+	v_old_a_param = replace (v_old_a_param,',',E',\n    ');
+	v_old_ct_param = replace (v_old_ct_param,',',E',\n            ');
+
 	--capture new parameters related to the class
 	SELECT string_agg(concat('a.',om_visit_parameter.id),E',\n    ' order by om_visit_parameter.id) as a_param,
 	string_agg(concat('ct.',om_visit_parameter.id),E',\n            ' order by om_visit_parameter.id) as ct_param,
@@ -73,7 +74,10 @@ SET search_path = "SCHEMA_NAME", public;
 	INTO v_new_parameters
 	FROM om_visit_parameter JOIN om_visit_class_x_parameter ON om_visit_parameter.id=om_visit_class_x_parameter.parameter_id
 	WHERE class_id=v_class_id;
-
+raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
+raise notice 'v_old_a_param,%',v_old_a_param;
+raise notice 'v_new_parameters - ct,%',v_new_parameters.ct_param;
+raise notice 'v_old_ct_param,%',v_old_ct_param;
 
 	IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS FALSE THEN
 		-- create a new view if doesn't exist
