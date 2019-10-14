@@ -44,7 +44,8 @@ BEGIN
 
 				raise notice 'aux_json,%',aux_json;
 
-				IF (rec.id ILIKE 'v_%' OR rec.id ILIKE 've_%' OR rec.id ILIKE 'vi_%') AND rec.id not ilike 'value%' AND aux_json.action = 'desktop' THEN
+				IF (rec.id ILIKE 'v_%' OR rec.id ILIKE 've_%' OR rec.id ILIKE 'vi_%') AND rec.id != 'vnode' 
+				AND rec.id not ilike 'value%' AND aux_json.action = 'desktop' THEN
 
 					EXECUTE 'DROP TRIGGER IF EXISTS  gw_trg_notify ON '||rec.id||';';
 					EXECUTE  'CREATE TRIGGER gw_trg_notify 
