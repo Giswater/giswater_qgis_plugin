@@ -1465,8 +1465,6 @@ class UpdateSQL(ApiParent):
         sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
         status = self.controller.execute_sql(sql, commit=False)
         if status:
-            self.reload_trg(project_type=self.project_type_selected)
-            self.reload_trg(project_type='api')
             self.reload_fct_ftrg(project_type=self.project_type_selected)
             self.reload_fct_ftrg(project_type='api')
             self.api(False)
