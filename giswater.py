@@ -821,8 +821,8 @@ class Giswater(QObject):
         self.controller.get_config_param_user()
         self.list_to_hide = []
         try:
-            #db format of value for parameter qgis_toolbar_hide_actions -> {"action_index":[199, 74,75]}
-            json_list = json.loads(self.controller.cfgp_user['qgis_toolbar_hide_actions'].value, object_pairs_hook=OrderedDict)
+            #db format of value for parameter qgis_toolbar_hidebuttons -> {"action_index":[199, 74,75]}
+            json_list = json.loads(self.controller.cfgp_user['qgis_toolbar_hidebuttons'].value, object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
         except  KeyError as e:
             pass
