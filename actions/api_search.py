@@ -207,6 +207,10 @@ class ApiSearch(ApiParent):
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            if not list_coord:
+                msg = "Empty coordinate list"
+                self.controller.show_warning(msg)
+                return
             points = self.get_points(list_coord)
             self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
@@ -217,6 +221,10 @@ class ApiSearch(ApiParent):
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            if not list_coord:
+                msg = "Empty coordinate list"
+                self.controller.show_warning(msg)
+                return
             points = self.get_points(list_coord)
             self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
@@ -227,12 +235,15 @@ class ApiSearch(ApiParent):
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
-            if list_coord:
-                max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-                self.resetRubberbands()
-                point = QgsPointXY(float(max_x), float(max_y))
-                self.draw_point(point)
-                self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            if not list_coord:
+                msg = "Empty coordinate list"
+                self.controller.show_warning(msg)
+                return
+            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+            self.resetRubberbands()
+            point = QgsPointXY(float(max_x), float(max_y))
+            self.draw_point(point)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
