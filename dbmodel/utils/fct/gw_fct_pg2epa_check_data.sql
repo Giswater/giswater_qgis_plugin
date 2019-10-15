@@ -483,6 +483,9 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s without elevation'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=64 AND cur_user=current_user'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, 'INFO: No nodes with null values on field elevation have been founded';
 		END IF;
 
 		-- 0 elevation control
@@ -495,6 +498,9 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s with elevation=0'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=65 AND cur_user=current_user'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, 'INFO: No nodes with ''0'' on field elevation have been founded';
 		END IF;
 
 		-- pg2epa_inlet_flowtrace control
@@ -506,6 +512,9 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc''s totally disconnected fron any reservoir'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, 'INFO: No results founded for pipes and nodes disconected from inlets');
 		END IF;
 
 
@@ -526,6 +535,9 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc''s with more than two arcs'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with more than mandatory two arcs');
 		END IF;
 
 		-- node2arcs with less than two arcs
@@ -546,6 +558,9 @@ BEGIN
 			v_count,' node2arc''s with less than mandatory two arcs. Perharps it is a border node2arc. Please review your data'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user'));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with less than mandatory two arcs');
 		END IF;
 
 	
