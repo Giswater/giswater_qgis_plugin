@@ -221,6 +221,9 @@ class ApiSearch(ApiParent):
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+
+            self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
+            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
             if not list_coord:
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
@@ -230,8 +233,7 @@ class ApiSearch(ApiParent):
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
-            self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
-            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
+
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
