@@ -30,3 +30,6 @@ UPDATE audit_cat_table SET notify_action='[{"action":"desktop","name":"refresh_c
 WHERE id='link';
 UPDATE audit_cat_table SET notify_action='[{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["vnode", "v_edit_vnode"]}]' 
 WHERE id='vnode';
+
+-- 15/10/2019
+UPDATE audit_cat_function SET alias = 'Build nodes using arcs start & end vertices' WHERE function_name = 'gw_fct_built_nodefromarc';
