@@ -19,3 +19,14 @@ INSERT INTO sys_fprocess_cat VALUES (65, 'Nodes with elevation=0', 'epa', 'Nodes
 INSERT INTO sys_fprocess_cat VALUES (66, 'Node2arc with more than two arcs', 'epa', 'Node2arc with more than two arcs', 'ws');
 INSERT INTO sys_fprocess_cat VALUES (67, 'Node2arc with less than two arcs', 'epa', 'Node2arc with less than two arcs', 'ws');
 
+--15/10/2019
+UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_system_variables", "enabled":"true", "trg_fields":"parameter, value, data_type, context, descript, label","featureType":[""]}]' 
+WHERE id = 'config_param_system';
+
+UPDATE audit_cat_table SET notify_action = '[{"action":"user","name":"refresh_config_user_variables", "enabled":"true", "trg_fields":"parameter,value,cur_user","featureType":[""]}]'
+WHERE id = 'config_param_user';
+
+UPDATE audit_cat_table SET notify_action='[{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["link", "v_edit_link"]}]' 
+WHERE id='link';
+UPDATE audit_cat_table SET notify_action='[{"action":"desktop","name":"refresh_canvas", "enabled":"true", "trg_fields":"the_geom","featureType":["vnode", "v_edit_vnode"]}]' 
+WHERE id='vnode';

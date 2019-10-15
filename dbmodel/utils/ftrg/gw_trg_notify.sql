@@ -129,7 +129,7 @@ BEGIN
 		v_action = current_user;
 	END IF;
 	
-	PERFORM pg_notify('||v_action||', '{"functionAction":'||v_notification||',"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
+	PERFORM pg_notify(v_action, '{"functionAction":'||v_notification||',"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 	
 
 	RETURN new;
