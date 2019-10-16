@@ -313,7 +313,7 @@ class ManageNewPsector(ParentManage):
                     feature = layer.selectedFeatures()
                     
                 if feature != []:
-                    if feature.geometry() is not None:
+                    if feature.geometry().get() is not None:
                         psector_rec = feature.geometry().boundingBox()
                         # Do zoom when QgsRectangles don't intersect
                         if not canvas_rec.intersects(psector_rec):
