@@ -831,7 +831,12 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_psector_selector(self, tablename, field, value):
-
+        # TODO Don't delete this self.controller.log_info(""),
+        #  a little before executing this function, self.controller.get_config_param_user is executed by a trigger
+        #  when config_param_user is modified by de insert_or_update_new_psector(...).
+        #  The following sql generates a bug that avoids cooling the self.controller.cfgp_user variable,
+        #  mysteriously this results in an empty print even with the console closed.
+        self.controller.log_info("")
         sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
                f"VALUES ('{value}', current_user);")
         self.controller.execute_sql(sql, commit=True)
