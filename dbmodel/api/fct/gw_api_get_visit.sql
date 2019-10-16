@@ -217,6 +217,9 @@ BEGIN
 				raise notice '======> %',v_featuretablename;
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
 				v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
+				IF v_visitclass IS NULL THEN
+					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
+				END IF;
 			ELSE
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
 				IF p_visittype=1 THEN
@@ -228,6 +231,9 @@ BEGIN
 					ELSE
 						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_noinfra_vdef') AND cur_user=current_user)::integer;
 					END IF;
+				END IF;
+				IF v_visitclass IS NULL THEN
+					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
 				END IF;
 			END IF;				
 							
