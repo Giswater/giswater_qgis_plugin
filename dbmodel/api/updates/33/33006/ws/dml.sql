@@ -8,4 +8,18 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --14/10/2019
-UPDATE  audit_cat_param_user SET label='Quality mode:' WHERE id = inp_options_quality_mode
+UPDATE  audit_cat_param_user SET label='Quality mode:' WHERE id = inp_options_quality_mode;
+
+--16/10/2019
+UPDATE config_api_form_fields SET dv_querytext = 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id != 0' 
+WHERE column_id = 'expl_id' and formtype = 'feature';
+
+UPDATE config_api_form_fields SET dv_querytext ='SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL' 
+WHERE column_id = 'dma_id' and formtype = 'feature';
+
+UPDATE config_api_form_fields SET dv_querytext ='SELECT dqa_id as id, name as idval FROM dqa WHERE dqa_id = 0 UNION SELECT dqa_id as id, name as idval FROM dqa WHERE dqa_id IS NOT NULL ' 
+WHERE column_id = 'dqa_id' and formtype = 'feature';
+
+UPDATE config_api_form_fields SET dv_querytext ='SELECT id, descript as idval FROM cat_presszone WHERE id = ''0'' UNION SELECT id, descript as idval FROM cat_presszone WHERE id IS NOT NULL ' 
+WHERE column_id = 'presszonecat_id' and formtype = 'feature';
+
