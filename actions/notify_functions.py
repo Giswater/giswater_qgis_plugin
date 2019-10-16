@@ -6,8 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsEditorWidgetSetup, QgsLayerTreeLayer, QgsProject, QgsTask, QgsApplication
-
+from qgis.core import QgsApplication, QgsEditorWidgetSetup, QgsMessageLog, QgsLayerTreeLayer, QgsProject, QgsTask
 import json
 import threading
 from collections import OrderedDict
@@ -115,6 +114,33 @@ class NotifyFunctions(ParentAction):
                 print(f"Exception AttributeError: {e}")
                 pass
                 print(f"Exception error: {e}")
+
+    def show_message(self, **kwargs):
+        """
+        Show message in console log,
+        :param kwargs: dict with all needed
+        :param kwargs['message']: message to show
+        :param kwargs['tabName']: tab where the info will be displayed
+        :param kwargs['level']:  0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(black), 4 = None(black)
+        :return:
+        """
+        try:
+            msg = kwargs['message']
+        except KeyError:
+            msg = ''
+
+        try:
+            tab_name = kwargs['tabName']
+        except KeyError:
+            tab_name = 'Notify channel'
+
+        try:
+            level = kwargs['level']
+        except KeyError:
+            level = 0
+
+        msg = f'<font color="green">{msg}"asd´laskdlkasñdlk añ ñlak sdñalks dlñaksd aslñdk añsdka ñkk kañk ah ah "</font>'
+        QgsMessageLog.logMessage(msg, tab_name, level)
 
 
     def raise_notice(self, **kwargs):
