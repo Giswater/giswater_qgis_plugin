@@ -438,7 +438,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None, is_threading=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -449,15 +449,18 @@ class DaoController(object):
             if self.last_error:
                 text = "Undefined error" 
                 if '-1' in self.log_codes:   
-                    text = self.log_codes[-1]   
-                self.show_warning_detail(text, str(self.last_error))
+                    text = self.log_codes[-1]
+                if is_threading:
+                    QgsMessageLog.logMessage(f"{text}: {self.dao.last_error}", "Warning detail", 1)
+                else:
+                    self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False, is_threading=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         sql = self.get_sql(sql, log_sql, params)
@@ -470,7 +473,10 @@ class DaoController(object):
                 text = "Undefined error"
                 if '-1' in self.log_codes:
                     text = self.log_codes[-1]
-                self.show_warning_detail(text, str(self.dao.last_error))
+                if is_threading:
+                    QgsMessageLog.logMessage(f"{text}: {self.dao.last_error}", "Warning detail", 1)
+                else:
+                    self.show_warning_detail(text, str(self.dao.last_error))
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
@@ -1378,9 +1384,14 @@ class DaoController(object):
 
     def get_config_param_user(self):
         self.cfgp_user={}
-        sql = (f"SELECT parameter, value FROM config_param_user "
-               f" WHERE cur_user = current_user")
-        rows = self.get_rows(sql, commit=True)
+        sql = "SELECT current_user"
+        row = self.get_rows(sql, commit=True, is_threading=True)
+        print(f"curent -> {self.current_user}  ->> {row}  <<--")
+        sql = (f"SELECT parameter, value FROM api_ws_sample.config_param_user "
+               f" WHERE cur_user = '{self.current_user}'")
+
+        rows = self.get_rows(sql, commit=True, is_threading=True)
+        print(f"get_config_param_user ROWS -> {rows}")
         if not rows:
             return 
         for row in rows:
@@ -1391,7 +1402,7 @@ class DaoController(object):
 
         self.cfgp_system={}
         sql = f"SELECT parameter, value, data_type, context, descript, label FROM config_param_system "
-        rows = self.get_rows(sql, commit=True)
+        rows = self.get_rows(sql, commit=True, is_threading=True)
         if not rows:
             return 
         for row in rows:
