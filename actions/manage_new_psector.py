@@ -826,15 +826,15 @@ class ManageNewPsector(ParentManage):
 
     def delete_psector_selector(self, tablename):
         sql = (f"DELETE FROM {tablename}"
-               f" WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
+               f" WHERE cur_user = current_user;")
+        self.controller.execute_sql(sql, commit=True)
 
 
     def insert_psector_selector(self, tablename, field, value):
 
         sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
-               f"VALUES ('{str(value)}', current_user)")
-        self.controller.execute_sql(sql)
+               f"VALUES ('{value}', current_user);")
+        self.controller.execute_sql(sql, commit=True)
 
 
     def check_tab_position(self):
@@ -1051,20 +1051,20 @@ class ManageNewPsector(ParentManage):
                 sql += values
 
         if not self.update:
-            sql += " RETURNING psector_id"
-            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+            sql += " RETURNING psector_id;"
+            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True, commit=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
                 sql = ("SELECT parameter FROM config_param_user "
-                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user")
+                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user;")
                 row = self.controller.get_row(sql, commit=True)
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = '{new_psector_id[0]}' "
-                           f" WHERE parameter = 'psector_vdefault'")
+                           f" WHERE parameter = 'psector_vdefault';")
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-                           f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user)")
+                           f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user);")
                 self.controller.execute_sql(sql, log_sql=True)
         else:
             self.controller.execute_sql(sql, log_sql=True)

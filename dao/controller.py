@@ -1383,23 +1383,22 @@ class DaoController(object):
 
 
     def get_config_param_user(self):
-
-        self.cfgp_user={}
-        sql = (f"SELECT parameter, value FROM api_ws_sample.config_param_user "
-               f" WHERE cur_user = current_user")
+        """ Populate dictionary with table config_param_user """
+        sql = "SELECT parameter, value FROM config_param_user WHERE cur_user = current_user;"
         rows = self.get_rows(sql, commit=True, is_threading=True)
         if not rows:
-            return 
+            return
+        self.cfgp_user = {}
         for row in rows:
             self.cfgp_user[row['parameter']] = CfgUser(row['parameter'], row['value'])
 
 
     def get_config_param_system(self):
-
-        self.cfgp_system={}
-        sql = f"SELECT parameter, value, data_type, context, descript, label FROM config_param_system;"
+        """ Populate dictionary with table config_param_system """
+        sql = "SELECT parameter, value, data_type, context, descript, label FROM config_param_system;"
         rows = self.get_rows(sql, commit=True, is_threading=True)
         if not rows:
-            return 
+            return
+        self.cfgp_system = {}
         for row in rows:
             self.cfgp_system[row['parameter']] = CfgSystem(row['parameter'], row['value'], row['data_type'], row['context'], row['descript'], row['label'])
