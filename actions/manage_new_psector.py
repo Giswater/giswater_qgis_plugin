@@ -954,7 +954,7 @@ class ManageNewPsector(ParentManage):
 
         sql = (f"SELECT name FROM {self.plan_om}_psector"
                f" WHERE name = '{psector_name}'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if row is None:
             return False
         return True
@@ -984,8 +984,8 @@ class ManageNewPsector(ParentManage):
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
-               f"ORDER BY ordinal_position")
-        rows = self.controller.get_rows(sql, log_sql=True)
+               f"ORDER BY ordinal_position;")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
             self.controller.show_warning(message, parameter=viewname)
@@ -1057,7 +1057,7 @@ class ManageNewPsector(ParentManage):
             if new_psector_id and self.plan_om == 'plan':
                 sql = ("SELECT parameter FROM config_param_user "
                        " WHERE parameter = 'psector_vdefault' AND cur_user = current_user")
-                row = self.controller.get_row(sql)
+                row = self.controller.get_row(sql, commit=True)
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = '{new_psector_id[0]}' "
