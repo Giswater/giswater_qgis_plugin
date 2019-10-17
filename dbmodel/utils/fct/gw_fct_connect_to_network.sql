@@ -126,12 +126,16 @@ BEGIN
 				END IF;
 				
 			ELSE -- in this case only arc is posible (vnode)
-				v_link.the_geom := ST_ShortestLine(v_connect.the_geom, v_endfeature_geom);
-				v_link.userdefined_geom = FALSE;	
+			
+				v_link.the_geom := ST_ShortestLine(v_connect.the_geom, v_arc.the_geom);
+				v_link.userdefined_geom = FALSE;
+				v_link.exit_type = 'VNODE';	
 			END IF;
 
 			v_exit.the_geom = ST_EndPoint(v_link.the_geom);
 		END IF;
+
+		raise notice 'v_endfeature_geom %',v_endfeature_geom;
 		
 		IF v_exit.the_geom IS NOT NULL THEN
 
