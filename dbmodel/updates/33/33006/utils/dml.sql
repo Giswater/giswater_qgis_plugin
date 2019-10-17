@@ -33,3 +33,5 @@ WHERE id='vnode';
 
 -- 15/10/2019
 UPDATE audit_cat_function SET alias = 'Build nodes using arcs start & end vertices' WHERE function_name = 'gw_fct_built_nodefromarc';
+
+UPDATE audit_cat_table SET sys_role_id='role_basic' WHERE id = 'temp_table';
