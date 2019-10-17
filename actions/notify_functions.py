@@ -209,15 +209,21 @@ class NotifyFunctions(ParentAction):
         :return:
         """
 
+        # Set default styleSheet
+        color = "black"
+        level = 0
+        bold = ''
+
         msg = kwargs['message'] if 'message' in kwargs else 'No message found'
         tab_name = kwargs['tabName'] if 'tabName' in kwargs else 'Notify channel'
-        color = kwargs['styleSheet']['color'] if 'styleSheet' in kwargs and 'color' in kwargs['styleSheet'] else "black"
-        level = kwargs['styleSheet']['level'] if 'styleSheet' in kwargs and 'level' in kwargs['styleSheet'] else 0
-        if 'styleSheet' in kwargs and 'bold' in kwargs['styleSheet']:
-            bold = 'b' if kwargs['styleSheet']['bold'] else ''
-        else:
-            bold = ''
-
+        if 'styleSheet' in kwargs:
+            color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
+            level = kwargs['styleSheet']['level'] if 'level' in kwargs['styleSheet'] else 0
+            if 'bold' in kwargs['styleSheet']:
+                bold = 'b' if kwargs['styleSheet']['bold'] else ''
+            else:
+                bold = ''
+        
         msg = f'<font color="{color}"><{bold}>{msg}</font>'
         QgsMessageLog.logMessage(msg, tab_name, level)
 
