@@ -485,7 +485,7 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=64 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No nodes with null values on field elevation have been founded';
+			VALUES (14, v_result_id, 1, 'INFO: No nodes with null values on field elevation have been found');
 		END IF;
 
 		-- 0 elevation control
@@ -500,7 +500,7 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=65 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No nodes with ''0'' on field elevation have been founded';
+			VALUES (14, v_result_id, 1, 'INFO: No nodes with ''0'' on field elevation have been found');
 		END IF;
 
 		-- pg2epa_inlet_flowtrace control
@@ -514,7 +514,7 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results founded for pipes and nodes disconected from inlets');
+			VALUES (14, v_result_id, 1, 'INFO: No results found for pipes and nodes disconected from inlets');
 		END IF;
 
 
@@ -537,7 +537,7 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with more than mandatory two arcs');
+			VALUES (14, v_result_id, 1, 'INFO: No results found looking for node2arc''s with more than mandatory two arcs');
 		END IF;
 
 		-- node2arcs with less than two arcs
