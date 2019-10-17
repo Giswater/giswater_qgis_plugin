@@ -211,10 +211,10 @@ BEGIN
 		
 		--new visit
 		IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
-
+			
+			EXECUTE ('SELECT sys_type FROM '||v_featuretablename||' LIMIT 1') INTO v_featuretype;
 			-- get vdefault visitclass
 			IF v_offline THEN
-				raise notice '======> %',v_featuretablename;
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
 				v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
 				IF v_visitclass IS NULL THEN
