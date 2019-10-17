@@ -296,44 +296,53 @@ BEGIN
 		-- double geometry
 		IF v_doublegeometry AND NEW.gratecat_id IS NOT NULL THEN
 
-			-- get grate dimensions
-			v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
-			v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
-			v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
+			v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id);
+			v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id);
 
+
+			IF v_length*v_width IS NULL THEN
 			
+				RAISE EXCEPTION 'Selected gratecat_id has NULL width or length';
+				
+			ELSE 
+				-- get grate dimensions
+				v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
+				v_length = v_length*v_unitsfactor;
+				v_width = v_width*v_unitsfactor;
 
-			-- calculate center coordinates
-			v_x = st_x(NEW.the_geom);
-			v_y = st_y(NEW.the_geom);
-    
-			-- calculate dx & dy to fix extend from center
-			dx = v_length/2;
-			dy = v_width/2;
+				-- calculate center coordinates
+				v_x = st_x(NEW.the_geom);
+				v_y = st_y(NEW.the_geom);
+	    
+				-- calculate dx & dy to fix extend from center
+				dx = v_length/2;
+				dy = v_width/2;
 
-			-- calculate the extend polygon
-			p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
-			p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
-	
-			p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
-			p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
+				-- calculate the extend polygon
+				p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
+				p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
+		
+				p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
+				p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
 
-			p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
-			p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
+				p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
+				p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
 
-			p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
-			p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
-			
+				p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
+				p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
+				
 
-			-- generating the geometry
-			EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
-				p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
-				INTO v_the_geom_pol;
-			
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-			v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+				-- generating the geometry
+				EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
+					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
+					INTO v_the_geom_pol;
+				
+				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
-			INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('GULLY', v_the_geom_pol,v_new_pol_id);
+				INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('GULLY', v_the_geom_pol,v_new_pol_id);
+
+			END IF;
 		END IF;
 
         -- FEATURE INSERT

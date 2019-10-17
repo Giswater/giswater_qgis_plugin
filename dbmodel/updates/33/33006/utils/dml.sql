@@ -35,3 +35,7 @@ WHERE id='vnode';
 UPDATE audit_cat_function SET alias = 'Build nodes using arcs start & end vertices' WHERE function_name = 'gw_fct_built_nodefromarc';
 
 UPDATE audit_cat_table SET sys_role_id='role_basic' WHERE id = 'temp_table';
+
+-- 17/10/2019
+UPDATE audit_cat_param_user SET description = 'If true, link will be automatically generated when inserting a new connec with state=1. For planified connecs, link will always be automatically generated'
+WHERE id = 'edit_connect_force_automatic_connect2network';
