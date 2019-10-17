@@ -9,3 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 14/10/2019
 UPDATE config_param_system SET value='TRUE' where parameter='om_mincut_use_pgrouting';
+
+UPDATE  audit_cat_param_user SET label='Quality mode:' , layout_id=1, layout_order=9, layoutname='grl_general_1' WHERE id = 'inp_options_quality_mode';
+UPDATE  audit_cat_param_user SET layout_id=2, layout_order=9, layoutname='grl_general_2' WHERE id = 'inp_options_node_id';

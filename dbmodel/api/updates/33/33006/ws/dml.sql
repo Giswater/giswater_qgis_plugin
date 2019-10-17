@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---14/10/2019
-UPDATE  audit_cat_param_user SET label='Quality mode:' WHERE id = 'inp_options_quality_mode';
 
 --16/10/2019
 UPDATE config_api_form_fields SET dv_querytext = 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id != 0' 
