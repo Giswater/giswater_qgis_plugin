@@ -32,22 +32,22 @@ BEGIN
 	END IF;
 
 
-	--  Select links with end(exit) on the updated node
-		querystring := 'SELECT * FROM link WHERE (link.exit_id = ' || quote_literal(NEW.vnode_id)|| ' AND exit_type=''VNODE'');'; 
-		FOR linkrec IN EXECUTE querystring
-		LOOP
-			-- Update parent arc_id from connec table or gully table
-			IF linkrec.feature_type='CONNEC' THEN
-				UPDATE connec SET arc_id=arcrec.arc_id WHERE connec.connec_id = linkrec.feature_id;
-			ELSIF linkrec.feature_type='GULLY' THEN
-				UPDATE gully SET arc_id=arcrec.arc_id WHERE gully.gully_id = linkrec.feature_id;
-			END IF;		
+	--  Select links with end(exit) on the updated vnode
+	querystring := 'SELECT * FROM link WHERE (link.exit_id = ' || quote_literal(NEW.vnode_id)|| ' AND exit_type=''VNODE'');'; 
+	FOR linkrec IN EXECUTE querystring
+	LOOP
+		-- Update parent arc_id from connec table or gully table
+		IF linkrec.feature_type='CONNEC' THEN
+			UPDATE connec SET arc_id=arcrec.arc_id WHERE connec.connec_id = linkrec.feature_id;
+		ELSIF linkrec.feature_type='GULLY' THEN
+			UPDATE gully SET arc_id=arcrec.arc_id WHERE gully.gully_id = linkrec.feature_id;
+		END IF;		
 		
-			-- Update link
-			EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || 
-			quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
-			
-		END LOOP;
+		-- Update link
+		EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || 
+		quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
+		
+	END LOOP;
 
     RETURN NEW;
 

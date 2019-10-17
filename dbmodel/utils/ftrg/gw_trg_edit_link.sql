@@ -310,22 +310,34 @@ BEGIN
 		
 	ELSIF TG_OP = 'UPDATE' THEN 
 				
-		IF st_equals (NEW.the_geom, (SELECT the_geom FROM link WHERE link_id=NEW.link_id)) THEN -- if geometry comes from link table
+		IF NEW.ispsectorgeom IS FALSE THEN -- if geometry comes from link table
 				
 			UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type, the_geom=NEW.the_geom 
 			WHERE link_id=NEW.link_id;				
 			
 		ELSE -- if geometry comes from psector_plan tables then 
 			
-			-- update psector tables
-			v_arc_id= (SELECT arc_id FROM arc , v_edit_link  WHERE st_dwithin (st_endpoint(v_edit_link.the_geom), arc.the_geom,0.01) AND v_edit_link.the_geom=OLD.the_geom)::text;
+			-- if geometry have changed by user 
+			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
+				v_userdefined_geom  = TRUE
+			ELSE 
+				v_userdefined_geom  = FALSE
+			END IF;
 
-			UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom
-			WHERE plan_psector_x_connec.connec_id=NEW.feature_id AND plan_psector_x_connec.arc_id= v_arc_id;
-
-			IF v_projectype = 'UD' THEN
-				UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom
-				WHERE plan_psector_x_gully.gully_id=NEW.feature_id AND plan_psector_x_gully.arc_id= v_arc_id;
+			IF v_projectype = 'WS' THEN
+				UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
+				WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+			
+			ELSIF v_projectype = 'UD' THEN
+					
+				IF NEW.feature_type='CONNEC' THEN
+					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
+					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+				ELSIF NEW.feature_type='GULLY' THEN
+					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
+					WHERE plan_psector_x_gully.id=NEW.psector_rowid;
+				END IF;
+				
 			END IF;
 
 		END IF;
