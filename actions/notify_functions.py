@@ -84,14 +84,7 @@ class NotifyFunctions(ParentAction):
         
 
     def wait_notifications(self, conn):
-        """
-        functions called in -> getattr(self, function_name)(**params):
-            def refresh_config_user_variables(self, **kwargs)
-            def refresh_config_system_variables(self, **kwargs)
-            def refresh_canvas(self, **kwargs)
-            def refresh_attribute_table(self, **kwargs)
-            def raise_notice(self, **kwargs)
-        """
+
         while True:
             conn.poll()
             while conn.notifies:
@@ -104,6 +97,14 @@ class NotifyFunctions(ParentAction):
 
 
     def execute_functions(self, complet_result):
+        """
+        functions called in -> getattr(self, function_name)(**params):
+            def refresh_config_user_variables(self, **kwargs)
+            def refresh_config_system_variables(self, **kwargs)
+            def refresh_canvas(self, **kwargs)
+            def refresh_attribute_table(self, **kwargs)
+            def show_message(self, **kwargs)
+        """
         for function in complet_result['functionAction']['functions']:
             function_name = function['name']
             params = function['parameters']
@@ -114,42 +115,6 @@ class NotifyFunctions(ParentAction):
                 print(f"Exception AttributeError: {e}")
                 pass
                 print(f"Exception error: {e}")
-
-    def show_message(self, **kwargs):
-        """
-        Show message in console log,
-        :param kwargs: dict with all needed
-        :param kwargs['message']: message to show
-        :param kwargs['tabName']: tab where the info will be displayed
-        :param kwargs['level']:  0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(black), 4 = None(black)
-        :return:
-        """
-        try:
-            msg = kwargs['message']
-        except KeyError:
-            msg = ''
-
-        try:
-            tab_name = kwargs['tabName']
-        except KeyError:
-            tab_name = 'Notify channel'
-
-        try:
-            level = kwargs['level']
-        except KeyError:
-            level = 0
-
-        msg = f'<font color="green">{msg}"asd´laskdlkasñdlk añ ñlak sdñalks dlñaksd aslñdk añsdka ñkk kañk ah ah "</font>'
-        QgsMessageLog.logMessage(msg, tab_name, level)
-
-
-    def raise_notice(self, **kwargs):
-        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
-            Used to show raise notices sent by postgresql
-        """
-        msg_list = kwargs['msg']
-        for msg in msg_list:
-            print(f"{msg}")
 
 
     def refresh_config_user_variables(self, **kwargs):
@@ -230,9 +195,42 @@ class NotifyFunctions(ParentAction):
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
+    def show_message(self, **kwargs):
+        """
+        functions called in -> getattr(self, function_name)(**params):
+        Show message in console log,
+        :param kwargs: dict with all needed
+        :param kwargs['message']: message to show
+        :param kwargs['tabName']: tab where the info will be displayed
+        :param kwargs['styleSheet']:  define text format (message type, color, and bold), 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
+        :param kwargs['styleSheet']['level']: 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
+        :param kwargs['styleSheet']['color']: can be like "red", "green", "orange", "pink"...typical html colors
+        :param kwargs['styleSheet']['bold']: if is true, then print as bold
+        :return:
+        """
 
+        msg = kwargs['message'] if 'message' in kwargs else 'No message found'
+        tab_name = kwargs['tabName'] if 'tabName' in kwargs else 'Notify channel'
+        color = kwargs['styleSheet']['color'] if 'styleSheet' in kwargs and 'color' in kwargs['styleSheet'] else "black"
+        level = kwargs['styleSheet']['level'] if 'styleSheet' in kwargs and 'level' in kwargs['styleSheet'] else 0
+        if 'styleSheet' in kwargs and 'bold' in kwargs['styleSheet']:
+            bold = 'b' if kwargs['styleSheet']['bold'] else ''
+        else:
+            bold = ''
+
+        msg = f'<font color="{color}"><{bold}>{msg}</font>'
+        QgsMessageLog.logMessage(msg, tab_name, level)
 
     # TODO unused functions atm
+
+    def raise_notice(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
+            Used to show raise notices sent by postgresql
+        """
+        msg_list = kwargs['msg']
+        for msg in msg_list:
+            print(f"{msg}")
+
     def set_column_visibility(self, layer, col_name, hidden):
         """ Hide selected fields according table config_api_form_fields.hidden """
         config = layer.attributeTableConfig()
