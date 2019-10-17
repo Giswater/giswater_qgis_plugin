@@ -44,7 +44,7 @@ BEGIN
 	-- copy data
 	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS FALSE 
 	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_fromschema AND table_type='BASE TABLE') 
-	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') AND id NOT IN('price_value_unit'. 'temp_table')
+	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') AND id NOT IN('price_value_unit', 'temp_table')
 	LOOP
 
 		-- get primary key

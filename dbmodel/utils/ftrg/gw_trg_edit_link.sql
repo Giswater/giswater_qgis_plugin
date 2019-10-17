@@ -26,6 +26,8 @@ DECLARE
 	v_count integer;
 	v_node_id integer;
 	v_arc_id text;
+	v_userdefined_geom boolean;
+
 	
 BEGIN
 
@@ -319,9 +321,9 @@ BEGIN
 			
 			-- if geometry have changed by user 
 			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
-				v_userdefined_geom  = TRUE
+				v_userdefined_geom  = TRUE;
 			ELSE 
-				v_userdefined_geom  = FALSE
+				v_userdefined_geom  = FALSE;
 			END IF;
 
 			IF v_projectype = 'WS' THEN
