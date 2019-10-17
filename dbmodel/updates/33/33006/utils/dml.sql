@@ -14,10 +14,10 @@ UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (tex
 FROM temp_table WHERE fprocesscat_id = 63 and user_name = current_user)) as idval ' WHERE id = 'cad_tools_base_layer_vdefault';
 
 -- 14/10/2019
-INSERT INTO sys_fprocess_cat VALUES (64, 'Nodes without elevation', 'epa', 'Nodes without elevation', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (65, 'Nodes with elevation=0', 'epa', 'Nodes with elevation=0', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (66, 'Node2arc with more than two arcs', 'epa', 'Node2arc with more than two arcs', 'ws');
-INSERT INTO sys_fprocess_cat VALUES (67, 'Node2arc with less than two arcs', 'epa', 'Node2arc with less than two arcs', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (64, 'Nodes without elevation', 'epa', 'Nodes without elevation', 'ws') ON conflict (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (65, 'Nodes with elevation=0', 'epa', 'Nodes with elevation=0', 'ws') ON conflict (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (66, 'Node2arc with more than two arcs', 'epa', 'Node2arc with more than two arcs', 'ws') ON conflict (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (67, 'Node2arc with less than two arcs', 'epa', 'Node2arc with less than two arcs', 'ws') ON conflict (id) DO NOTHING;
 
 --15/10/2019
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_system_variables", "enabled":"true", "trg_fields":"parameter, value, data_type, context, descript, label","featureType":[""]}]' 
