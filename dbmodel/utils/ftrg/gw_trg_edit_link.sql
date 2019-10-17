@@ -25,6 +25,7 @@ DECLARE
 	v_link_searchbuffer double precision;
 	v_count integer;
 	v_node_id integer;
+	v_arc_id text;
 	
 BEGIN
 
@@ -103,11 +104,11 @@ BEGIN
     IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 	
 		-- control of relationship with connec / gully
-		SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state=1
+		SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 		
 		IF v_projectype = 'UD'THEN
-			SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state=1
+			SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state>0
 			ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
 		END IF;
 
@@ -116,11 +117,11 @@ BEGIN
 			NEW.the_geom = ST_reverse (NEW.the_geom);
 
 			-- check control again
-			SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state=1
+			SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state>0
 			ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 		
 			IF v_projectype = 'UD' THEN
-				SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state=1
+				SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state>0
 				ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
 			END IF;
 			
@@ -130,11 +131,11 @@ BEGIN
 		END IF;
 
 		-- arc as end point
-		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state=1
+		SELECT * INTO v_arc FROM v_edit_arc WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom, v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_arc.the_geom) LIMIT 1;
 		
 		-- node as end point
-		SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state=1
+		SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom) LIMIT 1;
 		
 		-- for ws projects control of link related to nodarc
@@ -145,22 +146,22 @@ BEGIN
 		END IF;
 		
 		-- connec as init point
-		SELECT * INTO v_connec1 FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state=1 
+		SELECT * INTO v_connec1 FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0 
 		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 
 		-- connec as end point
-		SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state=1
+		SELECT * INTO v_connec2 FROM v_edit_connec WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom,v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 
 			IF v_projectype='UD' then
 		
 				--gully as init point
 				SELECT * INTO v_gully1 FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
-				AND state=1 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+				AND state>0 ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
 
 				--gully as end point
 				SELECT * INTO v_gully2 FROM v_edit_gully WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom,v_link_searchbuffer) 
-				AND state=1 ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
+				AND state>0 ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
 	
 				IF v_gully1.gully_id IS NOT NULL THEN
 					NEW.feature_id=v_gully1.gully_id;
@@ -315,17 +316,18 @@ BEGIN
 			WHERE link_id=NEW.link_id;				
 			
 		ELSE -- if geometry comes from psector_plan tables then 
-			-- update link
-			UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type 
-			WHERE link_id=NEW.link_id;
 			
 			-- update psector tables
+			v_arc_id= (SELECT arc_id FROM arc , v_edit_link  WHERE st_dwithin (st_endpoint(v_edit_link.the_geom), arc.the_geom,0.01) AND v_edit_link.the_geom=OLD.the_geom)::text;
+
+			UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom
+			WHERE plan_psector_x_connec.connec_id=NEW.feature_id AND plan_psector_x_connec.arc_id= v_arc_id;
+
 			IF v_projectype = 'UD' THEN
-				UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom FROM v_edit_gully 
-				WHERE plan_psector_x_gully.gully_id=NEW.feature_id AND plan_psector_x_gully.arc_id=v_edit_gully.arc_id;
+				UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom
+				WHERE plan_psector_x_gully.gully_id=NEW.feature_id AND plan_psector_x_gully.arc_id= v_arc_id;
 			END IF;
-					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom FROM v_edit_connec 
-			WHERE plan_psector_x_connec.connec_id=NEW.feature_id AND plan_psector_x_connec.arc_id=v_edit_connec.arc_id;
+
 		END IF;
 	
 		-- Update state_type if edit_connect_update_statetype is TRUE
