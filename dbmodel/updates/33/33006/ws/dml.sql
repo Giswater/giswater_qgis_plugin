@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 14/10/2019
-UPDATE config_param_user SET value='TRUE' where parameter='om_mincut_use_pgrouting';
+UPDATE config_param_system SET value='TRUE' where parameter='om_mincut_use_pgrouting';
