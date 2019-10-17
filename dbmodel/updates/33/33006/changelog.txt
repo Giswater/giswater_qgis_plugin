@@ -6,3 +6,4 @@
 - Bug fix on notify trg
 - Add notifications for links and vnode
 - API -configure 'Undefined' zone values
+- API - configure man_type fields
