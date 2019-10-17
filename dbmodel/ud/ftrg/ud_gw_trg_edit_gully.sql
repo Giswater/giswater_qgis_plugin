@@ -302,7 +302,7 @@ BEGIN
 
 			IF v_length*v_width IS NULL THEN
 			
-				RAISE EXCEPTION 'Selected gratecat_id has NULL width or length';
+				RAISE EXCEPTION 'Selected gratecat_id has NULL width or length. Check catalog data or your custom config values before continue';
 				
 			ELSE 
 				-- get grate dimensions
@@ -368,6 +368,7 @@ BEGIN
 		IF NEW.state=2 THEN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
+			
 			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
 			SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
 			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"());
