@@ -189,11 +189,14 @@ BEGIN
 			v_37=v_37+1;
 		END LOOP;
 
-		-- Disable custom foreing keys
+		
+		-- Disable custom foreing keys (to activate when bug solved)
+		/*
 		v_query_text =  'SELECT *  FROM typevalue_fk';
 		FOR v_tablerecord IN EXECUTE v_query_text LOOP				
 			EXECUTE 'ALTER TABLE '||v_tablerecord.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
 		END LOOP;
+		*/
 
 		-- Disable topocontrol triggers
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
@@ -248,11 +251,13 @@ BEGIN
 			v_37=v_37+1;	
 		END LOOP;
 
-		-- Enable custom foreing keys
+		-- Enable custom foreing keys (to activate when bug solved)
+		/*
 		v_query_text =  'SELECT *  FROM typevalue_fk';
 		FOR v_tablerecord IN EXECUTE v_query_text LOOP				
 			EXECUTE 'ALTER TABLE '||v_tablerecord.target_table||' ENABLE TRIGGER gw_trg_typevalue_fk';
 		END LOOP;
+		*/
 
 
 		-- Enable topocontrol triggers
