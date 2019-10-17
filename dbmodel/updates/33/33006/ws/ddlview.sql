@@ -34,7 +34,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
      JOIN sector ON sector.sector_id::text = arc.sector_id::text
      JOIN dma ON dma.dma_id::text = arc.dma_id::text
      LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
-  WHERE link.feature_id::text = v_state_connec.connec_id::text AND plan_psector_x_connec.state=1;
+  WHERE link.feature_id::text = v_state_connec.connec_id::text;
 
 
 
@@ -59,5 +59,5 @@ CREATE OR REPLACE VIEW v_edit_link AS
      JOIN sector ON sector.sector_id::text = arc.sector_id::text
      JOIN dma ON dma.dma_id::text = arc.dma_id::text
      LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
-  WHERE link.feature_id::text = v_state_connec.connec_id::text AND plan_psector_x_connec.state=1;
+  WHERE link.feature_id::text = v_state_connec.connec_id::text;
   
