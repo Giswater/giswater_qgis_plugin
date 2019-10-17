@@ -44,7 +44,7 @@ BEGIN
 	-- copy data
 	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS FALSE 
 	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_fromschema AND table_type='BASE TABLE') 
-	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') AND id NOT IN('price_value_unit')
+	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') AND id NOT IN('price_value_unit'. 'temp_table')
 	LOOP
 
 		-- get primary key
@@ -52,11 +52,11 @@ BEGIN
 			INTO v_idname
 			USING v_tablerecord.id;
 
+		RAISE NOTICE ' COPYING DATA FROM/TO TABLE: %', v_tablerecord.id;
+
 		-- execute copy from table to table
 		EXECUTE 'INSERT INTO '||v_toschema||'.'||v_tablerecord.id||' SELECT * FROM '||v_fromschema||'.'||v_tablerecord.id||' 
 			WHERE '||v_idname||' NOT IN (SELECT '||v_idname||' FROM '||v_toschema||'.'||v_tablerecord.id||')';
-
-		RAISE NOTICE ' COPYING DATA FROM/TO TABLE: %', v_tablerecord.id;
 		
 	END LOOP;
 		

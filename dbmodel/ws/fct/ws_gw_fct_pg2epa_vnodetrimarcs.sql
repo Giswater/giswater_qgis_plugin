@@ -40,12 +40,12 @@ BEGIN
 	FROM (
 		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, arc_id, 
 		case 	
-			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom)=1 then 0.9900 
-			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom)=0 then 0.0100 
-			else (st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
-		FROM rpt_inp_arc , vnode 
+			when st_linelocatepoint (rpt_inp_arc.the_geom , v_edit_vnode.the_geom)=1 then 0.9900 
+			when st_linelocatepoint (rpt_inp_arc.the_geom , v_edit_vnode.the_geom)=0 then 0.0100 
+			else (st_linelocatepoint (rpt_inp_arc.the_geom , v_edit_vnode.the_geom))::numeric(12,4) end as locate
+		FROM rpt_inp_arc , v_edit_vnode
 		JOIN v_edit_link a ON vnode_id=exit_id::integer
-		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC'
+		WHERE st_dwithin ( rpt_inp_arc.the_geom, v_edit_vnode.the_geom, 0.01) AND v_edit_vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC'
 		AND result_id=result_id_var
 		UNION
 		SELECT node_1, arc_id,  0 FROM rpt_inp_arc WHERE result_id=result_id_var AND arc_type != 'NODE2ARC'

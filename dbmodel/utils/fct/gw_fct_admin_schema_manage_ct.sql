@@ -189,6 +189,12 @@ BEGIN
 			v_37=v_37+1;
 		END LOOP;
 
+		-- Disable custom foreing keys
+		v_query_text =  'SELECT *  FROM typevalue_fk';
+		FOR v_tablerecord IN EXECUTE v_query_text LOOP				
+			EXECUTE 'ALTER TABLE '||v_tablerecord.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
+		END LOOP;
+
 		-- Disable topocontrol triggers
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
 		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
@@ -241,6 +247,13 @@ BEGIN
 			EXECUTE v_query_text;
 			v_37=v_37+1;	
 		END LOOP;
+
+		-- Enable custom foreing keys
+		v_query_text =  'SELECT *  FROM typevalue_fk';
+		FOR v_tablerecord IN EXECUTE v_query_text LOOP				
+			EXECUTE 'ALTER TABLE '||v_tablerecord.target_table||' ENABLE TRIGGER gw_trg_typevalue_fk';
+		END LOOP;
+
 
 		-- Enable topocontrol triggers
 		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
