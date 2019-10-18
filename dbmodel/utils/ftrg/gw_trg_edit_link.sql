@@ -110,7 +110,7 @@ BEGIN
 		SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom) LIMIT 1;
 		
-		IF v_projectype = 'UD'THEN
+		IF v_projectype = 'UD' AND v_connect.connec_id IS NULL THEN
 			SELECT * INTO v_connect FROM v_edit_gully WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom, v_link_searchbuffer) AND state>0
 			ORDER by st_distance(ST_StartPoint(NEW.the_geom), v_edit_gully.the_geom) LIMIT 1;
 		END IF;

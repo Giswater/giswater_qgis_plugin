@@ -249,17 +249,17 @@ BEGIN
 				NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.streetaxis2_id, NEW.streetaxis_id, 
 				NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 				NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,NEW.feature_id, NEW.label_x, NEW.label_y, NEW.label_rotation,
-				NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id);
-				
-		-- Control of automatic insert of link and vnode
-		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
-		AND cur_user=current_user LIMIT 1) IS TRUE THEN
-			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
-			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
-		END IF;
+				NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id);	
+		
+		IF NEW.state=1 THEN
+			-- Control of automatic insert of link and vnode
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
+			AND cur_user=current_user LIMIT 1) IS TRUE THEN
+				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+				SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
+			END IF;
 
-
-		IF NEW.state=2 THEN
+		ELSIF NEW.state=2 THEN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
 			
@@ -267,11 +267,9 @@ BEGIN
 			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
 			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"());
 			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id) VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id);
+			
 		END IF;
-		
-		
-
- 
+		 
 	-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter 
