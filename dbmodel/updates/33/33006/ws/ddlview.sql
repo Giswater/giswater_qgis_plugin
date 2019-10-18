@@ -49,7 +49,7 @@ SELECT * FROM (SELECT link.link_id,
      JOIN dma ON dma.dma_id::text = arc.dma_id::text
      LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
   WHERE link.feature_id::text = v_state_connec.connec_id::text) a
-  WHERE state=1;
+  WHERE state < 2;
 
 
 
@@ -60,7 +60,7 @@ SELECT * FROM (SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
     vnode.sector_id,
     vnode.dma_id,
     CASE
-        WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.state
+        WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
         ELSE plan_psector_x_connec.state
     END AS state,
     vnode.annotation,
@@ -86,5 +86,5 @@ SELECT * FROM (SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
      JOIN dma ON dma.dma_id::text = arc.dma_id::text
      LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
   WHERE link.feature_id::text = v_state_connec.connec_id::text) a
-  WHERE state=1;
+  WHERE state < 2;
   

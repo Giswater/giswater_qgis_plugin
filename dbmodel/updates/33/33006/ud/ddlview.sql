@@ -241,7 +241,7 @@ SELECT link.link_id,
     JOIN dma ON dma.dma_id::text = arc.dma_id::text
     LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
     WHERE link.feature_id::text = v_state_gully.gully_id::text) a
-   WHERE state=1;
+   WHERE state < 2;
    
     
 CREATE OR REPLACE VIEW v_edit_vnode AS
@@ -251,7 +251,7 @@ SELECT * FROM (SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
    arc.sector_id,
    arc.dma_id,
     CASE
-        WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.state
+        WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
         ELSE plan_psector_x_connec.state
     END AS state,
     vnode.annotation,
@@ -285,7 +285,7 @@ SELECT vnode.vnode_id,
    arc.sector_id,
    arc.dma_id,
     CASE
-        WHEN plan_psector_x_gully.vnode_geom IS NULL THEN vnode.state
+        WHEN plan_psector_x_gully.vnode_geom IS NULL THEN link.state
         ELSE plan_psector_x_gully.state
     END AS state,
     vnode.annotation,
@@ -312,6 +312,6 @@ SELECT vnode.vnode_id,
     JOIN dma ON dma.dma_id::text = arc.dma_id::text
     LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
     WHERE link.feature_id::text = v_state_gully.gully_id::text) a
-	WHERE state=1;
+	WHERE state < 2;
 
   
