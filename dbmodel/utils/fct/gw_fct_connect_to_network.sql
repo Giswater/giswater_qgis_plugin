@@ -70,8 +70,18 @@ BEGIN
 			SELECT * INTO v_connect FROM gully WHERE gully_id = connect_id_aux;
 		END IF;
 		
-		raise notice 'LINK: % CONNECT % ', v_link, v_connect;
+		--raise exception 'LINK: % CONNECT % ', v_link, v_connect;
 
+		-- exception control. It's no possible to create another link when already exists for the connect
+		IF v_connect.state=2 AND v_link.exit_id IS NOT NULL THEN
+			IF feature_type_aux = 'CONNEC' THEN
+				RAISE EXCEPTION 'The connect2network tool is not enabled to work with connec''s with state=2. For planned connec''s you must to create the links for that connec (one link for each alternative and each connec) by using the psector form and relate the connec using the arc_id field. After that you will can customize the link''s geometry. connec_id: %' ,connect_id_aux;
+			ELSIF feature_type_aux = 'GULLY' THEN
+				RAISE EXCEPTION 'The connect2network tool is not enabled to work with gully''s with state=2. For planned gully''s you must to create the links for that gully (one link for each alternative and each gully) by using the psector form and relate the gully using the arc_id field. After that you will can customize the link''s geometry. gully_id: %' ,connect_id_aux;
+			END IF;
+		END IF;
+
+		
 		-- get values from old vnode
 		SELECT * INTO v_exit FROM vnode WHERE vnode_id::text=v_link.exit_id;
 	
@@ -91,6 +101,11 @@ BEGIN
 		SELECT * INTO v_arc FROM arc WHERE arc_id = v_connect.arc_id;
 
 		raise notice 'v_connect.arc_id %, v_arc: % ', v_connect.arc_id, v_arc;
+
+		-- state control
+		IF v_arc.state=2 AND v_connect.state=1 THEN
+			RAISE EXCEPTION 'It is not possible to relate connects with state=1 to arcs with state=2. Please check your map';
+		END IF;
 
 		-- compute link
 		IF v_arc.the_geom IS NOT NULL THEN

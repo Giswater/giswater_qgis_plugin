@@ -27,6 +27,7 @@ DECLARE
 	v_node_id integer;
 	v_arc_id text;
 	v_userdefined_geom boolean;
+	v_end_state integer;
 
 	
 BEGIN
@@ -140,6 +141,7 @@ BEGIN
 		SELECT * INTO v_node FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom, v_link_searchbuffer) AND state>0
 		ORDER by st_distance(ST_EndPoint(NEW.the_geom), v_edit_node.the_geom) LIMIT 1;
 		
+		
 		-- for ws projects control of link related to nodarc
 		IF v_projectype = 'WS' AND v_node IS NOT NULL THEN
 			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION SELECT node_id FROM inp_pump) THEN
@@ -186,15 +188,17 @@ BEGIN
 		
 			-- end point of link geometry
 			v_end_point = (ST_ClosestPoint(v_arc.the_geom, ST_EndPoint(NEW.the_geom)));
+			v_end_state= v_arc.state;
 			
 			-- vnode
 			SELECT * INTO v_vnode FROM vnode WHERE ST_DWithin(v_end_point, vnode.the_geom, 0.01) LIMIT 1;
-	
+
 			IF v_vnode.vnode_id IS NULL THEN
 				INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
 				VALUES ((SELECT nextval('vnode_vnode_id_seq')), v_arc.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, 'AUTO', v_end_point) RETURNING vnode_id INTO v_node_id;
 			ELSE
 				v_end_point = v_vnode.the_geom;
+				v_node_id = v_vnode.vnode_id;
 			END IF;
 		
 			-- update connec
@@ -251,6 +255,7 @@ BEGIN
 			NEW.exit_type='NODE';
 			NEW.exit_id=v_node.node_id;
 			v_end_point = v_node.the_geom;
+			v_end_state= v_node.state;
 		
 		ELSIF v_connec2.connec_id IS NOT NULL THEN
 				
@@ -273,6 +278,8 @@ BEGIN
 			NEW.exit_type='CONNEC';
 			NEW.exit_id=v_connec2.connec_id;
 			v_end_point = v_connec2.the_geom;
+			v_end_state= v_connec2.state;
+
 			
 		END IF;
 		
@@ -287,6 +294,7 @@ BEGIN
 				NEW.exit_type='GULLY';
 				NEW.exit_id=v_gully2.gully_id;
 				v_end_point = v_gully2.the_geom;
+				v_end_state = v_gully2.state;
 			END IF;
 		END IF;
 		
@@ -304,6 +312,20 @@ BEGIN
 	-- upsert process
 		
 	IF TG_OP ='INSERT' THEN
+		-- exception control. It's no possible to create another link when already exists for the connect
+		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id) IS NOT NULL THEN
+			IF NEW.feature_type = 'CONNEC' THEN
+				RAISE EXCEPTION 'It is not possible to create the link. On inventory mode only one link it is enabled for each connec. On planning mode it is possible to create more than one links, one for each alternative, but it is mandatory to use the psector form and relate the connec using the arc_id field. After that you will can customize the link''s geometry. connec_id: %' ,NEW.feature_id;
+			ELSIF NEW.feature_type = 'GULLY' THEN
+				RAISE EXCEPTION 'It is not possible to create the link. On inventory mode only one link it is enabled for each gully. On planning mode it is possible to create more than one links, one for each alternative, but it is mandatory to use the psector form and relate the connec using the arc_id field. After that you will can customize the link''s geometry. gully_id: %' ,NEW.feature_id;
+			END IF;		
+		END IF;
+
+		-- state control
+		IF v_connect.state=1 AND v_end_state=2 THEN
+			RAISE EXCEPTION 'It''s not possible to relate one connect with state=2 over feature with state=1';
+		END IF;
+		
 
 		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
 		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom);
@@ -313,30 +335,40 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN 
 				
 		IF NEW.ispsectorgeom IS FALSE THEN -- if geometry comes from link table
-				
-			UPDATE link SET userdefined_geom='TRUE', state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type, the_geom=NEW.the_geom 
-			WHERE link_id=NEW.link_id;				
+
+			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
+				UPDATE link SET userdefined_geom='TRUE', the_geom=NEW.the_geom 	WHERE link_id=NEW.link_id;
+				UPDATE vnode SET the_geom=St_endpoint(NEW.the_geom) WHERE vnode_id=NEW.exit_id::integer AND NEW.exit_type='VNODE';
+			END IF;
+			
+			UPDATE link SET state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type WHERE link_id=NEW.link_id;				
 			
 		ELSE -- if geometry comes from psector_plan tables then 
+
+			-- control endfeature (only VNODE it is possible)
+			IF NEW.exit_type!='VNODE' THEN
+				RAISE EXCEPTION 'On planning mode working with alternatives, it''s not possible to relate connect over other connects or nodes. Only arcs are avaliable';
+			END IF;
 			
 			-- if geometry have changed by user 
 			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 				v_userdefined_geom  = TRUE;
+				v_end_point = ST_EndPoint(NEW.the_geom);
 			ELSE 
 				v_userdefined_geom  = FALSE;
 			END IF;
 
 			IF v_projectype = 'WS' THEN
-				UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
+				UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
 				WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 			
 			ELSIF v_projectype = 'UD' THEN
 					
 				IF NEW.feature_type='CONNEC' THEN
-					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
+					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
 					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 				ELSIF NEW.feature_type='GULLY' THEN
-					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
+					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
 					WHERE plan_psector_x_gully.id=NEW.psector_rowid;
 				END IF;
 				
@@ -361,24 +393,38 @@ BEGIN
 						
 	ELSIF TG_OP = 'DELETE' THEN
 		
-		IF OLD.exit_type='VNODE' THEN
+		IF OLD.ispsectorgeom IS FALSE THEN -- if geometry comes from link table
+			DELETE FROM link WHERE link_id = OLD.link_id;
 
-			-- delete vnode if no more links are related to vnode
-			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=OLD.exit_id;	
+			IF OLD.exit_type='VNODE' THEN
+				-- delete vnode if no more links are related to vnode
+				SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=OLD.exit_id;	
 							
-			IF v_count < 2 THEN -- only 1 link or cero exists
+				IF v_count < 2 THEN -- only 1 link or cero exists
 					DELETE FROM vnode WHERE  vnode_id::text=OLD.exit_id;
+				END IF;
+			END IF;
+			
+		ELSE
+			IF v_projectype = 'WS' THEN
+				UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL
+				WHERE plan_psector_x_connec.id=OLD.psector_rowid;
+			
+			ELSIF v_projectype = 'UD' THEN
+				IF OLD.feature_type='CONNEC' THEN
+					UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL
+					WHERE plan_psector_x_connec.id=OLD.psector_rowid;
+				ELSIF OLD.feature_type='GULLY' THEN
+					UPDATE plan_psector_x_gully SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL
+					WHERE plan_psector_x_gully.id=OLD.psector_rowid;
+				END IF;
 			END IF;
 		END IF;
-		
-		DELETE FROM link WHERE link_id = OLD.link_id;
 						
-	    RETURN NULL;
+		RETURN NULL;
 	   
 	END IF;
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

@@ -333,15 +333,16 @@ BEGIN
 	        END IF;
 	    END IF;
 
-		-- Control of automatic insert of link and vnode
-		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
-		AND cur_user=current_user LIMIT 1) IS TRUE THEN
-			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
-			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
-		END IF;
+		
+		IF NEW.state=1 THEN
+			-- Control of automatic insert of link and vnode
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
+			AND cur_user=current_user LIMIT 1) IS TRUE THEN
+				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+				SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
+			END IF;
 
-
-		IF NEW.state=2 THEN
+		ELSIF NEW.state=2 THEN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
 			

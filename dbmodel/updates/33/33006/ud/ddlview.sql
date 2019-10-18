@@ -175,12 +175,12 @@ SELECT * FROM (SELECT link.link_id,
    arc.dma_id,
    arc.expl_id,
        CASE
-       WHEN plan_psector_x_connec.state IS NULL THEN link.state
+       WHEN plan_psector_x_connec.link_geom IS NULL THEN link.state
        ELSE plan_psector_x_connec.state
     END AS state,
     st_length2d(link.the_geom) AS gis_length,
     CASE
-        WHEN plan_psector_x_connec.userdefined_geom IS NULL THEN link.userdefined_geom
+        WHEN plan_psector_x_connec.link_geom IS NULL THEN link.userdefined_geom
         ELSE plan_psector_x_connec.userdefined_geom
     END AS userdefined_geom,
     CASE
@@ -215,12 +215,12 @@ SELECT link.link_id,
    arc.dma_id,
    arc.expl_id,
        CASE
-       WHEN plan_psector_x_gully.state IS NULL THEN link.state
+       WHEN plan_psector_x_gully.link_geom IS NULL THEN link.state
        ELSE plan_psector_x_gully.state
     END AS state,
     st_length2d(link.the_geom) AS gis_length,
     CASE
-        WHEN plan_psector_x_gully.userdefined_geom IS NULL THEN link.userdefined_geom
+        WHEN plan_psector_x_gully.link_geom IS NULL THEN link.userdefined_geom
         ELSE plan_psector_x_gully.userdefined_geom
     END AS userdefined_geom,
     CASE
@@ -253,7 +253,7 @@ SELECT * FROM (SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
    arc.sector_id,
    arc.dma_id,
     CASE
-        WHEN plan_psector_x_connec.state IS NULL THEN vnode.state
+        WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.state
         ELSE plan_psector_x_connec.state
     END AS state,
     vnode.annotation,
@@ -287,7 +287,7 @@ SELECT vnode.vnode_id,
    arc.sector_id,
    arc.dma_id,
     CASE
-        WHEN plan_psector_x_gully.state IS NULL THEN vnode.state
+        WHEN plan_psector_x_gully.vnode_geom IS NULL THEN vnode.state
         ELSE plan_psector_x_gully.state
     END AS state,
     vnode.annotation,
