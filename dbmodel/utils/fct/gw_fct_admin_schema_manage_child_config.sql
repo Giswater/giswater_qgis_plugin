@@ -82,13 +82,17 @@ BEGIN
 	--insert configuration copied from the parent view config
 	FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname=concat('ve_',v_feature_type))
 	LOOP
-	--raise notice 'rec,%',rec;
 		EXECUTE 'INSERT INTO config_api_form_fields('||v_config_fields||')
 		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
 
 	END LOOP;
 
-	
+	--update configuration of man_type fields setting featurecat related to the view
+	EXECUTE 'UPDATE config_api_form_fields SET dv_querytext = concat(dv_querytext, ''OR featurecat_id = '''||quote_literal(v_cat_feature)||''''')
+	WHERE formname = '''||v_view_name||'''
+	and (column_id =''location_type'' OR column_id =''fluid_type'' OR column_id =''function_type'' OR column_id =''category_type'')
+	AND dv_querytext NOT ILIKE ''%OR%'';';
+
 	--select columns from man_* table without repeating the identifier
 	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale
 	FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
@@ -97,7 +101,6 @@ BEGIN
 
 	--insert configuration from the man_* tables of the feature type
 	FOR rec IN  EXECUTE v_man_fields LOOP
-	raise notice 'rec,%',rec;
 
 		--capture max layout_id for the view
 		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layout_name=''layout_data_1'';'
