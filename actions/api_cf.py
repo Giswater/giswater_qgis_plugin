@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: latin-1 -*-
 try:
-    from qgis.core import Qgis
+    from qgis.core import Qgis, QgsApplication
 except:
     from qgis.core import QGis as Qgis
 
@@ -39,13 +39,14 @@ from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
+from .api_catalog import ApiCatalog
 from .api_parent import ApiParent
+from .gw_thread import GwTask
 from .manage_document import ManageDocument
 from .manage_element import ManageElement
-from .manage_visit import ManageVisit
 from .manage_gallery import ManageGallery
-from .api_catalog import ApiCatalog
-from ..ui_manager import ApiCfUi, EventFull, LoadDocuments, Sections, ApiBasicInfo
+from .manage_visit import ManageVisit
+from ..ui_manager import ApiBasicInfo, ApiCfUi, EventFull, LoadDocuments, Sections
 
 
 class ApiCF(ApiParent):
@@ -122,7 +123,6 @@ class ApiCF(ApiParent):
         action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
-
         main_menu.exec_(click_point)
 
 
@@ -288,6 +288,8 @@ class ApiCF(ApiParent):
                 return False, None
 
         self.complet_result = row
+        self.task1 = GwTask('Loading form')
+        QgsApplication.taskManager().addTask(self.task1)
 
         result = row[0]['body']['data']
         if 'fields' not in result:
@@ -309,6 +311,7 @@ class ApiCF(ApiParent):
                 else:
                     sub_tag = 'node'
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag)
+
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
 
@@ -489,8 +492,10 @@ class ApiCF(ApiParent):
         self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
-
-        for field in complet_result[0]['body']['data']['fields']:
+        total_fields = len(complet_result[0]['body']['data']['fields'])
+        
+        for progress, field in enumerate(complet_result[0]['body']['data']['fields']):
+            self.task1.setProgress((progress*100)/total_fields)
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
             if widget is None:
                 return False, False
