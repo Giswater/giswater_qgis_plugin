@@ -5,5 +5,7 @@
 - Enhance epanet controls before exportation checking elevation, inlets and number of arcs for nodearcs features
 - Bug fix on notify trg
 - Add notifications for links and vnode
-- API -configure 'Undefined' zone values
+- Bug fix on v_edit_link and v_edit_vnode
+- Enhance link/vnode on psector strategy
+- API - configure 'Undefined' zone values
 - API - configure man_type fields
