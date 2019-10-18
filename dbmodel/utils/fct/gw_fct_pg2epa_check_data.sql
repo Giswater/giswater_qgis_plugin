@@ -504,9 +504,9 @@ BEGIN
 		END IF;
 
 		-- pg2epa_inlet_flowtrace control
-		PERFORM pg2epa_inlet_flowtrace (v_result_id);
+		--PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result_id);
 
-		SELECT count(*) FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user;
+		SELECT count(*) INTO v_count  FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc''s totally disconnected fron any reservoir'));
@@ -517,19 +517,19 @@ BEGIN
 			VALUES (14, v_result_id, 1, 'INFO: No results found for pipes and nodes disconected from inlets');
 		END IF;
 
-
 		-- node2arcs with more than two arcs
 		DELETE FROM anl_node WHERE fprocesscat_id=66 and cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
-		SELECT 66, count(*) as count, a.node_id FROM (SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_1
+		SELECT 66, a.node_id, a.nodecat_id, a.the_geom FROM (
+		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_1
 		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
 		UNION ALL
-		SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_2
+		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_2
 		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
-		GROUP by node_id
-		HAVING count(*) <> 2;
+		GROUP by node_id, nodecat_id, the_geom
+		HAVING count(*) > 2;
 
-		SELECT count(*) FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user;
+		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc''s with more than two arcs'));
@@ -537,21 +537,22 @@ BEGIN
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results found looking for node2arc''s with more than mandatory two arcs');
+			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with more than mandatory two arcs');
 		END IF;
 
 		-- node2arcs with less than two arcs
 		DELETE FROM anl_node WHERE fprocesscat_id=67 and cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
-		SELECT 66, count(*) as count, a.node_id FROM (SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_1
+		SELECT 66, a.node_id, a.nodecat_id, a.the_geom FROM (
+		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_1
 		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
 		UNION ALL
-		SELECT node_id FROM node JOIN arc a1 ON node_id=a1.node_2
+		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_2
 		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
-		GROUP by node_id
-		HAVING count(*) <> 2;
+		GROUP by node_id, nodecat_id, the_geom
+		HAVING count(*) < 2;
 
-		SELECT count(*) FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user;
+		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',
