@@ -62,5 +62,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-select * from plan_psector_x_connec WHERE id=12

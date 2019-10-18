@@ -194,9 +194,8 @@ SELECT * FROM (SELECT link.link_id,
     CASE
         WHEN plan_psector_x_connec.link_geom IS NULL THEN NULL
         ELSE plan_psector_x_connec.id
-    END AS psector_rowid,
-  'CONNEC' as feature_type
-  FROM link
+    END AS psector_rowid
+	FROM link
     JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
     JOIN arc USING (arc_id)
     JOIN sector ON sector.sector_id::text = arc.sector_id::text
@@ -234,9 +233,8 @@ SELECT link.link_id,
     CASE
         WHEN plan_psector_x_gully.link_geom IS NULL THEN NULL
         ELSE plan_psector_x_gully.id
-    END AS psector_rowid,
-   'GULLY' as feature_type
-  FROM link
+    END AS psector_rowid
+	FROM link
     JOIN v_state_gully ON link.feature_id::text = v_state_gully.gully_id::text
     LEFT JOIN arc USING (arc_id)
     JOIN sector ON sector.sector_id::text = arc.sector_id::text
