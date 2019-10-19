@@ -12,7 +12,8 @@ UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_hydrometer_period';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_options';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_dma_parameter_period';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_dma_hydrometer_period';
-UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_hydrometer_x_connec';
+--UPDATE commented on 19/10/2019 becasuse it is used on corporate environtment. On 3.3.007 will be created again for those of that was removed
+--UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_rtc_hydrometer_x_connec';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='config';
 
 
