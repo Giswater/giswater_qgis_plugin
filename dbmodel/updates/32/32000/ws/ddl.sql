@@ -35,6 +35,5 @@ CREATE TABLE inp_pump_importinp
   status character varying(12)
 );
 
-
-ALTER TABLE rpt_inp_node ADD column pattern_id varchar(16);
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"pattern_id", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"flw_code", "dataType":"varchar(512)"}}$$);
