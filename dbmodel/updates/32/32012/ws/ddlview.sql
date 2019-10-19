@@ -19,7 +19,6 @@ DROP VIEW IF EXISTS ve_inp_demand;
 DROP VIEW IF EXISTS v_inp_backdrop;
 DROP VIEW IF EXISTS v_inp_controls;
 DROP VIEW IF EXISTS v_inp_curve;
-DROP VIEW IF EXISTS v_inp_demand;
 DROP VIEW IF EXISTS v_inp_emitter;
 DROP VIEW IF EXISTS v_inp_energy_el;
 DROP VIEW IF EXISTS v_inp_energy_gl;
@@ -47,6 +46,7 @@ DROP VIEW IF EXISTS v_inp_valve_fl;
 DROP VIEW IF EXISTS v_inp_valve_lc;
 DROP VIEW IF EXISTS v_inp_valve_pr;
 DROP VIEW IF EXISTS v_inp_vertice;
+DROP VIEW IF EXISTS v_inp_demand;
 
 
 
