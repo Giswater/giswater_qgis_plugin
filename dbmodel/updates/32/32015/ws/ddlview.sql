@@ -536,7 +536,7 @@ CREATE OR REPLACE VIEW v_edit_connec AS
 	   LEFT JOIN (SELECT connec.connec_id,
 	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 		FROM ext_rtc_hydrometer
-		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		JOIN connec ON ext_rtc_hydrometer.connec_id::text=connec.customer_code
 		GROUP BY connec.connec_id) a USING (connec_id)
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -855,7 +855,7 @@ CREATE OR REPLACE VIEW ve_connec AS
 	   LEFT JOIN (SELECT connec.connec_id,
 	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 		FROM ext_rtc_hydrometer
-		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		JOIN connec ON ext_rtc_hydrometer.connec_id::text=connec.customer_code
 		GROUP BY connec.connec_id) a USING (connec_id)
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -938,7 +938,7 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
 	 LEFT JOIN (SELECT connec.connec_id,
 	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 		FROM ext_rtc_hydrometer
-		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		JOIN connec ON ext_rtc_hydrometer.connec_id::text=connec.customer_code
 		GROUP BY connec.connec_id) a USING (connec_id)    
    LEFT JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
    JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -1012,7 +1012,7 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
 	 LEFT JOIN (SELECT connec.connec_id,
 	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 		FROM ext_rtc_hydrometer
-		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		JOIN connec ON ext_rtc_hydrometer.connec_id::text=connec.customer_code
 		GROUP BY connec.connec_id) a USING (connec_id)    
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -1091,7 +1091,7 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
 	 LEFT JOIN (SELECT connec.connec_id,
 	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 		FROM ext_rtc_hydrometer
-		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		JOIN connec ON ext_rtc_hydrometer.connec_id::text=connec.customer_code
 		GROUP BY connec.connec_id) a USING (connec_id)  
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -1165,7 +1165,7 @@ CREATE OR REPLACE VIEW v_edit_man_wjoin AS
 	 LEFT JOIN (SELECT connec.connec_id,
 	   count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 		FROM ext_rtc_hydrometer
-		JOIN connec ON ext_rtc_hydrometer.connec_id=connec.customer_code
+		JOIN connec ON ext_rtc_hydrometer.connec_id::text=connec.customer_code
 		GROUP BY connec.connec_id) a USING (connec_id)    
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
@@ -1175,8 +1175,10 @@ CREATE OR REPLACE VIEW v_edit_man_wjoin AS
      LEFT JOIN sector ON connec.sector_id = sector.sector_id;
 	 
 	 
-	 DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+-- DROP commented on 19/10/2019 becasuse it is used on corporate environtment. On 3.3.007 will be created again for those of that was removed
+-- DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
 	 
+	
 	
 
 

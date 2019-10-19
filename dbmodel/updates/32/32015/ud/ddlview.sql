@@ -7,7 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+--DROP commented on 19/10/2019 becasuse it is used on corporate environtment. On 3.3.007 will be created again for those of that was removed
+--DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
 
 CREATE OR REPLACE VIEW v_state_connec AS 
 SELECT DISTINCT ON (connec_id) 
