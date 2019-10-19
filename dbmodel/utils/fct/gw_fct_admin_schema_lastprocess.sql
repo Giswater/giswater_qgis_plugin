@@ -89,6 +89,16 @@ BEGIN
 			EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name;
 		END LOOP;
 		
+		-- drop deprecated columns
+		IF v_projecttype = 'WS' THEN 
+			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_19;
+			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_20;
+			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_21;
+			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_22;
+			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
+			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;
+		END IF;
+		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
 		VALUES ('schema_manager', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
