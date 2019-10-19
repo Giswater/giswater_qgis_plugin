@@ -13,6 +13,8 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":"True"}}$$)
 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":"True"}}$$)
+
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"addvalue", "newName":"_addvalue_"}}$$)
 */
 
@@ -47,14 +49,21 @@ BEGIN
 	v_isutils = (p_data->>'data')::json->>'isUtils';
 	v_newname = (p_data->>'data')::json->>'newName';
 
+	-- manage utils schema
 	IF v_isutils THEN
-		v_schemautils = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_schema_utils');
+		v_schemautils = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_utils_schema');
+		IF v_schemautils THEN 		
+			SET search_path = 'utils', public;
+			v_schemaname := 'utils';
+			v_table := substring(v_table,5,999);
+			
+		END IF;
 	END IF;
 
 	-- check if column not exists
 	IF v_action='ADD' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NULL THEN
 
-		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
+		v_querytext = 'ALTER TABLE '||quote_ident(v_schemaname) ||'.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
 		EXECUTE v_querytext;
 		
 	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL  
