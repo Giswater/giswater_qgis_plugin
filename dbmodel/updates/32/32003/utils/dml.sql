@@ -1188,7 +1188,6 @@ update config_param_system set iseditable=TRUE where isenabled = true and isedit
 update config_param_system set dv_isparent=FALSE where isenabled = true and dv_isparent is null;
 update config_param_system set isautoupdate=FALSE where isenabled = true and isautoupdate is null;
 
-update config_param_system a set id = b.a FROM 
-	(SELECT row_number() over (order by id)+1000 AS a, id FROM config_param_system) b where b.id = a.id;
-update config_param_system a set id = b.a FROM 
-	(SELECT row_number() over (order by id) AS a, id FROM config_param_system) b where b.id = a.id;
+-- refactor id on table
+update config_param_system a set id = b.a FROM 	(SELECT row_number() over (order by id)+10000 AS a, id FROM config_param_system) b where b.id = a.id;
+update config_param_system a set id = b.a FROM 	(SELECT row_number() over (order by id) AS a, id FROM config_param_system) b where b.id = a.id;
