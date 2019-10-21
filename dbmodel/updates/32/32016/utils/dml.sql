@@ -278,7 +278,7 @@ INSERT INTO config_param_system(parameter, value, data_type, context, descript, 
 VALUES ('plan_psector_statetype', '{"done_planified":"98", "done_ficticious":"97", "canceled_planified":"96", "canceled_ficticious":"95"}', 'json', 'plan', 
 'Psector statetype assigned to features after executing or canceling planification', 'Psector state type:', 'utils', false) 
 -- in case of variable exists
-ON CONFLICT DO NOTHING;
+ON CONFLICT (parameter) DO NOTHING;
 
 -- in case of variable exists (or in case was inserted lines before only redundant update)
 UPDATE config_param_system SET label='Psector state type:',  project_type='utils', isdeprecated=FALSE WHERE parameter='plan_psector_statetype';
