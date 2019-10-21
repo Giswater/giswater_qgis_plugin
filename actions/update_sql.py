@@ -279,9 +279,15 @@ class UpdateSQL(ApiParent):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             else:
-                if str(self.version_metadata) != str(self.project_data_schema_version):
+                if str(self.version_metadata) > str(self.project_data_schema_version):
                     self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                                 '(Schema version is lower than plugin version, please update schema)')
+                    self.dlg_readsql.btn_info.setEnabled(True)
+                elif str(self.version_metadata) < str(self.project_data_schema_version):
+                    self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                                 '(Schema version is higher than plugin version, please update plugin)')
                     self.dlg_readsql.btn_info.setEnabled(True)
                 else:
                     self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -1629,9 +1635,15 @@ class UpdateSQL(ApiParent):
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
         else:
-            if str(self.version_metadata) != str(self.project_data_schema_version):
+            if str(self.version_metadata) > str(self.project_data_schema_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Not is the same version as the last release)')
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                             '(Schema version is lower than plugin version, please update schema)')
+                self.dlg_readsql.btn_info.setEnabled(True)
+            elif str(self.version_metadata) < str(self.project_data_schema_version):
+                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                             '(Schema version is higher than plugin version, please update plugin)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -3196,13 +3208,18 @@ class UpdateSQL(ApiParent):
         self.project_data_schema_version = result[0]
         self.project_data_language = result[1]
 
-        if str(self.version_metadata) != str(self.project_data_schema_version):
+        if str(self.version_metadata) > str(self.project_data_schema_version):
             self.dlg_info.lbl_status.setPixmap(self.status_no_update)
-            utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.lbl_status_text,
-                                         '(Not is the same version as the last release)')
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         '(Schema version is lower than plugin version, please update schema)')
+        elif str(self.version_metadata) < str(self.project_data_schema_version):
+            self.dlg_info.lbl_status.setPixmap(self.status_no_update)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         '(Schema version is higher than plugin version, please update plugin)')
         else:
             self.dlg_info.lbl_status.setPixmap(self.status_ok)
             utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.lbl_status_text, '')
+
         utils_giswater.dis_enable_dialog(self.dlg_info, True)
 
         # Open dialog
