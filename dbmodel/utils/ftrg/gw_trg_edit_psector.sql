@@ -23,8 +23,9 @@ DECLARE
 	v_state_canceled_planified integer;
 	v_state_canceled_ficticious integer;
 	v_plan_statetype_ficticious integer;
+	v_plan_statetype_planned integer;
 	v_current_state_type integer;
-    v_id text;
+    v_id text;  
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -117,6 +118,7 @@ BEGIN
 			SELECT ((value::json)->>'canceled_planified') INTO v_state_canceled_planified FROM config_param_system WHERE parameter='plan_psector_statetype';
 			SELECT ((value::json)->>'canceled_ficticious') INTO v_state_canceled_ficticious FROM config_param_system WHERE parameter='plan_psector_statetype';
 			SELECT value::integer INTO v_plan_statetype_ficticious FROM config_param_system WHERE parameter = 'plan_statetype_ficticius';
+			SELECT value::integer INTO v_plan_statetype_planned FROM config_param_system WHERE parameter = 'plan_statetype_planned';
 
 			--temporary remove topology control
 			UPDATE config_param_system set value = 'false' WHERE parameter='state_topocontrol';
@@ -128,13 +130,14 @@ BEGIN
 
 				--loop over each feature in plan_psector_x_* table in order to update state values
 				FOR rec IN EXECUTE v_sql LOOP
+				
 					--get the current state_type of a feature
 					EXECUTE 'SELECT state_type FROM v_edit_'||lower(rec_type.id)||' WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';'
 					INTO v_current_state_type;
 
 					--set planned features to obsolete and update state_type depending on the new status and current state_type
 					IF NEW.status = 0 THEN	
-						IF v_current_state_type = v_plan_statetype_ficticious THEN
+						IF v_current_state_type = v_plan_statetype_ficticious OR v_current_state_type = v_state_canceled_ficticious THEN
 							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_done_ficticious||'
 							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
 							
@@ -142,8 +145,20 @@ BEGIN
 							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_done_planified||'
 							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
 						END IF;
+						
+					ELSIF NEW.status = 2 THEN
+						IF v_current_state_type = v_state_done_ficticious OR v_current_state_type = v_state_canceled_ficticious THEN
+							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 2, state_type = '||v_plan_statetype_ficticious||'
+							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+							
+						ELSE
+							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 2, state_type = '||v_plan_statetype_planned||'
+							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
+							
+						END IF;			
+						
 					ELSIF NEW.status = 3 THEN
-						IF v_current_state_type = v_plan_statetype_ficticious THEN
+						IF v_current_state_type = v_plan_statetype_ficticious OR v_current_state_type = v_state_done_ficticious THEN
 							EXECUTE 'UPDATE v_edit_'||lower(rec_type.id)||' SET state = 0, state_type = '||v_state_canceled_ficticious||'
 							WHERE '||lower(rec_type.id)||'_id = '''||rec.id||''';';
 							
@@ -153,6 +168,7 @@ BEGIN
 							
 						END IF;
 					END IF;
+					
 				END LOOP;
 				--reestablish topology control
 				UPDATE config_param_system set value = 'true' WHERE parameter='state_topocontrol';	
