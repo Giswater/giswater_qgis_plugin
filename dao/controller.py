@@ -1112,9 +1112,9 @@ class DaoController(object):
         sql = ("SELECT tablename FROM "
                "(SELECT tablename, 1 as c FROM sys_feature_cat"
                " WHERE type = '" + geom_type.upper() + "'"
-               " UNION SELECT parentlayer, 0 FROM sys_feature_type"
-               " WHERE id='" + geom_type.upper() + "') as t "
-               " ORDER BY c")
+               " UNION SELECT parentlayer, 0 FROM sys_feature_type WHERE id='" + geom_type.upper() + "'"
+               " UNION SELECT child_layer, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
+               " ORDER BY c, tablename")
         rows = self.get_rows(sql, log_sql=True)
         if rows:
             for row in rows:
