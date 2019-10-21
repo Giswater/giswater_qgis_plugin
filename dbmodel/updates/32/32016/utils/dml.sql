@@ -280,7 +280,7 @@ VALUES ('plan_psector_statetype', '{"done_planified":"98", "done_ficticious":"97
 -- in case of variable exists
 ON CONFLICT DO NOTHING;
 
--- in case of variable exists
+-- in case of variable exists (or in case was inserted lines before only redundant update)
 UPDATE config_param_system SET label='Psector state type:',  project_type='utils', isdeprecated=FALSE WHERE parameter='plan_psector_statetype';
 
 
