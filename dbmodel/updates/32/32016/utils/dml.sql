@@ -274,9 +274,16 @@ UPDATE audit_cat_param_user SET formname='dynamic_param' WHERE id='visitclass_vd
 
 UPDATE audit_cat_function SET istoolbox = FALSE WHERE function_name = 'gw_fct_edit_check_data' OR function_name = 'gw_fct_om_check_data';
 
-INSERT INTO config_param_system(parameter, value, data_type, context, descript, label,   project_type, isdeprecated)
+INSERT INTO config_param_system(parameter, value, data_type, context, descript, label, project_type, isdeprecated)
 VALUES ('plan_psector_statetype', '{"done_planified":"98", "done_ficticious":"97", "canceled_planified":"96", "canceled_ficticious":"95"}', 'json', 'plan', 
-'Psector statetype assigned to features after executing or canceling planification', 'Psector state type:', 'utils', false);
+'Psector statetype assigned to features after executing or canceling planification', 'Psector state type:', 'utils', false) 
+-- in case of variable exists
+ON CONFLICT DO NOTHING;
+
+-- in case of variable exists
+UPDATE config_param_system SET label='Psector state type:',  project_type='utils', isdeprecated=FALSE WHERE parameter='plan_psector_statetype';
+
+
 
 UPDATE audit_cat_param_user SET description='If true, connec''s label and vnode symbol will be rotated using the angle of link. You need to have label symbol configurated with "CASE WHEN label_x = 5 THEN ''    '' ||  "connec_id"  
 ELSE  "connec_id"  || ''    ''  END", label_x as quadrant and label_rotation as rotation', label='Automatic rotation for connec labels and vnodes:' WHERE id='edit_link_connecrotation_update';
