@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"status", "dataType":"integer"}}$$);
 
 
-CREATE TABLE plan_typevalue(
+CREATE TABLE IF NOT EXISTS plan_typevalue(
   typevalue text NOT NULL,
   id integer NOT NULL,
   idval text,
@@ -19,7 +19,7 @@ CREATE TABLE plan_typevalue(
   addparam json,
   CONSTRAINT plan_typevalue_pkey PRIMARY KEY (typevalue, id));
 
-CREATE TABLE om_typevalue(
+CREATE TABLE IF NOT EXISTS om_typevalue(
   typevalue text NOT NULL,
   id integer NOT NULL,
   idval text,
