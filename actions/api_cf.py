@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: latin-1 -*-
 try:
-    from qgis.core import Qgis, QgsApplication
+    from qgis.core import Qgis
 except:
     from qgis.core import QGis as Qgis
 
@@ -41,7 +41,6 @@ from functools import partial
 from .. import utils_giswater
 from .api_catalog import ApiCatalog
 from .api_parent import ApiParent
-from .gw_thread import GwTask
 from .manage_document import ManageDocument
 from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
@@ -288,8 +287,6 @@ class ApiCF(ApiParent):
                 return False, None
 
         self.complet_result = row
-        self.task1 = GwTask('Loading form')
-        QgsApplication.taskManager().addTask(self.task1)
 
         result = row[0]['body']['data']
         if 'fields' not in result:
@@ -492,10 +489,7 @@ class ApiCF(ApiParent):
         self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
-        total_fields = len(complet_result[0]['body']['data']['fields'])
-        
-        for progress, field in enumerate(complet_result[0]['body']['data']['fields']):
-            self.task1.setProgress((progress*100)/total_fields)
+        for field in complet_result[0]['body']['data']['fields']:
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
             if widget is None:
                 return False, False
