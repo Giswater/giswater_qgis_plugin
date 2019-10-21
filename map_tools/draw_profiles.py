@@ -123,7 +123,7 @@ class DrawProfiles(ParentMapTool):
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
         template_path = ""
         try:
-            template_path = self.controller.cfgp_user['composers_path'].value
+            template_path = self.controller.cfgp_user['qgis_composers_path'].value
         except  KeyError as e:
             pass
 
@@ -1474,7 +1474,7 @@ class DrawProfiles(ParentMapTool):
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         template_path = ""
         try:
-            template_path = self.controller.cfgp_user['composers_path'].value + f'{os.sep}{self.template}.qpt'
+            template_path = self.controller.cfgp_user['qgis_composers_path'].value + f'{os.sep}{self.template}.qpt'
         except  KeyError as e:
             pass
 

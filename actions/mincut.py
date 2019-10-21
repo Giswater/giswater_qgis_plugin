@@ -2297,7 +2297,7 @@ class MincutParent(ParentAction):
         # Check if path exist
         template_folder = ""
         try:
-            template_folder = self.controller.cfgp_user['composers_path'].value
+            template_folder = self.controller.cfgp_user['qgis_composers_path'].value
         except  KeyError as e:
             pass
         try:
@@ -2310,7 +2310,7 @@ class MincutParent(ParentAction):
         self.dlg_comp = MincutComposer()
         self.load_settings(self.dlg_comp)
 
-        # Fill ComboBox cbx_template with templates *.qpt from ...system_variables/composers_path
+        # Fill ComboBox cbx_template with templates *.qpt
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
         self.dlg_comp.cbx_template.clear()
         self.dlg_comp.cbx_template.addItem('')
@@ -2344,7 +2344,7 @@ class MincutParent(ParentAction):
         # Check if template file exists
         template_path = ""
         try:
-            template_path = self.controller.cfgp_user['composers_path'].value + f'{os.sep}{self.template}.qpt'
+            template_path = self.controller.cfgp_user['qgis_composers_path'].value + f'{os.sep}{self.template}.qpt'
         except  KeyError as e:
             pass
 
