@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --30/09/2019
+
+DROP VIEW IF EXISTS v_edit_samplepoint;
 CREATE OR REPLACE VIEW v_edit_samplepoint AS 
 SELECT samplepoint.sample_id,
     samplepoint.code,
@@ -15,7 +17,6 @@ SELECT samplepoint.sample_id,
     samplepoint.featurecat_id,
     samplepoint.dma_id,
     dma.macrodma_id,
-    samplepoint.presszonecat_id,
     samplepoint.state,
     samplepoint.builtdate,
     samplepoint.enddate,
