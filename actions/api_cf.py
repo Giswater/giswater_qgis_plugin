@@ -559,7 +559,9 @@ class ApiCF(ApiParent):
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
+        btn_cancel.clicked.connect(self.roll_back)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
+        self.dlg_cf.dlg_closed.connect(self.roll_back)
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
@@ -568,6 +570,11 @@ class ApiCF(ApiParent):
         # Open dialog
         self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
+
+
+    def roll_back(self):
+        self.layer.rollBack()
+
 
     def set_vdefault_edition(self):
         sql = ("SELECT value FROM config_param_user "
@@ -833,7 +840,7 @@ class ApiCF(ApiParent):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
             return
-
+        # If we make an info
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -854,7 +861,7 @@ class ApiCF(ApiParent):
             extras = '"fields":' + my_json + ''
             body = self.create_body(feature=feature, extras=extras)
             sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
-
+        # If we make an insert
         else:
             my_json = json.dumps(_json)
             feature = f'"featureType":"{self.feature_type}", '
@@ -1038,7 +1045,7 @@ class ApiCF(ApiParent):
     def set_auto_update_combobox(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -1053,7 +1060,7 @@ class ApiCF(ApiParent):
     def set_auto_update_dateedit(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -1068,7 +1075,7 @@ class ApiCF(ApiParent):
     def set_auto_update_spinbox(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -1083,7 +1090,7 @@ class ApiCF(ApiParent):
     def set_auto_update_checkbox(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
