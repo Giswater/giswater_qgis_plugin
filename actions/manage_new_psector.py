@@ -376,6 +376,9 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(self.document_open)
 
+        self.cmb_status.currentIndexChanged.connect(
+            partial(self.show_status_warning))
+
         self.set_completer()
 
         sql = (f"SELECT other, gexpenses, vat "
@@ -1404,3 +1407,9 @@ class ManageNewPsector(ParentManage):
         model.setStringList(values)
         self.completer.setModel(model)
 
+
+    def show_status_warning(self):
+        msg = "WARNING: You have been updated the status value.  If you click OK on the main dialog, a process will be " \
+              "triggered to update the state & state_type values of all that features that belongs on the psector " \
+              "according with the system variables plan_psector_statetype, plan_statetype_planned, plan_statetype_ficticious"
+        result = self.controller.show_details(msg, 'Message warning')
