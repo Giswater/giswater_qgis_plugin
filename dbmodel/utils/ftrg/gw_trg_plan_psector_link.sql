@@ -17,12 +17,17 @@ DECLARE
 	v_point_aux public.geometry;
 	v_arc_geom public.geometry;
 	v_userdefined_geom boolean;
+	v_idlink text;
+	v_idvnode text;
+	v_channel text;
+	v_schemaname text;
 	
 BEGIN 
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-
+	
 	v_table_name:= TG_ARGV[0];
+	v_schemaname='SCHEMA_NAME';
 
 	IF v_table_name = 'connec' THEN
 		SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
@@ -31,7 +36,7 @@ BEGIN
 	END IF;
 	
 	-- update values on plan psector table
-	IF NEW.userdefined_geom IS NOT TRUE THEN -- in case of true this value must be updated on the trg_edit_vnode
+	IF NEW.userdefined_geom IS NOT TRUE THEN
 		v_link_geom := ST_ShortestLine(v_feature_geom, (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id));
 		v_vnode_geom = ST_EndPoint(v_link_geom);
 		
@@ -52,9 +57,19 @@ BEGIN
 	-- update plan_psector tables
 	IF v_table_name = 'connec' THEN
 		UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
+		v_idlink = (SELECT link_id FROM v_edit_link WHERE psector_rowid=NEW.id AND feature_type ='CONNEC');
+		v_idvnode = (SELECT vnode_id FROM v_edit_vnode WHERE psector_rowid=NEW.id AND feature_type ='CONNEC');
 	ELSIF v_table_name = 'gully' THEN
 		UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-	END IF;		
+		v_idlink  = (SELECT link_id FROM v_edit_link WHERE rowid=NEW.id AND feature_type ='GULLY');
+		v_idvnode = (SELECT vnode_id FROM v_edit_vnode WHERE psector_rowid=NEW.id AND feature_type ='GULLY');
+	END IF;	
+
+	-- notify to qgis in order to reindex geometries for snapping
+	v_channel := replace (current_user::text,'.','_');
+	PERFORM pg_notify (v_channel, '{"functionAction":{"name":"indexing_feature", "parameters":[{"layerName":"v_edit_link", "featureType":"", "id":"'||v_idlink||'","geometry:{"st_astext":"'||st_astext(v_link_geom)||'"}}
+												     ,{"layerName":"v_edit_vnode","featureType":"", "id":"'||v_idvnode||'","geometry:{"st_astext":"'||st_astext(v_vnode_geom)||'"}}]},
+					   "user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 
 	RETURN NEW;
 
