@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP VIEW IF EXISTS v_edit_samplepoint;
 CREATE OR REPLACE VIEW v_edit_samplepoint AS 
-SELECT samplepoint.sample_id,
+ SELECT samplepoint.sample_id,
     samplepoint.code,
     samplepoint.lab_code,
     samplepoint.feature_id,
@@ -25,12 +25,12 @@ SELECT samplepoint.sample_id,
     samplepoint.workcat_id_end,
     samplepoint.rotation,
     samplepoint.muni_id,
-    samplepoint.postcode,
     samplepoint.streetaxis_id,
     samplepoint.postnumber,
-    samplepoint.postcomplement,
+    samplepoint.postcode,
     samplepoint.streetaxis2_id,
     samplepoint.postnumber2,
+    samplepoint.postcomplement,
     samplepoint.postcomplement2,
     samplepoint.place_name,
     samplepoint.cabinet,
