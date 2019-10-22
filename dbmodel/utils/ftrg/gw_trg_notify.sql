@@ -126,7 +126,7 @@ BEGIN
 	v_notification := COALESCE(v_notification, '{}');
 
 	IF v_action = 'user' THEN
-		v_action = current_user;
+		v_action = replace(current_user,'.','_');
 	END IF;
 	
 	PERFORM pg_notify(v_action, '{"functionAction":'||v_notification||',"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
