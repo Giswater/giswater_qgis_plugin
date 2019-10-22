@@ -149,29 +149,57 @@ VALUES (2754, 'gw_trg_cat_manager', 'utils', 'trigger function', 'Propagate chan
 
 
 INSERT INTO audit_cat_error(id, error_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3024, 'Can''t delete the parameter. There is at least one event related to it', 2, true,'utils',false);
+VALUES (3024, 'Can''t delete the parameter. There is at least one event related to it', 2, true,'utils',false)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_error SET isdeprecated=FALSE WHERE id=3024;
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3026, 'Can''t delete the class. There is at least one visit related to it','The class will be set to unactive.', 
-1, true,'utils',false);
+1, true,'utils',false)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_error SET isdeprecated=FALSE WHERE id=3026;
+
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3028, 'Can''t modify typevalue:','It''s impossible to change system values.', 
-2, true,'utils',false);
+2, true,'utils',false)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_error SET isdeprecated=FALSE WHERE id=3028;
+
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3030, 'Can''t delete typevalue:','It''s being used in a table.', 
-2, true,'utils',false);
+2, true,'utils',false)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_error SET isdeprecated=FALSE WHERE id=3030;
+
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3032, 'Can''t apply the foreign key','there are values already inserted that are not present in the catalog', 
-2, true,'utils',false);
+2, true,'utils',false)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_error SET isdeprecated=FALSE WHERE id=3032;
+
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3034, 'Inventory state and state type of planified features has been updated',null, 1, true,'utils',false);
+VALUES (3034, 'Inventory state and state type of planified features has been updated',null, 1, true,'utils',false)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_error SET isdeprecated=FALSE WHERE id=3034;
+
 
 INSERT INTO audit_cat_error(id, error_message,hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3036, 'Selected state type doesn''t correspond with state','Modify the value of state or state type.', 2, true,'utils',false);
+VALUES (3036, 'Selected state type doesn''t correspond with state','Modify the value of state or state type.', 2, true,'utils',false)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_error SET isdeprecated=FALSE WHERE id=3036;
+
+
 
 INSERT INTO audit_cat_table VALUES ('om_visit_type', 'O&M', 'Catalog of visit types', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
 INSERT INTO audit_cat_table VALUES ('om_visit_class', 'O&M', 'Catalog of visit classes', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL);
