@@ -1374,11 +1374,11 @@ class MincutParent(ParentAction):
 
 
     def auto_mincut(self):
-        """ B1-126: atic mincut analysis """
+        """ B1-126: Automatic mincut analysis """
 
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
-        # Vertex markerAutom
+        # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
         self.vertex_marker.setIconSize(15)
