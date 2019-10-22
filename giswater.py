@@ -628,7 +628,8 @@ class Giswater(QObject):
         try:
             # Unlisten notify channel and stop thread
             if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and  hasattr(self, 'notify'):
-                self.notify.stop_listening('watchers')
+                self.notify.stop_listening('desktop')
+                self.notify.stop_listening(self.controller.current_user)
 
             # Remove icon of action 'Info'
             self.iface.removeToolBarIcon(self.action_info)

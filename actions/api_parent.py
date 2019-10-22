@@ -160,11 +160,9 @@ class ApiParent(ParentAction):
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
-
         try:
             self.save_settings(dlg)
             dlg.close()
-
         except AttributeError as e:
             print(type(e).__name__)
             pass
