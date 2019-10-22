@@ -225,6 +225,8 @@ class GwToolBox(ApiParent):
 
             if layer_name != -1:
                 feature_field = f'"tableName":"{layer_name}", '
+                feature_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
+                feature_field += f'"featureType":"{feature_type}", '
             feature_field += feature_id_list
 
         widget_list = dialog.grb_parameters.findChildren(QWidget)
@@ -345,7 +347,9 @@ class GwToolBox(ApiParent):
                     dialog.grb_input_layer.setVisible(False)
                     dialog.grb_selection_type.setVisible(False)
                 else:
-                    self.populate_layer_combo(function[0]['input_params']['featureType'])
+                    self.populate_cmb_type()
+                    self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
+                    self.populate_layer_combo()
                 self.construct_form_param_user(dialog, function, 0, self.function_list)
                 self.load_settings_values(dialog, function)
                 status = True
@@ -353,6 +357,33 @@ class GwToolBox(ApiParent):
 
         return status
 
+    def populate_cmb_type(self):
+        sql =("SELECT id, id  FROM sys_feature_type WHERE parentlayer is not null order by id;")
+        feat_type  = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_functions.cmb_geom_type, feat_type, 1)
+
+
+    def get_all_group_layers(self, geom_type):
+
+        list_items = []
+        sql = ("SELECT tablename, type FROM "
+               "(SELECT tablename, type, 1 as c FROM sys_feature_cat"
+               " WHERE type = '" + geom_type.upper() + "'"
+               " UNION SELECT parentlayer, id, 0 FROM sys_feature_type WHERE id='" + geom_type.upper() + "'"
+               " UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
+               " ORDER BY c, tablename")
+        rows = self.get_rows(sql, commit=True)
+        if rows:
+            for row in rows:
+                layer = self.get_layer_by_tablename(row[0])
+                if layer:
+                    elem = []
+                    elem.append(row[1])
+                    elem.append(layer)
+                    list_items.append(elem)
+
+        return list_items
+    
 
     def control_isparametric(self, dialog):
         """ Control if the function is not parameterized whit a json, is old and we need disable all widgets """
@@ -377,19 +408,20 @@ class GwToolBox(ApiParent):
         dialog.txt_info.setStyleSheet("QWidget { background: rgb(255, 255, 255); color: rgb(10, 10, 10)}")
 
 
-    def populate_layer_combo(self, geom_type):
-
+    def populate_layer_combo(self):
+        geom_type = utils_giswater.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
         self.layers = self.controller.get_all_group_layers(geom_type)
+
         layers = []
         legend_layers = self.controller.get_layers()
-
-        for layer in self.layers:
+        for geom_type, layer in self.layers:
             if layer in legend_layers:
                 elem = []
                 layer_name = self.controller.get_layer_source_table_name(layer)
                 elem.append(layer.name())
                 elem.append(layer_name)
+                elem.append(geom_type)
                 layers.append(elem)
         utils_giswater.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
 
