@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 INSERT INTO config_param_system(parameter, value, data_type, context, descript, label, project_type, isdeprecated)
-VALUES ('plan_statetype_planned', '93', 'integer', 'plan', 'State type for planned elements', 'State type for planned elements', 'utils', false) 
+VALUES ('plan_statetype_planned', '3', 'integer', 'plan', 'State type for planned elements', 'State type for planned elements', 'utils', false) 
 -- in case existing
 ON CONFLICT (parameter) DO NOTHING;
 

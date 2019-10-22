@@ -110,7 +110,7 @@ BEGIN
 		WHERE psector_id=OLD.psector_id;
 
 		--if the status of a psector had changed to 3 or 0 proceed with changes of feature states
-		IF (OLD.status != NEW.status) AND (NEW.status = 0 OR NEW.status = 3)  THEN
+		IF (OLD.status != NEW.status) AND (NEW.status = 0 OR NEW.status = 2 OR NEW.status = 3)  THEN
 
 			--get the values of future state_types 
 			SELECT ((value::json)->>'done_planified') INTO v_state_done_planified FROM config_param_system WHERE parameter='plan_psector_statetype';
