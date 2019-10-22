@@ -75,10 +75,12 @@ class ManageNewPsector(ParentManage):
 
         # tab General elements
         self.psector_id = self.dlg_plan_psector.findChild(QLineEdit, "psector_id")
+        self.ext_code = self.dlg_plan_psector.findChild(QLineEdit, "ext_code")
         self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
         self.cmb_sector_id = self.dlg_plan_psector.findChild(QComboBox, "sector_id")
         self.cmb_result_id = self.dlg_plan_psector.findChild(QComboBox, "result_id")
+        self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
         self.dlg_plan_psector.lbl_result_id.setVisible(True)
         self.cmb_result_id.setVisible(True)
 
@@ -92,6 +94,11 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
+
+        # Populate combo status
+        sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.cmb_status, rows, 1)
 
         if self.plan_om == 'om':
             self.populate_result_id(self.dlg_plan_psector.result_id, self.plan_om + '_result_cat')
@@ -173,7 +180,7 @@ class ManageNewPsector(ParentManage):
             self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node", set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node")
             sql = ("SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2,"
-                   " observ, atlas_id, scale, rotation, active "
+                   " observ, atlas_id, scale, rotation, active, ext_code, status "
                    " FROM " + self.schema_name + "." + self.plan_om + "_psector"
                    " WHERE psector_id = " + str(psector_id))
             row = self.controller.get_row(sql)
@@ -181,6 +188,8 @@ class ManageNewPsector(ParentManage):
                 return
             
             self.psector_id.setText(str(row['psector_id']))
+            if str(row['ext_code']) != 'None':
+                self.ext_code.setText(str(row['ext_code']))
             sql = ("SELECT name FROM " + self.schema_name + ".plan_psector_cat_type WHERE id = " + str(row['psector_type']))
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_psector_type, str(result['name']), 1)
@@ -190,6 +199,7 @@ class ManageNewPsector(ParentManage):
             sql = ("SELECT name FROM " + self.schema_name + ".sector WHERE sector_id = " + str(row['sector_id']))
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_sector_id, str(result['name']), 1)
+            utils_giswater.set_combo_itemData(self.cmb_status, str(row['status']), 0)
 
             # utils_giswater.setRow(row)
             utils_giswater.setChecked(self.dlg_plan_psector, "active", row['active'])
@@ -256,7 +266,6 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self.enable_all))
 
-
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
         self.dlg_plan_psector.btn_select.clicked.connect(partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
@@ -280,6 +289,9 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(self.document_delete)
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(self.document_open)
+
+        self.cmb_status.currentIndexChanged.connect(
+            partial(self.show_status_warning))
 
         self.set_completer()
 
@@ -815,7 +827,7 @@ class ManageNewPsector(ParentManage):
                             date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
                         elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'
-                              or column_name == 'result_id' or column_name == 'psector_type'):
+                              or column_name == 'result_id' or column_name == 'psector_type' or column_name == 'status'):
                             combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
                             elem = combo.itemData(combo.currentIndex())
                             value = str(elem[0])
@@ -845,7 +857,7 @@ class ManageNewPsector(ParentManage):
                                 date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
                             elif (widget_type is QComboBox) and (column_name == 'expl_id' or column_name == 'sector_id'
-                                or column_name == 'result_id' or column_name == 'psector_type'):
+                                or column_name == 'result_id' or column_name == 'psector_type' or column_name == 'status'):
                                 combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
                                 elem = combo.itemData(combo.currentIndex())
                                 value = str(elem[0])
@@ -1212,3 +1224,9 @@ class ManageNewPsector(ParentManage):
         model.setStringList(values)
         self.completer.setModel(model)
 
+
+    def show_status_warning(self):
+        msg = "WARNING: You have been updated the status value.  If you click OK on the main dialog, a process will be " \
+              "triggered to update the state & state_type values of all that features that belongs on the psector " \
+              "according with the system variables plan_psector_statetype, plan_statetype_planned, plan_statetype_ficticious"
+        result = self.controller.show_details(msg, 'Message warning')
