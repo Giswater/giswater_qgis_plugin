@@ -15,3 +15,5 @@ ON CONFLICT (parameter) DO NOTHING;
 
 --in case existing
 UPDATE  config_param_system WHERE SET label='State type for planned elements', project_type='utils', isdeprecated=FALSE WHERE parameter='plan_statetype_planned';
+
+UPDATE value_state_type SET isoperative=false WHERE state=0;
