@@ -61,7 +61,7 @@ BEGIN
 		v_idvnode = (SELECT vnode_id FROM v_edit_vnode WHERE psector_rowid=NEW.id AND feature_type ='CONNEC');
 	ELSIF v_table_name = 'gully' THEN
 		UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-		v_idlink  = (SELECT link_id FROM v_edit_link WHERE rowid=NEW.id AND feature_type ='GULLY');
+		v_idlink  = (SELECT link_id FROM v_edit_link WHERE psector_rowid=NEW.id AND feature_type ='GULLY');
 		v_idvnode = (SELECT vnode_id FROM v_edit_vnode WHERE psector_rowid=NEW.id AND feature_type ='GULLY');
 	END IF;	
 
