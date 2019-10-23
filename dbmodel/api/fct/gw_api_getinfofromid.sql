@@ -416,7 +416,12 @@ BEGIN
 
 -- Propierties of info layer's
 ------------------------------
-    IF v_tablename IS NOT NULL THEN 
+    IF v_tablename IS NULL THEN 
+
+	v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_api_tableinfo_x_infotype or config_api_layer)", "results":0}';
+	
+
+    ELSIF v_tablename IS NOT NULL THEN 
 
 	--    Check generic
 	-------------------
@@ -549,7 +554,7 @@ BEGIN
 	
 	-- message for null
 	IF v_tablename IS NULL THEN
-		v_message='{"priority":0, "text":"No feature found on that point", "results":0}';
+		v_message='{"priority":0, "text":"No feature found", "results":0}';
 	END IF;
 
     
