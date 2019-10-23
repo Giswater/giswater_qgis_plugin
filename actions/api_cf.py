@@ -267,11 +267,10 @@ class ApiCF(ApiParent):
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False, None
 
-        # When info is nothing
-        if 'results' in row[0]:
-            if row[0]['results'] == 0:
-                self.controller.show_message(row[0]['message']['text'], 0)
-                return False, None
+        # When something is wrong
+        if row[0]['message']:
+            self.controller.show_message(row[0]['message']['text'], row[0]['message']['level'])
+            return False, None
 
         # When insert feature failed
         if row[0]['status'] == "Failed":
