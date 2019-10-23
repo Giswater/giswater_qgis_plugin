@@ -25,7 +25,7 @@ UPDATE audit_cat_function SET input_params='{"featureType":["connec"]}' WHERE in
 UPDATE audit_cat_function SET input_params='{"featureType":["arc"]}' WHERE input_params='{"featureType":"arc"}';
 
 
-INSERT INTO sys_fprocess_cat(68,'Update elevation from DEM', 'edit','Update elevation from DEM','utils');
+INSERT INTO sys_fprocess_cat VALUES (68,'Update elevation from DEM', 'edit','Update elevation from DEM','utils');
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params,return_type, descript, sys_role_id, isdeprecated, 
 istoolbox, alias, isparametric)
