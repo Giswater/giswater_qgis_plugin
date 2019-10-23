@@ -490,6 +490,10 @@ class ApiCF(ApiParent):
         result = complet_result[0]['body']['data']
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
+            if field['column_id'] =='depth':
+                print(f"{field['column_id']} --> {field['hidden']}")
+            if 'hidden' in field and field['hidden']:
+                continue
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
             if widget is None:
                 return False, False
@@ -2251,6 +2255,10 @@ class ApiCF(ApiParent):
         # Put widgets into layout
         widget_list = []
         for field in complet_list[0]['body']['data']['fields']:
+            if field['column_id'] =='depth':
+                print(f"{field['column_id']} --> {field['hidden']}")
+            if 'hidden' in field and field['hidden']:
+                continue
             label, widget = self.set_widgets(dialog, complet_list, field)
             if widget is not None:
                 if (type(widget)) == QSpacerItem:
