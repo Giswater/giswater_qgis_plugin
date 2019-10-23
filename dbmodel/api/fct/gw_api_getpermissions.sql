@@ -43,7 +43,7 @@ BEGIN
     v_table := p_data->>'tableName';
 
 -- 
-    EXECUTE 'select array_agg(row_to_json(a)) FROM (SELECT privilege_type FROM information_schema.role_table_grants where table_name=$1 and table_schema=$2 and grantee=current_user)a'
+    EXECUTE 'select array_agg(row_to_json(a)) FROM (SELECT privilege_type FROM information_schema.role_table_grants where table_name=$1 and table_schema=$2 and grantee IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, ''member'')) LIMIT 1)a'
 	INTO v_permissions_array
 	USING v_table, schemas_array[1];
 
