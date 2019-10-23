@@ -411,7 +411,7 @@ class GwToolBox(ApiParent):
     def populate_layer_combo(self):
         geom_type = utils_giswater.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
-        self.layers = self.controller.get_all_group_layers(geom_type)
+        self.layers = self.get_all_group_layers(geom_type)
 
         layers = []
         legend_layers = self.controller.get_layers()
