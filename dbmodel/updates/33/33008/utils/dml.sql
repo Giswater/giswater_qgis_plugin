@@ -49,4 +49,4 @@ INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('raster_type', 'Slope'
 INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('edit_typevalue', 'raster_type', 'cat_raster', 'raster_type');
 
-UPDATE sys_feature_cat SET parentlayer = 'v_edit_vnode' WHERE id='VNODE';
+UPDATE sys_feature_type SET parentlayer = 'v_edit_vnode' WHERE id='VNODE';
