@@ -372,10 +372,10 @@ class GwToolBox(ApiParent):
                " UNION SELECT parentlayer, id, 0 FROM sys_feature_type WHERE id='" + geom_type.upper() + "'"
                " UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
                " ORDER BY c, tablename")
-        rows = self.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         if rows:
             for row in rows:
-                layer = self.get_layer_by_tablename(row[0])
+                layer = self.controller.get_layer_by_tablename(row[0])
                 if layer:
                     elem = []
                     elem.append(row[1])
