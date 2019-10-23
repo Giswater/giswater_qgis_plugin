@@ -71,12 +71,8 @@ BEGIN
 			ELSIF v_project_type = 'WS' THEN
 				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
 
-			ELSIF v_project_type = 'UD' and v_feature_type='vnode' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
-
 			ELSE
 				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
-			
 			END IF;
 			
 			--Filter features if there are only some selected
@@ -86,13 +82,10 @@ BEGIN
 
 		ELSIF v_updatevalues = 'nullValues' THEN 
 			IF v_project_type = 'WS' and v_feature_type='vnode' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE elevation IS NULL AND expl_id = '||v_exploitation||'';
 
-			ELSIF v_project_type = 'WS' THEN
+			ELSIF v_project_type = 'WS' and v_feature_type!='vnode' THEN
 				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elevation, the_geom, state FROM '||v_worklayer||' WHERE elevation IS NULL AND expl_id = '||v_exploitation||'';
-	
-			ELSIF v_project_type = 'UD' and v_feature_type='vnode' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE expl_id = '||v_exploitation||'';
 
 			ELSE
 				v_query = 'SELECT '||v_feature_type||'_id as feature_id, top_elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE top_elev IS NULL AND expl_id = '||v_exploitation||'';
@@ -129,16 +122,18 @@ BEGIN
 			ELSE
 				IF v_project_type = 'WS' AND v_feature_type='vnode' THEN 
 					EXECUTE 'UPDATE vnode SET elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
+				ELSIF v_project_type = 'UD' AND v_feature_type='vnode' THEN 
+					EXECUTE 'UPDATE vnode SET top_elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
 				
-				ELSIF v_project_type = 'WS' THEN 
+				ELSIF v_project_type = 'WS' AND v_feature_type!='vnode'  THEN 
 					EXECUTE 'UPDATE '||v_worklayer||' SET elevation = '||v_elevation||'::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'::text';
-				ELSE
+				ELSIF v_project_type = 'UD' AND v_feature_type!='vnode' THEN
 					EXECUTE 'UPDATE '||v_worklayer||' SET top_elev = '||v_elevation||' ::numeric WHERE '||v_feature_type||'_id = '||rec.feature_id||'::text';
 				END IF;
 
 				--temporal insert values into anl_node to create layer with all updated points
 				INSERT INTO anl_node (node_id, state,   expl_id, fprocesscat_id, the_geom, descript)
-				VALUES (rec.feature_id, rec.state, v_exploitation, '68',rec.the_geom, upper(v_feature_type));
+				VALUES (rec.feature_id, rec.state::integer, v_exploitation, 68,rec.the_geom, upper(v_feature_type));
 
 				INSERT INTO audit_check_data(fprocesscat_id,result_id, error_message)
 				VALUES (68,'elevation from raster',concat('ELEVATION UPDATED - FEATURE TYPE:',upper(v_feature_type),', ID: ', rec.feature_id));
