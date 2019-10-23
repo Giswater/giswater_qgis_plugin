@@ -360,10 +360,14 @@ class GwToolBox(ApiParent):
         return status
 
     def populate_cmb_type(self, feature_types):
+        f_types = "("
+        for item in feature_types:
+            f_types += f"'{item.upper()}', "
+        f_types = f_types[:-2]+")"
         sql =(f"SELECT id, id  FROM sys_feature_type "
-              f"WHERE parentlayer is not null AND lower(id) in {tuple(feature_types)} order by id;")
+              f"WHERE parentlayer is not null AND id in {f_types} order by id;")
         feat_types  = self.controller.get_rows(sql, commit=True)
-        if len(feat_types) <= 1:
+        if feat_types and len(feat_types) <= 1:
             self.dlg_functions.cmb_geom_type.setVisible(False)
         utils_giswater.set_item_data(self.dlg_functions.cmb_geom_type, feat_types, 1)
 
