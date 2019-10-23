@@ -255,6 +255,12 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'node_function_vdefault' AND cur_user = current_user);
 		END IF;
 
+		-- elevation from raster
+		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND NEW.top_elev  AND
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+			NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+		END IF;  
+
             -- FEATURE INSERT
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 				dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
@@ -491,6 +497,13 @@ BEGIN
 		-- The geom
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+
+			--update elevation from raster
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE'  AND
+				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+			END IF;  
+			
 		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
 			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
 		END IF;

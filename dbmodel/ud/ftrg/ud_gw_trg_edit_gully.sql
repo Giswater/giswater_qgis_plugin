@@ -278,6 +278,12 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'gully_function_vdefault' AND cur_user = current_user);
 		END IF;
 
+		-- elevation from raster
+		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND NEW.top_elev AND
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+			NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+		END IF;  		
+
 		--set rotation field
 		WITH index_query AS(
 		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
@@ -399,6 +405,12 @@ BEGIN
 		-- UPDATE geom
 		IF st_equals(NEW.the_geom, OLD.the_geom)is false THEN   
 			UPDATE gully SET the_geom=NEW.the_geom WHERE gully_id = OLD.gully_id;		
+
+			--update elevation from raster
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE'  AND
+				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+			END IF;  
 		END IF;	
 		
 		-- Reconnect arc_id

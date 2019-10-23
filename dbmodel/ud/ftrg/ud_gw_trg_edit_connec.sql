@@ -238,6 +238,12 @@ BEGIN
 		IF NEW.function_type IS NULL THEN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'connec_function_vdefault' AND cur_user = current_user);
 		END IF;
+
+		--elevation from raster
+		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND NEW.top_elev IS NULL AND
+		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+			NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+		END IF;   
 		
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation, "observ",
@@ -293,7 +299,13 @@ BEGIN
 
        -- UPDATE geom
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;		
+			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;	
+
+			-- update elevation from raster
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE'  AND
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+			END IF;   	
         END IF;
 		
 		-- Reconnect arc_id

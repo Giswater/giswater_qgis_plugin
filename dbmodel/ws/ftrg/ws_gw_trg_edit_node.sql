@@ -322,7 +322,13 @@ BEGIN
 		IF NEW.function_type IS NULL THEN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'node_function_vdefault' AND cur_user = current_user);
 		END IF;	
-			
+		
+		--elevation from raster
+		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND 
+		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+			NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+		END IF;   	
+
 		-- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 		buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, rotation,verified,
@@ -570,7 +576,13 @@ BEGIN
 				EXECUTE v_sql INTO v_node_id;
 				NEW.parent_id=v_node_id;
 			END IF;
-						
+			
+			--update elevation from raster
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND 
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+			END IF;   	
+
 		END IF;
 	
 		--Hemisphere
