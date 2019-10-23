@@ -182,17 +182,17 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setVisible(True)
         extras = ''
         feature_field = ''
-        # Check if time functions is short or long, activate and set undetermined  if not short
+        # TODO Check if time functions is short or long, activate and set undetermined  if not short
+
+        # Get function name
+        function_name = None
         for group, function in list(result['fields'].items()):
             if len(function) != 0:
                 self.save_settings_values(dialog, function)
                 function_name = function[0]['functionname']
-                if 'input_params' in function[0]:
-                    if function[0]['input_params'] is not None:
-                        if 'featureType' in function[0]['input_params']:
-                            feature_type = function[0]['input_params']['featureType']
                 break
-
+        if function_name is None:
+            return
         # If function is not parametrized, call function(old) without json
         if self.is_paramtetric is False:
             self.execute_no_parametric(dialog, function_name)
@@ -202,7 +202,7 @@ class GwToolBox(ApiParent):
             dialog.progressBar.setValue(1)
             return
 
-        if str(function[0]['input_params']['featureType']) != "":
+        if function[0]['input_params']['featureType']:
             layer_name = utils_giswater.get_item_data(dialog, combo, 1)
             if layer_name != -1:
                 layer = self.set_selected_layer(dialog, combo)
@@ -215,6 +215,7 @@ class GwToolBox(ApiParent):
                 feature_id_list += ']'
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
+                feature_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
                 for feature in features:
                     feature_id = feature.attribute(feature_type+"_id")
                     feature_id_list += f'"{feature_id}", '
@@ -258,7 +259,7 @@ class GwToolBox(ApiParent):
                             extras += f'"{param_name}":"{str(value).lower()}", '
 
         if widget_is_void:
-            message = "This paramater is mandatory. Please, set a value"
+            message = "This param is mandatory. Please, set a value"
             self.controller.show_warning(message, parameter='')
             dialog.progressBar.setVisible(False)
             dialog.progressBar.setMinimum(0)
@@ -343,11 +344,12 @@ class GwToolBox(ApiParent):
                         layout.addWidget(label, 0, 0)
                     status = True
                     break
-                if str(function[0]['input_params']['featureType']) == "":
+                if not function[0]['input_params']['featureType']:
                     dialog.grb_input_layer.setVisible(False)
                     dialog.grb_selection_type.setVisible(False)
                 else:
-                    self.populate_cmb_type()
+                    feature_types = function[0]['input_params']['featureType']
+                    self.populate_cmb_type(feature_types)
                     self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
                     self.populate_layer_combo()
                 self.construct_form_param_user(dialog, function, 0, self.function_list)
@@ -357,10 +359,13 @@ class GwToolBox(ApiParent):
 
         return status
 
-    def populate_cmb_type(self):
-        sql =("SELECT id, id  FROM sys_feature_type WHERE parentlayer is not null order by id;")
-        feat_type  = self.controller.get_rows(sql, commit=True)
-        utils_giswater.set_item_data(self.dlg_functions.cmb_geom_type, feat_type, 1)
+    def populate_cmb_type(self, feature_types):
+        sql =(f"SELECT id, id  FROM sys_feature_type "
+              f"WHERE parentlayer is not null AND lower(id) in {tuple(feature_types)} order by id;")
+        feat_types  = self.controller.get_rows(sql, commit=True)
+        if len(feat_types) <= 1:
+            self.dlg_functions.cmb_geom_type.setVisible(False)
+        utils_giswater.set_item_data(self.dlg_functions.cmb_geom_type, feat_types, 1)
 
 
     def get_all_group_layers(self, geom_type):
@@ -377,9 +382,7 @@ class GwToolBox(ApiParent):
             for row in rows:
                 layer = self.controller.get_layer_by_tablename(row[0])
                 if layer:
-                    elem = []
-                    elem.append(row[1])
-                    elem.append(layer)
+                    elem = [row[1], layer]
                     list_items.append(elem)
 
         return list_items
