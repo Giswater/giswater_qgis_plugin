@@ -10,7 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE TABLE raster_dem(
   id serial NOT NULL PRIMARY KEY,
   rast raster,
-  filename text,
   rastercat_id varchar(16));
 
 

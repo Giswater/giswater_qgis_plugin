@@ -7,6 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
+DROP TRIGGER IS EXISTS gw_trg_edit_vnode ON v_edit_vnode;
 CREATE TRIGGER gw_trg_edit_vnode INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_vnode  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_edit_vnode();

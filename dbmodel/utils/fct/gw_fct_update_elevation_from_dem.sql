@@ -82,7 +82,7 @@ BEGIN
 
 		ELSIF v_updatevalues = 'nullValues' THEN 
 			IF v_project_type = 'WS' and v_feature_type='vnode' THEN
-				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE elevation IS NULL AND expl_id = '||v_exploitation||'';
+				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elev as elevation, the_geom, state FROM '||v_worklayer||' WHERE elev IS NULL AND expl_id = '||v_exploitation||'';
 
 			ELSIF v_project_type = 'WS' and v_feature_type!='vnode' THEN
 				v_query = 'SELECT '||v_feature_type||'_id as feature_id, elevation, the_geom, state FROM '||v_worklayer||' WHERE elevation IS NULL AND expl_id = '||v_exploitation||'';
