@@ -666,8 +666,9 @@ class AddNewLot(ParentManage):
                "WHERE id ='"+str(lot_id)+"'")
         lot = self.controller.get_row(sql, commit=True)
         if lot:
-            value = lot['serie'] + " " + lot['class_id']
-            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot, value)
+            if lot['serie'] is not None and lot['class_id'] is not None:
+                value = lot['serie'] + " " + lot['class_id']
+                utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot, value)
             index = self.dlg_lot.cmb_ot.currentIndex()
             self.set_ot_fields(index)
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
