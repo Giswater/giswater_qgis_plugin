@@ -866,7 +866,8 @@ class AddNewLot(ParentManage):
             row = index_list[i].row()
             column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
             feature_id = index.sibling(row, column_index).data()
-            self.ids.remove(feature_id)
+            list_ids = self.get_table_values(self.tbl_relation, feature_type)
+            list_ids.remove(feature_id)
             model.takeRow(row)
 
         self.check_for_ids()
