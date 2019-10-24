@@ -127,6 +127,11 @@ class NotifyFunctions(ParentAction):
         self.controller.get_config_param_system()
 
 
+    def indexing_spatial_layer(self, **kwargs):
+        """ Force reload dataProvider of layer """
+        self.controller.indexing_spatial_layer(kwargs['layerName'])
+
+
     def refresh_canvas(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
         # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken

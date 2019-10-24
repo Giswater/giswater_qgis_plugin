@@ -1383,3 +1383,10 @@ class DaoController(object):
         self.cfgp_system = {}
         for row in rows:
             self.cfgp_system[row['parameter']] = CfgSystem(row['parameter'], row['value'], row['data_type'], row['context'], row['descript'], row['label'])
+
+
+    def indexing_spatial_layer(self, layer_name):
+        """ Force reload dataProvider of layer """
+        layer = self.get_layer_by_tablename(layer_name)
+        if layer:
+            layer.dataProvider().forceReload()
