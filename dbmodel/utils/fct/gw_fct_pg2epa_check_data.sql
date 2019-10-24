@@ -521,13 +521,13 @@ BEGIN
 		DELETE FROM anl_node WHERE fprocesscat_id=66 and cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
 		SELECT 66, a.node_id, a.nodecat_id, a.the_geom FROM (
-		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_1
-		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
-		UNION ALL
-		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_2
-		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+			SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
+			WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+			UNION ALL
+			SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_2
+			WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
 		GROUP by node_id, nodecat_id, the_geom
-		HAVING count(*) > 2;
+		HAVING count(*) >2;
 
 		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user;
 		IF v_count > 0 THEN
@@ -544,11 +544,11 @@ BEGIN
 		DELETE FROM anl_node WHERE fprocesscat_id=67 and cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
 		SELECT 66, a.node_id, a.nodecat_id, a.the_geom FROM (
-		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_1
-		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
-		UNION ALL
-		SELECT node_id, nodecat_id, node.the_geom FROM node JOIN arc a1 ON node_id=a1.node_2
-		WHERE node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+			SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
+			WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+			UNION ALL
+			SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_2
+			WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
 		GROUP by node_id, nodecat_id, the_geom
 		HAVING count(*) < 2;
 
