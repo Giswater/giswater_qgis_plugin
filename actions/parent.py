@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from PyQt4.QtCore import Qt, QSettings
+from PyQt4.QtCore import Qt, QSettings, QDate
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap, QCompleter
 from PyQt4.QtGui import QStringListModel, QAction
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
@@ -390,41 +390,59 @@ class ParentAction(object):
         
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
-                           index=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-                                  25, 26, 27, 28, 29, 30]):
-        
+                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
+        """
+        :param dialog:
+        :param tableleft: Table to consult and load on the left side
+        :param tableright: Table to consult and load on the right side
+        :param field_id_left: ID field of the left table
+        :param field_id_right: ID field of the right table
+        :param name: field name (used in add_lot.py)
+        :param hide_left: Columns to hide from the left table
+        :param hide_right: Columns to hide from the right table
+        :param aql: (add query left) Query added to the left side (used in basic.py def basic_exploitation_selector())
+        :return:
+        """
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE " + name + " NOT IN "
-        query_left += "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft
-        query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+        query_left = "SELECT * FROM "+tableleft+" WHERE "+name+" NOT IN "
+        query_left += "(SELECT "+tableleft+"."+name+" FROM "+tableleft+""
+        query_left += " RIGHT JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_left += " WHERE cur_user = current_user)"
+        query_left += " AND  "+field_id_left+" > -1"
+        query_left += aql
+
+
 
         self.fill_table_by_query(tbl_all_rows, query_left)
-        self.hide_colums(tbl_all_rows, index)
+        self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
 
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
-        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+
+        query_right = "SELECT "+tableleft+"."+name+", cur_user, "+tableleft+"."+field_id_left+", "+tableright+"."+field_id_right+" FROM "+tableleft+""
+        query_right += " JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+
         query_right += " WHERE cur_user = current_user"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
-        self.hide_colums(tbl_selected_rows, [1, 2, 3])
+        self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
-        query_delete = "DELETE FROM " + self.schema_name + "." + tableright
-        query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
+        query_delete = "DELETE FROM "+tableright+""
+        query_delete += " WHERE current_user = cur_user AND "+tableright+"."+field_id_right+"="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
+
 
 
     def hide_colums(self, widget, comuns_to_hide):
@@ -626,7 +644,7 @@ class ParentAction(object):
         return cursor        
                     
                 
-    def set_table_columns(self, dialog, widget, table_name):
+    def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(dialog, widget)
@@ -636,14 +654,16 @@ class ParentAction(object):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
+               " FROM config_client_forms"
+               " WHERE table_id = '"+table_name+"'"
                " ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False)
+
+        rows = self.controller.get_rows(sql, commit=True, log_info=False)
         if not rows:
             return
 
         for row in rows:
+
             if not row['status']:
                 columns_to_delete.append(row['column_index'] - 1)
             else:
@@ -654,12 +674,16 @@ class ParentAction(object):
                 widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
-        # widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
+        if isQStandardItemModel:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+        else:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+
+        return widget
 
 
     def connect_signal_selection_changed(self, option):
@@ -823,3 +847,30 @@ class ParentAction(object):
         action.setObjectName(action_name)
 
         return action
+
+    def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
+
+        sql = ("SELECT id, idval"
+               " FROM "+table_name+""
+               " WHERE typevalue = '"+typevalue+"'"
+               " ORDER BY "+order_by+"")
+        rows = self.controller.get_rows(sql, commit=True)
+        return rows
+
+
+    def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
+
+        sql = ("SELECT MIN(LEAST("+field_from+", "+field_to+")),"
+               " MAX(GREATEST("+field_from+", "+field_to+"))"
+               " FROM "+table_name+"")
+        row = self.controller.get_row(sql, log_sql=False)
+        current_date = QDate.currentDate()
+        if row:
+            if row[0]:
+                widget_from.setDate(row[0])
+            else:
+                widget_from.setDate(current_date)
+            if row[1]:
+                widget_to.setDate(row[1])
+            else:
+                widget_to.setDate(current_date)

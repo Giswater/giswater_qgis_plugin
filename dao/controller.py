@@ -18,7 +18,10 @@ from functools import partial
 
 from giswater.dao.pg_dao import PgDao
 from giswater.dao.logger import Logger
-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
 
 class DaoController():
     
@@ -438,12 +441,12 @@ class DaoController():
         return True
 
 
-    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False):
+    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
             self.log_info(sql, stack_level_increase=1)
-        value = self.dao.execute_returning(sql)
+        value = self.dao.execute_returning(sql, commit)
         self.last_error = self.dao.last_error
         if not value:
             if log_error:
@@ -456,7 +459,7 @@ class DaoController():
         else:
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit()
+                return self.get_error_from_audit(commit)
 
         return value
            
@@ -1114,3 +1117,11 @@ class DaoController():
         """ Return log folder """
         return self.logger.log_folder
     
+    def set_layer_visible(self, layer, visible=True):
+        """ Set layer visible """
+
+        if layer:
+            if Qgis.QGIS_VERSION_INT < 29900:
+                self.iface.legendInterface().setLayerVisible(layer, visible)
+            else:
+                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)

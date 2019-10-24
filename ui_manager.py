@@ -209,6 +209,26 @@ class InfoShowInfo(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('basic_table.ui')
+class BasicTable(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('lot_management.ui')
+class LotManagement(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('user_management.ui')
+class UserManagement(QtGui.QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('load_documents.ui')
 class LoadDocuments(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
