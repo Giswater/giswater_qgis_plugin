@@ -26,7 +26,7 @@ DECLARE
 	v_parent_layer text;
 	v_notify_for_all text;
 	v_schemaname text;
-	v_action text;
+	v_channel text;
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -40,10 +40,10 @@ BEGIN
 	EXECUTE 'SELECT notify_action FROM audit_cat_table WHERE id = '''||v_table||''''
 	INTO v_notify_action_json;
 	
-	SELECT (a)->>'action' INTO v_action  FROM json_array_elements(v_notify_action_json) a;
+	SELECT (a)->>'channel' INTO v_channel  FROM json_array_elements(v_notify_action_json) a;
 	
 	--capture data from the input json
-	FOR rec_notify_action IN SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'enabled' as enabled, 
+	FOR rec_notify_action IN SELECT (a)->>'channel' as channel,(a)->>'name' as name, (a)->>'enabled' as enabled, 
 	(a)->>'featureType' as featureType FROM json_array_elements(v_notify_action_json) a LOOP
 
 		--transform enabled notifications for desktop
@@ -125,11 +125,11 @@ BEGIN
 	
 	v_notification := COALESCE(v_notification, '{}');
 
-	IF v_action = 'user' THEN
-		v_action = replace(current_user,'.','_');
+	IF v_channel = 'user' THEN
+		v_channel = replace(current_user,'.','_');
 	END IF;
 	
-	PERFORM pg_notify(v_action, '{"functionAction":'||v_notification||',"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
+	PERFORM pg_notify(v_channel, '{"functionAction":'||v_notification||',"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 	
 
 	RETURN new;
