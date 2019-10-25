@@ -130,7 +130,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) orphan. Take a look on temporal table to know details'));
+		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) orphan. Take a look on temporal table to know details.'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (14, v_result_id, 1, 'INFO: There is/are no nodes orphan');
@@ -151,10 +151,10 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) without start/end nodes. Take a look on temporal table to know details'));
+		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) without start/end nodes. Take a look on temporal table to know details.'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes');
+		VALUES (14, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes.');
 	END IF;
 		
 	-- only UD projects
@@ -193,7 +193,7 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, concat('WARNING:  ',v_count_2,' from ',v_count, ' junction(s) type sink has/have outfallparam field defined and has/have been switched to OUTFALL using defined parameters.'));
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 2, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=13 AND cur_user=current_user JOIN inp_junction USING (node_id) WHERE outfallparam IS NOT NULL'));		
+				VALUES (14, v_result_id, 2, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=13 AND cur_user=current_user JOIN inp_junction USING (node_id) WHERE outfallparam IS NOT NULL.'));		
 			END IF;
 		
 			v_countglobal=v_countglobal+v_count+v_count_2; 
@@ -201,152 +201,152 @@ BEGIN
 			v_count_2=0;
 		ELSE 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Any junction have been swiched on the fly to OUTFALL. Only junctions node sink with outfallparam values will be transformed on the fly to OUTFALL'));
+			VALUES (14, v_result_id, 1, concat('INFO: Any junction have been swiched on the fly to OUTFALL. Only junctions node sink with outfallparam values will be transformed on the fly to OUTFALL.'));
 		END IF;
 			
 		-- check common mistakes
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment WHERE outlet_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column oulet_id on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column oulet_id on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where rg_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rg_id column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rg_id column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column rg_id on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column rg_id on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where area is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column area on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column area on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where width is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column width on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column width on subcatchment table have been checked without any values missed.'));
 		END IF;
 		
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where slope is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column slope on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column slope on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where clength is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column clength on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column clength on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where nimp is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column nimp on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column nimp on subcatchment table have been checked without any values missed.'));
 		END IF;
 		
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where nperv is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column nperv on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column nperv on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where simp is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column simp on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column simp on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where sperv is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column sperv on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column sperv on subcatchment table have been checked without any values missed.'));
 		END IF;
 		
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where zero is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column zero on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column zero on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where routeto is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column routeto on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column routeto on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment where rted is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: Column rted on subcatchment table have been checked without any values missed'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column rted on subcatchment table have been checked without any values missed.'));
 		END IF;
 
 		SELECT infiltration INTO infiltration_aux FROM cat_hydrology JOIN inp_selector_hydrology
@@ -359,15 +359,15 @@ BEGIN
 			
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,	' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2)'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,	' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).'));
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('HINT: Acording EPA SWMM user''s manual, conduct_2 is deprecated, but anywat need to be informed. Any value is valid because always will be ignored by SWMM'));
+				VALUES (14, v_result_id, 3, concat('HINT: Acording EPA SWMM user''s manual, conduct_2 is deprecated, but anywat need to be informed. Any value is valid because always will be ignored by SWMM.'));
 				
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 	
-				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''CURVE_NUMBER'' infiltration method on subcatchment table (curveno, conduct_2, drytime_2) have been checked without any values missed'));
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''CURVE_NUMBER'' infiltration method on subcatchment table (curveno, conduct_2, drytime_2) have been checked without any values missed.'));
 			END IF;
 		
 		ELSIF infiltration_aux='GREEN_AMPT' THEN
@@ -377,13 +377,13 @@ BEGIN
 			
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction, conduct, initdef)'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction, conduct, initdef).'));
 				v_countglobal=v_countglobal+v_count;
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''GREEN_AMPT'' infiltration method on subcatchment table (suction, conduct, initdef) have been checked without any values missed'));
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''GREEN_AMPT'' infiltration method on subcatchment table (suction, conduct, initdef) have been checked without any values missed.'));
 			END IF;
 		
 		
@@ -394,12 +394,12 @@ BEGIN
 			
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil)'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil).'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''MODIFIED_HORTON'' infiltration method on subcatchment table (maxrate, minrate, decay, drytime, maxinfil) have been checked without any values missed'));
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''MODIFIED_HORTON'' infiltration method on subcatchment table (maxrate, minrate, decay, drytime, maxinfil) have been checked without any values missed.'));
 			END IF;
 			
 		END IF;
@@ -409,34 +409,34 @@ BEGIN
 		where (form_type is null) OR (intvl is null) OR (rgage_type is null);
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' raingage(s) with null values at least on mandatory columns for rain type (form_type, intvl, rgage_type)'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' raingage(s) with null values at least on mandatory columns for rain type (form_type, intvl, rgage_type).'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, concat('INFO: All mandatory colums for raingage (form_type, intvl, rgage_type) have been checked without any values missed'));
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory colums for raingage (form_type, intvl, rgage_type) have been checked without any values missed.'));
 			END IF;		
 			
 		SELECT count(*) INTO v_count FROM v_edit_raingage where rgage_type='TIMESERIES' AND timser_id IS NULL;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' raingage(s) with null values on the mandatory column for ''TIMESERIES'' raingage type'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' raingage(s) with null values on the mandatory column for ''TIMESERIES'' raingage type.'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, concat('INFO: All mandatory colums for ''TIMESERIES'' raingage type have been checked without any values missed'));
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory colums for ''TIMESERIES'' raingage type have been checked without any values missed.'));
 			END IF;		
 
 		SELECT count(*) INTO v_count FROM v_edit_raingage where rgage_type='FILE' AND (fname IS NULL or sta IS NULL or units IS NULL);
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' raingage(s) with null values at least on mandatory columns for ''FILE'' raingage type (fname, sta, units)'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' raingage(s) with null values at least on mandatory columns for ''FILE'' raingage type (fname, sta, units).'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, concat('INFO: All mandatory colums (fname, sta, units) for ''FILE'' raingage type have been checked without any values missed'));
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory colums (fname, sta, units) for ''FILE'' raingage type have been checked without any values missed.'));
 			END IF;				
 
 	ELSIF v_project_type='WS' THEN
@@ -467,7 +467,7 @@ BEGIN
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 			VALUES (14, v_result_id, 2, concat('WARNING: The node2arc parameter have been modified from ', 
-			v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts'));
+			v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts.'));
 		ELSE 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 			VALUES (14, v_result_id, 1, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value:', v_nodearc_user::numeric(12,3)));
@@ -480,12 +480,12 @@ BEGIN
 			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
 			SELECT 64, node_id, nodecat_id, the_geom FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s without elevation'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s without elevation.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=64 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No nodes with null values on field elevation have been found');
+			VALUES (14, v_result_id, 1, 'INFO: No nodes with null values on field elevation have been found.');
 		END IF;
 
 		-- 0 elevation control
@@ -495,26 +495,26 @@ BEGIN
 			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
 			SELECT 65, node_id, nodecat_id, the_geom FROM rpt_inp_node WHERE result_id=v_result_id AND elevation=0;
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s with elevation=0'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s with elevation=0.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=65 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No nodes with ''0'' on field elevation have been found');
+			VALUES (14, v_result_id, 1, 'INFO: No nodes with ''0'' on field elevation have been found.');
 		END IF;
 
 		-- pg2epa_inlet_flowtrace control
-		--PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result_id);
+		PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result_id);
 
 		SELECT count(*) INTO v_count  FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc''s totally disconnected fron any reservoir'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc''s totally disconnected fron any reservoir, according with the gw_fct_pg2epa_inlet_flowtrace function.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results found for pipes and nodes disconected from inlets');
+			VALUES (14, v_result_id, 1, 'INFO: gw_fct_pg2epa_inlet_flowtrace have been triggered. No results founded for pipes and nodes disconected from inlets.');
 		END IF;
 
 		-- node2arcs with more than two arcs
@@ -532,18 +532,18 @@ BEGIN
 		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc''s with more than two arcs'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc''s with more than two arcs.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with more than mandatory two arcs');
+			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with more than mandatory two arcs.');
 		END IF;
 
 		-- node2arcs with less than two arcs
 		DELETE FROM anl_node WHERE fprocesscat_id=67 and cur_user=current_user;
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
-		SELECT 66, a.node_id, a.nodecat_id, a.the_geom FROM (
+		SELECT 67, a.node_id, a.nodecat_id, a.the_geom FROM (
 			SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
 			WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
 			UNION ALL
@@ -556,19 +556,87 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',
-			v_count,' node2arc''s with less than mandatory two arcs. Perharps it is a border node2arc. Please review your data'));
+			v_count,' node2arc''s with less than mandatory two arcs. Perharps it is a border node2arc. Please review your data.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user'));
 		ELSE 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with less than mandatory two arcs');
+			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with less than mandatory two arcs.');
 		END IF;
 
+
+		-- check sense of cv pipes only to warning to user about the sense of the geometry
+		DELETE FROM anl_arc WHERE fprocesscat_id=69 and cur_user=current_user;
+		INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, the_geom)
+		SELECT 69, arc_id, arccat_id, the_geom FROM v_edit_inp_pipe WHERE status='CV';
 	
-		-- timestep control (patterns used againsts timesetep simulation)
-		--TODO
+		SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=69 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',
+			v_count,' CV pipes. Be carefull with the sense of pipe and check that node_1 and node_2 are on the right direction to prevent reverse flow.'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 2, concat('HINT: SELECT * FROM anl_arc WHERE fprocesscat_id=69 AND cur_user=current_user'));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, 'INFO: CV pipes checked. No results founded.');
+		END IF;
 		
+		
+		-- check sense of valves has good direction (at least arc_id exists as closest arc)
+		DELETE FROM anl_node WHERE fprocesscat_id=70 and cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
+		select 70, node_id, nodecat_id, the_geom FROM v_edit_inp_valve WHERE node_id NOT IN(
+			select node_id FROM v_edit_inp_valve JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
+			union
+			select node_id FROM v_edit_inp_valve JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_2);
+		
+		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=70 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Please check your data before continue.'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=70 AND cur_user=current_user'));
+		END IF;
+
+
+		-- check sense of pumps has good direction (at least arc_id exists as closest arc)
+		DELETE FROM anl_node WHERE fprocesscat_id=71 and cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
+		select 71, node_id, nodecat_id, the_geom FROM v_edit_inp_pump WHERE node_id NOT IN(
+			select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
+			union
+			select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_2);
+		
+		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=71 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' pump(s) without to_arc value according with the two closest arcs. Please check your data before continue.'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=71 AND cur_user=current_user'));
+		END IF;
+
+
+		-- check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)
+		DELETE FROM anl_node WHERE fprocesscat_id=72 and cur_user=current_user;
+		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
+		select 72, v_edit_inp_pump.node_id, nodecat_id, the_geom FROM vi_curves JOIN v_edit_inp_pump USING (curve_id);
+		
+		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=72 AND cur_user=current_user;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=72 AND cur_user=current_user'));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results founded. Due a EPANET''s bug with 3-point curves, it is forbidden to export curves like this because newer it will work on EPANET.');
+		END IF;
 	
+
+		-- timestep control (patterns used againsts timesetep simulation)
+		--TODO		
+
 		IF v_demandtype > 1 THEN --(2 or 3)
 
 			SELECT value INTO v_period FROM config_param_user WHERE parameter = 'inp_options_rtc_period_id' AND cur_user=current_user;
@@ -586,23 +654,23 @@ BEGIN
 			IF  v_count = 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 				VALUES (14, v_result_id, 3, concat(
-				'ERROR: There is/are not hydrometers to define the CRM period demand. Please check your hydrometer selector or simply verify if there are hydrometers on the project'));
+				'ERROR: There is/are not hydrometers to define the CRM period demand. Please check your hydrometer selector or simply verify if there are hydrometers on the project.'));
 				v_countglobal=v_countglobal+1; 
 				v_count=0;
 			ELSIF v_count_2 < v_count THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 				VALUES (14, v_result_id, 2, concat('WARNING: There is/are ', v_count, ' hydrometer(s) on current settings for user (v_rtc_hydrometer) and there are only ',
-				v_count_2,' hydrometer(s) with period values from that settings on the hydrometer-period table (ext_rtc_hydrometer_x_data)'));
+				v_count_2,' hydrometer(s) with period values from that settings on the hydrometer-period table (ext_rtc_hydrometer_x_data).'));
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-				VALUES (14, v_result_id, 2, concat('HINT: SELECT hydrometer_id FROM vi_parent_hydrometer EXCEPT SELECT hydrometer_id FROM ext_rtc_hydrometer_x_data'));
+				VALUES (14, v_result_id, 2, concat('HINT: SELECT hydrometer_id FROM vi_parent_hydrometer EXCEPT SELECT hydrometer_id FROM ext_rtc_hydrometer_x_data.'));
 				
 				v_countglobal=v_countglobal+(v_count-v_count_2); 
 				v_count=0;
 				
 			ELSIF v_count_2 = v_count  THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-				VALUES (14, v_result_id, 1, concat('INFO: There is/are ', v_count, ' hydrometer(s) on this exportation all of them with period flow values on the hydrometer-period table'));
+				VALUES (14, v_result_id, 1, concat('INFO: There is/are ', v_count, ' hydrometer(s) on this exportation all of them with period flow values on the hydrometer-period table.'));
 				v_countglobal=v_countglobal;
 				v_count=0;
 			END IF;
@@ -629,19 +697,19 @@ BEGIN
 		
 			IF  v_count = 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-				VALUES (14, v_result_id, 2, concat('WARNING: There is not any dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue'));
+				VALUES (14, v_result_id, 2, concat('WARNING: There is not any dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
 				v_countglobal=v_countglobal+1;
 				v_count=0;	
 			
 			ELSIF v_count_2 > v_count THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 				VALUES (14, v_result_id, 2, concat('WARNING: There is/are ', v_count_2, 
-				' dma''s on this exportation but there is/are only ',v_count,' dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue'));
+				' dma''s on this exportation but there is/are only ',v_count,' dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
 				v_countglobal=v_countglobal+v_count_2;
 				v_count=0;	
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-				VALUES (14, v_result_id, 1, concat('INFO: There is/are ', v_count, ' dma''s on this exportation. The dma-period table (ext_rtc_scada_dma_period) it''s filled'));
+				VALUES (14, v_result_id, 1, concat('INFO: There is/are ', v_count, ' dma''s on this exportation. The dma-period table (ext_rtc_scada_dma_period) it''s filled.'));
 				v_countglobal=v_countglobal;
 				v_count=0;
 			END IF;
@@ -657,18 +725,18 @@ BEGIN
 				IF  v_count = 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 					VALUES (14, v_result_id, 3, concat(
-					'ERROR: According with the pattern method used there are not dma''s with pattern defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue'));
+					'ERROR: According with the pattern method used there are not dma''s with pattern defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
 					v_countglobal=v_countglobal+1;
 					v_count=0;
 				ELSIF v_count_2 > v_count THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 					VALUES (14, v_result_id, 2, concat('WARNING: According with the pattern method used, there is/are ', v_count_2, 
 					' dma''s on this exportation and there are only ',v_count,
-					' dma''s on the dma-period table (ext_rtc_scada_dma_period) with pattern_id identified. Please check it before continue'));
+					' dma''s on the dma-period table (ext_rtc_scada_dma_period) with pattern_id identified. Please check it before continue.'));
 				ELSE
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 					VALUES (14, v_result_id, 1, concat(
-					'INFO: According with the pattern method used, all dma''s on the dma-period table (ext_rtc_scada_dma_period) have defined pattern_id'));			
+					'INFO: According with the pattern method used, all dma''s on the dma-period table (ext_rtc_scada_dma_period) have defined pattern_id.'));			
 					v_countglobal=v_countglobal;
 					v_count=0;
 				END IF;
@@ -684,13 +752,13 @@ BEGIN
 
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 						VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,
-						' volume patterns related to dma''s on this exportation. For this pattern method all the dma''s need unitary pattern'));
+						' volume patterns related to dma''s on this exportation. For this pattern method all the dma''s need unitary pattern.'));
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 						VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM audit_check_data WHERE fprocesscat_id=61 AND user_name=current_user'));		
 	
 						DELETE FROM audit_check_data WHERE fprocesscat_id=61 and user_name=current_user;				
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-						SELECT 61, v_result_id, concat('Pattern used ', pattern_id, ' on some DMA is not unitary WHEN pattern method choosed requires unitary pattern') 
+						SELECT 61, v_result_id, concat('Pattern used ', pattern_id, ' on some DMA is not unitary WHEN pattern method choosed requires unitary pattern.') 
 						FROM (SELECT pattern_id FROM v_rtc_period_hydrometer JOIN inp_pattern USING (pattern_id) EXCEPT
 						SELECT pattern_id FROM v_rtc_period_hydrometer JOIN inp_pattern USING (pattern_id) WHERE pattern_type='UNITARY')a;
 					ELSE 
@@ -710,13 +778,13 @@ BEGIN
 
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 						VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,
-						' unitary patterns related to dma''s on this exportation. For this pattern method all the dma''s need volume pattern'));
+						' unitary patterns related to dma''s on this exportation. For this pattern method all the dma''s need volume pattern.'));
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 						VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM audit_check_data WHERE fprocesscat_id=61 AND user_name=current_user'));		
 	
 						DELETE FROM audit_check_data WHERE fprocesscat_id=61 and user_name=current_user;				
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-						SELECT 61, v_result_id, concat('Pattern ',pattern_id,' used on some DMA is unitary WHEN pattern method choosed requires volume pattern') 
+						SELECT 61, v_result_id, concat('Pattern ',pattern_id,' used on some DMA is unitary WHEN pattern method choosed requires volume pattern.') 
 						FROM (SELECT pattern_id FROM v_rtc_period_hydrometer JOIN inp_pattern USING (pattern_id) EXCEPT
 						SELECT pattern_id FROM v_rtc_period_hydrometer JOIN inp_pattern USING (pattern_id) WHERE pattern_type='VOLUME')a;
 					ELSE
@@ -745,7 +813,7 @@ BEGIN
 
 					DELETE FROM audit_check_data WHERE fprocesscat_id=62 and cur_user=current_user;				
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-					SELECT 62, v_result_id, pattern_id ,'Patterns used on hydrometer is not unitary WHEN pattern method choosed requires unitary pattern' 
+					SELECT 62, v_result_id, pattern_id ,'Patterns used on hydrometer is not unitary WHEN pattern method choosed requires unitary pattern.' 
 					FROM (SELECT pattern_id FROM v_rtc_period_hydrometer JOIN inp_pattern USING (pattern_id) EXCEPT
 					SELECT pattern_id FROM v_rtc_period_hydrometer JOIN inp_pattern USING (pattern_id) WHERE pattern_type='UNITARY')a;
 				ELSE
@@ -761,17 +829,17 @@ BEGIN
 				IF  v_count_2 = 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 					VALUES (14, v_result_id, 3, concat(
-					'ERROR: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue'));
+					'ERROR: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
 					v_countglobal=v_countglobal+1;
 					v_count=0;
 				ELSIF v_count > v_count_2 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 					VALUES (14, v_result_id, 2, concat('WARNING: There is/are ', v_count, ' hydrometers''s with volume but only', v_count_2,
-					' with defined pattern on on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue'));
+					' with defined pattern on on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
 				ELSE
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 					VALUES (14, v_result_id, 1, concat(
-					'INFO: All the hydrometers are well-configured with volume and pattern on the the hydrometer-period table (ext_rtc_hydrometer_x_data)'));			
+					'INFO: All the hydrometers are well-configured with volume and pattern on the the hydrometer-period table (ext_rtc_hydrometer_x_data).'));			
 					v_countglobal=v_countglobal;
 					v_count=0;
 				END IF;
@@ -806,7 +874,7 @@ BEGIN
 				v_count=0;	
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: Vnodes checked. There is/are not vnodes over nodarcs');
+				VALUES (14, v_result_id, 1, 'INFO: Vnodes checked. There is/are not vnodes over nodarcs.');
 			END IF;
 		ELSE
 			-- check if demand type for connec is used
@@ -814,7 +882,7 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 3, concat('ERROR: The pattern method used, ',v_patternmethodval,' it is incompatible with the export network mode used, ',v_networkmodeval)); 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, 'HINT: Change the pattern method using some of the CONNEC method avaliable or change export network USING some of TRIMED ARCS method avaliable');
+				VALUES (14, v_result_id, 3, 'HINT: Change the pattern method using some of the CONNEC method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
 			END IF;		
 		END IF;
 				
@@ -825,40 +893,40 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',v_count,
-			' material(s) with null values at least on mandatory columns for Roughness catalog (init_age,end_age,roughness). Perharps are not used but check it before continue'));
+			' material(s) with null values at least on mandatory columns for Roughness catalog (init_age,end_age,roughness). Perharps are not used but check it before continue.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1,  'INFO: Roughness catalog checked. No mandatory values missed');
+			VALUES (14, v_result_id, 1,  'INFO: Roughness catalog checked. No mandatory values missed.');
 		END IF;
 		
 		-- check roughness inconsistency in function of headloss formula used
 		v_min = (SELECT min(roughness) FROM inp_cat_mat_roughness);
 		v_max = (SELECT max(roughness) FROM inp_cat_mat_roughness);
-		v_headloss = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_headloss');
+		v_headloss = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_headloss.');
 			
 		IF v_headloss = 'D-W' AND (v_min < 0.0025 AND v_max > 0.15) THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, concat(
-				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,')'));
+				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 				v_countglobal=v_countglobal+1; 
 			
 		ELSIF v_headloss = 'H-W' AND (v_min < 110 AND v_max > 150) THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 	
 				VALUES (14, v_result_id, 2, concat(
-				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,')'));
+				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 				v_countglobal=v_countglobal+1; 
 			
 		ELSIF v_headloss = 'C-M' AND (v_min < 0.011 AND v_max > 0.017) THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, concat(
-				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula C-M (0.011-0.017) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,')'));
+				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula C-M (0.011-0.017) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 				v_countglobal=v_countglobal+1; 	
 		ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 1, concat(
-				'INFO: Roughness values have been checked againts head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected'));
+				'INFO: Roughness values have been checked againts head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected.'));
 				v_countglobal=v_countglobal+1; 	
 			
 		END IF;
@@ -873,12 +941,12 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 3, concat(
-				'ERROR: There is/are ',v_count,' tank(s) with null values at least on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol)'));
+				'ERROR: There is/are ',v_count,' tank(s) with null values at least on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol).'));
 				v_countglobal=v_countglobal+v_count;
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: Tanks checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: Tanks checked. No mandatory values missed.');
 			END IF;	
 		
 		
@@ -889,12 +957,12 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 3, concat(
-				'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory columns for valve (valv_type, status, to_arc)'));
+				'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory columns for valve (valv_type, status, to_arc).'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: Valve status checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: Valve status checked. No mandatory values missed.');
 			END IF;
 		
 
@@ -903,12 +971,12 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 3, concat(
-				'ERROR: There is/are ',v_count,' PBV-PRV-PSV valve(s) with null values at least on mandatory on the mandatory column for Pressure valves'));
+				'ERROR: There is/are ',v_count,' PBV-PRV-PSV valve(s) with null values at least on mandatory on the mandatory column for Pressure valves.'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: PBC-PRV-PSV valves checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: PBC-PRV-PSV valves checked. No mandatory values missed.');
 			END IF;				
 	
 		SELECT count(*) INTO v_count FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
@@ -916,36 +984,36 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 3, concat(
-				'ERROR: There is/are ',v_count,' GPV valve(s) with null values at least on mandatory on the mandatory column for General purpose valves'));
+				'ERROR: There is/are ',v_count,' GPV valve(s) with null values at least on mandatory on the mandatory column for General purpose valves.'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: GPV valves checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: GPV valves checked. No mandatory values missed.');
 			END IF;	
 
 		SELECT count(*) INTO v_count FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE ((valv_type='TCV')) AND result_id=v_result_id;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' TCV valve(s) with null values at least on mandatory column for Losses Valves'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' TCV valve(s) with null values at least on mandatory column for Losses Valves.'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: TCV valves checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: TCV valves checked. No mandatory values missed.');
 			END IF;				
 
 		SELECT count(*) INTO v_count FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE ((valv_type='FCV') AND (flow IS NULL)) AND result_id=v_result_id;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' FCV valve(s) with null values at least on mandatory column for Flow Control Valves'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' FCV valve(s) with null values at least on mandatory column for Flow Control Valves.'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: FCV valves checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: FCV valves checked. No mandatory values missed.');
 			END IF;				
 					
 		-- pumps
@@ -953,12 +1021,12 @@ BEGIN
 		WHERE ((curve_id IS NULL) OR (inp_pump.status IS NULL) OR (to_arc IS NULL)) AND result_id=v_result_id;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump(s) with null values at least on mandatory columns for pump (curve_id, status, to_arc)'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump(s) with null values at least on mandatory columns for pump (curve_id, status, to_arc).'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: Pumps checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: Pumps checked. No mandatory values missed.');
 			END IF;	
 		
 		SELECT count(*) INTO v_count FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
@@ -966,12 +1034,12 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 				VALUES (14, v_result_id, 3, concat(
-				'ERROR: There is/are ',v_count,' additional pump(s) with null values at least on mandatory columns for additional pump (curve_id, status)'));
+				'ERROR: There is/are ',v_count,' additional pump(s) with null values at least on mandatory columns for additional pump (curve_id, status).'));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: Additional pumps checked. No mandatory values missed');
+				VALUES (14, v_result_id, 1, 'INFO: Additional pumps checked. No mandatory values missed.');
 			END IF;	
 	END IF;
 	
@@ -979,35 +1047,35 @@ BEGIN
 	-- info data analysis
 	IF v_project_type  = 'UD' THEN
 		SELECT min(length), max(length) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(n), max(n) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(z1), max(z1) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(z2), max(z2) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 		SELECT min(slope), max(slope) INTO v_min, v_max FROM v_edit_arc WHERE sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(sys_elev), max(sys_elev) INTO v_min, v_max FROM v_edit_node WHERE sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 	ELSE
 		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM v_edit_node WHERE sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 		SELECT min(length), max(length) INTO v_min, v_max FROM vi_pipes;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for pipe length. Minimun and maximum values are: (',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for pipe length. Minimun and maximum values are: (',v_min,' - ',v_max,' ).'));
 	
 		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM vi_pipes;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for pipe diameter. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for pipe diameter. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM vi_pipes;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' )'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 	END IF;
 	
