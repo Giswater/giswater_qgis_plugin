@@ -129,6 +129,10 @@ BEGIN
 		v_channel = replace(current_user,'.','_');
 	END IF;
 	
+	IF v_channel IS NULL THEN
+		v_channel='desktop';
+	END IF;
+
 	PERFORM pg_notify(v_channel, '{"functionAction":'||v_notification||',"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 	
 
