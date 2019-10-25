@@ -2362,6 +2362,11 @@ class UpdateSQL(ApiParent):
                         self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
                         f_to_read = str(f_to_read.replace(self.text_replace[0], self.text_replace[1]))
 
+                    for text_replace in self.xml_set_labels:
+                        self.text_replace = self.dev_settings.value('xml_set/' + text_replace)
+                        self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
+                        f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
+
                     # Close file
                     f.close()
 
