@@ -6,35 +6,17 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
+from qgis.core import Qgis, QgsGeometry, QgsMapToPixel, QgsPointXY
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint as QgsPointXY
-    from qgis.PyQt.QtGui import QStringListModel
-    import urlparse as parse
-else:
-    from qgis.core import QgsPointXY
-    from qgis.PyQt.QtCore import QStringListModel
-    import urllib.parse as parse
-
-from qgis.PyQt.QtCore import QDate, QPoint, Qt
+from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit,QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
-from qgis.core import QgsMapToPixel, QgsGeometry
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
-import json
-import os
-import re
-import subprocess
-import sys
-import webbrowser
+import json, os, re, subprocess, urllib.parse as parse, sys, webbrowser
 from collections import OrderedDict
 from functools import partial
 
@@ -141,10 +123,7 @@ class ApiCF(ApiParent):
                     point = QgsPointXY(float(x), float(y))
                     points.append(point)
                 rb = QgsRubberBand(self.canvas)
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    polyline = QgsGeometry.fromPolyline(points)
-                else:
-                    polyline = QgsGeometry.fromPolylineXY(points)
+                polyline = QgsGeometry.fromPolylineXY(points)
                 rb.setToGeometry(polyline, None)
                 rb.setColor(QColor(255, 0, 0, 100))
                 rb.setWidth(5)
@@ -489,8 +468,6 @@ class ApiCF(ApiParent):
         result = complet_result[0]['body']['data']
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
-            if field['column_id'] =='depth':
-                print(f"{field['column_id']} --> {field['hidden']}")
             if 'hidden' in field and field['hidden']:
                 continue
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
@@ -2292,12 +2269,7 @@ class ApiCF(ApiParent):
                 standar_model = widget.model()
         for widget in widget_list:
             if type(widget) is QLineEdit:
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    widget.textChanged.connect(partial(
-                        self.filter_table, complet_result, standar_model, dialog, widget_list))
-                else:
-                    widget.editingFinished.connect(partial(
-                        self.filter_table, complet_result, standar_model, dialog, widget_list))
+                widget.editingFinished.connect(partial(self.filter_table, complet_result, standar_model, dialog, widget_list))
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(
                     self.filter_table, complet_result, standar_model, dialog, widget_list))
