@@ -67,7 +67,7 @@ BEGIN
 
 	-- notify to qgis in order to reindex geometries for snapping
 	v_channel := replace (current_user::text,'.','_');
-	PERFORM pg_notify (v_channel, '{"functionAction": {"functions": [{"name": "indexing_feature","parameters":{"layerName": "v_edit_link","id": "'||v_idlink||'","geometry": {"st_astext": "'||st_astext(v_link_geom)||'"}}},{"name": "indexing_feature","parameters":  {"layerName": "v_edit_vnode","id": "'||v_idvnode||'","geometry": {"st_astext": "'||st_astext(v_vnode_geom)||'"}}}]},"user": "'||current_user||'","schema": "'||v_schemaname||'"}');
+	PERFORM pg_notify (v_channel, '{"functionAction":{"functions":[{"name":"indexing_spatial_layer","parameters":{"layerName":"v_edit_link"}},{"name":"indexing_spatial_layer","parameters":{"layerName":"v_edit_vnode"}}]},"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
 
 	RETURN NEW;
 
