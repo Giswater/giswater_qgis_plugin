@@ -143,13 +143,16 @@ class ParentDialog(QDialog):
         if close_dialog:
             self.close_dialog()
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'cf_keep_opened_edition' AND cur_user = current_user")
-        row = self.controller.get_row(sql, commit=True)
-        if row:
-            self.iface.activeLayer().startEditing()
+        try:
+            value = self.controller.cfgp_user['qgis_toggledition_forceopen'].value
+            if value and value.upper() == "TRUE":
+                self.iface.activeLayer().startEditing()
+        except  KeyError as e:
+            pass
+        except Exception as e:
+            print(f"{type(e).__name__} --> {e}")
 
-        # Close database connection        
+        # Close database connection
         self.controller.close_db()         
         
         # Close logger file

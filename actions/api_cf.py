@@ -580,12 +580,14 @@ class ApiCF(ApiParent):
 
 
     def set_vdefault_edition(self):
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'cf_keep_opened_edition'")
-        row = self.controller.get_row(sql)
-
-        if (not row or row[0].lower() != 'true') and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+        try:
+            value = self.controller.cfgp_user['qgis_toggledition_forceopen'].value
+            if not value or value.upper() != "TRUE" and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+        except  KeyError as e:
+            pass
+        except Exception as e:
+            print(f"{type(e).__name__} --> {e}")
 
 
     def get_last_value(self):
