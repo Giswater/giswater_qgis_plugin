@@ -6,12 +6,16 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsApplication, QgsEditorWidgetSetup, QgsMessageLog, QgsLayerTreeLayer, QgsProject, QgsTask
+from qgis.core import QgsEditorWidgetSetup, QgsMessageLog, QgsLayerTreeLayer, QgsProject
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QMessageBox
+import datetime
 import json
 import threading
 from collections import OrderedDict
-from functools import partial
+
 from .parent import ParentAction
+
 
 class NotifyFunctions(ParentAction):
 
@@ -48,8 +52,7 @@ class NotifyFunctions(ParentAction):
         self.controller.execute_sql(f"LISTEN {channel_name};")
         self.user_thread = threading.Thread(target=getattr(self, target), args=args)
         self.user_thread.start()
-        # task1 = QgsTask.fromFunction('start listening', getattr(self, target)(args), on_finished=self.task_completed, wait_time=20)
-        # QgsApplication.taskManager().addTask(task1)
+
 
     def task_stopped(self, task):
 
@@ -84,7 +87,6 @@ class NotifyFunctions(ParentAction):
         
 
     def wait_notifications(self, conn):
-
         while True:
             conn.poll()
             while conn.notifies:
@@ -99,10 +101,11 @@ class NotifyFunctions(ParentAction):
     def execute_functions(self, complet_result):
         """
         functions called in -> getattr(self, function_name)(**params):
+            def indexing_spatial_layer(self, **kwargs)
+            def refresh_attribute_table(self, **kwargs)
+            def refresh_canvas(self, **kwargs)
             def refresh_config_user_variables(self, **kwargs)
             def refresh_config_system_variables(self, **kwargs)
-            def refresh_canvas(self, **kwargs)
-            def refresh_attribute_table(self, **kwargs)
             def show_message(self, **kwargs)
         """
         for function in complet_result['functionAction']['functions']:
@@ -116,30 +119,16 @@ class NotifyFunctions(ParentAction):
                 pass
                 print(f"Exception error: {e}")
 
-
-    def refresh_config_user_variables(self, **kwargs):
-        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
-        self.controller.get_config_param_user()
-
-
-    def refresh_config_system_variables(self, **kwargs):
-        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
-        self.controller.get_config_param_system()
-
-
+    # Functions called by def wait_notifications(...)
     def indexing_spatial_layer(self, **kwargs):
         """ Force reload dataProvider of layer """
-        self.controller.indexing_spatial_layer(kwargs['layerName'])
-
-
-    def refresh_canvas(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
-        # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
-        # self.canvas.refreshAllLayers()
-
-        all_layers = self.controller.get_layers()
-        for layer in all_layers:
-            layer.triggerRepaint()
+        # Get list of layer names
+        layers_name_list = kwargs['tableName']
+        if not layers_name_list:
+            return
+        for layer_name in layers_name_list:
+            self.controller.indexing_spatial_layer(layer_name)
 
 
     def refresh_attribute_table(self, **kwargs):
@@ -200,8 +189,33 @@ class NotifyFunctions(ParentAction):
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
+    def refresh_canvas(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+        # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
+        # self.canvas.refreshAllLayers()
+
+        all_layers = self.controller.get_layers()
+        for layer in all_layers:
+            layer.triggerRepaint()
+
+
+    def refresh_config_user_variables(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+        self.controller.get_config_param_user()
+
+
+    def refresh_config_system_variables(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+        self.controller.get_config_param_system()
+
+
     def show_message(self, **kwargs):
         """
+        PERFORM pg_notify(current_user,
+                  '{"functionAction":{"functions":[{"name":"show_message","parameters":
+                  {"message":"line 1 \n line 2","tabName":"Notify channel",
+                  "styleSheet":{"level":1,"color":"red","bold":true}}}]},"user":"postgres","schema":"api_ws_sample"}');
+
         functions called in -> getattr(self, function_name)(**params):
         Show message in console log,
         :param kwargs: dict with all needed
@@ -213,7 +227,6 @@ class NotifyFunctions(ParentAction):
         :param kwargs['styleSheet']['bold']: if is true, then print as bold
         :return:
         """
-
         # Set default styleSheet
         color = "black"
         level = 0
@@ -228,20 +241,11 @@ class NotifyFunctions(ParentAction):
                 bold = 'b' if kwargs['styleSheet']['bold'] else ''
             else:
                 bold = ''
-        
         msg = f'<font color="{color}"><{bold}>{msg}</font>'
         QgsMessageLog.logMessage(msg, tab_name, level)
 
-    # TODO unused functions atm
 
-    def raise_notice(self, **kwargs):
-        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
-            Used to show raise notices sent by postgresql
-        """
-        msg_list = kwargs['msg']
-        for msg in msg_list:
-            print(f"{msg}")
-
+    # Another used functions
     def set_column_visibility(self, layer, col_name, hidden):
         """ Hide selected fields according table config_api_form_fields.hidden """
         config = layer.attributeTableConfig()
@@ -252,6 +256,45 @@ class NotifyFunctions(ParentAction):
                 break
         config.setColumns(columns)
         layer.setAttributeTableConfig(config)
+
+
+    # TODO unused functions atm
+    def show_messagebox(self, **kwargs):
+        """ Shows a message box with detail information """
+        msg = kwargs['message'] if 'message' in kwargs else 'No message found'
+        title = kwargs['title'] if 'title' in kwargs else 'New message'
+        inf_text = kwargs['inf_text'] if 'inf_text' in kwargs else 'Info text'
+        # color = "black"
+        # bold = ''
+        # if 'styleSheet' in kwargs:
+        #     color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
+        #     if 'bold' in kwargs['styleSheet']:
+        #         bold = 'b' if kwargs['styleSheet']['bold'] else ''
+        #     else:
+        #         bold = ''
+        # msg = f'<font color="{color}"><{bold}>{msg}</font>'
+        msg_box = QMessageBox()
+        msg_box.setText(msg)
+        if title:
+            title = self.controller.tr(title)
+            msg_box.setWindowTitle(title)
+        if inf_text:
+            inf_text = self.controller.tr(inf_text)
+            msg_box.setInformativeText(inf_text)
+        msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.setDefaultButton(QMessageBox.Ok)
+        msg_box.open()
+
+    def raise_notice(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
+            Used to show raise notices sent by postgresql
+        """
+        msg_list = kwargs['msg']
+        for msg in msg_list:
+            print(f"{msg}")
+
+
 
 
 
