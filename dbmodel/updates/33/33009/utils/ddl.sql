@@ -7,6 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DROP TRIGGER IF EXISTS gw_trg_edit_vnode ON v_edit_vnode;
-CREATE TRIGGER gw_trg_edit_vnode INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_vnode  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_edit_vnode();
+ALTER TABLE ext_cat_period ADD COLUMN period_year integer;
+ALTER TABLE ext_cat_period ADD COLUMN period_name varchar(16);
+ALTER TABLE ext_cat_period ADD COLUMN expl_id integer[];
