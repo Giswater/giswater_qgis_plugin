@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --23/10/2019
 UPDATE audit_cat_table SET notify_action=replace(notify_action::text,'action','channel')::json where notify_action is not null;
 UPDATE audit_cat_table SET notify_action=replace(notify_action::text,'desktop','user')::json where notify_action::text ilike '%refresh_canvas%';
+
+--25/10/2019
+UPDATE config_param_user SET parameter='qgis_toggledition_forceopen' WHERE parameter ='cf_keep_opened_edition';
