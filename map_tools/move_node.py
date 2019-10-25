@@ -239,7 +239,12 @@ class MoveNodeMapTool(ParentMapTool):
                 answer = self.controller.ask_question(message, title)
                 if answer:
                     self.move_node(node_id, point)
+                    self.controller.indexing_spatial_layer('v_edit_arc')
+                    self.controller.indexing_spatial_layer('v_edit_connec')
+                    self.controller.indexing_spatial_layer('v_edit_gully')
+                    self.controller.indexing_spatial_layer('v_edit_node')
                     self.refresh_legend()
+
 
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()

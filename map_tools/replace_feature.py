@@ -372,6 +372,10 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Refresh canvas
             self.refresh_map_canvas()
+            self.controller.indexing_spatial_layer('v_edit_arc')
+            self.controller.indexing_spatial_layer('v_edit_connec')
+            self.controller.indexing_spatial_layer('v_edit_gully')
+            self.controller.indexing_spatial_layer('v_edit_node')
             self.refresh_legend()
 
             # Deactivate map tool
