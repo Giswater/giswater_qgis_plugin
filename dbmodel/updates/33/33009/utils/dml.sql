@@ -13,3 +13,4 @@ UPDATE audit_cat_table SET notify_action=replace(notify_action::text,'desktop','
 
 --25/10/2019
 UPDATE config_param_user SET parameter='qgis_toggledition_forceopen' WHERE parameter ='cf_keep_opened_edition';
+UPDATE audit_cat_param_user SET id='qgis_toggledition_forceopen' WHERE parameter ='cf_keep_opened_edition';
