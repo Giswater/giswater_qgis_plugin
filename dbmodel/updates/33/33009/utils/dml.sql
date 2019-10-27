@@ -18,9 +18,9 @@ UPDATE config_param_system SET parameter='sys_mincutalerts_enable' WHERE paramet
 
 
 -- 25/10/2019
-INSERT INTO sys_fprocess_cat VALUES (69,'Check exported pipes with status CV', 'epa','Check exported pipes with status CV','ws');
-INSERT INTO sys_fprocess_cat VALUES (70,'Check exported valves where to_arc is not according with closest arcs', 'epa','Check exported valves where to_arc is not according with closest arcs','ws');
-INSERT INTO sys_fprocess_cat VALUES (71,'Check exported pumps where to_arc is not one of the two closest arcs', 'epa','Check exported pumps where to_arc is not one of the two closest arcs','ws');
-INSERT INTO sys_fprocess_cat VALUES (72,'Pump curve with 3 points', 'epa','Pump curve with 3 points','ws');
-INSERT INTO sys_fprocess_cat VALUES (73,'go2crm connec.dma values', 'epa','go2crm connec.dma values','ws');
-INSERT INTO sys_fprocess_cat VALUES (74,'crm2pg connec_x_data flow values', 'epa','crm2pg connec_x_data flow values','ws');
+INSERT INTO sys_fprocess_cat VALUES (69,'Check pipes with status CV', 'epa','Check exported pipes with status CV','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (70,'Check concordance of to_arc valves', 'epa','Check concordance of to_arc valves','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (71,'Check concordance of to_arc pumps', 'epa','Check concordance of to_arc pumps','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (72,'Pump curve with 3 points', 'epa','Pump curve with 3 points','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (73,'go2crm connec dma values', 'epa','go2crm connec.dma values','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (74,'crm2pg connec_x_data flow values', 'epa','crm2pg connec_x_data flow values','ws') ON CONFLICT (id) DO NOTHING;

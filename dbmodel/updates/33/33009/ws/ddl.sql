@@ -9,6 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
-ALTER TABLE inp_typevalue_source RENAME TO _inp_typevalue_evap_;
+ALTER TABLE inp_typevalue_source RENAME TO _inp_typevalue_source_;
 
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_tank", "column":"to_arc", "dataType":"text[]"}}$$);

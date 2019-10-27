@@ -70,5 +70,31 @@ concat('HEAD ',curve_id) IN (SELECT head FROM vi_pumps) OR
 concat('GPV ',curve_id) IN (SELECT setting FROM vi_valves) OR
 curve_id IN (SELECT energyvalue FROM vi_energy WHERE idval = 'EFFIC');
 
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_tank AS 
+ SELECT DISTINCT ON (v_node.node_id) v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
+    inp_tank.initlevel,
+    inp_tank.minlevel,
+    inp_tank.maxlevel,
+    inp_tank.diameter,
+    inp_tank.minvol,
+    inp_tank.curve_id,
+    inp_tank.to_arc
+   FROM inp_selector_sector,
+    v_node
+     JOIN inp_tank USING (node_id)
+     JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text OR a.node_2::text = v_node.node_id::text
+  WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
   
   
