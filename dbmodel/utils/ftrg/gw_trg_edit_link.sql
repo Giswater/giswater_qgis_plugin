@@ -420,6 +420,13 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+
+		-- update arc_id of connect
+		IF OLD.feature_type='CONNEC' THEN
+			UPDATE connec SET arc_id=NULL WHERE connec_id = OLD.feature_id;
+		ELSIF OLD.feature_type='GULLY' THEN
+			UPDATE gully SET arc_id=NULL WHERE gully_id = OLD.feature_id;
+		END IF;
 						
 		RETURN NULL;
 	   
