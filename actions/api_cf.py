@@ -498,6 +498,9 @@ class ApiCF(ApiParent):
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
                         widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
+                        # TODO emit this signal solve the problem when user do an insert and combo child are not filtered
+                        #  delete this when the function refactor (postgresql) fct_gw_setvdefault is done and the values ​​of the children are already filtered
+                        widget.currentIndexChanged.emit(widget.currentIndex())
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
