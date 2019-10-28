@@ -110,3 +110,6 @@ SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1
 -- lastprocess
 UPDATE connec SET pjoint_type='VNODE', pjoint_id='478', label_rotation=24.5, label_x=3
 WHERE connec_id='3014';
+
+delete from link where link_id=197;
+delete from link where link_id=211;
