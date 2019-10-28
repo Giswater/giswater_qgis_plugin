@@ -1427,7 +1427,9 @@ class Giswater(QObject):
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['column_id'], field['hidden'])
-
+                # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
+                if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+                    self.set_column_multiline(layer, field, fieldIndex)
                 # Set alias column
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
@@ -1452,9 +1454,6 @@ class Giswater(QObject):
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-                elif field['widgettype'] == 'typeahead':
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
     def set_column_visibility(self, layer, col_name, hidden):
@@ -1467,6 +1466,14 @@ class Giswater(QObject):
                 break
         config.setColumns(columns)
         layer.setAttributeTableConfig(config)
+
+        
+    def set_column_multiline(self, layer, field, fieldIndex):
+        """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+        if field['widgettype'] == 'text':
+            if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
