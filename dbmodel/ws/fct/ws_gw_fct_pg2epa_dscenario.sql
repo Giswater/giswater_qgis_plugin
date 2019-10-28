@@ -31,6 +31,9 @@ BEGIN
 		UPDATE rpt_inp_node SET demand=demand + a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
 	
 	END IF;
+	
+	-- set cero where null in orther to prevent user's null values on demand table
+	UPDATE rpt_inp_node SET demand=0 WHERE demand IS NULL AND result_id=result_id_var;
 
 RETURN 1;
 	
