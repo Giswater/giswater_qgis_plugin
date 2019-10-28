@@ -865,7 +865,7 @@ class UpdateSQL(ApiParent):
 
         sql = 'UPDATE ' + self.schema + '.version SET sample=True ' \
               'WHERE id = (SELECT id FROM ' + self.schema + '.version ORDER BY id DESC LIMIT 1)'
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep+project_type
@@ -1544,8 +1544,9 @@ class UpdateSQL(ApiParent):
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.set_wait_cursor()
-            self.load_updates(project_type, update_changelog=True)
-            self.set_info_project()
+            status = self.load_updates(project_type, update_changelog=True)
+            if status:
+                self.set_info_project()
             self.set_arrow_cursor()
         else:
             return
@@ -1572,11 +1573,16 @@ class UpdateSQL(ApiParent):
         self.schema = None
 
         self.set_wait_cursor()
-        self.load_fct_ftrg(project_type=project_type)
-        self.update_30to31(project_type=project_type)
-        self.update_31to39(project_type=project_type)
-        self.api(project_type=project_type)
-        self.execute_last_process(schema_name=schema_name, locale=True)
+        status = self.load_fct_ftrg(project_type=project_type)
+        if status:
+            status = self.update_30to31(project_type=project_type)
+        if status:
+            status = self.update_31to39(project_type=project_type)
+        if status:
+            status = self.api(project_type=project_type)
+        if status:
+            status = self.execute_last_process(schema_name=schema_name, locale=True)
+
         self.set_arrow_cursor()
 
         if update_changelog is False:
@@ -1589,6 +1595,8 @@ class UpdateSQL(ApiParent):
 
             # Reset count error variable to 0
             self.error_count = 0
+
+        return status
 
 
     def reload_tablect(self, project_type=False):
