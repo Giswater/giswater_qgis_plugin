@@ -24,3 +24,7 @@ INSERT INTO sys_fprocess_cat VALUES (71,'Check concordance of to_arc pumps', 'ep
 INSERT INTO sys_fprocess_cat VALUES (72,'Pump curve with 3 points', 'epa','Pump curve with 3 points','ws') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess_cat VALUES (73,'go2crm connec dma values', 'epa','go2crm connec.dma values','ws') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess_cat VALUES (74,'crm2pg connec_x_data flow values', 'epa','crm2pg connec_x_data flow values','ws') ON CONFLICT (id) DO NOTHING;
+
+-- 29/10/2019
+UPDATE audit_cat_param_user SET dv_querytext = 'SELECT expl_id AS id , name as idval FROM exploitation WHERE expl_id IS NOT NULL AND expl_id  != 0' WHERE id = 'exploitation_vdefault';
+UPDATE audit_cat_param_user SET dv_querytext = 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL AND sector_id != 0' WHERE id = 'sector_vdefault';
