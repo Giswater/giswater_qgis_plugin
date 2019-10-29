@@ -280,8 +280,28 @@ class ParentAction(object):
         query_delete = f"DELETE FROM {tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
+
+        # Order control
+        tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
+        tbl_selected_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_selected_rows, query_right))
+
+
+    def order_by_column(self, qtable, query, idx):
+        """
+        :param qtable: QTableView widget
+        :param query: Query for populate QsqlQueryModel
+        :param idx: The index of the clicked column
+        :return:
+        """
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable.horizontalHeader().sortIndicatorOrder()
+        col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
+        query += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable, query)
+        self.refresh_map_canvas()
 
 
     def hide_colums(self, widget, comuns_to_hide):
@@ -305,7 +325,17 @@ class ParentAction(object):
             self.controller.execute_sql(query_delete + str(expl_id[i]))
 
         # Refresh
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_left.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
+        
+        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_right.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_right, query_right)
         self.refresh_map_canvas()
 
@@ -354,7 +384,17 @@ class ParentAction(object):
                 self.controller.execute_sql(sql)
 
         # Refresh
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_left.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_right, query_right)
+
+        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_right.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
         self.refresh_map_canvas()
 

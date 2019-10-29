@@ -110,7 +110,11 @@
          </widget>
         </item>
         <item row="4" column="4">
-         <widget class="QTableView" name="selected_rows"/>
+         <widget class="QTableView" name="selected_rows">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item row="3" column="3">
          <widget class="QLabel" name="no_label_3">
@@ -125,7 +129,11 @@
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QTableView" name="all_rows"/>
+         <widget class="QTableView" name="all_rows">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item row="4" column="3">
          <layout class="QGridLayout" name="gridLayout">
