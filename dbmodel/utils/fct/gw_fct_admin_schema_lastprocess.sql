@@ -6,8 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2650
 
-
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_lastprocess(p_data json)
   RETURNS json AS
 $BODY$
@@ -42,7 +40,8 @@ DECLARE
 	v_tablename record;
 	v_schemaname text;
     v_oldversion text;
-	v_is_sample boolean;
+	v_is_sample boolean = FALSE;
+	v_sample_exist text = '';
 	
 BEGIN 
 	-- search path
@@ -60,7 +59,11 @@ BEGIN
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 	v_superusers := (p_data ->> 'data')::json->> 'superUsers';
-	SELECT sample INTO v_is_sample FROM version ORDER BY id LIMIT 1;
+	
+	-- Check if exist sample column on version table
+	SELECT column_name INTO v_sample_exist  
+	FROM information_schema.columns 
+	WHERE table_name='version' and column_name='sample';
 
 	-- last proccess
 	IF v_isnew IS TRUE THEN
@@ -73,7 +76,13 @@ BEGIN
 		
 		
 		-- inserting version table
-		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg, v_is_sample);	
+		IF v_sample_exist != 'sample' THEN
+			SELECT sample INTO v_is_sample FROM version ORDER BY id LIMIT 1;
+			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg, v_is_sample);
+		ELSE
+			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg);
+		END IF;
+		
 		v_message='Project sucessfully created';
 		
 		-- create json info_schema
