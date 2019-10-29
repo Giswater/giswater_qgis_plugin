@@ -347,8 +347,7 @@ class AddNewLot(ParentManage):
         sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
                " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id "
                " FROM ext_workorder "
-               " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
-               " WHERE om_visit_lot.serie IS NULL")
+               " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie ")
         if lot_id:
             _sql = (f"SELECT serie FROM om_visit_lot "
                     f" WHERE id = '{lot_id}'")
@@ -1341,8 +1340,8 @@ class AddNewLot(ParentManage):
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = (f'SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
-               f' FROM {table_object}')
+        sql = (f'SELECT MIN(startdate), MAX(startdate)'
+               f' FROM om_visit_lot')
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             if row[0]:
@@ -1413,6 +1412,19 @@ class AddNewLot(ParentManage):
                 result_relation.append(row[0])
         else:
             result = ''
+
+        # set timeStart and timeEnd as the min/max dave values get from model
+        current_date = QDate.currentDate()
+        sql = ('SELECT MIN(starttime), MAX(endtime)'
+               ' FROM om_visit_lot_x_user')
+        row = self.controller.get_row(sql, commit=self.autocommit)
+        if row:
+            if row[0]:
+                self.dlg_user_manage.date_event_from.setDate(row[0])
+            if row[1]:
+                self.dlg_user_manage.date_event_to.setDate(row[1])
+            else:
+                self.dlg_user_manage.date_event_to.setDate(current_date)
 
         # TODO: Disable columns user_id + team_id
 
