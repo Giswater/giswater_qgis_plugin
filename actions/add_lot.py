@@ -354,8 +354,7 @@ class AddNewLot(ParentManage):
         sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
                " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id "
                " FROM ext_workorder "
-               " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
-               " WHERE om_visit_lot.serie IS NULL")
+               " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie ")
         if lot_id:
             _sql = ("SELECT serie FROM om_visit_lot "
                     " WHERE id = '"+str(lot_id)+"'")
