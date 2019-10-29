@@ -28,3 +28,16 @@ INSERT INTO sys_fprocess_cat VALUES (74,'crm2pg connec_x_data flow values', 'epa
 -- 29/10/2019
 UPDATE audit_cat_param_user SET dv_querytext = 'SELECT expl_id AS id , name as idval FROM exploitation WHERE expl_id IS NOT NULL AND expl_id  != 0' WHERE id = 'exploitation_vdefault';
 UPDATE audit_cat_param_user SET dv_querytext = 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL AND sector_id != 0' WHERE id = 'sector_vdefault';
+
+UPDATE sys_fprocess_cat SET fprocess_name = 'EPA check data', fprocess_i18n='EPA check data' WHERE id=14;
+UPDATE sys_fprocess_cat SET fprocess_name = 'OM check data', fprocess_i18n='OM check data' WHERE id=25;
+UPDATE sys_fprocess_cat SET fprocess_name = 'EDIT check data', fprocess_i18n='EDIT check data' WHERE id=16;
+UPDATE sys_fprocess_cat SET fprocess_name = 'PLAN check data', fprocess_i18n='PLAN check data' WHERE id=15;
+UPDATE sys_fprocess_cat SET fprocess_name = 'SYS check data', fprocess_i18n='SYS check data' WHERE id=26;
+
+INSERT INTO sys_fprocess_cat VALUES (75,'Null values on state_type column', 'om','Null values on state type column','utils') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (76,'Null values on closed/broken values for valves', 'om','Null values on closed/broken values for valves','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (77,'inlet_x_exploitation with null/wrong values', 'om','inlet_x_exploitation with null/wrong values','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (78,'node_type filled with gradelimiter values', 'system', 'node_type filled with gradelimiter values','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (79,'mapzone.nodeparent acording with grafdelimiter', 'system', 'mapzone.nodeparent acording with grafdelimiter','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (80,'feature.to_arc acording with mapzone.nodeparent', 'system', 'feature.to_arc acording with mapzone.nodeparent','ws') ON CONFLICT (id) DO NOTHING;
