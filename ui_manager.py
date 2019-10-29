@@ -226,6 +226,11 @@ class ChangeNodeType(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('crm_trace.ui')
+class DlgTrace(GwDialog, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('csv2pg.ui')
 class Csv2Pg(GwDialog, FORM_CLASS):
     pass
