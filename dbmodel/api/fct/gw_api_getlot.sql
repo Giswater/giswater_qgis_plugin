@@ -44,6 +44,7 @@ DECLARE
 	v_fieldvalue text;
 	v_geometry json;
 	v_value text;
+	v_team text;
 
 BEGIN
 
@@ -97,8 +98,10 @@ BEGIN
 				v_fieldvalue := (v_values->>(aux_json->>'column_id'));
 				IF (aux_json->>'column_id') = 'lot_id' THEN
 					v_fieldvalue = (v_values->>('idval'));
+				ELSIF (aux_json->>'column_id') = 'team_id' OR (aux_json->>'column_id') = 'visitclass_id' THEN
+					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'iseditable', FALSE);
 				END IF;
-				raise notice 'v_fieldvalue --> %',v_fieldvalue;
+				
 				IF (aux_json->>'widgettype')='combo' THEN 
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 				ELSE 
@@ -126,6 +129,10 @@ BEGIN
 				array_index := array_index + 1;
 				IF (aux_json->>'column_id') = 'id' THEN
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_id, ''));
+				ELSIF (aux_json->>'column_id') = 'team_id' THEN
+					-- Get current user team id
+					EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY starttime DESC' INTO v_fieldvalue;
+					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 				END IF;
 			END LOOP;
 										

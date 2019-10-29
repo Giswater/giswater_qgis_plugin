@@ -55,6 +55,7 @@ BEGIN
 	v_descript = ((p_data ->>'data')::json->>'fields')::json->>'descript'::text;
 	v_status = ((p_data ->>'data')::json->>'fields')::json->>'status'::text;
 	v_visitclass_id = ((p_data ->>'data')::json->>'fields')::json->>'visitclass_id'::text;
+	v_team = ((p_data ->>'data')::json->>'fields')::json->>'team_id'::text;
 	
 	-- Control NULL's
 	v_tablename := COALESCE(v_tablename, '');
@@ -70,7 +71,7 @@ BEGIN
 	EXECUTE 'SELECT * FROM om_visit_lot WHERE id =' || v_id ||'' INTO v_result;
 
 	-- Get current user team id
-	EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY starttime DESC' INTO v_team;
+	--EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY starttime DESC' INTO v_team;
 	
 
 	IF v_result IS NOT NULL THEN
