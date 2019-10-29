@@ -15,6 +15,8 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
 
+
+from qgis.core import Qgis, QgsApplication
 from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog, QMessageBox
@@ -24,16 +26,16 @@ import json
 import os
 import re
 import subprocess
-import time
+
 from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
 from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
+from .gw_thread import GwTask
 from .update_sql import UpdateSQL
-from ..ui_manager import FileManager, Multirow_selector, HydrologySelector
-from ..ui_manager import EpaResultCompareSelector, EpaResultManager
+from ..ui_manager import EpaResultCompareSelector, EpaResultManager, FileManager, HydrologySelector, Multirow_selector
 
 
 class Go2Epa(ApiParent):
@@ -515,7 +517,10 @@ class Go2Epa(ApiParent):
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
+        task_rpt_to_db = GwTask('Import RPT to database')
+        QgsApplication.taskManager().addTask(task_rpt_to_db)
         for line_number, row in enumerate(full_file):
+            task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
             row = row.rstrip()
@@ -564,7 +569,7 @@ class Go2Epa(ApiParent):
                         sp_n.append(dirty_list[x])
 
             # Find strings into dict and set source column
-            for k, v  in sources.items():
+            for k, v in sources.items():
                 try:
                     if k == f'{sp_n[0]} {sp_n[1]}':
                         source = "'" + v + "'"
