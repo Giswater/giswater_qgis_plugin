@@ -212,7 +212,11 @@ BEGIN
 		--new visit
 		IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
 			
-			EXECUTE ('SELECT sys_type FROM '||v_featuretablename||' LIMIT 1') INTO v_featuretype;
+			-- Featuretablename is null when visit is unexpected generic
+			IF v_featuretablename IS NOT NULL AND v_featureid IS NOT NULL THEN
+				EXECUTE ('SELECT sys_type FROM '||v_featuretablename||' LIMIT 1') INTO v_featuretype;
+			END IF;
+
 			-- get vdefault visitclass
 			IF v_offline THEN
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
@@ -225,15 +229,21 @@ BEGIN
 				IF p_visittype=1 THEN
 					v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_planned_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
 				ELSIF  p_visittype=2 THEN
-
+					
 					IF v_featuretablename IS NOT NULL THEN
 						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_unspected_vdef_', v_featuretablename) AND cur_user=current_user)::integer;	
 					ELSE
 						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('om_visit_noinfra_vdef') AND cur_user=current_user)::integer;
 					END IF;
 				END IF;
+
+				-- Set visitclass for unexpected generic
+				IF v_featuretype IS NULL THEN
+					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type IS NULL AND visit_type=p_visittype LIMIT 1);
+				END IF;
+
 				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
+					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=p_visittype LIMIT 1);
 				END IF;
 			END IF;				
 							
