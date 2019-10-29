@@ -201,7 +201,7 @@ BEGIN
 		INTO v_featuretype
 		USING v_tablename;
 	v_featuretype := LOWER(v_featuretype); 
-	v_featuretype := COALESCE(v_featuretype, '[]'); 
+	v_featuretype := COALESCE(v_featuretype, ''); 
 
 -- Get vdefault values
 	-- Create List
