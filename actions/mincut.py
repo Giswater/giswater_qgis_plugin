@@ -33,7 +33,7 @@ import operator
 from datetime import datetime
 from collections import OrderedDict
 from functools import partial
-from .gw_thread import GwTask
+from .gw_task import GwTask
 from .. import utils_giswater
 from .parent import ParentAction
 from .mincut_config import MincutConfig

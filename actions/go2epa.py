@@ -33,7 +33,7 @@ from functools import partial
 from .. import utils_giswater
 from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
-from .gw_thread import GwTask
+from .gw_task import GwTask
 from .update_sql import UpdateSQL
 from ..ui_manager import EpaResultCompareSelector, EpaResultManager, FileManager, HydrologySelector, Multirow_selector
 
