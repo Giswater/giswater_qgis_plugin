@@ -451,8 +451,7 @@ class ApiCF(ApiParent):
 
         # Get feature type as geom_type (node, arc, connec, gully)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
-
-        if self.geom_type == '':
+        if str(self.geom_type) in ('', '[]'):
             if 'feature_cat' in globals():
                 parent_layer = self.feature_cat.parent_layer
             else:
@@ -1122,8 +1121,7 @@ class ApiCF(ApiParent):
             widget = f'{tab_type}_{self.geom_type}at_id'
         else:
             widget = f'{tab_type}_{self.geom_type}cat_id'
-
-        self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type[0])
+        self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
 
 
     def show_actions(self, tab_name):
