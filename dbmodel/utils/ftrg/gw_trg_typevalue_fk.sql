@@ -36,9 +36,6 @@ BEGIN
 	--in case that field is one of the addfields capture the parameter_id
 	v_new_param = (v_new_data ->>'parameter_id')::text;
 
-	RAISE NOTICE 'v_new_data,%',v_new_data;
-	RAISE NOTICE 'v_new_param,%',v_new_param;
-
 	IF v_typevalue_fk IS NOT NULL THEN
 	
 		--loop over defined typevalues
@@ -47,9 +44,6 @@ BEGIN
 			--capture new value of a target field
 			v_new_field = (v_new_data ->>rec.target_field)::text;
 		
-
-			RAISE NOTICE 'v_new_field,%',v_new_field;
-
 			IF  v_new_param = rec.parameter_id or v_new_param IS NULL THEN
 				--create a list of possible values of the field
 				EXECUTE 'SELECT array_agg(id) FROM '||rec.typevalue_table||' 

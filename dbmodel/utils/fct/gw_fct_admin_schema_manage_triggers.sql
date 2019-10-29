@@ -42,8 +42,6 @@ BEGIN
 			FOR aux_json IN  SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'trg_fields' as trg_fields,(a)->>'featureType' as featureType 
 			FROM json_array_elements(v_notify_action) a LOOP
 
-				raise notice 'aux_json,%',aux_json;
-
 				IF (rec.id ILIKE 'v_%' OR rec.id ILIKE 've_%' OR rec.id ILIKE 'vi_%') AND rec.id != 'vnode' 
 				AND rec.id not ilike 'value%' AND aux_json.action = 'desktop' THEN
 

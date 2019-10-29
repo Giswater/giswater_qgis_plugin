@@ -30,8 +30,7 @@ BEGIN
 	
 	
 	v_table:= TG_ARGV[0];
-	
-	raise notice 'v_table,%',v_table;
+
 	--on insert of a new typevalue creat a trigger for the table
 	IF TG_OP = 'INSERT' AND v_table = 'typevalue_fk' THEN
 		--check if there are values on the defined fileds that already have a value that is not present in a catalog
@@ -65,15 +64,11 @@ BEGIN
 			v_query =  'SELECT *  FROM typevalue_fk JOIN '||v_table||' ON '||v_table||'.typevalue = typevalue_name 
 			and typevalue_name = '''||NEW.typevalue||''';';
 
-			raise notice 'v_query,%',v_query;	
-
 			IF NEW.id!= OLD.id THEN
 				
 				
 				FOR rec IN EXECUTE v_query LOOP
-				
-					RAISE NOTICE 'rec,%',rec;
-					
+
 					EXECUTE 'ALTER TABLE '||rec.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
 					
 					EXECUTE 'UPDATE '||rec.target_table||' SET '||rec.target_field||' = '''||NEW.id||''' 
@@ -89,7 +84,6 @@ BEGIN
 
 		--select configuration from the related typevalue table
 		v_query = 'SELECT * FROM SCHEMA_NAME.'||v_table||' WHERE '||v_table||'.typevalue = '''|| OLD.typevalue||''' AND  '||v_table||'.id = '''||OLD.id||''';';
-		RAISE NOTICE 'v_query,%',v_query;
 
 		--if typevalue is a system typevalue - error, cant delete the value, else proceed with the delete process
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue_cat) THEN
@@ -98,11 +92,8 @@ BEGIN
 		ELSE 
 			--select configuration from the typevalue_fk table
 			v_query = 'SELECT * FROM typevalue_fk WHERE typevalue_table = '''||v_table||''' AND typevalue_name = '''||OLD.typevalue||''';';
-			RAISE NOTICE 'v_query,%',v_query;
-			
+	
 			EXECUTE v_query INTO v_typevalue_fk;
-
-			RAISE NOTICE 'v_typevalue_fk,%',v_typevalue_fk;
 
 			--loop over all the fields that may use the defined value
 			FOR rec IN EXECUTE v_query LOOP
