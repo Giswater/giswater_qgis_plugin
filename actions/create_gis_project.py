@@ -53,13 +53,13 @@ class CreateGisProject():
         template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
         if not os.path.exists(template_path):
             self.controller.show_warning("Template GIS file not found", parameter=template_path, duration=20)
-            return
+            return False, None
 
         # Get database parameters from layer source
         layer_source, not_version = self.controller.get_layer_source_from_credentials()
         if layer_source is None:
             self.controller.show_warning("Error getting database parameters")
-            return
+            return False, None
 
         host = layer_source['host']
         port = layer_source['port']
@@ -84,7 +84,7 @@ class CreateGisProject():
             message = "Do you want to overwrite file?"
             answer = self.controller.ask_question(message, "overwrite file")
             if not answer:
-                return
+                return False, qgs_path
 
         # Create destination file from template file
         self.controller.log_info("Creating GIS file... " + qgs_path)
