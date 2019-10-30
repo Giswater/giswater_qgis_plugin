@@ -906,7 +906,8 @@ class Giswater(QObject):
         # Get parent layers
         sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' "
                "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
-               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature")
+               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature"
+               " ORDER BY parent_layer")
         parent_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
 
         for parent_layer in parent_layers:
@@ -918,7 +919,9 @@ class Giswater(QObject):
                    f"WHERE parent_layer = '{parent_layer[1]}' "
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
-                   f"   WHERE table_schema = '{schema_name}')")
+                   f"   WHERE table_schema = '{schema_name}')"
+                   f" ORDER BY child_layer")
+
 
             child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
             child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
