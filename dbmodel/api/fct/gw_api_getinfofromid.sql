@@ -539,7 +539,9 @@ BEGIN
 		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5)'
 		INTO v_fields
 		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined;
-
+		IF v_configtabledefined IS FALSE  THEN
+            v_forminfo := json_build_object('formName','F16','template','GENERIC');
+        END IF;
     END IF;
 
     v_tablename:= (to_json(v_tablename));

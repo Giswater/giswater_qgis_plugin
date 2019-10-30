@@ -94,7 +94,7 @@ BEGIN
 		(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
 		(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
 		''::TEXT AS tooltip, ''::TEXT as placeholder, false AS iseditable, false as isclickable,
-		row_number()over() AS orderby, 
+		row_number()over() AS orderby, null as stylesheet, null as widgetcontrols, null as layout_name,
 		3 AS layout_id, 
 		row_number()over() AS layout_order, 
 		FALSE AS dv_parent_id, FALSE AS isparent, FALSE AS button_function, ''::TEXT AS dv_querytext, ''::TEXT AS dv_querytext_filterc, FALSE AS action_function, FALSE AS isautoupdate
