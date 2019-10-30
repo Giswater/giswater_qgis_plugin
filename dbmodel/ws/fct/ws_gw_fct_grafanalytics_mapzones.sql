@@ -18,13 +18,16 @@ $BODY$
 TO CONFIGURE
 ------------
 
-set graf_delimiter field on node_type table (below an example)
-UPDATE node_type SET graf_delimiter='NONE';
-UPDATE node_type SET graf_delimiter='SECTOR' WHERE type IN ('SOURCE','WATERWELL', 'ETAP' 'TANK');
+set graf_delimiter field on node_type table (below an example). It's not mandatory but provides more consistency to the analyzed data
 
-set to_arc on inp_inlet (for SECTORS)
+UPDATE node_type 
+SET graf_delimiter='NONE';
+SET graf_delimiter='SECTOR' WHERE type IN ('SOURCE','WATERWELL', 'ETAP' 'TANK');
 
-set to_arc on tables inp_valve (for presszone), inp_pump (for presszone)  ------------->>>>> crec que NO( inp_shortpipe (for DQA, DMA))
+UPDATE sector SET grafconfig='[{"nodeParent":"1", "toArc":[2,3,4]}, {"nodeParent":"5", "toArc":[6,7,8]}]';
+UPDATE dma SET grafconfig='[{"nodeParent":"11", "toArc":[12,13,14]}, {"nodeParent":"5", "toArc":[16,17,18]}]';
+UPDATE dqa SET grafconfig='[{"nodeParent":"21", "toArc":[22,23,24]}, {"nodeParent":"5", "toArc":[26,27,28]}]';
+UPDATE cat_preszone SET grafconfig='[{"nodeParent":"31", "toArc":[32,33,34]}, {"nodeParent":"35", "toArc":[36,37,38]}]';
 
 update arc set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0;
 update node set sector_id=0, dma_id=0, dqa_id=0,  presszonecat_id=0;
@@ -36,8 +39,9 @@ TO EXECUTE
 ----------
 
 -- SECTOR
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[15]", 
+"updateFeature":"TRUE", "updateMapZone":"FALSE","concaveHullParam":0.85, "debug":"FALSE"}}}');
+
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -57,19 +61,6 @@ SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND use
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 
 
-
--- PRESZZONE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
-"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85}}}');
-
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
-
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=48 AND user_name=current_user group by log_message order by 2 --PZONE
-
-SELECT presszonecat_id, count(presszonecat_id) from v_edit_arc  group by presszonecat_id order by 1;
-
-
-
 -- DQA
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
 "updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
@@ -80,6 +71,16 @@ SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=44 AND use
 
 SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
+
+-- PRESZZONE
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
+"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
+
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=48 AND user_name=current_user group by log_message order by 2 --PZONE
+
+SELECT presszonecat_id, count(presszonecat_id) from v_edit_arc  group by presszonecat_id order by 1;
 
 
 -----------------
@@ -135,7 +136,7 @@ v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
 v_result 		text;
-v_count			json;
+v_count			integer;
 v_version		text;
 v_table			text;
 v_field 		text;
@@ -143,6 +144,7 @@ v_fieldmp 		text;
 v_srid 			integer;
 v_concavehull		float;
 v_debug			boolean;
+v_input 		json;
 
 BEGIN
 	-- Search path
@@ -160,6 +162,30 @@ BEGIN
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
+
+	-- data quality analysis
+	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+	PERFORM gw_fct_om_check_data(v_input);
+
+	-- check criticity in order to continue or not
+
+	SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
+	IF v_count > 3 THEN
+	
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+		-- Control nulls
+		v_result_info := COALESCE(v_result_info, '{}'); 
+		
+		--  Return
+		RETURN ('{"status":"Accepted", "message":{"priority":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
+		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+	END IF;
+ 
 
 	-- set fprocesscat
 	IF v_class = 'PRESSZONE' THEN 
@@ -203,13 +229,15 @@ BEGIN
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 	DELETE FROM selector_pSECTOR WHERE cur_user=current_user;
-	
+
+	/*
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN 
 		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
+	*/
 
 	-- create graf
 	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
@@ -219,26 +247,18 @@ BEGIN
 	SELECT  v_class, arc_id, node_2, node_1, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
-	-- set boundary conditions of graf table	
+	-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
 	IF v_class = 'PRESSZONE' THEN
-		-- query text to select graf_delimiters
-		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''SECTOR'',''PRESSZONE'')';
+		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from cat_presszone WHERE grafconfig IS NOT NULL';
 	
 	ELSIF v_class = 'DMA' THEN
-		-- query text to select graf_delimiters
-		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''SECTOR'',''DMA'')';
+		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from dma WHERE grafconfig IS NOT NULL';
 
 	ELSIF v_class = 'DQA' THEN
-		-- query text to select graf_delimiters
-		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''SECTOR'',''DQA'')';
+		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from dqa WHERE grafconfig IS NOT NULL';
 
 	ELSIF v_class = 'SECTOR' THEN
-		-- query text to select graf_delimiters
-		v_text = 'SELECT a.node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-			  WHERE graf_delimiter IN (''SECTOR'')';
+		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from sector WHERE grafconfig IS NOT NULL';
 	END IF;
 
 	-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
@@ -253,25 +273,60 @@ BEGIN
 	
 	EXECUTE v_querytext;
 
-	-- open boundary conditions enabling sense for graf delimiters allowed on inp_pump/inp_valve/inp_shortpipe/inp_inlet tables
-	-- all inlets
-	-- all pumps
-	-- all valves
-	-- only shortpipes as node_type (flowmeter)
-	-- only tanks node_type NOT IN (queue_tanks, acumulator_tanks)
-	UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_pump ON to_arc = arc_id WHERE node_1=node_id) AND user_name=current_user;
-	UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_valve ON to_arc = arc_id WHERE node_1=node_id AND user_name=current_user);
-	UPDATE anl_graf SET flag=0 WHERE id IN ( SELECT id FROM anl_graf JOIN inp_shortpipe ON to_arc = arc_id WHERE node_1=node_id) AND user_name=current_user;
-	UPDATE anl_graf SET flag=0 WHERE id IN (SELECT id FROM anl_graf JOIN inp_inlet ON to_arc  = arc_id WHERE node_1=node_id  
-						UNION SELECT id FROM anl_graf JOIN inp_reservoir ON to_arc  = arc_id WHERE node_1=node_id
-						UNION SELECT id FROM anl_graf JOIN (SELECT unnest(to_arc) AS to_arc, node_id  FROM inp_tank) b ON to_arc  = arc_id WHERE node_1=node_id) AND user_name=current_user; 
-						
+	v_text =  concat ('SELECT * FROM (',v_text,')a JOIN anl_graf e ON a.node_id=e.node_1 WHERE user_name=current_user AND grafclass=',quote_literal(v_class));
 
+	-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
+	
+	-- in function of graf class
+	IF v_class = 'SECTOR' THEN
+		-- sector (sector.grafconfig)
+		UPDATE anl_graf SET flag=0 WHERE id IN (
+			SELECT id FROM anl_graf JOIN (
+			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
+			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
+			as to_arc from sector 
+			where grafconfig is not null order by 1,2) a 
+			ON to_arc=arc_id WHERE node_id=node_1
+			) AND user_name=current_user;
+	
+	ELSIF v_class = 'DMA' THEN
+		-- dma (dma.grafconfig)
+		UPDATE anl_graf SET flag=0 WHERE id IN (
+			SELECT id FROM anl_graf JOIN (
+			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
+			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
+			as to_arc from dma 
+			where grafconfig is not null order by 1,2) a
+			ON to_arc=arc_id WHERE node_id=node_1
+			) AND user_name=current_user;
+
+	ELSIF v_class = 'DQA' THEN
+		-- dqa (dqa.grafconfig)
+		UPDATE anl_graf SET flag=0 WHERE id IN (
+		SELECT id FROM anl_graf JOIN (
+			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
+			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
+			as to_arc from dqa 
+			where grafconfig is not null order by 1,2) a
+			ON to_arc=arc_id WHERE node_id=node_1
+			) AND user_name=current_user;
+
+	ELSIF v_class = 'PRESSZONE' THEN
+		-- cat_presszone (cat_presszone.grafconfig)
+		UPDATE anl_graf SET flag=0 WHERE id IN (
+		SELECT id FROM anl_graf JOIN (
+			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
+			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
+			as to_arc from cat_presszone 
+			where grafconfig is not null order by 1,2) a
+			ON to_arc=arc_id WHERE node_id=node_1
+			) AND user_name=current_user;		
+	END IF;
+				
 	IF v_debug IS NULL OR v_debug IS FALSE THEN
 
 		-- starting process
-		LOOP
-		
+		LOOP	
 			EXIT WHEN v_cont1 = -1;
 			v_cont1 = v_cont1+1;
 			
@@ -289,11 +344,9 @@ BEGIN
 				v_cont1 = -1;
 			END IF;
 
-			raise notice '---> GRAF DELIMITER NUMBER %, FEATURE ID: %', v_cont1, v_featureid;
-
 			-- reset water flag
 			UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
-				
+			
 			------------------
 			-- starting engine
 
@@ -308,18 +361,21 @@ BEGIN
 			EXECUTE v_querytext;
 
 			cont1 = 0;
+			v_count = 0;
 
 			-- inundation process
 			LOOP	
-				RAISE NOTICE '-> Starting loop';
 				cont1 = cont1+1;
 				
 				UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
 				
 				GET DIAGNOSTICS affected_rows =row_count;
 				EXIT WHEN affected_rows = 0;
-				EXIT WHEN cont1 = 200;
-				raise notice 'COUNTER FINAL % FEATURE_ID %', cont1, v_featureid;
+				EXIT WHEN cont1 = 150;
+				
+				v_count = v_count + affected_rows;
+				--raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, v_count;
+				
 			END LOOP;
 			
 			-- finish engine
@@ -342,7 +398,7 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 			VALUES (v_fprocesscat_id, concat('INFO: Mapzone type ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
 
-			raise notice 'PROCESS % FEATURE % COUNT % CLASS %', v_fprocesscat_id, v_featureid, v_count, v_class;
+			--raise notice 'PROCESS % FEATURE % COUNT % CLASS %', v_fprocesscat_id, v_featureid, v_count, v_class;
 
 		END LOOP;
 
@@ -350,17 +406,17 @@ BEGIN
 		IF v_updatetattributes THEN 
 
 			-- update arc table
-			v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
-					FROM anl_arc a join (SELECT '||quote_ident(v_fieldmp)||', unnest(nodeparent) as nodeparent from '
-					||quote_ident(v_table)||') b	ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
+			v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' FROM anl_arc a JOIN 
+					(SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||quote_ident(v_table)||') b
+					 ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 			EXECUTE v_querytext;
 
 			-- update node table with graf nodes
 			v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
-					FROM anl_node a join (SELECT  '||quote_ident(v_fieldmp)||', unnest(nodeparent) as nodeparent from '
+					FROM anl_node a join (SELECT  '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '
 					||quote_ident(v_table)||') b ON  nodeparent = descript WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.node_id=node.node_id AND cur_user=current_user';
 			EXECUTE v_querytext;
-			
+	
 			-- update node table without graf nodes using v_edit_node because the exploitation filter. Rows before is not neeeded because on table anl_* is data filtered by the process...
 			v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_node.arc_id';
 			EXECUTE v_querytext;
@@ -432,38 +488,26 @@ BEGIN
 		-- set selector
 		DELETE FROM selector_audit WHERE cur_user=current_user;
 		INSERT INTO selector_audit (fprocesscat_id, cur_user) VALUES (v_fprocesscat_id, current_user);
-		
 
 		-- get results
-		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-		/*
-		-- points
+		-- disconnected arcs
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
-
-		-- lines
-		v_result = null;
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+		FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
-		-- polygons
+		-- disconnected connecs
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
+		FROM (SELECT connec_id, connecat_id, c.state, c.expl_id, c.the_geom FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
-
-		*/
+		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
 
 	END IF;
 
@@ -471,12 +515,14 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
-	v_result_polygon := COALESCE(v_result_polygon, '{}');
-		
 
---  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;
+
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
+					  '"point":'||v_result_point||','||
+					  '"line":'||v_result_line||
+					  '}}}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
