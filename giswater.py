@@ -1431,7 +1431,7 @@ class Giswater(QObject):
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['column_id'], field['hidden'])
                 # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
-                if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+                if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
                     self.set_column_multiline(layer, field, fieldIndex)
                 # Set alias column
                 if field['label']:
