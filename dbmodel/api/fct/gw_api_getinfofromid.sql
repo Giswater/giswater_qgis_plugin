@@ -375,7 +375,7 @@ BEGIN
 		IF v_tablename IS NULL THEN
 
 
-			v_message  = '{"priority":1, "text":"Epa type is not defined for this feature. Basic values are used"}';
+			v_message  = '{"level":1, "text":"Epa type is not defined for this feature. Basic values are used"}';
 
 			-- check parent_view
 			EXECUTE 'SELECT tableparent_id from config_api_layer WHERE layer_id=$1'
@@ -554,7 +554,7 @@ BEGIN
 	
 	-- message for null
 	IF v_tablename IS NULL THEN
-		v_message='{"priority":0, "text":"No feature found", "results":0}';
+		v_message='{"level":0, "text":"No feature found", "results":0}';
 	END IF;
 
     
