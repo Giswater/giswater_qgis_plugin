@@ -84,5 +84,8 @@ class CrmTrace(ApiParent):
             status = subprocess.call(args)
             self.controller.log_info(status)
         except Exception as e:
-            self.controller.log_warning(str(e))
+            self.controller.show_warning(str(e))
+
+        msg = "Process executed successfully. Open script .log file to get more details"
+        self.controller.show_info(msg, duration=20)
 
