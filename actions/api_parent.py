@@ -788,6 +788,8 @@ class ApiParent(ParentAction):
         if 'value' in field:
             if field['value'] in ("t", "true", True):
                 widget.setChecked(True)
+        if 'iseditable' in field:
+            widget.setEnabled(field['iseditable'])
         widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
