@@ -951,8 +951,6 @@ class ApiCF(ApiParent):
             else:
                 _json[str(widget.property('column_id'))] = str(value)
 
-        self.controller.log_info(str(_json))
-
 
     def check_datatype_validator(self, dialog, widget, btn):
         """
