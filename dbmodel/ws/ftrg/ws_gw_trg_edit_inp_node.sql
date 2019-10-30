@@ -57,9 +57,9 @@ BEGIN
         IF node_table = 'inp_junction' THEN
             UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
         ELSIF node_table = 'inp_reservoir' THEN
-            UPDATE inp_reservoir SET pattern_id=NEW.pattern_id, to_arc=NEW.to_arc WHERE node_id=OLD.node_id;  
+            UPDATE inp_reservoir SET pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;  
         ELSIF node_table = 'inp_tank' THEN
-            UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id, to_arc=NEW.to_arc WHERE node_id=OLD.node_id;
+            UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id WHERE node_id=OLD.node_id;
         ELSIF node_table = 'inp_pump' THEN          
             UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, to_arc=NEW.to_arc, status=NEW.status WHERE node_id=OLD.node_id;
         ELSIF node_table = 'inp_valve' THEN     
@@ -69,7 +69,7 @@ BEGIN
             UPDATE inp_shortpipe SET minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE node_id=OLD.node_id;  
         ELSIF node_table = 'inp_inlet' THEN     
             UPDATE inp_inlet SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id,
-            pattern_id=NEW.pattern_id, to_arc=NEW.to_arc WHERE node_id=OLD.node_id;
+            pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
         END IF;
         
         UPDATE node 
