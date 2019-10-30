@@ -88,13 +88,100 @@ CREATE OR REPLACE VIEW v_edit_inp_tank AS
     inp_tank.maxlevel,
     inp_tank.diameter,
     inp_tank.minvol,
-    inp_tank.curve_id,
-    inp_tank.to_arc
-   FROM inp_selector_sector,
+    inp_tank.curve_id
+	FROM inp_selector_sector,
     v_node
      JOIN inp_tank USING (node_id)
      JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text OR a.node_2::text = v_node.node_id::text
   WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
+
+CREATE OR REPLACE VIEW v_edit_inp_reservoir AS 
+ SELECT DISTINCT ON (v_node.node_id) v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
+    inp_reservoir.pattern_id
+   FROM inp_selector_sector,
+    v_node
+     JOIN inp_reservoir USING (node_id)
+     JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text OR a.node_2::text = v_node.node_id::text
+  WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
   
+
+ CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
+ SELECT DISTINCT ON (v_node.node_id) v_node.node_id,
+    v_node.elevation,
+    v_node.depth,
+    v_node.nodecat_id,
+    v_node.sector_id,
+    v_node.macrosector_id,
+    v_node.state,
+    v_node.annotation,
+    v_node.the_geom,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id,
+    inp_inlet.pattern_id
+   FROM inp_selector_sector,
+    v_node
+     JOIN inp_inlet USING (node_id)
+     JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text OR a.node_2::text = v_node.node_id::text
+  WHERE a.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+  
+CREATE OR REPLACE VIEW v_edit_vnode AS 
+ SELECT a.vnode_id,
+    a.vnode_type,
+    a.feature_type,
+    a.elev,
+    a.sector_id,
+    a.dma_id,
+    a.state,
+    a.annotation,
+    a.the_geom,
+    a.expl_id,
+    a.rotation,
+    a.ispsectorgeom,
+    a.psector_rowid
+   FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
+            vnode.vnode_type,
+            link.feature_type,
+            vnode.elev,
+            vnode.sector_id,
+            vnode.dma_id,
+                CASE
+                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
+                    ELSE plan_psector_x_connec.state
+                END AS state,
+            vnode.annotation,
+                CASE
+                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
+                    ELSE plan_psector_x_connec.vnode_geom
+                END AS the_geom,
+            vnode.expl_id,
+            vnode.rotation,
+                CASE
+                    WHEN plan_psector_x_connec.link_geom IS NULL THEN false
+                    ELSE true
+                END AS ispsectorgeom,
+                CASE
+                    WHEN plan_psector_x_connec.link_geom IS NULL THEN NULL::integer
+                    ELSE plan_psector_x_connec.id
+                END AS psector_rowid
+           FROM v_edit_link link
+             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
+             LEFT JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
+             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
+          WHERE link.feature_id::text = v_state_connec.connec_id::text) a
+  WHERE a.state < 2;
+
   

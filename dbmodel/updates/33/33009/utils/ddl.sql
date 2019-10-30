@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE ext_cat_period ADD COLUMN period_year integer;
-ALTER TABLE ext_cat_period ADD COLUMN period_name varchar(16);
-ALTER TABLE ext_cat_period ADD COLUMN expl_id integer[];
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_cat_period", "column":"period_year", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_cat_period", "column":"period_name", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_cat_period", "column":"expl_id", "dataType":"integer[]"}}$$);

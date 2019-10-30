@@ -16,3 +16,5 @@ INSERT INTO inp_typevalue VALUES ('inp_value_opti_hyd', 'NONE', '') ON CONFLICT 
 UPDATE audit_cat_param_user SET vdefault = 2 WHERE id='inp_options_valve_mode';
 
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_source';
+
+UPDATE audit_cat_table SET sys_role_id='role_edit' WHERE id='inp_inlet';

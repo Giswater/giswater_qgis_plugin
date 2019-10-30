@@ -39,5 +39,26 @@ INSERT INTO sys_fprocess_cat VALUES (75,'Null values on state_type column', 'om'
 INSERT INTO sys_fprocess_cat VALUES (76,'Null values on closed/broken values for valves', 'om','Null values on closed/broken values for valves','ws') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess_cat VALUES (77,'inlet_x_exploitation with null/wrong values', 'om','inlet_x_exploitation with null/wrong values','ws') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess_cat VALUES (78,'node_type filled with gradelimiter values', 'system', 'node_type filled with gradelimiter values','ws') ON CONFLICT (id) DO NOTHING;
-INSERT INTO sys_fprocess_cat VALUES (79,'mapzone.nodeparent acording with grafdelimiter', 'system', 'mapzone.nodeparent acording with grafdelimiter','ws') ON CONFLICT (id) DO NOTHING;
-INSERT INTO sys_fprocess_cat VALUES (80,'feature.to_arc acording with mapzone.nodeparent', 'system', 'feature.to_arc acording with mapzone.nodeparent','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (79,'sector-nodeparent acording with grafdelimiter', 'system', 'sector-nodeparent acording with grafdelimiter','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (80,'dma-nodeparent acording with grafdelimiter', 'system', 'dma-nodeparent acording with grafdelimiter','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (81,'dqa-nodeparent acording with grafdelimiter', 'system', 'dqa-nodeparent acording with grafdelimiter','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (82,'presszone-nodeparent acording with grafdelimiter', 'system', 'presszone-nodeparent acording with grafdelimiter','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (83,'sector-toarc acording with topology', 'system', 'sector-toarc acording with topology','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (84,'dma-toarc acording with topology', 'system', 'dma-toarc acording with topology','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (85,'dqa-toarc acording with topology', 'system', 'dqa-toarc acording with topology','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (86,'presszone-toarc acording with topology', 'system', 'presszone-toarc acording with topology','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (87,'Nodes with state_type is_operative false', 'system', 'Nodes with state_type is_operative false','utils') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (88,'Arcs with state_type is_operative false', 'system', 'Arcs with state_type is_operative false','utils') ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_function SET return_type='[{"widgetname":"selectionMode", "label":"Selection mode:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"comboIds":["userSelectors","wholeSystem"],
+"comboNames":["Users selection (expl & state & psector)", "Whole system"], "selectedId":"userSelectors"}]', 
+descript='The function allows the possibility to find errors and data inconsistency before first om process (mincut, dynamic mapzones (ws), profile (ud))',
+context=NULL, istoolbox=TRUE, isparametric=TRUE
+WHERE id=2670;
+
+UPDATE audit_cat_function SET
+descript= 'Function to analyze graf of network. Multiple analysis is avaliable. Dynamic analisys to sectorize network using the flow traceability function. 
+Before work with this funcion it is mandatory to configurate field graf_delimiter on node_type and field grafconfig on [dma, sector, cat_presszone and dqa] tables'
+WHERE id=2710;
+
+
