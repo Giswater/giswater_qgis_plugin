@@ -229,15 +229,26 @@ BEGIN
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 	DELETE FROM selector_pSECTOR WHERE cur_user=current_user;
-
-	/*
+	
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
-		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN 
+		INSERT INTO selector_expl (expl_id, cur_user) 
+		SELECT expl_id, current_user FROM exploitation WHERE expl_id IN	(SELECT (json_array_elements_text(v_expl))::integer);
+		
+		/*
+		SELECT expl_id, current_user FROM exploitation where macroexpl_id IN 
 		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
+		*/
 	END IF;
-	*/
+	
+	-- reset mapzones (update to 0)
+	v_querytext = 'UPDATE v_edit_arc SET '||quote_ident(v_field)||' = 0 ';
+	EXECUTE v_querytext;
+	v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = 0 ';
+	EXECUTE v_querytext;
+	v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = 0 ';
+	EXECUTE v_querytext;
 
 	-- create graf
 	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
@@ -248,18 +259,7 @@ BEGIN
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 	-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
-	IF v_class = 'PRESSZONE' THEN
-		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from cat_presszone WHERE grafconfig IS NOT NULL';
-	
-	ELSIF v_class = 'DMA' THEN
-		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from dma WHERE grafconfig IS NOT NULL';
-
-	ELSIF v_class = 'DQA' THEN
-		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from dqa WHERE grafconfig IS NOT NULL';
-
-	ELSIF v_class = 'SECTOR' THEN
-		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from sector WHERE grafconfig IS NOT NULL';
-	END IF;
+	v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL';
 
 	-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
 	v_querytext  = 'UPDATE anl_graf SET flag=1 WHERE 
