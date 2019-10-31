@@ -6,12 +6,13 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsEditorWidgetSetup, QgsMessageLog, QgsLayerTreeLayer, QgsProject
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox
-import datetime
+
 import json
 import threading
+
 from collections import OrderedDict
 
 from .parent import ParentAction
@@ -40,6 +41,7 @@ class NotifyFunctions(ParentAction):
         self.controller.execute_sql(f"LISTEN {channel_name};")
         self.desktop_thread = threading.Thread(target=getattr(self, target), args=args)
         self.desktop_thread.start()
+
 
     def start_user_thread(self, channel_name, target=None, args=()):
         """
@@ -82,6 +84,7 @@ class NotifyFunctions(ParentAction):
     def kill(self):
         self.killed = True
 
+
     def stop_listening(self, channel_name):
         self.controller.execute_sql(f"UNLISTEN {channel_name};")
         
@@ -119,6 +122,7 @@ class NotifyFunctions(ParentAction):
                 pass
                 print(f"Exception error: {e}")
 
+
     # Functions called by def wait_notifications(...)
     def indexing_spatial_layer(self, **kwargs):
         """ Force reload dataProvider of layer """
@@ -127,8 +131,11 @@ class NotifyFunctions(ParentAction):
         layers_name_list = kwargs['tableName']
         if not layers_name_list:
             return
-        for layer_name in layers_name_list:
-            self.controller.indexing_spatial_layer(layer_name)
+        if type(layers_name_list) == str:
+            self.controller.indexing_spatial_layer(layers_name_list)
+        if type(layers_name_list) == list:
+            for layer_name in layers_name_list:
+                self.controller.indexing_spatial_layer(layer_name)
 
 
     def refresh_attribute_table(self, **kwargs):
@@ -174,12 +181,25 @@ class NotifyFunctions(ParentAction):
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['column_id'], field['hidden'])
-
+                # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
+                if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
+                    self.set_column_multiline(layer, field, fieldIndex)
                 # Set alias column
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
-                # Get values
+                # Set field constraints
+                if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
+                    if field['widgetcontrols']['setQgisConstraints'] is True:
+                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
+                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
+                                             QgsFieldConstraints.ConstraintStrengthHard)
+
+                # Manage editability
+                self.set_read_only(layer, field, fieldIndex)
+
+                # Manage fields
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
                         for i in range(0, len(field['comboIds'])):
@@ -202,7 +222,6 @@ class NotifyFunctions(ParentAction):
     def refresh_config_user_variables(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
         self.controller.get_config_param_user()
-
 
     def refresh_config_system_variables(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
@@ -258,7 +277,30 @@ class NotifyFunctions(ParentAction):
         layer.setAttributeTableConfig(config)
 
 
-    # TODO unused functions atm
+    def set_column_multiline(self, layer, field, fieldIndex):
+        """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+        if field['widgettype'] == 'text':
+            if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+
+    def set_read_only(self, layer, field, field_index):
+        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+        # Get layer config
+        config = layer.editFormConfig()
+        try:
+            # Set field editability
+            config.setReadOnly(field_index, not field['iseditable'])
+        except KeyError as e:
+            # Control if key 'iseditable' not exist
+            pass
+        finally:
+            # Set layer config
+            layer.setEditFormConfig(config)
+
+
+    #  TODO unused functions atm
     def show_messagebox(self, **kwargs):
         """ Shows a message box with detail information """
         msg = kwargs['message'] if 'message' in kwargs else 'No message found'

@@ -1403,7 +1403,6 @@ class Giswater(QObject):
             body = self.create_body(feature=feature)
             sql = (f"SELECT gw_api_getinfofromid($${{{body}}}$$)")
             row = self.controller.get_row(sql, commit=True)
-
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 continue
