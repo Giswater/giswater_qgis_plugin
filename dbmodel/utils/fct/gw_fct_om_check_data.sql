@@ -105,24 +105,22 @@ BEGIN
 	
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=25 AND user_name=current_user;
-	DELETE FROM anl_arc WHERE fprocesscat_id=25 AND result_id=v_result_id AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fprocesscat_id=25 AND result_id=v_result_id AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 4, '-----------------------------------------------------------');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, '-----------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 3, 'CRITICAL ERRORS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 3, '----------------------');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 3, 'CRITICAL ERRORS');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 3, '----------------------');	
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 2, 'WARNINGS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 2, '--------------');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 2, 'WARNINGS');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 2, '--------------');	
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 1, '-------');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 1, '-------');	
 	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 0, 'NETWORK ANALYSIS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 0, '-------------------------');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 0, 'NETWORK ANALYSIS');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 0, '-------------------------');	
 
 		
 	-- UTILS
