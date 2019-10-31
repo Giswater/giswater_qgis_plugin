@@ -123,6 +123,7 @@ DECLARE
 	v_role text;
 	v_parentfields text;
 	v_status text ='Accepted';
+	v_childtype text;
 
 
 BEGIN
@@ -413,7 +414,12 @@ BEGIN
 		raise notice 'NO parent-child, NO editable NO informable: %' , v_tablename;
         END IF;
 
-
+-- Get child type
+	EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = $1 LIMIT 1'
+		INTO v_childtype
+		USING v_tablename;
+	v_childtype := COALESCE(v_childtype, ''); 
+	
 -- Propierties of info layer's
 ------------------------------
     IF v_tablename IS NULL THEN 
@@ -465,7 +471,7 @@ BEGIN
 		
 	-- Feature info
 	v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',null,
-					    'featureType',v_featuretype,'tableParent',v_table_parent, 'tableName', v_tablename, 
+					    'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'tableName', v_tablename, 
 					    'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
      
 	IF v_id IS NULL THEN
