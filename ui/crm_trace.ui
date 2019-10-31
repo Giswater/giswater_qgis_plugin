@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Seleccione municipio</string>
   </property>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Explotación:</string>
+    <string>Municipio:</string>
    </property>
   </widget>
   <widget class="QComboBox" name="cbo_expl">
