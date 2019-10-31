@@ -92,3 +92,6 @@ class CrmTrace(ApiParent):
         except Exception as e:
             self.controller.show_warning(str(e))
 
+        # Close dialog
+        self.close_dialog(self.dlg_trace)
+
