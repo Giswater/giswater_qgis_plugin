@@ -1568,7 +1568,6 @@ class ApiCF(ApiParent):
                f"ORDER BY cat_period_id")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
 
         rows.append(['', ''])
