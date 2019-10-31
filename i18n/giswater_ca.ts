@@ -1020,6 +1020,11 @@
         <source>The field widgettype is not configured for</source>
         <translation>El camp widgettype no esta configurat per </translation>
     </message>
+    <message>
+        <source>Zoom unavailable. Doesn't exist the geometry for the street</source>
+        <translation>Zoom no disponible. No existeix la geometria del carrer</translation>
+    </message>
+
 </context>
 
 </TS>

@@ -170,12 +170,16 @@ class ApiSearch(ApiParent):
         # IF for zoom to tab address (streets)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
-            polygon = polygon[9:len(polygon)-2]
-            polygon = polygon.split(',')
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            self.zoom_to_rectangle(x1, y1, x2, y2)
-
+            if polygon:
+                polygon = polygon[9:len(polygon)-2]
+                polygon = polygon.split(',')
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                self.zoom_to_rectangle(x1, y1, x2, y2)
+            else:
+                message = f"Zoom unavailable. Doesn't exist the geometry for the street"
+                self.controller.show_info(message, parameter=item['display_name'])
+                
         # IF for zoom to tab address (postnumbers)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']

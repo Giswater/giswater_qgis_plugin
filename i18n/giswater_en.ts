@@ -1018,6 +1018,11 @@
         <source>The field widgettype is not configured for</source>
         <translation>The field widgettype is not configured for</translation>
     </message>
+    <message>
+        <source>Zoom unavailable. Doesn't exist the geometry for the street</source>
+        <translation>Zoom unavailable. Doesn't exist the geometry for the street</translation>
+    </message>
+
 </context>
 
 </TS>
