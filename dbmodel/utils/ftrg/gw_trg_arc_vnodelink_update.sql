@@ -37,7 +37,7 @@ BEGIN
 
 		PERFORM gw_fct_connect_to_network(array_connec_agg, 'CONNEC');
 		
-		IF (select wsoftware FROM version LIMIT 1)='ud' THEN 
+		IF (select wsoftware FROM version LIMIT 1)='UD' THEN 
 
 			FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id 
 			WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=NEW.arc_id

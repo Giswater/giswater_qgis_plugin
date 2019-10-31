@@ -340,9 +340,7 @@ BEGIN
 				UPDATE link SET userdefined_geom='TRUE', the_geom=NEW.the_geom 	WHERE link_id=NEW.link_id;
 				UPDATE vnode SET the_geom=St_endpoint(NEW.the_geom) WHERE vnode_id=NEW.exit_id::integer AND NEW.exit_type='VNODE';
 			END IF;
-			
-			UPDATE link SET state=NEW.state, exit_id=NEW.exit_id, exit_type=NEW.exit_type WHERE link_id=NEW.link_id;				
-			
+						
 		ELSE -- if geometry comes from psector_plan tables then 
 
 			-- control endfeature (only VNODE it is possible)
