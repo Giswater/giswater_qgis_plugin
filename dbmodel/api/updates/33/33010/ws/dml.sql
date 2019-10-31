@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --30/10/2019
+SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+
 INSERT INTO config_api_form_fields (formname, formtype, column_id, isenabled, ismandatory,
             datatype, widgettype, label, iseditable, widgetcontrols, hidden)
 VALUES ('inp_rules_x_arc', 'form','text', true,false, 'string','text','text', true,'{"setQgisMultiline":true}', false);
