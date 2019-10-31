@@ -373,7 +373,7 @@ class ApiCF(ApiParent):
         # Get feature type (Junction, manhole, valve, fountain...)
         pos_ini = complet_result[0]['body']['feature']['tableName'].rfind("_")
         pos_fi = len(str(complet_result[0]['body']['feature']['tableName']))
-        self.feature_type = complet_result[0]['body']['feature']['tableName'][pos_ini + 1:pos_fi]
+        self.feature_type = complet_result[0]['body']['feature']['childType']
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
