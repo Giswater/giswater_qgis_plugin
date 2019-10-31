@@ -120,7 +120,7 @@ BEGIN
 
 					ELSE 
 						--remove parenthesis from the feature_types
-						v_featuretype_replaced = replace(replace(v_featuretype,'[',''),']','')
+						v_featuretype_replaced = replace(replace(v_featuretype,'[',''),']','');
 						--concatenation for other layers
 						IF v_channel = 'desktop' THEN
 							IF v_notification_data_desktop IS NOT NULL AND v_notification_data_desktop!=v_featuretype_replaced THEN
