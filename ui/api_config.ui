@@ -56,8 +56,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>668</width>
-         <height>484</height>
+         <width>672</width>
+         <height>494</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
@@ -88,7 +88,7 @@
           <property name="currentIndex">
            <number>0</number>
           </property>
-          <widget class="QWidget" name="tab1_2">
+          <widget class="QWidget" name="tab_basic">
            <attribute name="title">
             <string>Basic</string>
            </attribute>
@@ -101,7 +101,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_3">
+          <widget class="QWidget" name="tab_featurecat">
            <attribute name="title">
             <string>Featurecat</string>
            </attribute>
@@ -114,7 +114,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab">
+          <widget class="QWidget" name="tab_mantype">
            <attribute name="title">
             <string>Man type</string>
            </attribute>
@@ -127,7 +127,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="tab_addfields">
            <attribute name="title">
             <string>Addfields</string>
            </attribute>
@@ -137,7 +137,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_4">
+          <widget class="QWidget" name="tab_admin">
            <attribute name="title">
             <string>Admin</string>
            </attribute>
