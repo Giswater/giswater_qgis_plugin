@@ -78,15 +78,17 @@ class CrmTrace(ApiParent):
             self.controller.log_warning("File not found", parameter=script_path)
             return
 
+        # Get database current user
+        cur_user = self.controller.get_current_user()
+
         # Execute script
-        args = ['python', script_path, expl_name]
+        args = ['python', script_path, expl_name, cur_user, self.schema_name]
         self.controller.log_info(str(args))
         try:
             status = subprocess.call(args)
-            self.controller.log_info(status)
+            self.controller.log_info(str(status))
+            msg = "Process executed successfully. Open script .log file to get more details"
+            self.controller.show_info(msg, duration=20)
         except Exception as e:
             self.controller.show_warning(str(e))
-
-        msg = "Process executed successfully. Open script .log file to get more details"
-        self.controller.show_info(msg, duration=20)
 
