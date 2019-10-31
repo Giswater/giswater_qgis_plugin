@@ -19,3 +19,9 @@ WHERE id=2710;
 SELECT setval('config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('crm_dailyscript_folderpath','c:\\gis\\dailyscript','text', 'crm', 'Folder to store scripts to execute daily');
+
+--31/10/2019
+UPDATE audit_cat_table SET notify_action = replace(notify_action::text,'refresh_canvas','indexing_spatial_layer')::json WHERE 
+notify_action::text ilike '%refresh_canvas%';
+
+select gw_fct_admin_schema_manage_triggers('notify',null);

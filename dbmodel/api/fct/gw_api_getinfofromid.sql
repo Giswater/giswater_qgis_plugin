@@ -69,7 +69,7 @@ DECLARE
 	v_tablename character varying;
 	v_tablename_original character varying;
 	v_id character varying;
-	v_inputgeometry geometry;
+	v_inputgeometry public.geometry;
 	v_editable boolean;
 	v_device integer;
 	v_infotype integer;
