@@ -67,7 +67,8 @@ class CrmTrace(ApiParent):
 
         # Get python synchronization script path
         try:
-            script_path = self.controller.cfgp_user['guk_script_path'].value
+            script_folder = self.controller.cfgp_system['crm_daily_script_folderpath'].value
+            script_path = script_folder + os.sep + 'main.py'
         except KeyError as e:
             self.controller.log_warning(str(e))
             return
