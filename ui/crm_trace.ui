@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Seleccione explotación</string>
+   <string>Sincronización con comercial</string>
   </property>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
