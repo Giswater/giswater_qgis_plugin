@@ -177,11 +177,11 @@ class Giswater(QObject):
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
-            elif int(index_action) in (64, 65, 74, 75, 76, 81, 82, 84):
+            elif int(index_action) in (18, 64, 65, 74, 75, 76, 81, 82, 84):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (1, 2, 18, 33, 34, 66, 67, 68, 69):
+            elif int(index_action) in (1, 2, 33, 34, 66, 67, 68, 69):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -424,9 +424,10 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
         toolbar_id = "om_ws"
-        list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84']
+        list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+
 
     def toolbar_om_ud(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)
@@ -443,7 +444,7 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
         toolbar_id = "edit"
-        list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '69', '39', '34', '66', '33', '67', '18']
+        list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '69', '39', '34', '66', '33', '67']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
@@ -457,6 +458,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
+
     def toolbar_epa(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
@@ -465,6 +467,7 @@ class Giswater(QObject):
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+
 
     def toolbar_master(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)

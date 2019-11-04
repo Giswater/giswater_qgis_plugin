@@ -4,9 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis
 from qgis.PyQt.QtCore import QSettings
 
 from .api_cf import ApiCF
@@ -14,7 +12,6 @@ from .manage_element import ManageElement
 from .manage_document import ManageDocument
 from .manage_workcat_end import ManageWorkcatEnd
 from .delete_feature import DeleteFeature
-from .crm_trace import CrmTrace
 from .parent import ParentAction
 
 
@@ -28,7 +25,6 @@ class Edit(ParentAction):
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
         self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
         self.delete_feature = DeleteFeature(iface, settings, controller, plugin_dir)
-        self.crm_trace = CrmTrace(iface, settings, controller, plugin_dir)
         self.suppres_form = None
 
 
@@ -127,9 +123,4 @@ class Edit(ParentAction):
     def del_feature(self):
         """" Button 69: Delete Feature """
         self.delete_feature.manage_delete_feature()
-
-
-    def custom_trace(self):
-        """" Button 18: Trace """
-        self.crm_trace.manage_trace()
 
