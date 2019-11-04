@@ -6,15 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2764
 
-DROP FUNCTION IF EXISTS proyecto_prueba.gw_fct_odbc2pg_check_data(json);
-CREATE OR REPLACE FUNCTION proyecto_prueba.gw_fct_odbc2pg_check_data(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_odbc2pg_check_data(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_odbc2pg_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 
 /*EXAMPLE
 
-SELECT proyecto_prueba.gw_fct_odbc2pg_check_data($${
+SELECT SCHEMA_NAME.gw_fct_odbc2pg_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"exploitation":"557", "period":"4T", "year":"2019"}}}$$)
 
@@ -35,7 +35,7 @@ DECLARE
 BEGIN
 
 	--  Search path	
-	SET search_path = "proyecto_prueba", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
 	v_expl := (((p_data ->>'data')::json->>'parameters')::json->>'exploitation')::integer;
