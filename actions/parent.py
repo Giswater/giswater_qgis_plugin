@@ -819,9 +819,11 @@ class ParentAction(object):
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
-        if change_tab:
+        if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(1)
+
         return change_tab
+
 
     def get_composers_list(self):
 
@@ -933,6 +935,7 @@ class ParentAction(object):
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
 
+
     def double_validator(self, value, widget, btn_accept):
         """ Check if the value is double or not.
             This function is called in def set_datatype_validator(self, value, widget, btn)
@@ -944,3 +947,4 @@ class ParentAction(object):
         else:
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
+

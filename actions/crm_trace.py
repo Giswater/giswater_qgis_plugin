@@ -5,14 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QRadioButton, QPushButton
-
+import json
 import os
 import subprocess
-from .. import utils_giswater
-from ..ui_manager import DlgTrace
+from collections import OrderedDict
 from functools import partial
 
+from .. import utils_giswater
+from ..ui_manager import DlgTrace
 from .api_parent import ApiParent
 
 
@@ -38,7 +38,7 @@ class CrmTrace(ApiParent):
 
         # Fill combo 'exploitation'
         sql = "SELECT name FROM exploitation WHERE active = True ORDER BY name"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
 
         # Open dialog
@@ -99,7 +99,6 @@ class CrmTrace(ApiParent):
             self.controller.show_warning(str(e))
             return False
         finally:
-            self.close_dialog(self.dlg_trace)
             return True
 
 
@@ -111,4 +110,58 @@ class CrmTrace(ApiParent):
         if not exists:
             self.controller.show_warning("Function not found", parameter=function_name)
             return False
+
+        # SELECT gw_fct_odbc2pg_main($${"client": {"device":3, "infoType":100, "lang":"ES"},
+        # "feature": {}, "data": {"parameters": {"exploitation":"557", "period":"4T", "year":"2019"} } }$$)
+
+        # Get expl_id, year and period from table 'audit_log'
+        sql = ("SELECT to_json(log_message) as log_message "
+               "FROM utils.audit_log "
+               "WHERE fprocesscat_id = 74 "
+               "ORDER BY id DESC LIMIT 1")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_warning("Error getting data from audit table", parameter=sql)
+            return False
+
+        result = json.loads(row[0])
+        self.controller.log_info(str(result))
+        if 'expl_id' in result:
+            expl_id = result['expl_id']
+        if 'year' in result:
+            year = result['year']
+        if 'period' in result:
+            period = result['period']
+
+        # Set function parameters
+        client = '"client": {"device":3, "infoType":100, "lang":"ES"}, '
+        feature = '"feature": {}, '
+        data = f'"data": {{"parameters": {{"exploitation":"{expl_id}", "period":"{period}", "year":"{year}"}}}}'
+        body = client + feature + data
+        sql = f"SELECT {function_name}($${{{body}}}$$)::text"
+        self.controller.log_info(sql)
+
+        # Execute function and show results
+        row = self.controller.get_row(sql, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_warning("Process failed", parameter=sql)
+            return False
+
+        # Process result
+        result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        if 'status' not in result[0]:
+            self.controller.show_warning("Process failed", parameter="status not found")
+            return False
+
+        if result[0]['status'] == "Accepted":
+            qtextedit = self.dlg_trace.txt_infolog
+            if 'body' in result[0]:
+                if 'data' in result[0]['body']:
+                    self.populate_info_text(self.dlg_trace, None, qtextedit, result[0]['body']['data'], False, False)
+
+        message = result[0]['message']['text']
+        msg = "Process executed successfully. Read 'Info log' for more details"
+        self.controller.show_info(msg, parameter=message, duration=20)
+
+        return True
 
