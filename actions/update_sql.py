@@ -1989,7 +1989,9 @@ class UpdateSQL(ApiParent):
         window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        if str(self.version_metadata) > str(self.project_data_schema_version):
+        if schema_name == 'Nothing to select' or schema_name == '':
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+        elif str(self.version_metadata) > str(self.project_data_schema_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
