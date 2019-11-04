@@ -37,9 +37,9 @@ class CrmTrace(ApiParent):
         self.dlg_trace.rejected.connect(partial(self.save_settings, self.dlg_trace))
 
         # Fill combo 'exploitation'
-        sql = "SELECT name FROM exploitation ORDER BY name"
+        sql = "SELECT name FROM exploitation WHERE active = True ORDER BY name"
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.fillComboBox(self.dlg_trace, 'cbo_expl', rows)
+        utils_giswater.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
 
         # Open dialog
         self.open_dialog(self.dlg_trace)
@@ -53,30 +53,36 @@ class CrmTrace(ApiParent):
         self.controller.log_info(str(expl_name))
 
         # Execute synchronization script
-        self.execute_script(expl_name)
+        status = self.execute_script(expl_name)
+
+        # Execute PG function 'gw_fct_odbc2pg_main'
+        if status:
+            self.execute_odbc2pg()
 
 
-    def execute_script(self, expl_name='ZA'):
+    def execute_script(self, expl_name=None):
         """ Execute synchronization script """
 
         self.controller.log_info("execute_script")
 
-        if expl_name is None:
+        if expl_name is None or expl_name == 'null':
             self.controller.show_warning("Any exploitation selected")
-            return
+            return False
 
         # Get python synchronization script path
         try:
-            script_folder = self.controller.cfgp_system['crm_daily_script_folderpath'].value
+            param_name = 'crm_daily_script_folderpath'
+            script_folder = self.controller.cfgp_system[param_name].value
             script_path = script_folder + os.sep + 'main.py'
         except KeyError as e:
-            self.controller.log_warning(str(e))
-            return
+            self.controller.show_warning(str(e))
+            return False
 
         # Check if script path exists
         if not os.path.exists(script_path):
-            self.controller.log_warning("File not found", parameter=script_path)
-            return
+            msg = "File not found: {}. Check config system parameter: '{}'".format(script_path, param_name)
+            self.controller.show_warning(msg, duration=20)
+            return False
 
         # Get database current user
         cur_user = self.controller.get_current_user()
@@ -91,7 +97,18 @@ class CrmTrace(ApiParent):
             self.controller.show_info(msg, duration=20)
         except Exception as e:
             self.controller.show_warning(str(e))
+            return False
+        finally:
+            self.close_dialog(self.dlg_trace)
+            return True
 
-        # Close dialog
-        self.close_dialog(self.dlg_trace)
+
+    def execute_odbc2pg(self, function_name='gw_fct_odbc2pg_main'):
+        """ Execute PG function @function_name """
+
+        self.controller.log_info("execute_odbc2pg")
+        exists = self.controller.check_function(function_name)
+        if not exists:
+            self.controller.show_warning("Function not found", parameter=function_name)
+            return False
 
