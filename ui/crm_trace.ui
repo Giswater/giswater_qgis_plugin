@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>542</height>
+    <width>525</width>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Seleccione explotación</string>
+   <string>Sincronización con comercial</string>
   </property>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>490</y>
+     <x>300</x>
+     <y>480</y>
      <width>100</width>
      <height>28</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>490</y>
+     <x>410</x>
+     <y>480</y>
      <width>100</width>
      <height>28</height>
     </rect>
@@ -39,57 +39,67 @@
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QLabel" name="lbl_main">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>30</y>
-     <width>121</width>
-     <height>31</height>
+     <x>10</x>
+     <y>20</y>
+     <width>501</width>
+     <height>441</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Explotación:</string>
+   <property name="currentIndex">
+    <number>0</number>
    </property>
-  </widget>
-  <widget class="QComboBox" name="cbo_expl">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>30</y>
-     <width>301</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="editable">
-    <bool>true</bool>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="txt_infolog">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>120</y>
-     <width>451</width>
-     <height>351</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_main_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>90</y>
-     <width>121</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Info log:</string>
-   </property>
+   <widget class="QWidget" name="tab_sincro">
+    <attribute name="title">
+     <string>Sincronización</string>
+    </attribute>
+    <widget class="QComboBox" name="cbo_expl">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>50</y>
+       <width>301</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <property name="maxVisibleItems">
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lbl_main">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Explotación:</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_infolog">
+    <attribute name="title">
+     <string>Info log</string>
+    </attribute>
+    <widget class="QTextEdit" name="txt_infolog">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>481</width>
+       <height>381</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <resources/>

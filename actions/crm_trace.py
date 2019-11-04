@@ -150,18 +150,42 @@ class CrmTrace(ApiParent):
         # Process result
         result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if 'status' not in result[0]:
-            self.controller.show_warning("Process failed", parameter="status not found")
+            self.controller.show_warning("Parameter not found", parameter="status")
+            return False
+        if 'message' not in result[0]:
+            self.controller.show_warning("Parameter not found", parameter="message")
             return False
 
+        geometry_type = ''
         if result[0]['status'] == "Accepted":
-            qtextedit = self.dlg_trace.txt_infolog
             if 'body' in result[0]:
                 if 'data' in result[0]['body']:
-                    self.populate_info_text(self.dlg_trace, None, qtextedit, result[0]['body']['data'], False, False)
+                    if 'info' in result[0]['body']['data']:
+                        if 'geometryType' in result[0]['body']['data']['info']:
+                            geometry_type = result[0]['body']['data']['info']['geometryType']
+                            self.controller.log_info(geometry_type)
+
+                    if geometry_type != '':
+                        self.add_result_memory_layer(geometry_type)
+                    else:
+                        qtabwidget = self.dlg_trace.tab_main
+                        qtextedit = self.dlg_trace.txt_infolog
+                        self.populate_info_text(self.dlg_trace, qtabwidget, qtextedit, result[0]['body']['data'])
 
         message = result[0]['message']['text']
         msg = "Process executed successfully. Read 'Info log' for more details"
         self.controller.show_info(msg, parameter=message, duration=20)
 
         return True
+
+
+    def add_result_memory_layer(self, geometry_type):
+        """ Add result memory layer """
+
+        self.controller.log_info("add_result_memory_layer")
+
+        srid = self.controller.plugin_settings_value('srid')
+        layer_name = "Resultado sincronización"
+        #v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+        #self.populate_vlayer(v_layer, data, k, counter)
 
