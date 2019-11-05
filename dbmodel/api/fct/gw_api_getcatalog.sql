@@ -91,11 +91,16 @@ BEGIN
 		i=1;
 		IF v_text IS NOT NULL THEN
 			FOREACH text IN ARRAY v_text
-			LOOP			
+			LOOP
+				
 				-- Get field and value from json
 				SELECT v_text [i] into v_json_field;
-				v_field:= (SELECT (v_json_field ->> 'key')) ;
-				v_value:= (SELECT (v_json_field ->> 'value')) ;
+				IF v_json_field ->> 'value' != '' THEN
+					
+					v_field:= (SELECT (v_json_field ->> 'key')) ;
+					v_value:= (SELECT (v_json_field ->> 'value')) ;
+				END IF;
+				
 				i=i+1;
 				
 				-- creating the query_text (it's supossed that with field id there is no creation of query text filter)
