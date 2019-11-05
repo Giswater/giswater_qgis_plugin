@@ -155,24 +155,70 @@ class GwToolBox(ApiParent):
 
 
     def load_settings_values(self, dialog, function):
-        """ Load QGIS settings related with csv options """
+        """ Load QGIS settings related with toolbox options """
 
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-
+        geom_type = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_geom_type")
+        utils_giswater.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
+        layer = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_layers")
+        utils_giswater.set_combo_itemData(dialog.cmb_layers, layer, 0)
         if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_rbt_previous") == 'true':
             dialog.rbt_previous.setChecked(True)
         else:
             dialog.rbt_layer.setChecked(True)
 
+    def load_parametric_values(self, dialog, function):
+        """ Load QGIS settings related with parametric toolbox options """
+        cur_user = self.controller.get_current_user()
+        function_name = function[0]['functionname']
+        layout = dialog.findChild(QWidget, 'grb_parameters')
+        widgets = layout.findChildren(QWidget)
+        for widget in widgets:
+            if type(widget) not in (QCheckBox, QComboBox, QLineEdit):
+                continue
+            if type(widget) is QCheckBox:
+                if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}") == 'true':
+                    widget.setChecked(True)
+                else:
+                    widget.setChecked(True)
+            elif type(widget) is QComboBox:
+                value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                utils_giswater.set_combo_itemData(widget, value, 0)
+            elif type(widget) in (QLineEdit, QSpinBox):
+                value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                utils_giswater.setWidgetText(dialog, widget, value)
 
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """
 
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous",
-                                                  dialog.rbt_previous.isChecked())
+        geom_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
+        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_geom_type", geom_type)
+        layer = utils_giswater.get_item_data(dialog, dialog.cmb_layers, 0)
+        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_layers", layer)
+        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous", dialog.rbt_previous.isChecked())
+
+
+
+    def save_parametric_values(self, dialog, function):
+        """ Save QGIS settings related with parametric toolbox options """
+        cur_user = self.controller.get_current_user()
+        function_name = function[0]['functionname']
+        layout = dialog.findChild(QWidget, 'grb_parameters')
+        widgets = layout.findChildren(QWidget)
+        for widget in widgets:
+            if type(widget) not in (QCheckBox, QComboBox, QLineEdit):
+                continue
+            if type(widget) is QCheckBox:
+                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", widget.isChecked())
+            elif type(widget) is QComboBox:
+                value = utils_giswater.get_item_data(dialog, widget, 0)
+                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
+            elif type(widget) in (QLineEdit, QSpinBox):
+                value = utils_giswater.getWidgetText(dialog, widget)
+                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
 
 
     def execute_function(self, dialog, combo, result):
@@ -189,6 +235,7 @@ class GwToolBox(ApiParent):
         for group, function in list(result['fields'].items()):
             if len(function) != 0:
                 self.save_settings_values(dialog, function)
+                self.save_parametric_values(dialog, function)
                 function_name = function[0]['functionname']
                 break
         if function_name is None:
@@ -351,6 +398,7 @@ class GwToolBox(ApiParent):
                     self.populate_layer_combo()
                 self.construct_form_param_user(dialog, function, 0, self.function_list)
                 self.load_settings_values(dialog, function)
+                self.load_parametric_values(dialog, function)
                 status = True
                 break
 
