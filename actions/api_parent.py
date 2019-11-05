@@ -1218,7 +1218,6 @@ class ApiParent(ParentAction):
             field_id = 'fields'
         elif 'return_type' in row[pos]:
             if row[pos]['return_type'] not in ('', None):
-                self.controller.log_info(str(row[pos]['return_type']))
                 field_id = 'return_type'
 
         if field_id == '':

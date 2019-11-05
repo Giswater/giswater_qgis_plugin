@@ -1418,25 +1418,21 @@ class Giswater(QObject):
 
             complet_result = row[0]
 
-            # Take the columns configured in table config_api_form_fields where isenabled is False
-            sql =(f"SELECT column_id, hidden FROM config_api_form_fields "
-                  f"WHERE formname = '{layer_name}' AND isenabled=False")
-            cols_to_hide = self.controller.get_rows(sql, commit=True)
-            if cols_to_hide:
-                for col in cols_to_hide:
-                    self.set_column_visibility(layer, col[0], col[1])
 
             for field in complet_result['body']['data']['fields']:
                 _values = {}
+
                 # Get column index
                 fieldIndex = layer.fields().indexFromName(field['column_id'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['column_id'], field['hidden'])
+
                 # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
                 if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
                     self.set_column_multiline(layer, field, fieldIndex)
+
                 # Set alias column
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])

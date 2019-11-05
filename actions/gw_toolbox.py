@@ -168,6 +168,7 @@ class GwToolBox(ApiParent):
         else:
             dialog.rbt_layer.setChecked(True)
 
+
     def load_parametric_values(self, dialog, function):
         """ Load QGIS settings related with parametric toolbox options """
         cur_user = self.controller.get_current_user()
@@ -189,6 +190,7 @@ class GwToolBox(ApiParent):
                 value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
                 utils_giswater.setWidgetText(dialog, widget, value)
 
+
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """
 
@@ -199,7 +201,6 @@ class GwToolBox(ApiParent):
         layer = utils_giswater.get_item_data(dialog, dialog.cmb_layers, 0)
         self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_layers", layer)
         self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous", dialog.rbt_previous.isChecked())
-
 
 
     def save_parametric_values(self, dialog, function):
