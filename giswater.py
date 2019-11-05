@@ -593,6 +593,8 @@ class Giswater(QObject):
         # Disable for Linux 'go2epa' actions
         self.manage_actions_linux()           
         
+        self.hide_actions()
+        
         # Set objects for map tools classes
         self.manage_map_tools()
 
@@ -610,7 +612,7 @@ class Giswater(QObject):
         
         # Manage project variable 'expl_id'
         self.manage_expl_id()           
-        self.hide_actions()
+        
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
