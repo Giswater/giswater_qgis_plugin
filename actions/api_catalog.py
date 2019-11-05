@@ -118,6 +118,8 @@ class ApiCatalog(ApiParent):
         for field in result['fields']:
             if field['column_id'] == 'id':
                 self.populate_combo(id,field)
+            elif field['column_id'] == 'matcat_id':
+                utils_giswater.setWidgetText(self.dlg_catalog, matcat_id, '')
 
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
@@ -226,11 +228,10 @@ class ApiCatalog(ApiParent):
                     combolist.append(elem)
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo
+            if widget.objectName() != 'id':
+                records_sorted.insert(0, ['', ''])
             for record in records_sorted:
                 widget.addItem(str(record[1]), record)
-        if 'selectedId' in field:
-            if str(field['selectedId']) != 'None':
-                utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
 
 
     def fill_geomcat_id(self, previous_dialog, widget_name):
