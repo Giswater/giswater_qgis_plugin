@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --31/10/2019
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"isoperative", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"exploitation", "column":"active", "dataType":"boolean"}}$$);

@@ -1,4 +1,4 @@
 3.3.010
 *************
 - Minor bug fix
-- Minor updates
+- Creation of odbc2pg ecosystem

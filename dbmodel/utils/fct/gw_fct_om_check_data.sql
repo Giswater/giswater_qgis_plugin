@@ -20,15 +20,6 @@ SELECT gw_fct_om_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)
 
-
-
-
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
-
-
-
-
 */
 
 
@@ -124,14 +115,14 @@ BEGIN
 
 		
 	-- UTILS
-	-- Check node_1 or node_2 nulls
+	-- Check node_1 or node_2 nulls (fprocesscat = 4)
 	v_querytext = '(SELECT arc_id,arccat_id,the_geom FROM '||v_edit||'arc WHERE state > 0 AND node_1 IS NULL UNION SELECT arc_id,arccat_id,the_geom FROM '
 	||v_edit||'arc WHERE state > 0 AND node_2 IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		DELETE FROM anl_arc WHERE fprocesscat_id=4 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, the_geom) SELECT 4, arc_id, arccat_id, the_geom FROM ', v_querytext);
+		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) SELECT 4, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arc''s without node_1 or node_2.'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -155,13 +146,13 @@ BEGIN
 	END IF;
 
 
-	-- Check nodes with state_type isoperative = false (87)
+	-- Check nodes with state_type isoperative = false (fprocesscat = 87)
 	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node n JOIN value_state_type ON id=state_type WHERE n.state > 0 AND is_operative IS FALSE';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
 		DELETE FROM anl_node WHERE fprocesscat_id=87 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) SELECT 87, node_id, nodecat_id, the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 87, node_id, nodecat_id, ''nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -172,14 +163,14 @@ BEGIN
 	END IF;
 
 
-	-- Check arcs with state_type isoperative = false (88)
+	-- Check arcs with state_type isoperative = false (fprocesscat = 88)
 	v_querytext = 'SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc a JOIN value_state_type ON id=state_type WHERE a.state > 0 AND is_operative IS FALSE';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count > 0 THEN
 		DELETE FROM anl_arc WHERE fprocesscat_id=88 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, the_geom) SELECT 88, arc_id, arccat_id, the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) SELECT 88, arc_id, arccat_id, ''arcs with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -199,13 +190,13 @@ BEGIN
 	
 	ELSIF v_project_type='WS' THEN
 
-		-- valves closed/broken with null values
+		-- valves closed/broken with null values (fprocesscat = 76)
 		v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom FROM '||v_edit||'man_valve JOIN node n USING (node_id) WHERE n.state > 0 AND (broken IS NULL OR closed IS NULL)) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=76 and cur_user=current_user;
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) SELECT 76, node_id, nodecat_id, the_geom FROM ', v_querytext);
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 76, node_id, nodecat_id, ''valves closed/broken with null values'', the_geom FROM ', v_querytext);
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' valve''s (state=1) with broken or closed with NULL values.'));
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -246,7 +237,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=79 and cur_user=current_user;
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) SELECT 79, node_id, nodecat_id, the_geom FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 79, node_id, nodecat_id, ''The node_type is defined as SECTOR but this node is not configured on the sector.grafconfig'', the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
 			' node(s) with node_type.graf_delimiter=''SECTOR'' not configured on the sector table.'));
@@ -268,7 +259,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=80 and cur_user=current_user;
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) SELECT 80, node_id, nodecat_id, the_geom FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 80, node_id, nodecat_id, ''The node_type is defined as DMA but this node is not configured on the dma.grafconfig'', the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
 			' node(s) with node_type.graf_delimiter=''DMA'' not configured on the dma table.'));
@@ -290,7 +281,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=81 and cur_user=current_user;
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) SELECT 81, node_id, nodecat_id, the_geom FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 81, node_id, nodecat_id, ''The node_type is defined as DQA but this node is not configured on the dqa.grafconfig'', the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
 			' node(s) with node_type.graf_delimiter=''DQA'' not configured on the dqa table.'));
@@ -312,7 +303,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=82 and cur_user=current_user;
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) SELECT 82, node_id, nodecat_id, the_geom FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 82, node_id, nodecat_id, ''The node_type is defined as PRESSZONE but this node is not configured on the cat_presszone.grafconfig'' the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
 			' node(s) with node_type.graf_delimiter=''PRESSZONE'' not configured on the cat_presszone table.'));
@@ -349,26 +340,19 @@ BEGIN
 	--points
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=25 AND result_id=v_result_id) row; 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() 
+	AND (fprocesscat_id=4 OR fprocesscat_id=87 OR fprocesscat_id=76 OR fprocesscat_id=79 OR fprocesscat_id=80 OR fprocesscat_id=81 OR fprocesscat_id=82)) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
 
 	--lines
-	--frpocesscat_id=39 gets arcs without source of water
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=39 OR fprocesscat_id=25) AND result_id=v_result_id) row; 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=88) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
-
 	--polygons
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=25 AND result_id=v_result_id) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
-
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results

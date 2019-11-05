@@ -26,10 +26,16 @@ notify_action::text ilike '%refresh_canvas%';
 
 select gw_fct_admin_schema_manage_triggers('notify',null);
 
-INSERT INTO sys_fprocess_cat VALUES (89,'Get period volume per connec using ODBC', 'system', 'Get period volume per connec using ODBC','utils') ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2762, 'gw_fct_odbc2pg_main', 'utils', 'function', 'Main function to return with values from ODBC systems','role_om',FALSE, FALSE,FALSE);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2762, 'gw_fct_odbc2pg_main', 'gw_fct_odbc2pg_check_data','function', 'Main function to return with values from ODBC systems','role_om',FALSE, FALSE,FALSE);
+VALUES (2764, 'gw_fct_odbc2pg_check_data', 'utils', 'function', 'Function to check data when returning from ODBC systems','role_om',FALSE, FALSE,FALSE);
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2764, 'gw_fct_odbc2pg_check_data', 'gw_fct_odbc2pg_check_data','function', 'Function to check data when returning from ODBC systems','role_om',FALSE, FALSE,FALSE);
+
+--05/11/2019
+UPDATE audit_cat_param_user SET vdefault = replace (vdefault,']', ',18]')
+WHERE id='qgis_toolbar_hidebuttons';
+
+UPDATE config_param_user SET value = replace (value,']', ',18]')
+WHERE parameter='qgis_toolbar_hidebuttons';
