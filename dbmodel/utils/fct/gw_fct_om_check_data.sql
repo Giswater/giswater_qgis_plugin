@@ -99,7 +99,7 @@ BEGIN
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, '-----------------------------------------------------------');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, '-------------------------------------------------------------');
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 3, 'CRITICAL ERRORS');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 3, '----------------------');	
@@ -108,10 +108,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 2, '--------------');	
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 1, '-------');	
-	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 0, 'NETWORK ANALYSIS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 0, '-------------------------');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 1, '-------');
 
 		
 	-- UTILS
@@ -303,7 +300,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=82 and cur_user=current_user;
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 82, node_id, nodecat_id, ''The node_type is defined as PRESSZONE but this node is not configured on the cat_presszone.grafconfig'' the_geom FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 82, node_id, nodecat_id, ''The node_type is defined as PRESSZONE but this node is not configured on the cat_presszone.grafconfig'', the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
 			' node(s) with node_type.graf_delimiter=''PRESSZONE'' not configured on the cat_presszone table.'));

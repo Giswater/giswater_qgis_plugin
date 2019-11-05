@@ -462,8 +462,11 @@ BEGIN
 			-- message
 			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 			VALUES (v_fprocesscat_id, concat('INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
-			VALUES (v_fprocesscat_id, concat('INFO: To see results you can query using this values (XX): SECTOR:30, DQA:44, DMA:45, PRESSZONE:46, STATICPRESSURE, from SECTOR analysis:47'));		
+			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
+			VALUES (v_fprocesscat_id, concat('INFO: To see results you can query using this values (XX): SECTOR:30, DQA:44, DMA:45, PRESSZONE:46, STATICPRESSURE, from SECTOR analysis:47'));
+			INSERT INTO audit_check_data (fprocesscat_id, error_message) 	
 			VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_arc WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
+			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 			VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_node WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
 		END IF;
 

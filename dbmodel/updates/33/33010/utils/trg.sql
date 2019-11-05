@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --31/10/2019
+
+DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON SCHEMA_NAME.man_addfields_parameter;
 CREATE TRIGGER gw_trg_typevalue_fk
   AFTER INSERT OR UPDATE
   ON SCHEMA_NAME.man_addfields_parameter
@@ -15,6 +17,7 @@ CREATE TRIGGER gw_trg_typevalue_fk
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_typevalue_fk('man_addfields_parameter');
 
 
+DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON SCHEMA_NAME.plan_psector;
 CREATE TRIGGER gw_trg_typevalue_fk
   AFTER INSERT OR UPDATE
   ON SCHEMA_NAME.plan_psector
@@ -22,7 +25,7 @@ CREATE TRIGGER gw_trg_typevalue_fk
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_typevalue_fk('plan_psector');
 
 
-
+DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON SCHEMA_NAME.om_visit_parameter;
 CREATE TRIGGER gw_trg_typevalue_fk
   AFTER INSERT OR UPDATE
   ON SCHEMA_NAME.om_visit_parameter
