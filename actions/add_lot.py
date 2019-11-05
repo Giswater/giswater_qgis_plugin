@@ -22,7 +22,7 @@ from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout
-from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget
+from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget, QDateEdit, QPushButton
 from qgis.core import QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsRubberBand
 
@@ -30,6 +30,8 @@ import csv
 import os
 import re
 from functools import partial
+import urlparse as parse
+import webbrowser
 
 from .. import utils_giswater
 from .manage_visit import ManageVisit
@@ -53,7 +55,7 @@ class AddNewLot(ParentManage):
         self.rb_red.setIconSize(20)
         self.rb_list = []
         self.lot_date_format = 'yyyy-MM-dd'
-        self.max_team_id = 0
+        self.max_id = 0
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
@@ -117,6 +119,10 @@ class AddNewLot(ParentManage):
         # Fill QWidgets of the form
         self.fill_fields(lot_id)
 
+        # Tab 'Loads'
+        self.tbl_load = self.dlg_lot.findChild(QTableView, "tbl_load")
+        utils_giswater.set_qtv_config(self.tbl_load)
+
         new_lot_id = lot_id
         if lot_id is None:
             new_lot_id = self.get_next_id('om_visit_lot', 'id')
@@ -166,6 +172,10 @@ class AddNewLot(ParentManage):
         self.dlg_lot.cmb_man_team.clicked.connect(self.manage_team)
         self.set_lot_headers()
         self.set_active_layer()
+
+        self.set_icon(self.dlg_lot.btn_open_image, "136b")
+        self.dlg_lot.btn_open_image.clicked.connect(self.open_load_image)
+
         if lot_id is not None:
             self.set_values(lot_id)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
@@ -285,9 +295,10 @@ class AddNewLot(ParentManage):
     def manage_team(self):
         """ Open dialog of teams """
 
-        self.max_team_id = self.get_max_id('cat_team')
+        self.max_id = self.get_max_id('cat_team')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
+        self.dlg_basic_table.setWindowTitle("Team management")
         table_name = 'cat_team'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
@@ -295,7 +306,7 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table)
@@ -323,10 +334,10 @@ class AddNewLot(ParentManage):
     def add_row(self, qtable):
         """ Append new record to model with correspondent id """
 
-        self.max_team_id += 1
+        self.max_id += 1
         model = qtable.model()
         record = model.record()
-        record.setValue("id", self.max_team_id)
+        record.setValue("id", self.max_id)
         model.insertRecord(model.rowCount(), record)
 
 
@@ -340,12 +351,15 @@ class AddNewLot(ParentManage):
         return 0
 
 
-    def save_basic_table(self, qtable):
+    def save_basic_table(self, qtable, manage_type=None):
 
         model = qtable.model()
         if model.submitAll():
             self.close_dialog(self.dlg_basic_table)
-            self.populate_cmb_team()
+            if manage_type == 'team':
+                self.populate_cmb_team()
+        else:
+            print(str(model.lastError().text()))
 
 
     def manage_widget_lot(self, lot_id):
@@ -910,7 +924,7 @@ class AddNewLot(ParentManage):
         index = 0
         for x in range(0, self.dlg_lot.tab_widget.count()):
             if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab' or self.dlg_lot.tab_widget.widget(
-                    x).objectName() == 'VisitsTab':
+                    x).objectName() == 'VisitsTab' or self.dlg_lot.tab_widget.widget(x).objectName() == 'LoadsTab':
                 index = x
 
                 if feature_type in ('', 'null', None, -1):
@@ -919,6 +933,7 @@ class AddNewLot(ParentManage):
                 else:
                     self.dlg_lot.tab_widget.setTabEnabled(index, True)
         utils_giswater.set_combo_itemData(self.feature_type, feature_type, 1)
+        self.fill_tab_load()
 
 
     def reload_table_visit(self):
@@ -1382,6 +1397,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_manage_user.clicked.connect(partial(self.open_user_manage))
+        self.dlg_lot_man.btn_manage_vehicle.clicked.connect(partial(self.open_vehicle_manage))
 
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
@@ -1394,6 +1410,33 @@ class AddNewLot(ParentManage):
 
         # Open form
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
+
+
+    def open_vehicle_manage(self):
+
+        self.max_id = self.get_max_id('om_team_x_vehicle')
+        self.dlg_basic_table = BasicTable()
+        self.load_settings(self.dlg_basic_table)
+        self.dlg_basic_table.setWindowTitle("Vehicle management")
+        table_name = 'v_om_team_x_vehicle'
+        # TODO:: Add trigger editable view into v_om_team_x_vehicle
+        # table_name = 'om_team_x_vehicle'
+
+        widget = QPushButton()
+        widget.setText(str('Test'))
+        widget.setStyleSheet("Text-align:left")
+        widget.setFlat(True)
+        widget.setObjectName("test")
+
+        # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
+        self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
+        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
+        self.open_dialog(self.dlg_basic_table)
 
 
     def open_user_manage(self):
@@ -1579,23 +1622,18 @@ class AddNewLot(ParentManage):
         """
 
         widget = utils_giswater.getWidget(dialog, str(widget_name))
-        print(str(widget))
         csv_path = utils_giswater.getWidgetText(dialog, widget)
-        print(str(csv_path))
-        print(str("TEST1"))
         if str(csv_path) == 'null':
             msg = "Select a valid path."
             self.controller.show_info_box(msg, "Info")
             return
         all_rows = []
         row = []
-        print(str("TEST2"))
         # Get headers from model
         for h in range(0, qtable.model().columnCount()):
             if qtable.model().headerData(h, Qt.Horizontal) not in columns:
                 row.append(str(qtable.model().headerData(h, Qt.Horizontal)))
         all_rows.append(row)
-        print(str("TEST3"))
         # Get all rows from model
         for r in range(0, qtable.model().rowCount()):
             row = []
@@ -1608,22 +1646,16 @@ class AddNewLot(ParentManage):
                         value = value.toString(date_format)
                     row.append(value)
             all_rows.append(row)
-        print(str("TEST4"))
         # Write list into csv file
         try:
-            print(str("TEST5"))
-            print(str(csv_path))
             if os.path.exists(str(csv_path)):
-                print(str("TEST6"))
                 msg = "Are you sure you want to overwrite this file?"
                 answer = self.controller.ask_question(msg, "Overwrite")
                 if answer:
                     self.write_to_csv(csv_path, all_rows)
             else:
-                print(str("TEST7"))
                 self.write_to_csv(csv_path, all_rows)
         except Exception as e:
-            print(str("EXCEPTION"))
             print(str(e))
             msg = "File path doesn't exist or you dont have permission or file is opened"
             self.controller.show_warning(msg)
@@ -1767,3 +1799,99 @@ class AddNewLot(ParentManage):
                 layer.removeSelection()
             self.iface.actionPan().trigger()
             self.visit_class.setEnabled(True)
+
+
+    """ FUNCTIONS RELATED WITH TAB LOAD"""
+    def fill_tab_load(self):
+        """ Fill tab 'Load' """
+        table_load = "om_vehicle_x_parameters"
+        filter = "lot_id = '" + str(utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.lot_id)) + "'"
+
+        self.fill_tbl_load_man(self.dlg_lot, self.tbl_load, table_load, filter)
+        self.set_columns_config(self.tbl_load, table_load)
+
+    def set_columns_config(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False, commit=True)
+        if not rows:
+            return widget
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                if row['alias'] is not None:
+                    widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        if isQStandardItemModel:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+        else:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+
+        return widget
+
+
+    def fill_tbl_load_man(self, dialog, widget, table_name, expr_filter):
+        """ Fill the table control to show documents """
+
+        # Get widgets
+        self.date_load_to = self.dlg_lot.findChild(QDateEdit, "date_load_to")
+        self.date_load_from = self.dlg_lot.findChild(QDateEdit, "date_load_from")
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
+
+    def open_load_image(self):
+
+        selected_list = self.tbl_load.selectionModel().selectedRows(0)
+        if selected_list == 0:
+            message = "Any load selected"
+            self.controller.show_info_box(message)
+            return
+
+        elif len(selected_list) > 1:
+            message = "More then one event selected. Select just one"
+            self.controller.show_warning(message)
+            return
+
+        # Get path of selected image
+        sql = ("SELECT image FROM om_vehicle_x_parameters"
+               " WHERE id = '" + str(selected_list[0].data()) + "'")
+        row = self.controller.get_row(sql, commit=True)
+        if not row:
+            return
+
+        path = str(row[0])
+
+        # Parse a URL into components
+        url = parse.urlsplit(path)
+
+        # Open selected image
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
+            # If path is URL open URL in browser
+            webbrowser.open(path)
+        else:
+            # If its not URL ,check if file exist
+            if not os.path.exists(path):
+                message = "File not found"
+                self.controller.show_warning(message, parameter=path)
+            else:
+                # Open the image
+                os.startfile(path)
