@@ -218,7 +218,7 @@ class GwToolBox(ApiParent):
                 value = utils_giswater.get_item_data(dialog, widget, 0)
                 self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = utils_giswater.getWidgetText(dialog, widget)
+                value = utils_giswater.getWidgetText(dialog, widget, False, False)
                 self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
 
 
@@ -291,7 +291,7 @@ class GwToolBox(ApiParent):
                             widget.setStyleSheet("border: 1px solid gray")
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '
-                            if value is '':
+                            if value is '' and widget.property('is_mandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):

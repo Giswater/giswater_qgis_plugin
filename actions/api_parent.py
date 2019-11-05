@@ -1236,6 +1236,10 @@ class ApiParent(ParentAction):
 
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
+                    if 'isMandatory' in field:
+                        widget.setProperty('is_mandatory', field['isMandatory'])
+                    else:
+                        widget.setProperty('is_mandatory', True)
                     widget.setText(field['value'])
                     if 'reg_exp' in field:
                         if field['reg_exp'] is not None:
