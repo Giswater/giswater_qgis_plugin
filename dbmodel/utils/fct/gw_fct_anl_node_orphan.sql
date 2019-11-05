@@ -50,7 +50,7 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
-	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_point_templayer_filepath' AND cur_user=current_user;
+	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7;
