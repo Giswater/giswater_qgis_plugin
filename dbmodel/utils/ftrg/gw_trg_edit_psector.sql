@@ -124,7 +124,7 @@ BEGIN
 			UPDATE config_param_system set value = 'false' WHERE parameter='state_topocontrol';
 
 			--loop over network feature types in order to get the data from each plan_psector_x_* table 
-			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category = 1) LOOP
+			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category = 1 ORDER BY id asc) LOOP
 
 				v_sql = 'SELECT '||rec_type.id||'_id as id FROM plan_psector_x_'||lower(rec_type.id)||' WHERE state = 1 AND psector_id = '||OLD.psector_id||';';
 
