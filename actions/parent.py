@@ -948,3 +948,23 @@ class ParentAction(object):
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
 
+
+    def load_qml(self, layer, qml_path):
+        """ Apply QML style located in @qml_path in @layer """
+
+        if layer is None:
+            return False
+
+        if not os.path.exists(qml_path):
+            self.controller.log_warning("File not found", parameter=qml_path)
+            return False
+
+        if not qml_path.endswith(".qml"):
+            self.controller.log_warning("File extension not valid", parameter=qml_path)
+            return False
+
+        layer.loadNamedStyle(qml_path)
+        layer.triggerRepaint()
+
+        return True
+
