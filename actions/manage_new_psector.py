@@ -515,18 +515,9 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        sql = (f"SELECT value FROM config_param_user "
-               f"WHERE parameter = 'composer_{self.plan_om}_vdefault' AND cur_user= current_user")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 0)
-
-        utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
-        sql = (f"SELECT value FROM config_param_user "
-               f"WHERE parameter = 'composer_{self.plan_om}_vdefault' AND cur_user= current_user")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, row[0])
+        obj = self.controller.get_obj_from_cfgp_user(f'composer_{self.plan_om}_vdefault')
+        if obj:
+            utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, obj.value, 0)
 
 
     def generate_rapports(self):
@@ -1063,10 +1054,8 @@ class ManageNewPsector(ParentManage):
             new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True, commit=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
-                sql = ("SELECT parameter FROM config_param_user "
-                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user;")
-                row = self.controller.get_row(sql, commit=True)
-                if row:
+                obj = self.controller.get_obj_from_cfgp_user(f'psector_vdefault')
+                if obj:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = '{new_psector_id[0]}' "
                            f" WHERE parameter = 'psector_vdefault';")

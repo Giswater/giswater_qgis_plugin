@@ -1960,11 +1960,9 @@ class MincutParent(ParentAction):
 
         # Get scale zoom
         self.scale_zoom = 2500
-        sql = ("SELECT value FROM config_param_system"
-               " WHERE parameter = 'scale_zoom'")
-        row = self.controller.get_row(sql, commit=True)
-        if row:
-            self.scale_zoom = row['value']
+        zoom = self.controller.get_obj_from_cfgp_system('scale_zoom')
+        if zoom and zoom.value:
+            self.scale_zoom = zoom.value
             
         return True            
 

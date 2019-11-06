@@ -54,12 +54,9 @@ class Basic(ParentAction):
         field_id_left = "expl_id"
         field_id_right = "expl_id"
 
-        # Check config_param_system
-        sql = ("SELECT value FROM config_param_system "
-               " WHERE parameter ='sys_exploitation_x_user'")
-        row = self.controller.get_row(sql, commit=True)
         query = ""
-        if row[0].lower() == 'true':
+        obj = self.controller.get_obj_from_cfgp_system('sys_exploitation_x_user')
+        if obj and obj.value.lower() == 'true':
             query = f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
         query += f" AND expl_id != 0"
 

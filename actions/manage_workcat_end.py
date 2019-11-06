@@ -106,10 +106,8 @@ class ManageWorkcatEnd(ParentManage):
     def set_edit_arc_downgrade_force(self, value):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        sql = ("SELECT * FROM config_param_user "
-               "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
-        row = self.controller.get_row(sql, log_info=False)
-        if row:
+        obj = self.controller.get_obj_from_cfgp_user(f'edit_arc_downgrade_force')
+        if obj:
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{value}' "
                    f"WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
@@ -123,11 +121,9 @@ class ManageWorkcatEnd(ParentManage):
     def fill_fields(self):
         """ Fill dates and combo cat_work """
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
-        row = self.controller.get_row(sql, log_info=False)
-        if row:
-            enddate = self.manage_dates(row[0]).date()
+        obj = self.controller.get_obj_from_cfgp_user(f'enddate_vdefault')
+        if obj:
+            enddate = self.manage_dates(obj.value).date()
             self.dlg_work_end.enddate.setDate(enddate)
         else:
             enddate = QDate.currentDate()
@@ -137,11 +133,9 @@ class ManageWorkcatEnd(ParentManage):
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'workcat_id_end_vdefault' and cur_user = current_user")
-        row = self.controller.get_row(sql, log_info=False)
-        if row:
-            utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
+        obj = self.controller.get_obj_from_cfgp_user(f'workcat_id_end_vdefault')
+        if obj:
+            utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, obj.value)
 
 
     def manage_dates(self, date_value):

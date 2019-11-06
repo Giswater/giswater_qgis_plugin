@@ -159,7 +159,6 @@ class ManageElement(ParentManage):
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
-            # Set calendars date from config_param_user
             utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
         self.update_location_cmb()
         # Open the dialog    
