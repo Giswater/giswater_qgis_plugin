@@ -76,18 +76,14 @@ class ReplaceFeatureMapTool(ParentMapTool):
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'workcat_id_end_vdefault'")
-        row = self.controller.get_row(sql)
-        if row:
-            workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
+        obj = self.controller.get_obj_from_cfgp_user('workcat_id_end_vdefault')
+        if obj:
+            workcat_vdefault = self.dlg_replace.workcat_id_end.findText(obj.value)
             self.dlg_replace.workcat_id_end.setCurrentIndex(workcat_vdefault)
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
-        row = self.controller.get_row(sql, log_info=False)
-        if row:
-            self.enddate_aux = self.manage_dates(row[0]).date()
+        obj = self.controller.get_obj_from_cfgp_user('enddate_vdefault')
+        if obj:
+            self.enddate_aux = self.manage_dates(obj.value).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
@@ -155,11 +151,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def update_date(self):
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
-        row = self.controller.get_row(sql, log_info=False)
-        if row:
-            self.enddate_aux = self.manage_dates(row[0]).date()
+        obj = self.controller.get_obj_from_cfgp_user('enddate_vdefault')
+        if obj:
+            self.enddate_aux = self.manage_dates(obj.value).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
