@@ -1860,7 +1860,7 @@ class AddNewLot(ParentManage):
     def open_load_image(self):
 
         selected_list = self.tbl_load.selectionModel().selectedRows(0)
-        if selected_list == 0:
+        if selected_list == 0 or str(selected_list) == '[]':
             message = "Any load selected"
             self.controller.show_info_box(message)
             return
