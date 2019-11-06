@@ -827,7 +827,7 @@ class Giswater(QObject):
         self.controller.get_config_param_user()
         self.list_to_hide = []
         try:
-            #db format of value for parameter qgis_toolbar_hidebuttons -> {"action_index":[199, 74,75]}
+            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
             json_list = json.loads(self.controller.cfgp_user['qgis_toolbar_hidebuttons'].value, object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
         except  KeyError as e:
@@ -1429,21 +1429,22 @@ class Giswater(QObject):
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['column_id'], field['hidden'])
 
-                # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
-                if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
-                    self.set_column_multiline(layer, field, fieldIndex)
-
                 # Set alias column
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
-                # Set field constraints
-                if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
-                    if field['widgetcontrols']['setQgisConstraints'] is True:
-                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
-                                             QgsFieldConstraints.ConstraintStrengthSoft)
-                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
-                                             QgsFieldConstraints.ConstraintStrengthHard)
+                if 'widgetcontrols' in field:
+                    # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
+                    if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
+                        self.set_column_multiline(layer, field, fieldIndex)
+
+                    # Set field constraints
+                    if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
+                        if field['widgetcontrols']['setQgisConstraints'] is True:
+                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                                 QgsFieldConstraints.ConstraintStrengthSoft)
+                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
+                                                 QgsFieldConstraints.ConstraintStrengthHard)
 
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
