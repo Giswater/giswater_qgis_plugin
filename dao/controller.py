@@ -27,7 +27,7 @@ from .pg_dao import PgDao
 from .logger import Logger
 from ..models.cfg_user import CfgUser
 from ..models.cfg_system import CfgSystem
-
+from .. import sys_manager
 
 
 class DaoController(object):
@@ -376,7 +376,18 @@ class DaoController(object):
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)        
         msg_box.exec_()                      
-        
+
+
+    def show_warning_open_file(self, text, inf_text, file_path, context_name=None):
+        """ Show warning message with a button to open @file_path """
+
+        widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
+        button = QPushButton(widget)
+        button.setText(self.tr("Open file"))
+        button.clicked.connect(partial(sys_manager.open_file, file_path))
+        widget.layout().addWidget(button)
+        self.iface.messageBar().pushWidget(widget, 1)
+
         
     def ask_question(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         """ Ask question to the user """   

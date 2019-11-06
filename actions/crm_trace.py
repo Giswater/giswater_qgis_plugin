@@ -11,6 +11,7 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
+from .. import sys_manager
 from .. import utils_giswater
 from ..ui_manager import DlgTrace
 from .api_parent import ApiParent
@@ -97,12 +98,21 @@ class CrmTrace(ApiParent):
         args = [python_path, script_path, expl_name, cur_user, self.schema_name]
         self.controller.log_info(str(args))
         status = True
+
+        # Get script log file path
+        log_file = sys_manager.manage_tstamp()
+        log_path = script_folder + os.sep + "log" + os.sep + log_file
+        self.controller.log_info(log_path)
+
+        # Manage result
         try:
             result = subprocess.call(args)
             self.controller.log_info("result: " + str(result))
             if result != 0:
-                msg = "Process finished with some errors. Open script .log file to get more details"
-                self.controller.show_warning(msg, duration=20)
+                # Show warning message with button to open script log file
+                msg = "Process finished with some errorss"
+                inf_msg = "Open script .log file to get more details"
+                self.controller.show_warning_open_file(msg, inf_msg, log_path)
                 status = False
         except Exception as e:
             self.controller.show_warning(str(e))
