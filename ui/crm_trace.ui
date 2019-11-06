@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>525</width>
-    <height>523</height>
+    <height>582</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>300</x>
-     <y>480</y>
+     <y>550</y>
      <width>100</width>
      <height>28</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>480</y>
+     <y>550</y>
      <width>100</width>
      <height>28</height>
     </rect>
@@ -45,7 +45,7 @@
      <x>10</x>
      <y>20</y>
      <width>501</width>
-     <height>441</height>
+     <height>511</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -58,8 +58,8 @@
     <widget class="QComboBox" name="cbo_expl">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>50</y>
+       <x>180</x>
+       <y>20</y>
        <width>301</width>
        <height>28</height>
       </rect>
@@ -75,13 +75,54 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>50</y>
+       <y>20</y>
        <width>121</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>Explotación:</string>
+     </property>
+    </widget>
+    <widget class="QPlainTextEdit" name="txt_desc">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>461</width>
+       <height>391</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>5</number>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="plainText">
+      <string>Este botón ha sido desarrollado para comunicar la base de datos del GIS con la base de datos de comercial realizando los siguientes procesos:
+- Se updatea en la base de datos comercial la zona de medición a la que pertenecen las acometidas a partir de un geoproceso del gis teniendo en cuenta las valvulas de medición y las condiciones de parada configuradas en el sistema.
+- Se vuelve de la base de datos comercial con el valor de consumo (m3) en la acometida sumando todo el consumo de los abonados.
+El proceso finaliza cargando de forma gráfica todas aquellas acometidas y aquellos tramos que se han quedado sin zona de medición (dma=0). 
+El estilo de las capas es configurable mediante la configuración de un archivo de estilo (*.qml) en el formulario de configruación.
+En el tab log se puede observar más detalle de cómo ha sido desarrollado todo el proceso.</string>
+     </property>
+     <property name="backgroundVisible">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -95,7 +136,7 @@
        <x>10</x>
        <y>10</y>
        <width>481</width>
-       <height>381</height>
+       <height>461</height>
       </rect>
      </property>
     </widget>
