@@ -118,8 +118,6 @@ class ApiCatalog(ApiParent):
         for field in result['fields']:
             if field['column_id'] == 'id':
                 self.populate_combo(id,field)
-            elif field['column_id'] == 'matcat_id':
-                utils_giswater.setWidgetText(self.dlg_catalog, matcat_id, '')
 
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
