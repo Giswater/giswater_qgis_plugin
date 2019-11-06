@@ -451,7 +451,7 @@ class DaoController(object):
                 if '-1' in self.log_codes:   
                     text = self.log_codes[-1]
                 if is_threading:
-                    QgsMessageLog.logMessage(f"{text}: {self.dao.last_error}", "Warning detail", 1)
+                    self.log_warning(f"{self.dao.last_error}", stack_level_increase=1)
                 else:
                     self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
@@ -474,7 +474,7 @@ class DaoController(object):
                 if '-1' in self.log_codes:
                     text = self.log_codes[-1]
                 if is_threading:
-                    QgsMessageLog.logMessage(f"{text}: {self.dao.last_error}", "Warning detail", 1)
+                    self.log_warning(f"{self.dao.last_error}", stack_level_increase=1)
                 else:
                     self.show_warning_detail(text, str(self.dao.last_error))
             elif self.last_error is None and log_info:
