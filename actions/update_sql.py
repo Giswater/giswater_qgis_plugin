@@ -84,15 +84,14 @@ class UpdateSQL(ApiParent):
         self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
         self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
         self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
-
-        if self.project_type is not None and len(layers) != 0:
-            self.info_show_info()
-            return
-
         # Create the dialog and signals
         self.dlg_readsql = Readsql()
         self.load_settings(self.dlg_readsql)
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
+
+        if self.project_type is not None and len(layers) != 0:
+            self.info_show_info()
+            return
 
         # Check if user have dev permissions
         self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
