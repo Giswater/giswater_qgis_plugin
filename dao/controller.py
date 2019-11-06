@@ -1374,6 +1374,16 @@ class DaoController(object):
             self.cfgp_user[row['parameter']] = CfgUser(row['parameter'], row['value'])
 
 
+    def get_value_from_cfgp_user(self, key):
+        value = None
+        try:
+            value = self.cfgp_user[key].value
+        except KeyError as e:
+            print(f"{type(e).__name__} --> {e}")
+            pass
+        finally:
+            return value
+
     def get_config_param_system(self):
         """ Populate dictionary with table config_param_system """
         sql = "SELECT parameter, value, data_type, context, descript, label FROM config_param_system;"
@@ -1384,6 +1394,15 @@ class DaoController(object):
         for row in rows:
             self.cfgp_system[row['parameter']] = CfgSystem(row['parameter'], row['value'], row['data_type'], row['context'], row['descript'], row['label'])
 
+    def get_value_from_cfgp_system(self, key):
+        value = None
+        try:
+            value = self.cfgp_system[key].value
+        except KeyError as e:
+            print(f"{type(e).__name__} --> {e}")
+            pass
+        finally:
+            return value
 
     def indexing_spatial_layer(self, layer_name):
         """ Force reload dataProvider of layer """
