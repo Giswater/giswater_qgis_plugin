@@ -27,6 +27,7 @@ DECLARE
 	v_tabname varchar;
 	fields_array json[];
 	fields json;   
+	field json;
 	query_result character varying;
 	query_result_ids json;
 	query_result_names json;
@@ -65,6 +66,11 @@ BEGIN
 	SELECT gw_api_get_formfields(v_formname, 'catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device)
 		INTO fields_array;
 
+--	Remove selectedId form fields
+	FOREACH field in ARRAY fields_array
+	LOOP
+		fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', ''::text);
+	END LOOP;
 	-- Set featuretype_id
 	IF v_formname='upsert_catalog_arc' THEN
 		v_featurecat_id = 'arctype_id';
