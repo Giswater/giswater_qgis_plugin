@@ -54,9 +54,8 @@ class CrmTrace(ApiParent):
 
         # Execute synchronization script
         status = self.execute_script(expl_name)
-
-        # Execute PG function 'gw_fct_odbc2pg_main'
         if status:
+            # Execute PG function 'gw_fct_odbc2pg_main'
             self.execute_odbc2pg()
 
 
@@ -87,19 +86,29 @@ class CrmTrace(ApiParent):
         # Get database current user
         cur_user = self.controller.get_current_user()
 
+        # Get python folder path
+        python_path = 'python'
+        if 'python_folderpath' in self.controller.cfgp_system:
+            self.controller.log_info("getting 'python_folderpath'")
+            python_folderpath = self.controller.cfgp_system['python_folderpath'].value
+            python_path = python_folderpath + os.sep + python_path
+
         # Execute script
-        args = ['python', script_path, expl_name, cur_user, self.schema_name]
+        args = [python_path, script_path, expl_name, cur_user, self.schema_name]
         self.controller.log_info(str(args))
+        status = True
         try:
-            status = subprocess.call(args)
-            self.controller.log_info(str(status))
-            msg = "Process executed successfully. Open script .log file to get more details"
-            self.controller.show_info(msg, duration=20)
+            result = subprocess.call(args)
+            self.controller.log_info("result: " + str(result))
+            if result != 0:
+                msg = "Process finished with some errors. Open script .log file to get more details"
+                self.controller.show_warning(msg, duration=20)
+                status = False
         except Exception as e:
             self.controller.show_warning(str(e))
-            return False
+            status = False
         finally:
-            return True
+            return status
 
 
     def execute_odbc2pg(self, function_name='gw_fct_odbc2pg_main'):
