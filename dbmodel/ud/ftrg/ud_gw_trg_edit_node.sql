@@ -610,30 +610,17 @@ BEGIN
 	
 		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
 	
-		IF v_man_table='man_chamber' THEN
-			DELETE FROM node WHERE node_id=OLD.node_id;
-			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
-			
-		ELSIF v_man_table='man_storage' THEN
-			DELETE FROM node WHERE node_id=OLD.node_id;
-			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );
-			
-		ELSIF v_man_table='man_wwtp' THEN
-			DELETE FROM node WHERE node_id=OLD.node_id;
-			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id );
-			
-		ELSIF v_man_table='man_netgully' THEN
-			DELETE FROM node WHERE node_id=OLD.node_id;
-			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id );
+		-- delete from polygon table (before the deletion of node)
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id );
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id );
 		
-		ELSE 	
-			DELETE FROM node WHERE node_id = OLD.node_id;
-			
-		END IF;
+		-- delete from note table
+		DELETE FROM node WHERE node_id = OLD.node_id;
 
-		--Delete addfields
-		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 
-		(SELECT id FROM man_addfields_parameter WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.node_type);
+		--Delete addfields (after or before deletion of node, doesn't matter)
+		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id;
 
 		RETURN NULL;
 	
