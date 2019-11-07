@@ -225,7 +225,6 @@ class AddNewLot(ParentManage):
             result = ''
 
         # Set listeners for export csv
-
         self.dlg_lot.btn_export_visits.clicked.connect(
             partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_visit, 'txt_path', result_visit,
                     self.lot_date_format))
@@ -347,7 +346,6 @@ class AddNewLot(ParentManage):
         row = self.controller.get_row(sql, commit=True)
         if row[0] is not None:
             return int(row[0])
-
         return 0
 
 
@@ -987,7 +985,6 @@ class AddNewLot(ParentManage):
         standard_model.setHorizontalHeaderLabels(headers)
 
         # Hide columns
-
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
 
         # Populate model visit
@@ -1012,33 +1009,34 @@ class AddNewLot(ParentManage):
             if len(row) > 0:
                 standard_model.appendRow(item)
 
-        self.put_combobox(self.dlg_lot.tbl_visit, rows)
-
-
-    def put_combobox(self, qtable, rows):
-        """ Set one column of a QtableView as QCheckBox with values from database. """
-
-        # Fill ComboBox cmb_status
-        status_list = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
-        if status_list is None:
+        combo_values = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        if combo_values is None:
             return
+        self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 15, combo_values)
+
+
+    def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
+        """ Set one column of a QtableView as QComboBox with values from database. """
 
         for x in range(0, len(rows)):
             combo = QComboBox()
             row = rows[x]
-            utils_giswater.set_item_data(combo, status_list, 1)
-            utils_giswater.set_combo_itemData(combo, str(row['status']), 0)
-            i = qtable.model().index(x, self.cmb_position)
-            qtable.setIndexWidget(i, combo)
-            combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x))
+            # Populate QComboBox
+            utils_giswater.set_item_data(combo, combo_values, 1)
+            # Set QCombobox to wanted item
+            utils_giswater.set_combo_itemData(combo, str(row[field]), 0)
+            # Get index and put QComboBox into QTableView at index position
+            idx = qtable.model().index(x, widget_pos)
+            qtable.setIndexWidget(idx, combo)
+            combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x, widget_pos))
 
 
-    def update_status(self, combo, qtable, pos_x):
-
+    def update_status(self, combo, qtable, pos_x, widget_pos):
+        """ Update values from QComboBox to QTableView """
         elem = combo.itemData(combo.currentIndex())
-        i = qtable.model().index(pos_x, self.cmb_position)
+        i = qtable.model().index(pos_x, widget_pos)
         qtable.model().setData(i, elem[0])
-        i = qtable.model().index(pos_x, self.cmb_position + 1)
+        i = qtable.model().index(pos_x, widget_pos+1)
         qtable.model().setData(i, elem[1])
 
 
@@ -1075,7 +1073,7 @@ class AddNewLot(ParentManage):
         self.tbl_relation.setModel(standard_model)
         self.tbl_relation.horizontalHeader().setStretchLastSection(True)
 
-        # # Get headers
+        # Get headers
         headers = []
         for x in columns_name:
             headers.append(x[0])
