@@ -210,8 +210,6 @@ class GwToolBox(ApiParent):
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
-            if type(widget) not in (QCheckBox, QComboBox, QLineEdit):
-                continue
             if type(widget) is QCheckBox:
                 self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", widget.isChecked())
             elif type(widget) is QComboBox:
