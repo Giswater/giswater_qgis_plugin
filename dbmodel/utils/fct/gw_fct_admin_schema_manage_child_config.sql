@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
-"feature":{"catFeature":"SHUTOFF-VALVE"},
+"feature":{"catFeature":"SHUTOFF_VALVE"},
 "data":{"filterFields":{}, "pageInfo":{}, "view_name":"ve_node_shutoffvalve", "feature_type":"node" }}$$);
 */
 DECLARE
