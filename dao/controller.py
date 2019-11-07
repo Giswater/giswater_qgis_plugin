@@ -1385,15 +1385,19 @@ class DaoController(object):
             self.cfgp_user[row['parameter']] = CfgUser(row['parameter'], row['value'])
 
 
-    def get_obj_from_cfgp_user(self, key):
+    def get_obj_from_cfgp_user(self, key, show_info=False):
+        """ Returns the object from self.cfgp_user (config_param_user) based on the key received """
         obj = None
         try:
             obj = self.cfgp_user[key]
         except KeyError as e:
-            print(f"{type(e).__name__} --> {e}")
-            pass
+            if show_info:
+                self.log_info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
+            else:
+                self.logger.info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
         finally:
             return obj
+
 
     def get_config_param_system(self):
         """ Populate dictionary with table config_param_system """
@@ -1405,15 +1409,20 @@ class DaoController(object):
         for row in rows:
             self.cfgp_system[row['parameter']] = CfgSystem(row['parameter'], row['value'], row['data_type'], row['context'], row['descript'], row['label'])
 
-    def get_obj_from_cfgp_system(self, key):
+
+    def get_obj_from_cfgp_system(self, key, show_info=False):
+        """ Returns the object from self.cfgp_system (config_param_system) based on the key received """
         obj = None
         try:
             obj = self.cfgp_system[key]
         except KeyError as e:
-            print(f"{type(e).__name__} --> {e}")
-            pass
+            if show_info:
+                self.log_info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
+            else:
+                self.logger.info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
         finally:
             return obj
+
 
     def indexing_spatial_layer(self, layer_name):
         """ Force reload dataProvider of layer """
