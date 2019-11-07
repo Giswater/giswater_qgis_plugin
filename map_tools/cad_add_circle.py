@@ -77,6 +77,8 @@ class CadAddCircle(ParentMapTool):
                 else:
                     feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
                 provider = self.layer_circle.dataProvider()
+                # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
+                # but all work ok
                 provider.addFeatures([feature])
 
             self.layer_circle.commitChanges()
