@@ -42,7 +42,6 @@ TO EXECUTE
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[15]", 
 "updateFeature":"TRUE", "updateMapZone":"FALSE","concaveHullParam":0.85, "debug":"FALSE"}}}');
 
-
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 
 SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=30 AND user_name=current_user group by log_message order by 2 --SECTOR
@@ -51,14 +50,17 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 
 -- DMA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[557]", 
+	"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"false"}}}');
 
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"113952", "updateFeature":TRUE}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85,"debug":"false"}}}');
 
 SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user group by log_message order by 2 --DMA
 
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
+
+UPDATE arc SET dma_id=0
 
 
 -- DQA
@@ -86,33 +88,28 @@ SELECT presszonecat_id, count(presszonecat_id) from v_edit_arc  group by presszo
 -----------------
 TO CHECK PROBLEMS
 -----------------
+0) reset values
+UPDATE arc SET dma_id=0
 
-1) Run function on mode debug
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"TRUE"}}}');
+1) Run function on 
+	mode debug
+	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[557]", 
+	"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"false"}}}');
 
-2) Look for header nodes
-SELECT DISTINCT node_id, nodecat_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-WHERE graf_delimiter IN ('SECTOR')  AND state=1
+	only for one element	
+	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1041", 
+	"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
-3) Look for that header nodes has defined the arc_id to start to flooding network
-SELECT DISTINCT node_id, nodecat_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-JOIN inp_tank USING (node_id)
-WHERE graf_delimiter IN ('SECTOR')  AND state=1
-UNION
-SELECT DISTINCT node_id, nodecat_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-JOIN inp_reservoir USING (node_id)
-WHERE graf_delimiter IN ('SECTOR')  AND state=1
-UNION
-SELECT DISTINCT node_id, nodecat_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-JOIN inp_inlet USING (node_id)
-WHERE graf_delimiter IN ('SECTOR')  AND state=1
+2) Check final results
+SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 
-4) Look for any node can flood (flag = 0)
-SELECT * FROM anl_graf WHERE flag=0 AND user_name=current_user AND node_1 IN (SELECT DISTINCT node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
-WHERE graf_delimiter IN ('SECTOR','DMA'))
-	-- > if result is cero, problem is on inp_inlet, inp_valve, inp_shortpipe table
-	
+3) Look graf flooders (flag=0 and grafdelimiter node)
+SELECT arc_id, node_1 FROM anl_graf WHERE flag=0 AND user_name=current_user AND node_1 IN (SELECT DISTINCT node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
+WHERE graf_delimiter IN ('DMA'))
+
+4) Look for the graf stoppers (flag=1)
+SELECT arc_id, node_1 FROM anl_graf where flag=1 order by node_1
+
 */
 
 DECLARE
@@ -145,6 +142,9 @@ v_srid 			integer;
 v_concavehull		float;
 v_debug			boolean;
 v_input 		json;
+v_count1		integer;
+v_count2		integer;
+v_count3		integer;
 
 BEGIN
 	-- Search path
@@ -168,7 +168,6 @@ BEGIN
 	PERFORM gw_fct_om_check_data(v_input);
 
 	-- check criticity in order to continue or not
-
 	SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
 	IF v_count > 3 THEN
 	
@@ -224,6 +223,11 @@ BEGIN
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 2, 'WARNINGS');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 2, '--------------');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 1, 'INFO');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 1, '-------');
+
 	
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -235,11 +239,6 @@ BEGIN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
 		INSERT INTO selector_expl (expl_id, cur_user) 
 		SELECT expl_id, current_user FROM exploitation WHERE expl_id IN	(SELECT (json_array_elements_text(v_expl))::integer);
-		
-		/*
-		SELECT expl_id, current_user FROM exploitation where macroexpl_id IN 
-		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
-		*/
 	END IF;
 	
 	-- reset mapzones (update to 0)
@@ -327,12 +326,14 @@ BEGIN
 
 		-- starting process
 		LOOP	
+		
 			EXIT WHEN v_cont1 = -1;
 			v_cont1 = v_cont1+1;
 			
 			IF v_nodeid IS NULL THEN
 				v_querytext = 'SELECT * FROM ('||v_text||' AND checkf=0 LIMIT 1)a';
 				IF v_querytext IS NOT NULL THEN
+					RAISE NOTICE 'v_querytext %', v_querytext;
 					EXECUTE v_querytext INTO v_feature;
 				END IF;
 
@@ -346,6 +347,8 @@ BEGIN
 
 			-- reset water flag
 			UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
+
+			raise notice '------------ Feature_id % ', v_featureid;
 			
 			------------------
 			-- starting engine
@@ -358,6 +361,9 @@ BEGIN
 			-- set the starting element (check)
 			v_querytext = 'UPDATE anl_graf SET checkf=1 WHERE node_1='||quote_literal(v_featureid)||'  
 			AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
+
+			RAISE NOTICE 'v_querytext %', v_querytext;
+			
 			EXECUTE v_querytext;
 
 			cont1 = 0;
@@ -374,7 +380,8 @@ BEGIN
 				EXIT WHEN cont1 = 150;
 				
 				v_count = v_count + affected_rows;
-				--raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, v_count;
+
+				raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, affected_rows;
 				
 			END LOOP;
 			
@@ -393,12 +400,13 @@ BEGIN
 				JOIN v_edit_node b USING (node_id)';
 				
 			-- message
-			SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND descript=v_featureid::text AND cur_user=current_user;
-			
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-			VALUES (v_fprocesscat_id, concat('INFO: Mapzone type ', v_class ,' for node: ',v_featureid ,' have been identified. Total number of arcs is :', v_count));
+			SELECT count(*) INTO v_count1 FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND descript=v_featureid::text AND cur_user=current_user;
+			SELECT count(*) INTO v_count2 FROM anl_node WHERE fprocesscat_id=v_fprocesscat_id AND descript=v_featureid::text AND cur_user=current_user;
+			SELECT count(*) INTO v_count3 FROM anl_arc JOIN connec USING (arc_id) WHERE fprocesscat_id=v_fprocesscat_id AND anl_arc.descript=v_featureid::text AND cur_user=current_user;			
+		
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (v_fprocesscat_id, 1, concat('INFO: ', v_class ,' for node: ',v_featureid ,' have been processed. ARCS (', v_count1, '), NODES (', v_count2, '), CONNECS (', v_count3,')'));
 
-			--raise notice 'PROCESS % FEATURE % COUNT % CLASS %', v_fprocesscat_id, v_featureid, v_count, v_class;
 
 		END LOOP;
 
@@ -455,19 +463,19 @@ BEGIN
 			END IF;
 
 			-- message
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-			VALUES (v_fprocesscat_id, concat('WARNING: Attribute ', v_class ,' on arc/node/connec features have been updated by this process'));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (v_fprocesscat_id, 2, concat('WARNING: Attribute ', v_class ,' on arc/node/connec features have been updated by this process'));
 			
 		ELSE
 			-- message
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-			VALUES (v_fprocesscat_id, concat('INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-			VALUES (v_fprocesscat_id, concat('INFO: To see results you can query using this values (XX): SECTOR:30, DQA:44, DMA:45, PRESSZONE:46, STATICPRESSURE, from SECTOR analysis:47'));
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) 	
-			VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_arc WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-			VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_node WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (v_fprocesscat_id, 1, concat('INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (v_fprocesscat_id, 1, concat('INFO: To see results you can query using this values (XX): SECTOR:30, DQA:44, DMA:45, PRESSZONE:46, STATICPRESSURE, from SECTOR analysis:47'));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 	
+			VALUES (v_fprocesscat_id, 1, concat('SELECT * FROM anl_arc WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
+			INSERT INTO audit_check_data (fprocesscat_id ,criticity, error_message) 
+			VALUES (v_fprocesscat_id, 1, concat('SELECT * FROM anl_node WHERE fprocesscat_id = (XX) AND cur_user=current_user;'));
 		END IF;
 
 		-- update geometry of mapzones
@@ -484,33 +492,39 @@ BEGIN
 			EXECUTE v_querytext;	
 
 			-- message
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-			VALUES (v_fprocesscat_id, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
 		END IF;
 
 		-- set selector
 		DELETE FROM selector_audit WHERE cur_user=current_user;
-		INSERT INTO selector_audit (fprocesscat_id, cur_user) VALUES (v_fprocesscat_id, current_user);
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 3, '');	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 2, '');	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 1, '');
+
 
 		-- get results
+		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by criticity desc, id asc) row; 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
 
 		-- disconnected arcs
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 		FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "values":',v_result, '}');
 
 		-- disconnected connecs
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 		FROM (SELECT connec_id, connecat_id, c.state, c.expl_id, c.the_geom FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"", "values":',v_result, '}');
 
 	END IF;
 

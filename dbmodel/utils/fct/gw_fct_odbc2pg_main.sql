@@ -29,6 +29,8 @@ DECLARE
 	v_version		text;
 	v_result 		json;
 	v_result_info		json;
+	v_result_point		json;
+	v_result_line		json;
 	v_querytext		text;
 	v_count			integer;
 
@@ -47,26 +49,26 @@ BEGIN
 
 	-- move data from audit table to other table
 	-- SELECT audit_log_data.feature_id, log_message->>'year' AS year, log_message->>'period' AS period, log_message->>'m3value' AS m3value FROM audit_log_data WHERE fprocesscat_id = 73;	
-	VALUES (73, 1, 'DMA - NUMBER OF CONNECS IMPORTED WITH NOT NULL VALUES');
-	INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message)  
-	SELECT 73, 1, concat(dma_id, ' - ', count(*)) FROM v_edit_connec
-	JOIN audit_log_data ON connec_id=audit_log_data.feature_id AND feature_type='CONNEC' 
-	WHERE expl_id=v_expl
-	GROUP BY dma_id; 
 
 	-- check data and get result
 	SELECT gw_fct_odbc2pg_check_data(p_data) INTO v_result;
 
 	-- process data
 	v_result_info = (((v_result->>'body')::json->>'data')::json->>'info')::json;	
+	v_result_point = (((v_result->>'body')::json->>'data')::json->>'point')::json;	
+	v_result_line = (((v_result->>'body')::json->>'data')::json->>'line')::json;	
+
 			
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"ODBC connection analysis done succesfully"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"ODBC import/export process done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||'}'||'}}')::json;
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||
+		     '}}}')::json;
 	
 END;
 $BODY$
