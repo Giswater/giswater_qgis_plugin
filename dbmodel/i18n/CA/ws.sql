@@ -21,7 +21,7 @@ INSERT INTO cat_feature VALUES ('TUBERIA', 'PIPE', 'ARC');
 INSERT INTO cat_feature VALUES ('VARC', 'VARC', 'ARC');
 INSERT INTO cat_feature VALUES ('VALVULA_CONTROL', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('VALVULA_REDUCTORA', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('GREEN-VALVE', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('GREEN_VALVE', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('CORBA', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('FILTRE', 'FILTER', 'NODE');
 INSERT INTO cat_feature VALUES ('FINAL_LINEA', 'JUNCTION', 'NODE');
@@ -61,7 +61,7 @@ INSERT INTO node_type VALUES ('ADAPTACIO', 'JUNCTION', 'JUNCTION', 'man_junction
 INSERT INTO node_type VALUES ('VALVULA_CONTROL', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Vàlvula de control');
 INSERT INTO node_type VALUES ('VALVULA_VENTOSA', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Vàlvula ventosa');
 INSERT INTO node_type VALUES ('VALVULA_REDUCTORA', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula reductora');
-INSERT INTO node_type VALUES ('GREEN-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Green valve');
+INSERT INTO node_type VALUES ('GREEN_VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Green valve');
 INSERT INTO node_type VALUES ('CORBA', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Corba');
 INSERT INTO node_type VALUES ('FILTRE', 'FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Filtre');
 INSERT INTO node_type VALUES ('FINAL_LINEA', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 1, TRUE, 'Final de línia');
