@@ -6,142 +6,132 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
-    <height>582</height>
+    <width>388</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Sincronización con comercial</string>
   </property>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>550</y>
-     <width>100</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Accept</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_cancel">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>550</y>
-     <width>100</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Close</string>
-   </property>
-  </widget>
-  <widget class="QTabWidget" name="tab_main">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>501</width>
-     <height>511</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <widget class="QWidget" name="tab_sincro">
-    <attribute name="title">
-     <string>Sincronización</string>
-    </attribute>
-    <widget class="QComboBox" name="cbo_expl">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>20</y>
-       <width>301</width>
-       <height>28</height>
-      </rect>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1" colspan="2">
+    <widget class="QTabWidget" name="tab_main">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <property name="maxVisibleItems">
-      <number>10</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl_main">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>121</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Explotación:</string>
-     </property>
-    </widget>
-    <widget class="QPlainTextEdit" name="txt_desc">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>70</y>
-       <width>461</width>
-       <height>391</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <kerning>true</kerning>
-      </font>
-     </property>
-     <property name="autoFillBackground">
-      <bool>true</bool>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="lineWidth">
-      <number>5</number>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="plainText">
-      <string>Este botón ha sido desarrollado para comunicar la base de datos del GIS con la base de datos de comercial realizando los siguientes procesos:
+     <widget class="QWidget" name="tab_sincro">
+      <attribute name="title">
+       <string>Sincronización</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="4" column="0" colspan="2">
+        <widget class="QPlainTextEdit" name="txt_desc">
+         <property name="font">
+          <font>
+           <kerning>true</kerning>
+          </font>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="lineWidth">
+          <number>5</number>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="plainText">
+          <string>Este botón ha sido desarrollado para comunicar la base de datos del GIS con la base de datos de comercial realizando los siguientes procesos:
 - Se updatea en la base de datos comercial la zona de medición a la que pertenecen las acometidas a partir de un geoproceso del gis teniendo en cuenta las valvulas de medición y las condiciones de parada configuradas en el sistema.
 - Se vuelve de la base de datos comercial con el valor de consumo (m3) en la acometida sumando todo el consumo de los abonados.
 El proceso finaliza cargando de forma gráfica todas aquellas acometidas y aquellos tramos que se han quedado sin zona de medición (dma=0). 
 El estilo de las capas es configurable mediante la configuración de un archivo de estilo (*.qml) en el formulario de configruación.
 En el tab log se puede observar más detalle de cómo ha sido desarrollado todo el proceso.</string>
-     </property>
-     <property name="backgroundVisible">
-      <bool>false</bool>
-     </property>
+         </property>
+         <property name="backgroundVisible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="lbl_main">
+           <property name="maximumSize">
+            <size>
+             <width>65</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Explotación:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cbo_expl">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="maxVisibleItems">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_infolog">
+      <attribute name="title">
+       <string>Info log</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QTextEdit" name="txt_infolog"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
-   </widget>
-   <widget class="QWidget" name="tab_infolog">
-    <attribute name="title">
-     <string>Info log</string>
-    </attribute>
-    <widget class="QTextEdit" name="txt_infolog">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>481</width>
-       <height>461</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-  </widget>
+   </item>
+   <item row="2" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_accept">
+       <property name="text">
+        <string>Accept</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
