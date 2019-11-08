@@ -69,7 +69,7 @@ class UpdateSQL(ApiParent):
         # Check if connection is still False
         connection_status, not_version = self.controller.set_database_connection()
         if not connection_status:
-            msg = "Connection error"
+            msg = "Some error occurred when connecting to the database. Do you want to enter credentials manually?"
             result = self.controller.ask_question(msg, "Info")
             if result:
                 dlg_credentials = Credentials()
