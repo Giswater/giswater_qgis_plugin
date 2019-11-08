@@ -58,7 +58,7 @@ class Basic(ParentAction):
         obj = self.controller.get_obj_from_cfgp_system('sys_exploitation_x_user')
         if obj and obj.value.lower() == 'true':
             query = f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
-        query += f" AND expl_id != 0"
+        query += f" AND expl_id != 0 AND active IS NOT FALSE"
 
         self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, aql=query)
 
