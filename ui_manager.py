@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt import uic, QtCore
-from qgis.PyQt.QtWidgets import QMainWindow, QDialog, QDockWidget, QWhatsThis
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction, QMainWindow, QDialog, QDockWidget, QWhatsThis, QLineEdit
 import configparser
 import os
 import webbrowser
-
+from functools import partial
 
 class GwDockWidget(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
@@ -229,6 +230,40 @@ class ChangeNodeType(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('crm_trace.ui')
 class DlgTrace(GwDialog, FORM_CLASS):
     pass
+
+
+FORM_CLASS = get_ui_class('credentials.ui')
+class Credentials(GwDialog, FORM_CLASS):
+    def __init__(self, subtag=None):
+        super().__init__()
+        self.txt_pass.setClearButtonEnabled(True)
+        # icon_path = os.path.dirname(__file__) + os.sep + 'icons'  + os.sep + '100.png'
+        # print(icon_path)
+        # if os.path.exists(icon_path):
+        #     print("EXIST")
+        #     icon = QIcon(icon_path)
+        # self.action = QAction(icon, "show")
+        # self.action.triggered.connect(self.show_pass)
+        self.btn_accept.clicked.connect(partial(self.pass_))
+        # self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+
+
+    def show_pass(self):
+        if self.txt_pass.echoMode() == 0:
+            self.txt_pass.setEchoMode(QLineEdit.Password)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + '100.png'
+            text = "Show password"
+        elif self.txt_pass.echoMode() == 2:
+            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + '99.png'
+            text = "Hide password"
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action.setIcon(icon)
+            self.action.setText(text)
+
+    def pass_(self):
+        pass
 
 
 FORM_CLASS = get_ui_class('csv2pg.ui')

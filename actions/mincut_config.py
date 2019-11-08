@@ -332,7 +332,6 @@ class MincutConfig(ParentAction):
         interval = f"'{date_from.strftime(format_low)}'::timestamp AND '{date_to.strftime(format_high)}'::timestamp"
 
         expr = f"(forecast_start BETWEEN {interval})"
-        self.controller.log_info(str(expr))
         self.tbl_mincut_edit.model().setFilter(expr)
         self.tbl_mincut_edit.model().select()
 
