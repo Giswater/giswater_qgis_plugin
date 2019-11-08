@@ -551,7 +551,7 @@ class GwToolBox(ApiParent):
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
                     self.populate_vlayer(v_layer, data, k, counter)
-                    # TODO borrar este if cuando todas las funciones esten refactorizadas
+                    # TODO delete this 'if' when all functions are refactored
                     if 'qmlPath' in data[k]:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
