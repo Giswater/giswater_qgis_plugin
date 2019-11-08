@@ -1436,6 +1436,35 @@ class AddNewLot(ParentManage):
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table)
 
+        # Populate model visit
+        sql = ("SELECT * FROM v_om_team_x_vehicle")
+        rows = self.controller.get_rows(sql, commit=True)
+
+        if rows is None:
+            return
+
+        # Add combo into column team_id
+        sql = ("SELECT id, idval"
+               " FROM cat_team"
+               " ORDER BY id")
+        combo_values = self.controller.get_rows(sql, commit=True)
+
+        if combo_values is None:
+            return
+
+        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 0, 1, combo_values)
+
+        # Add combo into column vehicle_id
+        sql = ("SELECT id, idval"
+               " FROM ext_cat_vehicle"
+               " ORDER BY id")
+        combo_values = self.controller.get_rows(sql, commit=True)
+
+        if combo_values is None:
+            return
+
+        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 0, 2, combo_values)
+
 
     def open_user_manage(self):
 
