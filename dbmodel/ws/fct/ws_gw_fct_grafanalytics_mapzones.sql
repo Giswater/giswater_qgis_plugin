@@ -348,7 +348,7 @@ BEGIN
 			-- reset water flag
 			UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
 
-			raise notice '------------ Feature_id % ', v_featureid;
+			--raise notice '------------ Feature_id % ', v_featureid;
 			
 			------------------
 			-- starting engine
@@ -362,7 +362,7 @@ BEGIN
 			v_querytext = 'UPDATE anl_graf SET checkf=1 WHERE node_1='||quote_literal(v_featureid)||'  
 			AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
 
-			RAISE NOTICE 'v_querytext %', v_querytext;
+			--RAISE NOTICE 'v_querytext %', v_querytext;
 			
 			EXECUTE v_querytext;
 
@@ -373,7 +373,7 @@ BEGIN
 			LOOP	
 				cont1 = cont1+1;
 				
-				UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
+				UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class AND user_name=current_user;
 				
 				GET DIAGNOSTICS affected_rows =row_count;
 				EXIT WHEN affected_rows = 0;
@@ -381,7 +381,7 @@ BEGIN
 				
 				v_count = v_count + affected_rows;
 
-				raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, affected_rows;
+				--raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, affected_rows;
 				
 			END LOOP;
 			
