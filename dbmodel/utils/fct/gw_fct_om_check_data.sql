@@ -179,15 +179,13 @@ BEGIN
 
 	-- Check state not according with state_type
 
-		
+
 
 	-- Check for orphan rows on man_addfields values table
 	
 	
 	
-	-- Check for orphan rows on polygon table
-	
-	
+
 	
 	
 	-- only UD projects
@@ -201,6 +199,7 @@ BEGIN
 					UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'));
@@ -210,9 +209,40 @@ BEGIN
 		END IF;
 		
 		
-		-- Check for missing rows on inp tables without values
+		-- Check for missed features on inp tables
+		v_querytext = '(SELECT arc_id, 'arc' as feature_tpe FROM arc WHERE arc_id NOT IN (select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir 
+						UNION select arc_id from inp_pump UNION select arc_id from inp_outlet UNION select arc_id from inp_orifice) AND state > 0
+						UNION
+						SELECT node_id 'node' FROM node WHERE node_id NOT IN(
+						select node_id from inp_junction UNION select node_id from inp_storage UNION select node_id from inp_outfall UNION select node_id from inp_divider)
+						AND state >0) a';
 		
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No features missed on inp_tables found.');
+		END IF;
+		
+	
+		-- Check for orphan polygons on polygon table
+		v_querytext = 'SELECT pol_id FROM polygon EXCEPT SELECT pol_id  FROM (select pol_id from gully UNION select pol_id from man_chamber 
+					   UNION select pol_id from man_netgully UNION select pol_id from man_storage UNION select pol_id from man_wwtp) a';
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' polygons without parent (gully, netgully, chamber, storage or wwtp). Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.');
+		END IF;
+	
+	
 	
 	ELSIF v_project_type='WS' THEN
 
@@ -231,14 +261,37 @@ BEGIN
 			VALUES (25, 1, 'INFO: No features (arc, node, connec, element) with NULL values on code found.');
 		END IF;
 		
-		-- Check for missing rows on inp tables without values
+	
+		-- Check for missed features on inp tables
+		v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (select arc_id from inp_pipe) AND state > 0 SELECT node_id FROM node WHERE node_id 
+						NOT IN(select node_id from inp_shortpipe UNION select node_id from inp_valve UNION select node_id from inp_tank 
+						UNION select node_id FROM inp_reservoir UNION SELECT node_id from inp_inlet) AND state >0) a';
+		
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No features missed on inp_tables found.');
+		END IF;
 	
 	
-	
-	
-	
-	
-	
+		-- Check for orphan polygons on polygon table
+		v_querytext = 'SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a';
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' polygons without parent (register, tank, fountain). Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No polygons without parent feature (register, tank, fountain) found.');
+		END IF;
+		
+		
 		-- valves closed/broken with null values (fprocesscat = 76)
 		v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom FROM '||v_edit||'man_valve JOIN node n USING (node_id) WHERE n.state > 0 AND (broken IS NULL OR closed IS NULL)) a';
 
