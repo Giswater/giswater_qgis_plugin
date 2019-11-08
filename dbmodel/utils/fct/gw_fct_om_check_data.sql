@@ -180,6 +180,16 @@ BEGIN
 	-- Check state not according with state_type
 
 		
+
+	-- Check for orphan rows on man_addfields values table
+	
+	
+	
+	-- Check for orphan rows on polygon table
+	
+	
+	
+	
 	-- only UD projects
 	IF 	v_project_type='UD' THEN
 	
@@ -199,6 +209,10 @@ BEGIN
 			VALUES (25, 1, 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.');
 		END IF;
 		
+		
+		-- Check for missing rows on inp tables without values
+		
+		
 	
 	ELSIF v_project_type='WS' THEN
 
@@ -217,6 +231,13 @@ BEGIN
 			VALUES (25, 1, 'INFO: No features (arc, node, connec, element) with NULL values on code found.');
 		END IF;
 		
+		-- Check for missing rows on inp tables without values
+	
+	
+	
+	
+	
+	
 	
 		-- valves closed/broken with null values (fprocesscat = 76)
 		v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom FROM '||v_edit||'man_valve JOIN node n USING (node_id) WHERE n.state > 0 AND (broken IS NULL OR closed IS NULL)) a';
