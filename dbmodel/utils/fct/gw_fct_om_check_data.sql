@@ -179,14 +179,45 @@ BEGIN
 
 	-- Check state not according with state_type
 
-	
+		
 	-- only UD projects
 	IF 	v_project_type='UD' THEN
+	
+		-- Check code nulls
+		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
+					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
+					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
+					UNION SELECT guly_id, gratecat_id, the_geom FROM '||v_edit||'gully WHERE code IS NULL
+					UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
 
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.');
+		END IF;
 		
 	
 	ELSIF v_project_type='WS' THEN
 
+		-- Check code nulls
+		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
+					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
+					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
+					UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No features (arc, node, connec, element) with NULL values on code found.');
+		END IF;
+		
+	
 		-- valves closed/broken with null values (fprocesscat = 76)
 		v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom FROM '||v_edit||'man_valve JOIN node n USING (node_id) WHERE n.state > 0 AND (broken IS NULL OR closed IS NULL)) a';
 
