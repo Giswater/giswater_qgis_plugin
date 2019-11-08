@@ -179,19 +179,11 @@ BEGIN
 
 	-- Check state not according with state_type
 
-
-
-	-- Check for orphan rows on man_addfields values table
-	
-	
-	
-
-	
 	
 	-- only UD projects
 	IF 	v_project_type='UD' THEN
 	
-		-- Check code nulls
+		-- Check code wirh null values
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
 					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
@@ -241,12 +233,26 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.');
 		END IF;
+		
 	
+		-- Check for orphan rows on man_addfields values table
+		v_querytext = 'SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)';
+
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	
+		IF v_count > 0 THEN
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows without feature on man_addfields_value table. Please, check your data before continue'.));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 2, concat('HINT: SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No rows without feature found on man_addfields_value table.');
+		END IF;
 	
 	
 	ELSIF v_project_type='WS' THEN
 
-		-- Check code nulls
+		-- Check code wirh null values
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
 					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
@@ -290,7 +296,22 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No polygons without parent feature (register, tank, fountain) found.');
 		END IF;
-		
+	
+	
+		-- Check for orphan rows on man_addfields values table
+		v_querytext = 'SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec)';
+
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	
+		IF v_count > 0 THEN
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows without feature on man_addfields_value table. Please, check your data before continue'.));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 2, concat('HINT: SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec)'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No rows without feature found on man_addfields_value table.');
+		END IF;
+	
 		
 		-- valves closed/broken with null values (fprocesscat = 76)
 		v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom FROM '||v_edit||'man_valve JOIN node n USING (node_id) WHERE n.state > 0 AND (broken IS NULL OR closed IS NULL)) a';
