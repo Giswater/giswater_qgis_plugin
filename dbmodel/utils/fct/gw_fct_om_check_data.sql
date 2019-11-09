@@ -177,17 +177,31 @@ BEGIN
 		VALUES (25, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.');
 	END IF;
 
-	-- Check state not according with state_type
-
 	
 	-- only UD projects
 	IF 	v_project_type='UD' THEN
-	
+
+		-- Check state not according with state_type	
+		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
+				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
+				UNION SELECT a.state, state_type FROM '||v_edit||'connec a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
+				UNION SELECT a.state, state_type FROM '||v_edit||'element a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state';
+
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No features without concordance againts state and state_type.');
+		END IF;
+
 		-- Check code wirh null values
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
 					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
-					UNION SELECT guly_id, gratecat_id, the_geom FROM '||v_edit||'gully WHERE code IS NULL
+					UNION SELECT gully_id, gratecat_id, the_geom FROM '||v_edit||'gully WHERE code IS NULL
 					UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
@@ -202,10 +216,10 @@ BEGIN
 		
 		
 		-- Check for missed features on inp tables
-		v_querytext = '(SELECT arc_id, 'arc' as feature_tpe FROM arc WHERE arc_id NOT IN (select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir 
+		v_querytext = '(SELECT arc_id, ''arc'' as feature_tpe FROM arc WHERE arc_id NOT IN (select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir 
 						UNION select arc_id from inp_pump UNION select arc_id from inp_outlet UNION select arc_id from inp_orifice) AND state > 0
 						UNION
-						SELECT node_id 'node' FROM node WHERE node_id NOT IN(
+						SELECT node_id, ''node'' FROM node WHERE node_id NOT IN(
 						select node_id from inp_junction UNION select node_id from inp_storage UNION select node_id from inp_outfall UNION select node_id from inp_divider)
 						AND state >0) a';
 		
@@ -221,14 +235,14 @@ BEGIN
 		
 	
 		-- Check for orphan polygons on polygon table
-		v_querytext = 'SELECT pol_id FROM polygon EXCEPT SELECT pol_id  FROM (select pol_id from gully UNION select pol_id from man_chamber 
-					   UNION select pol_id from man_netgully UNION select pol_id from man_storage UNION select pol_id from man_wwtp) a';
+		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from gully UNION select pol_id from man_chamber 
+					   UNION select pol_id from man_netgully UNION select pol_id from man_storage UNION select pol_id from man_wwtp) a) b';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' polygons without parent (gully, netgully, chamber, storage or wwtp). Please, check your data before continue'));
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' polygons without parent (gully, netgully, chamber, storage or wwtp).  We recommend you to clean data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.');
@@ -241,7 +255,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 		IF v_count > 0 THEN
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows without feature on man_addfields_value table. Please, check your data before continue'.));
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows on man_addfields_value without parent feature. We recommend you to clean data before continue.'));
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('HINT: SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)'));
 		ELSE
@@ -251,6 +265,24 @@ BEGIN
 	
 	
 	ELSIF v_project_type='WS' THEN
+
+		-- Check state not according with state_type	
+		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
+				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
+				UNION SELECT a.state, state_type FROM '||v_edit||'connec a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
+				UNION SELECT a.state, state_type FROM '||v_edit||'gully a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
+				UNION SELECT a.state, state_type FROM '||v_edit||'element a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state';
+
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No features without concordance againts state and state_type.');
+		END IF;
+
 
 		-- Check code wirh null values
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
@@ -266,10 +298,9 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No features (arc, node, connec, element) with NULL values on code found.');
 		END IF;
-		
 	
 		-- Check for missed features on inp tables
-		v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (select arc_id from inp_pipe) AND state > 0 SELECT node_id FROM node WHERE node_id 
+		v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (SELECT arc_id from inp_pipe) AND state > 0 UNION SELECT node_id FROM node WHERE node_id 
 						NOT IN(select node_id from inp_shortpipe UNION select node_id from inp_valve UNION select node_id from inp_tank 
 						UNION select node_id FROM inp_reservoir UNION SELECT node_id from inp_inlet) AND state >0) a';
 		
@@ -285,13 +316,13 @@ BEGIN
 	
 	
 		-- Check for orphan polygons on polygon table
-		v_querytext = 'SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a';
+		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a) b';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' polygons without parent (register, tank, fountain). Please, check your data before continue'));
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' polygons without parent (register, tank, fountain).  We recommend you to clean data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No polygons without parent feature (register, tank, fountain) found.');
@@ -304,7 +335,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 		IF v_count > 0 THEN
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows without feature on man_addfields_value table. Please, check your data before continue'.));
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows without feature on man_addfields_value table.  We recommend you to clean data before continue.'));
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('HINT: SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec)'));
 		ELSE
@@ -382,7 +413,8 @@ BEGIN
 
 		IF v_count > 0 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=80 and cur_user=current_user;
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 80, node_id, nodecat_id, ''The node_type is defined as DMA but this node is not configured on the dma.grafconfig'', the_geom FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 80, node_id, nodecat_id, ''The node_type is defined as DMA but this node is not configured on the dma.grafconfig'', the_geom FROM ('
+			, v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
 			' node(s) with node_type.graf_delimiter=''DMA'' not configured on the dma table.'));
