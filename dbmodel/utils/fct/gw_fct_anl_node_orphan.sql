@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_node_orphan($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_junction", "id":["1004","1005"]},
+"feature":{"tableName":"node"},
 "data":{"selectionMode":"previousSelection",
 	"parameters":{"saveOnDatabase":true}}}$$)
 */
@@ -34,6 +34,8 @@ DECLARE
 	v_selectionmode text;
 	v_worklayer text;
 	v_qmlpointpath	text;
+	v_projectype text;
+	v_partialquery text;
 	
 BEGIN
 
@@ -41,7 +43,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
-	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+	SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -55,11 +57,17 @@ BEGIN
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7;
 
-	-- Computing process
+	-- built partial query
+	IF v_projectype = 'WS' THEN
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN node_type nt ON nt.id=nc.nodetype_id';
+	ELSIF v_projectype = 'UD' THEN
+		v_partialquery = 'JOIN node_type ON id = a.node_type';
+	END IF;
 
+	-- Computing process
 	IF v_array != '()' THEN
-		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a WHERE a.state=1 AND node_id IN '||v_array||' AND 
-		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state=1) = 0' 
+		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN '||v_array||' AND isarcdivide=false AND 
+		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
 		LOOP
 			--find the closest arc and the distance between arc and node
 			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
@@ -69,8 +77,8 @@ BEGIN
 			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
 		END LOOP;
 	ELSE
-		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a WHERE a.state=1 AND 
-		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state=1) = 0' 
+		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide=false AND 
+		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
 		LOOP
 			--find the closest arc and the distance between arc and node
 			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
