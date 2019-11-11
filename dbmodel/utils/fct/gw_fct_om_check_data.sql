@@ -112,8 +112,13 @@ BEGIN
 
 		
 	-- UTILS
+
+	-- delete config_param_user rows with deprecated variables
+	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user);
+	
+	
 	-- Check node_1 or node_2 nulls (fprocesscat = 4)
-	v_querytext = '(SELECT arc_id,arccat_id,the_geom FROM '||v_edit||'arc WHERE state > 0 AND node_1 IS NULL UNION SELECT arc_id,arccat_id,the_geom FROM '
+	v_querytext = '(SELECT arc_id,arccat_id,the_geom FROM '||v_edit||'arc WHERE state > 0 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom FROM '
 	||v_edit||'arc WHERE state > 0 AND node_2 IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
