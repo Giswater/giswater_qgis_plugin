@@ -480,7 +480,7 @@ BEGIN
 			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
 			SELECT 64, node_id, nodecat_id, the_geom FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s without elevation.'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) without elevation.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=64 AND cur_user=current_user'));
 		ELSE
@@ -495,7 +495,7 @@ BEGIN
 			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
 			SELECT 65, node_id, nodecat_id, the_geom FROM rpt_inp_node WHERE result_id=v_result_id AND elevation=0;
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s with elevation=0.'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) with elevation=0.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=65 AND cur_user=current_user'));
 		ELSE
@@ -509,7 +509,7 @@ BEGIN
 		SELECT count(*) INTO v_count  FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc''s totally disconnected fron any reservoir, according with the gw_fct_pg2epa_inlet_flowtrace function.'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) totally disconnected fron any reservoir, according with the gw_fct_pg2epa_inlet_flowtrace function.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user'));
 		ELSE
@@ -532,12 +532,12 @@ BEGIN
 		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc''s with more than two arcs.'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc(s) with more than two arcs.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with more than mandatory two arcs.');
+			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc(s) with more than mandatory two arcs.');
 		END IF;
 
 		-- node2arcs with less than two arcs
@@ -556,12 +556,12 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',
-			v_count,' node2arc''s with less than mandatory two arcs. Perharps it is a border node2arc. Please review your data.'));
+			v_count,' node2arc(s) with less than mandatory two arcs. Perharps it is a border node2arc. Please review your data.'));
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user'));
 		ELSE 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc''s with less than mandatory two arcs.');
+			VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc(s) with less than mandatory two arcs.');
 		END IF;
 
 
@@ -893,7 +893,7 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',v_count,
-			' material(s) with null values at least on mandatory columns for Roughness catalog (init_age,end_age,roughness). Perharps are not used but check it before continue.'));
+			' material(s) with null values at least on mandatory columns for Roughness catalog (init_age,end_age,roughness). Perharps is/are not used but check it before continue.'));
 			v_countglobal=v_countglobal+v_count; 
 			v_count=0;
 		ELSE

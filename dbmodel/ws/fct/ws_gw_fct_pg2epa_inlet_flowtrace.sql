@@ -34,23 +34,19 @@ BEGIN
 
 	-- fill the graf table
 	insert into anl_mincut_arc_x_node (
-	select  arc.arc_id, node1.node_id, current_user, left(node1.nodecat_id,4), node2.node_id, left(node2.nodecat_id,4), 0, 0
+	select  arc.arc_id, node_1, current_user, null, node_2, null, 0, 0
 	from rpt_inp_arc arc
-	inner join rpt_inp_node AS node1 on node_1 = node1.node_id
-	inner join rpt_inp_node AS node2 on node_2 = node2.node_id
-	WHERE arc.result_id=p_result_id and node1.result_id=p_result_id and node2.result_id=p_result_id
+	WHERE arc.result_id=p_result_id
 	union all
-	select  arc.arc_id, node1.node_id, current_user, left(node1.nodecat_id,4), node2.node_id, left(node2.nodecat_id,4), 0, 0
+	select  arc.arc_id, node_2, current_user, null, node_1, null, 0, 0
 	from rpt_inp_arc arc
-	inner join rpt_inp_node AS node1 on node_2 = node1.node_id
-	inner join rpt_inp_node AS node2 on node_1 = node2.node_id
-	WHERE arc.result_id=p_result_id and node1.result_id=p_result_id and node2.result_id=p_result_id
+	WHERE arc.result_id=p_result_id
 	);
 	
 	-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
 	DELETE FROM anl_mincut_arc_x_node WHERE user_name=current_user AND arc_id IN 
 	(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM anl_mincut_arc_x_node GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
-		
+
 	-- init inlets
 	UPDATE anl_mincut_arc_x_node
 		SET flag1=1, water=1 

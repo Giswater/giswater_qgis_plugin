@@ -44,6 +44,7 @@ INSERT INTO cat_arc VALUES ('FC160-PN10', 'PIPE', 'FC', '10', '160', 144.00000, 
 INSERT INTO cat_arc VALUES ('PVC90-PN16', 'PIPE', 'PVC', '16', '90', 82.00000, 90.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc90_pn10.svg', 0.10, 0.10, 0.09, 0.0064, 0.95, 4.50, 'm', 'A_PVC90_PN16', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
 INSERT INTO cat_arc VALUES ('VFD150-PN16', 'VARC', 'FD', '16', '150', 153.00000, 170.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd150.svg', 0.10, 0.10, 0.17, 0.0227, 0.97, 8.50, 'm', 'A_FD150', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
 INSERT INTO cat_arc VALUES ('VFC110-PN10', 'VARC', 'FC', '10', '110', 99.00000, 110.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110.svg', 0.10, 0.10, 0.09, 0.0095, 0.91, 4.00, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
+INSERT INTO cat_arc VALUES ('VIRTUAL', 'VARC', 'PE', NULL, NULL, 999, NULL, 'Virtual arc. Mandatory to fill some diameter and some material because EPANET needs some values to work with', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110.svg', 0.10, 0.10, 0.09, 0.0095, 0.91, 4.00, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
 
 
 INSERT INTO cat_brand VALUES ('brand1');

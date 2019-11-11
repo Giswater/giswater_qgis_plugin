@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
+DROP INDEX IF EXISTS link_exit_id;
 CREATE INDEX link_exit_id
   ON link
   USING btree
