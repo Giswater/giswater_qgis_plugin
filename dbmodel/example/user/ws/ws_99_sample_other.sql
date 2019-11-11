@@ -224,3 +224,8 @@ SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param'
 -- rotate vnodes and connec labels
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
 UPDATE link SET the_geom=the_geom;
+
+
+--update audit_cat_param_user with cat_feature vdefaults
+UDPATE cat_feature SET id=id;
+

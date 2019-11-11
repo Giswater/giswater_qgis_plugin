@@ -14,3 +14,10 @@ SELECT setval('config_param_system_id_seq', (SELECT max(id) FROM config_param_sy
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('python_folderpath','c:/program files/qgis 3.4/apps/Python37','text', 'crm', 'Folder to path for python')
 ON CONFLICT (parameter) DO NOTHING;
+
+
+UPDATE audit_cat_function SET function_name='gw_trg_cat_feature'
+WHERE id=2758;
+
+--update audit_cat_param_user with cat_feature vdefaults
+UDPATE cat_feature SET id=id;

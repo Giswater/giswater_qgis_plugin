@@ -66,50 +66,32 @@ BEGIN
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-				RETURN audit_function(1022,1316);
-			END IF;
-			IF v_customfeature IS NOT NULL THEN
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
-			END IF;			
+		IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
+			RETURN audit_function(1022,1304);
+		END IF;
 
-			IF (NEW.connecat_id IS NULL) THEN			
-				IF v_man_table='man_greentap' THEN
-					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='greentapcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				ELSIF v_man_table='man_wjoin' THEN
-					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wjoincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				ELSIF v_man_table='man_fountain' OR v_man_table='man_fountain_pol' THEN
-					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='fountaincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);	
-				ELSIF v_man_table='man_tap' THEN
-					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tapcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);	
-				ELSIF v_man_table='parent' THEN
-					NEW.connecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				END IF;
-			END IF;
-				
-			IF (NEW.connecat_id IS NULL) AND v_man_table='parent' THEN
+		IF v_customfeature IS NOT NULL THEN
+			NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
+		ELSE
+			NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+
+			-- get first value (last chance)
+			IF (NEW.connecat_id IS NULL) THEN
 				NEW.connecat_id := (SELECT id FROM cat_connec LIMIT 1);
-			ELSIF (NEW.connecat_id IS NULL) THEN
-				PERFORM audit_function(1086,1316);
-			END IF;				
-
-			IF v_customfeature IS NOT NULL THEN
-				IF (NEW.connecat_id NOT IN (select cat_connec.id FROM cat_connec WHERE connectype_id=v_customfeature)) THEN 
-					PERFORM audit_function(1092,1318);
-				END IF;
 			END IF;
 
-			IF v_man_table!='parent' AND v_customfeature IS NULL THEN
-				IF (NEW.connecat_id NOT IN (select cat_connec.id FROM cat_connec JOIN connec_type ON cat_connec.connectype_id=connec_type.id WHERE connec_type.man_table=v_type_man_table)) THEN 
-					PERFORM audit_function(1088,1316);
-				END IF;
-			END IF;
+		END IF;
+
+		IF (NEW.connecat_id IS NULL) THEN
+			PERFORM audit_function(1086,1304);
+		END IF;				
+
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1316);  
+                RETURN audit_function(1008,1304);  
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -122,14 +104,14 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1316,NEW.connec_id);          
+                RETURN audit_function(1010,1304,NEW.connec_id);          
             END IF;            
         END IF;
         
 	-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1316);  
+                RETURN audit_function(1012,1304);  
             END IF;
 				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -142,7 +124,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1316,NEW.connec_id);  
+                RETURN audit_function(1014,1304,NEW.connec_id);  
             END IF;            
         END IF;
 
@@ -183,7 +165,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1316,NEW.connec_id);
+					PERFORM audit_function(2012,1304,NEW.connec_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -194,7 +176,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM audit_function(2024,1316,NEW.connec_id);
+					PERFORM audit_function(2024,1304,NEW.connec_id);
 				END IF;	
 			END IF;
 		END IF;

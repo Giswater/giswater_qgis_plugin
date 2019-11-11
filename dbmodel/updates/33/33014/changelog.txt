@@ -1,2 +1,7 @@
 3.3.014
 *************
+- enhance catalog for custom feature
+- enhance control of custom feature id
+
+
+WARNING: Huge improvment related to cat_feaute.id From now it is forbidden to manage id's with '-' or '.'. In this case update will crash. We encourage you to fix it before

@@ -53,35 +53,36 @@ BEGIN
         -- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-				RETURN audit_function(1020,1314); 
+				RETURN audit_function(1020,1302); 
 			END IF; 
 
+			-- get vdefault values using config user values
 			IF v_customfeature IS NOT NULL THEN
 				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
+			ELSE
+				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+
+				-- get first value (last chance)
+				IF (NEW.arccat_id IS NULL) THEN
+					NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+				END IF;    
+			END IF;
+
+			-- get values using proximity
+			IF (NEW.arccat_id IS NULL) THEN
+				NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			END IF;
 
 			IF (NEW.arccat_id IS NULL) THEN
-				IF v_man_table='parent' THEN
-					NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				ELSE
-					NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pipecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				END IF;
-
-				IF (NEW.arccat_id IS NULL) THEN
-					NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
-
-				IF (NEW.arccat_id IS NULL) THEN
-					NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
-				END IF;       
-				END IF;
+				PERFORM audit_function(1088,1302);
 			END IF;
+   
 		END IF;
-
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1314);  
+                RETURN audit_function(1008,1302);  
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -94,14 +95,14 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1314,NEW.arc_id);          
+                RETURN audit_function(1010,1302,NEW.arc_id);          
             END IF;            
         END IF;
         
 	-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1314);  
+                RETURN audit_function(1012,1302);  
             END IF;
 				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -114,7 +115,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1314,NEW.arc_id);  
+                RETURN audit_function(1014,1302,NEW.arc_id);  
             END IF;            
         END IF;
 	
@@ -155,7 +156,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1314,NEW.arc_id);
+					PERFORM audit_function(2012,1302,NEW.arc_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -166,7 +167,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM audit_function(2024,1314,NEW.arc_id);
+					PERFORM audit_function(2024,1302,NEW.arc_id);
 				END IF;	
 			END IF;
 		END IF;

@@ -67,74 +67,23 @@ BEGIN
 		-- Node Catalog ID
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-				RETURN audit_function(1006,1318);  
+				RETURN audit_function(1006,1320);  
 			END IF;
 			
-				IF v_customfeature IS NOT NULL THEN
-					NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
-				END IF;
+			IF v_customfeature IS NOT NULL THEN		
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);			
+			ELSE
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 
+				-- get first value (last chance)
 				IF (NEW.nodecat_id IS NULL) THEN
-					IF v_man_table='man_tank' OR v_man_table='man_tank_pol' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_hydrant' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='hydrantcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_junction' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='junctioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_pump' THEN		
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pumpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_reduction' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='reductioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_valve' THEN	
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='valvecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_manhole' THEN	
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='manholecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_meter' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='metercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_source' THEN	
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='sourcecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_waterwell' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='waterwellcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_filter' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='filtercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_register' OR v_man_table='man_register_pol' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='registercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_netwjoin' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netwjoincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_expansiontank' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='expansiontankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_flexunion' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='flexuioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_netelement' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netelementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_netsamplepoint' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netsamplepointcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='man_wtp' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSIF v_man_table='parent' THEN
-						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					END IF;
+					NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
 				END IF;
-
-			IF (NEW.nodecat_id IS NULL) AND v_man_table='parent' THEN
-				NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=v_type_man_table LIMIT 1);
-			ELSIF (NEW.nodecat_id IS NULL) THEN
-				PERFORM audit_function(1090,1318);
-			END IF;				
+			END IF;
 			
-			IF v_customfeature IS NOT NULL THEN
-				IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node WHERE nodetype_id=v_customfeature)) THEN 
-					PERFORM audit_function(1092,1318);
-				END IF;
-			END IF;
-
-			IF  v_man_table!='parent' AND v_customfeature IS NULL THEN
-
-				IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=v_type_man_table)) THEN 
-					PERFORM audit_function(1092,1318);
-				END IF;
-
-			END IF;
+			IF (NEW.nodecat_id IS NULL) THEN
+				PERFORM audit_function(1090,1320);
+			END IF;				
 
 		END IF;
 
@@ -146,7 +95,7 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1318);  
+                RETURN audit_function(1008,1320);  
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -159,14 +108,14 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1318,NEW.node_id);          
+                RETURN audit_function(1010,1320,NEW.node_id);          
             END IF;            
         END IF;
         
 	-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1318);  
+                RETURN audit_function(1012,1320);  
             END IF;
 				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -179,7 +128,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1318,NEW.node_id);  
+                RETURN audit_function(1014,1320,NEW.node_id);  
             END IF;            
         END IF;
 		
@@ -205,7 +154,7 @@ BEGIN
 
         --check relation state - state_type
         IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	RETURN audit_function(3036,1318,NEW.state::text);
+        	RETURN audit_function(3036,1320,NEW.state::text);
        	END IF;
 
 		--Inventory	
@@ -220,7 +169,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1318,NEW.node_id);
+					PERFORM audit_function(2012,1320,NEW.node_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -231,7 +180,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM audit_function(2024,1318,NEW.node_id);
+					PERFORM audit_function(2024,1320,NEW.node_id);
 				END IF;	
 			END IF;
 		END IF;
@@ -546,14 +495,14 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-						RETURN audit_function(2110,1318);
+						RETURN audit_function(2110,1320);
 					END IF;
 				END IF;
 			END IF;
 		END IF;
 		--check relation state - state_type
         IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	RETURN audit_function(3036,1318,NEW.state::text);
+        	RETURN audit_function(3036,1320,NEW.state::text);
        	END IF;
 
 		-- rotation
