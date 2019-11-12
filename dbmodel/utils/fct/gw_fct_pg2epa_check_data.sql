@@ -171,12 +171,13 @@ BEGIN
 		IF v_dwfscenario IS NULL THEN v_dwfscenario='NONE';
 		END IF;
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Result id: ', v_result_id));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Created by: ', current_user, ', ON ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Hydrology scenario: ', v_hydrologyscenario));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('DWF scenario: ', v_dwfscenario));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Allow ponding: ', v_allowponding));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Flow routing: ', v_florouting));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Flow units: ', v_flowunits));	
-
 	
 		SELECT count(*) into v_count FROM anl_node WHERE fprocesscat_id=13 AND cur_user=current_user;
 		
@@ -453,6 +454,8 @@ BEGIN
 		SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
 		SELECT idval INTO v_qualmodeval FROM inp_typevalue WHERE id=v_qualitymode::text AND typevalue ='inp_value_opti_qual';
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Result id: ', v_result_id));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Created by: ', current_user, ', ON ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Demand type: ', v_demandtypeval));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Pattern method: ', v_patternmethodval));
@@ -618,24 +621,20 @@ BEGIN
 
 
 		-- check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)
-		DELETE FROM anl_node WHERE fprocesscat_id=72 and cur_user=current_user;
-		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom)
-		select 72, v_edit_inp_pump.node_id, nodecat_id, the_geom FROM vi_curves JOIN v_edit_inp_pump USING (curve_id);
-		
-		SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=72 AND cur_user=current_user;
+		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve join (select distinct curve_id FROM vi_curves JOIN v_edit_inp_pump 
+				USING (curve_id))a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('HINT: SELECT * FROM anl_node WHERE fprocesscat_id=72 AND cur_user=current_user'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
 		ELSE 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results founded. Due a EPANET''s bug with 3-point curves, it is forbidden to export curves like this because newer it will work on EPANET.');
 		END IF;
-	
 
+		-- TODO:
+		-- curve pumps control (value y is decreasing)
 		-- timestep control (patterns used againsts timesetep simulation)
-		--TODO		
+
 
 		IF v_demandtype > 1 THEN --(2 or 3)
 
@@ -676,7 +675,7 @@ BEGIN
 			END IF;
 
 			-- check connec - hydrometer relation
-			SELECT count(*) INTO v_count FROM v_edit_connec WHERE connec_id NOT IN (SELECT connec_id FROM v_rtc_hydrometer);
+			SELECT count(*) INTO v_count FROM v_edit_connec JOIN vi_parent_arc USING (arc_id) WHERE connec_id NOT IN (SELECT connec_id FROM v_rtc_hydrometer);
 
 			IF v_count > 0 THEN
 
