@@ -275,7 +275,6 @@ BEGIN
 		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
 				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
 				UNION SELECT a.state, state_type FROM '||v_edit||'connec a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
-				UNION SELECT a.state, state_type FROM '||v_edit||'gully a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
 				UNION SELECT a.state, state_type FROM '||v_edit||'element a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;

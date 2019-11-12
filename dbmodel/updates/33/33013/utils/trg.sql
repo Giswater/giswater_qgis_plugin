@@ -11,4 +11,4 @@ DROP TRIGGER IF EXISTS gw_trg_update_child_view ON SCHEMA_NAME.cat_feature;
 CREATE TRIGGER gw_trg_update_child_view
 AFTER INSERT OR UPDATE ON SCHEMA_NAME.cat_feature
 FOR EACH ROW
-EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_update_child_view();
+EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_cat_feature();

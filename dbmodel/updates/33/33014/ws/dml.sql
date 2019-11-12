@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DELETE FROM audit_cat_param_user WHERE id IN (expansiontankcat_vdefault, filtercat_vdefault, flexunioncat_vdefault, fountaincat_vdefault, greentapcat_vdefault, hydrant_vdefault, 
-											 junctioncat_vdefault, manholecat_vdefault, metercat_vdefault, netelementcat_vdefault, netsamplepointcat_vdefault, netwjoincat_vdefault,
-											 pipecat_vdefault, pumpcat_vdefault, reductioncat_vdefault, registercat_vdefault, sourcecat_vdefault, tankcat_vdefault, tapcat_vdefault, 
-											 valvecat_vdefault, waterwellcat_vdefault, wjoincat_vdefault, wtpcat_vdefault);
+DELETE FROM audit_cat_param_user WHERE id IN ('expansiontankcat_vdefault', 'filtercat_vdefault', 'flexunioncat_vdefault', 'fountaincat_vdefault', 'greentapcat_vdefault', 
+							'hydrant_vdefault', 'junctioncat_vdefault', 'manholecat_vdefault', 'metercat_vdefault', 'netelementcat_vdefault', 'netsamplepointcat_vdefault', 
+							'netwjoincat_vdefault', 'pipecat_vdefault', 'pumpcat_vdefault', 'reductioncat_vdefault', 'registercat_vdefault', 'sourcecat_vdefault', 
+							'tankcat_vdefault', 'tapcat_vdefault', 'valvecat_vdefault', 'waterwellcat_vdefault', 'wjoincat_vdefault', 'wtpcat_vdefault');
