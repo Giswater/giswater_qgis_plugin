@@ -227,5 +227,5 @@ UPDATE link SET the_geom=the_geom;
 
 
 --update audit_cat_param_user with cat_feature vdefaults
-UDPATE cat_feature SET id=id;
+UPDATE cat_feature SET id=id;
 

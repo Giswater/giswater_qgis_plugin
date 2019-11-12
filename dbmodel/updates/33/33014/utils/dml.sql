@@ -20,4 +20,4 @@ UPDATE audit_cat_function SET function_name='gw_trg_cat_feature'
 WHERE id=2758;
 
 --update audit_cat_param_user with cat_feature vdefaults
-UDPATE cat_feature SET id=id;
+UPDATE cat_feature SET id=id;
