@@ -248,7 +248,10 @@ class ApiCF(ApiParent):
 
         # When something is wrong
         if row[0]['message']:
-            self.controller.show_message(row[0]['message']['text'], row[0]['message']['level'])
+            level = 1
+            if 'level' in row[0]['message']:
+                level = int(row[0]['message']['level'])
+            self.controller.show_message(row[0]['message']['text'], level)
             return False, None
 
         # When insert feature failed
