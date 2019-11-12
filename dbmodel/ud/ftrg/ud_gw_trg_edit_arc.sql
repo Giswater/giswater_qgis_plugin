@@ -480,7 +480,7 @@ BEGIN
 			SET  arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, 
-			orkcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,  
+			workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,  
 			postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber, 
 			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
