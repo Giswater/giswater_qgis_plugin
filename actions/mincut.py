@@ -1570,7 +1570,7 @@ class MincutParent(ParentAction):
             # Enable button CustomMincut and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
-            self.action_mincut.setDisabled(True)
+            self.action_mincut.setDisabled(False)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
@@ -1798,7 +1798,7 @@ class MincutParent(ParentAction):
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             if mincut_class_status == '1':
-                self.action_mincut.setDisabled(True)
+                self.action_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(False)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
@@ -2488,7 +2488,7 @@ class MincutParent(ParentAction):
             self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(False)        
             # Actions
-            self.action_mincut.setDisabled(False)
+            self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)
