@@ -93,9 +93,11 @@ class CrmTrace(ApiParent):
         # Get python folder path
         python_path = 'python'
         if 'python_folderpath' in self.controller.cfgp_system:
-            self.controller.log_info("getting 'python_folderpath'")
             python_folderpath = self.controller.cfgp_system['python_folderpath'].value
-            python_path = python_folderpath + os.sep + python_path
+            if os.path.exists(python_folderpath):
+                python_path = python_folderpath + os.sep + python_path
+            else:
+                self.controller.log_warning("Folder not found", parameter=python_folderpath)
 
         # Execute script
         args = [python_path, script_path, expl_name, cur_user, self.schema_name]
@@ -171,6 +173,7 @@ class CrmTrace(ApiParent):
 
         # Process result
         result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        self.controller.log_info(str(row[0]))
         if 'status' not in result[0]:
             self.controller.show_warning("Parameter not found", parameter="status")
             return False
@@ -182,7 +185,9 @@ class CrmTrace(ApiParent):
             if 'body' in result[0]:
                 if 'data' in result[0]['body']:
                     data = result[0]['body']['data']
-                    self.add_temp_layer(self.dlg_trace, data, function_name)
+                    tab_main = self.dlg_trace.tab_main
+                    txt_infolog = self.dlg_trace.txt_infolog
+                    self.add_temp_layer(self.dlg_trace, tab_main, txt_infolog, data, function_name)
 
         message = result[0]['message']['text']
         msg = "Process executed successfully. Read 'Info log' for more details"
@@ -191,57 +196,58 @@ class CrmTrace(ApiParent):
         return True
 
 
-    def add_temp_layer(self, dialog, data, function_name):
+    def add_temp_layer(self, dialog, tab_main, txt_infolog, data, function_name):
         """ Manage parameter 'data' from JSON response """
 
         self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
-        qtabwidget = dialog.mainTab
-        qtextedit = dialog.txt_infolog
         for k, v in list(data.items()):
             if str(k) == "info":
-                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
+                self.controller.log_info("populate_info_text")
+                self.populate_info_text(dialog, tab_main, txt_infolog, data)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:
-                    counter = len(data[k]['values'])
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
-                    self.populate_vlayer(v_layer, data, k, counter)
+                    self.controller.log_info("populate_vlayer")
+                    self.populate_vlayer(v_layer, data, k)
                     # TODO delete this 'if' when all functions are refactored
                     if 'qmlPath' in data[k]:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
+                else:
+                    self.controller.log_info("No data found")
 
 
-    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
+    def populate_vlayer(self, virtual_layer, data, layer_type):
         """ Populate @virtual_layer with contents get from JSON response """
 
-        prov = virtual_layer.dataProvider()
-
         # Enter editing mode
+        data_provider = virtual_layer.dataProvider()
         virtual_layer.startEditing()
-        if counter > 0:
-            for key, value in list(data[layer_type]['values'][0].items()):
-                # add columns
-                if str(key) != 'the_geom':
-                    prov.addAttributes([QgsField(str(key), QVariant.String)])
+        columns = data[layer_type]['values'][0]
+        for key, value in list(columns.items()):
+            # add columns
+            if str(key) != 'the_geom':
+                data_provider.addAttributes([QgsField(str(key), QVariant.String)])
 
         # Add features
         for item in data[layer_type]['values']:
             attributes = []
             fet = QgsFeature()
-
             for k, v in list(item.items()):
                 if str(k) != 'the_geom':
                     attributes.append(v)
                 if str(k) in 'the_geom':
                     sql = f"SELECT St_AsText('{v}')"
                     row = self.controller.get_row(sql, log_sql=False)
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
+                    if row:
+                        wkt = str(row[0])
+                        geometry = QgsGeometry.fromWkt(wkt)
+                        fet.setGeometry(geometry)
             fet.setAttributes(attributes)
-            prov.addFeatures([fet])
+            data_provider.addFeatures([fet])
 
         # Commit changes
         virtual_layer.commitChanges()
