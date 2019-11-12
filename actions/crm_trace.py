@@ -5,6 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import QgsProject, QgsFeature, QgsGeometry, QgsVectorLayer, QgsField
+from qgis.PyQt.QtCore import Qt, QVariant
+
 import json
 import os
 import subprocess
@@ -175,21 +178,11 @@ class CrmTrace(ApiParent):
             self.controller.show_warning("Parameter not found", parameter="message")
             return False
 
-        geometry_type = ''
         if result[0]['status'] == "Accepted":
             if 'body' in result[0]:
                 if 'data' in result[0]['body']:
-                    if 'info' in result[0]['body']['data']:
-                        if 'geometryType' in result[0]['body']['data']['info']:
-                            geometry_type = result[0]['body']['data']['info']['geometryType']
-                            self.controller.log_info(geometry_type)
-
-                    if geometry_type != '':
-                        self.add_result_memory_layer(geometry_type)
-                    else:
-                        qtabwidget = self.dlg_trace.tab_main
-                        qtextedit = self.dlg_trace.txt_infolog
-                        self.populate_info_text(self.dlg_trace, qtabwidget, qtextedit, result[0]['body']['data'])
+                    data = result[0]['body']['data']
+                    self.add_temp_layer(self.dlg_trace, data, function_name)
 
         message = result[0]['message']['text']
         msg = "Process executed successfully. Read 'Info log' for more details"
@@ -198,13 +191,66 @@ class CrmTrace(ApiParent):
         return True
 
 
-    def add_result_memory_layer(self, geometry_type):
-        """ Add result memory layer """
+    def add_temp_layer(self, dialog, data, function_name):
+        """ Manage parameter 'data' from JSON response """
 
-        self.controller.log_info("add_result_memory_layer")
-
+        self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
-        layer_name = "Resultado sincronización"
-        #v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-        #self.populate_vlayer(v_layer, data, k, counter)
+        qtabwidget = dialog.mainTab
+        qtextedit = dialog.txt_infolog
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
+            else:
+                counter = len(data[k]['values'])
+                if counter > 0:
+                    counter = len(data[k]['values'])
+                    geometry_type = data[k]['geometryType']
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
+                    self.populate_vlayer(v_layer, data, k, counter)
+                    # TODO delete this 'if' when all functions are refactored
+                    if 'qmlPath' in data[k]:
+                        qml_path = data[k]['qmlPath']
+                        self.load_qml(v_layer, qml_path)
+
+
+    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
+        """ Populate @virtual_layer with contents get from JSON response """
+
+        prov = virtual_layer.dataProvider()
+
+        # Enter editing mode
+        virtual_layer.startEditing()
+        if counter > 0:
+            for key, value in list(data[layer_type]['values'][0].items()):
+                # add columns
+                if str(key) != 'the_geom':
+                    prov.addAttributes([QgsField(str(key), QVariant.String)])
+
+        # Add features
+        for item in data[layer_type]['values']:
+            attributes = []
+            fet = QgsFeature()
+
+            for k, v in list(item.items()):
+                if str(k) != 'the_geom':
+                    attributes.append(v)
+                if str(k) in 'the_geom':
+                    sql = f"SELECT St_AsText('{v}')"
+                    row = self.controller.get_row(sql, log_sql=False)
+                    geometry = QgsGeometry.fromWkt(str(row[0]))
+                    fet.setGeometry(geometry)
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        # Commit changes
+        virtual_layer.commitChanges()
+        QgsProject.instance().addMapLayer(virtual_layer, False)
+
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup('GW Functions results')
+        if my_group is None:
+            my_group = root.insertGroup(0, 'GW Functions results')
+
+        my_group.insertLayer(0, virtual_layer)
 
