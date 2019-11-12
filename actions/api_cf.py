@@ -260,7 +260,9 @@ class ApiCF(ApiParent):
         if 'status' in row[0]['body']['data']['fields']:
             if row[0]['body']['data']['fields']['status'].lower() == 'failed':
                 msg = row[0]['body']['data']['fields']['message']['text']
-                level = int(row[0]['body']['data']['fields']['message']['level'])
+                level = 1
+                if 'level' in row[0]['body']['data']['fields']['message']:
+                    level = int(row[0]['body']['data']['fields']['message']['level'])
                 self.controller.show_message(msg, message_level=level)
                 return False, None
 
