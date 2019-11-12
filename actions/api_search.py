@@ -303,9 +303,9 @@ class ApiSearch(ApiParent):
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
                 if len(line_list) == 2:
-                    widget = line_list[1]
-                    widget.setReadOnly(True)
-                    widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+                    widget_add = line_list[1]
+                    widget_add.setReadOnly(True)
+                    widget_add.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
             else:
                 self.lbl_visible = True
                 self.dlg_search.lbl_msg.setVisible(False)
@@ -339,8 +339,9 @@ class ApiSearch(ApiParent):
         """ Clear second line edit if exist """
 
         line_edit_add = line_list[1]
+        line_edit_add.blockSignals(True)
         line_edit_add.setText('')
-
+        line_edit_add.blockSignals(False)
 
     def add_combobox(self, field):
 
