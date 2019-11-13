@@ -11,7 +11,14 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_ct(p_data json
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+
+warning: it seems that NOT WORKS: 
+ALTER TABLE gully_type DROP CONSTRAINT gully_type_id_fkey;
+ALTER TABLE gully_type  ADD CONSTRAINT gully_type_id_fkey FOREIGN KEY (id) REFERENCES SCHEMA_NAME.cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+      
+SELECT gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"DROP"}}$$)
 
@@ -40,12 +47,15 @@ DECLARE
 	v_return json;
 	v_36 integer=0;
 	v_37 integer=0;
+	v_projectype text;
 BEGIN
 
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
+
+	SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
 	
 	v_action = (p_data->>'data')::json->>'action';
 
@@ -205,7 +215,10 @@ BEGIN
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_update;
-		ALTER TABLE rtc_hydrometer DISABLE TRIGGER gw_trg_rtc_hydrometer;
+
+		IF v_projectype ='WS' THEN
+			ALTER TABLE rtc_hydrometer DISABLE TRIGGER gw_trg_rtc_hydrometer;
+		END IF;
 
 			
 		v_return = concat('{"constraints dropped":"',v_36,'","notnull dropped":"',v_37,'"}');	
@@ -266,7 +279,10 @@ BEGIN
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_update;
-		ALTER TABLE rtc_hydrometer ENABLE TRIGGER gw_trg_rtc_hydrometer;
+
+		IF v_projectype ='WS' THEN
+			ALTER TABLE rtc_hydrometer ENABLE TRIGGER gw_trg_rtc_hydrometer;
+		END IF;
 
 
 		v_return = concat('{"constraints reloaded":"',v_36,'","notnull reloaded":"',v_37,'"}');

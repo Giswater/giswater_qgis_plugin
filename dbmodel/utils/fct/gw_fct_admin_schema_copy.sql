@@ -7,17 +7,21 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2722
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_copy(p_data json)
+CREATE OR REPLACE FUNCTION gw_fct_admin_schema_copy(p_data json)
   RETURNS void AS
 $BODY$
+
+
 
 /*EXAMPLE
 
 DISABLE CONSTRAINTS:
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
 EXECUTE:
-SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${"client":{"lang":"CA"}, "data":{"fromSchema":"SCHEMA_NAME", "toSchema":"ws"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${"client":{"lang":"CA"}, "data":{"fromSchema":"bgeo_treball", "toSchema":"ud"}}$$)
+WARNING: need to decide before what to do with configs: config_api_* AND config_param_system
+
 
 ENABLE CONSTRAINTS:
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)
@@ -40,9 +44,14 @@ BEGIN
 	-- get input parameters
 	v_fromschema := (p_data ->> 'data')::json->> 'fromSchema';
 	v_toschema := (p_data ->> 'data')::json->> 'toSchema';
-	
-	-- copy data
-	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS FALSE 
+
+
+	-- delete previous data
+	DELETE FROM config_param_user;
+
+
+	-- copy data using primary key
+	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS FALSE AND id NOT IN ('config_param_system')
 	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_fromschema AND table_type='BASE TABLE') 
 	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') AND id NOT IN('price_value_unit', 'temp_table')
 	LOOP
@@ -52,13 +61,17 @@ BEGIN
 			INTO v_idname
 			USING v_tablerecord.id;
 
-		RAISE NOTICE ' COPYING DATA FROM/TO TABLE: %', v_tablerecord.id;
+		RAISE NOTICE ' COPYING DATA FROM/TO TABLE: % , %', v_tablerecord.id, v_idname;
 
 		-- execute copy from table to table
 		EXECUTE 'INSERT INTO '||v_toschema||'.'||v_tablerecord.id||' SELECT * FROM '||v_fromschema||'.'||v_tablerecord.id||' 
 			WHERE '||v_idname||' NOT IN (SELECT '||v_idname||' FROM '||v_toschema||'.'||v_tablerecord.id||')';
 		
 	END LOOP;
+
+	-- copy data using others
+	EXECUTE 'INSERT INTO '||v_toschema||'.config_param_system SELECT * FROM '||v_fromschema||'.config_param_syste WHERE parameter NOT IN (SELECT parameter FROM '||v_toschema||'.config_param_system)';
+		
 		
 RETURN;
 	

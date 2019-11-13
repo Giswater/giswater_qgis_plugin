@@ -25,3 +25,9 @@ UPDATE cat_feature SET id=id;
 
 --12/11/2019
 UPDATE audit_cat_param_user SET ismandatory=true WHERE formname = 'epaoptions';
+
+
+-- 13/11/2019
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('om_flowtrace_usearcsense','true','text', 'crm', 'If false ignore arc sense, only topological connection is used to propagate the flow upstream')
+ON CONFLICT (parameter) DO NOTHING;
