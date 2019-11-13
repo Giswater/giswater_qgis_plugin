@@ -103,6 +103,7 @@ DECLARE
 	v_audit_widgettype text;
 	v_active_feature text;
 	v_created_addfields record;
+	v_unaccent_id text;
 BEGIN
 
 	
@@ -188,6 +189,16 @@ BEGIN
 raise notice 'v_multi_create,%',v_multi_create;
 
 PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+
+--check if the new field doesnt have accents and fix it
+IF v_action='CREATE' THEN
+	v_unaccent_id = array_to_string(ts_lexize('unaccent',v_param_name),',','*');
+
+	IF v_unaccent_id IS NOT NULL THEN
+		v_param_name = v_unaccent_id;
+	END IF;
+
+END IF;
 
 IF v_multi_create IS TRUE THEN
 	
@@ -275,11 +286,14 @@ IF v_multi_create IS TRUE THEN
 			v_param_user_id=1;
 		END IF;
 
-		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
-      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id )
-		VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
-		v_isenabled, 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
-		v_dv_querytext, v_dv_querytext_filterc,v_param_name );
+		IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM audit_cat_param_user) THEN
+			INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
+	      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id )
+			VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
+			v_isenabled, 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
+			v_dv_querytext, v_dv_querytext_filterc,v_param_name );
+		
+		END IF;
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
@@ -540,7 +554,7 @@ ELSE
 		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  isenabled, layout_id, layout_order, 
       	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id)
 		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
-		concat('Default value of addfield ',v_param_name, 'for ', v_cat_feature), 
+		concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
 		'role_edit', v_param_name, v_isenabled, 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
 		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name);
 
