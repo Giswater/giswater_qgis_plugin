@@ -632,9 +632,9 @@ class Giswater(QObject):
 
         try:
             # Unlisten notify channel and stop thread
-            if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and  hasattr(self, 'notify'):
-                self.notify.stop_listening('desktop')
-                self.notify.stop_listening(self.controller.current_user)
+            if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
+                list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+                self.notify.stop_listening(list_channels)
 
             # Remove icon of action 'Info'
             self.iface.removeToolBarIcon(self.action_info)
@@ -754,6 +754,7 @@ class Giswater(QObject):
         if not layer:
             self.controller.show_warning("Layer not found", parameter="v_edit_node")
             return
+
         self.controller.get_current_user()
         layer_source = self.controller.get_layer_source(layer)
         self.schema_name = layer_source['schema']
@@ -863,15 +864,12 @@ class Giswater(QObject):
         # Manage layer fields
         self.get_layers_to_config()
         self.set_layer_config(self.available_layers)
-        # Log it
-        message = "Project read successfully"
-        self.controller.log_info(message)
 
-        # Create a thread and start listen
-        if  self.settings.value('system_variables/use_notify').upper() == 'TRUE' :
+        # Create a thread to listen selected database channels
+        if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.notify.start_desktop_thread('desktop', 'wait_notifications', (self.controller.dao.conn, ))
-            self.notify.start_user_thread(self.controller.current_user.replace(".","_"), 'wait_notifications', (self.controller.dao.conn, ))
+            list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+            self.notify.start_listening(list_channels)
 
         # Save toolbar position after closing QGIS
         self.iface.actionExit().triggered.connect(self.save_toolbars_position)
@@ -883,8 +881,13 @@ class Giswater(QObject):
         # Put add layers button into toc
         self.add_layers_button()
 
+        # Log it
+        message = "Project read successfully"
+        self.controller.log_info(message)
+
 
     def add_layers_button(self):
+
         icon_path = self.plugin_dir + '/icons/306.png'
         dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
         toolbar = dockwidget.findChildren(QToolBar)[0]

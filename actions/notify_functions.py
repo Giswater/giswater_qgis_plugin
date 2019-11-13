@@ -31,30 +31,16 @@ class NotifyFunctions(ParentAction):
         self.plugin_dir = plugin_dir
 
 
-    def start_desktop_thread(self, channel_name, target=None, args=()):
+    def start_listening(self, list_channels):
         """
-        :param channel_name: Channel to be listened
-        :param target:  is the callable object to be invoked by the run()
-                        method. Defaults to None, meaning nothing is called.
-        :param args: is the argument tuple for the target invocation. Defaults to ().
-        :return:
+        :param list_channels: List of channels to be listened
         """
-        self.controller.execute_sql(f"LISTEN {channel_name};")
-        self.desktop_thread = threading.Thread(target=getattr(self, target), args=args)
-        self.desktop_thread.start()
 
+        for channel_name in list_channels:
+            self.controller.execute_sql(f"LISTEN {channel_name};")
 
-    def start_user_thread(self, channel_name, target=None, args=()):
-        """
-        :param channel_name: Channel to be listened
-        :param target:  is the callable object to be invoked by the run()
-                        method. Defaults to None, meaning nothing is called.
-        :param args: is the argument tuple for the target invocation. Defaults to ().
-        :return:
-        """
-        self.controller.execute_sql(f"LISTEN {channel_name};")
-        self.user_thread = threading.Thread(target=getattr(self, target), args=args)
-        self.user_thread.start()
+        thread = threading.Thread(target=self.wait_notifications)
+        thread.start()
 
 
     def task_stopped(self, task):
@@ -82,24 +68,37 @@ class NotifyFunctions(ParentAction):
             self.controller.log_info("Exception: {}".format(exception))
             raise exception
 
-    def kill(self):
-        self.killed = True
+
+    def stop_listening(self, list_channels):
+        """
+        :param list_channels: List of channels to be unlistened
+        """
+
+        for channel_name in list_channels:
+            self.controller.execute_sql(f"UNLISTEN {channel_name};")
 
 
-    def stop_listening(self, channel_name):
-        self.controller.execute_sql(f"UNLISTEN {channel_name};")
-        
+    def wait_notifications(self):
 
-    def wait_notifications(self, conn):
-        while True:
-            conn.poll()
-            while conn.notifies:
-                notify = conn.notifies.pop(0)
-                print(f"Got NOTIFY:{notify.pid}, {notify.channel}, {notify.payload}")
-                if not notify.payload:
-                    continue
-                complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
-                self.execute_functions(complet_result)
+        # Initialize thread
+        thread = threading.Timer(interval=0.1, function=self.wait_notifications)
+        thread.start()
+
+        # Check if any notification to process
+        conn = self.controller.dao.conn
+        conn.poll()
+        for notify in conn.notifies:
+            msg = f"Got NOTIFY: {notify.pid}, {notify.channel}, {notify.payload}"
+            self.controller.log_info(msg)
+            if notify.payload:
+                try:
+                    complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
+                    self.execute_functions(complet_result)
+                except Exception as e:
+                    pass
+
+        # Clear list of notifications already processed
+        conn.notifies.clear()
 
 
     def execute_functions(self, complet_result):
