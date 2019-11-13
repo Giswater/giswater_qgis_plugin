@@ -5,14 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox
 
 import json
 import threading
-
 from collections import OrderedDict
 
 from .parent import ParentAction
@@ -111,6 +109,7 @@ class NotifyFunctions(ParentAction):
             def refresh_config_system_variables(self, **kwargs)
             def show_message(self, **kwargs)
         """
+
         for function in complet_result['functionAction']['functions']:
             function_name = function['name']
             params = function['parameters']
@@ -118,9 +117,7 @@ class NotifyFunctions(ParentAction):
                 getattr(self, function_name)(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
-                print(f"Exception AttributeError: {e}")
-                pass
-                print(f"Exception error: {e}")
+                self.controler.log_warning(str(e))
 
 
     # Functions called by def wait_notifications(...)
@@ -153,7 +150,7 @@ class NotifyFunctions(ParentAction):
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
                 msg = f"Layer {layer_name} does not found, therefore, not configured"
-                print(msg)
+                self.controler.log_info(msg)
                 continue
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
@@ -161,15 +158,13 @@ class NotifyFunctions(ParentAction):
             sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row:
-                print(f'NOT ROW FOR: {sql}')
-                # self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                self.controler.log_info(f'NOT ROW FOR: {sql}')
                 continue
 
             # When info is nothing
             if 'results' in row[0]:
                 if row[0]['results'] == 0:
-                    print(f"{row[0]['message']['text']}")
-                    # self.controller.show_message(row[0]['message']['text'], 1)
+                    self.controler.log_info(f"{row[0]['message']['text']}")
                     continue
 
             complet_result = row[0]
@@ -223,6 +218,7 @@ class NotifyFunctions(ParentAction):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
         self.controller.get_config_param_user()
 
+
     def refresh_config_system_variables(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
         self.controller.get_config_param_system()
@@ -261,6 +257,7 @@ class NotifyFunctions(ParentAction):
                 bold = 'b' if kwargs['styleSheet']['bold'] else ''
             else:
                 bold = ''
+
         msg = f'<font color="{color}"><{bold}>{msg}</font>'
         QgsMessageLog.logMessage(msg, tab_name, level)
 
@@ -341,7 +338,7 @@ class NotifyFunctions(ParentAction):
 
         msg_list = kwargs['msg']
         for msg in msg_list:
-            print(f"{msg}")
+            self.controler.log_info(f"{msg}")
 
 
     def refreshCanvas(self, **kwargs):
