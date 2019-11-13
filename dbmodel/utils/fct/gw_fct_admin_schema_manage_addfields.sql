@@ -198,6 +198,10 @@ IF v_action='CREATE' THEN
 		v_param_name = v_unaccent_id;
 	END IF;
 
+	IF v_param_name ilike '%-%' OR v_param_name ilike '%.%' THEN
+	 	v_param_name=replace(replace(replace(v_param_name, ' ','_'),'-','_'),'.','_');
+	END IF;
+
 END IF;
 
 IF v_multi_create IS TRUE THEN
