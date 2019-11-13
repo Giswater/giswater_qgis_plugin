@@ -1679,23 +1679,8 @@ class ApiCF(ApiParent):
             rows.append(['', ''])
             utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
 
-        # Get selected dates
-        date_from = self.date_event_from.date()
-        date_to = self.date_event_to.date()
-        if date_from > date_to:
-            message = "Selected date interval is not valid"
-            self.controller.show_warning(message)
-            return
-
-        format_low = 'yyyy-MM-dd 00:00:00.000'
-        format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = f"'{date_from.toString(format_low)}'::timestamp AND '{date_to.toString(format_high)}'::timestamp"
-
-        # Set filter
-        filter_ += f" AND(tstamp BETWEEN {interval}) AND (tstamp BETWEEN {interval})"
-
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)
+        self.set_model_to_table(widget, table_name)
+        self.set_filter_table_event(widget)
 
 
     def open_visit_event(self):
