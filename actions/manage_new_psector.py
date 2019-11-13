@@ -111,9 +111,19 @@ class ManageNewPsector(ParentManage):
         atlas_id.setValidator(QIntValidator())
 
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type')
-        self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation',  " WHERE expl_id != '0' ")
-        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', " WHERE sector_id != '0' ")
         self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority')
+
+        # Set visible FALSE for cmb_sector
+        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')
+        self.dlg_plan_psector.lbl_sector.setVisible(False)
+        self.cmb_sector_id.setVisible(False)
+
+        # Populate combo expl_id
+        sql = ("SELECT expl_id, name from exploitation "
+               " JOIN selector_expl USING (expl_id) "
+               " WHERE exploitation.expl_id != 0")
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.cmb_expl_id, rows, 1)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
@@ -325,6 +335,13 @@ class ManageNewPsector(ParentManage):
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
+
+        else:
+
+            # Set psector_status vdefault
+            sql = ("SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = 2")
+            result = self.controller.get_row(sql)
+            utils_giswater.set_combo_itemData(self.cmb_status, str(result[1]), 1)
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql, commit=True)
