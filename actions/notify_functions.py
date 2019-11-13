@@ -22,6 +22,7 @@ class NotifyFunctions(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control notify from PostgresSql """
+
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
@@ -246,6 +247,7 @@ class NotifyFunctions(ParentAction):
         :param kwargs['styleSheet']['bold']: if is true, then print as bold
         :return:
         """
+
         # Set default styleSheet
         color = "black"
         level = 0
@@ -267,6 +269,7 @@ class NotifyFunctions(ParentAction):
     # Another used functions
     def set_column_visibility(self, layer, col_name, hidden):
         """ Hide selected fields according table config_api_form_fields.hidden """
+
         config = layer.attributeTableConfig()
         columns = config.columns()
         for column in columns:
@@ -279,6 +282,7 @@ class NotifyFunctions(ParentAction):
 
     def set_column_multiline(self, layer, field, fieldIndex):
         """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+
         if field['widgettype'] == 'text':
             if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
@@ -287,6 +291,7 @@ class NotifyFunctions(ParentAction):
 
     def set_read_only(self, layer, field, field_index):
         """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+
         # Get layer config
         config = layer.editFormConfig()
         try:
@@ -303,6 +308,7 @@ class NotifyFunctions(ParentAction):
     #  TODO unused functions atm
     def show_messagebox(self, **kwargs):
         """ Shows a message box with detail information """
+
         msg = kwargs['message'] if 'message' in kwargs else 'No message found'
         title = kwargs['title'] if 'title' in kwargs else 'New message'
         inf_text = kwargs['inf_text'] if 'inf_text' in kwargs else 'Info text'
@@ -328,16 +334,15 @@ class NotifyFunctions(ParentAction):
         msg_box.setDefaultButton(QMessageBox.Ok)
         msg_box.open()
 
+
     def raise_notice(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
             Used to show raise notices sent by postgresql
         """
+
         msg_list = kwargs['msg']
         for msg in msg_list:
             print(f"{msg}")
-
-
-
 
 
     def refreshCanvas(self, **kwargs):
@@ -349,7 +354,9 @@ class NotifyFunctions(ParentAction):
             layer = self.controller.get_layer_by_tablename(layer_name)
             layer.triggerRepaint()
 
+
     def get_all_layers(self, group):
+
         for child in group.children():
             if isinstance(child, QgsLayerTreeLayer):
                 self.all_layers.append(child.layer().name())
@@ -357,32 +364,3 @@ class NotifyFunctions(ParentAction):
             else:
                 self.get_all_layers(child)
 
-    def test(self, **kwargs):
-        print("TESTTESTTEST")
-    def test0(self, **kwargs):
-        print("IN TEST0")
-        for k, v in kwargs.items():
-            print(f'TEST 0 KEY: {k}, VALUE: {v}')
-        print("OUT TEST 0")
-    # params = {'param11':'test1'}
-    def test1(self, param11):
-        # **params in call need to be in this format {'param11':'test1'}
-        print("IN TEST 1")
-        print(param11)
-
-    # params = {'param11':'test1'}
-    def test2(self, param21, param22):
-        print("IN TEST 2")
-        print(f'{param21}, {param22}')
-        print("OUT TEST 2")
-
-    def test3(self, **kwargs):
-        print("IN TEST 3")
-        print(kwargs['param'])
-        list_name = kwargs['param']
-        print(list_name)
-        for x in list_name:
-            print(x)
-        # for k, v in kwargs.items():
-        #     print(f'TEST 3 KEY: {k}, VALUE: {v}')
-        print("OUT TEST 3")
