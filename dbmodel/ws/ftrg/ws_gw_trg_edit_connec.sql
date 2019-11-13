@@ -267,7 +267,7 @@ BEGIN
 		--elevation from raster
 		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND NEW.elevation IS NULL AND
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-			NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+			NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
 		END IF;   	
 
         -- FEATURE INSERT
@@ -369,7 +369,7 @@ BEGIN
 			--update elevation from raster
 			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND 
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-				NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+				NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
 			END IF;   	
 		
 		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN

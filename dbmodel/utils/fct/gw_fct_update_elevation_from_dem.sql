@@ -111,7 +111,7 @@ BEGIN
 		--loop over selected nodes, intersect node with raster
 		FOR rec IN EXECUTE v_query LOOP
 
-			EXECUTE 'SELECT public.ST_Value(rast,1,$1,false) FROM raster_dem order by st_value limit 1;'
+			EXECUTE 'SELECT public.ST_Value(rast,1,$1,false) FROM ext_raster_dem order by st_value limit 1;'
 			USING rec.the_geom
 			INTO v_elevation;
 

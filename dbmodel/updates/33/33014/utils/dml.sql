@@ -31,3 +31,14 @@ UPDATE audit_cat_param_user SET ismandatory=true WHERE formname = 'epaoptions';
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('om_flowtrace_usearcsense','true','text', 'crm', 'If false ignore arc sense, only topological connection is used to propagate the flow upstream')
 ON CONFLICT (parameter) DO NOTHING;
+
+UPDATE typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
+
+
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+    VALUES ('ext_cat_raster', 'external catalog', 'Catalog of rasters', 'role_edit', 0, 0, false)
+    ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+    VALUES ('ext_raster_dem', 'external table', 'Table to store raster DEM', 'role_edit', 0, 0, false)
+    ON CONFLICT (id) DO NOTHING;

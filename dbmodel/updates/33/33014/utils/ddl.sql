@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --13/11/2019
 ALTER TABLE audit_cat_column ADD CONSTRAINT audit_cat_column_pkey PRIMARY KEY(column_id);
+
+ALTER TABLE IF EXISTS raster_dem RENAME TO ext_raster_dem;
+ALTER TABLE IF EXISTS cat_raster RENAME TO ext_cat_raster;

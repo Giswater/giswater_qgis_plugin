@@ -281,7 +281,7 @@ BEGIN
 		-- elevation from raster
 		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND NEW.top_elev  IS NULL AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-			NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+			NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
 		END IF;  		
 
 		--set rotation field
@@ -310,7 +310,8 @@ BEGIN
 			
 				RAISE EXCEPTION 'Selected gratecat_id has NULL width or length. Check catalog data or your custom config values before continue';
 				
-			ELSE 
+			ELSIF v_length*v_width != 0 THEN
+ 
 				-- get grate dimensions
 				v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
 				v_length = v_length*v_unitsfactor;
@@ -409,7 +410,7 @@ BEGIN
 			--update elevation from raster
 			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE'  AND
 				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-				NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM raster_dem order by st_value limit 1);
+				NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
 			END IF;  
 		END IF;	
 		
