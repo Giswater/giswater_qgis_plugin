@@ -331,7 +331,7 @@ BEGIN
 -------------------------------------
 
 
-        IF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' THEN
+        IF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
 
 		parent_child_relation:=true;
 
