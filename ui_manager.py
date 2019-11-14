@@ -237,33 +237,28 @@ class Credentials(GwDialog, FORM_CLASS):
     def __init__(self, subtag=None):
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
-        # icon_path = os.path.dirname(__file__) + os.sep + 'icons'  + os.sep + '100.png'
-        # print(icon_path)
-        # if os.path.exists(icon_path):
-        #     print("EXIST")
-        #     icon = QIcon(icon_path)
-        # self.action = QAction(icon, "show")
-        # self.action.triggered.connect(self.show_pass)
-        self.btn_accept.clicked.connect(partial(self.pass_))
-        # self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+        self.action = QAction("show")
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action = QAction(icon, "show")
+        self.action.triggered.connect(self.show_pass)
+        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
 
 
     def show_pass(self):
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + '100.png'
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + '99.png'
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.svg'
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
             self.action.setIcon(icon)
             self.action.setText(text)
-
-    def pass_(self):
-        pass
 
 
 FORM_CLASS = get_ui_class('csv2pg.ui')

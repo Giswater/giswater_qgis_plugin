@@ -276,9 +276,6 @@ class UpdateSQL(ApiParent):
                 self.visit_manager()
 
                 role_admin = self.controller.check_role_user("role_admin", self.username)
-                self.controller.log_info(f"self.username --> {self.username}")
-                self.controller.log_info(f"self.super_users --> {self.super_users}")
-                self.controller.log_info(f"role_admin --> {role_admin}")
                 if not role_admin and self.username not in self.super_users:
                     msg = "You don't have permissions to administrate project schemas on this connection"
                     self.controller.show_message(msg, 1)
