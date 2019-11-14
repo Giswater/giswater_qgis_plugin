@@ -50,6 +50,8 @@ class DaoController(object):
         self.current_user = None
         self.cfgp_user = {}
         self.cfgp_system = {}
+        self.min_log_level = 20
+        self.min_message_level = 0
 
         if create_logger:
             self.set_logger(logger_name)
@@ -86,12 +88,22 @@ class DaoController(object):
         if self.logger is None:
             if logger_name is None:
                 logger_name = 'plugin'
-            log_level = int(self.settings.value('status/log_level'))
+
+            self.min_log_level = int(self.settings.value('status/log_level'))
             log_suffix = self.settings.value('status/log_suffix')
-            self.logger = Logger(self, logger_name, log_level, log_suffix)
+            self.logger = Logger(self, logger_name, self.min_log_level, log_suffix)
             self.log_info("Logger initialized")
-        
-                
+
+            if self.min_log_level == 10:
+                self.min_message_level = 0
+            elif self.min_log_level == 20:
+                self.min_message_level = 0
+            elif self.min_log_level == 30:
+                self.min_message_level = 1
+            elif self.min_log_level == 40:
+                self.min_message_level = 2
+
+
     def close_logger(self):
         """ Close logger file """
         
@@ -905,35 +917,77 @@ class DaoController(object):
         return self.user   
     
 
-    def log_message(self, text=None, message_level=0, context_name=None, parameter=None):
+    def qgis_log_message(self, text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
         """ Write message into QGIS Log Messages Panel with selected message level
-            @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} 
+            @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
         """
 
         msg = None
         if text:
             msg = self.tr(text, context_name)
             if parameter:
-                msg += ": " + str(parameter)            
-        QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
+                msg += ": " + str(parameter)
+
+        if tab_name is None:
+            tab_name = self.plugin_name
+
+        if message_level >= self.min_message_level:
+            msg = "QGIS: " + str(msg)
+            QgsMessageLog.logMessage(msg, tab_name, message_level)
 
         return msg
-        
 
-    def log_info(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
+
+    def log_message(self, text=None, message_level=0, context_name=None, parameter=None, logger_file=True,
+                    stack_level_increase=0, tab_name=None):
+        """ Write message into QGIS Log Messages Panel """
+
+        msg = self.qgis_log_message(text, message_level, context_name, parameter, tab_name)
+        if self.logger and logger_file:
+            if message_level == 0:
+                self.logger.info(msg, stack_level_increase=stack_level_increase)
+            elif message_level == 1:
+                self.logger.warning(msg, stack_level_increase=stack_level_increase)
+            elif message_level == 2:
+                self.logger.error(msg, stack_level_increase=stack_level_increase)
+            elif message_level == 4:
+                self.logger.debug(msg, stack_level_increase=stack_level_increase)
+
+
+    def log_debug(self, text=None, context_name=None, parameter=None, logger_file=True,
+                  stack_level_increase=0, tab_name=None):
+        """ Write debug message into QGIS Log Messages Panel """
+
+        msg = self.qgis_log_message(text, 0, context_name, parameter, tab_name)
+        if self.logger and logger_file:
+            self.logger.debug(msg, stack_level_increase=stack_level_increase)
+
+
+    def log_info(self, text=None, context_name=None, parameter=None, logger_file=True,
+                 stack_level_increase=0, tab_name=None):
         """ Write information message into QGIS Log Messages Panel """
 
-        msg = self.log_message(text, 0, context_name, parameter=parameter)
+        msg = self.qgis_log_message(text, 0, context_name, parameter, tab_name)
         if self.logger and logger_file:        
             self.logger.info(msg, stack_level_increase=stack_level_increase)
 
 
-    def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
+    def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True,
+                    stack_level_increase=0, tab_name=None):
         """ Write warning message into QGIS Log Messages Panel """
 
-        msg = self.log_message(text, 1, context_name, parameter=parameter)
+        msg = self.qgis_log_message(text, 1, context_name, parameter, tab_name)
         if self.logger and logger_file:
             self.logger.warning(msg, stack_level_increase=stack_level_increase)
+
+
+    def log_error(self, text=None, context_name=None, parameter=None, logger_file=True,
+                  stack_level_increase=0, tab_name=None):
+        """ Write error message into QGIS Log Messages Panel """
+
+        msg = self.qgis_log_message(text, 2, context_name, parameter, tab_name)
+        if self.logger and logger_file:
+            self.logger.error(msg, stack_level_increase=stack_level_increase)
         
      
     def add_translator(self, locale_path, log_info=False):
