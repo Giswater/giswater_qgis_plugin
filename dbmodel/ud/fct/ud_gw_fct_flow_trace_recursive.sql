@@ -17,8 +17,6 @@ BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-
-    SELECT value INTO v_use_arcsense FROM config_param_system WHERE parameter = 'om_flowtrace_usearcsense';
     
     -- Check if the node is already computed
     SELECT node_id INTO exists_id FROM anl_flow_node WHERE node_id = node_id_arg AND cur_user="current_user"() AND context='Flow trace';
@@ -30,8 +28,7 @@ BEGIN
         INSERT INTO anl_flow_node (node_id, expl_id, context, the_geom) VALUES
         (node_id_arg, (SELECT expl_id FROM v_edit_node WHERE node_id = node_id_arg), 'Flow trace', (SELECT the_geom FROM v_edit_node WHERE node_id = node_id_arg));
 
-        IF v_use_arcsense THEN
-            
+                   
 		-- Loop for all the upstream arcs
 		FOR rec_table IN SELECT arc_id, node_1, the_geom, expl_id FROM v_edit_arc WHERE node_2 = node_id_arg
 		LOOP
@@ -44,31 +41,6 @@ BEGIN
 			PERFORM gw_fct_flow_trace_recursive(rec_table.node_1);
 	
 		END LOOP;
-	ELSE
-
-		-- Loop for all the upstream arcs
-		FOR rec_table IN SELECT arc_id, node_1, node_2, the_geom, expl_id FROM v_edit_arc WHERE node_2 = node_id_arg OR node_1 = node_id_arg
-		LOOP
-			-- Insert into tables
-			INSERT INTO anl_flow_arc (arc_id, expl_id, context, the_geom) VALUES
-			(rec_table.arc_id, rec_table.expl_id, 'Flow trace', rec_table.the_geom);
-
-			IF node_id_arg = rec_table.node_1 THEN
-
-				-- Call recursive function
-				PERFORM gw_fct_flow_trace_recursive(rec_table.node_2);
-
-
-			ELSIF node_id_arg = rec_table.node_2 THEN
-		
-				-- Call recursive function
-				PERFORM gw_fct_flow_trace_recursive(rec_table.node_1);
-			END IF;
-	
-		END LOOP;
-
-	END IF;
-
     
     END IF;
     
