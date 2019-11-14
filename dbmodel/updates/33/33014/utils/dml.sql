@@ -42,3 +42,9 @@ INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity
 INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
     VALUES ('ext_raster_dem', 'external table', 'Table to store raster DEM', 'role_edit', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2772, 'gw_fct_grafanalytics', 'ud','api function', 'Graf analytics', 'role_edit',FALSE, FALSE, FALSE)
+ON conflict (id) DO NOTHING;
+
+	

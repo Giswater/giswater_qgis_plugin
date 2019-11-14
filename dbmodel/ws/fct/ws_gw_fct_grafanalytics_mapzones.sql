@@ -251,10 +251,10 @@ BEGIN
 
 	-- create graf
 	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
-	SELECT  v_class, arc_id, node_1, node_2, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  v_class, arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT  v_class, arc_id, node_2, node_1, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  v_class, arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 	-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
@@ -264,15 +264,15 @@ BEGIN
 	v_querytext  = 'UPDATE anl_graf SET flag=1 WHERE 
 			node_1 IN('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN anl_graf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
 			OR node_2 IN ('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id=d.node_id JOIN anl_graf e ON a.node_id=e.node_1 WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN anl_graf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
 			AND user_name=current_user';
 	
 	EXECUTE v_querytext;
 
-	v_text =  concat ('SELECT * FROM (',v_text,')a JOIN anl_graf e ON a.node_id=e.node_1 WHERE user_name=current_user AND grafclass=',quote_literal(v_class));
+	v_text =  concat ('SELECT * FROM (',v_text,')a JOIN anl_graf e ON a.node_id::integer=e.node_1::integer WHERE user_name=current_user AND grafclass=',quote_literal(v_class));
 
 	-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
 	
@@ -285,7 +285,7 @@ BEGIN
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from sector 
 			where grafconfig is not null order by 1,2) a 
-			ON to_arc=arc_id WHERE node_id=node_1
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
 			) AND user_name=current_user;
 	
 	ELSIF v_class = 'DMA' THEN
@@ -296,7 +296,7 @@ BEGIN
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from dma 
 			where grafconfig is not null order by 1,2) a
-			ON to_arc=arc_id WHERE node_id=node_1
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
 			) AND user_name=current_user;
 
 	ELSIF v_class = 'DQA' THEN
@@ -307,7 +307,7 @@ BEGIN
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from dqa 
 			where grafconfig is not null order by 1,2) a
-			ON to_arc=arc_id WHERE node_id=node_1
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
 			) AND user_name=current_user;
 
 	ELSIF v_class = 'PRESSZONE' THEN
@@ -318,7 +318,7 @@ BEGIN
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from cat_presszone 
 			where grafconfig is not null order by 1,2) a
-			ON to_arc=arc_id WHERE node_id=node_1
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
 			) AND user_name=current_user;		
 	END IF;
 				
@@ -341,7 +341,7 @@ BEGIN
 				EXIT WHEN v_featureid IS NULL;
 				
 			ELSIF v_nodeid IS NOT NULL THEN
-				v_featureid = v_nodeid;
+				v_featureid = v_nodeid::integer;
 				v_cont1 = -1;
 			END IF;
 
@@ -373,7 +373,7 @@ BEGIN
 			LOOP	
 				cont1 = cont1+1;
 				
-				UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class AND user_name=current_user;
+				UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id AND n.grafclass=v_class AND user_name=current_user;
 				
 				GET DIAGNOSTICS affected_rows =row_count;
 				EXIT WHEN affected_rows = 0;

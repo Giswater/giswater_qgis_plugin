@@ -102,15 +102,15 @@ BEGIN
 
 	-- create graf
 	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
-	SELECT  v_class, arc_id, node_1, node_2, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  v_class, arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT  v_class, arc_id, node_2, node_1, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  v_class, arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 	
 	-- set boundary conditions of graf table	
 	UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
-	WHERE c.node_id=anl_graf.node_1 AND graf_delimiter !='NONE' ;
+	WHERE c.node_id::integer=anl_graf.node_1 AND graf_delimiter !='NONE' ;
 			
 	-- starting process
 	LOOP
@@ -131,13 +131,13 @@ BEGIN
 		EXIT WHEN v_arc IS NULL;
 				
 		-- set the starting element
-		v_querytext = 'UPDATE anl_graf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||' AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 		
+		v_querytext = 'UPDATE anl_graf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'::integer AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 		
 		EXECUTE v_querytext;
 
 		-- inundation process
 		LOOP	
 			cont1 = cont1+1;
-			UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id AND n.grafclass=v_class;
+			UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id AND n.grafclass=v_class;
 			GET DIAGNOSTICS affected_rows =row_count;
 			EXIT WHEN affected_rows = 0;
 			EXIT WHEN cont1 = 200;
