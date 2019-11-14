@@ -117,7 +117,7 @@ class NotifyFunctions(ParentAction):
                 getattr(self, function_name)(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
-                self.controler.log_warning(str(e))
+                self.controller.log_warning(f"Exception error: {e}")
 
 
     # Functions called by def wait_notifications(...)
@@ -150,7 +150,7 @@ class NotifyFunctions(ParentAction):
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
                 msg = f"Layer {layer_name} does not found, therefore, not configured"
-                self.controler.log_info(msg)
+                self.controller.log_info(msg)
                 continue
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
@@ -158,13 +158,13 @@ class NotifyFunctions(ParentAction):
             sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row:
-                self.controler.log_info(f'NOT ROW FOR: {sql}')
+                self.controller.log_info(f'NOT ROW FOR: {sql}')
                 continue
 
             # When info is nothing
             if 'results' in row[0]:
                 if row[0]['results'] == 0:
-                    self.controler.log_info(f"{row[0]['message']['text']}")
+                    self.controller.log_info(f"{row[0]['message']['text']}")
                     continue
 
             complet_result = row[0]
@@ -338,7 +338,7 @@ class NotifyFunctions(ParentAction):
 
         msg_list = kwargs['msg']
         for msg in msg_list:
-            self.controler.log_info(f"{msg}")
+            self.controller.log_info(f"{msg}")
 
 
     def refreshCanvas(self, **kwargs):
