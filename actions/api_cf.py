@@ -1847,9 +1847,10 @@ class ApiCF(ApiParent):
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
+        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        if rows:
+            rows.append(['', ''])
+            utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
 
         # End cascading filter
         # Get selected values in Comboboxes
@@ -1864,10 +1865,10 @@ class ApiCF(ApiParent):
         # Set filter
         expr += f" AND visit_start BETWEEN {interval}"
 
-        if event_type_value != 'null':
+        if event_type_value not in ('null', -1):
             expr += f" AND parameter_type ILIKE '%{event_type_value}%'"
 
-        if event_id != 'null':
+        if event_id not in ('null', -1):
             expr += f" AND parameter_id ILIKE '%{event_id}%'"
 
         # Refresh model with selected filter
