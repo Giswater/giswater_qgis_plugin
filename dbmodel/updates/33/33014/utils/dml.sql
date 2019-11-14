@@ -29,7 +29,7 @@ UPDATE audit_cat_param_user SET ismandatory=true WHERE formname = 'epaoptions';
 
 -- 13/11/2019
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
-VALUES ('om_flowtrace_usearcsense','true','text', 'crm', 'If false ignore arc sense, only topological connection is used to propagate the flow upstream')
+VALUES ('om_flowtrace_usearcsense','true','boolean', 'crm', 'If false ignore arc sense, only topological connection is used to propagate the flow upstream')
 ON CONFLICT (parameter) DO NOTHING;
 
 UPDATE typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';

@@ -14,7 +14,7 @@ $BODY$
 
 /*
 --EXAMPLE
-SELECT gw_fct_grafanalytics('{"data":{"parameters":{"node":"5100"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"parameters":{"node":"5100"}}}');
 
 vacuum analyze
 
@@ -36,6 +36,7 @@ BEGIN
 
    	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'node');
 	
+	delete FROM anl_arc where cur_user=current_user AND fprocesscat_id=39;
 	delete FROM anl_graf where user_name=current_user AND grafclass='FLOWTRACE';
 
 	-- fill the graf table
