@@ -66,21 +66,22 @@ class UpdateSQL(ApiParent):
         # Declare variable superusers
         self.super_users = []
 
+        # Get last database connection from controller
+        self.last_connection = self.get_last_connection()
+
         # Check if connection is still False
         connection_status, not_version = self.controller.set_database_connection()
         if not connection_status:
             dlg_credentials = Credentials()
             dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, dlg_credentials))
             dlg_credentials.open()
+            dlg_credentials.lbl_connection_message.setText(str("Could not retrieve connection parameters for '" + str(self.last_connection) + "':"))
         else:
             # Set logger file
             self.controller.set_logger()
 
             # Check if we have any layer loaded
             layers = self.controller.get_layers()
-
-            # Get last database connection from controller
-            self.last_connection = self.get_last_connection()
 
             # Get database connection user and role
             self.username = self.get_user_connection(self.last_connection)
