@@ -240,12 +240,18 @@ BEGIN
 		END IF;
 
 		--elevation from raster
-		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND NEW.top_elev IS NULL AND
+		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND 
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-			NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
-		END IF;   
+			NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id =
+				(SELECT id FROM ext_raster_dem WHERE
+				st_dwithin (ST_MakeEnvelope(
+				ST_UpperLeftX(rast), 
+				ST_UpperLeftY(rast),
+				ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
+				ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
+		END IF;  
 		
-        -- FEATURE INSERT
+		-- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation, "observ",
 					"comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id,postcode,
 					streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  undelete, featurecat_id,feature_id,  label_x, label_y, label_rotation, accessibility,diagonal, 
@@ -297,16 +303,22 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-       -- UPDATE geom
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+		-- UPDATE geom
+		IF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;	
 
-			-- update elevation from raster
-			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE'  AND
+			--update elevation from raster
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND 
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-				NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
-			END IF;   	
-        END IF;
+				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id =
+					(SELECT id FROM ext_raster_dem WHERE
+					st_dwithin (ST_MakeEnvelope(
+					ST_UpperLeftX(rast), 
+					ST_UpperLeftY(rast),
+					ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
+					ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
+			END IF;  	
+		END IF;
 		
 		-- Reconnect arc_id
 		IF (NEW.arc_id != OLD.arc_id OR OLD.arc_id IS NULL) AND NEW.arc_id IS NOT NULL THEN  -- case when arc_id comes from connec table

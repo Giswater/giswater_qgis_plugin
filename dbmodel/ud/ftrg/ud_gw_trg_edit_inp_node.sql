@@ -30,15 +30,21 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 	
-		-- State
-		IF (NEW.state != OLD.state) THEN
-			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
-		END IF;
+	-- State
+	IF (NEW.state != OLD.state) THEN
+		UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
+	END IF;
 			
-		-- The geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
-			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
-		END IF;
+	-- The geom
+	IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+		UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+	END IF;
+
+	--update elevation from raster
+	IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE'  AND
+		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+		NEW.top_elev = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
+	END IF;  
 	
 
         UPDATE node 

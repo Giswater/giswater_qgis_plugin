@@ -265,10 +265,17 @@ BEGIN
 		END IF;
 
 		--elevation from raster
-		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND NEW.elevation IS NULL AND
+		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND 
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-			NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
-		END IF;   	
+			NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id =
+				(SELECT id FROM ext_raster_dem WHERE
+				st_dwithin (ST_MakeEnvelope(
+				ST_UpperLeftX(rast), 
+				ST_UpperLeftY(rast),
+				ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
+				ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
+
+		END IF;    	
 
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
@@ -363,16 +370,22 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		-- UPDATE geom/dma/sector/expl_id
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='POINT'  THEN
+		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='POINT'  THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
 
 			--update elevation from raster
-			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND 
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND 
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-				NEW.elevation = (SELECT public.ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem order by st_value limit 1);
-			END IF;   	
+				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id =
+					(SELECT id FROM ext_raster_dem WHERE
+					st_dwithin (ST_MakeEnvelope(
+					ST_UpperLeftX(rast), 
+					ST_UpperLeftY(rast),
+					ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
+					ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
+			END IF;  	
 		
-		ELSIF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
+		ELSIF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
 			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
 			NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
 			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
