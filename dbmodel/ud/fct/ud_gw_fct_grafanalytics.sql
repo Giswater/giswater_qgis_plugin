@@ -14,7 +14,7 @@ $BODY$
 
 /*
 --EXAMPLE
-SELECT gw_fct_grafanalytics('{"data":{"parameters":{"node":"5100"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics('{"data":{"parameters":{"node":"5100"}}}');
 
 vacuum analyze
 
