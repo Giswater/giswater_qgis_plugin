@@ -17,7 +17,10 @@ from .parent import ParentAction
 
 
 class NotifyFunctions(ParentAction):
-
+    # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
+    #                   re-LISTEN all channels
+    conn_failed = False
+    list_channels = None
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control notify from PostgresSql """
 
@@ -33,7 +36,7 @@ class NotifyFunctions(ParentAction):
         """
         :param list_channels: List of channels to be listened
         """
-
+        self.list_channels = list_channels
         for channel_name in list_channels:
             self.controller.execute_sql(f"LISTEN {channel_name};")
 
@@ -77,26 +80,33 @@ class NotifyFunctions(ParentAction):
 
 
     def wait_notifications(self):
+        try:
+            if self.conn_failed:
+                for channel_name in self.list_channels:
+                    self.controller.execute_sql(f"LISTEN {channel_name};")
+                self.conn_failed = False
 
-        # Initialize thread
-        thread = threading.Timer(interval=0.1, function=self.wait_notifications)
-        thread.start()
+            # Initialize thread
+            thread = threading.Timer(interval=0.1, function=self.wait_notifications)
+            thread.start()
 
-        # Check if any notification to process
-        conn = self.controller.dao.conn
-        conn.poll()
-        for notify in conn.notifies:
-            msg = f"Got NOTIFY: {notify.pid}, {notify.channel}, {notify.payload}"
-            self.controller.log_info(msg)
-            if notify.payload:
-                try:
-                    complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
-                    self.execute_functions(complet_result)
-                except Exception as e:
-                    pass
+            # Check if any notification to process
+            conn = self.controller.dao.conn
+            conn.poll()
+            for notify in conn.notifies:
+                msg = f"Got NOTIFY: {notify.pid}, {notify.channel}, {notify.payload}"
+                self.controller.log_info(msg)
+                if notify.payload:
+                    try:
+                        complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
+                        self.execute_functions(complet_result)
+                    except Exception as e:
+                        pass
 
-        # Clear list of notifications already processed
-        conn.notifies.clear()
+            # Clear list of notifications already processed
+            conn.notifies.clear()
+        except AttributeError:
+            self.conn_failed = True
 
 
     def execute_functions(self, complet_result):
