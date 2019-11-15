@@ -147,7 +147,6 @@ class UpdateSQL(ApiParent):
             elif self.locale == 'en_us':
                 self.locale = 'EN'
 
-            self.filter_srid_value = self.controller.plugin_settings_value('srid')
             self.schema = None
 
             if self.dev_user != 'TRUE':
@@ -270,6 +269,7 @@ class UpdateSQL(ApiParent):
                 # Create extension postgis if not exist
                 sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
                 self.controller.execute_sql(sql)
+
                 # Manage widgets tabs
                 self.populate_data_schema_name(self.cmb_project_type)
                 self.set_info_project()
@@ -1953,14 +1953,15 @@ class UpdateSQL(ApiParent):
             result = self.controller.get_row(sql)
 
             if result is None:
-                sql = "SELECT giswater, language FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
+                sql = "SELECT giswater, language, epsg FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
                 result = self.controller.get_row(sql)
             else:
-                sql = "SELECT giswater, language, sample FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
+                sql = "SELECT giswater, language, epsg, sample FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
                 result = self.controller.get_row(sql)
-                self.is_sample = result[2]
+                self.is_sample = result[3]
             self.project_data_schema_version = result[0]
             self.project_data_language = result[1]
+            self.filter_srid_value = str(result[2])
 
             if self.is_sample is None:
                 self.is_sample = 'False'
@@ -1998,6 +1999,7 @@ class UpdateSQL(ApiParent):
                + str(postgis_version[0]) + ' \n \n' + ''
                'Name: ' + schema_name + '\n' + ''
                'Version: ' + self.project_data_schema_version + ' \n' + ''
+               'EPSG: ' + self.filter_srid_value + ' \n' + ''
                'Language: ' + self.project_data_language + ' \n' + ''
                'Title: ' + str(result[0]['title']) + '\n' + ''
                'Author: ' + str(result[0]['author']) + '\n' + ''
