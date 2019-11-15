@@ -14,7 +14,8 @@ UPDATE audit_cat_function SET isdeprecated=TRUE where function_name='gw_fct_util
 UPDATE sys_csv2pg_cat SET formname='importcsv', functionname='gw_fct_utils_csv2pg_import_dbprices' WHERE id=1;
 
 -- csv2pg visit functions
-INSERT INTO sys_csv2pg_cat VALUES (9, 'Import om visit', 'Import om visit', 'To use this import csv function parameter you need to configure before execute it the system parameter ''utils_csv2pg_om_visit_parameters''. 
+INSERT INTO sys_csv2pg_cat (id, name, name_i18n, csv_structure, sys_role, formname, functionname)
+VALUES (9, 'Import om visit', 'Import om visit', 'To use this import csv function parameter you need to configure before execute it the system parameter ''utils_csv2pg_om_visit_parameters''. 
 Also whe recommend to read before the annotations inside the function to work as well as posible with', 'role_om', 'importcsv', 'gw_fct_utils_csv2pg_import_omvisit');
 
 UPDATE sys_csv2pg_cat SET isdeprecated=true WHERE id=2;

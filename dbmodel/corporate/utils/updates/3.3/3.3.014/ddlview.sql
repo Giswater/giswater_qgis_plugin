@@ -20,5 +20,5 @@ SELECT
   provider,
   year,
   rast
-FROM utils.raster
+FROM utils.raster_dem
 JOIN utils.cat_raster ON cat_raster.id=rastercat_id;
