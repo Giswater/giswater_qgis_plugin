@@ -91,6 +91,7 @@ class UpdateSQL(ApiParent):
             self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
             self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
             self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
+
             # Create the dialog and signals
             self.dlg_readsql = Readsql()
             self.load_settings(self.dlg_readsql)
@@ -3234,18 +3235,19 @@ class UpdateSQL(ApiParent):
         self.version_metadata = self.get_plugin_version()
         # Check if exist column sample in table version
         sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + self.schema_name + "';"
-        result = self.controller.get_row(sql)
+        result = self.controller.get_row(sql, commit=True)
 
         if result is None:
             sql = "SELECT giswater, language FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
-            result = self.controller.get_row(sql)
+            result = self.controller.get_row(sql, commit=True)
         else:
             sql = "SELECT giswater, language, sample FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
-            result = self.controller.get_row(sql)
+            result = self.controller.get_row(sql, commit=True)
             self.is_sample = result[2]
 
         self.project_data_schema_version = result[0]
         self.project_data_language = result[1]
+
 
         if str(self.version_metadata) > str(self.project_data_schema_version):
             self.dlg_info.lbl_status.setPixmap(self.status_no_update)
