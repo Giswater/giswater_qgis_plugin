@@ -7,9 +7,9 @@ or (at your option) any later version.
 
 # -*- coding: latin-1 -*-
 from qgis.core import Qgis, QgsGeometry, QgsMapToPixel, QgsPointXY
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
 
-from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt
+from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt, pyqtSignal, QObject
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
@@ -27,15 +27,20 @@ from .manage_document import ManageDocument
 from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import ApiBasicInfo, ApiCfUi, EventFull, LoadDocuments, Sections
 
 
-class ApiCF(ApiParent):
+class ApiCF(ApiParent, QObject):
+    
+    # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadApiInfo
+    signal_activate = pyqtSignal()
 
     def __init__(self, iface, settings, controller, plugin_dir, tab_type):
         """ Class constructor """
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        QObject.__init__(self)
         self.iface = iface
         self.settings = settings
         self.controller = controller
@@ -404,6 +409,8 @@ class ApiCF(ApiParent):
         action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
         action_catalog = self.dlg_cf.findChild(QAction, "actionCatalog")
         action_workcat = self.dlg_cf.findChild(QAction, "actionWorkcat")
+        action_get_arc_id = self.dlg_cf.findChild(QAction, "actionGetArcId")
+        action_get_parent_id = self.dlg_cf.findChild(QAction, "actionGetParentId")
         action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
         action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
         action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
@@ -425,6 +432,8 @@ class ApiCF(ApiParent):
         self.set_icon(action_rotation, "107c")
         self.set_icon(action_catalog, "195")
         self.set_icon(action_workcat, "193")
+        self.set_icon(action_get_arc_id, "209")
+        self.set_icon(action_get_parent_id, "210")
         self.set_icon(action_zoom_in, "103")
         self.set_icon(action_zoom_out, "107")
         self.set_icon(action_centered, "104")
@@ -528,6 +537,8 @@ class ApiCF(ApiParent):
         action_edit.triggered.connect(partial(self.start_editing, self.layer))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
+        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
@@ -970,6 +981,7 @@ class ApiCF(ApiParent):
             print(e)
             """If the function called by getattr don't exist raise this exception"""
             pass
+
 
     def check_min_max_value(self,dialog, widget, btn_accept):
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
@@ -2516,6 +2528,122 @@ class ApiCF(ApiParent):
 
         # Open dialog
         dlg.open()
+
+
+    def get_snapped_feature_id(self, dialog, action, option):
+        """ Snap feature and set a value into dialog """
+
+        layer_name = 'v_edit_' + option
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        widget_name = f"data_{option}_id"
+        widget = dialog.findChild(QWidget, widget_name)
+        if not layer or not widget:
+            action.setChecked(False)
+            return
+
+        # Block the signals of de dialog so that the key ESC does not close it
+        dialog.blockSignals(True)
+
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
+
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
+        self.snapper = self.snapper_manager.get_snapper()
+
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Disable snapping
+        self.snapper_manager.enable_snapping()
+
+        # Set snapping to 'arc' and 'node'
+        self.snapper_manager.set_snapping_layers()
+
+        # if we are doing info over connec or over node
+        if option == 'arc':
+            self.snapper_manager.snap_to_arc()
+        elif option == 'node':
+            self.snapper_manager.snap_to_node()
+
+        # Set signals
+        self.canvas.xyCoordinates.connect(partial(self.mouse_move, layer))
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
+
+
+    def mouse_move(self, layer, point):
+        """ Mouse motion detection """
+
+        # Set active layer
+        self.iface.setActiveLayer(layer)
+        layer_name = self.controller.get_layer_source_table_name(layer)
+
+        # Get clicked point
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            # Check feature
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == layer_name:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def get_id(self, dialog, action, option, point, event):
+        """ Get selected attribute from snapped feature """
+        # @options{'key':['att to get from snapped feature', 'widget name destination']}
+        options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id']}
+
+        if event == Qt.RightButton:
+            self.disconnect_snapping(False)
+            self.cancel_snapping_tool(dialog, action)
+            return
+
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
+
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
+        if not self.snapper_manager.result_is_valid():
+            return
+        # Get the point. Leave selection
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        feat_id = snapped_feat.attribute(f'{options[option][0]}')
+        widget = dialog.findChild(QWidget, f"{options[option][1]}")
+        widget.setFocus()
+        utils_giswater.setWidgetText(dialog, widget, str(feat_id))
+        self.snapper_manager.recover_snapping_options()
+        self.cancel_snapping_tool(dialog, action)
+
+
+    def cancel_snapping_tool(self, dialog, action):
+        self.disconnect_snapping(False)
+        dialog.blockSignals(False)
+        action.setChecked(False)
+        self.signal_activate.emit()
+
+
+    def disconnect_snapping(self, action_pan=True):
+        """ Select 'Pan' as current map tool and disconnect snapping """
+
+        try:
+            self.canvas.xyCoordinates.disconnect()
+            self.emit_point.canvasClicked.disconnect()
+            if action_pan:
+                self.iface.actionPan().trigger()
+            self.vertex_marker.hide()
+        except Exception as e:
+            print(f"{type(e).__name__} --> {e}")
 
 
     """ OTHER FUNCTIONS """

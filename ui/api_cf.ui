@@ -52,7 +52,7 @@
              <x>0</x>
              <y>0</y>
              <width>634</width>
-             <height>381</height>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -816,6 +816,8 @@
    <addaction name="actionRotation"/>
    <addaction name="actionCatalog"/>
    <addaction name="actionWorkcat"/>
+   <addaction name="actionGetArcId"/>
+   <addaction name="actionGetParentId"/>
    <addaction name="separator"/>
    <addaction name="actionInterpolate"/>
    <addaction name="actionZoom"/>
@@ -990,6 +992,25 @@
    </property>
    <property name="visible">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionGetArcId">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Get new arc id</string>
+   </property>
+   <property name="toolTip">
+    <string>Get new arc id</string>
+   </property>
+  </action>
+  <action name="actionGetParentId">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Get new parent id</string>
    </property>
   </action>
  </widget>

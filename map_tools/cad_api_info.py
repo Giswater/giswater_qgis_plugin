@@ -6,8 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapToPixel
+
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor
+from qgis.PyQt.QtWidgets import QAction
 
 from .parent import ParentMapTool
 from ..actions.api_cf import ApiCF
@@ -23,6 +25,8 @@ class CadApiInfo(ParentMapTool):
         super(CadApiInfo, self).__init__(iface, settings, action, index_action)
         self.index_action = index_action
         self.tab_type = None
+        # :var self.block_signal: used when the signal 'signal_activate' is emitted from the info, do not open another form
+        self.block_signal = False
 
 
     def create_point(self, event):
@@ -58,8 +62,14 @@ class CadApiInfo(ParentMapTool):
         for rb in self.rubberband_list:
             rb.reset()
 
+        if self.block_signal:
+            self.block_signal = False
+            return
+
         self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
+        self.info_cf.signal_activate.connect(self.reactivate_map_tool)
         complet_result = None
+
         if event.button() == Qt.LeftButton:
             point = self.create_point(event)
             if point is False:
@@ -78,6 +88,13 @@ class CadApiInfo(ParentMapTool):
             self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type=self.tab_type)
 
 
+    def reactivate_map_tool(self):
+        """ Reactivate tool """
+        self.block_signal = True
+        info_action = self.iface.mainWindow().findChild(QAction, 'map_tool_api_info_data')
+        info_action.trigger()
+
+
     def activate(self):
 
         # Check button
@@ -92,7 +109,6 @@ class CadApiInfo(ParentMapTool):
         elif self.index_action == '199':
             self.tab_type = 'inp'
 
-        
 
     def deactivate(self):
 
