@@ -94,12 +94,14 @@ class ManageNewPsector(ParentManage):
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
 
         # Set visible FALSE for cmb_sector
-        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')
+        sql = ("SELECT sector_id, name FROM sector")
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.cmb_sector_id, rows, 1)
         self.dlg_plan_psector.lbl_sector.setVisible(False)
         self.cmb_sector_id.setVisible(False)
 
         # Populate combo expl_id
-        sql = ("SELECT expl_id, name from exploitation "
+        sql = ("SELECT expl_id, name FROM exploitation "
                " JOIN selector_expl USING (expl_id) "
                " WHERE exploitation.expl_id != 0")
         rows = self.controller.get_rows(sql, commit=True)
