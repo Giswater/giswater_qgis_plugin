@@ -58,6 +58,7 @@ class CadApiInfo(ParentMapTool):
         for rb in self.rubberband_list:
             rb.reset()
 
+        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
         complet_result = None
         if event.button() == Qt.LeftButton:
             point = self.create_point(event)
@@ -91,8 +92,7 @@ class CadApiInfo(ParentMapTool):
         elif self.index_action == '199':
             self.tab_type = 'inp'
 
-        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
-
+        
 
     def deactivate(self):
 
