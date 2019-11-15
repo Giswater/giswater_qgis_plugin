@@ -44,8 +44,10 @@ class ApiConfig(ApiParent):
         # Set layers name in temp_table
         self.set_layers_name()
 
-        # Get role_user
+        # Get user and role
         user_role = self.controller.get_restriction()
+        super_users = self.settings.value('system_variables/super_users')
+        cur_user = self.controller.get_current_user()
 
         self.list_update = []
 
@@ -213,9 +215,8 @@ class ApiConfig(ApiParent):
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
         self.hide_void_groupbox(self.dlg_config)
-
-        # Check user role and remove tabs
-        if user_role != 'role_admin':
+        # Check user/role and remove tabs
+        if user_role != 'role_admin' and cur_user not in super_users:
             utils_giswater.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
