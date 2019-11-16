@@ -13,7 +13,7 @@ $BODY$
 
 /*
 TO EXECUTE
-
+INSERT INTO anl_mincut_result_cat values (-1);
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "parameters":{"id":-1, "process":"base"}}}')
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "parameters":{"id":-1, "process":"extended"}}}')
 
@@ -43,7 +43,7 @@ BEGIN
 	v_mincutid = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'id');
 
 	-- reset graf & audit_log tables
-	DELETE FROM anl_graf where user_name=current_user;
+	DELETE FROM temp_anlgraf;
 	
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -51,42 +51,40 @@ BEGIN
 	DELETE FROM selector_psector WHERE cur_user=current_user;
 	
 	-- create graf
-	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
-	SELECT  v_class, arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf )
+	SELECT arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT  v_class, arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 	
 	
 	-- set boundary conditions of graf table	
 	IF v_mincutprocess = 'base' THEN
-		UPDATE anl_graf SET flag=1
+		UPDATE temp_anlgraf SET flag=1
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))
-		AND (anl_graf.node_1 = anl_mincut_result_valve.node_id::integer OR anl_graf.node_2 = anl_mincut_result_valve.node_id::integer)
-		AND user_name=current_user;
+		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
 			
 	ELSIF v_mincutprocess = 'extended' THEN 
-		UPDATE anl_graf SET flag=1
+		UPDATE temp_anlgraf SET flag=1
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE 
-		AND (anl_graf.node_1 = anl_mincut_result_valve.node_id::integer OR anl_graf.node_2 = anl_mincut_result_valve.node_id::integer) 
-		AND user_name=current_user;
+		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
 	END IF;
 				
 	-- reset water flag
-	UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
+	UPDATE temp_anlgraf SET water=0;
 	
 	------------------
 	-- starting engine
 				
 	-- set the starting element
-	v_querytext = 'UPDATE anl_graf SET water=1 WHERE arc_id='||quote_literal(v_arc)||' AND flag=0 AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
+	v_querytext = 'UPDATE temp_anlgraf SET water=1 WHERE arc_id='||quote_literal(v_arc)||' AND flag=0'; 
 	EXECUTE v_querytext;
 			
 	EXECUTE v_querytext;-- inundation process
 	LOOP	
 		cont1 = cont1+1;
-		UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id::integer = a.arc_id::integer AND n.grafclass=v_class;
+		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id::integer = a.arc_id::integer;
 		GET DIAGNOSTICS affected_rows =row_count;
 		EXIT WHEN affected_rows = 0;
 		EXIT WHEN cont1 = 100;
@@ -97,24 +95,24 @@ BEGIN
 	
 	-- insert arc results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_arc (result_id, arc_id)
-		SELECT '||v_mincutid||', a.arc_id FROM (SELECT arc_id FROM anl_graf WHERE grafclass=''MINCUT'' AND water=1 AND user_name=current_user)a';
+		SELECT '||v_mincutid||', a.arc_id FROM (SELECT arc_id FROM temp_anlgraf WHERE water=1)a';
 
 	-- insert node results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_node (result_id, node_id)
 		SELECT '||v_mincutid||', b.node_1 FROM (SELECT node_1 FROM
-		(SELECT node_1,water FROM anl_graf WHERE grafclass=''MINCUT'' UNION SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
+		(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
 		GROUP BY node_1, water HAVING water=1) b';
 
 	-- insert delimiters into table
 	IF v_mincutprocess = 'base' THEN
 		EXECUTE 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE result_id = '||v_mincutid||' AND node_id IN 
-			(select node_1 from (SELECT node_1, water FROM anl_graf WHERE grafclass=''MINCUT'' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
+			(select node_1::varchar from (SELECT node_1, water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
 			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)';
 			
 	ELSIF v_mincutprocess = 'extended' THEN
 		EXECUTE 'INSERT INTO anl_mincut_result_node (result_id, node_id)
-			SELECT '||v_mincutid||', b.node_1 FROM (SELECT node_1 FROM
-			(SELECT node_1,water FROM anl_graf WHERE grafclass=''MINCUT'' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass=''MINCUT'')a
+			SELECT '||v_mincutid||', b.node_1 FROM (SELECT node_1::varchar FROM
+			(SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
 			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2) b';
 	END IF;
 

@@ -13,13 +13,13 @@ RETURNS json AS
 $BODY$
 
 /*
-delete from anl_graf
+delete from temp_anlgraf
 TO EXECUTE
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}')
 
 delete from SCHEMA_NAME.audit_log_data;
-delete from SCHEMA_NAME.anl_graf
+delete from SCHEMA_NAME.temp_anlgraf
 
 SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
@@ -30,30 +30,30 @@ SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=c
 
 DECLARE
 affected_rows 		numeric;
-cont1 				integer default 0;
-v_class 			text = 'MINSECTOR';
-v_feature 			record;
-v_expl 				json;
-v_data 				json;
+cont1 			integer default 0;
+v_class 		text = 'MINSECTOR';
+v_feature 		record;
+v_expl 			json;
+v_data 			json;
 v_fprocesscat_id 	integer;
-v_addparam 			record;
+v_addparam 		record;
 v_attribute 		text;
-v_arcid 			text;
+v_arcid 		text;
 v_featuretype		text;
 v_featureid 		integer;
 v_querytext 		text;
 v_updatefeature 	boolean;
-v_arc				text;
+v_arc			text;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
-v_result 			text;
-v_count				json;
-v_version			text;
+v_result 		text;
+v_count			json;
+v_version		text;
 v_updatemapzgeom 	boolean;
 v_concavehull		float;
-v_srid				integer;
+v_srid			integer;
 
 
 
@@ -77,7 +77,7 @@ BEGIN
 	v_featuretype='arc';
 
 		-- reset graf & audit_log tables
-	DELETE FROM anl_graf where user_name=current_user;
+	DELETE FROM temp_anlgraf;
 	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id=34 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user;
@@ -101,16 +101,16 @@ BEGIN
 	END IF;
 
 	-- create graf
-	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
-	SELECT  v_class, arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	INSERT INTO temp_anlgraf ( arc_id, node_1, node_2, water, flag, checkf )
+	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT  v_class, arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 	
 	-- set boundary conditions of graf table	
-	UPDATE anl_graf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
-	WHERE c.node_id::integer=anl_graf.node_1 AND graf_delimiter !='NONE' ;
+	UPDATE temp_anlgraf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
+	WHERE c.node_id::integer=temp_anlgraf.node_1 AND graf_delimiter !='NONE' ;
 			
 	-- starting process
 	LOOP
@@ -118,26 +118,26 @@ BEGIN
 		cont1 = 0;
 
 		-- reset water flag
-		UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
+		UPDATE temp_anlgraf SET water=0;
 
 		------------------
 		-- starting engine
 		-- when arc_id is provided as a parameter
 		IF v_arcid IS NULL THEN
-			SELECT a.arc_id INTO v_arc FROM (SELECT arc_id, max(checkf) as checkf FROM anl_graf WHERE grafclass=v_class GROUP by arc_id) a 
-			JOIN v_edit_arc b ON a.arc_id=b.arc_id WHERE checkf=0 LIMIT 1;
+			SELECT a.arc_id INTO v_arc FROM (SELECT arc_id, max(checkf) as checkf FROM temp_anlgraf GROUP by arc_id) a 
+			JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer WHERE checkf=0 LIMIT 1;
 		END IF;
 
 		EXIT WHEN v_arc IS NULL;
 				
 		-- set the starting element
-		v_querytext = 'UPDATE anl_graf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'::integer AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 		
+		v_querytext = 'UPDATE temp_anlgraf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'::integer';
 		EXECUTE v_querytext;
 
 		-- inundation process
 		LOOP	
 			cont1 = cont1+1;
-			UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id AND n.grafclass=v_class;
+			UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 			GET DIAGNOSTICS affected_rows =row_count;
 			EXIT WHEN affected_rows = 0;
 			EXIT WHEN cont1 = 200;
@@ -149,20 +149,19 @@ BEGIN
 		-- insert arc results into audit table
 		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
 			SELECT DISTINCT ON (arc_id)'||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_arc)||' 
-			FROM (SELECT arc_id, max(water) as water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' 
-			AND water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
+			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer';
 	
 		-- insert node results into audit table
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
 			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
-			(SELECT node_1,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' UNION SELECT node_2,water FROM anl_graf WHERE grafclass='||quote_literal(v_class)||')a
-			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c USING(node_id)';
+			(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
+			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id::integer=b.node_id::integer';
 
 		-- insert node delimiters into audit table
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
 			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, 0 FROM 
-			(SELECT node_1 as node_id FROM (SELECT node_1,water FROM anl_graf WHERE grafclass=''MINSECTOR'' UNION ALL SELECT node_2,water FROM anl_graf WHERE grafclass=''MINSECTOR'')a
-			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c USING(node_id)';
+			(SELECT node_1 as node_id FROM (SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
+			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c ON c.node_id::integer=b.node_id::integer';
 		-- NOTE: node delimiter are inserted two times in table, as node from minsector trace and as node delimiter
 
 				
@@ -201,10 +200,8 @@ BEGIN
 		-- update graf on minsector_graf
 		DELETE FROM minsector_graf;
 		INSERT INTO minsector_graf 
-		SELECT node_id, nodecat_id, a.minsector_id as minsector_1, b.minsector_id as minsector_2 FROM node 
-		join arc a on a.node_1=node_id
-		join arc b on b.node_2=node_id
-		WHERE node.minsector_id=0;
+		SELECT DISTINCT ON (node_id) node_id, nodecat_id, a.minsector_id as minsector_1, b.minsector_id as minsector_2 
+		FROM node join arc a on a.node_1=node_id join arc b on b.node_2=node_id WHERE node.minsector_id=0 order by 1;
 
 		-- message
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 

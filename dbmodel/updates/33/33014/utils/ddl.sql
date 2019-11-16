@@ -15,20 +15,18 @@ ALTER TABLE IF EXISTS raster_dem RENAME TO ext_raster_dem;
 ALTER TABLE IF EXISTS cat_raster RENAME TO ext_cat_raster;
 
 
+ALTER TABLE anl_graf RENAME TO _anl_graf_;
+
+
 --14/11/2019
-
-DROP VIEW IF EXISTS v_anl_graf;
-
-DROP TABLE IF EXISTS anl_graf;
-
-CREATE TABLE anl_graf
+CREATE TABLE IF NOT EXISTS temp_anlgraf
 (
-  id serial PRIMARY KEY NOT NULL,
-  grafclass character varying(16),
+  id serial NOT NULL,
   arc_id integer,
   node_1 integer,
   node_2 integer,
   water smallint,
   flag smallint,
   checkf smallint,
-  user_name text);
+  CONSTRAINT temp_anlgraf_pkey PRIMARY KEY (id)
+);

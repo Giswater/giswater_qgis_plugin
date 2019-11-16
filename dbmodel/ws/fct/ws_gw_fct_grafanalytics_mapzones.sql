@@ -39,7 +39,7 @@ TO EXECUTE
 ----------
 
 -- SECTOR
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[15]", 
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1]", 
 "updateFeature":"TRUE", "updateMapZone":"FALSE","concaveHullParam":0.85, "debug":"FALSE"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
@@ -104,11 +104,11 @@ UPDATE arc SET dma_id=0
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 
 3) Look graf flooders (flag=0 and grafdelimiter node)
-SELECT arc_id, node_1 FROM anl_graf WHERE flag=0 AND user_name=current_user AND node_1 IN (SELECT DISTINCT node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN anl_graf e ON a.node_id=e.node_1
+SELECT arc_id, node_1 FROM temp_anlgraf WHERE flag=0 AND user_name=current_user AND node_1 IN (SELECT DISTINCT node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id=e.node_1
 WHERE graf_delimiter IN ('DMA'))
 
 4) Look for the graf stoppers (flag=1)
-SELECT arc_id, node_1 FROM anl_graf where flag=1 order by node_1
+SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
 
 */
 
@@ -217,7 +217,7 @@ BEGIN
 	-- reset graf & audit_log tables
 	DELETE FROM anl_arc where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
 	DELETE FROM anl_node where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
-	DELETE FROM anl_graf where user_name=current_user;
+	DELETE FROM temp_anlgraf;
 	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 
 	-- Starting process
@@ -232,7 +232,7 @@ BEGIN
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	DELETE FROM selector_pSECTOR WHERE cur_user=current_user;
+	DELETE FROM selector_psector WHERE cur_user=current_user;
 	
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
@@ -249,77 +249,72 @@ BEGIN
 	v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = 0 ';
 	EXECUTE v_querytext;
 
-	-- create graf
-	INSERT INTO anl_graf ( grafclass, arc_id, node_1, node_2, water, flag, checkf, user_name )
-	SELECT  v_class, arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	-- fill the graf table
+	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT  v_class, arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, current_user FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 	-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
 	v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL';
 
 	-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
-	v_querytext  = 'UPDATE anl_graf SET flag=1 WHERE 
+	v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
 			node_1 IN('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN anl_graf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
 			OR node_2 IN ('||v_text||' UNION
 			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
-			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN anl_graf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
-			AND user_name=current_user';
+			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))';
 	
 	EXECUTE v_querytext;
 
-	v_text =  concat ('SELECT * FROM (',v_text,')a JOIN anl_graf e ON a.node_id::integer=e.node_1::integer WHERE user_name=current_user AND grafclass=',quote_literal(v_class));
+	v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE user_name=current_user AND grafclass=',quote_literal(v_class));
 
 	-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
 	
 	-- in function of graf class
 	IF v_class = 'SECTOR' THEN
 		-- sector (sector.grafconfig)
-		UPDATE anl_graf SET flag=0 WHERE id IN (
-			SELECT id FROM anl_graf JOIN (
+		UPDATE temp_anlgraf SET flag=0 WHERE id IN (
+			SELECT id FROM temp_anlgraf JOIN (
 			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from sector 
 			where grafconfig is not null order by 1,2) a 
-			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
-			) AND user_name=current_user;
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 	
 	ELSIF v_class = 'DMA' THEN
 		-- dma (dma.grafconfig)
-		UPDATE anl_graf SET flag=0 WHERE id IN (
-			SELECT id FROM anl_graf JOIN (
+		UPDATE temp_anlgraf SET flag=0 WHERE id IN (
+			SELECT id FROM temp_anlgraf JOIN (
 			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from dma 
 			where grafconfig is not null order by 1,2) a
-			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
-			) AND user_name=current_user;
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 
 	ELSIF v_class = 'DQA' THEN
 		-- dqa (dqa.grafconfig)
-		UPDATE anl_graf SET flag=0 WHERE id IN (
-		SELECT id FROM anl_graf JOIN (
+		UPDATE temp_anlgraf SET flag=0 WHERE id IN (
+		SELECT id FROM temp_anlgraf JOIN (
 			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from dqa 
 			where grafconfig is not null order by 1,2) a
-			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
-			) AND user_name=current_user;
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 
 	ELSIF v_class = 'PRESSZONE' THEN
 		-- cat_presszone (cat_presszone.grafconfig)
-		UPDATE anl_graf SET flag=0 WHERE id IN (
-		SELECT id FROM anl_graf JOIN (
+		UPDATE temp_anlgraf SET flag=0 WHERE id IN (
+		SELECT id FROM temp_anlgraf JOIN (
 			SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 			json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
 			as to_arc from cat_presszone 
 			where grafconfig is not null order by 1,2) a
-			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer
-			) AND user_name=current_user;		
+			ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);		
 	END IF;
 				
 	IF v_debug IS NULL OR v_debug IS FALSE THEN
@@ -346,7 +341,7 @@ BEGIN
 			END IF;
 
 			-- reset water flag
-			UPDATE anl_graf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
+			UPDATE temp_anlgraf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
 
 			--raise notice '------------ Feature_id % ', v_featureid;
 			
@@ -354,13 +349,11 @@ BEGIN
 			-- starting engine
 
 			-- set the starting element (water)
-			v_querytext = 'UPDATE anl_graf SET water=1 WHERE node_1='||quote_literal(v_featureid)||'  
-			AND flag=0 AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
+			v_querytext = 'UPDATE temp_anlgraf SET water=1 WHERE node_1='||quote_literal(v_featureid)||' AND flag=0'; 
 			EXECUTE v_querytext;
 
 			-- set the starting element (check)
-			v_querytext = 'UPDATE anl_graf SET checkf=1 WHERE node_1='||quote_literal(v_featureid)||'  
-			AND anl_graf.user_name=current_user AND grafclass='||quote_literal(v_class); 
+			v_querytext = 'UPDATE temp_anlgraf SET checkf=1 WHERE node_1='||quote_literal(v_featureid);
 
 			--RAISE NOTICE 'v_querytext %', v_querytext;
 			
@@ -373,7 +366,7 @@ BEGIN
 			LOOP	
 				cont1 = cont1+1;
 				
-				UPDATE anl_graf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id AND n.grafclass=v_class AND user_name=current_user;
+				UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 				
 				GET DIAGNOSTICS affected_rows =row_count;
 				EXIT WHEN affected_rows = 0;
@@ -390,13 +383,12 @@ BEGIN
 			
 			-- insert arc results into audit table	
 			EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
-				SELECT  DISTINCT ON (arc_id) '||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' 
-				FROM (SELECT arc_id FROM anl_graf WHERE grafclass='||quote_literal(v_class)||' AND user_name=current_user AND water=1) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
+				SELECT  DISTINCT ON (arc_id) '||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' FROM (SELECT arc_id FROM temp_anlgraf) a 
+				JOIN v_edit_arc b ON a.arc_id=b.arc_id';
 
 			-- insert node results into audit table
 			EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-				SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_featureid)||' FROM (SELECT node_1 as node_id FROM anl_graf 
-				WHERE water >0 AND grafclass='||quote_literal(v_class)||' AND user_name=current_user)a
+				SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_featureid)||' FROM (SELECT node_1 as node_id FROM temp_anlgraf WHERE water >0)a
 				JOIN v_edit_node b USING (node_id)';
 				
 			-- message
@@ -496,12 +488,9 @@ BEGIN
 			VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
 		END IF;
 
-		-- set selector
-		DELETE FROM selector_audit WHERE cur_user=current_user;
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 3, '');	
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 2, '');	
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 1, '');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (v_fprocesscat_id,  3, '');	
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (v_fprocesscat_id,  2, '');	
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (v_fprocesscat_id,  1, '');
 
 
 		-- get results

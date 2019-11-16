@@ -28,10 +28,6 @@ UPDATE audit_cat_param_user SET ismandatory=true WHERE formname = 'epaoptions';
 
 
 -- 13/11/2019
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
-VALUES ('om_flowtrace_usearcsense','true','boolean', 'crm', 'If false ignore arc sense, only topological connection is used to propagate the flow upstream')
-ON CONFLICT (parameter) DO NOTHING;
-
 UPDATE typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
 
 
@@ -43,8 +39,23 @@ INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity
     VALUES ('ext_raster_dem', 'external table', 'Table to store raster DEM', 'role_edit', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2772, 'gw_fct_grafanalytics', 'ud','api function', 'Graf analytics', 'role_edit',FALSE, FALSE, FALSE)
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2772, 'gw_fct_grafanalytics_flowtrace', 'utils','function', '{"featureType":[]}',
+'[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"comboIds":["DISCONNECTEDARCS","CONNECTEDARCS"],
+"comboNames":["DISCONNECTED ARCS","CONNECTED ARCS"], "selectedId":"CONNECTEDARCS"}, 
+{"widgetname":"nodeId", "label":"Node id:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layout_order":2, "value":""}]',
+'Function to analyze flow trace of network from one node. Arcs connected and arcs disconnected must be analyzed', 'role_om',FALSE, TRUE, 'Flow trace analytics', TRUE)
 ON conflict (id) DO NOTHING;
 
+
+
+--15/11/2019
+INSERT INTO sys_fprocess_cat VALUES (93,'Flowtrace disconnected arcs', 'edit', 'Flowtrace disconnected arcs','ws') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess_cat VALUES (94,'Flowtrace connected arcs', 'edit', 'Flowtrace connected arcs','ws') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+    VALUES ('temp_anlgraf', 'temporal table', 'Temporal tabl to store the grafanalytics process', 'role_basic', 0, 0, false)
+    ON CONFLICT (id) DO NOTHING;
 	
+UPDATE audit_cat_table SET isdeprecated = TRUE WHERE id='anl_graf';

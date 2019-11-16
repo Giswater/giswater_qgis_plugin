@@ -9,20 +9,20 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --14/11/2019
-DROP INDEX IF EXISTS anl_grag_arc_id;
-CREATE INDEX anl_graf_arc_id
-  ON anl_graf
+DROP INDEX IF EXISTS temp_anlgraf_arc_id;
+CREATE INDEX temp_anlgraf_arc_id
+  ON temp_anlgraf
   USING btree
   (arc_id);
 
-DROP INDEX IF EXISTS anl_graf_node_1;
-CREATE INDEX anl_graf_node_1
-  ON anl_graf
+DROP INDEX IF EXISTS temp_anlgraf_node_1;
+CREATE INDEX temp_anlgraf_node_1
+  ON temp_anlgraf
   USING btree
   (node_1);
 
-DROP INDEX IF EXISTS anl_graf_node_2;
-CREATE INDEX anl_graf_node_2
-  ON anl_graf
+DROP INDEX IF EXISTS temp_anlgraf_node_2;
+CREATE INDEX temp_anlgraf_node_2
+  ON temp_anlgraf
   USING btree
   (node_2);
