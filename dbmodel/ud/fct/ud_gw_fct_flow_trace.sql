@@ -13,36 +13,19 @@ $BODY$
 /*
 example:
 SELECT SCHEMA_NAME.gw_fct_flow_trace ('5100');
-
 */
+
 DECLARE 
-    v_use_arcsense boolean;
-	v_call text;
+
  
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 	
-	SELECT value::boolean INTO v_use_arcsense FROM config_param_system WHERE parameter = 'om_flowtrace_usearcsense';
-    
-	IF v_use_arcsense IS FALSE THEN
-
-		-- Reset values
-		DELETE FROM anl_flow_node WHERE cur_user="current_user"() AND context='Flow trace';
-		DELETE FROM anl_flow_arc WHERE cur_user="current_user"() AND context='Flow trace' ; 
-    
-		-- Compute the tributary area using recursive function
-		PERFORM gw_fct_flow_trace_recursive(p_node_id, 0);
+	-- Compute the tributary area using recursive function
+	PERFORM gw_fct_flow_trace_recursive(p_node_id, 0);
 	
-	ELSIF v_use_arcsense IS TRUE THEN
-	
-		-- Compute the whole area using grafanalyics function
-		v_call = concat('{"data":{"parameters":{"node":"',p_node_id,'"}}}');		
-		PERFORM gw_fct_grafanalytics(v_call);
-	
-	END IF;
-
 RETURN 1;
         
 END;
