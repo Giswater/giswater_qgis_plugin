@@ -31,15 +31,20 @@ BEGIN
 	
 	v_table:= TG_ARGV[0];
 
-	--on insert of a new typevalue creat a trigger for the table
+	--on insert of a new typevalue create a trigger for the table
 	IF TG_OP = 'INSERT' AND v_table = 'typevalue_fk' THEN
+	
+		
+	
+	
+	
 		--check if there are values on the defined fileds that already have a value that is not present in a catalog
 		IF NEW.parameter_id IS NULL THEN
 			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE '||NEW.target_field||' is not null 
 				AND '||NEW.target_field||' NOT IN (SELECT id FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
 			into v_count;
 		ELSE
-			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE parameter_id = '||NEW.parameter_id||	' AND  '||NEW.target_field||' is not null 
+			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE parameter_id = '||NEW.parameter_id||' AND  '||NEW.target_field||' is not null 
 				AND '||NEW.target_field||' NOT IN (SELECT id FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
 
 			into v_count;

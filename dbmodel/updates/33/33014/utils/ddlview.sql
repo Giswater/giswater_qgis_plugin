@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --14/11/2019
-DROP VIEW v_anl_graf;
+DROP VIEW  IF EXISTS v_anl_graf;
 CREATE OR REPLACE VIEW v_anl_graf AS 
  WITH nodes_a AS (
          SELECT 

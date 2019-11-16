@@ -16,8 +16,6 @@ ALTER TABLE IF EXISTS cat_raster RENAME TO ext_cat_raster;
 
 
 --16/11/2019
-ALTER TABLE anl_graf RENAME TO _anl_graf_;
-
 CREATE TABLE IF NOT EXISTS temp_anlgraf
 (
   id serial NOT NULL,

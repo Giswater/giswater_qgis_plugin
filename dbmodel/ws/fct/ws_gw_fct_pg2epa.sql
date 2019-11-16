@@ -31,6 +31,7 @@ DECLARE
 	v_response integer;
 	v_message text;
 	v_skipdemandpattern boolean;
+	v_buildupmode integer;
       
 BEGIN
 
@@ -44,7 +45,8 @@ BEGIN
 	-- Getting user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_skipdemandpattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_skipdemandpattern' AND cur_user=current_user);
-
+	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
+	
 
 	-- only mandatory nodarc
 	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
@@ -106,14 +108,19 @@ BEGIN
 		
 	-- Calling for modify the valve status
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
-
 	
+
 	-- Calling for the export function
 	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(v_result, null);
 	
-	-- manage return message
+	-- manage return message with data quality
 	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"}, "message":"',v_message,'","saveOnDatabase":true}}')::json;
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+
+	-- Use fast epanet models (modifying values in order to force builtupmode 1
+	IF v_buildupmode = 1 THEN
+		PERFORM gw_fct_pg2epa_fast_builtup(v_result);
+	END IF;
 
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 	

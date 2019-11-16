@@ -60,6 +60,19 @@ INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity
 --16/11/2019
 UPDATE audit_cat_table SET isdeprecated = TRUE WHERE id='anl_graf';
 
-UPDATE sys_feature_cat SET net_category=2 WHERE id='ELEMENT';
-UPDATE sys_feature_cat SET net_category=3 WHERE id='LINK';
-UPDATE sys_feature_cat SET net_category=4 WHERE id='VNODE';
+UPDATE sys_feature_type SET net_category=2 WHERE id='ELEMENT';
+UPDATE sys_feature_type SET net_category=3 WHERE id='LINK';
+UPDATE sys_feature_type SET net_category=4 WHERE id='VNODE';
+
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('inp_fast_builddup',
+'{"nullElevBuffer":100, "tank":{"distVirtualReservoir":1}, pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"},	"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}}'
+,'json', 'epa', 'Parameters for buildup a fast EPA model')
+ON CONFLICT (parameter) DO NOTHING;
+
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2774, 'gw_fct_go2epa_fast_buildup', 'ws','function', 'Function to generate a fast buildup of EPANET model assuming simplifications from inp_fast_builddup stored on config_param_system', 
+'role_epa',FALSE, TRUE, 'Flow trace analytics', TRUE)
+ON conflict (id) DO NOTHING;
+
