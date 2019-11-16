@@ -11,7 +11,6 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_flow_trace_recursive(node_id_arg
 DECLARE
     exists_id character varying;
     rec_table record;
-    v_use_arcsense boolean;
 
 BEGIN
 

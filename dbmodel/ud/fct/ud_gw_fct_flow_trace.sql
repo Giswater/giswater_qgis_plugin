@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2218
 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_flow_trace(character varying);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_flow_trace(p_node_id character varying)  
 RETURNS smallint AS 
 $BODY$
@@ -24,7 +25,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 	
 	-- Compute the tributary area using recursive function
-	PERFORM gw_fct_flow_trace_recursive(p_node_id, 0);
+	PERFORM gw_fct_flow_trace_recursive(p_node_id);
 	
 RETURN 1;
         
