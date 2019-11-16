@@ -49,7 +49,6 @@ VALUES (2772, 'gw_fct_grafanalytics_flowtrace', 'utils','function', '{"featureTy
 ON conflict (id) DO NOTHING;
 
 
-
 --15/11/2019
 INSERT INTO sys_fprocess_cat VALUES (93,'Flowtrace disconnected arcs', 'edit', 'Flowtrace disconnected arcs','ws') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess_cat VALUES (94,'Flowtrace connected arcs', 'edit', 'Flowtrace connected arcs','ws') ON CONFLICT (id) DO NOTHING;
@@ -57,5 +56,10 @@ INSERT INTO sys_fprocess_cat VALUES (94,'Flowtrace connected arcs', 'edit', 'Flo
 INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
     VALUES ('temp_anlgraf', 'temporal table', 'Temporal tabl to store the grafanalytics process', 'role_basic', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
-	
+
+--16/11/2019
 UPDATE audit_cat_table SET isdeprecated = TRUE WHERE id='anl_graf';
+
+UPDATE sys_feature_cat SET net_category=2 WHERE id='ELEMENT';
+UPDATE sys_feature_cat SET net_category=3 WHERE id='LINK';
+UPDATE sys_feature_cat SET net_category=4 WHERE id='VNODE';
