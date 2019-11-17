@@ -72,7 +72,7 @@ BEGIN
 
 		-- new point
 		v_x=st_x(v_record.the_geom);
-		v_y=st_y(v_record.the_geom) - v_n2nlength;
+		v_y=st_y(v_record.the_geom) + v_n2nlength;
 		v_geom_point = ST_setsrid(ST_MakePoint(v_x, v_y),v_srid);
 
 		-- new line
@@ -103,7 +103,6 @@ BEGIN
 	-- set pump stations
 	UPDATE rpt_inp_arc SET status= v_statusps WHERE status IS NULL AND result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '2'); 
 
-	
 	IF v_forcestatusps IS NOT NULL THEN
 		UPDATE rpt_inp_arc SET status= v_forcestatusps WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '2'); 
 	END IF;
