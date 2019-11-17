@@ -180,3 +180,44 @@ UNION
      JOIN inp_pump_additional ON rpt_inp_arc.arc_id::text = concat(inp_pump_additional.node_id, '_n2a', inp_pump_additional.order_id)
      LEFT JOIN inp_typevalue ON inp_typevalue.id::text = rpt_inp_arc.status::text
   WHERE inp_pump_additional.status::text = 'CLOSED'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+  
+  
+ 
+CREATE OR REPLACE VIEW vi_tanks AS 
+ SELECT inp_tank.node_id,
+    rpt_inp_node.elevation,
+    inp_tank.initlevel,
+    inp_tank.minlevel,
+    inp_tank.maxlevel,
+    inp_tank.diameter,
+    inp_tank.minvol,
+    inp_tank.curve_id
+   FROM inp_selector_result,
+    inp_tank
+     JOIN rpt_inp_node ON inp_tank.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND rpt_inp_node.epa_type::text = 'TANK'::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT inp_inlet.node_id,
+    rpt_inp_node.elevation,
+    inp_inlet.initlevel,
+    inp_inlet.minlevel,
+    inp_inlet.maxlevel,
+    inp_inlet.diameter,
+    inp_inlet.minvol,
+    inp_inlet.curve_id
+   FROM inp_selector_result,
+    inp_inlet
+     LEFT JOIN ( SELECT a.node_id,
+            count(*) AS ct
+           FROM ( SELECT rpt_inp_arc.node_1 AS node_id
+                   FROM rpt_inp_arc,
+                    inp_selector_result inp_selector_result_1
+                  WHERE rpt_inp_arc.result_id::text = inp_selector_result_1.result_id::text AND inp_selector_result_1.cur_user = "current_user"()::text
+                UNION ALL
+                 SELECT rpt_inp_arc.node_2
+                   FROM rpt_inp_arc,
+                    inp_selector_result inp_selector_result_1
+                  WHERE rpt_inp_arc.result_id::text = inp_selector_result_1.result_id::text AND inp_selector_result_1.cur_user = "current_user"()::text) a
+          GROUP BY a.node_id) b USING (node_id)
+     JOIN rpt_inp_node ON inp_inlet.node_id::text = rpt_inp_node.node_id::text
+  WHERE b.ct > 1 AND rpt_inp_node.epa_type::text = 'TANK'::text;

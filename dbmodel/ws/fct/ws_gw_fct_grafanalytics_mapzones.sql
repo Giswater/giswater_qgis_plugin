@@ -40,7 +40,7 @@ TO EXECUTE
 
 -- SECTOR
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1]", 
-"updateFeature":"TRUE", "updateMapZone":"FALSE","concaveHullParam":0.85, "debug":"FALSE"}}}');
+"updateFeature":"TRUE", "updateMapZone":"FALSE","concaveHullParam":0.85, "debug":"true"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -50,8 +50,8 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 
 -- DMA
-	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[557]", 
-	"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", 
 "updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85,"debug":"false"}}}');
@@ -93,19 +93,25 @@ UPDATE arc SET dma_id=0
 
 1) Run function on 
 	mode debug
-	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[557]", 
+	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
 	"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"false"}}}');
 
 	only for one element	
 	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1041", 
 	"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
+	SELECT * from temp_anlgraf order by id;
+
 2) Check final results
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
+SELECT sector_id, count(sector_id) from v_edit_arc  group by sector_id order by 1;
 
-3) Look graf flooders (flag=0 and grafdelimiter node)
+-3) Look graf flooders (flag=0 and grafdelimiter node)
+SELECT arc_id, node_1 FROM temp_anlgraf WHERE flag=0 AND node_1 IN (SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer
+WHERE graf_delimiter IN ('SECTOR'))
+
 SELECT arc_id, node_1 FROM temp_anlgraf WHERE flag=0 AND user_name=current_user AND node_1 IN (SELECT DISTINCT node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id=e.node_1
-WHERE graf_delimiter IN ('DMA'))
+WHERE graf_delimiter IN ('SECTOR'))
 
 4) Look for the graf stoppers (flag=1)
 SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
@@ -164,7 +170,7 @@ BEGIN
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
 
 	-- data quality analysis
-	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"onlyGrafAnalytics":"true", "selectionMode":"userSelectors"}}}'::json;
 	PERFORM gw_fct_om_check_data(v_input);
 
 	-- check criticity in order to continue or not
@@ -258,20 +264,20 @@ BEGIN
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 	-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
-	v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL';
+	v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id from '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL';
 
 	-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
 	v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
 			node_1 IN('||v_text||' UNION
-			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
+			SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
 			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))
 			OR node_2 IN ('||v_text||' UNION
-			SELECT (a.node_id) FROM node a 	JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
+			SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id 
 			LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE (graf_delimiter=''MINSECTOR'' AND closed=TRUE))';
 	
 	EXECUTE v_querytext;
 
-	v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE user_name=current_user AND grafclass=',quote_literal(v_class));
+	v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer');
 
 	-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
 	
@@ -341,9 +347,9 @@ BEGIN
 			END IF;
 
 			-- reset water flag
-			UPDATE temp_anlgraf SET water=0 WHERE user_name=current_user AND grafclass=v_class;
+			UPDATE temp_anlgraf SET water=0;
 
-			--raise notice '------------ Feature_id % ', v_featureid;
+			raise notice '------------ Feature_id % ', v_featureid;
 			
 			------------------
 			-- starting engine
@@ -355,7 +361,7 @@ BEGIN
 			-- set the starting element (check)
 			v_querytext = 'UPDATE temp_anlgraf SET checkf=1 WHERE node_1='||quote_literal(v_featureid);
 
-			--RAISE NOTICE 'v_querytext %', v_querytext;
+			RAISE NOTICE 'v_querytext %', v_querytext;
 			
 			EXECUTE v_querytext;
 
@@ -374,7 +380,7 @@ BEGIN
 				
 				v_count = v_count + affected_rows;
 
-				--raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, affected_rows;
+				raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, affected_rows;
 				
 			END LOOP;
 			
@@ -383,13 +389,13 @@ BEGIN
 			
 			-- insert arc results into audit table	
 			EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
-				SELECT  DISTINCT ON (arc_id) '||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' FROM (SELECT arc_id FROM temp_anlgraf) a 
-				JOIN v_edit_arc b ON a.arc_id=b.arc_id';
+				SELECT  DISTINCT ON (arc_id) '||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' FROM (SELECT arc_id FROM temp_anlgraf WHERE water >0) a 
+				JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer';
 
 			-- insert node results into audit table
 			EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
 				SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_featureid)||' FROM (SELECT node_1 as node_id FROM temp_anlgraf WHERE water >0)a
-				JOIN v_edit_node b USING (node_id)';
+				JOIN v_edit_node b ON a.node_id::integer=b.node_id::integer';
 				
 			-- message
 			SELECT count(*) INTO v_count1 FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND descript=v_featureid::text AND cur_user=current_user;

@@ -66,7 +66,7 @@ UPDATE sys_feature_type SET net_category=4 WHERE id='VNODE';
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('inp_fast_builddup',
-'{"nullElevBuffer":100, "tank":{"distVirtualReservoir":1}, pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"},	"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}}'
+'{"nullElevBuffer":100, "tank":{"distVirtualReservoir":1}, "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"},	"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}}'
 ,'json', 'epa', 'Parameters for buildup a fast EPA model')
 ON CONFLICT (parameter) DO NOTHING;
 
