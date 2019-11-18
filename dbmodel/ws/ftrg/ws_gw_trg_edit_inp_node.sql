@@ -18,7 +18,10 @@ DECLARE
     epa_type varchar;
     v_sql varchar;
     old_nodetype varchar;
-    new_nodetype varchar;    
+    new_nodetype varchar;
+    v_tablename varchar;
+    v_pol_id varchar;
+    v_node_id varchar;
 
 BEGIN
 

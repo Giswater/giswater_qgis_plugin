@@ -547,6 +547,8 @@ CREATE OR REPLACE VIEW v_edit_connec AS
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id;
 	 
 
+DROP VIEW IF EXISTS v_edit_vnode;
+DROP VIEW IF EXISTS v_edit_link;
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
@@ -583,7 +585,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
      LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id);
 	 
 
-DROP VIEW v_edit_vnode;
+DROP VIEW IF EXISTS v_edit_vnode;
 CREATE OR REPLACE VIEW v_edit_vnode AS 
  SELECT DISTINCT ON (vnode_id) vnode.vnode_id,
     vnode.vnode_type,

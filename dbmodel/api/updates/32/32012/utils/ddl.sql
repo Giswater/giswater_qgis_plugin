@@ -99,8 +99,8 @@ CREATE TABLE config_api_tableinfo_x_infotype
   CONSTRAINT config_api_tableinfo_x_inforole_pkey PRIMARY KEY (id)
 );
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_fields", "column":"layout_name", "dataType":"varchar(16)"}}$$);
 
-ALTER TABLE config_api_form_fields ADD COLUMN layout_name character varying;
 
 /* created in 3.106
 
