@@ -170,7 +170,7 @@ BEGIN
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
 
 	-- data quality analysis
-	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"onlyGrafAnalytics":"true", "selectionMode":"userSelectors"}}}'::json;
+	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"onlyGrafAnalytics":true, "selectionMode":"userSelectors"}}}'::json;
 	PERFORM gw_fct_om_check_data(v_input);
 
 	-- check criticity in order to continue or not

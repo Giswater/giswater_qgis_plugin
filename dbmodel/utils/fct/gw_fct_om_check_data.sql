@@ -80,7 +80,7 @@ BEGIN
 
 	-- getting input data 	
 	v_features := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
-	v_onlygrafanalytics := ((p_data ->>'data')::json->>'parameters')::json->>'onlyGrafAnalytics'::boolean;
+	v_onlygrafanalytics := ((p_data ->>'data')::json->>'parameters')::json->>'onlyGrafAnalytics';
 
 	
 	-- select config values
@@ -291,7 +291,7 @@ BEGIN
 		END IF;
 
 
-		IF v_onlygrafanalytics IS FALSE THEN
+		IF v_onlygrafanalytics::boolean IS FALSE THEN
 
 			-- Check code with null values
 			v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
