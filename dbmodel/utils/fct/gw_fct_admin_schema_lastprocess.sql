@@ -99,6 +99,7 @@ BEGIN
 		END LOOP;
 		
 		-- drop deprecated columns
+		
 		IF v_projecttype = 'WS' THEN 
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_19;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_20;
@@ -107,6 +108,14 @@ BEGIN
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;
 		END IF;
+
+		ALTER TABLE man_addfields_parameter DROP COLUMN if exists _default_value_;
+		ALTER TABLE man_addfields_parameter DROP COLUMN if exists _form_label_;
+		ALTER TABLE man_addfields_parameter DROP COLUMN if exists _widgettype_id_;
+		ALTER TABLE man_addfields_parameter DROP COLUMN if exists _dv_table_;
+		ALTER TABLE man_addfields_parameter DROP COLUMN if exists _dv_key_column_;
+		ALTER TABLE man_addfields_parameter DROP COLUMN if exists _sql_text_;
+		
 		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
