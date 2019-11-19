@@ -14,4 +14,4 @@ ALTER TABLE man_addfields_parameter RENAME form_label TO _form_label_ ;
 ALTER TABLE man_addfields_parameter RENAME widgettype_id TO _widgettype_id_ ;
 ALTER TABLE man_addfields_parameter RENAME dv_table TO _dv_table_ ;
 ALTER TABLE man_addfields_parameter RENAME dv_key_column TO _dv_key_column_ ;
-ALTER TABLE man_addfields_parameter RENAME sql_text TO to _sql_text_ ;
+ALTER TABLE man_addfields_parameter RENAME sql_text TO _sql_text_ ;
