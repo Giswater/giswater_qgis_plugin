@@ -378,6 +378,9 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 3, concat('ERROR: There is/are at least ',v_count,' 
 			exploitation(s) bad configured on the anl_mincut_inlet_x_exploitation table. Please check your data before continue'));
+		ELSIF v_count=0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 2, concat('WARNING: The table anl_mincut_inlet_x_exploitation is not configured.')); 
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: It seems anl_mincut_inlet_x_exploitation table is well configured. At least, table is filled with nodes from all exploitations.');
@@ -387,7 +390,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM node_type where graf_delimiter IS NULL;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('ERROR: There is/are ',v_count,' rows on the node_type table with null values on graf_delimiter. Please check your data before continue'));
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows on the node_type table with null values on graf_delimiter. Please check your data before continue'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: The graf_delimiter column on node_type table has values for all rows.');
