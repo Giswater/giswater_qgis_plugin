@@ -8,5 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --20/11/2019
+SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+
 INSERT INTO config_api_form_fields (formname, formtype, column_id, isenabled, ismandatory, datatype, widgettype, dv_querytext, label, iseditable, hidden)
-VALUES ('v_inp_edit_pump', 'form','pump_pype', true, false, 'string','combo', 'SELECT id, idval FROM inp_typevalue WHERE typevalue  = ''inp_typevalue_pumptype''','pump_type', true, false);
+VALUES ('v_inp_edit_pump', 'form','pump_type', true, false, 'string','combo', 'SELECT id, idval FROM inp_typevalue WHERE typevalue  = ''inp_typevalue_pumptype''','pump_type', true, false);
