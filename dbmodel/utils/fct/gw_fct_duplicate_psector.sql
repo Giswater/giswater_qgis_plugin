@@ -43,6 +43,7 @@ v_sql text;
 v_connect2network text;
 v_psector_vdefault text;
 v_schemaname text;
+v_parent_layer text;
 
 BEGIN
 
@@ -126,17 +127,16 @@ BEGIN
 		WHEN id='ARC' THEN 2
 		WHEN id='CONNEC' THEN 3 
 		WHEN id='GULLY' THEN 4 END) LOOP
-	raise notice ' rec_type,%', rec_type;
+
+		SELECT parent_layer into v_parent_layer FROM cat_feature WHERE feature_type=rec_type.id LIMIT 1;
 
 		EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
-		FROM information_schema.columns where table_name='''||rec_type.parentlayer||''' and table_schema='''||v_schemaname||'''
+		FROM information_schema.columns where table_name='''||v_parent_layer||''' and table_schema='''||v_schemaname||'''
 		and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema='''||v_schemaname||''') 
 		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'';'
 		INTO v_insert_fields;
 
 		FOR rec IN EXECUTE 'SELECT * FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1' LOOP
-		raise notice ' rec,%', rec;
-		
 			IF rec_type.id='ARC' THEN
 				v_field_id=rec.arc_id;
 			ELSIF rec_type.id='NODE' THEN
@@ -176,7 +176,6 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=53) row; 
 
-	raise notice 'v_result,%',v_result;
 	-- Control nulls
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
