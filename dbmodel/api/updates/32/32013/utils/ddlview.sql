@@ -15,7 +15,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
     config_api_form_fields.num_decimals,
     config_api_form_fields.widgettype,
     config_api_form_fields.label,
-    man_addfields_parameter.default_value,
     config_api_form_fields.layout_name,
     config_api_form_fields.layout_order,
     man_addfields_parameter.orderby AS addfield_order,

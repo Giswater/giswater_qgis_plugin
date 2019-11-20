@@ -280,9 +280,9 @@ IF v_multi_create IS TRUE THEN
 		END IF;
 		
 		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, 
-		form_label, widgettype_id, active, orderby, iseditable)
+		active, orderby, iseditable)
 		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
-		v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
+		v_active, v_orderby, v_iseditable);
 		
 		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
 
@@ -528,9 +528,9 @@ ELSE
 	--modify the configuration of the parameters and fields in config_api_form_fields
 	IF v_action = 'CREATE' THEN
 		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, 
-		form_label, widgettype_id, active, orderby, iseditable)
+		active, orderby, iseditable)
 		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
-		v_label, v_add_widgettype, v_active, v_orderby, v_iseditable);
+		v_active, v_orderby, v_iseditable);
 	
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
 		AND layout_name = ''layout_data_1'';'
