@@ -421,7 +421,7 @@ class GwToolBox(ApiParent):
         sql = ("SELECT tablename, type FROM "
                "(SELECT tablename, type, 1 as c FROM sys_feature_cat"
                " WHERE type = '" + geom_type.upper() + "'"
-               " UNION SELECT parentlayer, id, 0 FROM sys_feature_type WHERE id='" + geom_type.upper() + "'"
+               " UNION SELECT DISTINCT(parent_layer), feature_type, 0 FROM cat_feature WHERE feature_type='" + geom_type.upper() + "'"
                " UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
                " ORDER BY c, tablename")
         rows = self.controller.get_rows(sql, commit=True)
