@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_api_getcatalog($${
 
 DECLARE
 	api_version text;
-	v_schema_name text;
+	v_schemaname text;
 	formTabs text;
 	v_device integer;
 	v_formname varchar;
