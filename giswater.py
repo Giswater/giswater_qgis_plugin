@@ -609,14 +609,20 @@ class Giswater(QObject):
         if not rows:
             return False
 
+        msg = "Field child_layer of id: "
         for row in rows:
             tablename = row['child_layer']
+            if not tablename:
+                msg += f"{row['id']}, "
+                continue
             elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['shortcut_key'],
                                  row['parent_layer'], row['child_layer'])
             self.feature_cat[tablename] = elem
 
         self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
 
+        if msg != "Fields child_layer of ids: ":
+            self.controller.show_warning(msg + "is not defined in table cat_feature")
         return True
 
 
