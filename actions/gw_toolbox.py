@@ -509,7 +509,7 @@ class GwToolBox(ApiParent):
                         icon = QIcon(path_icon_red)
                         label.setIcon(icon)
                         label.setForeground(QColor(255, 0, 0))
-                        msg = "Function configured on the table audit_cat_function, but not found in the database"
+                        msg = f"Function {function['functionname']} configured on the table audit_cat_function, but not found in the database"
                         label.setToolTip(msg)
                         self.no_clickable_items.append(str(function['alias']))
                 else:
