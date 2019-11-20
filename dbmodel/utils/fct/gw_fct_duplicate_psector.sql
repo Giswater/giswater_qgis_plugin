@@ -43,7 +43,6 @@ v_sql text;
 v_connect2network text;
 v_psector_vdefault text;
 v_schemaname text;
-v_parent_layer text;
 
 BEGIN
 
@@ -128,10 +127,8 @@ BEGIN
 		WHEN id='CONNEC' THEN 3 
 		WHEN id='GULLY' THEN 4 END) LOOP
 
-		SELECT parent_layer into v_parent_layer FROM cat_feature WHERE feature_type=rec_type.id LIMIT 1;
-
 		EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
-		FROM information_schema.columns where table_name='''||v_parent_layer||''' and table_schema='''||v_schemaname||'''
+		FROM information_schema.columns where table_name=''v_edit_'||lower(rec_type.id)||''' and table_schema='''||v_schemaname||'''
 		and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema='''||v_schemaname||''') 
 		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'';'
 		INTO v_insert_fields;
