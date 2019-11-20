@@ -621,7 +621,7 @@ class Giswater(QObject):
 
         self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
 
-        if msg != "Fields child_layer of ids: ":
+        if msg != "Field child_layer of id: ":
             self.controller.show_warning(msg + "is not defined in table cat_feature")
         return True
 
