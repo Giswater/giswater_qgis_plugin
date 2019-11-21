@@ -29,7 +29,7 @@ v_result_info 		json;
 v_result_point		json;
 v_array 		text;
 v_version 		text;
-
+v_qmlpointpath text;
 
 BEGIN
 	-- Search path
@@ -48,8 +48,9 @@ BEGIN
 
 	-- Reset values
     DELETE FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=5;
-	
-	raise notice 'v_worklayer % v_connectolerance % v_id %',v_worklayer ,v_connectolerance ,v_array;
+
+    --select default geometry style
+	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Computing process
 	IF v_array != '()' THEN
@@ -78,7 +79,7 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, connec_id, connecat_id, state, expl_id, descript, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=5) row; 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
