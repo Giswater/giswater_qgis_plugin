@@ -8,8 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
-CREATE VIEW SCHEM_NAME.ext_raster_dem AS
+CREATE VIEW SCHEMA_NAME.ext_raster_dem AS
 SELECT
   raster_dem.id,
   code,
