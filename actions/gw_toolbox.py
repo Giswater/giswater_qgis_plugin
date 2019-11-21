@@ -179,10 +179,10 @@ class GwToolBox(ApiParent):
             if type(widget) not in (QCheckBox, QComboBox, QLineEdit):
                 continue
             if type(widget) is QCheckBox:
-                if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}") == 'true':
+                if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}"):
                     widget.setChecked(True)
                 else:
-                    widget.setChecked(True)
+                    widget.setChecked(False)
             elif type(widget) is QComboBox:
                 value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
                 utils_giswater.set_combo_itemData(widget, value, 0)
