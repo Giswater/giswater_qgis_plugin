@@ -1,3 +1,5 @@
 3.3.016
 *************
 - New function that checks API configuration - gw_fct_admin_check_data
+- Node orphan analysis, option: choose nodes that divide arcs
+- Use qml styles for temporal analysis layers

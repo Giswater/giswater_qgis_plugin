@@ -36,7 +36,8 @@ DECLARE
 	v_qmlpointpath	text;
 	v_projectype text;
 	v_partialquery text;
-	
+	v_isarcdivide text;
+
 BEGIN
 
 	-- Search path
@@ -51,8 +52,10 @@ BEGIN
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
+	v_isarcdivide := (((p_data ->>'data')::json->>'parameters')::json->>'isArcDivide')::text;
 
-	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
+	--select default geometry style
+	SELECT  regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7;
@@ -66,7 +69,8 @@ BEGIN
 
 	-- Computing process
 	IF v_array != '()' THEN
-		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN '||v_array||' AND isarcdivide=false AND 
+		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN '||v_array||' 
+		AND isarcdivide= '||v_isarcdivide||' AND 
 		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
 		LOOP
 			--find the closest arc and the distance between arc and node
@@ -77,7 +81,7 @@ BEGIN
 			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
 		END LOOP;
 	ELSE
-		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide=false AND 
+		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide='||v_isarcdivide||' AND 
 		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
 		LOOP
 			--find the closest arc and the distance between arc and node

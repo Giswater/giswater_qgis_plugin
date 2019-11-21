@@ -16,3 +16,9 @@ false, true,'Check API configuration',true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (95, 'Admin check data', 'Check', 'Admin check data','utils') ON CONFLICT (id) DO NOTHING;
+
+
+--21/11/2019
+UPDATE audit_cat_function SET return_type = '[{"widgetname":"isArcDivide", "label":"Analyse nodes that divide arcs:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":1, "value":"FALSE"},
+{"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]' 
+WHERE function_name = 'gw_fct_anl_node_orphan';
