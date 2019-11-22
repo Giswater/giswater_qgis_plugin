@@ -11,7 +11,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character v
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_mincut('2205', 'arc', -1)
+INSERT INTO SCHEMA_NAME.anl_mincut_result_cat VALUES (1);
+SELECT SCHEMA_NAME.gw_fct_mincut('2205', 'arc', 1)
 */
 
 DECLARE
@@ -40,6 +41,7 @@ DECLARE
     v_data		json;
     v_volume 		float;
     v_priority		json;
+    v_count		int2;
     
 BEGIN
     -- Search path
@@ -76,8 +78,12 @@ BEGIN
     SELECT expl_id, current_user from exploitation 
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
+    -- Delete from state selector (0)
+    SELECT count(*) INTO v_count FROM selector_state WHERE cur_user=current_user AND state_id=0;
+    DELETE FROM selector_state WHERE cur_user=current_user AND state_id=0;
+
     IF v_debug THEN RAISE NOTICE '4-update values of mincut cat table'; END IF;
-    
+ 
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg WHERE id=result_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg WHERE id=result_id_arg;
 
@@ -185,7 +191,8 @@ BEGIN
 				
 		IF v_priority IS NULL THEN v_priority='{}'; END IF;
 	
-		v_return = concat('{"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"number":"',v_numhydrometer,'","priority":',v_priority,'}}}');
+		v_return = concat('{"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
+		v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"number":"',v_numhydrometer,'","priority":',v_priority,'}}}');
 			
 		INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_return);
 
@@ -193,6 +200,11 @@ BEGIN
 		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
 			' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
 			INTO v_geometry;
+
+		-- restore state selector
+		IF v_count = 1 THEN
+			INSERT INTO selector_state (cur_user, state_id) VALUES (current_user, 0);
+		END IF;
 
 		-- returning
 		v_return = concat('{"mincutOverlap":"',v_overlap,'", "geometry":"',v_geometry,'"}');

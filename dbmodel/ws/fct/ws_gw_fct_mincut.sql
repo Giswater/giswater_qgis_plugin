@@ -53,6 +53,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character v
 $BODY$
 
 /*EXAMPLE
+INSERT INTO SCHEMA_NAME.anl_mincut_result_cat VALUES (1);
 SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', 1)
 */
 
@@ -79,6 +80,7 @@ DECLARE
     v_debug		Boolean;
     v_overlap		text;
     v_geometry 		text;
+	v_count 		int2;
 
 BEGIN
     -- Search path
@@ -118,6 +120,10 @@ BEGIN
     SELECT expl_id, current_user from exploitation 
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
+	-- Delete from state selector (0)
+	SELECT count(*) INTO v_count FROM selector_state WHERE cur_user=current_user AND state_id=0;
+	DELETE FROM selector_state WHERE cur_user=current_user AND state_id=0;
+	
     IF v_debug THEN
 	RAISE NOTICE '4-update values of mincut cat table';
     END IF;
@@ -324,6 +330,11 @@ BEGIN
 	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
 		' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
 	        INTO v_geometry;
+			
+	-- restore state selector
+	IF v_count = 1 THEN
+		INSERT INTO selector_state (cur_user, state_id) VALUES (current_user, 0);
+	END IF;
 
 	-- returning
     	v_return = concat('{"mincutOverlap":"',v_overlap,'", "geometry":"',v_geometry,'"}');
