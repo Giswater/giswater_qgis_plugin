@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>388</width>
-    <height>453</height>
+    <width>1079</width>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,12 +47,17 @@
           <bool>true</bool>
          </property>
          <property name="plainText">
-          <string>Este botón ha sido desarrollado para comunicar la base de datos del GIS con la base de datos de comercial realizando los siguientes procesos:
-- Se updatea en la base de datos comercial la zona de medición a la que pertenecen las acometidas a partir de un geoproceso del gis teniendo en cuenta las valvulas de medición y las condiciones de parada configuradas en el sistema.
-- Se vuelve de la base de datos comercial con el valor de consumo (m3) en la acometida sumando todo el consumo de los abonados.
-El proceso finaliza cargando de forma gráfica todas aquellas acometidas y aquellos tramos que se han quedado sin zona de medición (dma=0). 
-El estilo de las capas es configurable mediante la configuración de un archivo de estilo (*.qml) en el formulario de configruación.
-En el tab log se puede observar más detalle de cómo ha sido desarrollado todo el proceso.</string>
+          <string>
+INSTRUCCIONES:
+--------------------
+
+Escogiendo una explotación, se comunica la base de datos del GIS con la base de datos de comercial (CRM) realizando para el último período facturado:
+
+PASO 1: Se updatea en CRM la zona de medición a la que pertenecen las acometidas teniendo en cuenta valvulas frontera y caudalimetros.
+
+PASO 2: Se capturan en el CRM los valores de consumo (m3) para el período de cada abonado
+
+El proceso carga acometidas y tramos que se han quedado sin zona de medición (dma=0). El estilo de las capas es configurable mediante un archivo de estilo de QGIS  (*.qml) en el formulario de config.</string>
          </property>
          <property name="backgroundVisible">
           <bool>false</bool>
