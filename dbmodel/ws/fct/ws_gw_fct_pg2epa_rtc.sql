@@ -41,10 +41,6 @@ BEGIN
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
 
-	-- reset pattern method if 11 is not used (unique estimated pattern)
-	IF v_patternmethod::integer > 11 THEN
-		UPDATE config_param_user SET value=null WHERE parameter='inp_options_pattern' and cur_user=current_user;
-	END IF;
 
 	RAISE NOTICE ' DEMAND TYPE: % PATTERN METHOD: %', v_demandtype, v_patternmethod;
 
