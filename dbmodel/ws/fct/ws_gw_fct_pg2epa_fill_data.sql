@@ -31,7 +31,7 @@ BEGIN
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
 	SELECT DISTINCT ON (v_node.node_id)
 	result_id_var,
-	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom
+	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom
 	FROM v_node 
 		LEFT JOIN value_state_type ON id=state_type
 		JOIN v_edit_inp_pipe a ON node_1=v_node.node_id OR node_2=v_node.node_id
@@ -59,10 +59,10 @@ BEGIN
 	inp_pipe.minorloss
 	FROM inp_selector_sector, v_arc
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
-		JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
-		JOIN inp_pipe ON v_arc.arc_id = inp_pipe.arc_id
-		JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
+		LEFT JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
+		LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
+		LEFT JOIN inp_pipe ON v_arc.arc_id = inp_pipe.arc_id
+		LEFT JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
 		WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN '1900-01-01'::date ELSE builtdate END))/365 >= inp_cat_mat_roughness.init_age 
 		AND (now()::date - (CASE WHEN builtdate IS NULL THEN '1900-01-01'::date ELSE builtdate END))/365 < inp_cat_mat_roughness.end_age
 		AND ((is_operative IS TRUE) OR (is_operative IS NULL))

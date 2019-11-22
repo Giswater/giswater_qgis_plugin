@@ -527,9 +527,9 @@ ELSE
 
 	--modify the configuration of the parameters and fields in config_api_form_fields
 	IF v_action = 'CREATE' THEN
-		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals, 
+		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals,
 		active, orderby, iseditable)
-		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals, 
+		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals,
 		v_active, v_orderby, v_iseditable);
 	
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''

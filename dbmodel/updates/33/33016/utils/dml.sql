@@ -22,3 +22,15 @@ VALUES (95, 'Admin check data', 'Check', 'Admin check data','utils') ON CONFLICT
 UPDATE audit_cat_function SET return_type = '[{"widgetname":"isArcDivide", "label":"Analyse nodes that divide arcs:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":1, "value":"FALSE"},
 {"widgetname":"saveOnDatabase", "label":"Save on database:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":9, "value":"FALSE"}]' 
 WHERE function_name = 'gw_fct_anl_node_orphan';
+
+
+-- 22/11/2019
+UPDATE config_param_system SET parameter='inp_fast_buildup',
+value='{"nullElevBuffer":100, "pipe":{"diameter":"160"}, "tank":{"distVirtualReservoir":1}, "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"}, "PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}}'
+WHERE parameter='inp_fast_builddup';
+
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2778, 'gw_fct_pg2epa_nod2arc_double', 'ws', 'function', null, null, null,'Function to create two nodarcs from one nod2arc (when PUMP has a curve_type choosed PUMP-2N2A)', 'role_epa',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;

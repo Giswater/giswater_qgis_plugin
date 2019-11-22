@@ -118,7 +118,7 @@ BEGIN
 	v_arc_x_node.the_geom
 	FROM inp_selector_sector, v_arc_x_node
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN cat_arc ON v_arc_x_node.arccat_id = cat_arc.id
+		LEFT JOIN cat_arc ON v_arc_x_node.arccat_id = cat_arc.id
 		LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
 		LEFT JOIN inp_conduit ON v_arc_x_node.arc_id = inp_conduit.arc_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))

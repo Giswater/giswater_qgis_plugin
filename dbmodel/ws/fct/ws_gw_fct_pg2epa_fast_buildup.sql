@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2774
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fast_buildup(varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fast_buildup(p_result text)
 RETURNS integer 
 AS $BODY$
@@ -34,6 +33,7 @@ v_forcestatusprv text;
 v_buffer float;
 v_n2nlength float;
 v_querytext text;
+v_diameter float;
 
 BEGIN
 
@@ -51,10 +51,14 @@ BEGIN
 	SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_system WHERE parameter = 'inp_fast_builddup';
 	SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_system WHERE parameter = 'inp_fast_builddup';
 	SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_system WHERE parameter = 'inp_fast_builddup';
-	
+	SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_fast_builddup';
+
 	-- setting roughness for null values
 	SELECT avg(roughness) INTO v_roughness FROM rpt_inp_arc WHERE result_id=p_result;
 	UPDATE rpt_inp_arc SET roughness = v_roughness WHERE roughness IS NULL AND result_id= p_result;
+
+	-- setting diameter for null values
+	UPDATE rpt_inp_arc SET diameter = v_diameter WHERE diameter IS NULL AND result_id= p_result;
 
 	-- setting null elevation values using closest points values
 	UPDATE rpt_inp_node SET elevation = d.elevation FROM

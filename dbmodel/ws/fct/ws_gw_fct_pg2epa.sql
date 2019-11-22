@@ -17,7 +17,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"resultId":"Prueba1", "useNetworkGeom":"true"}}$$)
+"data":{"resultId":"Prueba1", "useNetworkGeom":"false"}}$$)
 */
 
 DECLARE
@@ -25,43 +25,37 @@ DECLARE
 	v_return json;
 	v_input json;
 	v_result text;
-	v_usenetworkgeom boolean;
 	v_onlymandatory_nodarc boolean = false;
 	v_vnode_trimarcs boolean = false;
 	v_response integer;
 	v_message text;
-	v_skipdemandpattern boolean;
+	v_usenetworkdemand boolean;
 	v_buildupmode integer;
-      
+	v_usenetworkgeom boolean;
+	
 BEGIN
+
 
 	--  Get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
+	v_usenetworkdemand =  (p_data->>'data')::json->>'useNetworkDemand';
+
+	v_usenetworkdemand = FALSE;
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Getting user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
-	v_skipdemandpattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_skipdemandpattern' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
-	
 
 	-- only mandatory nodarc
 	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
 		v_onlymandatory_nodarc = TRUE;
 	END IF;
 
-	RAISE NOTICE 'Starting pg2epa process.';
-
-	-- Upsert on rpt_cat_table
-	DELETE FROM rpt_cat_result WHERE result_id=v_result;
-	INSERT INTO rpt_cat_result (result_id) VALUES (v_result);
-	
-	-- Upsert on node rpt_inp result manager table
-	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+	RAISE NOTICE '1 - Starting pg2epa process.';
 
 	-- first message on user's pannel
 	v_message = concat ('INFO: Network geometry have been used taking another one from previous result. It is suposed network geometry from previous result it is ok');
@@ -69,14 +63,23 @@ BEGIN
 	-- use previous network geometry
 	IF v_usenetworkgeom IS FALSE THEN
 
+		-- Upsert on rpt_cat_table
+		DELETE FROM rpt_cat_result WHERE result_id=v_result;
+		INSERT INTO rpt_cat_result (result_id) VALUES (v_result);
+
+		v_usenetworkgeom = 'FALSE';
+
 		-- setting first message on user's pannel
 		v_message = concat ('INFO: The process to check vnodes over nodarcs is disabled because on this export mode arcs will not trimed using vnodes');
 		
 		-- Fill inprpt tables
 		PERFORM gw_fct_pg2epa_fill_data(v_result);
 		
-		-- Calling for gw_fct_pg2epa_nod2arc function
+		-- Calling for gw_fct_pg2epa_nod2arc function  (with false it means normal nod2arc)
 		PERFORM gw_fct_pg2epa_nod2arc(v_result, v_onlymandatory_nodarc);
+
+		-- Calling for gw_fct_pg2epa_doublenod2arc (with true it means double nod2arc)
+		PERFORM gw_fct_pg2epa_nod2arc_double(v_result);
 			
 		-- Calling for gw_fct_pg2epa_pump_additional function;
 		PERFORM gw_fct_pg2epa_pump_additional(v_result);
@@ -89,14 +92,26 @@ BEGIN
 			IF v_response = 0 THEN
 				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
 			ELSE
-				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , 
+				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet floSCHEMA_NAME from connecs using vnode_id, ' , 
 				v_response, ' nodarc nodes have been renamed using vnode_id');
 			END IF;
 		END IF;
+	ELSE 
+		v_usenetworkgeom = 'TRUE';
+
+		-- delete rpt_* tables keeping rpt_inp_tables
+		DELETE FROM rpt_arc WHERE result_id = v_result;
+		DELETE FROM rpt_node WHERE result_id = v_result;
+		DELETE FROM rpt_energy_usage WHERE result_id = v_result;
+		DELETE FROM rpt_hydraulic_status WHERE result_id = v_result;
+		DELETE FROM rpt_node WHERE result_id = v_result;	
+		DELETE FROM rpt_inp_pattern_value WHERE result_id = v_result;	
 	END IF;
 
+	RAISE NOTICE '-------> 3 ';
+
 	-- update demands & patterns
-	IF v_skipdemandpattern IS FALSE OR v_skipdemandpattern IS NULL THEN
+	IF v_usenetworkdemand IS NOT TRUE THEN
 
 		-- set demand and patterns in function of demand type and pattern method choosed
 		SELECT gw_fct_pg2epa_rtc(v_result) INTO v_response;	
@@ -105,13 +120,19 @@ BEGIN
 		PERFORM gw_fct_pg2epa_dscenario(v_result);	
 	END IF;
 
+	RAISE NOTICE '-------> 4 ';
 		
 	-- Calling for modify the valve status
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
 	
-
 	-- manage return message with data quality
-	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'"}, "message":"',v_message,'","saveOnDatabase":true}}')::json;
+	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'", "useNetworkGeom":"',v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
+
+	-- Upsert on node rpt_inp result manager table
+	DELETE FROM inp_selector_result WHERE cur_user=current_user;
+	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+
+
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 
 	-- Use fast epanet models (modifying values in order to force builtupmode 1
@@ -119,8 +140,12 @@ BEGIN
 		PERFORM gw_fct_pg2epa_fast_buildup(v_result);
 	END IF;
 
+	RAISE NOTICE '-------> 5 ';
+
 	-- Calling for the export function
 	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(v_result, null);
+	
+	RAISE NOTICE '-------> 6 ';
 
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 	
