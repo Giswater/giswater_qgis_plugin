@@ -76,14 +76,15 @@ class ReplaceFeatureMapTool(ParentMapTool):
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        obj = self.controller.get_obj_from_cfgp_user('workcat_id_end_vdefault')
-        if obj:
-            workcat_vdefault = self.dlg_replace.workcat_id_end.findText(obj.value)
+        row = self.controller.get_config('workcat_id_end_vdefault')
+        if row:
+            workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
             self.dlg_replace.workcat_id_end.setCurrentIndex(workcat_vdefault)
 
-        obj = self.controller.get_obj_from_cfgp_user('enddate_vdefault')
-        if obj:
-            self.enddate_aux = self.manage_dates(obj.value).date()
+
+        row = self.controller.get_config('enddate_vdefault')
+        if row:
+            self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
@@ -151,9 +152,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def update_date(self):
 
-        obj = self.controller.get_obj_from_cfgp_user('enddate_vdefault')
-        if obj:
-            self.enddate_aux = self.manage_dates(obj.value).date()
+        row = self.controller.get_config('enddate_vdefault')
+        if row:
+            self.enddate_aux = self.manage_dates(row[0]).date()
         else:
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "

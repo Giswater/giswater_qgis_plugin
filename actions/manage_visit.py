@@ -643,14 +643,14 @@ class ManageVisit(ParentManage, QObject):
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
-            obj = self.controller.get_obj_from_cfgp_user(f'visitcat_vdefault')
-            if obj:
+            row = self.controller.get_config('visitcat_vdefault')
+            if row:
                 # if int then look for default row ans set it
                 try:
-                    utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, obj.value, 0)
+                    utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, row[0], 0)
                     for i in range(0, self.dlg_add_visit.visitcat_id.count()):
                         elem = self.dlg_add_visit.visitcat_id.itemData(i)
-                        if str(obj.value) == str(elem[0]):
+                        if str(row[0]) == str(elem[0]):
                             utils_giswater.setWidgetText(self.dlg_add_visit.visitcat_id, (elem[1]))
                 except TypeError:
                     pass
@@ -697,9 +697,9 @@ class ManageVisit(ParentManage, QObject):
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
-        obj = self.controller.get_obj_from_cfgp_user(f'om_param_type_vdefault')
-        if obj:
-            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, obj.value, 0)
+        row = self.controller.get_config('om_param_type_vdefault')
+        if row:
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
 
     def set_completers(self):

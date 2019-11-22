@@ -64,7 +64,6 @@ class DuplicatePsector(ParentManage, QObject):
         # Execute manage add fields function
         sql = f"SELECT gw_fct_duplicate_psector($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-
         if not row or row[0] is None:
             self.controller.show_message("Function gw_fct_duplicate_psector executed with no result ", 3)
             return
@@ -82,7 +81,5 @@ class DuplicatePsector(ParentManage, QObject):
             self.close_dialog(self.dlg_duplicate_psector)
         else:
             utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
-
-
 
         self.is_duplicated.emit()

@@ -94,7 +94,8 @@ class NotifyFunctions(ParentAction):
             conn = self.controller.dao.conn
             conn.poll()
             for notify in conn.notifies:
-                msg = f"Got NOTIFY: {notify.pid}, {notify.channel}, {notify.payload}"
+                msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
+                msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
                 if notify.payload:
                     try:
@@ -115,8 +116,6 @@ class NotifyFunctions(ParentAction):
             def indexing_spatial_layer(self, **kwargs)
             def refresh_attribute_table(self, **kwargs)
             def refresh_canvas(self, **kwargs)
-            def refresh_config_user_variables(self, **kwargs)
-            def refresh_config_system_variables(self, **kwargs)
             def show_message(self, **kwargs)
         """
 
@@ -222,16 +221,6 @@ class NotifyFunctions(ParentAction):
         all_layers = self.controller.get_layers()
         for layer in all_layers:
             layer.triggerRepaint()
-
-
-    def refresh_config_user_variables(self, **kwargs):
-        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
-        self.controller.get_config_param_user()
-
-
-    def refresh_config_system_variables(self, **kwargs):
-        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
-        self.controller.get_config_param_system()
 
 
     def show_message(self, **kwargs):

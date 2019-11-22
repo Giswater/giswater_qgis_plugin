@@ -515,6 +515,7 @@ class ManageNewPsector(ParentManage):
                 elem = [index, layout.name()]
                 records.append(elem)
                 index = index + 1
+
         if records in ([], None):
             # If no composer configurated, disable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(False)
@@ -532,9 +533,9 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        obj = self.controller.get_obj_from_cfgp_user(f'composer_{self.plan_om}_vdefault')
-        if obj:
-            utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, obj.value, 0)
+        row = self.controller.get_config(f'composer_{self.plan_om}_vdefault')
+        if row:
+            utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
 
     def generate_rapports(self):
@@ -842,12 +843,6 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_psector_selector(self, tablename, field, value):
-        # TODO Don't delete this self.controller.log_info(""),
-        #  a little before executing this function, self.controller.get_config_param_user is executed by a trigger
-        #  when config_param_user is modified by def insert_or_update_new_psector(...).
-        #  The following sql generates a bug that avoids cooling the self.controller.cfgp_user variable,
-        #  mysteriously this is solved with an empty print.
-        self.controller.log_info("")
         sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
                f"VALUES ('{value}', current_user);")
         self.controller.execute_sql(sql, commit=True)
@@ -1071,8 +1066,8 @@ class ManageNewPsector(ParentManage):
             new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True, commit=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
-                obj = self.controller.get_obj_from_cfgp_user(f'psector_vdefault')
-                if obj:
+                row = self.controller.get_config('psector_vdefault')
+                if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = '{new_psector_id[0]}' "
                            f" WHERE parameter = 'psector_vdefault';")

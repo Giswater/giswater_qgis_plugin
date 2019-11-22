@@ -172,8 +172,8 @@ class Dimensions(ParentDialog):
     def create_map_tips(self):
         """ Create MapTips on the map """
 
-        dim_tooltip = self.controller.get_obj_from_cfgp_user('dim_tooltip')
-        if dim_tooltip and dim_tooltip.value.lower() != 'true':
+        row = self.controller.get_config('dim_tooltip')
+        if row and row[0].lower() != 'true':
             return
 
         self.timer_map_tips = QTimer(self.canvas)

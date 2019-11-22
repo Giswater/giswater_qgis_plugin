@@ -55,8 +55,8 @@ class Basic(ParentAction):
         field_id_right = "expl_id"
 
         query = ""
-        obj = self.controller.get_obj_from_cfgp_system('sys_exploitation_x_user')
-        if obj and obj.value.lower() == 'true':
+        row = self.controller.get_config('sys_exploitation_x_user', 'value', 'config_param_system')
+        if row and row[0].lower() == 'true':
             query = f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
         query += f" AND expl_id != 0 AND active IS NOT FALSE"
 

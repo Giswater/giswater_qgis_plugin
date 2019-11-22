@@ -144,8 +144,8 @@ class ParentDialog(QDialog):
             self.close_dialog()
 
         try:
-            value = self.controller.cfgp_user['qgis_toggledition_forceopen'].value
-            if value and value.upper() == "TRUE":
+            row = self.controller.get_config('qgis_toggledition_forceopen')
+            if row and row[0].upper() == "TRUE":
                 self.iface.activeLayer().startEditing()
         except  KeyError as e:
             pass

@@ -338,7 +338,6 @@ class MincutParent(ParentAction):
                 self.iface.actionPan().trigger()     
             self.vertex_marker.hide()
         except Exception as e:
-            print("TEST")
             print(f"{type(e).__name__} --> {e}")
 
 
@@ -1960,10 +1959,10 @@ class MincutParent(ParentAction):
 
         # Get scale zoom
         self.scale_zoom = 2500
-        zoom = self.controller.get_obj_from_cfgp_system('scale_zoom')
-        if zoom and zoom.value:
-            self.scale_zoom = zoom.value
-            
+        row = self.controller.get_config('scale_zoom', 'value', 'config_param_system')
+        if row and row[0]:
+            self.scale_zoom = row['value']
+
         return True            
 
 
@@ -2207,16 +2206,13 @@ class MincutParent(ParentAction):
         status = self.address_populate(dialog, dialog.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             return
-        sql = ("SELECT value FROM config_param_system"
-               " WHERE parameter = 'street_field_expl'")
-        self.street_field_expl = self.controller.get_row(sql, commit=True)
+
+        self.street_field_expl = self.controller.get_config('street_field_expl', 'value', 'config_param_system')
         if not self.street_field_expl:
             message = "Param street_field_expl not found"
             self.controller.show_warning(message)
             return
-        sql = ("SELECT value FROM config_param_system"
-               " WHERE parameter = 'portal_field_postal'")
-        portal_field_postal = self.controller.get_row(sql, commit=True)
+        portal_field_postal = self.controller.get_config('portal_field_postal', 'value', 'config_param_system')
         if not portal_field_postal:
             message = "Param portal_field_postal not found"
             self.controller.show_warning(message)
@@ -2294,10 +2290,10 @@ class MincutParent(ParentAction):
         """ Open Composer """
         # Check if path exist
         template_folder = ""
-        try:
-            template_folder = self.controller.cfgp_user['qgis_composers_path'].value
-        except  KeyError as e:
-            pass
+        row = self.controller.get_config('qgis_composers_path')
+        if row:
+            template_folder = row[0]
+
         try:
             template_files = os.listdir(template_folder)
         except FileNotFoundError as e:
@@ -2341,10 +2337,9 @@ class MincutParent(ParentAction):
 
         # Check if template file exists
         template_path = ""
-        try:
-            template_path = self.controller.cfgp_user['qgis_composers_path'].value + f'{os.sep}{self.template}.qpt'
-        except  KeyError as e:
-            pass
+        row = self.controller.get_config('qgis_composers_path')
+        if row:
+            template_path = row[0]+ f'{os.sep}{self.template}.qpt'
 
         if not os.path.exists(template_path):
             message = "File not found"

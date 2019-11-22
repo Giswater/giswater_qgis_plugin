@@ -122,11 +122,9 @@ class DrawProfiles(ParentMapTool):
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
         template_path = ""
-        try:
-            template_path = self.controller.cfgp_user['qgis_composers_path'].value
-        except  KeyError as e:
-            pass
-
+        row = self.controller.get_config('qgis_composers_path')
+        if row and row[0]:
+            template_path = row[0]
         template_files = []
         try:
             template_files = os.listdir(template_path)
@@ -1473,10 +1471,9 @@ class DrawProfiles(ParentMapTool):
         # Check if template file exists
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         template_path = ""
-        try:
-            template_path = self.controller.cfgp_user['qgis_composers_path'].value + f'{os.sep}{self.template}.qpt'
-        except  KeyError as e:
-            pass
+        row = self.controller.get_config('qgis_composers_path')
+        if row:
+            template_path = f'{row[0]}{os.sep}{self.template}.qpt'
 
         if not os.path.exists(template_path):
             message = "File not found"

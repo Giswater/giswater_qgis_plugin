@@ -25,8 +25,6 @@ from functools import partial
 
 from .pg_dao import PgDao
 from .logger import Logger
-from ..models.cfg_user import CfgUser
-from ..models.cfg_system import CfgSystem
 from .. import sys_manager
 
 
@@ -1428,54 +1426,13 @@ class DaoController(object):
         return function_name in object_functions
 
 
-    def get_config_param_user(self):
-        """ Populate dictionary with table config_param_user """
-        sql = "SELECT parameter, value FROM config_param_user WHERE cur_user = current_user;"
-        rows = self.get_rows(sql, commit=True, is_threading=True)
-        if not rows:
-            return
-        self.cfgp_user = {}
-        for row in rows:
-            self.cfgp_user[row['parameter']] = CfgUser(row['parameter'], row['value'])
-
-
-    def get_obj_from_cfgp_user(self, key, show_info=False):
-        """ Returns the object from self.cfgp_user (config_param_user) based on the key received """
-        obj = None
-        try:
-            obj = self.cfgp_user[key]
-        except KeyError as e:
-            if show_info:
-                self.log_info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
-            else:
-                self.logger.info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
-        finally:
-            return obj
-
-
-    def get_config_param_system(self):
-        """ Populate dictionary with table config_param_system """
-        sql = "SELECT parameter, value, data_type, context, descript, label FROM config_param_system;"
-        rows = self.get_rows(sql, commit=True, is_threading=True)
-        if not rows:
-            return
-        self.cfgp_system = {}
-        for row in rows:
-            self.cfgp_system[row['parameter']] = CfgSystem(row['parameter'], row['value'], row['data_type'], row['context'], row['descript'], row['label'])
-
-
-    def get_obj_from_cfgp_system(self, key, show_info=False):
-        """ Returns the object from self.cfgp_system (config_param_system) based on the key received """
-        obj = None
-        try:
-            obj = self.cfgp_system[key]
-        except KeyError as e:
-            if show_info:
-                self.log_info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
-            else:
-                self.logger.info(f"{type(e).__name__} --> {e}", stack_level_increase=1)
-        finally:
-            return obj
+    def get_config(self, parameter='', columns='value', table='config_param_user', log_info=True):
+        sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}'"
+        if table == 'config_param_user':
+            sql += " AND cur_user = current_user"
+        sql += ";"
+        row = self.get_row(sql, commit=True, log_info=log_info)
+        return row
 
 
     def indexing_spatial_layer(self, layer_name):
