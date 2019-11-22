@@ -191,7 +191,7 @@ BEGIN
 	--Error, no existing nodes
 	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
 		IF v_dsbl_error IS NOT TRUE THEN
-			PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
+			PERFORM audit_function (1042,1344, NEW.arc_id);	
 		ELSE
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
 		END IF;
