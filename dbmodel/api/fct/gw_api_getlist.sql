@@ -459,7 +459,7 @@ BEGIN
 	IF v_device =9 THEN
 		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'widgetfunction','gw_api_open_rpt_result','label','','stylesheet','','layout_order',0,'layout_name','rpt_layout1','widgetname','tableview_rpt','datatype','tableView','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	ELSE
-		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','list','name','list','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
 
 	-- getting footer buttons
