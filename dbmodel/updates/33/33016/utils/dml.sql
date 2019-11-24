@@ -45,3 +45,6 @@ VALUES (97, 'Arcs with state=1 using nodes on state=2', 'Edit', 'Arcs with state
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (98, 'Tanks with null mandatory values', 'EPA', 'Tanks with null mandatory values','ws') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (99, 'Mincut process', 'om', 'Mincut process', 'ws');
