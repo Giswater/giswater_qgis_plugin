@@ -58,7 +58,7 @@ BEGIN
 	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, null, null, null, node.the_geom
 	FROM inp_selector_sector, node 
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id);
 
 
 	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
