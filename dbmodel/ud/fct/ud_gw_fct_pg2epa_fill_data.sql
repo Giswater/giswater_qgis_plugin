@@ -34,63 +34,31 @@ BEGIN
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, y0, ysur, apond, the_geom
-	FROM inp_selector_sector, v_edit_node 
-		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_junction ON v_edit_node.node_id=inp_junction.node_id
-		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
-			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
-		WHERE (is_operative IS TRUE) OR (is_operative IS NULL)
+	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, y0, ysur, apond, the_geom
+	FROM inp_selector_sector, node 
+		JOIN inp_junction ON node.node_id=inp_junction.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
 	UNION
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, y0, ysur, apond, v_edit_node.the_geom
-	FROM inp_selector_sector, v_edit_node 
-		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_divider ON v_edit_node.node_id=inp_divider.node_id
-		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
-			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
-		WHERE (is_operative IS TRUE) OR (is_operative IS NULL)
+	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, y0, ysur, apond, node.the_geom
+	FROM inp_selector_sector, node 
+		JOIN inp_divider ON node.node_id=inp_divider.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
 	UNION
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, y0, ysur, apond, v_edit_node.the_geom
-	FROM inp_selector_sector, v_edit_node 
-		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_storage ON v_edit_node.node_id=inp_storage.node_id
-		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
-			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
-		WHERE (is_operative IS TRUE) OR (is_operative IS NULL)
+	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, y0, ysur, apond, node.the_geom
+	FROM inp_selector_sector, node 
+		JOIN inp_storage ON node.node_id=inp_storage.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
 	UNION
 	SELECT 
 	result_id_var,
-	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, v_edit_node.annotation, expl_id, null, null, null, v_edit_node.the_geom
-	FROM inp_selector_sector, v_edit_node 
-		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_outfall ON v_edit_node.node_id=inp_outfall.node_id
-		JOIN (	SELECT arc_id, node_1, node_2 FROM v_edit_inp_conduit 
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_orifice
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_outlet
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_pump
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_virtual
-			UNION SELECT arc_id, node_1, node_2 FROM v_edit_inp_weir
-			) a ON node_1=v_edit_node.node_id OR node_2=v_edit_node.node_id
-		WHERE (is_operative IS TRUE) OR (is_operative IS NULL);
+	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, null, null, null, node.the_geom
+	FROM inp_selector_sector, node 
+		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
 
 
 	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)

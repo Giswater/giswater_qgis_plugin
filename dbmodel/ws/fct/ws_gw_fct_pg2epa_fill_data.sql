@@ -32,12 +32,12 @@ BEGIN
 	SELECT DISTINCT ON (v_node.node_id)
 	result_id_var,
 	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom
-	FROM v_node 
-		LEFT JOIN value_state_type ON id=state_type
-		JOIN v_edit_inp_pipe a ON node_1=v_node.node_id OR node_2=v_node.node_id
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL)) ;
+	FROM node v_node 
+		JOIN (SELECT node_1 AS node_id, sector_id FROM vi_parent_arc UNION SELECT node_2, sector_id FROM vi_parent_arc)a USING (node_id)
+		JOIN cat_node c ON c.id=nodecat_id;
+		
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
-	
+
 
 -- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, minorloss)

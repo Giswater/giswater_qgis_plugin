@@ -26,7 +26,7 @@ WHERE function_name = 'gw_fct_anl_node_orphan';
 
 -- 22/11/2019
 UPDATE config_param_system SET parameter='inp_fast_buildup',
-value='{"nullElevBuffer":100, "pipe":{"diameter":"160"}, "tank":{"distVirtualReservoir":1}, "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"}, "PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}}'
+value='{"node":{"nullElevBuffer":100}, "pipe":{"diameter":"160"}, "junction":{"defaultDemand":"0.001"}, "tank":{"distVirtualReservoir":1}, "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"}, "PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}}'
 WHERE parameter='inp_fast_builddup';
 
 
@@ -34,3 +34,14 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2778, 'gw_fct_pg2epa_nod2arc_double', 'ws', 'function', null, null, null,'Function to create two nodarcs from one nod2arc (when PUMP has a curve_type choosed PUMP-2N2A)', 'role_epa',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+
+-- 23/11/2019
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (96, 'Arcs with state=1 using nodes on state=0', 'Edit', 'Arcs with state=1 using nodes on state=0','utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (97, 'Arcs with state=1 using nodes on state=2', 'Edit', 'Arcs with state=1 using nodes on state=2','utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (98, 'Tanks with null mandatory values', 'EPA', 'Tanks with null mandatory values','ws') ON CONFLICT (id) DO NOTHING;

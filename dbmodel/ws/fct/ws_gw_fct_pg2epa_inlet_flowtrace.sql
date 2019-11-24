@@ -14,15 +14,15 @@ $BODY$
 
 /*
 --EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_inlet_flowtrace('test2')
+SELECT gw_fct_pg2epa_inlet_flowtrace('testbgeo11')
 
 --RESULTS
-SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
-SELECT * FROM SCHEMA_NAME.anl_mincut_arc_x_node  where user_name=current_user;
+SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
+SELECT * FROM anl_mincut_arc_x_node  where user_name=current_user;
 */
 
 DECLARE
-affected_rows numeric;
+affected_roSCHEMA_NAME numeric;
 cont1 integer default 0;
 BEGIN
 
@@ -30,20 +30,21 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	delete FROM anl_mincut_arc_x_node where user_name=current_user;
-	delete FROM anl_arc where result_id=p_result_id and cur_user=current_user AND fprocesscat_id=39;
+	delete FROM anl_arc where cur_user=current_user AND fprocesscat_id=39;
+
 
 	-- fill the graf table
 	insert into anl_mincut_arc_x_node (
-	select  arc.arc_id, node_1, current_user, null, node_2, null, 0, 0
+	select  arc.arc_id, case when node_1 is null then '00000' else node_1 end, current_user, null, case when node_2 is null then '00000' else node_2 end, null, 0, 0
 	from rpt_inp_arc arc
 	WHERE arc.result_id=p_result_id
 	union all
-	select  arc.arc_id, node_2, current_user, null, node_1, null, 0, 0
+	select  arc.arc_id, case when node_2 is null then '00000' else node_2 end, current_user, null, case when node_1 is null then '00000' else node_1 end, null, 0, 0
 	from rpt_inp_arc arc
 	WHERE arc.result_id=p_result_id
 	);
 	
-	-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
+	-- Delete from the graf table all that roSCHEMA_NAME that only exists one time (it means that arc don't have the correct topology)
 	DELETE FROM anl_mincut_arc_x_node WHERE user_name=current_user AND arc_id IN 
 	(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM anl_mincut_arc_x_node GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 
@@ -63,9 +64,9 @@ BEGIN
 		where n.node_id = a.node_id and
 		n.arc_id = a.arc_id;
 
-		GET DIAGNOSTICS affected_rows =row_count;
+		GET DIAGNOSTICS affected_roSCHEMA_NAME =row_count;
 
-		exit when affected_rows = 0;
+		exit when affected_roSCHEMA_NAME = 0;
 		EXIT when cont1 = 200;
 
 	END LOOP;
