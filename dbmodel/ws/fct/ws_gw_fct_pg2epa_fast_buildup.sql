@@ -35,6 +35,7 @@ v_n2nlength float;
 v_querytext text;
 v_diameter float;
 v_defaultdemand float;
+v_demandtype int2;
 
 BEGIN
 
@@ -44,6 +45,7 @@ BEGIN
 	-- get values
 	SELECT epsg INTO v_srid FROM version LIMIT 1;
 
+	-- system variables
 	SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_buffer FROM config_param_system WHERE parameter = 'inp_fast_buildup';
 	SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_system WHERE parameter = 'inp_fast_buildup';
 	SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_fast_buildup';
@@ -55,6 +57,9 @@ BEGIN
 	SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_system WHERE parameter = 'inp_fast_buildup';
 	SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_system WHERE parameter = 'inp_fast_buildup';
 	
+	-- get user variables
+	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
+
 
 	-- delete orphan nodes
 	DELETE FROM rpt_inp_node WHERE result_id = p_result AND node_id NOT IN 
@@ -75,7 +80,9 @@ BEGIN
 	UPDATE rpt_inp_arc SET roughness = v_roughness WHERE roughness IS NULL AND result_id= p_result;
 
 	-- setting demands for null values
-	UPDATE rpt_inp_node SET demand = v_defaultdemand WHERE v_defaultdemand IS NULL AND result_id= p_result;
+	IF v_defaultdemand IS NOT NULL AND v_demandtype = 1 THEN
+		UPDATE rpt_inp_node SET demand = v_defaultdemand WHERE demand IS NULL AND result_id= p_result;
+	END IF;
 	
 	-- setting diameter for null values
 	UPDATE rpt_inp_arc SET diameter = v_diameter WHERE diameter IS NULL AND result_id= p_result;

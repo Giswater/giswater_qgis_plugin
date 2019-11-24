@@ -49,10 +49,17 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+	-- reset networkparameters i case of v_buildupmode = 1 (fast epanet)
+	IF v_buildupmode =  1 THEN
+		UPDATE config_param_user SET value = '1' WHERE parameter='inp_options_networkmode' AND cur_user=current_user;
+		UPDATE config_param_user SET value = '2' WHERE parameter='inp_options_valve_mode' AND cur_user=current_user;
+		UPDATE config_param_user SET value = 'NONE' WHERE parameter='inp_options_quality_mode' AND cur_user=current_user;
+	END IF;
+
 	-- Getting user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
-
+	
 	-- only mandatory nodarc
 	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
 		v_onlymandatory_nodarc = TRUE;
@@ -95,7 +102,7 @@ BEGIN
 			IF v_response = 0 THEN
 				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
 			ELSE
-				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet floSCHEMA_NAME from connecs using vnode_id, ' , 
+				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , 
 				v_response, ' nodarc nodes have been renamed using vnode_id');
 			END IF;
 		END IF;

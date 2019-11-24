@@ -18,7 +18,7 @@ SELECT gw_fct_pg2epa_check_data($${
 
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"resultId":"testbgeo","saveOnDatabase":true, "useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)
+"feature":{},"data":{"parameters":{"resultId":"testbgeo7","saveOnDatabase":true, "useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)
 */
 
 DECLARE
@@ -84,6 +84,7 @@ v_defaultdemand 	float;
 v_qmlpointpath		text = '';
 v_qmllinepath		text = '';
 v_qmlpolpath		text = '';
+v_doublen2a		integer;
 
 BEGIN
 
@@ -102,14 +103,14 @@ BEGIN
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 		
 	-- select config values
-	SELECT SCHEMA_NAMEoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
+	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
 
 	-- call go2epa function in case of new result
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
 
 		v_data = '{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"false"}}';
 
-		IF v_project_type = 'SCHEMA_NAME' THEN
+		IF v_project_type = 'WS' THEN
 			PERFORM gw_fct_pg2epa_main(v_data);
 		ELSE
 			PERFORM gw_fct_pg2epa_main(v_data);
@@ -168,10 +169,9 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Flow routing: ', v_florouting));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Flow units: ', v_flowunits));	
 		
-	ELSIF v_project_type = 'SCHEMA_NAME' THEN
+	ELSIF v_project_type = 'WS' THEN
 
-
-		SELECT  count(*) INTO v_count FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a_4') = arc_id JOIN inp_curve_id c ON c.id=curve_id WHERE result_id=v_result_id;
+		SELECT  count(*) INTO v_doublen2a FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a_4') = arc_id JOIN inp_curve_id c ON c.id=curve_id WHERE result_id=v_result_id;
 
 		SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 		SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
@@ -194,7 +194,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Pattern method: ', v_patternmethodval));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Valve mode: ', v_valvemodeval));	
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Number of pumps as Double-n2a: ', v_count));		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Number of pumps as Double-n2a: ', v_doublen2a));		
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval));
 
 		IF v_buildupmode = 1 THEN
@@ -213,12 +213,18 @@ BEGIN
 
 		
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, null);
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
+			'FAST BUILDUP RESET FOR USER VALUES: Network Mode: BASIC, Valve mode: INVENTORY VALUES, Quality mode: NONE');
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
 			concat('FAST BUILDUP VDEF: Null elevations have been setted using a buffer to closest node (',v_buffer,' mts.) acording variable of config_param_system.'));
-
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('FAST BUILDUP VDEF: Null demands have been setted to ',v_defaultdemand,' acording variable of config_param_system.'));
+	
+			IF v_defaultdemand IS NOT NULL AND v_demandtype = 1 THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
+				concat('FAST BUILDUP VDEF: Acording with demand method choosed (ESTIMATED) null demands have been setted to ',
+				v_defaultdemand,' acording variable of config_param_system.'));
+			END IF;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
 			concat('FAST BUILDUP VDEF: Virtual reservoirs have been created over each tank with a virtual pipe of length: ',v_n2nlength,' mts. acording variable of config_param_system.'));
@@ -362,7 +368,7 @@ BEGIN
 		IF 	v_project_type='UD' THEN
 
 			RAISE NOTICE '6- Check for missed features on inp tables';
-		v_querytext = '(SELECT arc_id, ''arc'' as feature_tpe FROM arc WHERE arc_id NOT IN (select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir 
+				v_querytext = '(SELECT arc_id, ''arc'' as feature_tpe FROM arc WHERE arc_id NOT IN (select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir 
 						UNION select arc_id from inp_pump UNION select arc_id from inp_outlet UNION select arc_id from inp_orifice) AND state > 0 AND epa_type !=''NOT DEFINED''
 						UNION
 						SELECT node_id, ''node'' FROM node WHERE node_id NOT IN(
@@ -641,7 +647,7 @@ BEGIN
 					VALUES (14, v_result_id, 1, concat('INFO: All mandatory colums (fname, sta, units) for ''FILE'' raingage type have been checked without any values missed.'));
 				END IF;				
 
-		ELSIF v_project_type='SCHEMA_NAME' THEN	
+		ELSIF v_project_type='WS' THEN	
 		
 
 			RAISE NOTICE '6 - Check for missed features on inp tables';
@@ -1171,7 +1177,7 @@ BEGIN
 
 	IF v_project_type = 'UD' THEN
 
-	ELSIF v_project_type = 'SCHEMA_NAME' THEN
+	ELSIF v_project_type = 'WS' THEN
 
 		IF v_usenetworkdemand IS TRUE THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
