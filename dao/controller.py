@@ -1426,8 +1426,10 @@ class DaoController(object):
         return function_name in object_functions
 
 
-    def get_config(self, parameter='', columns='value', table='config_param_user', log_info=True):
-        sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}'"
+    def get_config(self, parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+        sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
+        if sql_added:
+            sql += sql_added
         if table == 'config_param_user':
             sql += " AND cur_user = current_user"
         sql += ";"
