@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+-- 24/11/2019
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (100, 'Set to_arc values for graf delimiters', 'EPA', 'Set to_arc values for graf delimiters','ws') ON CONFLICT (id) DO NOTHING;
 
 --25/11/2019
 
