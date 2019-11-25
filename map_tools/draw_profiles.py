@@ -715,8 +715,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x]
         ysup = [s1y, s2y, s3y]
 
-        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_config('draw_profile_conf')
         if row is not None:
             row = json.loads(row[0])
             if 'color' in row:
@@ -876,9 +875,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x, s4x, s5x]
         ysup = [s1y, s2y, s3y, s4y, s5y]
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_config('draw_profile_conf')
         if row is not None:
             row = json.loads(row[0])
             if 'color' in row:
@@ -1076,8 +1073,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x, s4x, i4x]
         ysup = [s1y, s2y, s3y, s4y, i4y]
 
-        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_config('draw_profile_conf')
         if row is not None:
             row = json.loads(row[0])
             if 'color' in row:
@@ -1757,14 +1753,10 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.scale_horizontal.setDisabled(False)
 
             # Get rotation vdefaut if exist
-            sql = ("SELECT value FROM config_param_user "
-                   "WHERE parameter = 'rotation_vdefault' AND cur_user = current_user")
-            rows = self.controller.get_rows(sql, commit=True)
-            if rows:
-                row = rows[0]
-                if row:
-                    utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, row[0])
-                    self.rotation_vd_exist = True
+            row = self.controller.get_config('rotation_vdefault')
+            if row:
+                utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, row[0])
+                self.rotation_vd_exist = True
             else:
                 utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, '0')
 
