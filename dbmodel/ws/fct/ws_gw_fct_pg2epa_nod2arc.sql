@@ -121,7 +121,7 @@ BEGIN
     LOOP
     
 	v_count = v_count + 1;
-	RAISE NOTICE 'nodarc number: %', node_id_aux;
+	--RAISE NOTICE 'nodarc number: %', node_id_aux;
 	
         -- Get node data
 	SELECT * INTO record_node FROM rpt_inp_node WHERE node_id = node_id_aux AND result_id=result_id_var;

@@ -28,10 +28,10 @@ BEGIN
 
 -- Insert on node rpt_inp table
 -- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
+	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id)
 	SELECT DISTINCT ON (v_node.node_id)
 	result_id_var,
-	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom
+	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom, v_node.expl_id
 	FROM node v_node 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM vi_parent_arc UNION SELECT node_2, sector_id FROM vi_parent_arc)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id;
@@ -40,7 +40,8 @@ BEGIN
 
 
 -- Insert on arc rpt_inp table
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, minorloss)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, 
+	length, status, the_geom, minorloss, expl_id)
 	SELECT
 	result_id_var,
 	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
@@ -56,7 +57,8 @@ BEGIN
 	CASE WHEN inp_pipe.status IS NULL THEN 'OPEN'
 	ELSE inp_pipe.status END AS status,
 	v_arc.the_geom,
-	inp_pipe.minorloss
+	inp_pipe.minorloss,
+	v_arc.expl_id
 	FROM inp_selector_sector, v_arc
 		LEFT JOIN value_state_type ON id=state_type
 		LEFT JOIN cat_arc ON v_arc.arccat_id = cat_arc.id

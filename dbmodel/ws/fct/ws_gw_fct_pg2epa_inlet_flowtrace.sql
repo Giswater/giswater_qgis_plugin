@@ -78,6 +78,14 @@ BEGIN
 		JOIN arc b ON a.arc_id=b.arc_id
 		GROUP BY a.arc_id, user_name, the_geom
 		having max(water) = 0 and user_name=current_user;
+		
+
+	-- insert into result table the dry arcs (water=0)
+	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
+	SELECT 39, p_result_id, node_1, n.the_geom, 'Node disconnected from any reservoir' FROM arc JOIN anl_arc USING (arc_id) 
+	JOIN node n ON node_1=node_id WHERE fprocesscat_id=39 AND result_id = p_result_id AND cur_user=current_user UNION
+	SELECT 39, p_result_id, node_2, n.the_geom, 'Node disconnected from any reservoir' FROM arc JOIN anl_arc USING (arc_id) 
+	JOIN node n ON node_2=node_id WHERE fprocesscat_id=39 AND result_id = p_result_id AND cur_user=current_user;
 
 RETURN cont1;
 END;
