@@ -54,6 +54,8 @@ BEGIN
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_muni_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_streetaxis_id_fkey;';
 
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district DROP CONSTRAINT IF EXISTS district_muni_id_fkey;';
+
 
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_muni_id_fkey"; 
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_streetaxis_id_fkey"; 
@@ -89,6 +91,8 @@ BEGIN
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ADD CONSTRAINT "plot_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
 		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district ADD CONSTRAINT "district_muni_id_fkey" FOREIGN KEY ("muni_id") 
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 
 		--DOUBLE EXPLOITATION FK
 
@@ -196,6 +200,7 @@ BEGIN
 
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN muni_id DROP NOT NULL;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN streetaxis_id DROP NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district ALTER COLUMN muni_id DROP NOT NULL;';
 
 		--ADD NOT NULL ON UTILS
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.municipality ALTER COLUMN name SET NOT NULL;';
@@ -209,10 +214,13 @@ BEGIN
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN muni_id SET NOT NULL;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN streetaxis_id SET NOT NULL;';
 
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district ALTER COLUMN muni_id SET NOT NULL;';
+		
 		--DROP CHECK EXPL
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_expl_id_check;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_expl_id_check;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_expl_id_check;';
+
 
 		--CREATE CHECK EXPL
 
@@ -246,6 +254,8 @@ BEGIN
 		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_muni_id_fkey";
 		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_streetaxis_id_fkey";
 
+		ALTER TABLE "ext_district" DROP CONSTRAINT IF EXISTS "ext_district_muni_id_fkey";
+
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_muni_id_fkey"; 
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_streetaxis_id_fkey"; 
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_streetaxis2_id_fkey"; 
@@ -273,6 +283,8 @@ BEGIN
 		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		ALTER TABLE "ext_district" ADD CONSTRAINT "ext_district_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		ALTER TABLE "node" ADD CONSTRAINT "node_muni_id_fkey" FOREIGN KEY ("muni_id") 
 		REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -332,6 +344,8 @@ BEGIN
 		ALTER TABLE ext_plot ALTER COLUMN expl_id DROP NOT NULL;
 		ALTER TABLE ext_plot ALTER COLUMN streetaxis_id DROP NOT NULL;
 
+		ALTER TABLE ext_district ALTER COLUMN muni_id DROP NOT NULL;
+
 		--NOT NULL ADD
 		ALTER TABLE ext_municipality ALTER COLUMN name SET NOT NULL;
 
@@ -347,6 +361,8 @@ BEGIN
 		ALTER TABLE ext_plot ALTER COLUMN muni_id SET NOT NULL;
 		ALTER TABLE ext_plot ALTER COLUMN expl_id SET NOT NULL;
 		ALTER TABLE ext_plot ALTER COLUMN streetaxis_id SET NOT NULL;
+
+		ALTER TABLE ext_district ALTER COLUMN muni_id SET NOT NULL;
 	END IF;
 
 

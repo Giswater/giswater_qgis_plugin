@@ -5,15 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = "utils", public, pg_catalog;
 
 
---25/11/2019
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"comment", "dataType":"text"}}$$);
-
---26/11/2019
-CREATE TABLE ext_district
+--21/11/2019
+CREATE TABLE district
 (
   district_id integer NOT NULL,
   name text,

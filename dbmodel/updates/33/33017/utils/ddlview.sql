@@ -32,3 +32,4 @@ CREATE OR REPLACE VIEW v_edit_dimensions AS
     dimensions
      JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
   WHERE dimensions.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
