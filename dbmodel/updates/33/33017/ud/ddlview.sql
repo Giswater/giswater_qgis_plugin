@@ -25,14 +25,12 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS
     st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y,
     cat_arc.descript,
     value_state.name AS state,
-    sys_feature_type.parentlayer AS sys_table_id
+    'v_edit_arc' as sys_table_id
    FROM v_edit_arc
      JOIN node ON v_edit_arc.node_2::text = node.node_id::text
      JOIN arc_type ON arc_type.id::text = v_edit_arc.arc_type::text
      LEFT JOIN cat_arc ON v_edit_arc.arccat_id::text = cat_arc.id::text
-     JOIN value_state ON v_edit_arc.state = value_state.id
-     JOIN sys_feature_cat ON sys_feature_cat.id = arc_type.id
-     JOIN sys_feature_type ON sys_feature_type.id = sys_feature_cat.type;
+     JOIN value_state ON v_edit_arc.state = value_state.id;
 
      
 
@@ -54,14 +52,12 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream AS
     st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y,
     cat_arc.descript,
     value_state.name AS state,
-    sys_feature_type.parentlayer AS sys_table_id
+    'v_edit_arc' as sys_table_id
    FROM v_edit_arc
      JOIN node ON v_edit_arc.node_1::text = node.node_id::text
      JOIN arc_type ON arc_type.id::text = v_edit_arc.arc_type::text
      LEFT JOIN cat_arc ON v_edit_arc.arccat_id=cat_arc.id
      JOIN value_state ON v_edit_arc.state = value_state.id
-     LEFT JOIN sys_feature_cat ON sys_feature_cat.id = arc_type.id
-     LEFT JOIN sys_feature_type ON sys_feature_type.id = sys_feature_cat.type
 UNION
  SELECT row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
     node.node_id,
@@ -80,15 +76,13 @@ UNION
     st_y(v_edit_connec.the_geom) AS y,
     cat_connec.descript,
     value_state.name AS state,
-    sys_feature_type.parentlayer AS sys_table_id
+    'v_edit_connec' as sys_table_id
    FROM v_edit_connec
      JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
      JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
      JOIN connec_type ON connec_type.id::text = v_edit_connec.connec_type::text
      LEFT JOIN cat_connec ON v_edit_connec.connecat_id=cat_connec.id
      JOIN value_state ON v_edit_connec.state = value_state.id
-     LEFT JOIN sys_feature_cat ON sys_feature_cat.id = connec_type.id
-     LEFT JOIN sys_feature_type ON sys_feature_type.id = sys_feature_cat.type
 UNION
  SELECT row_number() OVER (ORDER BY node.node_id) + 3000000 AS rid,
     node.node_id,
@@ -107,12 +101,10 @@ UNION
     st_y(v_edit_gully.the_geom) AS y,
     cat_connec.descript,
     value_state.name AS state,
-    sys_feature_type.parentlayer AS sys_table_id
+    'v_edit_gully' as sys_table_id
    FROM v_edit_gully
      JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
      JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
      JOIN gully_type ON gully_type.id::text = v_edit_gully.gully_type::text
      LEFT JOIN cat_connec ON v_edit_gully.connec_arccat_id = cat_connec.id
-     JOIN value_state ON v_edit_gully.state = value_state.id
-     LEFT JOIN sys_feature_cat ON sys_feature_cat.id = gully_type.id
-     LEFT JOIN sys_feature_type ON sys_feature_type.id = sys_feature_cat.type;
+     JOIN value_state ON v_edit_gully.state = value_state.id;
