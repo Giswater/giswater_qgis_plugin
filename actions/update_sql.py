@@ -1935,9 +1935,6 @@ class UpdateSQL(ApiParent):
 
     def set_info_project(self):
 
-        if self.dao is None:
-            return
-
         # Set default lenaguage EN
         self.project_data_language = 'EN'
         self.is_sample = None
