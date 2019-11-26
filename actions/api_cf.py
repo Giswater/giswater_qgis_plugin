@@ -6,54 +6,41 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
+from qgis.core import Qgis, QgsGeometry, QgsMapToPixel, QgsPointXY
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint as QgsPointXY
-    from qgis.PyQt.QtGui import QStringListModel
-    import urlparse as parse
-else:
-    from qgis.core import QgsPointXY
-    from qgis.PyQt.QtCore import QStringListModel
-    import urllib.parse as parse
-
-from qgis.PyQt.QtCore import QDate, QPoint, Qt
+from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt, pyqtSignal, QObject
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit,QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
-from qgis.core import QgsMapToPixel, QgsGeometry
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
-import json
-import os
-import re
-import subprocess
-import sys
-import webbrowser
+import json, os, re, subprocess, urllib.parse as parse, sys, webbrowser
 from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
+from .api_catalog import ApiCatalog
 from .api_parent import ApiParent
 from .manage_document import ManageDocument
 from .manage_element import ManageElement
-from .manage_visit import ManageVisit
 from .manage_gallery import ManageGallery
-from .api_catalog import ApiCatalog
-from ..ui_manager import ApiCfUi, EventFull, LoadDocuments, Sections, ApiBasicInfo
+from .manage_visit import ManageVisit
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from ..ui_manager import ApiBasicInfo, ApiCfUi, EventFull, LoadDocuments, Sections
 
 
-class ApiCF(ApiParent):
+class ApiCF(ApiParent, QObject):
+    
+    # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadApiInfo
+    signal_activate = pyqtSignal()
 
     def __init__(self, iface, settings, controller, plugin_dir, tab_type):
         """ Class constructor """
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        QObject.__init__(self)
         self.iface = iface
         self.settings = settings
         self.controller = controller
@@ -122,7 +109,6 @@ class ApiCF(ApiParent):
         action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
-
         main_menu.exec_(click_point)
 
 
@@ -142,10 +128,7 @@ class ApiCF(ApiParent):
                     point = QgsPointXY(float(x), float(y))
                     points.append(point)
                 rb = QgsRubberBand(self.canvas)
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    polyline = QgsGeometry.fromPolyline(points)
-                else:
-                    polyline = QgsGeometry.fromPolylineXY(points)
+                polyline = QgsGeometry.fromPolylineXY(points)
                 rb.setToGeometry(polyline, None)
                 rb.setColor(QColor(255, 0, 0, 100))
                 rb.setWidth(5)
@@ -268,15 +251,16 @@ class ApiCF(ApiParent):
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False, None
 
-        # When info is nothing
-        if 'results' in row[0]:
-            if row[0]['results'] == 0:
-                self.controller.show_message(row[0]['message']['text'], 0)
-                return False, None
+        # When something is wrong
+        if row[0]['message']:
+            level = 1
+            if 'level' in row[0]['message']:
+                level = int(row[0]['message']['level'])
+            self.controller.show_message(row[0]['message']['text'], level)
+            return False, None
 
         # When insert feature failed
         if row[0]['status'] == "Failed":
-            print(str("TEST3"))
             self.controller.show_message(row[0]['message']['text'], 2)
             return False, None
 
@@ -284,8 +268,10 @@ class ApiCF(ApiParent):
         if 'status' in row[0]['body']['data']['fields']:
             if row[0]['body']['data']['fields']['status'].lower() == 'failed':
                 msg = row[0]['body']['data']['fields']['message']['text']
-                priority = int(row[0]['body']['data']['fields']['message']['priority'])
-                self.controller.show_message(msg, message_level=priority)
+                level = 1
+                if 'level' in row[0]['body']['data']['fields']['message']:
+                    level = int(row[0]['body']['data']['fields']['message']['level'])
+                self.controller.show_message(msg, message_level=level)
                 return False, None
 
         self.complet_result = row
@@ -305,11 +291,12 @@ class ApiCF(ApiParent):
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
             sub_tag = None
             if feature_cat:
-                if feature_cat == 'arc':
+                if feature_cat.feature_type.lower() == 'arc':
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag)
+
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
 
@@ -390,12 +377,13 @@ class ApiCF(ApiParent):
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
         utils_giswater.set_qtv_config(self.tbl_document)
 
-        # Get table name for use as title
+        # Get table name
         self.tablename = complet_result[0]['body']['feature']['tableName']
+
+        # Get feature type (Junction, manhole, valve, fountain...)
         pos_ini = complet_result[0]['body']['feature']['tableName'].rfind("_")
         pos_fi = len(str(complet_result[0]['body']['feature']['tableName']))
-        # Get feature type (Junction, manhole, valve, fountain...)
-        self.feature_type = complet_result[0]['body']['feature']['tableName'][pos_ini + 1:pos_fi]
+        self.feature_type = complet_result[0]['body']['feature']['childType']
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
@@ -421,6 +409,8 @@ class ApiCF(ApiParent):
         action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
         action_catalog = self.dlg_cf.findChild(QAction, "actionCatalog")
         action_workcat = self.dlg_cf.findChild(QAction, "actionWorkcat")
+        action_get_arc_id = self.dlg_cf.findChild(QAction, "actionGetArcId")
+        action_get_parent_id = self.dlg_cf.findChild(QAction, "actionGetParentId")
         action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
         action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
         action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
@@ -442,6 +432,8 @@ class ApiCF(ApiParent):
         self.set_icon(action_rotation, "107c")
         self.set_icon(action_catalog, "195")
         self.set_icon(action_workcat, "193")
+        self.set_icon(action_get_arc_id, "209")
+        self.set_icon(action_get_parent_id, "210")
         self.set_icon(action_zoom_in, "103")
         self.set_icon(action_zoom_out, "107")
         self.set_icon(action_centered, "104")
@@ -471,33 +463,29 @@ class ApiCF(ApiParent):
         self.set_icon(self.dlg_cf.btn_doc_new, "131b")
         self.set_icon(self.dlg_cf.btn_open_doc, "170b")
 
-        # Get feature type as geom_type (node, arc, connec)
+        # Get feature type as geom_type (node, arc, connec, gully)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
-
-        if self.geom_type == '[]':
+        if str(self.geom_type) in ('', '[]'):
             if 'feature_cat' in globals():
                 parent_layer = self.feature_cat.parent_layer
             else:
                 parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
             sql = "SELECT lower(feature_type) FROM cat_feature WHERE  parent_layer = '" + str(parent_layer) + "' LIMIT 1"
-            result = self.controller.get_row(sql, log_sql=True, commit=True)
+            result = self.controller.get_row(sql, commit=True)
             self.geom_type = result[0]
 
         # Get field id name
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
 
-        # Get feature_type
-        sql = ("SELECT system_id "
-               "FROM " + self.schema_name + ".cat_feature "
-               "WHERE child_layer = '" + self.tablename + "'")
-        feature_type = self.controller.get_row(sql, log_sql=True, commit=True)
-
         self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
-
         for field in complet_result[0]['body']['data']['fields']:
+            if 'hidden' in field and field['hidden']:
+                continue
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
+            if widget is None:
+                return False, False
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
 
             # Take the QGridLayout with the intention of adding a QSpacerItem later
@@ -547,8 +535,10 @@ class ApiCF(ApiParent):
 
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(partial(self.start_editing, self.layer))
-        action_catalog.triggered.connect(partial(self.open_catalog, tab_type, feature_type))
+        action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
+        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
@@ -564,7 +554,9 @@ class ApiCF(ApiParent):
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
+        btn_cancel.clicked.connect(self.roll_back)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
+        self.dlg_cf.dlg_closed.connect(self.roll_back)
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
@@ -574,13 +566,21 @@ class ApiCF(ApiParent):
         self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
 
-    def set_vdefault_edition(self):
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'cf_keep_opened_edition'")
-        row = self.controller.get_row(sql)
 
-        if (not row or row[0].lower() != 'true') and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+    def roll_back(self):
+        self.layer.rollBack()
+
+
+    def set_vdefault_edition(self):
+        try:
+
+            row = self.controller.get_config('qgis_toggledition_forceopen')
+            if not row or row[0].upper() != "TRUE" and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+        except  KeyError as e:
+            pass
+        except Exception as e:
+            print(f"{type(e).__name__} --> {e}")
 
 
     def get_last_value(self):
@@ -640,23 +640,46 @@ class ApiCF(ApiParent):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-        widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
-        if widget.property('column_id') == self.field_id:
-            self.feature_id = widget.text()
-            # Get selected feature
-            self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+
+        try :
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            if widget.property('column_id') == self.field_id:
+                self.feature_id = widget.text()
+                # Get selected feature
+                self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+        except AttributeError as e:
+            message = "The field widgettype is not configured for"
+            self.controller.show_message(message, 2, parameter=field['column_id'])
+
         return label, widget
 
 
     def manage_text(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_lineedit(field)
         widget = self.set_widget_size(widget, field)
+        widget = self.set_min_max_values(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
-        widget = self.set_data_type(field, widget, self.dlg_cf.btn_accept)
+        widget = self.set_data_type(field, widget)
+
+        return widget
+
+    def set_min_max_values(self, widget, field):
+        # Set max and min values allowed
+        if field['widgetcontrols'] and 'minValue' in field['widgetcontrols']:
+            widget.setProperty('minValue', field['widgetcontrols']['minValue'])
+
+        if field['widgetcontrols'] and ('maxValue' in field['widgetcontrols']):
+            widget.setProperty('maxValue', field['widgetcontrols']['maxValue'])
         return widget
 
 
     def manage_typeahead(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         completer = QCompleter()
         widget = self.manage_text(dialog, complet_result, field)
         widget = self.manage_lineedit(field, dialog, widget, completer)
@@ -664,6 +687,9 @@ class ApiCF(ApiParent):
 
 
     def manage_combo(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_combobox(field)
         widget = self.set_widget_size(widget, field)
         widget = self.set_auto_update_combobox(field, dialog, widget)
@@ -671,56 +697,86 @@ class ApiCF(ApiParent):
 
 
     def manage_check(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_checkbox(dialog, field)
         widget = self.set_auto_update_checkbox(field, dialog, widget)
         return widget
 
 
     def manage_datepickertime(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_calendar(dialog, field)
         widget = self.set_auto_update_dateedit(field, dialog, widget)
         return widget
 
 
     def manage_button(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_button(dialog, field)
         widget = self.set_widget_size(widget, field)
         return widget
 
 
     def manage_hyperlink(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_hyperlink(dialog, field)
         widget = self.set_widget_size(widget, field)
         return widget
 
 
     def manage_hspacer(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_horizontal_spacer()
         return widget
 
 
     def manage_vspacer(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_verical_spacer()
         return widget
 
 
     def manage_textarea(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_textarea(field)
         return widget
 
 
     def manage_spinbox(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_spinbox(field)
         widget = self.set_auto_update_spinbox(field, dialog, widget)
         return widget
 
 
     def manage_doubleSpinbox(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.manage_spinbox(dialog, complet_result, field)
         return widget
 
 
     def manage_tableView(self, dialog, complet_result, field):
+        """ This function is called in def set_widgets(self, dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        """
         widget = self.add_tableview(complet_result, field)
         widget = self.set_headers(widget, field)
         widget = self.populate_table(widget, field)
@@ -782,7 +838,7 @@ class ApiCF(ApiParent):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
             return
-
+        # If we make an info
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -803,7 +859,7 @@ class ApiCF(ApiParent):
             extras = '"fields":' + my_json + ''
             body = self.create_body(feature=feature, extras=extras)
             sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
-
+        # If we make an insert
         else:
             my_json = json.dumps(_json)
             feature = f'"featureType":"{self.feature_type}", '
@@ -912,22 +968,35 @@ class ApiCF(ApiParent):
             else:
                 _json[str(widget.property('column_id'))] = str(value)
 
-            if widget.property('datatype') == 'double':
-                if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
-                    widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
-                    dialog.btn_accept.setEnabled(True)
-                else:
-                    widget.setStyleSheet("border: 1px solid red")
-                    dialog.btn_accept.setEnabled(False)
-            elif widget.property('datatype') == 'integer':
-                if value is None or bool(re.search("^\d*$", value)):
-                    widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
-                    dialog.btn_accept.setEnabled(True)
-                else:
-                    widget.setStyleSheet("border: 1px solid red")
-                    dialog.btn_accept.setEnabled(False)
-        self.controller.log_info(str(_json))
 
+    def check_datatype_validator(self, dialog, widget, btn):
+        """
+        functions called in ->  widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn):
+            def integer_validator(self, value, widget, btn_accept)
+            def double_validator(self, value, widget, btn_accept)
+         """
+        value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+        try:
+            getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+        except AttributeError as e:
+            print(e)
+            """If the function called by getattr don't exist raise this exception"""
+            pass
+
+
+    def check_min_max_value(self,dialog, widget, btn_accept):
+        value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+        try:
+            if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or \
+                    (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
+                widget.setStyleSheet("border: 1px solid red")
+                btn_accept.setEnabled(False)
+            else:
+                widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+                btn_accept.setEnabled(True)
+        except ValueError as e:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)
 
     def check_tab_data(self, dialog):
         """ Check if current tab name is tab_data """
@@ -962,6 +1031,9 @@ class ApiCF(ApiParent):
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
+            widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
+            widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
+
         return widget
 
     def enabled_accept(self, dialog):
@@ -970,7 +1042,7 @@ class ApiCF(ApiParent):
     def set_auto_update_combobox(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -985,7 +1057,7 @@ class ApiCF(ApiParent):
     def set_auto_update_dateedit(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -1000,7 +1072,7 @@ class ApiCF(ApiParent):
     def set_auto_update_spinbox(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -1015,7 +1087,7 @@ class ApiCF(ApiParent):
     def set_auto_update_checkbox(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate']:
+            if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -1062,8 +1134,7 @@ class ApiCF(ApiParent):
             widget = f'{tab_type}_{self.geom_type}at_id'
         else:
             widget = f'{tab_type}_{self.geom_type}cat_id'
-
-        self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type[0])
+        self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
 
 
     def show_actions(self, tab_name):
@@ -1515,7 +1586,6 @@ class ApiCF(ApiParent):
                f"ORDER BY cat_period_id")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
 
         rows.append(['', ''])
@@ -1622,23 +1692,8 @@ class ApiCF(ApiParent):
             rows.append(['', ''])
             utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
 
-        # Get selected dates
-        date_from = self.date_event_from.date()
-        date_to = self.date_event_to.date()
-        if date_from > date_to:
-            message = "Selected date interval is not valid"
-            self.controller.show_warning(message)
-            return
-
-        format_low = 'yyyy-MM-dd 00:00:00.000'
-        format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = f"'{date_from.toString(format_low)}'::timestamp AND '{date_to.toString(format_high)}'::timestamp"
-
-        # Set filter
-        filter_ += f" AND(tstamp BETWEEN {interval}) AND (tstamp BETWEEN {interval})"
-
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)
+        self.set_model_to_table(widget, table_name)
+        self.set_filter_table_event(widget)
 
 
     def open_visit_event(self):
@@ -1805,9 +1860,10 @@ class ApiCF(ApiParent):
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
+        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        if rows:
+            rows.append(['', ''])
+            utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
 
         # End cascading filter
         # Get selected values in Comboboxes
@@ -1822,10 +1878,10 @@ class ApiCF(ApiParent):
         # Set filter
         expr += f" AND visit_start BETWEEN {interval}"
 
-        if event_type_value != 'null':
+        if event_type_value not in ('null', -1):
             expr += f" AND parameter_type ILIKE '%{event_type_value}%'"
 
-        if event_id != 'null':
+        if event_id not in ('null', -1):
             expr += f" AND parameter_id ILIKE '%{event_id}%'"
 
         # Refresh model with selected filter
@@ -2051,7 +2107,8 @@ class ApiCF(ApiParent):
         # Fill ComboBox doc_type
         sql = "SELECT id, id FROM doc_type ORDER BY id"
         rows = self.controller.get_rows(sql, commit=True)
-        rows.append(['', ''])
+        if rows:
+            rows.append(['', ''])
         utils_giswater.set_item_data(doc_type, rows)
 
         # Adding auto-completion to a QLineEdit
@@ -2086,7 +2143,7 @@ class ApiCF(ApiParent):
         doc_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
             expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
-        print(str(expr))
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
@@ -2175,6 +2232,10 @@ class ApiCF(ApiParent):
         # Put widgets into layout
         widget_list = []
         for field in complet_list[0]['body']['data']['fields']:
+            if field['column_id'] =='depth':
+                print(f"{field['column_id']} --> {field['hidden']}")
+            if 'hidden' in field and field['hidden']:
+                continue
             label, widget = self.set_widgets(dialog, complet_list, field)
             if widget is not None:
                 if (type(widget)) == QSpacerItem:
@@ -2207,12 +2268,7 @@ class ApiCF(ApiParent):
                 standar_model = widget.model()
         for widget in widget_list:
             if type(widget) is QLineEdit:
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    widget.textChanged.connect(partial(
-                        self.filter_table, complet_result, standar_model, dialog, widget_list))
-                else:
-                    widget.editingFinished.connect(partial(
-                        self.filter_table, complet_result, standar_model, dialog, widget_list))
+                widget.editingFinished.connect(partial(self.filter_table, complet_result, standar_model, dialog, widget_list))
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(
                     self.filter_table, complet_result, standar_model, dialog, widget_list))
@@ -2473,6 +2529,122 @@ class ApiCF(ApiParent):
 
         # Open dialog
         dlg.open()
+
+
+    def get_snapped_feature_id(self, dialog, action, option):
+        """ Snap feature and set a value into dialog """
+
+        layer_name = 'v_edit_' + option
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        widget_name = f"data_{option}_id"
+        widget = dialog.findChild(QWidget, widget_name)
+        if not layer or not widget:
+            action.setChecked(False)
+            return
+
+        # Block the signals of de dialog so that the key ESC does not close it
+        dialog.blockSignals(True)
+
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
+
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
+        self.snapper = self.snapper_manager.get_snapper()
+
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Disable snapping
+        self.snapper_manager.enable_snapping()
+
+        # Set snapping to 'arc' and 'node'
+        self.snapper_manager.set_snapping_layers()
+
+        # if we are doing info over connec or over node
+        if option == 'arc':
+            self.snapper_manager.snap_to_arc()
+        elif option == 'node':
+            self.snapper_manager.snap_to_node()
+
+        # Set signals
+        self.canvas.xyCoordinates.connect(partial(self.mouse_move, layer))
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
+
+
+    def mouse_move(self, layer, point):
+        """ Mouse motion detection """
+
+        # Set active layer
+        self.iface.setActiveLayer(layer)
+        layer_name = self.controller.get_layer_source_table_name(layer)
+
+        # Get clicked point
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            # Check feature
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == layer_name:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def get_id(self, dialog, action, option, point, event):
+        """ Get selected attribute from snapped feature """
+        # @options{'key':['att to get from snapped feature', 'widget name destination']}
+        options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id']}
+
+        if event == Qt.RightButton:
+            self.disconnect_snapping(False)
+            self.cancel_snapping_tool(dialog, action)
+            return
+
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(point=point)
+
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+
+        if not self.snapper_manager.result_is_valid():
+            return
+        # Get the point. Leave selection
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        feat_id = snapped_feat.attribute(f'{options[option][0]}')
+        widget = dialog.findChild(QWidget, f"{options[option][1]}")
+        widget.setFocus()
+        utils_giswater.setWidgetText(dialog, widget, str(feat_id))
+        self.snapper_manager.recover_snapping_options()
+        self.cancel_snapping_tool(dialog, action)
+
+
+    def cancel_snapping_tool(self, dialog, action):
+        self.disconnect_snapping(False)
+        dialog.blockSignals(False)
+        action.setChecked(False)
+        self.signal_activate.emit()
+
+
+    def disconnect_snapping(self, action_pan=True):
+        """ Select 'Pan' as current map tool and disconnect snapping """
+
+        try:
+            self.canvas.xyCoordinates.disconnect()
+            self.emit_point.canvasClicked.disconnect()
+            if action_pan:
+                self.iface.actionPan().trigger()
+            self.vertex_marker.hide()
+        except Exception as e:
+            print(f"{type(e).__name__} --> {e}")
 
 
     """ OTHER FUNCTIONS """

@@ -5,24 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
+import json
+from json import JSONDecodeError
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    import ConfigParser as configparser
-else:
-    import configparser
-    from qgis.core import QgsSnappingUtils, QgsPointLocator, QgsTolerance
-
-from qgis.core import QgsExpressionContextUtils, QgsProject, QgsEditorWidgetSetup, QgsDataSourceUri, QgsVectorLayer
+from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
+from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
 from qgis.PyQt.QtWidgets import QToolBar
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel
 
+import configparser
 import os.path
 import sys
 import webbrowser
@@ -84,10 +78,7 @@ class Giswater(QObject):
 
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        if Qgis.QGIS_VERSION_INT < 29900:
-            QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)
-        else:
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
             
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -186,7 +177,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
-            elif int(index_action) in (64, 65, 74, 75, 76, 81, 82, 84):
+            elif int(index_action) in (18, 64, 65, 74, 75, 76, 81, 82, 84):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
@@ -269,7 +260,7 @@ class Giswater(QObject):
                 if not help_added:
                     icon_path = self.plugin_dir + '/icons/308.png'
                     icon = QIcon(icon_path)
-                    if feature_cat.feature_type.lower() == 'node':
+                    if feature_cat.feature_type.upper() in ('NODE', 'CONNEC', 'GULLY'):
                         obj_action = QAction(icon, f'Insert point \t           ?', self)
                     else:
                         obj_action = QAction(icon, f'Insert arc \t           ?', self)
@@ -329,7 +320,7 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        list_actions = (23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 86, 64, 65, 66, 67, 68, 69,
+        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 86, 64, 65, 66, 67, 68, 69,
                         74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305)
 
         if int(index_action) in list_actions:
@@ -433,9 +424,10 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
         toolbar_id = "om_ws"
-        list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84']
+        list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+
 
     def toolbar_om_ud(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)
@@ -446,6 +438,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
+
     def toolbar_edit(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
@@ -454,6 +447,7 @@ class Giswater(QObject):
         list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '69', '39', '34', '66', '33', '67']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+
 
     def toolbar_cad(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)
@@ -464,6 +458,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
+
     def toolbar_epa(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
@@ -472,6 +467,7 @@ class Giswater(QObject):
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+
 
     def toolbar_master(self, x=0, y=0):
         """ Function called in def manage_toolbars(...)
@@ -593,9 +589,9 @@ class Giswater(QObject):
 
 
     def manage_feature_cat(self):
-        """ Manage records from table 'sys_feature_type' """
+        """ Manage records from table 'cat_feature' """
 
-        # Dictionary to keep every record of table 'sys_feature_cat'
+        # Dictionary to keep every record of table 'cat_feature'
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
 
@@ -613,14 +609,20 @@ class Giswater(QObject):
         if not rows:
             return False
 
+        msg = "Field child_layer of id: "
         for row in rows:
             tablename = row['child_layer']
-            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['feature_type'].lower(), row['shortcut_key'],
+            if not tablename:
+                msg += f"{row['id']}, "
+                continue
+            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['shortcut_key'],
                                  row['parent_layer'], row['child_layer'])
             self.feature_cat[tablename] = elem
 
         self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
 
+        if msg != "Field child_layer of id: ":
+            self.controller.show_warning(msg + "is not defined in table cat_feature")
         return True
 
 
@@ -636,8 +638,9 @@ class Giswater(QObject):
 
         try:
             # Unlisten notify channel and stop thread
-            if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and  hasattr(self, 'notify'):
-                self.notify.stop_listening('watchers')
+            if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
+                list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+                self.notify.stop_listening(list_channels)
 
             # Remove icon of action 'Info'
             self.iface.removeToolBarIcon(self.action_info)
@@ -758,6 +761,7 @@ class Giswater(QObject):
             self.controller.show_warning("Layer not found", parameter="v_edit_node")
             return
 
+        self.controller.get_current_user()
         layer_source = self.controller.get_layer_source(layer)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
@@ -767,6 +771,7 @@ class Giswater(QObject):
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
         self.controller.log_info("Set search_path")
         connection_status, not_version = self.controller.set_database_connection()
+
         self.set_info_button()
         if not connection_status or not_version:
             message = self.controller.last_error
@@ -818,14 +823,26 @@ class Giswater(QObject):
         if not self.manage_layers():
             return
 
-        # Manage records from table 'sys_feature_type'
+        # Manage records from table 'cat_feature'
         self.manage_feature_cat()
 
         # Manage snapping layers
         self.manage_snapping_layers()
 
-        # Get list of actions to hide
-        self.list_to_hide = self.settings.value('system_variables/action_to_hide')
+        self.list_to_hide = []
+        try:
+            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
+            row = self.controller.get_config('qgis_toolbar_hidebuttons')
+            json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
+            self.list_to_hide = [str(x) for x in json_list['action_index']]
+        except  KeyError as e:
+            pass
+        except JSONDecodeError as e:
+            # Control if json have a correct format
+            pass
+        finally:
+             # TODO remove this line when do you want enabled api info for epa
+             self.list_to_hide.append('199')
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
@@ -851,14 +868,12 @@ class Giswater(QObject):
         # Manage layer fields
         self.get_layers_to_config()
         self.set_layer_config(self.available_layers)
-        # Log it
-        message = "Project read successfully"
-        self.controller.log_info(message)
 
-        # Create a thread and start listen
-        if  self.settings.value('system_variables/use_notify').upper() == 'TRUE' :
+        # Create a thread to listen selected database channels
+        if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.notify.start_listening('desktop', 'wait_notifications', (self.controller.dao.conn, ))
+            list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+            self.notify.start_listening(list_channels)
 
         # Save toolbar position after closing QGIS
         self.iface.actionExit().triggered.connect(self.save_toolbars_position)
@@ -870,8 +885,13 @@ class Giswater(QObject):
         # Put add layers button into toc
         self.add_layers_button()
 
+        # Log it
+        message = "Project read successfully"
+        self.controller.log_info(message)
+
 
     def add_layers_button(self):
+
         icon_path = self.plugin_dir + '/icons/306.png'
         dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
         toolbar = dockwidget.findChildren(QToolBar)[0]
@@ -898,7 +918,8 @@ class Giswater(QObject):
         # Get parent layers
         sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' "
                "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
-               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature")
+               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature"
+               " ORDER BY parent_layer")
         parent_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
 
         for parent_layer in parent_layers:
@@ -906,17 +927,19 @@ class Giswater(QObject):
             sub_menu = main_menu.addMenu(str(parent_layer[0]))
 
             # Get child layers
-            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type) as type FROM cat_feature "
+            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), id as alias FROM cat_feature "
                    f"WHERE parent_layer = '{parent_layer[1]}' "
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
-                   f"   WHERE table_schema = '{schema_name}')")
+                   f"   WHERE table_schema = '{schema_name}')"
+                   f" ORDER BY child_layer")
+
 
             child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
-            child_layers.insert(0, ['Load all', 'Load all'])
+            child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
-                action = QAction(str(child_layer[0]), sub_menu, checkable=True)
+                action = QAction(str(child_layer[2]), sub_menu, checkable=True)
 
                 # Get load layers and create child layers menu (actions)
                 layers_list = []
@@ -945,9 +968,10 @@ class Giswater(QObject):
                           self.controller.credentials['password'])
         if child_layers is not None:
             for layer in child_layers:
-                uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
-                vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
-                QgsProject.instance().addMapLayer(vlayer)
+                if layer[0] != 'Load all':
+                    uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
+                    vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
+                    QgsProject.instance().addMapLayer(vlayer)
         else:
             uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
             vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
@@ -1024,17 +1048,13 @@ class Giswater(QObject):
         layer = self.controller.get_layer_by_tablename(layername)
         if not layer:
             return
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, snapping_type, 1, tolerance, False)
-        else:
-            if snapping_type == 0:
-                snapping_type = QgsPointLocator.Vertex
-            elif snapping_type == 1:
-                snapping_type = QgsPointLocator.Edge
-            elif snapping_type == 2:
-                snapping_type = QgsPointLocator.All
-            QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
+        if snapping_type == 0:
+            snapping_type = QgsPointLocator.Vertex
+        elif snapping_type == 1:
+            snapping_type = QgsPointLocator.Edge
+        elif snapping_type == 2:
+            snapping_type = QgsPointLocator.All
+        QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
 
     def manage_custom_forms(self):
@@ -1068,19 +1088,13 @@ class Giswater(QObject):
 
         if self.layer_node:
             display_field = 'depth : [% "' + fieldname_node + '" %]'
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.layer_node.setDisplayField(display_field)
-            else:
-                self.layer_node.setMapTipTemplate(display_field)
-                self.layer_node.setDisplayExpression(display_field)
+            self.layer_node.setMapTipTemplate(display_field)
+            self.layer_node.setDisplayExpression(display_field)
 
         if self.layer_connec:
             display_field = 'depth : [% "' + fieldname_connec + '" %]'
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.layer_connec.setDisplayField(display_field)
-            else:
-                self.layer_connec.setMapTipTemplate(display_field)
-                self.layer_connec.setDisplayExpression(display_field)
+            self.layer_connec.setMapTipTemplate(display_field)
+            self.layer_connec.setDisplayExpression(display_field)
 
     
     def manage_map_tools(self):
@@ -1141,10 +1155,7 @@ class Giswater(QObject):
         
         # Get project variable 'expl_id'
         try:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
-            else:
-                expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
+            expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
         except:
             pass
         
@@ -1354,11 +1365,36 @@ class Giswater(QObject):
         rows = self.controller.get_rows(sql, commit=True)
         self.available_layers = [layer[0] for layer in rows]
 
+        self.set_form_suppress(self.available_layers)
+
         layers_list = self.settings.value('system_variables/set_layer_config')
         for layer in layers_list:
             self.available_layers.append(layer)
 
 
+    def set_form_suppress(self, layers_list):
+        """ Set form suppress on "Hide form on add feature (global settings) """
+        for layer_name in layers_list:
+            layer = self.controller.get_layer_by_tablename(layer_name)
+            if layer is None: continue
+            config = layer.editFormConfig()
+            config.setSuppress(0)
+            layer.setEditFormConfig(config)
+
+
+    def set_read_only(self, layer, field, field_index):
+        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+        # Get layer config
+        config = layer.editFormConfig()
+        try:
+            # Set field editability
+            config.setReadOnly(field_index, not field['iseditable'])
+        except KeyError as e:
+            # Control if key 'iseditable' not exist
+            pass
+        finally:
+            # Set layer config
+            layer.setEditFormConfig(config)
 
 
     def set_layer_config(self, layers):
@@ -1377,7 +1413,6 @@ class Giswater(QObject):
             body = self.create_body(feature=feature)
             sql = (f"SELECT gw_api_getinfofromid($${{{body}}}$$)")
             row = self.controller.get_row(sql, commit=True)
-
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 continue
@@ -1390,16 +1425,10 @@ class Giswater(QObject):
 
             complet_result = row[0]
 
-            # Take the columns configured in table config_api_form_fields where isenabled is False
-            sql =(f"SELECT column_id, hidden FROM config_api_form_fields "
-                  f"WHERE formname = '{layer_name}' AND isenabled=False")
-            cols_to_hide = self.controller.get_rows(sql, commit=True)
-            if cols_to_hide:
-                for col in cols_to_hide:
-                    self.set_column_visibility(layer, col[0], col[1])
 
             for field in complet_result['body']['data']['fields']:
                 _values = {}
+
                 # Get column index
                 fieldIndex = layer.fields().indexFromName(field['column_id'])
 
@@ -1411,9 +1440,26 @@ class Giswater(QObject):
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
-                # Get values
+                if 'widgetcontrols' in field:
+                    # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
+                    if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
+                        self.set_column_multiline(layer, field, fieldIndex)
+
+                    # Set field constraints
+                    if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
+                        if field['widgetcontrols']['setQgisConstraints'] is True:
+                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                                 QgsFieldConstraints.ConstraintStrengthSoft)
+                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
+                                                 QgsFieldConstraints.ConstraintStrengthHard)
+
+                # Manage editability
+                self.set_read_only(layer, field, fieldIndex)
+
+                # Manage fields
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
+                        # Set values
                         for i in range(0, len(field['comboIds'])):
                             _values[field['comboNames'][i]] = field['comboIds'][i]
                     # Set values into valueMap
@@ -1431,6 +1477,14 @@ class Giswater(QObject):
                 break
         config.setColumns(columns)
         layer.setAttributeTableConfig(config)
+
+        
+    def set_column_multiline(self, layer, field, fieldIndex):
+        """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+        if field['widgettype'] == 'text':
+            if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):

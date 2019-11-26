@@ -206,9 +206,7 @@ class CadAddPoint(ParentMapTool):
 
         # Check for default base layer
         self.vdefault_layer = None
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_config('cad_tools_base_layer_vdefault')
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0], True)

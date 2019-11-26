@@ -20,11 +20,11 @@ else:
     from qgis.core import QgsPointXY, QgsLayoutExporter
 
 from qgis.core import QgsRectangle, QgsProject
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
-from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
-from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLabel
+from qgis.PyQt.QtWidgets import QLineEdit, QTableView
 
 import os
 import sys
@@ -110,10 +110,20 @@ class ManageNewPsector(ParentManage):
         atlas_id = self.dlg_plan_psector.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
 
-        self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
-        self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
-        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
-        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority', False)
+        self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type')
+        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority')
+
+        # Set visible FALSE for cmb_sector
+        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')
+        self.dlg_plan_psector.lbl_sector.setVisible(False)
+        self.cmb_sector_id.setVisible(False)
+
+        # Populate combo expl_id
+        sql = ("SELECT expl_id, name from exploitation "
+               " JOIN selector_expl USING (expl_id) "
+               " WHERE exploitation.expl_id != 0")
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.cmb_expl_id, rows, 1)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
@@ -289,7 +299,7 @@ class ManageNewPsector(ParentManage):
             layer = None
             if not is_api:
                 layername = f'v_edit_{self.plan_om}_psector'
-                layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
+                layer = self.controller.get_layer_by_tablename(layername, show_warning=False)
             if layer:
 
                 expr_filter = f"psector_id = '{psector_id}'"
@@ -313,7 +323,7 @@ class ManageNewPsector(ParentManage):
                     feature = layer.selectedFeatures()
                     
                 if feature != []:
-                    if feature.geometry() is not None:
+                    if feature.geometry().get() is not None:
                         psector_rec = feature.geometry().boundingBox()
                         # Do zoom when QgsRectangles don't intersect
                         if not canvas_rec.intersects(psector_rec):
@@ -325,6 +335,13 @@ class ManageNewPsector(ParentManage):
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
+
+        else:
+
+            # Set psector_status vdefault
+            sql = ("SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = 2")
+            result = self.controller.get_row(sql)
+            utils_giswater.set_combo_itemData(self.cmb_status, str(result[1]), 1)
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql, commit=True)
@@ -375,6 +392,9 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(self.document_delete)
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(self.document_open)
+
+        self.cmb_status.currentIndexChanged.connect(
+            partial(self.show_status_warning))
 
         self.set_completer()
 
@@ -495,6 +515,7 @@ class ManageNewPsector(ParentManage):
                 elem = [index, layout.name()]
                 records.append(elem)
                 index = index + 1
+
         if records in ([], None):
             # If no composer configurated, disable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(False)
@@ -512,18 +533,9 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        sql = (f"SELECT value FROM config_param_user "
-               f"WHERE parameter = 'composer_{self.plan_om}_vdefault' AND cur_user= current_user")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_config(f'composer_{self.plan_om}_vdefault')
         if row:
-            utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 0)
-
-        utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
-        sql = (f"SELECT value FROM config_param_user "
-               f"WHERE parameter = 'composer_{self.plan_om}_vdefault' AND cur_user= current_user")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, row[0])
+            utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
 
     def generate_rapports(self):
@@ -608,13 +620,21 @@ class ManageNewPsector(ParentManage):
                     self.controller.show_warning(msg, parameter=path)
 
         else:
-
             # Get layout manager object
             layout_manager = QgsProject.instance().layoutManager()
 
             # Get our layout
             layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
             layout = layout_manager.layoutByName(layout_name)
+
+            # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
+            # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
+            # close the layout designer again (finally sentence)
+            designer = self.iface.openLayoutDesigner(layout)
+            layout_view = designer.view()
+            designer_window = layout_view.window()
+            action = designer_window.findChild(QAction, 'mActionAtlasPreview')
+            action.trigger()
 
             # Export to PDF file
             if layout:
@@ -632,6 +652,8 @@ class ManageNewPsector(ParentManage):
                     self.controller.log_warning(str(e))
                     msg = "Cannot create file, check if selected composer is the correct composer"
                     self.controller.show_warning(msg, parameter=path)
+                finally:
+                    designer_window.close()
             else:
                 self.controller.show_warning("Layout not found", parameter=layout_name)
 
@@ -784,10 +806,9 @@ class ManageNewPsector(ParentManage):
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
                                                manage_new_psector=self, table_object=table_object)
-        self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
+        self.canvas.setMapTool(multiple_selection)
         self.connect_signal_selection_changed(dialog, table_object, query)
-
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
@@ -817,15 +838,14 @@ class ManageNewPsector(ParentManage):
 
     def delete_psector_selector(self, tablename):
         sql = (f"DELETE FROM {tablename}"
-               f" WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
+               f" WHERE cur_user = current_user;")
+        self.controller.execute_sql(sql, commit=True)
 
 
     def insert_psector_selector(self, tablename, field, value):
-
         sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
-               f"VALUES ('{str(value)}', current_user)")
-        self.controller.execute_sql(sql)
+               f"VALUES ('{value}', current_user);")
+        self.controller.execute_sql(sql, commit=True)
 
 
     def check_tab_position(self):
@@ -885,17 +905,18 @@ class ManageNewPsector(ParentManage):
         combo.blockSignals(False)
 
 
-    def populate_combos(self, combo, field_name, field_id, table_name, allow_nulls=True):
+    def populate_combos(self, combo, field_name, field_id, table_name, where=None):
         
-        sql = (f"SELECT DISTINCT({field_id}), {field_name}"
-               f" FROM {table_name} ORDER BY {field_name}")
+        sql = f"SELECT DISTINCT({field_id}), {field_name}  FROM {table_name} "
+        if where:
+            sql += where
+        sql += f" ORDER BY {field_name}"
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return
         combo.blockSignals(True)
         combo.clear()
-        if allow_nulls:
-            combo.addItem("", "")
+
         records_sorted = sorted(rows, key=operator.itemgetter(1))
         for record in records_sorted:
             combo.addItem(record[1], record)
@@ -944,7 +965,7 @@ class ManageNewPsector(ParentManage):
 
         sql = (f"SELECT name FROM {self.plan_om}_psector"
                f" WHERE name = '{psector_name}'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if row is None:
             return False
         return True
@@ -974,8 +995,8 @@ class ManageNewPsector(ParentManage):
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
-               f"ORDER BY ordinal_position")
-        rows = self.controller.get_rows(sql, log_sql=True)
+               f"ORDER BY ordinal_position;")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
             self.controller.show_warning(message, parameter=viewname)
@@ -1041,20 +1062,18 @@ class ManageNewPsector(ParentManage):
                 sql += values
 
         if not self.update:
-            sql += " RETURNING psector_id"
-            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+            sql += " RETURNING psector_id;"
+            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True, commit=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
-                sql = ("SELECT parameter FROM config_param_user "
-                       " WHERE parameter = 'psector_vdefault' AND cur_user = current_user")
-                row = self.controller.get_row(sql)
+                row = self.controller.get_config('psector_vdefault')
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = '{new_psector_id[0]}' "
-                           f" WHERE parameter = 'psector_vdefault'")
+                           f" WHERE parameter = 'psector_vdefault';")
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-                           f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user)")
+                           f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user);")
                 self.controller.execute_sql(sql, log_sql=True)
         else:
             self.controller.execute_sql(sql, log_sql=True)
@@ -1389,3 +1408,9 @@ class ManageNewPsector(ParentManage):
         model.setStringList(values)
         self.completer.setModel(model)
 
+
+    def show_status_warning(self):
+        msg = "WARNING: You have been updated the status value.  If you click OK on the main dialog, a process will be " \
+              "triggered to update the state & state_type values of all that features that belongs on the psector " \
+              "according with the system variables plan_psector_statetype, plan_statetype_planned, plan_statetype_ficticious"
+        result = self.controller.show_details(msg, 'Message warning')

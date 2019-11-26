@@ -40,15 +40,7 @@ class DuplicatePsector(ParentManage, QObject):
         utils_giswater.set_item_data(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
 
         # Set QComboBox with selected psector
-        if psector_id is not None:
-            utils_giswater.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
-        else:
-            # Set QComboBox with current psector
-            sql = ("SELECT value FROM config_param_user "
-                   "WHERE parameter='psector_vdefault' AND cur_user = current_user")
-            row = self.controller.get_row(sql, commit=True, log_sql=True)
-            if row:
-                utils_giswater.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, row[0], 0)
+        utils_giswater.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
 
         # Set listeners
         self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_duplicate_psector))
@@ -72,7 +64,6 @@ class DuplicatePsector(ParentManage, QObject):
         # Execute manage add fields function
         sql = f"SELECT gw_fct_duplicate_psector($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-
         if not row or row[0] is None:
             self.controller.show_message("Function gw_fct_duplicate_psector executed with no result ", 3)
             return
@@ -90,7 +81,5 @@ class DuplicatePsector(ParentManage, QObject):
             self.close_dialog(self.dlg_duplicate_psector)
         else:
             utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
-
-
 
         self.is_duplicated.emit()

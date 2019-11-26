@@ -67,7 +67,11 @@
        </spacer>
       </item>
       <item row="2" column="0" colspan="5">
-       <widget class="QTableView" name="tbl_document"/>
+       <widget class="QTableView" name="tbl_document">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLineEdit" name="doc_id">

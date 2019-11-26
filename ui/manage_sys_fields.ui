@@ -340,7 +340,11 @@
         </layout>
        </item>
        <item row="1" column="0">
-        <widget class="QTableView" name="tbl_update"/>
+        <widget class="QTableView" name="tbl_update">
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

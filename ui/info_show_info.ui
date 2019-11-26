@@ -48,6 +48,20 @@
    <item row="1" column="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QLabel" name="lbl_status">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_status_text">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -77,9 +91,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>gridLayoutWidget</zorder>
-  <zorder>lbl_version</zorder>
-  <zorder>horizontalLayoutWidget</zorder>
  </widget>
  <resources/>
  <connections/>

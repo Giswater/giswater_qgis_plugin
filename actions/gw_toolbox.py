@@ -155,15 +155,40 @@ class GwToolBox(ApiParent):
 
 
     def load_settings_values(self, dialog, function):
-        """ Load QGIS settings related with csv options """
+        """ Load QGIS settings related with toolbox options """
 
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-
+        geom_type = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_geom_type")
+        utils_giswater.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
+        layer = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_layers")
+        utils_giswater.set_combo_itemData(dialog.cmb_layers, layer, 0)
         if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_rbt_previous") == 'true':
             dialog.rbt_previous.setChecked(True)
         else:
             dialog.rbt_layer.setChecked(True)
+
+
+    def load_parametric_values(self, dialog, function):
+        """ Load QGIS settings related with parametric toolbox options """
+        cur_user = self.controller.get_current_user()
+        function_name = function[0]['functionname']
+        layout = dialog.findChild(QWidget, 'grb_parameters')
+        widgets = layout.findChildren(QWidget)
+        for widget in widgets:
+            if type(widget) not in (QCheckBox, QComboBox, QLineEdit):
+                continue
+            if type(widget) is QCheckBox:
+                if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}"):
+                    widget.setChecked(True)
+                else:
+                    widget.setChecked(False)
+            elif type(widget) is QComboBox:
+                value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                utils_giswater.set_combo_itemData(widget, value, 0)
+            elif type(widget) in (QLineEdit, QSpinBox):
+                value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                utils_giswater.setWidgetText(dialog, widget, value)
 
 
     def save_settings_values(self, dialog, function):
@@ -171,8 +196,28 @@ class GwToolBox(ApiParent):
 
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous",
-                                                  dialog.rbt_previous.isChecked())
+        geom_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
+        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_geom_type", geom_type)
+        layer = utils_giswater.get_item_data(dialog, dialog.cmb_layers, 0)
+        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_layers", layer)
+        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous", dialog.rbt_previous.isChecked())
+
+
+    def save_parametric_values(self, dialog, function):
+        """ Save QGIS settings related with parametric toolbox options """
+        cur_user = self.controller.get_current_user()
+        function_name = function[0]['functionname']
+        layout = dialog.findChild(QWidget, 'grb_parameters')
+        widgets = layout.findChildren(QWidget)
+        for widget in widgets:
+            if type(widget) is QCheckBox:
+                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", widget.isChecked())
+            elif type(widget) is QComboBox:
+                value = utils_giswater.get_item_data(dialog, widget, 0)
+                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
+            elif type(widget) in (QLineEdit, QSpinBox):
+                value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
 
 
     def execute_function(self, dialog, combo, result):
@@ -182,17 +227,18 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setVisible(True)
         extras = ''
         feature_field = ''
-        # Check if time functions is short or long, activate and set undetermined  if not short
+        # TODO Check if time functions is short or long, activate and set undetermined  if not short
+
+        # Get function name
+        function_name = None
         for group, function in list(result['fields'].items()):
             if len(function) != 0:
                 self.save_settings_values(dialog, function)
+                self.save_parametric_values(dialog, function)
                 function_name = function[0]['functionname']
-                if 'input_params' in function[0]:
-                    if function[0]['input_params'] is not None:
-                        if 'featureType' in function[0]['input_params']:
-                            feature_type = function[0]['input_params']['featureType']
                 break
-
+        if function_name is None:
+            return
         # If function is not parametrized, call function(old) without json
         if self.is_paramtetric is False:
             self.execute_no_parametric(dialog, function_name)
@@ -202,7 +248,7 @@ class GwToolBox(ApiParent):
             dialog.progressBar.setValue(1)
             return
 
-        if str(function[0]['input_params']['featureType']) != "":
+        if function[0]['input_params']['featureType']:
             layer_name = utils_giswater.get_item_data(dialog, combo, 1)
             if layer_name != -1:
                 layer = self.set_selected_layer(dialog, combo)
@@ -215,6 +261,7 @@ class GwToolBox(ApiParent):
                 feature_id_list += ']'
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
+                feature_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
                 for feature in features:
                     feature_id = feature.attribute(feature_type+"_id")
                     feature_id_list += f'"{feature_id}", '
@@ -225,6 +272,8 @@ class GwToolBox(ApiParent):
 
             if layer_name != -1:
                 feature_field = f'"tableName":"{layer_name}", '
+                feature_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
+                feature_field += f'"featureType":"{feature_type}", '
             feature_field += feature_id_list
 
         widget_list = dialog.grb_parameters.findChildren(QWidget)
@@ -240,7 +289,7 @@ class GwToolBox(ApiParent):
                             widget.setStyleSheet("border: 1px solid gray")
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '
-                            if value is '':
+                            if value is '' and widget.property('is_mandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
@@ -256,7 +305,7 @@ class GwToolBox(ApiParent):
                             extras += f'"{param_name}":"{str(value).lower()}", '
 
         if widget_is_void:
-            message = "This paramater is mandatory. Please, set a value"
+            message = "This param is mandatory. Please, set a value"
             self.controller.show_warning(message, parameter='')
             dialog.progressBar.setVisible(False)
             dialog.progressBar.setMinimum(0)
@@ -292,9 +341,6 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
         dialog.progressBar.setValue(1)
-
-        #Disable button run at the end of process
-        self.dlg_functions.btn_run.setEnabled(False)
 
 
     def execute_no_parametric(self, dialog, function_name):
@@ -341,18 +387,53 @@ class GwToolBox(ApiParent):
                         layout.addWidget(label, 0, 0)
                     status = True
                     break
-                if str(function[0]['input_params']['featureType']) == "":
+                if not function[0]['input_params']['featureType']:
                     dialog.grb_input_layer.setVisible(False)
                     dialog.grb_selection_type.setVisible(False)
                 else:
-                    self.populate_layer_combo(function[0]['input_params']['featureType'])
+                    feature_types = function[0]['input_params']['featureType']
+                    self.populate_cmb_type(feature_types)
+                    self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
+                    self.populate_layer_combo()
                 self.construct_form_param_user(dialog, function, 0, self.function_list)
                 self.load_settings_values(dialog, function)
+                self.load_parametric_values(dialog, function)
                 status = True
                 break
 
         return status
 
+    def populate_cmb_type(self, feature_types):
+        feat_types = []
+        for item in feature_types:
+            elem = []
+            elem.append(item.upper())
+            elem.append(item.upper())
+            feat_types.append(elem)
+        if feat_types and len(feat_types) <= 1:
+            self.dlg_functions.cmb_geom_type.setVisible(False)
+        utils_giswater.set_item_data(self.dlg_functions.cmb_geom_type, feat_types, 1)
+
+
+    def get_all_group_layers(self, geom_type):
+
+        list_items = []
+        sql = ("SELECT tablename, type FROM "
+               "(SELECT tablename, type, 1 as c FROM sys_feature_cat"
+               " WHERE type = '" + geom_type.upper() + "'"
+               " UNION SELECT DISTINCT(parent_layer), feature_type, 0 FROM cat_feature WHERE feature_type='" + geom_type.upper() + "'"
+               " UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
+               " ORDER BY c, tablename")
+        rows = self.controller.get_rows(sql, commit=True)
+        if rows:
+            for row in rows:
+                layer = self.controller.get_layer_by_tablename(row[0])
+                if layer:
+                    elem = [row[1], layer]
+                    list_items.append(elem)
+
+        return list_items
+    
 
     def control_isparametric(self, dialog):
         """ Control if the function is not parameterized whit a json, is old and we need disable all widgets """
@@ -377,19 +458,20 @@ class GwToolBox(ApiParent):
         dialog.txt_info.setStyleSheet("QWidget { background: rgb(255, 255, 255); color: rgb(10, 10, 10)}")
 
 
-    def populate_layer_combo(self, geom_type):
-
+    def populate_layer_combo(self):
+        geom_type = utils_giswater.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
-        self.layers = self.controller.get_all_group_layers(geom_type)
+        self.layers = self.get_all_group_layers(geom_type)
+
         layers = []
         legend_layers = self.controller.get_layers()
-
-        for layer in self.layers:
+        for geom_type, layer in self.layers:
             if layer in legend_layers:
                 elem = []
                 layer_name = self.controller.get_layer_source_table_name(layer)
                 elem.append(layer.name())
                 elem.append(layer_name)
+                elem.append(geom_type)
                 layers.append(elem)
         utils_giswater.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
 
@@ -427,7 +509,7 @@ class GwToolBox(ApiParent):
                         icon = QIcon(path_icon_red)
                         label.setIcon(icon)
                         label.setForeground(QColor(255, 0, 0))
-                        msg = "Function configured on the table audit_cat_function, but not found in the database"
+                        msg = f"Function {function['functionname']} configured on the table audit_cat_function, but not found in the database"
                         label.setToolTip(msg)
                         self.no_clickable_items.append(str(function['alias']))
                 else:
@@ -468,6 +550,10 @@ class GwToolBox(ApiParent):
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
                     self.populate_vlayer(v_layer, data, k, counter)
+                    # TODO delete this 'if' when all functions are refactored
+                    if 'qmlPath' in data[k]:
+                        qml_path = data[k]['qmlPath']
+                        self.load_qml(v_layer, qml_path)
 
 
     def populate_vlayer(self, virtual_layer, data, layer_type, counter):

@@ -15,6 +15,8 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QStringListModel
 
+
+from qgis.core import Qgis, QgsApplication
 from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog, QMessageBox
@@ -24,16 +26,16 @@ import json
 import os
 import re
 import subprocess
-import time
+
 from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
 from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
+from .gw_task import GwTask
 from .update_sql import UpdateSQL
-from ..ui_manager import FileManager, Multirow_selector, HydrologySelector
-from ..ui_manager import EpaResultCompareSelector, EpaResultManager
+from ..ui_manager import EpaResultCompareSelector, EpaResultManager, FileManager, HydrologySelector, Multirow_selector
 
 
 class Go2Epa(ApiParent):
@@ -91,7 +93,7 @@ class Go2Epa(ApiParent):
             field_id_right = "dscenario_id"
 
             self.dlg_go2epa.btn_hs_ds.clicked.connect(
-                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right, aql=""))
 
         elif self.project_type == 'ud':
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
@@ -504,7 +506,8 @@ class Go2Epa(ApiParent):
         rows = self.controller.get_rows(sql, commit=True)
         sources = {}
         for row in rows:
-            item = row[1].split(',')
+            aux = row[1].replace('{','').replace('}', '')
+            item = aux.split(',')
             for i in item:
                 sources[i.strip()]=row[0].strip()
 
@@ -514,7 +517,10 @@ class Go2Epa(ApiParent):
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
-        for row in full_file:
+        task_rpt_to_db = GwTask('Import RPT to database')
+        QgsApplication.taskManager().addTask(task_rpt_to_db)
+        for line_number, row in enumerate(full_file):
+            task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
             row = row.rstrip()
@@ -548,20 +554,22 @@ class Go2Epa(ApiParent):
                         aux = dirty_list[x][last_index:i]
                         sp_n.append(aux)
 
-                    elif bool(re.search('(\d\.\d{1,9}\.)', str(dirty_list[x]))):
+                    elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         # when -> 0.00859373.7500
-                        message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
-                              "Columns are overlaped one againts other, this is a not valid simulation. " 
-                              "Please ckeck and fix it before continue")
-                        self.controller.show_message(message, 1)
-                        _file.close()
-                        del _file
-                        return False
+                        if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
+                            print(f"Error near line {line_number+1} -> {dirty_list}")
+                            message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
+                                  "Columns are overlaped one againts other, this is a not valid simulation. " 
+                                  "Please ckeck and fix it before continue")
+                            self.controller.show_message(message, 1)
+                            _file.close()
+                            del _file
+                            return False
                     else:
                         sp_n.append(dirty_list[x])
 
             # Find strings into dict and set source column
-            for k, v  in sources.items():
+            for k, v in sources.items():
                 try:
                     if k == f'{sp_n[0]} {sp_n[1]}':
                         source = "'" + v + "'"
@@ -965,11 +973,12 @@ class Go2Epa(ApiParent):
                 rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
 
-            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_date))
-            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
-                        self.dlg_go2epa_result.cmb_sel_date, self.dlg_go2epa_result.cmb_sel_time))
+            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(self.populate_date_time,
+                        self.dlg_go2epa_result.cmb_sel_date))
+
+            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(partial(self.populate_time,
+                                   self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_time))
+
 
             # Populate GroupBox Selector compare
             result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result,
@@ -988,11 +997,10 @@ class Go2Epa(ApiParent):
                 rows = self.controller.get_rows(sql, add_empty_row=True)
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
 
-            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_com_date))
-            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id,
-                        self.dlg_go2epa_result.cmb_com_date, self.dlg_go2epa_result.cmb_com_time))
+            self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
+                self.populate_date_time, self.dlg_go2epa_result.cmb_com_date))
+            self.dlg_go2epa_result.cmb_com_date.currentIndexChanged.connect(partial(self.populate_time,
+                self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM rpt_selector_result"
@@ -1008,18 +1016,13 @@ class Go2Epa(ApiParent):
         self.open_dialog(self.dlg_go2epa_result)
 
 
-    def populate_date_time(self, combo_result, combo_date, combo_time):
-
-        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
-        date = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_date)
-        sql = (f"SELECT DISTINCT(resulttime), resulttime "
-               f"FROM rpt_arc "
+    def populate_date_time(self, combo_date):
+        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id,0)
+        sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
-               f"AND resultdate = '{date}' "
-               f"ORDER BY resulttime")
-        rows = self.controller.get_rows(sql, add_empty_row=True)
-        utils_giswater.set_item_data(combo_time, rows)
-
+               f"ORDER BY resultdate")
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(combo_date, rows)
 
     def populate_time(self, combo_result, combo_time):
         """ Populate combo times """

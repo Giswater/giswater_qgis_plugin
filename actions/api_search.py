@@ -50,6 +50,7 @@ class ApiSearch(ApiParent):
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.iface = iface
+        self.project_type = controller.get_project_type()
         self.json_search = {}
         self.lbl_visible = False
 
@@ -169,12 +170,16 @@ class ApiSearch(ApiParent):
         # IF for zoom to tab address (streets)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
-            polygon = polygon[9:len(polygon)-2]
-            polygon = polygon.split(',')
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            self.zoom_to_rectangle(x1, y1, x2, y2)
-
+            if polygon:
+                polygon = polygon[9:len(polygon)-2]
+                polygon = polygon.split(',')
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                self.zoom_to_rectangle(x1, y1, x2, y2)
+            else:
+                message = f"Zoom unavailable. Doesn't exist the geometry for the street"
+                self.controller.show_info(message, parameter=item['display_name'])
+                
         # IF for zoom to tab address (postnumbers)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
@@ -206,6 +211,10 @@ class ApiSearch(ApiParent):
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            if not list_coord:
+                msg = "Empty coordinate list"
+                self.controller.show_warning(msg)
+                return
             points = self.get_points(list_coord)
             self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
@@ -216,22 +225,31 @@ class ApiSearch(ApiParent):
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+
+            self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
+            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
+            if not list_coord:
+                msg = "Empty coordinate list"
+                self.controller.show_warning(msg)
+                return
             points = self.get_points(list_coord)
             self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
-            self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
-            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
+
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
-            if list_coord:
-                max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-                self.resetRubberbands()
-                point = QgsPointXY(float(max_x), float(max_y))
-                self.draw_point(point)
-                self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            if not list_coord:
+                msg = "Empty coordinate list"
+                self.controller.show_warning(msg)
+                return
+            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+            self.resetRubberbands()
+            point = QgsPointXY(float(max_x), float(max_y))
+            self.draw_point(point)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
@@ -285,9 +303,9 @@ class ApiSearch(ApiParent):
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
                 if len(line_list) == 2:
-                    widget = line_list[1]
-                    widget.setReadOnly(True)
-                    widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+                    widget_add = line_list[1]
+                    widget_add.setReadOnly(True)
+                    widget_add.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
             else:
                 self.lbl_visible = True
                 self.dlg_search.lbl_msg.setVisible(False)
@@ -321,8 +339,9 @@ class ApiSearch(ApiParent):
         """ Clear second line edit if exist """
 
         line_edit_add = line_list[1]
+        line_edit_add.blockSignals(True)
         line_edit_add.setText('')
-
+        line_edit_add.blockSignals(False)
 
     def add_combobox(self, field):
 
@@ -678,8 +697,7 @@ class ApiSearch(ApiParent):
                    f" FROM {table_name}")
             sql += f" WHERE workcat_id = '{workcat_id}' AND feature_type = '{feature}'"
             rows = self.controller.get_rows(sql)
-            if not rows:
-                return
+
 
             if extension is not None:
                 widget_name = f"lbl_total_{feature.lower()}{extension}"
@@ -688,11 +706,18 @@ class ApiSearch(ApiParent):
 
             widget = self.items_dialog.findChild(QLabel, str(widget_name))
 
-            if self.project_type == 'ws' and feature == 'GULLY':
-                widget.hide()
-            total = len(rows)
+            if not rows:
+                total = 0
+            else:
+                total = len(rows)
             # Add data to workcat search form
+
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
+            if self.project_type == 'ws' and feature == 'GULLY':
+                widget.setVisible(False)
+            
+            if not rows:
+                continue
             length = 0
             if feature == 'ARC':
                 for row in rows:

@@ -52,7 +52,7 @@
              <x>0</x>
              <y>0</y>
              <width>634</width>
-             <height>381</height>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -223,7 +223,11 @@
          </layout>
         </item>
         <item row="1" column="0">
-         <widget class="QTableView" name="tbl_element"/>
+         <widget class="QTableView" name="tbl_element">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -235,7 +239,11 @@
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QTableView" name="tbl_relations"/>
+           <widget class="QTableView" name="tbl_relations">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -256,7 +264,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QTableView" name="tbl_upstream"/>
+           <widget class="QTableView" name="tbl_upstream">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_2">
@@ -266,7 +278,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QTableView" name="tbl_downstream"/>
+           <widget class="QTableView" name="tbl_downstream">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -318,7 +334,11 @@
          </layout>
         </item>
         <item row="2" column="0">
-         <widget class="QTableView" name="tbl_hydrometer"/>
+         <widget class="QTableView" name="tbl_hydrometer">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -369,7 +389,11 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_14">
         <item row="4" column="0">
-         <widget class="QTableView" name="tbl_event_cf"/>
+         <widget class="QTableView" name="tbl_event_cf">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
          <widget class="Line" name="line_2">
@@ -719,7 +743,11 @@
          </layout>
         </item>
         <item row="3" column="0">
-         <widget class="QTableView" name="tbl_document"/>
+         <widget class="QTableView" name="tbl_document">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
          <widget class="Line" name="line">
@@ -816,6 +844,8 @@
    <addaction name="actionRotation"/>
    <addaction name="actionCatalog"/>
    <addaction name="actionWorkcat"/>
+   <addaction name="actionGetArcId"/>
+   <addaction name="actionGetParentId"/>
    <addaction name="separator"/>
    <addaction name="actionInterpolate"/>
    <addaction name="actionZoom"/>
@@ -990,6 +1020,25 @@
    </property>
    <property name="visible">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionGetArcId">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Get new arc id</string>
+   </property>
+   <property name="toolTip">
+    <string>Get new arc id</string>
+   </property>
+  </action>
+  <action name="actionGetParentId">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Get new parent id</string>
    </property>
   </action>
  </widget>

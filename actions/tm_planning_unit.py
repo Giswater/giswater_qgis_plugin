@@ -182,8 +182,8 @@ class TmPlanningUnit(TmParentAction):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
         multiple_selection = TmMultipleSelection(self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
-        self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
+        self.canvas.setMapTool(multiple_selection)
         self.connect_signal_selection_changed(qtable)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)

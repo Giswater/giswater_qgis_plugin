@@ -157,7 +157,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableView" name="tbl_docs_x_event"/>
+       <widget class="QTableView" name="tbl_docs_x_event">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">

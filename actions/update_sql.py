@@ -39,8 +39,10 @@ import xml.etree.cElementTree as ET
 from .. import utils_giswater
 from .api_parent import ApiParent
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields
+    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
 from .create_gis_project import CreateGisProject
+
+
 
 
 class UpdateSQL(ApiParent):
@@ -60,236 +62,270 @@ class UpdateSQL(ApiParent):
 
     def init_sql(self):
         """ Button 100: Execute SQL. Info show info """
-        # Create extension postgis if not exist
-        sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
-        self.controller.execute_sql(sql)
 
         # Declare variable superusers
         self.super_users = []
-        
-        # Check if connection is still False
-        connection_status, not_version = self.controller.set_database_connection()
-
-        # Set logger file
-        self.controller.set_logger()
-
-        # Check if we have any layer loaded
-        layers = self.controller.get_layers()
 
         # Get last database connection from controller
         self.last_connection = self.get_last_connection()
 
-        # Get database connection user and role
-        self.username = self.get_user_connection(self.last_connection)
-
-        if self.project_type is not None and len(layers) != 0:
-            self.info_show_info()
-            return
-
-        # Create the dialog and signals
-        self.dlg_readsql = Readsql()
-        self.load_settings(self.dlg_readsql)
-        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
-
-        # Set label status connection
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
-        self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
-        self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
-
-        # Check if user have dev permisions
-        self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
-        self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
-        self.dev_commit = self.settings.value('system_variables/dev_commit').upper()
-
-        # Get plugin version from metadata.txt file
-        self.plugin_version = self.get_plugin_version()
-        self.version_metadata = self.get_plugin_version()
-        self.project_data_schema_version = '0'
-
-        # Get widgets from form
-        self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
-        self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
-        self.btn_update_api = self.dlg_readsql.findChild(QPushButton, 'btn_update_api')
-        self.lbl_schema_name = self.dlg_readsql.findChild(QLabel, 'lbl_schema_name')
-
-        # Checkbox SCHEMA & API
-        self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
-        self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
-        self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
-        self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
-        self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
-
-        btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
-        self.set_icon(btn_info, '73')
-
-        self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
-
-        self.message_update = ''
-
-        # Error counter variable
-        self.error_count = 0
-
-        # Get locale of QGIS application
-        self.locale = QSettings().value('locale/userLocale').lower()
-        if self.locale == 'es_es':
-            self.locale = 'ES'
-        elif self.locale == 'es_ca':
-            self.locale = 'CA'
-        elif self.locale == 'en_us':
-            self.locale = 'EN'
-
-        self.filter_srid_value = self.controller.plugin_settings_value('srid')
-        self.schema = None
-
-        if self.dev_user != 'TRUE':
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
-            self.project_types = self.settings.value('system_variables/project_types')
-            utils_giswater.setWidgetVisible(self.dlg_readsql, 'btn_task_example', False)
+        # Check if connection is still False
+        connection_status, not_version = self.controller.set_database_connection()
+        if not connection_status:
+            dlg_credentials = Credentials()
+            dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, dlg_credentials))
+            dlg_credentials.open()
+            dlg_credentials.lbl_connection_message.setText(str("Could not retrieve connection parameters for '" + str(self.last_connection) + "':"))
         else:
-            self.project_types = self.settings.value('system_variables/project_types_dev')
+            # Set logger file
+            self.controller.set_logger()
 
-        # Declare sql directory
-        folder_name = os.path.dirname(os.path.abspath(__file__))
-        self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'sql'
-        if not os.path.exists(self.sql_dir):
-            self.controller.show_message("SQL folder not found", parameter=self.sql_dir)
-            return
+            # Check if we have any layer loaded
+            layers = self.controller.get_layers()
 
-        # Populate combo types
-        self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
-        for project_type in self.project_types:
-            self.cmb_project_type.addItem(str(project_type))
-        self.change_project_type(self.cmb_project_type)
+            # Get database connection user and role
+            self.username = self.get_user_connection(self.last_connection)
 
-        # Populate combo connections
-        s = QSettings()
-        s.beginGroup("PostgreSQL/connections")
-        connections = s.childGroups()
-        list_connections = []
-        for con in connections:
-            elem = [con, con]
-            list_connections.append(elem)
+            # Set label status connection
+            self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
+            self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
+            self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
+            self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
 
-        s.endGroup()
-        if str(list_connections) != '[]':
-            utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+            # Create the dialog and signals
+            self.dlg_readsql = Readsql()
+            self.load_settings(self.dlg_readsql)
+            self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
 
+            if self.project_type is not None and len(layers) != 0:
+                self.info_show_info()
+                return
 
-        # Declare all file variables
-        self.file_pattern_tablect = "tablect"
-        self.file_pattern_ddl = "ddl"
-        self.file_pattern_dml = "dml"
-        self.file_pattern_fct = "fct"
-        self.file_pattern_trg = "trg"
-        self.file_pattern_ftrg = "ftrg"
-        self.file_pattern_ddlview = "ddlview"
-        self.file_pattern_ddlrule = "ddlrule"
+            # Check if user have dev permissions
+            self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
+            self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
+            self.dev_commit = self.settings.value('system_variables/dev_commit').upper()
 
-        # Declare all directorys
-        if self.schema_name is not None and self.project_type is not None:
-            self.folderSoftware = self.sql_dir + os.sep + self.project_type + os.sep
+            # Get plugin version from metadata.txt file
+            self.plugin_version = self.get_plugin_version()
+            self.version_metadata = self.get_plugin_version()
+            self.project_data_schema_version = '0'
 
-        self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + str(self.locale) + os.sep
-        self.folderUtils = self.sql_dir + os.sep + 'utils' + os.sep
-        self.folderUpdates = self.sql_dir + os.sep + 'updates' + os.sep
-        self.folderExemple = self.sql_dir + os.sep + 'example' + os.sep
-        self.folderPath = ''
+            # Get widgets from form
+            self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
+            self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
+            self.btn_update_api = self.dlg_readsql.findChild(QPushButton, 'btn_update_api')
+            self.lbl_schema_name = self.dlg_readsql.findChild(QLabel, 'lbl_schema_name')
 
-        # Declare all directorys api
-        self.folderUpdatesApi = self.sql_dir + os.sep + 'api' + os.sep + 'updates' + os.sep
-        self.folderApi = self.sql_dir + os.sep + 'api' + os.sep
+            # Checkbox SCHEMA & API
+            self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
+            self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
+            self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
+            self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
+            self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
-        # Set Listeners
-        self.dlg_readsql.btn_task_example.clicked.connect(partial(self.task_example))
-        self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
-        self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
-        self.dlg_readsql.btn_custom_load_file.clicked.connect(
-            partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
-        self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, self.project_type_selected))
-        self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_api))
-        self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
-        self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
-        btn_info.clicked.connect(partial(self.show_info))
-        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
-        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_schema_name, self.cmb_project_type))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self.update_manage_ui))
-        self.dlg_readsql.btn_custom_select_file.clicked.connect(
-            partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
-        self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
-        self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
-        self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
-        self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
-        self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
-        self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
-        self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
-        self.dlg_readsql.btn_path.clicked.connect(partial(self.select_file_ui))
-        self.dlg_readsql.btn_import_ui.clicked.connect(partial(self.execute_import_ui))
-        self.dlg_readsql.btn_export_ui.clicked.connect(partial(self.execute_export_ui))
-        self.dlg_readsql.dlg_closed.connect(partial(self.save_selection))
+            btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
+            btn_info.setText('Update Project Schema')
+            self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
 
-        self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
-        self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
-        self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
-        self.dlg_readsql.btn_create_view.clicked.connect(partial(self.create_child_view))
+            self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
-        self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self.update_sys_fields))
+            self.message_update = ''
 
-        # Set last connection for default
-        utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
+            # Error counter variable
+            self.error_count = 0
 
-        # Open dialog
-        connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
-        window_title = f'Giswater ({connection} - {self.plugin_version})'
-        self.dlg_readsql.setWindowTitle(window_title)
+            super_users = self.settings.value('system_variables/super_users')
+            for super_user in super_users:
+                self.super_users.append(str(super_user))
 
-        self.open_dialog(self.dlg_readsql)
+            # Get locale of QGIS application
+            self.locale = QSettings().value('locale/userLocale').lower()
+            if self.locale == 'es_es':
+                self.locale = 'ES'
+            elif self.locale == 'es_ca':
+                self.locale = 'CA'
+            elif self.locale == 'en_us':
+                self.locale = 'EN'
 
-        super_users = self.settings.value('system_variables/super_users')
-        for super_user in super_users:
+            self.schema = None
 
-            self.super_users.append(str(super_user))
+            if self.dev_user != 'TRUE':
+                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
+                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
+                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
+                self.project_types = self.settings.value('system_variables/project_types')
+                utils_giswater.setWidgetVisible(self.dlg_readsql, 'btn_task_example', False)
+            else:
+                self.project_types = self.settings.value('system_variables/project_types_dev')
 
-        if connection_status is False:
-            msg = "Connection Failed. Please, check connection parameters"
-            self.controller.show_message(msg, 1)
-            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
-            utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-            return
+            # Declare sql directory
+            folder_name = os.path.dirname(os.path.abspath(__file__))
+            self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'sql'
+            if not os.path.exists(self.sql_dir):
+                self.controller.show_message("SQL folder not found", parameter=self.sql_dir)
+                return
 
-        else:
-            role_admin = self.controller.check_role_user("role_admin", self.username)
-            if not role_admin and self.username not in self.super_users:
-                msg = "You don't have permissions to administrate project schemas on this connection"
+            # Populate combo types
+            self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
+            for project_type in self.project_types:
+                self.cmb_project_type.addItem(str(project_type))
+            self.change_project_type(self.cmb_project_type)
+
+            # Populate combo connections
+            s = QSettings()
+            s.beginGroup("PostgreSQL/connections")
+            connections = s.childGroups()
+            list_connections = []
+            for con in connections:
+                elem = [con, con]
+                list_connections.append(elem)
+
+            s.endGroup()
+            if str(list_connections) != '[]':
+                utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+
+            # Declare all file variables
+            self.file_pattern_tablect = "tablect"
+            self.file_pattern_ddl = "ddl"
+            self.file_pattern_dml = "dml"
+            self.file_pattern_fct = "fct"
+            self.file_pattern_trg = "trg"
+            self.file_pattern_ftrg = "ftrg"
+            self.file_pattern_ddlview = "ddlview"
+            self.file_pattern_ddlrule = "ddlrule"
+
+            # Declare all directorys
+            if self.schema_name is not None and self.project_type is not None:
+                self.folderSoftware = self.sql_dir + os.sep + self.project_type + os.sep
+
+            self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + str(self.locale) + os.sep
+            self.folderUtils = self.sql_dir + os.sep + 'utils' + os.sep
+            self.folderUpdates = self.sql_dir + os.sep + 'updates' + os.sep
+            self.folderExemple = self.sql_dir + os.sep + 'example' + os.sep
+            self.folderPath = ''
+
+            # Declare all directorys api
+            self.folderUpdatesApi = self.sql_dir + os.sep + 'api' + os.sep + 'updates' + os.sep
+            self.folderApi = self.sql_dir + os.sep + 'api' + os.sep
+
+            # Set Listeners
+            self.dlg_readsql.btn_task_example.clicked.connect(partial(self.task_example))
+            self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
+            self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
+            self.dlg_readsql.btn_custom_load_file.clicked.connect(
+                partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
+            self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, self.project_type_selected))
+            self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_api))
+            self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
+            self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
+            btn_info.clicked.connect(partial(self.show_info))
+            self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
+            self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui))
+            self.cmb_project_type.currentIndexChanged.connect(
+                partial(self.populate_data_schema_name, self.cmb_project_type))
+            self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
+            self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
+            self.cmb_project_type.currentIndexChanged.connect(partial(self.update_manage_ui))
+            self.dlg_readsql.btn_custom_select_file.clicked.connect(
+                partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
+            self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
+            self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
+            self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
+            self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
+            self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
+            self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
+            self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
+            self.dlg_readsql.btn_path.clicked.connect(partial(self.select_file_ui))
+            self.dlg_readsql.btn_import_ui.clicked.connect(partial(self.execute_import_ui))
+            self.dlg_readsql.btn_export_ui.clicked.connect(partial(self.execute_export_ui))
+            self.dlg_readsql.dlg_closed.connect(partial(self.save_selection))
+
+            self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
+            self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
+            self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
+            self.dlg_readsql.btn_create_view.clicked.connect(partial(self.create_child_view))
+
+            self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self.update_sys_fields))
+
+            # Set last connection for default
+            utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
+
+            # Open dialog
+            connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
+            window_title = f'Giswater ({connection} - {self.plugin_version})'
+            self.dlg_readsql.setWindowTitle(window_title)
+
+            self.open_dialog(self.dlg_readsql)
+
+            if connection_status is False:
+                msg = "Connection Failed. Please, check connection parameters"
                 self.controller.show_message(msg, 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
+                utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
+                utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
+                return
             else:
-                utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
-                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                # Create extension postgis if not exist
+                sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
+                self.controller.execute_sql(sql)
 
-        # Manage widgets tabs
-        self.populate_data_schema_name(self.cmb_project_type)
-        self.set_info_project()
-        self.update_manage_ui()
-        self.visit_manager()
+                # Manage widgets tabs
+                self.populate_data_schema_name(self.cmb_project_type)
+                self.set_info_project()
+                self.update_manage_ui()
+                self.visit_manager()
 
-        # Load last schema name selected and project type
-        if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                         str(self.controller.plugin_settings_value('last_project_type_selected')))
+                role_admin = self.controller.check_role_user("role_admin", self.username)
+                if not role_admin and self.username not in self.super_users:
+                    msg = "You don't have permissions to administrate project schemas on this connection"
+                    self.controller.show_message(msg, 1)
+                    utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+                    self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
+                else:
+                    if str(self.version_metadata) > str(self.project_data_schema_version):
+                        self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                        utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                                     '(Schema version is lower than plugin version, please update schema)')
+                        self.dlg_readsql.btn_info.setEnabled(True)
+                    elif str(self.version_metadata) < str(self.project_data_schema_version):
+                        self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                        utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                                     '(Schema version is higher than plugin version, please update plugin)')
+                        self.dlg_readsql.btn_info.setEnabled(True)
+                    else:
+                        self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                        utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                        self.dlg_readsql.btn_info.setEnabled(False)
+                    utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
 
-        if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                         str(self.controller.plugin_settings_value('last_schema_name_selected')))
+            # Load last schema name selected and project type
+            if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
+                                             str(self.controller.plugin_settings_value('last_project_type_selected')))
+
+            if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
+                                             str(self.controller.plugin_settings_value('last_schema_name_selected')))
+
+
+    def set_credentials(self, dialog):
+        user_name = utils_giswater.getWidgetText(dialog, dialog.txt_user, False, False)
+        password = utils_giswater.getWidgetText(dialog, dialog.txt_pass, False, False)
+        settings = QSettings()
+        settings.beginGroup("PostgreSQL/connections")
+        default_connection = settings.value('selected')
+
+        if default_connection:
+            settings.endGroup()
+            settings.beginGroup("PostgreSQL/connections/" + default_connection)
+        settings.setValue('password', password)
+        settings.setValue('username', user_name)
+        settings.endGroup()
+        self.close_dialog(dialog)
+        self.init_sql()
 
 
     def gis_create_project(self):
@@ -852,7 +888,7 @@ class UpdateSQL(ApiParent):
 
         sql = 'UPDATE ' + self.schema + '.version SET sample=True ' \
               'WHERE id = (SELECT id FROM ' + self.schema + '.version ORDER BY id DESC LIMIT 1)'
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep+project_type
@@ -1458,8 +1494,6 @@ class UpdateSQL(ApiParent):
         sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
         status = self.controller.execute_sql(sql, commit=False)
         if status:
-            self.reload_trg(project_type=self.project_type_selected)
-            self.reload_trg(project_type='api')
             self.reload_fct_ftrg(project_type=self.project_type_selected)
             self.reload_fct_ftrg(project_type='api')
             self.api(False)
@@ -1533,8 +1567,9 @@ class UpdateSQL(ApiParent):
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.set_wait_cursor()
-            self.load_updates(project_type, update_changelog=True)
-            self.set_info_project()
+            status = self.load_updates(project_type, update_changelog=True)
+            if status:
+                self.set_info_project()
             self.set_arrow_cursor()
         else:
             return
@@ -1558,13 +1593,19 @@ class UpdateSQL(ApiParent):
 
         # Get current schema selected
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        self.schema = None
 
         self.set_wait_cursor()
-        self.load_fct_ftrg(project_type=project_type)
-        self.update_30to31(project_type=project_type)
-        self.update_31to39(project_type=project_type)
-        self.api(project_type=project_type)
-        self.execute_last_process(schema_name=schema_name, locale=True)
+        status = self.load_fct_ftrg(project_type=project_type)
+        if status:
+            status = self.update_30to31(project_type=project_type)
+        if status:
+            status = self.update_31to39(project_type=project_type)
+        if status:
+            status = self.api(project_type=project_type)
+        if status:
+            status = self.execute_last_process(schema_name=schema_name, locale=True)
+
         self.set_arrow_cursor()
 
         if update_changelog is False:
@@ -1577,6 +1618,8 @@ class UpdateSQL(ApiParent):
 
             # Reset count error variable to 0
             self.error_count = 0
+
+        return status
 
 
     def reload_tablect(self, project_type=False):
@@ -1623,24 +1666,36 @@ class UpdateSQL(ApiParent):
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
         else:
+            if str(self.version_metadata) > str(self.project_data_schema_version):
+                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                             '(Schema version is lower than plugin version, please update schema)')
+                self.dlg_readsql.btn_info.setEnabled(True)
+            elif str(self.version_metadata) < str(self.project_data_schema_version):
+                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                             '(Schema version is higher than plugin version, please update plugin)')
+                self.dlg_readsql.btn_info.setEnabled(True)
+            else:
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                self.dlg_readsql.btn_info.setEnabled(False)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
-        self.populate_data_schema_name(self.cmb_project_type)
-        self.set_last_connection(connection_name)
+            self.populate_data_schema_name(self.cmb_project_type)
+            self.set_last_connection(connection_name)
 
         if self.logged:
             self.username = self.get_user_connection(self.get_last_connection())
             role_admin = self.controller.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
-                self.controller.show_message("Connection Failed. You dont have permisions for this connection.", 1)
+                self.controller.show_message("Connection Failed. You dont have permissions for this connection.", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-
+                
 
     def set_last_connection(self, connection_name):
 
@@ -1896,18 +1951,18 @@ class UpdateSQL(ApiParent):
             result = self.controller.get_row(sql)
 
             if result is None:
-                sql = "SELECT giswater, language FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
+                sql = "SELECT giswater, language, epsg FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
                 result = self.controller.get_row(sql)
             else:
-                sql = "SELECT giswater, language, sample FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
+                sql = "SELECT giswater, language, epsg, sample FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
                 result = self.controller.get_row(sql)
-                self.is_sample = result[2]
+                self.is_sample = result[3]
             self.project_data_schema_version = result[0]
             self.project_data_language = result[1]
+            self.filter_srid_value = str(result[2])
 
             if self.is_sample is None:
                 self.is_sample = 'False'
-
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -1942,6 +1997,7 @@ class UpdateSQL(ApiParent):
                + str(postgis_version[0]) + ' \n \n' + ''
                'Name: ' + schema_name + '\n' + ''
                'Version: ' + self.project_data_schema_version + ' \n' + ''
+               'EPSG: ' + self.filter_srid_value + ' \n' + ''
                'Language: ' + self.project_data_language + ' \n' + ''
                'Title: ' + str(result[0]['title']) + '\n' + ''
                'Author: ' + str(result[0]['author']) + '\n' + ''
@@ -1954,6 +2010,22 @@ class UpdateSQL(ApiParent):
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
         self.dlg_readsql.setWindowTitle(window_title)
+
+        if schema_name == 'Nothing to select' or schema_name == '':
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+        elif str(self.version_metadata) > str(self.project_data_schema_version):
+            self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Schema version is lower than plugin version, please update schema)')
+            self.dlg_readsql.btn_info.setEnabled(True)
+        elif str(self.version_metadata) < str(self.project_data_schema_version):
+            self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         '(Schema version is higher than plugin version, please update plugin)')
+            self.dlg_readsql.btn_info.setEnabled(False)
+        else:
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            self.dlg_readsql.btn_info.setEnabled(False)
 
 
     def process_folder(self, folderPath, filePattern):
@@ -2120,11 +2192,8 @@ class UpdateSQL(ApiParent):
         filelist = sorted(os.listdir(filedir))
         status = True
         if self.schema is None:
-            if self.schema_name is None:
-                schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-                schema_name = schema_name.replace('"', '')
-            else:
-                schema_name = self.schema_name.replace('"','')
+            schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+            schema_name = schema_name.replace('"', '')
         else:
             schema_name = self.schema.replace('"', '')
 
@@ -2323,7 +2392,12 @@ class UpdateSQL(ApiParent):
                     for text_replace in self.text_replace_labels:
                         self.text_replace = self.dev_settings.value('text_replace/' + text_replace)
                         self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
-                        f_to_read = str(f_to_read.replace(self.text_replace[0], self.text_replace[1]))
+                        f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
+
+                    for text_replace in self.xml_set_labels:
+                        self.text_replace = self.dev_settings.value('xml_set/' + text_replace)
+                        self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
+                        f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
 
                     # Close file
                     f.close()
@@ -2474,6 +2548,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql,self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
 
             self.dlg_readsql.cmb_feature_name_view.clear()
             self.dlg_readsql.cmb_formname_fields.clear()
@@ -2486,6 +2561,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = ("SELECT wsoftware FROM " + str(schema_name) + ".version")
             wsoftware = self.controller.get_row(sql)
@@ -2752,7 +2828,7 @@ class UpdateSQL(ApiParent):
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel()
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = "cat_feature_id = '" + form_name + "'"
+        expr_filter = "cat_feature_id = '" + form_name + "'  ORDER BY id"
         self.fill_table(qtable, 've_config_sys_fields', self.model_update_table, expr_filter)
         self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sys_fields', schema_name)
 
@@ -3107,6 +3183,29 @@ class UpdateSQL(ApiParent):
                 self.populate_info_text(dialog, qtabwidget, qtextedit, data)
 
 
+    def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
+        """ Manage message depending result @status """
+
+        if status:
+            if msg_ok is None:
+                msg_ok = "Process finished successfully"
+            self.controller.show_info_box(msg_ok, "Info", parameter=parameter)
+        else:
+            if msg_error is None:
+                msg_error = "Process finished with some errors"
+            self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
+
+
+    def save_selection(self):
+
+        # Save last Project schema name and type selected
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+
+        self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
+        self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
+
+
     def info_show_info(self):
         """ Button 36: Info show info, open giswater and visit web page """
 
@@ -3130,28 +3229,37 @@ class UpdateSQL(ApiParent):
         self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
 
+        self.version_metadata = self.get_plugin_version()
+        # Check if exist column sample in table version
+        sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + self.schema_name + "';"
+        result = self.controller.get_row(sql, commit=True)
+
+        if result is None:
+            sql = "SELECT giswater, language FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
+            result = self.controller.get_row(sql, commit=True)
+        else:
+            sql = "SELECT giswater, language, sample FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
+            result = self.controller.get_row(sql, commit=True)
+            self.is_sample = result[2]
+
+        self.project_data_schema_version = result[0]
+        self.project_data_language = result[1]
+
+
+        if str(self.version_metadata) > str(self.project_data_schema_version):
+            self.dlg_info.lbl_status.setPixmap(self.status_no_update)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         '(Schema version is lower than plugin version, please update schema)')
+        elif str(self.version_metadata) < str(self.project_data_schema_version):
+            self.dlg_info.lbl_status.setPixmap(self.status_no_update)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         '(Schema version is higher than plugin version, please update plugin)')
+        else:
+            self.dlg_info.lbl_status.setPixmap(self.status_ok)
+            utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.lbl_status_text, '')
+
+        utils_giswater.dis_enable_dialog(self.dlg_info, True)
+
         # Open dialog
         self.open_dialog(self.dlg_info, maximize_button=False)
 
-
-    def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
-        """ Manage message depending result @status """
-
-        if status:
-            if msg_ok is None:
-                msg_ok = "Process finished successfully"
-            self.controller.show_info_box(msg_ok, "Info", parameter=parameter)
-        else:
-            if msg_error is None:
-                msg_error = "Process finished with some errors"
-            self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
-
-
-    def save_selection(self):
-
-        # Save last Project schema name and type selected
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-
-        self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
-        self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)

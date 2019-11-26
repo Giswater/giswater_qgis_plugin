@@ -86,19 +86,26 @@ class Logger(object):
         
     
     def debug(self, msg=None, stack_level=2, stack_level_increase=0):
-        """ Logger message into logger file with level = DEBUG """
+        """ Logger message into logger file with level DEBUG (10) """
         self.log(msg, logging.DEBUG, stack_level + stack_level_increase + 1)
         
         
     def info(self, msg=None, stack_level=2, stack_level_increase=0):
-        """ Logger message into logger file with level = INFO """
+        """ Logger message into logger file with level INFO (20) """
         self.log(msg, logging.INFO, stack_level + stack_level_increase + 1)
         
             
     def warning(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
-        """ Logger message into logger file with level = WARNING """
+        """ Logger message into logger file with level WARNING (30) """
         self.log(msg, logging.WARNING, stack_level + stack_level_increase + 1)
         if sum_error:
             self.num_errors+= 1
+
+
+    def error(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
+        """ Logger message into logger file with level ERROR (40) """
+        self.log(msg, logging.ERROR, stack_level + stack_level_increase + 1)
+        if sum_error:
+            self.num_errors += 1
         
                 

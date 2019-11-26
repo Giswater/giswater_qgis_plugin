@@ -347,8 +347,7 @@ class AddNewLot(ParentManage):
         sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
                " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id "
                " FROM ext_workorder "
-               " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
-               " WHERE om_visit_lot.serie IS NULL")
+               " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie ")
         if lot_id:
             _sql = (f"SELECT serie FROM om_visit_lot "
                     f" WHERE id = '{lot_id}'")
@@ -560,11 +559,13 @@ class AddNewLot(ParentManage):
             sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM om_visit_class"
                    " INNER JOIN config_api_visit ON config_api_visit.visitclass_id = om_visit_class.id")
 
-
         visitclass_ids = self.controller.get_rows(sql, commit=True)
         if visitclass_ids:
             visitclass_ids.append(['', '', '', ''])
-            utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
+        else:
+            visitclass_ids = []
+            visitclass_ids.append(['', '', '', ''])
+        utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
 
         # Fill ComboBox cmb_assigned_to
         self.populate_cmb_team()
@@ -705,6 +706,7 @@ class AddNewLot(ParentManage):
             if id_ not in self.ids:
                 self.ids.append(id_)
 
+        self.check_for_ids()
 
     def get_table_values(self, qtable, geom_type):
 
@@ -749,6 +751,7 @@ class AddNewLot(ParentManage):
                 if selected_id not in self.ids:
                     self.ids.append(selected_id)
         self.reload_table_relations()
+        self.check_for_ids()
 
 
     def reload_table_relations(self):
@@ -808,6 +811,7 @@ class AddNewLot(ParentManage):
         if feature_id not in self.ids:
             self.ids.append(feature_id)
             self.reload_table_relations()
+        self.check_for_ids()
 
 
     def get_feature_by_id(self, layer, id_, field_id):
@@ -854,6 +858,8 @@ class AddNewLot(ParentManage):
             feature_id = index.sibling(row, column_index).data()
             self.ids.remove(feature_id)
             model.takeRow(row)
+
+        self.check_for_ids()
         self.hilight_features(self.rb_list)
         self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja',
                                'startdate', 'enddate')
@@ -889,7 +895,7 @@ class AddNewLot(ParentManage):
 
 
     def set_tab_dis_enabled(self):
-
+        self.ids = []
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         index = 0
         for x in range(0, self.dlg_lot.tab_widget.count()):
@@ -955,7 +961,6 @@ class AddNewLot(ParentManage):
         standard_model.setHorizontalHeaderLabels(headers)
 
         # Hide columns
-
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
 
         # Populate model visit
@@ -980,33 +985,34 @@ class AddNewLot(ParentManage):
             if len(row) > 0:
                 standard_model.appendRow(item)
 
-        self.put_combobox(self.dlg_lot.tbl_visit, rows)
-
-
-    def put_combobox(self, qtable, rows):
-        """ Set one column of a QtableView as QCheckBox with values from database. """
-
-        # Fill ComboBox cmb_status
-        status_list = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
-        if status_list is None:
+        combo_values = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        if combo_values is None:
             return
+        self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 15, combo_values)
+
+
+    def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
+        """ Set one column of a QtableView as QComboBox with values from database. """
 
         for x in range(0, len(rows)):
             combo = QComboBox()
             row = rows[x]
-            utils_giswater.set_item_data(combo, status_list, 1)
-            utils_giswater.set_combo_itemData(combo, str(row['status']), 0)
-            i = qtable.model().index(x, self.cmb_position)
-            qtable.setIndexWidget(i, combo)
-            combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x))
+            # Populate QComboBox
+            utils_giswater.set_item_data(combo, combo_values, 1)
+            # Set QCombobox to wanted item
+            utils_giswater.set_combo_itemData(combo, str(row[field]), 0)
+            # Get index and put QComboBox into QTableView at index position
+            idx = qtable.model().index(x, widget_pos)
+            qtable.setIndexWidget(idx, combo)
+            combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x, widget_pos))
 
 
-    def update_status(self, combo, qtable, pos_x):
-
+    def update_status(self, combo, qtable, pos_x, widget_pos):
+        """ Update values from QComboBox to QTableView """
         elem = combo.itemData(combo.currentIndex())
-        i = qtable.model().index(pos_x, self.cmb_position)
+        i = qtable.model().index(pos_x, widget_pos)
         qtable.model().setData(i, elem[0])
-        i = qtable.model().index(pos_x, self.cmb_position+1)
+        i = qtable.model().index(pos_x, widget_pos+1)
         qtable.model().setData(i, elem[1])
 
 
@@ -1216,7 +1222,7 @@ class AddNewLot(ParentManage):
             geometry = feature.geometry()
             rb = QgsRubberBand(self.canvas)
             rb.setToGeometry(geometry, None)
-            rb.setColor(QColor(0, 0, 240, 50))
+            rb.setColor(QColor(255, 0, 0, 100))
             rb.setWidth(5)
             rb.show()
             rb_list.append(rb)
@@ -1273,6 +1279,7 @@ class AddNewLot(ParentManage):
             layer.removeSelection()
         self.save_settings(self.dlg_lot)
         self.save_user_values(self.dlg_lot)
+        self.iface.actionPan().trigger()
         self.close_dialog(self.dlg_lot)
 
 
@@ -1333,8 +1340,8 @@ class AddNewLot(ParentManage):
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = (f'SELECT MIN("Data inici planificada"), MAX("Data final planificada")'
-               f' FROM {table_object}')
+        sql = (f'SELECT MIN(startdate), MAX(startdate)'
+               f' FROM om_visit_lot')
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             if row[0]:
@@ -1406,6 +1413,19 @@ class AddNewLot(ParentManage):
         else:
             result = ''
 
+        # set timeStart and timeEnd as the min/max dave values get from model
+        current_date = QDate.currentDate()
+        sql = ('SELECT MIN(starttime), MAX(endtime)'
+               ' FROM om_visit_lot_x_user')
+        row = self.controller.get_row(sql, commit=self.autocommit)
+        if row:
+            if row[0]:
+                self.dlg_user_manage.date_event_from.setDate(row[0])
+            if row[1]:
+                self.dlg_user_manage.date_event_to.setDate(row[1])
+            else:
+                self.dlg_user_manage.date_event_to.setDate(current_date)
+
         # TODO: Disable columns user_id + team_id
 
         self.dlg_user_manage.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
@@ -1417,8 +1437,6 @@ class AddNewLot(ParentManage):
     def manage_accept(self, widget):
 
         model = widget.model()
-        print(str(widget))
-        print(str(model))
         status = model is not None and model.submitAll()
         if not status:
             return
@@ -1453,7 +1471,6 @@ class AddNewLot(ParentManage):
                        f"AND (endtime BETWEEN {interval} OR endtime IS NULL)")
 
         expr_filter += f" AND user_id LIKE '%{filter}%'"
-        print(str(expr_filter))
 
         self.dlg_user_manage.tbl_user.model().setFilter(expr_filter)
         self.dlg_user_manage.tbl_user.model().select()
@@ -1491,7 +1508,7 @@ class AddNewLot(ParentManage):
         """ Set visible lot layers """
 
         # Refresh extension of layer
-        layer = self.controller.get_layer_by_tablename("ve_lot_x_gully")
+        layer = self.controller.get_layer_by_tablename("v_lot")
         if layer:
             self.controller.set_layer_visible(layer)
             if zoom:
@@ -1689,3 +1706,13 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.tbl_lots.model().setFilter(expr_filter)
         self.dlg_lot_man.tbl_lots.model().select()
 
+
+    def check_for_ids(self):
+        if len(self.ids) !=0:
+            self.visit_class.setEnabled(False)
+        else:
+            layer = self.iface.activeLayer()
+            if layer:
+                layer.removeSelection()
+            self.iface.actionPan().trigger()
+            self.visit_class.setEnabled(True)

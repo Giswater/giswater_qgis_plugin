@@ -166,6 +166,10 @@ class ConnecMapTool(ParentMapTool):
                         # Create link
                         self.link_selected_features('gully', layer)
 
+        # Force reload dataProvider of layer
+        self.controller.indexing_spatial_layer('v_edit_link')
+        self.controller.indexing_spatial_layer('v_edit_vnode')
+
 
     def activate(self):
 

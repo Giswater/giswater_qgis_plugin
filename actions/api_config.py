@@ -38,6 +38,17 @@ class ApiConfig(ApiParent):
     def api_config(self):
         """ Button 99: Dynamic config form """
 
+        # Remove layers name from temp_table
+        sql = "DELETE FROM temp_table WHERE fprocesscat_id = '63' AND user_name = current_user;"
+        self.controller.execute_sql(sql)
+        # Set layers name in temp_table
+        self.set_layers_name()
+
+        # Get user and role
+        user_role = self.controller.get_restriction()
+        super_users = self.settings.value('system_variables/super_users')
+        cur_user = self.controller.get_current_user()
+
         self.list_update = []
 
         body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
@@ -204,6 +215,9 @@ class ApiConfig(ApiParent):
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
         self.hide_void_groupbox(self.dlg_config)
+        # Check user/role and remove tabs
+        if user_role != 'role_admin' and cur_user not in super_users:
+            utils_giswater.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
         self.open_dialog(self.dlg_config)
@@ -321,7 +335,6 @@ class ApiConfig(ApiParent):
                     self.order_widgets(field, self.gully_mantype_form, lbl, chk, widget)
                 elif field['layout_id'] == 22:
                     self.order_widgets(field, self.addfields_form, lbl, chk, widget)
-
 
 
     def construct_form_param_system(self, row, pos):
@@ -593,13 +606,23 @@ class ApiConfig(ApiParent):
     # TODO:
     def remove_empty_groupBox(self, layout):
 
-        self.controller.log_info(str("TEST"))
         groupBox_list = layout.findChild(QWidget)
-        self.controller.log_info(str(layout.objectName()))
-        self.controller.log_info(str(groupBox_list))
         if groupBox_list is None:
             return
         for groupBox in groupBox_list:
             widget_list = groupBox.findChildren(QWidget)
             if not widget_list:
                 groupBox.setVisible(False)
+
+
+    def set_layers_name(self):
+        """ Insert the name of all the TOC layers, then populate the cad_combo_layers """
+        layers = self.iface.mapCanvas().layers()
+        if not layers:
+            return
+        layers_name = '{"list_layers_name":"{'
+        for layer in layers:
+            layers_name += f"{layer.name()}, "
+        layers_name = layers_name[:-2] + '}"}'
+        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, user_name) VALUES (63, $${layers_name}$$, current_user);')
+        self.controller.execute_sql(sql)

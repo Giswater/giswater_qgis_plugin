@@ -34,6 +34,7 @@ if 'nt' in sys.builtin_module_names:
 from .. import utils_giswater
 from ..ui_manager import GwDialog, GwMainWindow
 import os
+import re
 import webbrowser
 
 
@@ -279,8 +280,28 @@ class ParentAction(object):
         query_delete = f"DELETE FROM {tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
+
+        # Order control
+        tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
+        tbl_selected_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_selected_rows, query_right))
+
+
+    def order_by_column(self, qtable, query, idx):
+        """
+        :param qtable: QTableView widget
+        :param query: Query for populate QsqlQueryModel
+        :param idx: The index of the clicked column
+        :return:
+        """
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable.horizontalHeader().sortIndicatorOrder()
+        col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
+        query += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable, query)
+        self.refresh_map_canvas()
 
 
     def hide_colums(self, widget, comuns_to_hide):
@@ -304,7 +325,17 @@ class ParentAction(object):
             self.controller.execute_sql(query_delete + str(expl_id[i]))
 
         # Refresh
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_left.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
+        
+        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_right.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_right, query_right)
         self.refresh_map_canvas()
 
@@ -353,7 +384,17 @@ class ParentAction(object):
                 self.controller.execute_sql(sql)
 
         # Refresh
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_left.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_right, query_right)
+
+        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_right.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
         self.refresh_map_canvas()
 
@@ -674,6 +715,30 @@ class ParentAction(object):
         model.setStringList(row)
         self.completer.setModel(model)
 
+    def get_max_rectangle_from_coords(self, list_coord):
+        """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
+        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+        """
+
+        coords = list_coord.group(1)
+        polygon = coords.split(',')
+        x, y = polygon[0].split(' ')
+        min_x = x  # start with something much higher than expected min
+        min_y = y
+        max_x = x  # start with something much lower than expected max
+        max_y = y
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
+            if x < min_x:
+                min_x = x
+            if x > max_x:
+                max_x = x
+            if y < min_y:
+                min_y = y
+            if y > max_y:
+                max_y = y
+
+        return max_x, max_y, min_x, min_y
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
 
@@ -754,9 +819,11 @@ class ParentAction(object):
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
-        if change_tab:
+        if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(1)
+
         return change_tab
+
 
     def get_composers_list(self):
 
@@ -854,4 +921,50 @@ class ParentAction(object):
                f" ORDER BY {order_by}")
         rows = self.controller.get_rows(sql, commit=True)
         return rows
+
+
+    def integer_validator(self, value, widget, btn_accept):
+        """ Check if the value is an integer or not.
+            This function is called in def set_datatype_validator(self, value, widget, btn)
+            widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+        """
+        if value is None or bool(re.search("^\d*$", value)):
+            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            btn_accept.setEnabled(True)
+        else:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)
+
+
+    def double_validator(self, value, widget, btn_accept):
+        """ Check if the value is double or not.
+            This function is called in def set_datatype_validator(self, value, widget, btn)
+            widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+        """
+        if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
+            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            btn_accept.setEnabled(True)
+        else:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)
+
+
+    def load_qml(self, layer, qml_path):
+        """ Apply QML style located in @qml_path in @layer """
+
+        if layer is None:
+            return False
+
+        if not os.path.exists(qml_path):
+            self.controller.log_warning("File not found", parameter=qml_path)
+            return False
+
+        if not qml_path.endswith(".qml"):
+            self.controller.log_warning("File extension not valid", parameter=qml_path)
+            return False
+
+        layer.loadNamedStyle(qml_path)
+        layer.triggerRepaint()
+
+        return True
 

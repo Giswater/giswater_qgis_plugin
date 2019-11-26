@@ -19,7 +19,7 @@ else:
     from qgis.core import QgsPrintLayout, QgsReadWriteContext
     from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
+from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils, QgsFeatureRequest, QgsProject, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QTime
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
@@ -27,11 +27,13 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
+import json
 import os
 import operator
 from datetime import datetime
+from collections import OrderedDict
 from functools import partial
-
+from .gw_task import GwTask
 from .. import utils_giswater
 from .parent import ParentAction
 from .mincut_config import MincutConfig
@@ -189,8 +191,12 @@ class MincutParent(ParentAction):
         action.triggered.connect(self.show_notified_list)
         # self.set_icon(action, "308")
         self.show_notified = action
-        action_visible = self.settings.value('customized_actions/show_sms_info', 'FALSE')
-        self.show_notified.setVisible(True) if action_visible.upper() == 'TRUE' else self.show_notified.setVisible(False)
+
+        try:
+            custom_action_sms = json.loads(self.controller.cfgp_system['sys_mincutalerts_enable'].value, object_pairs_hook=OrderedDict)
+            self.show_notified.setVisible(custom_action_sms['show_sms_info'])
+        except KeyError as e:
+            self.show_notified.setVisible(False)
 
         # Show future id of mincut
         if self.is_new:
@@ -332,7 +338,7 @@ class MincutParent(ParentAction):
                 self.iface.actionPan().trigger()     
             self.vertex_marker.hide()
         except Exception as e:
-            print(type(e).__name__)
+            print(f"{type(e).__name__} --> {e}")
 
 
     def real_start(self):
@@ -1497,7 +1503,9 @@ class MincutParent(ParentAction):
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
-
+        self.task1 = GwTask('Calculating mincut')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(0)
         srid = self.controller.plugin_settings_value('srid')
         real_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         if self.is_new:
@@ -1509,7 +1517,7 @@ class MincutParent(ParentAction):
             new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
             real_mincut_id = new_mincut_id[0]
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
-
+        self.task1.setProgress(25)
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
@@ -1517,13 +1525,11 @@ class MincutParent(ParentAction):
         sql = (f"SELECT gw_fct_mincut('{elem_id}',"
                f" '{elem_type}', '{real_mincut_id}');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-
         if not row[0]:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
 
         complet_result = row[0]
-
         if 'mincutOverlap' in complet_result:
             if complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
@@ -1540,11 +1546,11 @@ class MincutParent(ParentAction):
                 message = "Error on create auto mincut, you need to review data"
                 self.controller.show_warning(message)
                 self.set_cursor_restore()
+                self.task1.setProgress(100)
                 return
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
             self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
-            
             sql = (f"UPDATE anl_mincut_result_cat"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapping_x}, "
@@ -1553,33 +1559,32 @@ class MincutParent(ParentAction):
                    f" anl_feature_id = '{elem_id}'"
                    f" WHERE id = '{real_mincut_id}'")
             status = self.controller.execute_sql(sql, log_sql=True)
-
+            self.task1.setProgress(50)
             if not status:
                 message = "Error updating element in table, you need to review data"
                 self.controller.show_warning(message)
                 self.set_cursor_restore()
+                self.task1.setProgress(100)
                 return
-
             # Enable button CustomMincut and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
-            self.action_mincut.setDisabled(True)
+            self.action_mincut.setDisabled(False)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
-
             # Update table 'anl_mincut_result_selector'
             sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
                    f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
             self.controller.execute_sql(sql, log_error=True, log_sql=True)
-
+            self.task1.setProgress(75)
             # Refresh map canvas
             self.refresh_map_canvas()
 
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
-                    
+        self.task1.setProgress(100)
 
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
@@ -1792,7 +1797,7 @@ class MincutParent(ParentAction):
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             if mincut_class_status == '1':
-                self.action_mincut.setDisabled(True)
+                self.action_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(False)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
@@ -1954,12 +1959,10 @@ class MincutParent(ParentAction):
 
         # Get scale zoom
         self.scale_zoom = 2500
-        sql = ("SELECT value FROM config_param_system"
-               " WHERE parameter = 'scale_zoom'")
-        row = self.controller.get_row(sql, commit=True)
-        if row:
+        row = self.controller.get_config('scale_zoom', 'value', 'config_param_system')
+        if row and row[0]:
             self.scale_zoom = row['value']
-            
+
         return True            
 
 
@@ -2203,16 +2206,13 @@ class MincutParent(ParentAction):
         status = self.address_populate(dialog, dialog.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
             return
-        sql = ("SELECT value FROM config_param_system"
-               " WHERE parameter = 'street_field_expl'")
-        self.street_field_expl = self.controller.get_row(sql, commit=True)
+
+        self.street_field_expl = self.controller.get_config('street_field_expl', 'value', 'config_param_system')
         if not self.street_field_expl:
             message = "Param street_field_expl not found"
             self.controller.show_warning(message)
             return
-        sql = ("SELECT value FROM config_param_system"
-               " WHERE parameter = 'portal_field_postal'")
-        portal_field_postal = self.controller.get_row(sql, commit=True)
+        portal_field_postal = self.controller.get_config('portal_field_postal', 'value', 'config_param_system')
         if not portal_field_postal:
             message = "Param portal_field_postal not found"
             self.controller.show_warning(message)
@@ -2289,7 +2289,11 @@ class MincutParent(ParentAction):
     def mincut_composer(self):
         """ Open Composer """
         # Check if path exist
-        template_folder = self.settings.value('system_variables/composers_path')
+        template_folder = ""
+        row = self.controller.get_config('qgis_composers_path')
+        if row:
+            template_folder = row[0]
+
         try:
             template_files = os.listdir(template_folder)
         except FileNotFoundError as e:
@@ -2300,7 +2304,7 @@ class MincutParent(ParentAction):
         self.dlg_comp = MincutComposer()
         self.load_settings(self.dlg_comp)
 
-        # Fill ComboBox cbx_template with templates *.qpt from ...system_variables/composers_path
+        # Fill ComboBox cbx_template with templates *.qpt
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
         self.dlg_comp.cbx_template.clear()
         self.dlg_comp.cbx_template.addItem('')
@@ -2332,7 +2336,10 @@ class MincutParent(ParentAction):
             return
 
         # Check if template file exists
-        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
+        template_path = ""
+        row = self.controller.get_config('qgis_composers_path')
+        if row:
+            template_path = row[0]+ f'{os.sep}{self.template}.qpt'
 
         if not os.path.exists(template_path):
             message = "File not found"
@@ -2476,7 +2483,7 @@ class MincutParent(ParentAction):
             self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(False)        
             # Actions
-            self.action_mincut.setDisabled(False)
+            self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)

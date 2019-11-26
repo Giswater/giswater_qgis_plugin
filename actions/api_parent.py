@@ -142,6 +142,9 @@ class ApiParent(ParentAction):
                f" FROM {table_object}")
 
         rows = self.controller.get_rows(sql, log_sql=True)
+        if rows is None:
+            return
+
         for i in range(0, len(rows)):
             aux = rows[i]
             rows[i] = str(aux[0])
@@ -157,11 +160,9 @@ class ApiParent(ParentAction):
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
-
         try:
             self.save_settings(dlg)
             dlg.close()
-
         except AttributeError as e:
             print(type(e).__name__)
             pass
@@ -636,24 +637,8 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def set_data_type(self, field, widget, button=None):
-        #TODO order this
+    def set_data_type(self, field, widget):
         widget.setProperty('datatype', field['datatype'])
-        if 'datatype' in field:
-            if field['datatype'] == 'integer':  # Integer
-                pass
-            elif field['datatype'] == 'string':  # String
-                pass
-            elif field['datatype'] == 'date':  # Date
-                pass
-            elif field['datatype'] == 'datetime':  # DateTime
-                pass
-            elif field['datatype'] == 'boolean':  # Boolean
-                pass
-            elif field['datatype'] == 'double':  # Double
-                pass
-
-
         return widget
 
 
@@ -803,6 +788,8 @@ class ApiParent(ParentAction):
         if 'value' in field:
             if field['value'] in ("t", "true", True):
                 widget.setChecked(True)
+        if 'iseditable' in field:
+            widget.setEnabled(field['iseditable'])
         widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
@@ -949,39 +936,6 @@ class ApiParent(ParentAction):
             points.append(point)
 
         return points
-
-
-    def get_max_rectangle_from_coords(self, list_coord):
-        """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
-        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
-        """
-
-        coords = list_coord.group(1)
-        polygon = coords.split(',')
-        x, y = polygon[0].split(' ')
-        min_x = x  # start with something much higher than expected min
-        min_y = y
-        max_x = x  # start with something much lower than expected max
-        max_y = y
-        for i in range(0, len(polygon)):
-            x, y = polygon[i].split(' ')
-            if x < min_x:
-                min_x = x
-            if x > max_x:
-                max_x = x
-            if y < min_y:
-                min_y = y
-            if y > max_y:
-                max_y = y
-
-        return max_x, max_y, min_x, min_y
-
-
-    def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
-
-        rect = QgsRectangle(float(x1)+margin, float(y1)+margin, float(x2)-margin, float(y2)-margin)
-        self.canvas.setExtent(rect)
-        self.canvas.refresh()
 
 
     def draw(self, complet_result, zoom=True):
@@ -1264,7 +1218,6 @@ class ApiParent(ParentAction):
             field_id = 'fields'
         elif 'return_type' in row[pos]:
             if row[pos]['return_type'] not in ('', None):
-                self.controller.log_info(str(row[pos]['return_type']))
                 field_id = 'return_type'
 
         if field_id == '':
@@ -1283,6 +1236,10 @@ class ApiParent(ParentAction):
 
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
+                    if 'isMandatory' in field:
+                        widget.setProperty('is_mandatory', field['isMandatory'])
+                    else:
+                        widget.setProperty('is_mandatory', True)
                     widget.setText(field['value'])
                     if 'reg_exp' in field:
                         if field['reg_exp'] is not None:
@@ -1431,7 +1388,6 @@ class ApiParent(ParentAction):
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
                 widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
-            widget = self.set_function_associated(dialog, widget, field)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)

@@ -44,19 +44,8 @@ class ManageGallery(ParentManage):
                f" WHERE event_id = '{event_id}' AND visit_id = '{visit_id}'")
         rows = self.controller.get_rows(sql, commit=True)
         num = len(rows)
-
-        # Get doc_absolute_path from config_param_system
-        sql = ("SELECT value FROM config_param_system"
-               " WHERE parameter = 'doc_absolute_path'")
-        row = self.controller.get_row(sql)
-        if row[0]:
-            # If absolute_path exist in config_param_system
-            for n in range(0, num):
-                path = str(row[0]) + str(rows[n][0])
-                self.img_path_list1D.append(path)
-        else:
-            for m in range(0, num):
-                self.img_path_list1D.append(rows[m][0])
+        for m in range(0, num):
+            self.img_path_list1D.append(rows[m][0])
 
         # Add picture to gallery
         # Fill one-dimensional array till the end with "0"

@@ -55,26 +55,16 @@
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
              <widget class="QLabel" name="psector_id_label">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string>Psector id:</string>
               </property>
              </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
             </item>
             <item>
              <widget class="QLineEdit" name="psector_id">
@@ -100,22 +90,6 @@
                </size>
               </property>
              </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_12">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>45</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </item>
@@ -175,7 +149,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>42</width>
+                <width>32</width>
                 <height>20</height>
                </size>
               </property>
@@ -208,7 +182,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>14</width>
+                <width>11</width>
                 <height>20</height>
                </size>
               </property>
@@ -251,7 +225,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>28</width>
+                <width>23</width>
                 <height>20</height>
                </size>
               </property>
@@ -277,7 +251,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>18</width>
+                <width>14</width>
                 <height>20</height>
                </size>
               </property>
@@ -314,7 +288,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>11</width>
+                <width>9</width>
                 <height>20</height>
                </size>
               </property>
@@ -343,9 +317,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="priority_label_2">
+             <widget class="QLabel" name="lbl_psector_type">
               <property name="text">
-               <string>Sector:</string>
+               <string>Type:</string>
               </property>
              </widget>
             </item>
@@ -359,14 +333,14 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>16</width>
+                <width>23</width>
                 <height>20</height>
                </size>
               </property>
              </spacer>
             </item>
             <item>
-             <widget class="QComboBox" name="sector_id">
+             <widget class="QComboBox" name="psector_type">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -386,9 +360,9 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QLabel" name="lbl_psector_type">
+             <widget class="QLabel" name="lbl_sector">
               <property name="text">
-               <string>Type:</string>
+               <string>Sector:</string>
               </property>
              </widget>
             </item>
@@ -402,14 +376,14 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>48</width>
+                <width>34</width>
                 <height>20</height>
                </size>
               </property>
              </spacer>
             </item>
             <item>
-             <widget class="QComboBox" name="psector_type">
+             <widget class="QComboBox" name="sector_id">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -883,7 +857,7 @@
           <item>
            <widget class="QTabWidget" name="tab_feature">
             <property name="currentIndex">
-             <number>3</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="Arc">
              <attribute name="title">
@@ -891,7 +865,11 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="QTableView" name="tbl_psector_x_arc"/>
+               <widget class="QTableView" name="tbl_psector_x_arc">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -901,7 +879,11 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <item>
-               <widget class="QTableView" name="tbl_psector_x_node"/>
+               <widget class="QTableView" name="tbl_psector_x_node">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -911,7 +893,11 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_2">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_psector_x_connec"/>
+               <widget class="QTableView" name="tbl_psector_x_connec">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -921,7 +907,11 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_psector_x_gully"/>
+               <widget class="QTableView" name="tbl_psector_x_gully">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -946,8 +936,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>146</width>
-                 <height>122</height>
+                 <width>504</width>
+                 <height>454</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -955,7 +945,11 @@
                </attribute>
                <layout class="QVBoxLayout" name="verticalLayout_8">
                 <item>
-                 <widget class="QTableView" name="selected_rows"/>
+                 <widget class="QTableView" name="selected_rows">
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -1055,7 +1049,11 @@
                  </layout>
                 </item>
                 <item>
-                 <widget class="QTableView" name="all_rows"/>
+                 <widget class="QTableView" name="all_rows">
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="lbl_descript">
@@ -1697,6 +1695,9 @@
                 <height>0</height>
                </size>
               </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
               <property name="text">
                <string>Generate rapports</string>
               </property>
@@ -1791,7 +1792,11 @@
              </layout>
             </item>
             <item>
-             <widget class="QTableView" name="tbl_document"/>
+             <widget class="QTableView" name="tbl_document">
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -1845,8 +1850,8 @@
   <tabstop>name</tabstop>
   <tabstop>priority</tabstop>
   <tabstop>expl_id</tabstop>
-  <tabstop>sector_id</tabstop>
   <tabstop>psector_type</tabstop>
+  <tabstop>sector_id</tabstop>
   <tabstop>result_id</tabstop>
   <tabstop>descript</tabstop>
   <tabstop>text1</tabstop>

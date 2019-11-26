@@ -121,12 +121,16 @@ class DrawProfiles(ParentMapTool):
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
-        if not os.path.exists(template_path):
-            message = "File not found"
-            self.controller.show_warning(message, parameter=template_path)
-            return
-        template_files = os.listdir(template_path)
+        template_path = ""
+        row = self.controller.get_config('qgis_composers_path')
+        if row and row[0]:
+            template_path = row[0]
+        template_files = []
+        try:
+            template_files = os.listdir(template_path)
+        except FileNotFoundError as e:
+            pass
+
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
 
         self.dlg_draw_profile.cbx_template.clear()
@@ -711,8 +715,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x]
         ysup = [s1y, s2y, s3y]
 
-        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_config('draw_profile_conf')
         if row is not None:
             row = json.loads(row[0])
             if 'color' in row:
@@ -872,9 +875,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x, s4x, s5x]
         ysup = [s1y, s2y, s3y, s4y, s5y]
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_config('draw_profile_conf')
         if row is not None:
             row = json.loads(row[0])
             if 'color' in row:
@@ -1072,8 +1073,7 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x, s4x, i4x]
         ysup = [s1y, s2y, s3y, s4y, i4y]
 
-        sql = "SELECT value FROM config_param_user WHERE parameter = 'draw_profile_conf' AND cur_user = cur_user"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_config('draw_profile_conf')
         if row is not None:
             row = json.loads(row[0])
             if 'color' in row:
@@ -1466,11 +1466,11 @@ class DrawProfiles(ParentMapTool):
 
         # Check if template file exists
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        template_path = self.settings.value('system_variables/composers_path') + f'{os.sep}{self.template}.qpt'
-        if not os.path.exists(template_path):
-            message = "File not found"
-            self.controller.show_warning(message, parameter=template_path)
-            return
+        template_path = ""
+        row = self.controller.get_config('qgis_composers_path')
+        if row:
+            template_path = f'{row[0]}{os.sep}{self.template}.qpt'
+
         if not os.path.exists(template_path):
             message = "File not found"
             self.controller.show_warning(message, parameter=template_path)
@@ -1753,14 +1753,10 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.scale_horizontal.setDisabled(False)
 
             # Get rotation vdefaut if exist
-            sql = ("SELECT value FROM config_param_user "
-                   "WHERE parameter = 'rotation_vdefault' AND cur_user = current_user")
-            rows = self.controller.get_rows(sql, commit=True)
-            if rows:
-                row = rows[0]
-                if row:
-                    utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, row[0])
-                    self.rotation_vd_exist = True
+            row = self.controller.get_config('rotation_vdefault')
+            if row:
+                utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, row[0])
+                self.rotation_vd_exist = True
             else:
                 utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, '0')
 

@@ -5,11 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
+from qgis.core import Qgis
 from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
 
@@ -21,6 +17,7 @@ from .add_lot import AddNewLot
 from .manage_visit import ManageVisit
 from .manage_new_psector import ManageNewPsector
 from .parent import ParentAction
+from .crm_trace import CrmTrace
 from ..ui_manager import Psector_management
 from ..ui_manager import SelectorDate
 
@@ -29,10 +26,12 @@ class Om(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
+
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.new_lot = AddNewLot(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
+        self.crm_trace = CrmTrace(iface, settings, controller, plugin_dir)
 
         # Set project user
         self.current_user = self.controller.get_project_user()
@@ -307,8 +306,13 @@ class Om(ParentAction):
         """ '''Button 75: Lot management '''"""
         self.new_lot.lot_manager()
 
+
     def om_selector_lot(self):
         """ '''Button 76: Lot selector '''"""
         self.new_lot.lot_selector()
 
+
+    def custom_trace(self):
+        """" Button 18: Trace """
+        self.crm_trace.manage_trace()
 

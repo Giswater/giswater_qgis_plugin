@@ -1010,7 +1010,18 @@
         <source>Selected node</source>
         <translation>Selected node</translation>
     </message>
-
+    <message>
+        <source>Parameter not found</source>
+        <translation>Parameter not found</translation>
+    </message>
+    <message>
+        <source>The field widgettype is not configured for</source>
+        <translation>The field widgettype is not configured for</translation>
+    </message>
+    <message>
+        <source>Zoom unavailable. Doesn't exist the geometry for the street</source>
+        <translation>Zoom unavailable. Doesn't exist the geometry for the street</translation>
+    </message>
 
 </context>
 

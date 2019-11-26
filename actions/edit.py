@@ -4,13 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
-
 from qgis.PyQt.QtCore import QSettings
 
 from .api_cf import ApiCF
@@ -85,7 +79,6 @@ class Edit(ParentAction):
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
 
-
         if not result:
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
@@ -130,3 +123,4 @@ class Edit(ParentAction):
     def del_feature(self):
         """" Button 69: Delete Feature """
         self.delete_feature.manage_delete_feature()
+

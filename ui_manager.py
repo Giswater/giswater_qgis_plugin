@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt import uic, QtCore
-from qgis.PyQt.QtWidgets import QMainWindow, QDialog, QDockWidget, QWhatsThis
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction, QMainWindow, QDialog, QDockWidget, QWhatsThis, QLineEdit
 import configparser
 import os
 import webbrowser
-
+from functools import partial
 
 class GwDockWidget(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
@@ -50,7 +51,6 @@ class GwDialog(QDialog):
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
-                print(type(e).__name__)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
             
             return True
@@ -90,7 +90,6 @@ class GwMainWindow(QMainWindow):
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
             except Exception as e:
-                print(type(e).__name__)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
 
             return True
@@ -124,7 +123,6 @@ class ApiCfUi(GwMainWindow, FORM_CLASS):
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
-            print('event: {0}'.format(event))
             self.key_pressed.emit()
             return super(ApiCfUi, self).keyPressEvent(event)
 
@@ -227,6 +225,40 @@ class Cad_add_point(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('change_node_type.ui')
 class ChangeNodeType(GwDialog, FORM_CLASS):
     pass
+
+
+FORM_CLASS = get_ui_class('crm_trace.ui')
+class DlgTrace(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('credentials.ui')
+class Credentials(GwDialog, FORM_CLASS):
+    def __init__(self, subtag=None):
+        super().__init__()
+        self.txt_pass.setClearButtonEnabled(True)
+        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+        self.action = QAction("show")
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action = QAction(icon, "show")
+        self.action.triggered.connect(self.show_pass)
+        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+
+
+    def show_pass(self):
+        if self.txt_pass.echoMode() == 0:
+            self.txt_pass.setEchoMode(QLineEdit.Password)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+            text = "Show password"
+        elif self.txt_pass.echoMode() == 2:
+            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.svg'
+            text = "Hide password"
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action.setIcon(icon)
+            self.action.setText(text)
 
 
 FORM_CLASS = get_ui_class('csv2pg.ui')
@@ -363,7 +395,6 @@ class Mincut(GwMainWindow, FORM_CLASS):
 
     def closeEvent(self, event):
         """ Overwrite closeEvent method """
-
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.closeMainWin and self.mincutCanceled:
             event.accept()

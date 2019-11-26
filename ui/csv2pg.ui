@@ -299,7 +299,11 @@
            </layout>
           </item>
           <item>
-           <widget class="QTableView" name="tbl_csv"/>
+           <widget class="QTableView" name="tbl_csv">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

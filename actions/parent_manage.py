@@ -436,17 +436,20 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"
         sql = (f"SELECT DISTINCT({field_object_id})"
                f" FROM {table_object}")
-        row = self.controller.get_rows(sql, commit=self.autocommit)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        if rows is None:
+            return
+
+        for i in range(0, len(rows)):
+            aux = rows[i]
+            rows[i] = str(aux[0])
 
         # Set completer and model: add autocomplete in the widget
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
-        model.setStringList(row)
+        model.setStringList(rows)
         self.completer.setModel(model)
         
         
@@ -762,9 +765,9 @@ class ParentManage(ParentAction, object):
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
             parent_manage=self, table_object=table_object, dialog=dialog)
+        self.disconnect_signal_selection_changed()
         self.previous_map_tool = self.canvas.mapTool()        
         self.canvas.setMapTool(multiple_selection)              
-        self.disconnect_signal_selection_changed()        
         self.connect_signal_selection_changed(dialog, table_object, query)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
@@ -1130,6 +1133,7 @@ class ParentManage(ParentAction, object):
         
         try:
             self.canvas.selectionChanged.disconnect()  
+            self.iface.actionPan().trigger()
         except Exception:   
             pass
         

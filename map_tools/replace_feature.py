@@ -76,16 +76,13 @@ class ReplaceFeatureMapTool(ParentMapTool):
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'workcat_id_end_vdefault'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_config('workcat_id_end_vdefault')
         if row:
             workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
             self.dlg_replace.workcat_id_end.setCurrentIndex(workcat_vdefault)
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
-        row = self.controller.get_row(sql, log_info=False)
+
+        row = self.controller.get_config('enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -146,7 +143,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.controller.show_info_box(msg, "Info")
             return
 
-        sql = f"SELECT lower(feature_type) as type FROM cat_feature WHERE id = '{feature_type}'"
+        sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
         row = self.controller.get_row(sql)
 
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -155,9 +152,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def update_date(self):
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
-        row = self.controller.get_row(sql, log_info=False)
+        row = self.controller.get_config('enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -271,17 +266,20 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT({field_id}) "
                f"FROM {tablename} "
                f"ORDER BY {field_id}")
-        row = self.controller.get_rows(sql)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
+        rows = self.controller.get_rows(sql)
+        if rows is None:
+            return
+
+        for i in range(0, len(rows)):
+            aux = rows[i]
+            rows[i] = str(aux[0])
 
         # Set completer and model: add autocomplete in the widget
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         widget.setCompleter(self.completer)
         model = QStringListModel()
-        model.setStringList(row)
+        model.setStringList(rows)
         self.completer.setModel(model)
 
 
@@ -369,6 +367,10 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Refresh canvas
             self.refresh_map_canvas()
+            self.controller.indexing_spatial_layer('v_edit_arc')
+            self.controller.indexing_spatial_layer('v_edit_connec')
+            self.controller.indexing_spatial_layer('v_edit_gully')
+            self.controller.indexing_spatial_layer('v_edit_node')
             self.refresh_legend()
 
             # Deactivate map tool

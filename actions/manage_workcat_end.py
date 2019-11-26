@@ -106,9 +106,7 @@ class ManageWorkcatEnd(ParentManage):
     def set_edit_arc_downgrade_force(self, value):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        sql = ("SELECT * FROM config_param_user "
-               "WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
-        row = self.controller.get_row(sql, log_info=False)
+        row = self.controller.get_config('edit_arc_downgrade_force')
         if row:
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{value}' "
@@ -123,9 +121,7 @@ class ManageWorkcatEnd(ParentManage):
     def fill_fields(self):
         """ Fill dates and combo cat_work """
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
-        row = self.controller.get_row(sql, log_info=False)
+        row = self.controller.get_config('enddate_vdefault')
         if row:
             enddate = self.manage_dates(row[0]).date()
             self.dlg_work_end.enddate.setDate(enddate)
@@ -137,9 +133,7 @@ class ManageWorkcatEnd(ParentManage):
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE parameter = 'workcat_id_end_vdefault' and cur_user = current_user")
-        row = self.controller.get_row(sql, log_info=False)
+        row = self.controller.get_config('workcat_id_end_vdefault')
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 

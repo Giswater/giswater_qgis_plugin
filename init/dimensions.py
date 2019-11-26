@@ -171,11 +171,9 @@ class Dimensions(ParentDialog):
     
     def create_map_tips(self):
         """ Create MapTips on the map """
-        
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'dim_tooltip'")
-        row = self.controller.get_row(sql)
-        if not row or row[0].lower() != 'true':
+
+        row = self.controller.get_config('dim_tooltip')
+        if row and row[0].lower() != 'true':
             return
 
         self.timer_map_tips = QTimer(self.canvas)

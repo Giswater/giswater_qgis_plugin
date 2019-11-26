@@ -6,33 +6,21 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-
-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    pass
-else:
-    from qgis.core import QgsPointXY
-    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-
-import json
-from collections import OrderedDict
-from functools import partial
-
+from qgis.core import Qgis, QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
     QSpacerItem, QWidget
 
-from .api_parent import ApiParent
-from ..ui_manager import ApiDimensioningUi
+import json
+from collections import OrderedDict
+from functools import partial
 
 from .. import utils_giswater
+from .api_parent import ApiParent
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from ..ui_manager import ApiDimensioningUi
 
 
 class ApiDimensioning(ApiParent):
@@ -251,9 +239,7 @@ class ApiDimensioning(ApiParent):
     def create_map_tips(self):
         """ Create MapTips on the map """
 
-        sql = ("SELECT value FROM config_param_user "
-               "WHERE cur_user = current_user AND parameter = 'dim_tooltip'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_config('dim_tooltip')
         if not row or row[0].lower() != 'true':
             return
 

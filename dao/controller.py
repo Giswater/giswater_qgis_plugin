@@ -25,6 +25,7 @@ from functools import partial
 
 from .pg_dao import PgDao
 from .logger import Logger
+from .. import sys_manager
 
 
 class DaoController(object):
@@ -44,6 +45,12 @@ class DaoController(object):
         self.schema_name = None
         self.dao = None
         self.credentials = None
+        self.current_user = None
+        self.cfgp_user = {}
+        self.cfgp_system = {}
+        self.min_log_level = 20
+        self.min_message_level = 0
+
         if create_logger:
             self.set_logger(logger_name)
                 
@@ -79,12 +86,22 @@ class DaoController(object):
         if self.logger is None:
             if logger_name is None:
                 logger_name = 'plugin'
-            log_level = int(self.settings.value('status/log_level'))
+
+            self.min_log_level = int(self.settings.value('status/log_level'))
             log_suffix = self.settings.value('status/log_suffix')
-            self.logger = Logger(self, logger_name, log_level, log_suffix)
+            self.logger = Logger(self, logger_name, self.min_log_level, log_suffix)
             self.log_info("Logger initialized")
-        
-                
+
+            if self.min_log_level == 10:
+                self.min_message_level = 0
+            elif self.min_log_level == 20:
+                self.min_message_level = 0
+            elif self.min_log_level == 30:
+                self.min_message_level = 1
+            elif self.min_log_level == 40:
+                self.min_message_level = 2
+
+
     def close_logger(self):
         """ Close logger file """
         
@@ -369,7 +386,18 @@ class DaoController(object):
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)        
         msg_box.exec_()                      
-        
+
+
+    def show_warning_open_file(self, text, inf_text, file_path, context_name=None):
+        """ Show warning message with a button to open @file_path """
+
+        widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
+        button = QPushButton(widget)
+        button.setText(self.tr("Open file"))
+        button.clicked.connect(partial(sys_manager.open_file, file_path))
+        widget.layout().addWidget(button)
+        self.iface.messageBar().pushWidget(widget, 1)
+
         
     def ask_question(self, text, title=None, inf_text=None, context_name=None, parameter=None):
         """ Ask question to the user """   
@@ -431,7 +459,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None, is_threading=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -442,15 +470,18 @@ class DaoController(object):
             if self.last_error:
                 text = "Undefined error" 
                 if '-1' in self.log_codes:   
-                    text = self.log_codes[-1]   
-                self.show_warning_detail(text, str(self.last_error))
+                    text = self.log_codes[-1]
+                if is_threading:
+                    self.log_warning(f"{self.dao.last_error}", stack_level_increase=1)
+                else:
+                    self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False, is_threading=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         sql = self.get_sql(sql, log_sql, params)
@@ -463,7 +494,10 @@ class DaoController(object):
                 text = "Undefined error"
                 if '-1' in self.log_codes:
                     text = self.log_codes[-1]
-                self.show_warning_detail(text, str(self.dao.last_error))
+                if is_threading:
+                    self.log_warning(f"{self.dao.last_error}", stack_level_increase=1)
+                else:
+                    self.show_warning_detail(text, str(self.dao.last_error))
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
@@ -881,35 +915,77 @@ class DaoController(object):
         return self.user   
     
 
-    def log_message(self, text=None, message_level=0, context_name=None, parameter=None):
+    def qgis_log_message(self, text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
         """ Write message into QGIS Log Messages Panel with selected message level
-            @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} 
+            @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
         """
 
         msg = None
         if text:
             msg = self.tr(text, context_name)
             if parameter:
-                msg += ": " + str(parameter)            
-        QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
+                msg += ": " + str(parameter)
+
+        if tab_name is None:
+            tab_name = self.plugin_name
+
+        if message_level >= self.min_message_level:
+            msg = "QGIS: " + str(msg)
+            QgsMessageLog.logMessage(msg, tab_name, message_level)
 
         return msg
-        
 
-    def log_info(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
+
+    def log_message(self, text=None, message_level=0, context_name=None, parameter=None, logger_file=True,
+                    stack_level_increase=0, tab_name=None):
+        """ Write message into QGIS Log Messages Panel """
+
+        msg = self.qgis_log_message(text, message_level, context_name, parameter, tab_name)
+        if self.logger and logger_file:
+            if message_level == 0:
+                self.logger.info(msg, stack_level_increase=stack_level_increase)
+            elif message_level == 1:
+                self.logger.warning(msg, stack_level_increase=stack_level_increase)
+            elif message_level == 2:
+                self.logger.error(msg, stack_level_increase=stack_level_increase)
+            elif message_level == 4:
+                self.logger.debug(msg, stack_level_increase=stack_level_increase)
+
+
+    def log_debug(self, text=None, context_name=None, parameter=None, logger_file=True,
+                  stack_level_increase=0, tab_name=None):
+        """ Write debug message into QGIS Log Messages Panel """
+
+        msg = self.qgis_log_message(text, 0, context_name, parameter, tab_name)
+        if self.logger and logger_file:
+            self.logger.debug(msg, stack_level_increase=stack_level_increase)
+
+
+    def log_info(self, text=None, context_name=None, parameter=None, logger_file=True,
+                 stack_level_increase=0, tab_name=None):
         """ Write information message into QGIS Log Messages Panel """
 
-        msg = self.log_message(text, 0, context_name, parameter=parameter)
+        msg = self.qgis_log_message(text, 0, context_name, parameter, tab_name)
         if self.logger and logger_file:        
             self.logger.info(msg, stack_level_increase=stack_level_increase)
 
 
-    def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
+    def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True,
+                    stack_level_increase=0, tab_name=None):
         """ Write warning message into QGIS Log Messages Panel """
 
-        msg = self.log_message(text, 1, context_name, parameter=parameter)
+        msg = self.qgis_log_message(text, 1, context_name, parameter, tab_name)
         if self.logger and logger_file:
             self.logger.warning(msg, stack_level_increase=stack_level_increase)
+
+
+    def log_error(self, text=None, context_name=None, parameter=None, logger_file=True,
+                  stack_level_increase=0, tab_name=None):
+        """ Write error message into QGIS Log Messages Panel """
+
+        msg = self.qgis_log_message(text, 2, context_name, parameter, tab_name)
+        if self.logger and logger_file:
+            self.logger.error(msg, stack_level_increase=stack_level_increase)
         
      
     def add_translator(self, locale_path, log_info=False):
@@ -1093,25 +1169,6 @@ class DaoController(object):
         return list_items
 
 
-    def get_all_group_layers(self, geom_type):
-
-        list_items = []
-        sql = ("SELECT tablename FROM "
-               "(SELECT tablename, 1 as c FROM sys_feature_cat"
-               " WHERE type = '" + geom_type.upper() + "'"
-               " UNION SELECT parentlayer, 0 FROM sys_feature_type"
-               " WHERE id='" + geom_type.upper() + "') as t "
-               " ORDER BY c")
-        rows = self.get_rows(sql, log_sql=True)
-        if rows:
-            for row in rows:
-                layer = self.get_layer_by_tablename(row[0])
-                if layer:
-                    list_items.append(layer)
-
-        return list_items
-
-
     def check_role(self, role_name):
         """ Check if @role_name exists """
         
@@ -1145,7 +1202,7 @@ class DaoController(object):
         cur_user = ""
         if row:
             cur_user = str(row[0])
-            
+        self.current_user = cur_user
         return cur_user
     
     
@@ -1369,3 +1426,19 @@ class DaoController(object):
         return function_name in object_functions
 
 
+    def get_config(self, parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+        sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
+        if sql_added:
+            sql += sql_added
+        if table == 'config_param_user':
+            sql += " AND cur_user = current_user"
+        sql += ";"
+        row = self.get_row(sql, commit=True, log_info=log_info)
+        return row
+
+
+    def indexing_spatial_layer(self, layer_name):
+        """ Force reload dataProvider of layer """
+        layer = self.get_layer_by_tablename(layer_name)
+        if layer:
+            layer.dataProvider().forceReload()

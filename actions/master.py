@@ -199,10 +199,7 @@ class Master(ParentAction):
                    f" WHERE {column_id} IN ({list_id})")
             self.controller.execute_sql(sql)
             widget.model().select()
-            sql = (f"SELECT value FROM config_param_user "
-                   f" WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
-                   f" AND value IN ({list_id})")
-            row = self.controller.get_row(sql)
+            row = self.controller.get_config('psector_vdefault', sql_added=f" AND value IN ({list_id})")
             if row is not None:
                 sql = (f"DELETE FROM config_param_user "
                        f" WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
