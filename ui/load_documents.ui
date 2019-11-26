@@ -47,6 +47,9 @@
       <height>291</height>
      </rect>
     </property>
+    <property name="sortingEnabled">
+     <bool>true</bool>
+    </property>
    </widget>
   </widget>
   <widget class="QLineEdit" name="visit_id">

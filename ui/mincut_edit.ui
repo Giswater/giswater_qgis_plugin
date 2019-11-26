@@ -169,7 +169,11 @@
        </widget>
       </item>
       <item row="4" column="0" colspan="16">
-       <widget class="QTableView" name="tbl_mincut_edit"/>
+       <widget class="QTableView" name="tbl_mincut_edit">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="3" column="12">
        <widget class="QPushButton" name="btn_show">

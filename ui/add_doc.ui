@@ -361,7 +361,11 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="QTableView" name="tbl_doc_x_arc"/>
+               <widget class="QTableView" name="tbl_doc_x_arc">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -371,7 +375,11 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <item>
-               <widget class="QTableView" name="tbl_doc_x_node"/>
+               <widget class="QTableView" name="tbl_doc_x_node">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -381,7 +389,11 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_7">
               <item>
-               <widget class="QTableView" name="tbl_doc_x_connec"/>
+               <widget class="QTableView" name="tbl_doc_x_connec">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -391,7 +403,11 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <item>
-               <widget class="QTableView" name="tbl_doc_x_gully"/>
+               <widget class="QTableView" name="tbl_doc_x_gully">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>

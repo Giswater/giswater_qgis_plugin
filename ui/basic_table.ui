@@ -28,7 +28,11 @@
     </spacer>
    </item>
    <item row="0" column="0" colspan="4">
-    <widget class="QTableView" name="tbl_basic"/>
+    <widget class="QTableView" name="tbl_basic">
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item row="1" column="2">
     <widget class="QPushButton" name="btn_accept">
