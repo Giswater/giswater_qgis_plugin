@@ -252,7 +252,12 @@ class GwToolBox(ApiParent):
             layer_name = utils_giswater.get_item_data(dialog, combo, 1)
             if layer_name != -1:
                 layer = self.set_selected_layer(dialog, combo)
-
+                if not layer:
+                    dialog.progressBar.setVisible(False)
+                    dialog.progressBar.setMinimum(0)
+                    dialog.progressBar.setMaximum(1)
+                    dialog.progressBar.setValue(1)
+                    return
             selection_mode = self.rbt_checked['widget']
             extras += f'"selectionMode":"{selection_mode}",'
             # Check selection mode and get (or not get) all feature id
@@ -473,6 +478,13 @@ class GwToolBox(ApiParent):
                 elem.append(layer_name)
                 elem.append(geom_type)
                 layers.append(elem)
+        if not layers:
+            elem = []
+            elem.append(f"There is no layer related to {geom_type}.")
+            elem.append(None)
+            elem.append(None)
+            layers.append(elem)
+
         utils_giswater.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
 
 
