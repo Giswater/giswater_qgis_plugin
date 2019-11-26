@@ -1494,7 +1494,7 @@ class ApiCF(ApiParent, QObject):
 
         row = selected_list[0].row()
         table_name = qtable.model().record(row).value("sys_table_id")
-        feature_id = qtable.model().record(row).value("sys_id")
+        feature_id = qtable.model().record(row).value("feature_id")
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
