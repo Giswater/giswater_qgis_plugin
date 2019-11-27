@@ -1443,7 +1443,7 @@ class ApiCF(ApiParent, QObject):
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
         sys_type = self.tbl_relations.model().record(row).value("sys_type")
         sql = (f"SELECT feature_type FROM cat_feature "
-               f"WHERE id = '{sys_type}'")
+               f"WHERE system_id = '{sys_type}'")
         sys_type = self.controller.get_row(sql, commit=True)
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
