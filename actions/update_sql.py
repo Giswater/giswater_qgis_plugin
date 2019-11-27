@@ -69,13 +69,25 @@ class UpdateSQL(ApiParent):
         # Get last database connection from controller
         self.last_connection = self.get_last_connection()
 
+        # Create dlg credentials
+        self.dlg_credentials = Credentials()
+
+        # Populate combo connections
+        s = QSettings()
+        s.beginGroup("PostgreSQL/connections")
+        default_connection = s.value('selected')
+        connections = s.childGroups()
+        self.list_connections = []
+        for con in connections:
+            elem = [con, con]
+            self.list_connections.append(elem)
+
+        s.endGroup()
+
         # Check if connection is still False
         connection_status, not_version = self.controller.set_database_connection()
         if not connection_status:
-            dlg_credentials = Credentials()
-            dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, dlg_credentials))
-            dlg_credentials.open()
-            dlg_credentials.lbl_connection_message.setText(str("Could not retrieve connection parameters for '" + str(self.last_connection) + "':"))
+            self.create_credentials_form(set_connection=default_connection)
         else:
             # Set logger file
             self.controller.set_logger()
@@ -172,18 +184,8 @@ class UpdateSQL(ApiParent):
                 self.cmb_project_type.addItem(str(project_type))
             self.change_project_type(self.cmb_project_type)
 
-            # Populate combo connections
-            s = QSettings()
-            s.beginGroup("PostgreSQL/connections")
-            connections = s.childGroups()
-            list_connections = []
-            for con in connections:
-                elem = [con, con]
-                list_connections.append(elem)
-
-            s.endGroup()
-            if str(list_connections) != '[]':
-                utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+            if str(self.list_connections) != '[]':
+                utils_giswater.set_item_data(self.cmb_connection, self.list_connections, 1)
 
             # Declare all file variables
             self.file_pattern_tablect = "tablect"
@@ -311,19 +313,22 @@ class UpdateSQL(ApiParent):
                                              str(self.controller.plugin_settings_value('last_schema_name_selected')))
 
 
-    def set_credentials(self, dialog):
+    def set_credentials(self, dialog, new_connecton=False):
         user_name = utils_giswater.getWidgetText(dialog, dialog.txt_user, False, False)
         password = utils_giswater.getWidgetText(dialog, dialog.txt_pass, False, False)
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
-        default_connection = settings.value('selected')
-
-        if default_connection:
+        default_connection = utils_giswater.getWidgetText(dialog, dialog.cmb_connection)
+        settings.setValue('selected', default_connection)
+        if new_connecton:
+            connection_status, not_version = self.controller.set_database_connection()
+        else:
+            if default_connection:
+                settings.endGroup()
+                settings.beginGroup("PostgreSQL/connections/" + default_connection)
+            settings.setValue('password', password)
+            settings.setValue('username', user_name)
             settings.endGroup()
-            settings.beginGroup("PostgreSQL/connections/" + default_connection)
-        settings.setValue('password', password)
-        settings.setValue('username', user_name)
-        settings.endGroup()
         self.close_dialog(dialog)
         self.init_sql()
 
@@ -1659,12 +1664,8 @@ class UpdateSQL(ApiParent):
                                                credentials['password'])
 
         if not self.logged:
-            msg = "Connection Failed. Please, check connection parameters"
-            self.controller.show_message(msg, 1)
-            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, ignore_widgets='cmb_connection')
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
+            self.close_dialog(self.dlg_readsql)
+            self.create_credentials_form(set_connection=connection_name)
         else:
             if str(self.version_metadata) > str(self.project_data_schema_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
@@ -3262,4 +3263,18 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         self.open_dialog(self.dlg_info, maximize_button=False)
+
+
+    def create_credentials_form(self, set_connection):
+
+        if str(self.list_connections) != '[]':
+            utils_giswater.set_item_data(self.dlg_credentials.cmb_connection, self.list_connections, 1)
+
+        utils_giswater.setWidgetText(self.dlg_credentials, self.dlg_credentials.cmb_connection, str(set_connection))
+
+        self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
+        self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
+            partial(self.set_credentials, self.dlg_credentials, new_connecton=True))
+        self.dlg_credentials.open()
+
 
