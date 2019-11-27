@@ -780,7 +780,7 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def add_checkbox(self, dialog, field):
+    def add_checkbox(self, field):
 
         widget = QCheckBox()
         widget.setObjectName(field['widgetname'])
@@ -790,7 +790,6 @@ class ApiParent(ParentAction):
                 widget.setChecked(True)
         if 'iseditable' in field:
             widget.setEnabled(field['iseditable'])
-        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
 
@@ -1086,7 +1085,7 @@ class ApiParent(ParentAction):
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] in ('check','checkbox'):
                 widget = self.add_checkbox(dialog, field)
-
+                widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
             grid_layout.addWidget(label,x, 0)
             grid_layout.addWidget(widget, x, 1)
 

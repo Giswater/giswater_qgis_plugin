@@ -700,7 +700,8 @@ class ApiCF(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_checkbox(dialog, field)
+        widget = self.add_checkbox(field)
+        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         widget = self.set_auto_update_checkbox(field, dialog, widget)
         return widget
 
