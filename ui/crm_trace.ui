@@ -55,7 +55,7 @@ Escogiendo una explotación, se comunica la base de datos del GIS con la base de
 
 PASO 1: Se updatea en CRM la zona de medición a la que pertenecen las acometidas teniendo en cuenta valvulas frontera y caudalimetros.
 
-PASO 2: Se capturan en el CRM los valores de consumo (m3) para el período de cada abonado
+PASO 2: Se capturan en el CRM los valores de consumo para el período de cada abonado
 
 El proceso carga acometidas y tramos que se han quedado sin zona de medición (dma=0). El estilo de las capas es configurable mediante un archivo de estilo de QGIS  (*.qml) en el formulario de config.</string>
          </property>
