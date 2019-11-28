@@ -172,7 +172,7 @@ class CadAddCircle(ParentMapTool):
 
         self.layer_circle = self.controller.get_layer_by_tablename('v_edit_cad_auxcircle')
         if self.layer_circle is None:
-            self.controller.show_warning("Layer not found", parameter=self.layer_circle)
+            self.controller.show_warning("Layer not found", parameter='v_edit_cad_auxcircle')
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()

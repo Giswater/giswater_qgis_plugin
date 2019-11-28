@@ -197,7 +197,7 @@ class CadAddPoint(ParentMapTool):
 
         self.layer_points = self.controller.get_layer_by_tablename('v_edit_cad_auxpoint')
         if self.layer_points is None:
-            self.controller.show_warning("Layer not found", parameter=self.layer_points)
+            self.controller.show_warning("Layer not found", parameter='v_edit_cad_auxpoint')
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
