@@ -65,14 +65,20 @@ class ApiManageComposer(ApiParent):
         self.hide_void_groupbox(self.dlg_composer)
 
         # Set current values from canvas
-        w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
-        w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
-        reg_exp = QRegExp("\d{0,8}[\r]?")
-        w_scale.setValidator(QRegExpValidator(reg_exp))
         rotation = self.iface.mapCanvas().rotation()
         scale = int(self.iface.mapCanvas().scale())
-        utils_giswater.setWidgetText(self.dlg_composer, w_rotation, rotation)
-        utils_giswater.setWidgetText(self.dlg_composer, w_scale, scale)
+
+        w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
+        if w_rotation:
+            w_rotation.editingFinished.connect(partial(self.set_rotation, w_rotation))
+            utils_giswater.setWidgetText(self.dlg_composer, w_rotation, rotation)
+
+        w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
+        if w_scale:
+            w_scale.editingFinished.connect(partial(self.set_scale, w_scale))
+            reg_exp = QRegExp("\d{0,8}[\r]?")
+            w_scale.setValidator(QRegExpValidator(reg_exp))
+            utils_giswater.setWidgetText(self.dlg_composer, w_scale, scale)
         self.my_json['rotation'] = rotation
         self.my_json['scale'] = scale
 
@@ -98,6 +104,14 @@ class ApiManageComposer(ApiParent):
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
 
+    def set_rotation(self, widget):
+        """ Set rotation to mapCanvas """
+        self.iface.mapCanvas().setRotation(float(widget.text()))
+
+
+    def set_scale(self, widget):
+        """ Set zoomScale to mapCanvas """
+        self.iface.mapCanvas().zoomScale(float(widget.text()))
 
     def check_whidget_exist(self, dialog):
         """ Check if widget exist in composer """
@@ -114,7 +128,7 @@ class ApiManageComposer(ApiParent):
                 widget.setStyleSheet("border: 1px solid gray")
 
 
-    def load_composer_values(self, dialog, widget=None, my_json=None):
+    def load_composer_values(self, dialog):
         """ Load values from composer into form dialog """
 
         selected_com = self.get_current_composer()
