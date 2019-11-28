@@ -117,7 +117,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
         self.dlg_replace.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_replace))
-
+        self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
         self.open_dialog(self.dlg_replace, maximize_button=False)
 
