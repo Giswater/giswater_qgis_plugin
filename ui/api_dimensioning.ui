@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>674</width>
-    <height>601</height>
+    <height>549</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,19 +17,19 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QGridLayout" name="main_layout">
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="grb_distance">
+      <item row="5" column="0">
+       <widget class="QGroupBox" name="grb_other">
         <property name="title">
-         <string>Distance</string>
+         <string>Other</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2">
+        <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="distance_layout"/>
+          <layout class="QGridLayout" name="other_layout"/>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QGroupBox" name="grb_depth">
         <property name="title">
          <string>Depth</string>
@@ -41,7 +41,22 @@
         </layout>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="1" column="0">
+       <layout class="QGridLayout" name="top_layout"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QGroupBox" name="grb_distance">
+        <property name="title">
+         <string>Distance</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="distance_layout"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="4" column="0">
        <widget class="QGroupBox" name="grb_symbology">
         <property name="title">
          <string>Circle symbology</string>
@@ -52,9 +67,6 @@
          </item>
         </layout>
        </widget>
-      </item>
-      <item row="0" column="0">
-       <layout class="QGridLayout" name="top_layout"/>
       </item>
      </layout>
     </item>
