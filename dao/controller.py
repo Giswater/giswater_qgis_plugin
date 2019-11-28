@@ -5,20 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
-else:
-    from qgis.core import QgsProject, QgsDataSourceUri
+from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
 
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils
+
 
 import os.path
 from functools import partial
@@ -1316,10 +1309,7 @@ class DaoController(object):
 
         visible = False
         if layer:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                visible = self.iface.legendInterface().isLayerVisible(layer)
-            else:
-                visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
+            visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
 
         return visible
 
@@ -1328,19 +1318,13 @@ class DaoController(object):
         """ Set layer visible """
 
         if layer:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                self.iface.legendInterface().setLayerVisible(layer, visible)
-            else:
-                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+            QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
 
 
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            layers = self.iface.legendInterface().layers()
-        else:
-            layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
+        layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
 
         return layers
 
@@ -1354,21 +1338,14 @@ class DaoController(object):
 
     def set_path_from_qfiledialog(self, qtextedit, path):
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            if path:
-                qtextedit.setText(path)
-        else:
-            if path[0]:
-                qtextedit.setText(path[0])
+        if path[0]:
+            qtextedit.setText(path[0])
 
 
     def get_restriction(self):
 
         # Get project variable 'project_role'
-        if Qgis.QGIS_VERSION_INT < 29900:
-            project_role = QgsExpressionContextUtils.projectScope().variable('project_role')
-        else:
-            project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
+        project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
 
         role_edit = False
         role_om = False
@@ -1412,11 +1389,7 @@ class DaoController(object):
     def get_values_from_dictionary(self, dictionary):
         """ Return values from @dictionary """
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            list_values = dictionary.itervalues()
-        else:
-            list_values = iter(dictionary.values())
-
+        list_values = iter(dictionary.values())
         return list_values
 
 

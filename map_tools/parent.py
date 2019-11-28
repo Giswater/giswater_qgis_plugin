@@ -17,19 +17,8 @@
 
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry as QgsProject
-    from .snapping_utils_v2 import SnappingConfigManager
-else:
-    from qgis.core import QgsWkbTypes, QgsProject
-    from .snapping_utils_v3 import SnappingConfigManager
-
-from qgis.core import QgsExpression
+from qgis.core import QgsExpression, QgsProject, QgsWkbTypes
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
@@ -39,6 +28,7 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
+from .snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import GwDialog, GwMainWindow
 
 class ParentMapTool(QgsMapTool):
@@ -88,12 +78,7 @@ class ParentMapTool(QgsMapTool):
         self.reset()
         
         self.force_active_layer = True
-        
-        # Set default encoding
-        if Qgis.QGIS_VERSION_INT < 29900:
-            reload(sys)
-            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
-        
+
         
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
@@ -170,20 +155,11 @@ class ParentMapTool(QgsMapTool):
     def reset_rubber_band(self, geom_type="polygon"):
 
         try:
-
             if geom_type == "polygon":
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    geom_type = Qgis.Polygon
-                else:
-                    geom_type = QgsWkbTypes.PolygonGeometry
+                geom_type = QgsWkbTypes.PolygonGeometry
             elif geom_type == "line":
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    geom_type = Qgis.Line
-                else:
-                    geom_type = QgsWkbTypes.LineString
-
+                geom_type = QgsWkbTypes.LineString
             self.rubber_band.reset(geom_type)
-
         except:
             pass
 
@@ -332,23 +308,10 @@ class ParentMapTool(QgsMapTool):
 
     def get_composers_list(self):
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            active_composers = self.iface.activeComposers()
-        else:
-            layour_manager = QgsProject.instance().layoutManager().layouts()
-            active_composers = [layout for layout in layour_manager]
+        layour_manager = QgsProject.instance().layoutManager().layouts()
+        active_composers = [layout for layout in layour_manager]
 
         return active_composers
-
-
-    def get_composer_name(self, composer):
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            composer_name = composer.composerWindow().windowTitle()
-        else:
-            composer_name = composer.name()
-
-        return composer_name
 
 
     def get_composer_index(self, name):
@@ -356,7 +319,7 @@ class ParentMapTool(QgsMapTool):
         index = 0
         composers = self.get_composers_list()
         for comp_view in composers:
-            composer_name = self.get_composer_name(comp_view)
+            composer_name = comp_view.name()
             if composer_name == name:
                 break
             index += 1

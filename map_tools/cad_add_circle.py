@@ -5,10 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
 
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
@@ -72,10 +68,7 @@ class CadAddCircle(ParentMapTool):
 
             if not self.cancel_circle:
                 feature = QgsFeature()
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
-                else:
-                    feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
+                feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
                 provider = self.layer_circle.dataProvider()
                 # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
                 # but all work ok
