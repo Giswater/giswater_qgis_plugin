@@ -5,20 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 import json
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import pyqtSignal, QObject
 from .. import utils_giswater
 from .parent_manage import ParentManage
 from ..ui_manager import DupPsector
-
 
 
 class DuplicatePsector(ParentManage, QObject):

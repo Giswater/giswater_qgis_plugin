@@ -5,22 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
 
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsComposition
-    from qgis.PyQt.QtGui import QStringListModel
-    from qgis.core import QgsPoint as QgsPointXY
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-    from qgis.core import QgsPointXY, QgsLayoutExporter
-
-from qgis.core import QgsRectangle, QgsProject
-from qgis.PyQt.QtCore import Qt
+from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
+from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLabel
@@ -502,19 +489,12 @@ class ManageNewPsector(ParentManage):
         
         index = 0
         records = []
-        if Qgis.QGIS_VERSION_INT < 29900:
-            composers = self.iface.activeComposers()
-            for comp_view in composers:
-                elem = [index, comp_view.composerWindow().windowTitle()]
-                records.append(elem)
-                index = index + 1
-        else:
-            layout_manager = QgsProject.instance().layoutManager()
-            layouts = layout_manager.layouts()  # QgsPrintLayout
-            for layout in layouts:
-                elem = [index, layout.name()]
-                records.append(elem)
-                index = index + 1
+        layout_manager = QgsProject.instance().layoutManager()
+        layouts = layout_manager.layouts()  # QgsPrintLayout
+        for layout in layouts:
+            elem = [index, layout.name()]
+            records.append(elem)
+            index = index + 1
 
         if records in ([], None):
             # If no composer configurated, disable composer pdf file widgets
@@ -597,65 +577,42 @@ class ManageNewPsector(ParentManage):
 
 
     def generate_composer(self, path):
+        # Get layout manager object
+        layout_manager = QgsProject.instance().layoutManager()
 
-        if Qgis.QGIS_VERSION_INT < 29900:
+        # Get our layout
+        layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
+        layout = layout_manager.layoutByName(layout_name)
 
-            index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
-            comp_view = self.iface.activeComposers()[index]
-            my_comp = comp_view.composition()
-            if my_comp is not None:
-                my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
-                try:
-                    result = my_comp.exportAsPDF(path)
-                    if result:
-                        message = "Document PDF created in"
-                        self.controller.show_info(message, parameter=path)
-                        os.startfile(path)
-                    else:
-                        message = "Cannot create file, check if its open"
-                        self.controller.show_warning(message, parameter=path)
-                except Exception as e:
-                    self.controller.log_warning(str(e))
-                    msg = "Cannot create file, check if selected composer is the correct composer"
-                    self.controller.show_warning(msg, parameter=path)
+        # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
+        # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
+        # close the layout designer again (finally sentence)
+        designer = self.iface.openLayoutDesigner(layout)
+        layout_view = designer.view()
+        designer_window = layout_view.window()
+        action = designer_window.findChild(QAction, 'mActionAtlasPreview')
+        action.trigger()
 
+        # Export to PDF file
+        if layout:
+            try:
+                exporter = QgsLayoutExporter(layout)
+                exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
+                if os.path.exists(path):
+                    message = "Document PDF created in"
+                    self.controller.show_info(message, parameter=path)
+                    os.startfile(path)
+                else:
+                    message = "Cannot create file, check if its open"
+                    self.controller.show_warning(message, parameter=path)
+            except Exception as e:
+                self.controller.log_warning(str(e))
+                msg = "Cannot create file, check if selected composer is the correct composer"
+                self.controller.show_warning(msg, parameter=path)
+            finally:
+                designer_window.close()
         else:
-            # Get layout manager object
-            layout_manager = QgsProject.instance().layoutManager()
-
-            # Get our layout
-            layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
-            layout = layout_manager.layoutByName(layout_name)
-
-            # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
-            # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
-            # close the layout designer again (finally sentence)
-            designer = self.iface.openLayoutDesigner(layout)
-            layout_view = designer.view()
-            designer_window = layout_view.window()
-            action = designer_window.findChild(QAction, 'mActionAtlasPreview')
-            action.trigger()
-
-            # Export to PDF file
-            if layout:
-                try:
-                    exporter = QgsLayoutExporter(layout)
-                    exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
-                    if os.path.exists(path):
-                        message = "Document PDF created in"
-                        self.controller.show_info(message, parameter=path)
-                        os.startfile(path)
-                    else:
-                        message = "Cannot create file, check if its open"
-                        self.controller.show_warning(message, parameter=path)
-                except Exception as e:
-                    self.controller.log_warning(str(e))
-                    msg = "Cannot create file, check if selected composer is the correct composer"
-                    self.controller.show_warning(msg, parameter=path)
-                finally:
-                    designer_window.close()
-            else:
-                self.controller.show_warning("Layout not found", parameter=layout_name)
+            self.controller.show_warning("Layout not found", parameter=layout_name)
 
 
     def generate_csv(self, path, viewname):

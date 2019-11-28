@@ -5,17 +5,8 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint as QgsPointXY
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.core import QgsPointXY
-    from qgis.PyQt.QtCore import QStringListModel
+from qgis.core import QgsPointXY
+from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
@@ -778,12 +769,10 @@ class AddNewLot(ParentManage):
                 item.append(1)  # Set status field of the table relation
                 item.append('No visitat')
                 item.append('')
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    item.append(feature.geometry().asWkb().encode('hex').upper())
-                else:
-                    sql = f"SELECT ST_GeomFromText('{feature.geometry().asWkt()}', {self.srid})"
-                    the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
-                    item.append(the_geom[0])
+
+                sql = f"SELECT ST_GeomFromText('{feature.geometry().asWkt()}', {self.srid})"
+                the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+                item.append(the_geom[0])
                 row = []
                 for value in item:
                     row.append(QStandardItem(str(value)))
@@ -1288,10 +1277,7 @@ class AddNewLot(ParentManage):
 
         self.rb_red.reset()
         rb = self.rb_red
-        if Qgis.QGIS_VERSION_INT < 29900:
-            polyline = QgsGeometry.fromPolyline(points)
-        else:
-            polyline = QgsGeometry.fromPolylineXY(points)
+        polyline = QgsGeometry.fromPolylineXY(points)
         rb.setToGeometry(polyline, None)
         rb.setColor(color)
         rb.setWidth(width)
@@ -1547,10 +1533,7 @@ class AddNewLot(ParentManage):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select CSV file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            csv_path = QFileDialog.getSaveFileName(None, message, "", '*.csv')
-        else:
-            csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
+        csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
         utils_giswater.setWidgetText(dialog, widget, csv_path)
 
 

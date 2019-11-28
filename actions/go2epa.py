@@ -5,19 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
 
 
 from qgis.core import Qgis, QgsApplication
-from qgis.PyQt.QtCore import QTime, QDate, Qt
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog, QMessageBox
 
@@ -425,13 +416,8 @@ class Go2Epa(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.file_inp = QFileDialog.getSaveFileName(None, message, "", '*.inp')
-        else:
-            self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
-
+        self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
         utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
-
 
 
     def go2epa_select_file_rpt(self):
@@ -447,11 +433,7 @@ class Go2Epa(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select RPT file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
-        else:
-            self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
-
+        self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
         utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 

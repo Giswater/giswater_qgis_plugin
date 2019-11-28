@@ -5,28 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    import ConfigParser as configparser
-    from qgis.PyQt.QtGui import QStringListModel
-    from qgis.core import QgsMapLayerRegistry as QgsProject
-else:
-    import configparser
-    from qgis.PyQt.QtCore import QStringListModel
-    from qgis.core import QgsProject
-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QDate
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsRectangle
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
+import configparser
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -110,11 +97,7 @@ class ParentAction(object):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)        
         message = "Select file"
-        if Qgis.QGIS_VERSION_INT < 29900:
-            folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
-        else:
-            folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
-
+        folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
                 
@@ -827,23 +810,9 @@ class ParentAction(object):
 
     def get_composers_list(self):
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            active_composers = self.iface.activeComposers()
-        else:
-            layour_manager = QgsProject.instance().layoutManager().layouts()
-            active_composers = [layout for layout in layour_manager]
-
+        layour_manager = QgsProject.instance().layoutManager().layouts()
+        active_composers = [layout for layout in layour_manager]
         return active_composers
-
-
-    def get_composer_name(self, composer):
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            composer_name = composer.composerWindow().windowTitle()
-        else:
-            composer_name = composer.name()
-
-        return composer_name
 
 
     def get_composer_index(self, name):
@@ -851,7 +820,7 @@ class ParentAction(object):
         index = 0
         composers = self.get_composers_list()
         for comp_view in composers:
-            composer_name = self.get_composer_name(comp_view)
+            composer_name = comp_view.name()
             if composer_name == name:
                 break
             index += 1

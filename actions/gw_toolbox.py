@@ -5,17 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry, QgsProject
-else:
-    from qgis.core import QgsProject
-
-from qgis.core import QgsFeature, QgsGeometry, QgsVectorLayer, QgsField
+from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
@@ -598,11 +589,7 @@ class GwToolBox(ApiParent):
 
         # Commit changes
         virtual_layer.commitChanges()
-        if Qgis.QGIS_VERSION_INT < 29900:
-            QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
-        else:
-            QgsProject.instance().addMapLayer(virtual_layer, False)
-
+        QgsProject.instance().addMapLayer(virtual_layer, False)
         root = QgsProject.instance().layerTreeRoot()
         my_group = root.findGroup('GW Functions results')
         if my_group is None:

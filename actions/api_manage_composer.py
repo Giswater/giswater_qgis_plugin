@@ -5,21 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsComposerMap, QgsComposerLabel as QgsLayoutItemLabel
-    from qgis.gui import  QgsComposerView
-    from qgis.PyQt.QtGui import QPrintDialog, QPrinter, QDialog
-else:
-    from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
-    from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
+from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
 
 from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QLineEdit, QDialog
 
 import json
@@ -114,11 +105,7 @@ class ApiManageComposer(ApiParent):
         selected_com = self.get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                composition = selected_com.composition()
-                item = composition.getComposerItemById(widget.property('column_id'))
-            else:
-                item = selected_com.itemById(widget.property('column_id'))
+            item = selected_com.itemById(widget.property('column_id'))
             if type(item) != QgsLayoutItemLabel or item is None:
                 widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
@@ -134,17 +121,10 @@ class ApiManageComposer(ApiParent):
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
 
         if selected_com is not None:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                composition = selected_com.composition()
-                for widget in widget_list:
-                    item = composition.getComposerItemById(widget.property('column_id'))
-                    if type(item) == QgsLayoutItemLabel:
-                        widget.setText(item.text())
-            else:
-                for widget in widget_list:
-                    item = selected_com.itemById(widget.property('column_id'))
-                    if type(item) == QgsLayoutItemLabel:
-                        widget.setText(str(item.text()))
+            for widget in widget_list:
+                item = selected_com.itemById(widget.property('column_id'))
+                if type(item) == QgsLayoutItemLabel:
+                    widget.setText(str(item.text()))
 
 
     def open_composer(self, dialog):
@@ -152,10 +132,7 @@ class ApiManageComposer(ApiParent):
 
         selected_com = self.get_current_composer()
         if selected_com is not None:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                selected_com.composerWindow().show()
-            else:
-                self.iface.openLayoutDesigner(layout=selected_com)
+            self.iface.openLayoutDesigner(layout=selected_com)
 
         self.load_composer_values(dialog)
 
@@ -168,21 +145,12 @@ class ApiManageComposer(ApiParent):
         selected_com = self.get_current_composer()
         widget_list = dialog.findChildren(QLineEdit)
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            selected_com.composerWindow().show()
-            composition = selected_com.composition()
-            for widget in widget_list:
-                item = composition.getComposerItemById(widget.property('column_id'))
-                if type(item) == QgsLayoutItemLabel:
-                    item.setText(str(widget.text()))
-            composition.refreshItems()
-            composition.update()
-        else:
-            for widget in widget_list:
-                item = selected_com.itemById(widget.property('column_id'))
-                if type(item) == QgsLayoutItemLabel:
-                    item.setText(str(widget.text()))
-                    item.refresh()
+        for widget in widget_list:
+            print(f"{widget.objectName()} --> {widget.text()}")
+            item = selected_com.itemById(widget.property('column_id'))
+            if type(item) == QgsLayoutItemLabel:
+                item.setText(str(widget.text()))
+                item.refresh()
         if show:
             self.open_composer(dialog)
 
@@ -202,16 +170,10 @@ class ApiManageComposer(ApiParent):
         active_composers = self.get_composers_list()
 
         for composer in active_composers:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                if type(composer) == QgsComposerView:
-                    if composer != removed and composer.composerWindow():
-                        cur = composer.composerWindow().windowTitle()
-                        composers += cur + ', '
-            else:
-                if type(composer) == QgsPrintLayout:
-                    if composer != removed and composer.name():
-                        cur = composer.name()
-                        composers += cur + ', '
+            if type(composer) == QgsPrintLayout:
+                if composer != removed and composer.name():
+                    cur = composer.name()
+                    composers += cur + ', '
         if len(composers) > 2:
             composers = composers[:-2] + '}"'
         else:
@@ -233,14 +195,9 @@ class ApiManageComposer(ApiParent):
         selected_com = None
         active_composers = self.get_composers_list()
         for composer in active_composers:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                if composer.composerWindow().windowTitle() == self.my_json['composer']:
-                    selected_com = composer
-                    break
-            else:
-                if composer.name() == self.my_json['composer']:
-                    selected_com = composer
-                    break
+            if composer.name() == self.my_json['composer']:
+                selected_com = composer
+                break
 
         return selected_com
 
@@ -258,17 +215,13 @@ class ApiManageComposer(ApiParent):
         if printdialog.exec_() != QDialog.Accepted:
             return
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            print_ = getattr(selected_com.composition(), 'print')
-            success = print_(self.printer)
-        else:
-            actual_printer = QgsLayoutExporter(selected_com)
-            # The correct instruction for python3 is:
-            # success = actual_printer.print(self.printer, QgsLayoutExporter.PrintExportSettings())
-            # but python2 produces an error in the word 'print' at actual_printer.print(...),
-            # then we need to create a fake to cheat python2
-            print_ = getattr(actual_printer, 'print')
-            success = print_(self.printer, QgsLayoutExporter.PrintExportSettings())
+        actual_printer = QgsLayoutExporter(selected_com)
+        # The correct instruction for python3 is:
+        # success = actual_printer.print(self.printer, QgsLayoutExporter.PrintExportSettings())
+        # but python2 produces an error in the word 'print' at actual_printer.print(...),
+        # then we need to create a fake to cheat python2
+        print_ = getattr(actual_printer, 'print')
+        success = print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
 
     def update_rectangle(self, dialog, my_json):
@@ -303,33 +256,18 @@ class ApiManageComposer(ApiParent):
         active_composers = self.get_composers_list()
         for composer in active_composers:
             composer_map = []
-            if Qgis.QGIS_VERSION_INT < 29900:
-                composer_template = {'ComposerTemplate': composer.composerWindow().windowTitle()}
-                # Get map(item) from each composer template
-                index = 0
-                for item in composer.composition().items():
-                    cur_map = {}
-                    if isinstance(item, QgsComposerMap):
-                        cur_map['width'] = item.rect().width()
-                        cur_map['height'] = item.rect().height()
-                        cur_map['name'] = item.displayName()
-                        cur_map['index'] = index
-                        composer_map.append(cur_map)
-                        composer_template['ComposerMap'] = composer_map
-                        index += 1
-            else:
-                composer_template = {'ComposerTemplate': composer.name()}
-                index = 0
-                for item in composer.items():
-                    cur_map = {}
-                    if isinstance(item, QgsLayoutItemMap):
-                        cur_map['width'] = item.rect().width()
-                        cur_map['height'] = item.rect().height()
-                        cur_map['name'] = item.displayName()
-                        cur_map['index'] = index
-                        composer_map.append(cur_map)
-                        composer_template['ComposerMap'] = composer_map
-                        index += 1
+            composer_template = {'ComposerTemplate': composer.name()}
+            index = 0
+            for item in composer.items():
+                cur_map = {}
+                if isinstance(item, QgsLayoutItemMap):
+                    cur_map['width'] = item.rect().width()
+                    cur_map['height'] = item.rect().height()
+                    cur_map['name'] = item.displayName()
+                    cur_map['index'] = index
+                    composer_map.append(cur_map)
+                    composer_template['ComposerMap'] = composer_map
+                    index += 1
             composer_templates.append(composer_template)
             my_json['ComposerTemplates'] = composer_templates
 
@@ -364,18 +302,11 @@ class ApiManageComposer(ApiParent):
         active_composers = self.get_composers_list()
         for composer in active_composers:
             maps = []
-            if Qgis.QGIS_VERSION_INT < 29900:
-                if composer.composerWindow().windowTitle() == composer_name:
-                    for item in composer.composition().items():
-                        if isinstance(item, QgsComposerMap):
-                            maps.append(item)
-                    break
-            else:
-                if composer.name() == composer_name:
-                    for item in composer.items():
-                        if isinstance(item, QgsLayoutItemMap):
-                            maps.append(item)
-                    break
+            if composer.name() == composer_name:
+                for item in composer.items():
+                    if isinstance(item, QgsLayoutItemMap):
+                        maps.append(item)
+                break
 
         if len(maps) > 0:
             if rotation is None or rotation == 0:
@@ -384,10 +315,7 @@ class ApiManageComposer(ApiParent):
                 scale = self.iface.mapCanvas().scale()
             self.iface.mapCanvas().setRotation(float(rotation))
             maps[map_index].zoomToExtent(self.iface.mapCanvas().extent())
-            if Qgis.QGIS_VERSION_INT < 29900:
-                maps[map_index].setNewScale(float(scale))
-            else:
-                maps[map_index].setScale(float(scale))
+            maps[map_index].setScale(float(scale))
             maps[map_index].setMapRotation(float(rotation))
 
         return True

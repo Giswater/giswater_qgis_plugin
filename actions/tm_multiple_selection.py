@@ -5,20 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint as QgsPointXY
-    from qgis.gui import QgsMapCanvasSnapper
-else:
-    from qgis.core import QgsPointXY
-    from qgis.gui import QgsMapCanvas
-
-from qgis.core import QgsRectangle
-from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.core import QgsPointXY, QgsRectangle
+from qgis.gui import QgsMapCanvas, QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QApplication
@@ -170,10 +159,6 @@ class TmMultipleSelection(QgsMapTool):
     def get_snapper(self):
         """ Return snapper """
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            snapper = QgsMapCanvasSnapper(self.canvas)
-        else:
-            snapper = QgsMapCanvas.snappingUtils(self.canvas)
-
+        snapper = QgsMapCanvas.snappingUtils(self.canvas)
         return snapper
 
