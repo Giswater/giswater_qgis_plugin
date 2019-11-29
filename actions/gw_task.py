@@ -64,17 +64,17 @@ class GwTask(QgsTask, QObject):
         operations and raise Python exceptions here.
         """
         if result:
-            QgsMessageLog.logMessage(f'Task "{self.description()}" completed', MESSAGE_CATEGORY, Qgis.Success)
+            QgsMessageLog.logMessage(f'Task {self.description()} completed', MESSAGE_CATEGORY, Qgis.Success)
         else:
             if self.exception is None:
-                QgsMessageLog.logMessage(f'Task "{self.description()}" not successful but without exception ',
+                QgsMessageLog.logMessage(f'Task {self.description()} not successful but without exception ',
                                          MESSAGE_CATEGORY, Qgis.Warning)
             else:
-                QgsMessageLog.logMessage(f'Task "{self.description()}" Exception: {self.exception}',
+                QgsMessageLog.logMessage(f'Task {self.description()} Exception: {self.exception}',
                                          MESSAGE_CATEGORY, Qgis.Critical)
                 raise self.exception
 
 
     def cancel(self):
-        QgsMessageLog.logMessage(f'Task "{self.description()}" was cancelled', MESSAGE_CATEGORY, Qgis.Info)
+        QgsMessageLog.logMessage(f'Task {self.description()} was cancelled', MESSAGE_CATEGORY, Qgis.Info)
         super().cancel()
