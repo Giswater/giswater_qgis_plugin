@@ -1367,7 +1367,8 @@ class ManageNewPsector(ParentManage):
 
 
     def show_status_warning(self):
-        msg = "WARNING: You have been updated the status value.  If you click OK on the main dialog, a process will be " \
-              "triggered to update the state & state_type values of all that features that belongs on the psector " \
-              "according with the system variables plan_psector_statetype, plan_statetype_planned, plan_statetype_ficticious"
+        msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
+              "a process that updates the state & state_type values of all that features that belong to the psector, " \
+              "according to the system variables plan_psector_statetype, " \
+              "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
         result = self.controller.show_details(msg, 'Message warning')
