@@ -148,7 +148,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
-            row = self.controller.get_row(sql)
+            row = self.controller.get_row(sql, commit=True)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
                 builtdate = self.manage_dates(row[0])
@@ -227,7 +227,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
                     self.controller.execute_sql(sql, log_sql=True)
 
                     sql = "SELECT id FROM cat_work ORDER BY id"
-                    rows = self.controller.get_rows(sql)
+                    rows = self.controller.get_rows(sql, commit=True)
                     if rows:
                         utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
