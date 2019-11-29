@@ -87,7 +87,7 @@ class NotifyFunctions(ParentAction):
                 self.conn_failed = False
 
             # Initialize thread
-            thread = threading.Timer(interval=0.1, function=self.wait_notifications)
+            thread = threading.Timer(interval=1, function=self.wait_notifications)
             thread.start()
 
             # Check if any notification to process
