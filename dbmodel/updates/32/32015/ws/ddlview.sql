@@ -547,7 +547,6 @@ CREATE OR REPLACE VIEW v_edit_connec AS
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id;
 	 
 
-DROP VIEW IF EXISTS v_edit_vnode;
 DROP VIEW IF EXISTS v_edit_link;
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
