@@ -14,38 +14,18 @@ $BODY$
 DECLARE 
 	v_schemaname text;
 	v_project_type text;
-
 	v_feature_system_id text;
-	v_class_name text;
-	v_active boolean;
-	v_visit_type integer;
-	v_ismultievent boolean;
-	v_ismultifeature boolean;
-	v_data_type text;
-	v_parameter_type text;
-	v_descript text;
-	v_form_type text;
-	v_vdefault text;
-	v_short_descript text;
-	v_action text;
-	v_param_options text;
 	v_class_id integer;
-	v_action_type text;
-	v_param_name text;
-	v_code text;
-
-
 	v_om_visit_x_feature_fields text;
 	v_om_visit_fields text;
-	v_old_parameters record;
 	v_new_parameters record;
 	v_viewname text;
 	v_definition text;
-	v_old_viewname text;
 	v_old_a_param text;
 	v_old_ct_param text;
 	v_old_id_param text;
 	v_old_datatype text;
+
 BEGIN
 
 SET search_path = "SCHEMA_NAME", public;

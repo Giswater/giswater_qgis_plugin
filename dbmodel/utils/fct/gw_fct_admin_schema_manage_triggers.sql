@@ -17,14 +17,11 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk',null);
 */
 DECLARE
-	v_action text;
+
 	rec record;
-	rec_view record;
-	v_query text;
 	v_version text;
-	v_trg_fields text;
 	v_notify_action json;
-	aux_json record;  
+	rec_json record;  
 
 BEGIN
 	
@@ -39,21 +36,21 @@ BEGIN
 		FOR rec IN (select * FROM audit_cat_table WHERE notify_action IS NOT NULL AND context !='view from external schema') LOOP
 			v_notify_action = rec.notify_action;
 
-			FOR aux_json IN  SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'trg_fields' as trg_fields,(a)->>'featureType' as featureType 
+			FOR rec_json IN  SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'trg_fields' as trg_fields,(a)->>'featureType' as featureType 
 			FROM json_array_elements(v_notify_action) a LOOP
 
 				IF (rec.id ILIKE 'v_%' OR rec.id ILIKE 've_%' OR rec.id ILIKE 'vi_%') AND rec.id != 'vnode' 
-				AND rec.id not ilike 'value%' AND aux_json.action = 'desktop' THEN
+				AND rec.id not ilike 'value%' AND rec_json.action = 'desktop' THEN
 
 					EXECUTE 'DROP TRIGGER IF EXISTS  gw_trg_notify ON '||rec.id||';';
 					EXECUTE  'CREATE TRIGGER gw_trg_notify 
-							INSTEAD OF INSERT OR UPDATE OF '||aux_json.trg_fields||' OR DELETE ON '||rec.id||'
+							INSTEAD OF INSERT OR UPDATE OF '||rec_json.trg_fields||' OR DELETE ON '||rec.id||'
 							FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('''||rec.id||''');';
 					
 				ELSE
 					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_notify ON '||rec.id||';';
 					EXECUTE 'CREATE TRIGGER gw_trg_notify 
-							AFTER INSERT OR UPDATE OF '||aux_json.trg_fields||' OR DELETE ON '||rec.id||'
+							AFTER INSERT OR UPDATE OF '||rec_json.trg_fields||' OR DELETE ON '||rec.id||'
 							FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('''||rec.id||''');';
 					
 				END IF;
