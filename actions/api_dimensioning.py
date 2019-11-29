@@ -9,7 +9,7 @@ or (at your option) any later version.
 from qgis.core import Qgis, QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 
-from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
     QSpacerItem, QWidget
 
@@ -49,11 +49,11 @@ class ApiDimensioning(ApiParent):
 
         # Set signals
         actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
-        actionSnapping.triggered.connect(self.snapping)
+        actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
         self.set_icon(actionSnapping, "103")
 
         actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
-        actionOrientation.triggered.connect(self.orientation)
+        actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
         self.set_icon(actionOrientation, "133")
 
         self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature, layer))
@@ -142,11 +142,33 @@ class ApiDimensioning(ApiParent):
         self.close_dialog(self.dlg_dim)
 
 
-    def snapping(self):
+    def deactivate_signals(self, action):
+        self.snapper_manager.remove_marker()
+        try:
+            self.canvas.xyCoordinates.disconnect()
+        except TypeError as e:
+            pass
+
+        try:
+            self.emit_point.canvasClicked.disconnect()
+        except TypeError as e:
+            pass
+
+        if not action.isChecked():
+            action.setChecked(False)
+            return True
+        return False
+
+
+    def snapping(self, action):
         # Set active layer and set signals
+        if self.deactivate_signals(action): return
+
+        self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
-        self.emit_point.canvasClicked.connect(self.click_button_snapping)
+        self.emit_point.canvasClicked.connect(partial(self.click_button_snapping, action))
+
 
     def mouse_move(self, point):
 
@@ -163,10 +185,16 @@ class ApiDimensioning(ApiParent):
                 self.snapper_manager.add_marker(result)
 
 
-    def click_button_snapping(self, point, btn):
+    def click_button_snapping(self, action, point, btn):
 
         if not self.layer_dimensions:
             return
+
+        if btn == Qt.RightButton:
+            if btn == Qt.RightButton:
+                action.setChecked(False)
+                self.deactivate_signals(action)
+                return
 
         layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
@@ -218,14 +246,21 @@ class ApiDimensioning(ApiParent):
             utils_giswater.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
 
-    def orientation(self):
+    def orientation(self, action):
+        if self.deactivate_signals(action): return
 
-        self.emit_point.canvasClicked.connect(self.click_button_orientation)
+        self.dlg_dim.actionSnapping.setChecked(False)
+        self.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
 
 
-    def click_button_orientation(self, point):
+    def click_button_orientation(self, action, point, btn):
 
         if not self.layer_dimensions:
+            return
+
+        if btn == Qt.RightButton:
+            action.setChecked(False)
+            self.deactivate_signals(action)
             return
 
         self.x_symbol = self.dlg_dim.findChild(QLineEdit, "x_symbol")
