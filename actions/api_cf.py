@@ -575,7 +575,7 @@ class ApiCF(ApiParent, QObject):
         try:
 
             row = self.controller.get_config('qgis_toggledition_forceopen')
-            if not row or row[0].upper() != "TRUE" and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+            if (not row or row[0].upper() != "TRUE") and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
                 self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         except  KeyError as e:
             pass
