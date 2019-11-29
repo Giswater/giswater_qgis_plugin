@@ -5,7 +5,7 @@ from ..ui_manager import SelectorDate
 from qgis.core import QgsApplication, QgsTask, QgsMessageLog, Qgis
 
 
-MESSAGE_CATEGORY = 'Executing task'
+MESSAGE_CATEGORY = 'giswater'
 class GwTask(QgsTask, QObject):
     """This shows how to subclass QgsTask"""
     fake_progress = pyqtSignal()
@@ -48,12 +48,10 @@ class GwTask(QgsTask, QObject):
                 #     # this would crash QGIS
                 #     self.exception = Exception('bad value!')
                 #     return False
+
             return True
 
 
-    def open_form(self):
-        dlg =SelectorDate()
-        dlg.open()
 
 
     def finished(self, result):

@@ -499,10 +499,10 @@ class Go2Epa(ApiParent):
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
-        task_rpt_to_db = GwTask('Import RPT to database')
-        QgsApplication.taskManager().addTask(task_rpt_to_db)
+        self.task_rpt_to_db = GwTask('Import RPT to database')
+        QgsApplication.taskManager().addTask(self.task_rpt_to_db)
         for line_number, row in enumerate(full_file):
-            task_rpt_to_db.setProgress((line_number * 100) / row_count)
+            self.task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
             row = row.rstrip()
