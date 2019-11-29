@@ -18,16 +18,17 @@
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsExpression, QgsProject, QgsWkbTypes
+from qgis.core import QgsDataSourceUri, QgsExpression, QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
+from qgis.PyQt.QtWidgets import QTabWidget
 
 import os
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
-
+from .. import utils_giswater
 from .snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import GwDialog, GwMainWindow
 
@@ -380,3 +381,53 @@ class ParentMapTool(QgsMapTool):
                     ln.setData(Qt.Unchecked, Qt.CheckStateRole)
                     ln.setData(Qt.Checked, Qt.CheckStateRole)
                     ln.setData(current_state, Qt.CheckStateRole)
+
+
+    def put_layer_into_toc(self, tablename=None, the_geom="the_geom", field_id="id", group='GW Layers'):
+        """ Put layer from postgres DB into TOC"""
+        schema_name = self.controller.credentials['schema'].replace('"', '')
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
+                          self.controller.credentials['db'], self.controller.credentials['user'],
+                          self.controller.credentials['password'])
+        if not field_id:
+            field_id = self.controller.get_pk(tablename)
+            if not field_id:
+                field_id = "id"
+        uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+        layer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
+
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup(group)
+        if my_group is None:
+            my_group = root.insertGroup(0, group)
+
+        my_group.insertLayer(0, layer)
+        self.iface.mapCanvas().refresh()
+        return layer
+
+
+    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
+
+        change_tab = False
+        text = utils_giswater.getWidgetText(dialog, 'txt_infolog', return_string_null=False)
+        if reset_text:
+            text = ""
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    if force_tab:
+                        change_tab = True
+                else:
+                    text += "\n"
+
+        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        if change_tab and qtabwidget is not None:
+            qtabwidget.setCurrentIndex(tab_idx)
+
+        return change_tab
+
+
+

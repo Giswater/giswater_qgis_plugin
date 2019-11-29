@@ -350,9 +350,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Fill tab 'Info log'
             if complet_result and complet_result[0]['status'] == "Accepted":
-                qtabwidget = self.dlg_replace.info_log
-                qtextedit = self.dlg_replace.txt_infolog
-                self.populate_info_text(self.dlg_replace, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+                self.populate_info_text(self.dlg_replace, complet_result[0]['body']['data'])
 
             # Refresh canvas
             self.refresh_map_canvas()
@@ -666,22 +664,4 @@ class ReplaceFeatureMapTool(ParentMapTool):
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.id, rows)
         
 
-    def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
-
-        change_tab = False
-        text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
-        if reset_text:
-            text = ""
-        for item in data['info']['values']:
-            if 'message' in item:
-                if item['message'] is not None:
-                    text += str(item['message']) + "\n"
-                    if force_tab:
-                        change_tab = True
-                else:
-                    text += "\n"
-
-        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
-        if change_tab:
-            qtabwidget.setCurrentIndex(1)
 
