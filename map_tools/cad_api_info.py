@@ -114,6 +114,7 @@ class CadApiInfo(ParentMapTool):
 
         for rb in self.rubberband_list:
             rb.reset()
-        self.info_cf.resetRubberbands()
+        if hasattr(self, 'info_cf'):
+            self.info_cf.resetRubberbands()
         ParentMapTool.deactivate(self)
 
