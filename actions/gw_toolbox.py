@@ -6,8 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 
-from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsProject, QgsVectorLayer
-from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
 from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
@@ -537,63 +536,4 @@ class GwToolBox(ApiParent):
             return 0
 
 
-    def add_temp_layer(self, dialog, data, function_name):
-
-        self.delete_layer_from_toc(function_name)
-        srid = self.controller.plugin_settings_value('srid')
-        qtabwidget = dialog.mainTab
-        qtextedit = dialog.txt_infolog
-        for k, v in list(data.items()):
-            if str(k) == "info":
-                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
-            else:
-                counter = len(data[k]['values'])
-                if counter > 0:
-                    counter = len(data[k]['values'])
-                    geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
-                    self.populate_vlayer(v_layer, data, k, counter)
-                    # TODO delete this 'if' when all functions are refactored
-                    if 'qmlPath' in data[k]:
-                        qml_path = data[k]['qmlPath']
-                        self.load_qml(v_layer, qml_path)
-
-
-    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
-
-        prov = virtual_layer.dataProvider()
-
-        # Enter editing mode
-        virtual_layer.startEditing()
-        if counter > 0:
-            for key, value in list(data[layer_type]['values'][0].items()):
-                # add columns
-                if str(key) != 'the_geom':
-                    prov.addAttributes([QgsField(str(key), QVariant.String)])
-
-        # Add features
-        for item in data[layer_type]['values']:
-            attributes = []
-            fet = QgsFeature()
-
-            for k, v in list(item.items()):
-                if str(k) != 'the_geom':
-                    attributes.append(v)
-                if str(k) in 'the_geom':
-                    sql = f"SELECT St_AsText('{v}')"
-                    row = self.controller.get_row(sql, log_sql=False)
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
-            fet.setAttributes(attributes)
-            prov.addFeatures([fet])
-
-        # Commit changes
-        virtual_layer.commitChanges()
-        QgsProject.instance().addMapLayer(virtual_layer, False)
-        root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup('GW Functions results')
-        if my_group is None:
-            my_group = root.insertGroup(0, 'GW Functions results')
-
-        my_group.insertLayer(0, virtual_layer)
 

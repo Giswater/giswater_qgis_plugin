@@ -65,12 +65,10 @@ class DuplicatePsector(ParentManage, QObject):
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         # Populate tab info
-        qtabwidget = self.dlg_duplicate_psector.mainTab
-        qtextedit = self.dlg_duplicate_psector.txt_infolog
         data = complet_result[0]['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.populate_info_text(self.dlg_duplicate_psector, qtabwidget, qtextedit, data)
+                change_tab = self.populate_info_text(self.dlg_duplicate_psector, data)
         # Close dialog
         if not change_tab:
             self.close_dialog(self.dlg_duplicate_psector)

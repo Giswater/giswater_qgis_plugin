@@ -5,10 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
+from qgis.core import QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsProject, QgsRectangle, QgsVectorLayer
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QVariant
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
@@ -786,10 +786,30 @@ class ParentAction(object):
         return body
 
 
-    def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
+    def add_temp_layer(self, dialog, data, function_name):
+
+        self.delete_layer_from_toc(function_name)
+        srid = self.controller.plugin_settings_value('srid')
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                self.populate_info_text(dialog, data)
+            else:
+                counter = len(data[k]['values'])
+                if counter > 0:
+                    counter = len(data[k]['values'])
+                    geometry_type = data[k]['geometryType']
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
+                    self.populate_vlayer(v_layer, data, k, counter)
+                    # TODO delete this 'if' when all functions are refactored
+                    if 'qmlPath' in data[k]:
+                        qml_path = data[k]['qmlPath']
+                        self.load_qml(v_layer, qml_path)
+
+
+    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
 
         change_tab = False
-        text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
+        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
         if reset_text:
             text = ""
         for item in data['info']['values']:
@@ -801,11 +821,51 @@ class ParentAction(object):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
+        utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
+        qtabwidget = dialog.findChild(QTabWidget,'mainTab')
         if change_tab and qtabwidget is not None:
-            qtabwidget.setCurrentIndex(1)
+            qtabwidget.setCurrentIndex(tab_idx)
 
         return change_tab
+
+
+    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
+
+        prov = virtual_layer.dataProvider()
+
+        # Enter editing mode
+        virtual_layer.startEditing()
+        if counter > 0:
+            for key, value in list(data[layer_type]['values'][0].items()):
+                # add columns
+                if str(key) != 'the_geom':
+                    prov.addAttributes([QgsField(str(key), QVariant.String)])
+
+        # Add features
+        for item in data[layer_type]['values']:
+            attributes = []
+            fet = QgsFeature()
+
+            for k, v in list(item.items()):
+                if str(k) != 'the_geom':
+                    attributes.append(v)
+                if str(k) in 'the_geom':
+                    sql = f"SELECT St_AsText('{v}')"
+                    row = self.controller.get_row(sql, log_sql=False)
+                    geometry = QgsGeometry.fromWkt(str(row[0]))
+                    fet.setGeometry(geometry)
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        # Commit changes
+        virtual_layer.commitChanges()
+        QgsProject.instance().addMapLayer(virtual_layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup('GW Functions results')
+        if my_group is None:
+            my_group = root.insertGroup(0, 'GW Functions results')
+
+        my_group.insertLayer(0, virtual_layer)
 
 
     def get_composers_list(self):

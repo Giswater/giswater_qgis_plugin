@@ -3177,11 +3177,9 @@ class UpdateSQL(ApiParent):
 
     def set_log_text(self, dialog, data):
 
-        qtabwidget = dialog.mainTab
-        qtextedit = dialog.txt_infolog
         for k, v in list(data.items()):
             if str(k) == "info":
-                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
+                self.populate_info_text(dialog, data)
 
 
     def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):

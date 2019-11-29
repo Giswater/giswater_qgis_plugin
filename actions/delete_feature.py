@@ -139,12 +139,10 @@ class DeleteFeature(ApiParent):
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         # Populate tab info
-        qtabwidget = self.dlg_delete_feature.mainTab
-        qtextedit = self.dlg_delete_feature.txt_infolog_delete
         data = complet_result[0]['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.populate_info_text(self.dlg_delete_feature, qtabwidget, qtextedit, data)
+                change_tab = self.populate_info_text(self.dlg_delete_feature, data)
 
         self.dlg_delete_feature.btn_cancel.setText('Accept')
         # Close dialog
