@@ -430,29 +430,30 @@ class DrawProfiles(ParentMapTool):
                         self.start_end_node[1] = str(self.element_id)
                     self.exec_path()
                 self.layer_feature = self.layer_node
-        # widget = clicked button
-        # self.widget_start_point | self.widget_end_point : QLabels
-        # start_end_node = [0] : node start | start_end_node = [1] : node end
-        aux = ""
-        if str(self.widget_point.objectName()) == "start_point":
-            self.start_end_node[0] = self.widget_point.text()
-            aux = f"node_id = '{self.start_end_node[0]}'"
+            # widget = clicked button
+            # self.widget_start_point | self.widget_end_point : QLabels
+            # start_end_node = [0] : node start | start_end_node = [1] : node end
 
-        if str(self.widget_point.objectName()) == "end_point":
-            self.start_end_node[1] = self.widget_point.text()
-            aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
+            aux = ""
+            if str(self.widget_point.objectName()) == "start_point":
+                self.start_end_node[0] = self.widget_point.text()
+                aux = f"node_id = '{self.start_end_node[0]}'"
 
-        if str(self.widget_point.objectName()) == "list_sdditional_points":
-            # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
-            aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
-            for i in range(2, len(self.start_end_node)):
-                aux += f" OR node_id = '{self.start_end_node[i]}'"
+            if str(self.widget_point.objectName()) == "end_point":
+                self.start_end_node[1] = self.widget_point.text()
+                aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
 
-        # Select snapped features
-        selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-        self.layer_feature.selectByIds([k.id() for k in selection])
+            if str(self.widget_point.objectName()) == "list_sdditional_points":
+                # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
+                aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
+                for i in range(2, len(self.start_end_node)):
+                    aux += f" OR node_id = '{self.start_end_node[i]}'"
 
-        self.exec_path()
+            # Select snapped features
+            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+            self.layer_feature.selectByIds([k.id() for k in selection])
+
+            self.exec_path()
 
 
     def paint_event(self, arc_id, node_id):
