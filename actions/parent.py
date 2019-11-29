@@ -786,13 +786,13 @@ class ParentAction(object):
         return body
 
 
-    def add_temp_layer(self, dialog, data, function_name):
+    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1):
 
         self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == "info":
-                self.populate_info_text(dialog, data)
+                self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:

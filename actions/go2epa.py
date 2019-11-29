@@ -637,7 +637,7 @@ class Go2Epa(ApiParent):
         self.show_widgets(True)
 
         counter = 0
-        force_tab = False
+
         extras = '"iterative":"off"'
         if is_iterative:
             extras = '"iterative":"start"'
@@ -677,10 +677,7 @@ class Go2Epa(ApiParent):
             # Export to inp file
             if export_inp is True:
                 if complet_result[0]['status'] == "Accepted":
-                    qtabwidget = self.dlg_go2epa.mainTab
-                    qtextedit = self.dlg_go2epa.txt_infolog
-                    self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'],
-                                            force_tab, False)
+                    self.add_temp_layer(self.dlg_go2epa, complet_result[0]['body']['data'], 'INP results', True, False)
                 message = complet_result[0]['message']['text']
 
                 # Get values from temp_csv2pg and insert into INP file
@@ -758,11 +755,9 @@ class Go2Epa(ApiParent):
                         rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
                         if 'status' in rpt_result[0]:
                             if rpt_result[0]['status'] == "Accepted":
-                                qtabwidget = self.dlg_go2epa.mainTab
-                                qtextedit = self.dlg_go2epa.txt_infolog
                                 if 'body' in rpt_result[0]:
                                     if 'data' in rpt_result[0]['body']:
-                                        self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit,  rpt_result[0]['body']['data'], force_tab, False)
+                                        self.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'], 'RPT results', force_tab, False)
                         message = rpt_result[0]['message']['text']
 
                     # final message
