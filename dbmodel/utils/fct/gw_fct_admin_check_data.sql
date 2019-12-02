@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_check_data(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT gw_fct_api_check_data($${"client":
+SELECT gw_fct_admin_check_data($${"client":
 {"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text
 */
