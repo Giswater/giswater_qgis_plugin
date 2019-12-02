@@ -5,44 +5,35 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis, QgsVectorLayer, QgsProject
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-
-from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
-    QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox, QAbstractButton, \
-    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
-from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import QSettings, Qt
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsTask, QgsApplication
+from qgis.core import Qgis, QgsVectorLayer, QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
+from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
+    QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox, QAbstractButton, \
+    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
+
 import os
 import sys
+import random
 import re
 import json
 import subprocess
-from time import sleep
-import random
-from functools import partial
-from collections import OrderedDict
 import xml.etree.cElementTree as ET
+
+from collections import OrderedDict
+from functools import partial
+from time import sleep
 
 from .. import utils_giswater
 from .api_parent import ApiParent
+from .create_gis_project import CreateGisProject
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
     ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
-from .create_gis_project import CreateGisProject
-
-
 
 
 class UpdateSQL(ApiParent):
@@ -2228,9 +2219,6 @@ class UpdateSQL(ApiParent):
             f = open(filedir + os.sep + file, 'r')
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value))
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    f_to_read.decode(str('utf-8-sig'))
-
                 if self.dev_commit == 'TRUE':
                     status = self.controller.execute_sql(str(f_to_read))
                 else:
@@ -2261,11 +2249,7 @@ class UpdateSQL(ApiParent):
             try:
                 f = open(filedir + os.sep + 'changelog.txt', 'r')
                 if f:
-                    if Qgis.QGIS_VERSION_INT < 29900:
-                        f_to_read = str(f.read()).decode(str('utf-8-sig'))
-                    else:
-                        f_to_read = str(f.read())
-                    f_to_read = f_to_read + '\n'
+                    f_to_read = str(f.read()) + '\n'
                     self.message_update = self.message_update + '\n' + str(f_to_read)
                 else:
                     return False
@@ -2525,12 +2509,7 @@ class UpdateSQL(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select UI file")
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            file_ui = QFileDialog.getSaveFileName(None, message, "", '*.ui')
-        else:
-            file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
-
+        file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
         utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
 
@@ -3151,12 +3130,7 @@ class UpdateSQL(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
-        else:
-            file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
-
+        file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
         self.dlg_readsql_create_project.data_file.setText(file_inp)
 
 
