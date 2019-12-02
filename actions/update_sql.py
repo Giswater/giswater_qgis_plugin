@@ -1404,7 +1404,7 @@ class UpdateSQL(ParentAction):
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.execute_import_data()
-            self.api(project_type=project_type)
+            self.api(new_api=True, project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             
         elif self.rdb_no_ct.isChecked():
@@ -1412,7 +1412,7 @@ class UpdateSQL(ParentAction):
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type, no_ct=True)
-            self.api(project_type=project_type)
+            self.api(new_api=True, project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             
         elif self.rdb_sample.isChecked():
@@ -1432,7 +1432,7 @@ class UpdateSQL(ParentAction):
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
-            self.api(project_type=project_type)
+            self.api(new_api=True, project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.load_sample_data(project_type=project_type)
 
@@ -1451,7 +1451,7 @@ class UpdateSQL(ParentAction):
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
-            self.api(project_type=project_type)
+            self.api(new_api=True, project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
@@ -1464,7 +1464,7 @@ class UpdateSQL(ParentAction):
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
-            self.api(project_type=project_type)
+            self.api(new_api=True,project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
         self.setArrowCursor()
 
