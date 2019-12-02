@@ -452,7 +452,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None, is_threading=False):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -464,17 +464,14 @@ class DaoController(object):
                 text = "Undefined error" 
                 if '-1' in self.log_codes:   
                     text = self.log_codes[-1]
-                if is_threading:
-                    self.log_warning(f"{self.dao.last_error}", stack_level_increase=1)
-                else:
-                    self.show_warning_detail(text, str(self.last_error))
+                self.show_warning_detail(text, str(self.last_error))
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False, is_threading=False):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         sql = self.get_sql(sql, log_sql, params)
@@ -487,10 +484,7 @@ class DaoController(object):
                 text = "Undefined error"
                 if '-1' in self.log_codes:
                     text = self.log_codes[-1]
-                if is_threading:
-                    self.log_warning(f"{self.dao.last_error}", stack_level_increase=1)
-                else:
-                    self.show_warning_detail(text, str(self.dao.last_error))
+                self.show_warning_detail(text, str(self.dao.last_error))
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
