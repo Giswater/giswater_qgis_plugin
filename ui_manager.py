@@ -443,11 +443,6 @@ class Mincut_fin(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_selector.ui')
-class Multi_selector(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('multirow_selector.ui')
 class Multirow_selector(GwDialog, FORM_CLASS):
     pass
