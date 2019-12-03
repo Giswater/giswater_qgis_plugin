@@ -51,7 +51,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fprocesscat_id=95 AND user_name=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (95, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (95, null, 4, concat('CHECK API CONFIGURATION'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (95, null, 4, '-------------------------------------------------------------');
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (95, null, 3, 'CRITICAL ERRORS');	
