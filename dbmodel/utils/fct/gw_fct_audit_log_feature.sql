@@ -10,13 +10,13 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_audit_log_feature(enabled_aux te
   RETURNS void AS
 $BODY$ 
 DECLARE
-project_type_aux varchar;
+v_project_type varchar;
 
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
 	
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	
 	------------------
 	-- ACTIVATE TRIGGER
@@ -51,7 +51,7 @@ BEGIN
 			  FOR EACH ROW
 			  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_audit_log_feature();
 				  
-			IF project_type_aux='UD' THEN
+			IF v_project_type='UD' THEN
 				  
 				CREATE TRIGGER gw_trg_audit_log_feature_gully
 				AFTER UPDATE OR DELETE
@@ -73,7 +73,7 @@ BEGIN
 			ALTER TABLE "SCHEMA_NAME".connec ENABLE TRIGGER gw_trg_audit_log_feature_connec;
 			ALTER TABLE "SCHEMA_NAME".element ENABLE TRIGGER gw_trg_audit_log_feature_element;
 
-			IF project_type_aux='UD' THEN
+			IF v_project_type='UD' THEN
 
 				ALTER TABLE "SCHEMA_NAME".gully ENABLE TRIGGER gw_trg_audit_log_feature_gully;
 			END IF;
@@ -91,7 +91,7 @@ BEGIN
 			ALTER TABLE "SCHEMA_NAME".connec DISABLE TRIGGER gw_trg_audit_log_feature_connec;
 			ALTER TABLE "SCHEMA_NAME".element DISABLE TRIGGER gw_trg_audit_log_feature_element;
 			
-			IF project_type_aux='UD' THEN
+			IF v_project_type='UD' THEN
 		
 			ALTER TABLE "SCHEMA_NAME".gully DISABLE TRIGGER gw_trg_audit_log_feature_gully;
 
