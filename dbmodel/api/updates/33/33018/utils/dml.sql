@@ -24,3 +24,8 @@ INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, la
        isautoupdate, isreload, layout_name, hidden)
 VALUES ('dimensioning', 'catalog','comment',1,2,true,'string', 'text', 'comment',false,false,true,false,false,
 'other_layout',false);
+
+-- 03/12/2019
+INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue', 'tabMincut', 'tabMincut');
+
+INSERT INTO config_api_form_tabs (id, formname, tabname, tablabel, tabtext, sys_role, tooltip) VALUES (700, 'mincut', 'tabMincut', 'Mincut', 'Mincut Selector', 'role_basic', 'Mincut');
