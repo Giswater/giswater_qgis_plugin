@@ -673,12 +673,12 @@ class AddNewLot(ParentManage):
 
     def set_values(self, lot_id):
 
-        sql = ("SELECT * FROM om_visit_lot "
-               "WHERE id ='"+str(lot_id)+"'")
+        sql = ("SELECT * from ext_workorder LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
+               "WHERE id ='" + str(lot_id) + "'")
         lot = self.controller.get_row(sql, commit=True)
         if lot:
-            if lot['serie'] is not None and lot['class_id'] is not None:
-                value = lot['serie'] + " " + lot['class_id']
+            if lot['ct'] is not None:
+                value = lot['ct']
                 utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot, value)
             index = self.dlg_lot.cmb_ot.currentIndex()
             self.set_ot_fields(index)
