@@ -29,3 +29,6 @@ VALUES ('dimensioning', 'catalog','comment',1,2,true,'string', 'text', 'comment'
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue', 'tabMincut', 'tabMincut');
 
 INSERT INTO config_api_form_tabs (id, formname, tabname, tablabel, tabtext, sys_role, tooltip) VALUES (700, 'mincut', 'tabMincut', 'Mincut', 'Mincut Selector', 'role_basic', 'Mincut');
+
+INSERT INTO config_api_list (id, tablename, query_text, device) VALUES (16, 'om_vehicle_x_parameters', 'SELECT * FROM om_vehicle_x_parameters', 3);
+
