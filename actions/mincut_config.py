@@ -19,9 +19,10 @@ from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
-from ..ui_manager import Multirow_selector
-from ..ui_manager import Mincut_edit
+
+from .api_parent import ApiParent
 from .parent import ParentAction
+from ..ui_manager import ApiSelector, Mincut_edit
 
 
 class MincutConfig(ParentAction):
@@ -35,7 +36,8 @@ class MincutConfig(ParentAction):
         self.controller = self.mincut.controller
         self.schema_name = self.controller.schema_name
         self.settings = self.mincut.settings
-        
+        self.api_parent = ApiParent(mincut.iface, self.settings, self.controller, self.plugin_dir)
+
 
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
@@ -76,13 +78,12 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.spn_next_days.setRange(-9999, 9999)
         self.dlg_min_edit.btn_next_days.clicked.connect(self.filter_by_days)
         self.dlg_min_edit.spn_next_days.valueChanged.connect(self.filter_by_days)
-        self.dlg_min_edit.btn_show.clicked.connect(self.show_selection)
         self.dlg_min_edit.btn_cancel_mincut.clicked.connect(self.set_state_cancel_mincut)
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
-        self.dlg_min_edit.btn_selector_mincut.clicked.connect(self.mincut_selector)
+        self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector, self.tbl_mincut_edit, 'id'))
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
         self.set_icon(self.btn_notify, "307")
@@ -226,25 +227,26 @@ class MincutConfig(ParentAction):
             self.tbl_mincut_edit.model().select()
 
 
-    def show_selection(self):
+    def mincut_selector(self, qtable, field_id):
+        """ Manage mincut selector """
+        model = qtable.model()
+        selected_mincuts = []
+        for x in range(0, model.rowCount()):
+            i = int(model.fieldIndex(field_id))
+            value=model.data(model.index(x, i))
+            selected_mincuts.append(value)
+        selector_values = f'{{"mincut": {selected_mincuts}, "state": []}}'
 
-        selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
+        self.dlg_selector = ApiSelector()
+        self.load_settings(self.dlg_selector)
+        self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
+        self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
 
-        sql = "DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = self.tbl_mincut_edit.model().record(row).value("id")
-            sql += (f"\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) "
-                    f"  VALUES(current_user, {id_});")
-        status = self.controller.execute_sql(sql)
-        if not status:
-            message = "Error updating table"
-            self.controller.show_warning(message, parameter='anl_mincut_result_selector')
-        self.mincut.set_visible_mincut_layers(True)
+        self.api_parent.get_selector(self.dlg_selector, selector_values)
+
+        self.open_dialog(self.dlg_selector, maximize_button=False)
+
+
 
 
     def populate_combos(self):
@@ -259,30 +261,6 @@ class MincutConfig(ParentAction):
         sql = "SELECT expl_id, name FROM exploitation ORDER BY name"
         rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
-
-
-    def mincut_selector(self):
-
-        self.dlg_mincut_sel = Multirow_selector()
-        self.load_settings(self.dlg_mincut_sel)
-
-        self.dlg_mincut_sel.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_mincut_sel))
-        self.dlg_mincut_sel.rejected.connect(partial(self.close_dialog, self.dlg_mincut_sel))
-        self.dlg_mincut_sel.setWindowTitle("Mincut selector")
-        utils_giswater.setWidgetText(self.dlg_mincut_sel, 'lbl_filter', self.controller.tr('Filter by: Mincut id', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_mincut_sel, 'lbl_unselected', self.controller.tr('Unselected mincut', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_mincut_sel, 'lbl_selected', self.controller.tr('Selected mincut', context_name='labels'))
-
-        tableleft = "v_ui_anl_mincut_result_cat"
-        tableright = "anl_mincut_result_selector"
-        field_id_left = "id"
-        field_id_right = "result_id"
-        hide_left = [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
-        self.multi_row_selector(self.dlg_mincut_sel, tableleft, tableright, field_id_left, field_id_right, hide_left=hide_left)
-        self.dlg_mincut_sel.btn_select.clicked.connect(partial(self.mincut.set_visible_mincut_layers))
-
-        # Open dialog
-        self.open_dialog(self.dlg_mincut_sel, maximize_button=False)
 
 
     def open_mincut(self):

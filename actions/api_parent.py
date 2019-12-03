@@ -1385,63 +1385,6 @@ class ApiParent(ParentAction):
             _json[str(widget.property('column_id'))] = str(value)
 
 
-    def set_selector(self, widget, table_name, column_name, state):
-        """ Send values to DB
-        :param widget: QCheckBox that has changed status
-        :param table_name: name of the table that we have to update
-        :param column_name: name of the column that we have to update
-        :param state: sent by widget when stateChange
-        """
-        extras = f'"selector_type":"{widget.property("selector_type")}", '
-        extras += f'"tableName":"{table_name}", '
-        extras += f'"column_id":"{column_name}", '
-        extras += f'"result_name":"{widget.objectName()}", '
-        extras += f'"result_value":"{widget.isChecked()}"'
-        body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_setselectors($${" + body + "}$$)::text")
-        self.controller.execute_sql(sql, log_sql=True)
-
-
-    def get_selector(self, dialog, selector_type):
-        """ Ask to DB for selectors and make dialog
-        :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
-        :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
-        """
-
-        main_tab = dialog.findChild(QTabWidget, 'main_tab')
-        extras = f'"selector_type":"{selector_type}"'
-        body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_getselectors($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
-        if not row:
-            return
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        for form_tab in complet_result[0]['body']['form']['formTabs']:
-            # Create one tab for each form_tab and add to QTabWidget
-            tab_widget = QWidget(main_tab)
-            tab_widget.setObjectName(form_tab['tabName'])
-            main_tab.addTab(tab_widget, form_tab['tabLabel'])
-
-            # Create a new QGridLayout and put it into tab
-            gridlayout = QGridLayout()
-            gridlayout.setObjectName("grl_" + form_tab['tabName'])
-            tab_widget.setLayout(gridlayout)
-
-            for order, field in enumerate(form_tab['fields']):
-                label = QLabel()
-                label.setObjectName('lbl_' + field['label'])
-                label.setText(field['label'])
-                widget = self.add_checkbox(field)
-                widget.setProperty('selector_type', form_tab['selectorType'])
-                widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['tableName'], field['column_id'] ))
-                widget.setLayoutDirection(Qt.RightToLeft)
-                field['layoutname'] = gridlayout.objectName()
-                field['layout_order'] = order
-                self.put_widgets(dialog, field, label, widget)
-            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-            gridlayout.addItem(vertical_spacer1)
-
-
     def set_function_associated(self, dialog, widget, field):
 
         function_name = 'no_function_associated'
@@ -1528,3 +1471,63 @@ class ApiParent(ParentAction):
             webbrowser.open(path)
 
 
+
+    def get_selector(self, dialog, selector_type):
+        """ Ask to DB for selectors and make dialog
+        :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
+        :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
+        """
+
+        main_tab = dialog.findChild(QTabWidget, 'main_tab')
+        extras = f'"selector_type":{selector_type}'
+        body = self.create_body(extras=extras)
+        sql = ("SELECT gw_api_getselectors($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if not row:
+            return
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        for form_tab in complet_result[0]['body']['form']['formTabs']:
+            # Create one tab for each form_tab and add to QTabWidget
+            tab_widget = QWidget(main_tab)
+            tab_widget.setObjectName(form_tab['tabName'])
+            main_tab.addTab(tab_widget, form_tab['tabLabel'])
+
+            # Create a new QGridLayout and put it into tab
+            gridlayout = QGridLayout()
+            gridlayout.setObjectName("grl_" + form_tab['tabName'])
+            tab_widget.setLayout(gridlayout)
+
+            for order, field in enumerate(form_tab['fields']):
+                label = QLabel()
+                label.setObjectName('lbl_' + field['label'])
+                label.setText(field['label'])
+                widget = self.add_checkbox(field)
+                widget.setProperty('selector_type', form_tab['selectorType'])
+                widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['tableName'], field['column_id'], form_tab['selectorType']))
+                widget.setLayoutDirection(Qt.RightToLeft)
+                field['layoutname'] = gridlayout.objectName()
+                field['layout_order'] = order
+                self.put_widgets(dialog, field, label, widget)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            gridlayout.addItem(vertical_spacer1)
+
+
+    def set_selector(self, widget, table_name, column_name, selector_type, state):
+        """ Send values to DB
+        :param widget: QCheckBox that has changed status
+        :param table_name: name of the table that we have to update
+        :param column_name: name of the column that we have to update
+        :param state: sent by widget when stateChange
+        """
+        extras = f'"selector_type":"{widget.property("selector_type")}", '
+        extras += f'"tableName":"{table_name}", '
+        extras += f'"column_id":"{column_name}", '
+        extras += f'"result_name":"{widget.objectName()}", '
+        extras += f'"result_value":"{widget.isChecked()}"'
+        body = self.create_body(extras=extras)
+        sql = ("SELECT gw_api_setselectors($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
+            print(layer_name)
+            self.controller.indexing_spatial_layer(layer_name)
