@@ -31,6 +31,7 @@ DECLARE
 	v_result_list text[];
 	v_label_selector json;
 	v_concat_label text;
+	v_filter_name text;
 
 BEGIN
 
@@ -62,14 +63,17 @@ BEGIN
 			EXECUTE 'SELECT value FROM config_param_system WHERE parameter = ''api_selector_label''' INTO v_label_selector;
 			v_concat_label = replace(replace(v_label_selector->>'mincut', '[',''),']','');
 			v_concat_label = replace(v_concat_label::text, ',',', '' '',');	
+			v_filter_name = replace(replace(v_selectors_list->>'mincut', '[','('),']',')');
 
 			-- Get exploitations, selected and unselected
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			SELECT concat(' || v_concat_label || ') AS label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 			FROM v_ui_anl_mincut_result_cat WHERE name IN (SELECT result_id FROM anl_mincut_result_selector WHERE cur_user=' || quote_literal(current_user) || ')
+			AND name IN '||v_filter_name||' 
 			UNION
 			SELECT concat(' || v_concat_label || ') AS label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-			FROM v_ui_anl_mincut_result_cat WHERE name NOT IN (SELECT result_id FROM anl_mincut_result_selector WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label) a'
+			FROM v_ui_anl_mincut_result_cat WHERE name NOT IN (SELECT result_id FROM anl_mincut_result_selector WHERE cur_user=' || quote_literal(current_user) || ') 
+			AND name IN '||v_filter_name||' ORDER BY label) a'
 			INTO v_formTabs_minuct; 
 			
 			
