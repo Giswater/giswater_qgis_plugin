@@ -29,12 +29,13 @@ from collections import OrderedDict
 from functools import partial
 from time import sleep
 
+
 from .. import utils_giswater
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
     ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
-
+from .gw_task import GwTask
 
 class UpdateSQL(ApiParent):
 
@@ -1370,6 +1371,10 @@ class UpdateSQL(ApiParent):
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
         self.locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_locale')
 
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(0)
+
         # Initial checks
         if self.rdb_import_data.isChecked():
             self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
@@ -1392,48 +1397,46 @@ class UpdateSQL(ApiParent):
                 else:
                     return
 
-        self.set_wait_cursor()
-
         # Common execution
         status = self.load_base(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-
+        self.task1.setProgress(10)
         status = self.update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-
+        self.task1.setProgress(20)
         status = self.load_views(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-
+        self.task1.setProgress(30)
         status = self.load_trg(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-
+        self.task1.setProgress(40)
         status = self.update_31to39(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-
+        self.task1.setProgress(50)
         status = self.api(new_api=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-
+        self.task1.setProgress(60)
         status = self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-
+        self.task1.setProgress(70)
         # Custom execution
         if self.rdb_import_data.isChecked():
             #TODO::
-            self.set_arrow_cursor()
+            self.task1.setProgress(100)
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             self.controller.show_info_box(msg, "Info")
@@ -1442,11 +1445,11 @@ class UpdateSQL(ApiParent):
 
         elif self.rdb_sample.isChecked():
             self.load_sample_data(project_type=project_type)
-
+            self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-
+            self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
             pass
 
@@ -1455,8 +1458,7 @@ class UpdateSQL(ApiParent):
 
     def manage_process_result(self, schema_name=None):
 
-        self.set_arrow_cursor()
-
+        self.task1.setProgress(100)
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Create project")
         if status:
@@ -1486,17 +1488,22 @@ class UpdateSQL(ApiParent):
             close_dlg_rename = False
             self.schema = str(create_project)
 
-        self.set_wait_cursor()
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(0)
         sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
         status = self.controller.execute_sql(sql, commit=False)
         if status:
             self.reload_fct_ftrg(project_type=self.project_type_selected)
+            self.task1.setProgress(20)
             self.reload_fct_ftrg(project_type='api')
+            self.task1.setProgress(40)
             self.api(False)
+            self.task1.setProgress(60)
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             status = self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
-        self.set_arrow_cursor()
+        self.task1.setProgress(100)
 
         # Show message
         status = (self.error_count == 0)
@@ -1516,9 +1523,9 @@ class UpdateSQL(ApiParent):
 
     def update_api(self):
 
-        self.set_wait_cursor()
+        self.task1.setProgress(50)
         self.api(False)
-        self.set_arrow_cursor()
+        self.task1.setProgress(100)
 
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Update API")
@@ -1533,17 +1540,17 @@ class UpdateSQL(ApiParent):
 
     def implement_api(self):
 
-        self.set_wait_cursor()
+        self.task1.setProgress(50)
         self.api(True)
-        self.set_arrow_cursor()
+        self.task1.setProgress(100)
 
 
     def load_custom_sql_files(self, dialog, widget):
 
         folder_path = utils_giswater.getWidgetText(dialog, widget)
-        self.set_wait_cursor()
+        self.task1.setProgress(50)
         self.load_sql(folder_path)
-        self.set_arrow_cursor()
+        self.task1.setProgress(100)
 
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Load custom SQL files")
@@ -1562,11 +1569,11 @@ class UpdateSQL(ApiParent):
         msg = "Are you sure to update the project schema to last version?"
         result = self.controller.ask_question(msg, "Info")
         if result:
-            self.set_wait_cursor()
+            self.task1.setProgress(50)
             status = self.load_updates(project_type, update_changelog=True)
             if status:
                 self.set_info_project()
-            self.set_arrow_cursor()
+            self.task1.setProgress(100)
         else:
             return
 
@@ -1591,18 +1598,24 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         self.schema = None
 
-        self.set_wait_cursor()
+
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(0)
         status = self.load_fct_ftrg(project_type=project_type)
+        self.task1.setProgress(20)
         if status:
             status = self.update_30to31(project_type=project_type)
+        self.task1.setProgress(40)
         if status:
             status = self.update_31to39(project_type=project_type)
+        self.task1.setProgress(60)
         if status:
             status = self.api(project_type=project_type)
+        self.task1.setProgress(80)
         if status:
             status = self.execute_last_process(schema_name=schema_name, locale=True)
-
-        self.set_arrow_cursor()
+        self.task1.setProgress(100)
 
         if update_changelog is False:
             status = (self.error_count == 0)
@@ -2035,9 +2048,9 @@ class UpdateSQL(ApiParent):
     def schema_file_to_db(self):
 
         if self.chk_schema_funcion.isChecked():
-            self.set_wait_cursor()
+            self.task1.setProgress(50)
             self.reload_fct_ftrg(self.project_type_selected)
-            self.set_arrow_cursor()
+            self.task1.setProgress(100)
 
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Reload")
@@ -2053,9 +2066,9 @@ class UpdateSQL(ApiParent):
     def api_file_to_db(self):
 
         if self.chk_api_funcion.isChecked():
-            self.set_wait_cursor()
+            self.task1.setProgress(50)
             self.reload_fct_ftrg('api')
-            self.set_arrow_cursor()
+            self.task1.setProgress(100)
 
         # Show message
         if self.error_count == 0:
@@ -2289,7 +2302,9 @@ class UpdateSQL(ApiParent):
         if accepted:
 
             # Set wait cursor
-            self.set_wait_cursor()
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
+            self.task1.setProgress(0)
 
             # Insert inp values into database
             self.insert_inp_into_db(self.file_inp)
@@ -2318,6 +2333,7 @@ class UpdateSQL(ApiParent):
             body = self.create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
+            self.task1.setProgress(50)
             if row:
                 complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
                 self.set_log_text(self.dlg_import_inp, complet_result[0]['body']['data'])
@@ -2365,7 +2381,7 @@ class UpdateSQL(ApiParent):
                 return
 
             # Set wait cursor
-            self.set_wait_cursor()
+            self.task1.setProgress(50)
 
             # Start read files
             qgis_files = sorted(os.listdir(self.folder_path))
@@ -2398,7 +2414,7 @@ class UpdateSQL(ApiParent):
                     f.close()
 
             # Set arrow cursor
-            self.set_arrow_cursor()
+            self.task1.setProgress(100)
 
             # Finish proces
             msg = "The QGIS Projects templates was correctly created."
