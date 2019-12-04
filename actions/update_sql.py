@@ -1929,7 +1929,10 @@ class UpdateSQL(ApiParent):
 
         # Set default lenaguage EN
         self.project_data_language = 'EN'
+
+        # Declare variables
         self.is_sample = None
+        self.filter_srid_value = ''
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
