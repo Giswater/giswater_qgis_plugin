@@ -1188,9 +1188,10 @@ class Giswater(QObject):
                 table_name = layer_source['table']
                 db_name = layer_source['db']
                 host_name = layer_source['host']
+                table_user = layer_source['user']
                 sql += ("\nINSERT INTO audit_check_project"
-                        " (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
-                        " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1);")
+                        " (table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user)"
+                        " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1, '"+str(table_user)+"');")
                 
         status = self.controller.execute_sql(sql)
         if not status:
