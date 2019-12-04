@@ -61,6 +61,7 @@ class DrawProfiles(ParentMapTool):
 
         self.list_of_selected_nodes = []
         self.nodes = []
+        self.rotation_vd_exist = False
 
 
     def activate(self):
@@ -355,6 +356,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.scale_vertical.setDisabled(False)
         self.dlg_draw_profile.scale_horizontal.setDisabled(False)
         self.close_dialog(self.dlg_load)
+        self.rotation_vd_exist = True
 
 
     def activate_snapping(self, emit_point):
