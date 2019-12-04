@@ -234,8 +234,7 @@ class MincutConfig(ParentAction):
             i = int(model.fieldIndex(field_id))
             value=model.data(model.index(x, i))
             selected_mincuts.append(value)
-        selector_values = f'{{"mincut": {selected_mincuts}, "state": []}}'
-
+        selector_values = f'{{"mincut": {{"ids":{selected_mincuts}, "table":"anl_mincut_result_selector", "view":"v_ui_anl_mincut_result_cat"}}}}'
         self.dlg_selector = ApiSelector()
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
@@ -244,8 +243,6 @@ class MincutConfig(ParentAction):
         self.api_parent.get_selector(self.dlg_selector, selector_values)
 
         self.open_dialog(self.dlg_selector, maximize_button=False)
-
-
 
 
     def populate_combos(self):
