@@ -55,47 +55,44 @@ BEGIN
 	FOREACH v_aux_json IN ARRAY fields_array
 	LOOP		
 
-	-- Tab Exploitation
-	IF v_aux_json->>'json_object_keys' = 'mincut' THEN
-		SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='mincut' AND tabname='tabMincut' ;
-		IF rec_tab.id IS NOT NULL THEN
+	SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname=v_aux_json->>'json_object_keys';
+	IF rec_tab.id IS NOT NULL THEN
 
-			EXECUTE 'SELECT value FROM config_param_system WHERE parameter = ''api_selector_label''' INTO v_label_selector;
-			v_concat_label = replace(replace(v_label_selector->>'mincut', '[',''),']','');
-			v_concat_label = replace(v_concat_label::text, ',',', '' '',');	
-			v_filter_name = replace(replace(v_selectors_list->>'mincut', '[','('),']',')');
-
-			-- Get exploitations, selected and unselected
-			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			SELECT concat(' || v_concat_label || ') AS label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-			FROM v_ui_anl_mincut_result_cat WHERE name IN (SELECT result_id FROM anl_mincut_result_selector WHERE cur_user=' || quote_literal(current_user) || ')
-			AND name IN '||v_filter_name||' 
-			UNION
-			SELECT concat(' || v_concat_label || ') AS label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-			FROM v_ui_anl_mincut_result_cat WHERE name NOT IN (SELECT result_id FROM anl_mincut_result_selector WHERE cur_user=' || quote_literal(current_user) || ') 
-			AND name IN '||v_filter_name||' ORDER BY label) a'
-			INTO v_formTabs_minuct; 
-			
-			
-			-- Add tab name to json
-			v_formTabs_minuct := ('{"fields":' || v_formTabs_minuct || '}')::json;
-			v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabName', 'selector_mincut'::TEXT);
-			v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tableName', 'anl_mincut_result_selector'::TEXT);
-			v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabLabel', rec_tab.tablabel::TEXT);
-			v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabIdName', 'id'::TEXT);
-			v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'selectorType', 'mincut'::TEXT);
-			v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'active', v_active);
-
-			-- Create tabs array
-			IF v_firsttab THEN 
-				v_formTabs := v_formTabs || ',' || v_formTabs_minuct::text;
-			ELSE 
-				v_formTabs := v_formTabs || v_formTabs_minuct::text;
-			END IF;
-
-			v_firsttab := TRUE;
-			v_active :=FALSE;
+		EXECUTE 'SELECT value FROM config_param_system WHERE parameter = ''api_selector_label''' INTO v_label_selector;
+		v_concat_label = replace(replace(v_label_selector->>rec_tab.formname, '[',''),']','');
+		v_concat_label = replace(v_concat_label::text, ',',', '' '',');	
+		v_filter_name = 'AND name IN ' ||replace(replace(((v_selectors_list->>rec_tab.formname)::json->>'ids'), '[','('),']',')');
+		
+		IF (v_selectors_list->>rec_tab.formname)::json->>'ids' IN ('[]') THEN
+			v_filter_name = ' ';
 		END IF;
+		-- Get exploitations, selected and unselected
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+		SELECT concat(' || v_concat_label || ') AS label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+		FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'view') ||' WHERE name IN (SELECT result_id FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'table') ||' WHERE cur_user=' || quote_literal(current_user) || ')
+		'||v_filter_name||' 
+		UNION
+		SELECT concat(' || v_concat_label || ') AS label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+		FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'view') ||' WHERE name NOT IN (SELECT result_id FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'table') ||' WHERE cur_user=' || quote_literal(current_user) || ') 
+		'||v_filter_name||' ORDER BY label) a'
+		INTO v_formTabs_minuct; 
+		
+		-- Add tab name to json
+		v_formTabs_minuct := ('{"fields":' || v_formTabs_minuct || '}')::json;
+		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabName', rec_tab.tabname::TEXT);
+		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tableName', ((v_selectors_list->>rec_tab.formname)::json->>'table'));
+		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabLabel', rec_tab.tablabel::TEXT);
+		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'selectorType', rec_tab.formname::TEXT);
+
+		-- Create tabs array
+		IF v_firsttab THEN 
+			v_formTabs := v_formTabs || ',' || v_formTabs_minuct::text;
+		ELSE 
+			v_formTabs := v_formTabs || v_formTabs_minuct::text;
+		END IF;
+
+		v_firsttab := TRUE;
+		v_active :=FALSE;
 	END IF;
 
 
