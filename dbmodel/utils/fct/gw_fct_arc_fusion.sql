@@ -13,32 +13,18 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(node_id_arg character v
   RETURNS integer AS
 $BODY$
 DECLARE
-    epa_type_aux varchar;
-    arc_id_new varchar;
-    arc_id_old varchar;
-    rec_aux record;
-    intersect_loc double precision;
-    exists_id varchar;
-    message_id integer;
-    controlValue integer;
-    newRecord SCHEMA_NAME.v_edit_arc;
-    myRecord1 SCHEMA_NAME.v_edit_arc;
-    myRecord2 SCHEMA_NAME.v_edit_arc;
-    arc_geom geometry;
-    arc_id_1 varchar;
-    arc_id_2 varchar;
-    pointArray1 geometry[];
-    pointArray2 geometry[];
-	rec_doc_arc record;
-	rec_doc_node record;
-	rec_visit_node record;
-	rec_visit_arc record;
-	project_type_aux text;
-	array_agg varchar[];
-	connec_id_aux varchar;
-	gully_id_aux varchar;
-    addfieldRecord1 record;
-    addfieldRecord2 record;
+
+    v_point_array1 geometry[];
+    v_point_array2 geometry[];
+    v_count integer;
+    v_exists_node_id varchar;
+    v_new_record SCHEMA_NAME.v_edit_arc;
+    v_my_record1 SCHEMA_NAME.v_edit_arc;
+    v_my_record2 SCHEMA_NAME.v_edit_arc;
+    v_arc_geom geometry;
+    v_project_type text;
+    rec_addfield1 record;
+    rec_addfield2 record;
     rec_param integer;
     v_vnode integer;
     v_node_geom public.geometry;
@@ -48,10 +34,10 @@ BEGIN
     -- Search path
     SET search_path = SCHEMA_NAME, public;
 
-    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
     -- Check if the node is exists
-    SELECT node_id INTO exists_id FROM v_edit_node WHERE node_id = node_id_arg;
+    SELECT node_id INTO v_exists_node_id FROM v_edit_node WHERE node_id = node_id_arg;
     SELECT the_geom INTO v_node_geom FROM node WHERE node_id = node_id_arg;
     
 
@@ -59,109 +45,109 @@ BEGIN
     IF FOUND THEN
 
         -- Find arcs sharing node
-        SELECT COUNT(*) INTO controlValue FROM v_edit_arc WHERE node_1 = node_id_arg OR node_2 = node_id_arg;
+        SELECT COUNT(*) INTO v_count FROM v_edit_arc WHERE node_1 = node_id_arg OR node_2 = node_id_arg;
 
         -- Accepted if there are just two distinc arcs
-        IF controlValue = 2 THEN
+        IF v_count = 2 THEN
 
             -- Get both arc features
-            SELECT * INTO myRecord1 FROM v_edit_arc WHERE node_1 = node_id_arg OR node_2 = node_id_arg ORDER BY arc_id DESC LIMIT 1;
-            SELECT * INTO myRecord2 FROM v_edit_arc WHERE node_1 = node_id_arg OR node_2 = node_id_arg ORDER BY arc_id ASC LIMIT 1;
+            SELECT * INTO v_my_record1 FROM v_edit_arc WHERE node_1 = node_id_arg OR node_2 = node_id_arg ORDER BY arc_id DESC LIMIT 1;
+            SELECT * INTO v_my_record2 FROM v_edit_arc WHERE node_1 = node_id_arg OR node_2 = node_id_arg ORDER BY arc_id ASC LIMIT 1;
 
             -- Compare arcs
-            IF  myRecord1.arccat_id = myRecord2.arccat_id AND
-                myRecord1.sector_id = myRecord2.sector_id AND
-                myRecord1.expl_id = myRecord2.expl_id AND
-                myRecord1.state = myRecord2.state
+            IF  v_my_record1.arccat_id = v_my_record2.arccat_id AND
+                v_my_record1.sector_id = v_my_record2.sector_id AND
+                v_my_record1.expl_id = v_my_record2.expl_id AND
+                v_my_record1.state = v_my_record2.state
                 THEN
 
                 -- Final geometry
-                IF myRecord1.node_1 = node_id_arg THEN
-                    IF myRecord2.node_1 = node_id_arg THEN
-                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(ST_Reverse(myRecord1.the_geom))).geom);
-                        pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom));
+                IF v_my_record1.node_1 = node_id_arg THEN
+                    IF v_my_record2.node_1 = node_id_arg THEN
+                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(ST_Reverse(v_my_record1.the_geom))).geom);
+                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom));
                     ELSE
-                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom);
-                        pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(myRecord1.the_geom)).geom));
+                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom);
+                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record1.the_geom)).geom));
                     END IF;
                 ELSE
-                    IF myRecord2.node_1 = node_id_arg THEN
-                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord1.the_geom)).geom);
-                        pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom));
+                    IF v_my_record2.node_1 = node_id_arg THEN
+                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record1.the_geom)).geom);
+                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom));
                     ELSE
-                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom);
-                        pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(ST_Reverse(myRecord1.the_geom))).geom));
+                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom);
+                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(ST_Reverse(v_my_record1.the_geom))).geom));
                     END IF;
                 END IF;
 
-                arc_geom := ST_MakeLine(pointArray2);
+                v_arc_geom := ST_MakeLine(v_point_array2);
 
 
-                SELECT * INTO newRecord FROM v_edit_arc WHERE arc_id = myRecord1.arc_id;
+                SELECT * INTO v_new_record FROM v_edit_arc WHERE arc_id = v_my_record1.arc_id;
 
                 -- Create a new arc values
-                newRecord.the_geom := arc_geom;
-                newRecord.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
-                newRecord.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
-		newRecord.arc_id := (SELECT nextval('urn_id_seq'));
+                v_new_record.the_geom := v_arc_geom;
+                v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
+                v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
+		v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
 
             --Compare addfields and assign them to new arc
-            FOR rec_param IN SELECT DISTINCT parameter_id FROM man_addfields_value WHERE feature_id=myRecord1.arc_id
-                OR feature_id=myRecord2.arc_id
+            FOR rec_param IN SELECT DISTINCT parameter_id FROM man_addfields_value WHERE feature_id=v_my_record1.arc_id
+                OR feature_id=v_my_record2.arc_id
             LOOP
 
-            SELECT * INTO addfieldRecord1 FROM man_addfields_value WHERE feature_id=myRecord1.arc_id and parameter_id=rec_param;
-            SELECT * INTO addfieldRecord2 FROM man_addfields_value WHERE feature_id=myRecord2.arc_id and parameter_id=rec_param;
+            SELECT * INTO rec_addfield1 FROM man_addfields_value WHERE feature_id=v_my_record1.arc_id and parameter_id=rec_param;
+            SELECT * INTO rec_addfield2 FROM man_addfields_value WHERE feature_id=v_my_record2.arc_id and parameter_id=rec_param;
 
-                IF addfieldRecord1.value_param!=addfieldRecord2.value_param  THEN
+                IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
                     RETURN audit_function(3008,2112);
-                ELSIF addfieldRecord2.value_param IS NULL and addfieldRecord1.value_param IS NOT NULL THEN
-                    UPDATE man_addfields_value SET feature_id=newRecord.arc_id WHERE feature_id=myRecord1.arc_id AND parameter_id=rec_param;
-                ELSIF addfieldRecord1.value_param IS NULL and addfieldRecord2.value_param IS NOT NULL THEN
-                    UPDATE man_addfields_value SET feature_id=newRecord.arc_id WHERE feature_id=myRecord2.arc_id AND parameter_id=rec_param;
+                ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
+                    UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param;
+                ELSIF rec_addfield1.value_param IS NULL and rec_addfield2.value_param IS NOT NULL THEN
+                    UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record2.arc_id AND parameter_id=rec_param;
                 ELSE
-                   UPDATE man_addfields_value SET feature_id=newRecord.arc_id WHERE feature_id=myRecord1.arc_id AND parameter_id=rec_param;
+                   UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param;
                END IF;
 
             END LOOP;
 			-- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
 			-- to get values topocontrol arc needs to be before, but this is not possible
 			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'arc_searchnodes';
-			INSERT INTO v_edit_arc SELECT newRecord.*;
+			INSERT INTO v_edit_arc SELECT v_new_record.*;
 			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'arc_searchnodes';
 
-			UPDATE arc SET node_1=newRecord.node_1, node_2=newRecord.node_2 where arc_id=newRecord.arc_id;
+			UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
 					
 			--Insert data on audit_log_arc_traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
-			VALUES ('ARC FUSION', newRecord.arc_id, myRecord2.arc_id,myRecord1.arc_id,exists_id, CURRENT_TIMESTAMP, CURRENT_USER);
+			VALUES ('ARC FUSION', v_new_record.arc_id, v_my_record2.arc_id,v_my_record1.arc_id,v_exists_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
 				
 			-- Update complementary information from old arcs to new one
-			UPDATE element_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
-			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
-			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
-			UPDATE connec SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
-			UPDATE node SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+			UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
 			-- update links related to node
 			IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=node_id_arg LIMIT 1) IS NOT NULL THEN
 			
 				-- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
 				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', newRecord.state, newRecord.sector_id, newRecord.dma_id, newRecord.expl_id, v_node_geom) 
+				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_new_record.state, v_new_record.sector_id, v_new_record.dma_id, v_new_record.expl_id, v_node_geom) 
 				RETURNING vnode_id INTO v_vnode;
 				
 				-- update link with new vnode
 				UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=node_id_arg;	
 			END IF;
 	
-			IF project_type_aux='UD' THEN
-				UPDATE gully SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+			IF v_project_type='UD' THEN
+				UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 			END IF;
 
 			-- Delete information of arc deleted
-			DELETE FROM arc WHERE arc_id = myRecord1.arc_id;
-			DELETE FROM arc WHERE arc_id = myRecord2.arc_id;
+			DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
+			DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
 
 			-- create links that where related to deprecated node
 		
