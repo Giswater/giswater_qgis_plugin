@@ -32,3 +32,5 @@ INSERT INTO config_api_form_tabs (id, formname, tabname, tablabel, tabtext, sys_
 
 INSERT INTO config_api_list (id, tablename, query_text, device) VALUES (16, 'om_vehicle_x_parameters', 'SELECT * FROM om_vehicle_x_parameters', 3);
 
+-- 04/12/2019
+INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, project_type, isdeprecated) VALUES ('api_selector_label', '{"mincut": ["name", "work_order", "state"], "state": ["id", "name"]}', 'json', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'false');

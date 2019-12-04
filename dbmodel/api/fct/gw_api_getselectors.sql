@@ -29,6 +29,8 @@ DECLARE
 	v_aux_json json;
 	fields_array json[];
 	v_result_list text[];
+	v_label_selector json;
+	v_concat_label text;
 
 BEGIN
 
@@ -56,16 +58,21 @@ BEGIN
 	IF v_aux_json->>'json_object_keys' = 'mincut' THEN
 		SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='mincut' AND tabname='tabMincut' ;
 		IF rec_tab.id IS NOT NULL THEN
-			
+
+			EXECUTE 'SELECT value FROM config_param_system WHERE parameter = ''api_selector_label''' INTO v_label_selector;
+			v_concat_label = replace(replace(v_label_selector->>'mincut', '[',''),']','');
+			v_concat_label = replace(v_concat_label::text, ',',', '' '',');	
+
 			-- Get exploitations, selected and unselected
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			SELECT name::text as label, name as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+			SELECT concat(' || v_concat_label || ') AS test, name::text as label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 			FROM v_ui_anl_mincut_result_cat WHERE name IN (SELECT result_id FROM anl_mincut_result_selector WHERE cur_user=' || quote_literal(current_user) || ')
 			UNION
-			SELECT name::text as label, name as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+			SELECT concat(' || v_concat_label || ') AS test, name::text as label, name::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 			FROM v_ui_anl_mincut_result_cat WHERE name NOT IN (SELECT result_id FROM anl_mincut_result_selector WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label) a'
-			INTO v_formTabs_minuct;
-
+			INTO v_formTabs_minuct; 
+			
+			
 			-- Add tab name to json
 			v_formTabs_minuct := ('{"fields":' || v_formTabs_minuct || '}')::json;
 			v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabName', 'selector_mincut'::TEXT);
