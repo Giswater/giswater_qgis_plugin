@@ -1446,7 +1446,8 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.start_point.clear()
         self.dlg_draw_profile.end_point.clear()
         self.dlg_draw_profile.profile_id.clear()
-
+        self.rotation_vd_exist = False
+        
         # Get data from DB for selected item| tbl_list_arc
         self.dlg_draw_profile.tbl_list_arc.clear()
 
