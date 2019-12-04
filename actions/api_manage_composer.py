@@ -160,7 +160,6 @@ class ApiManageComposer(ApiParent):
         widget_list = dialog.findChildren(QLineEdit)
 
         for widget in widget_list:
-            print(f"{widget.objectName()} --> {widget.text()}")
             item = selected_com.itemById(widget.property('column_id'))
             if type(item) == QgsLayoutItemLabel:
                 item.setText(str(widget.text()))
