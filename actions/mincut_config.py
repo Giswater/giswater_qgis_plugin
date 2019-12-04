@@ -51,8 +51,7 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
-        self.set_icon(self.dlg_min_edit.btn_show, "191")
-
+        
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
         self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)        
