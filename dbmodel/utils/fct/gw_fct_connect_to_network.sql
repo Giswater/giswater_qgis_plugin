@@ -126,9 +126,6 @@ BEGIN
 				ELSIF v_link.exit_type='VNODE' THEN
 					-- in this case whe don't use the v_link record variable because perhaps there is not link
 					v_endfeature_geom = v_arc.the_geom;
-					v_pjointtype = v_link.exit_type;
-					v_pjointid = v_link.exit_id;
-					
 				END IF;
 
 				-- Reverse (if it's need) the existing link geometry
@@ -160,7 +157,9 @@ BEGIN
 				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
 				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;	
 				v_link.exit_id = v_exit_id;
+				v_pjointtype = v_link.exit_type;
 				v_link.exit_type = 'VNODE';
+				v_pjointid = v_link.exit_id;
 			END IF;
 
 			-- link for all links
@@ -169,8 +168,14 @@ BEGIN
 			VALUES ((SELECT nextval('link_link_id_seq')), v_link.the_geom, connect_id_aux, feature_type_aux, v_link.exit_type, v_link.exit_id, 
 			v_link.userdefined_geom, v_connect.state, v_arc.expl_id);
 
+			IF v_pjointtype IS NULL THEN
+				v_pjointtype = 'VNODE';
+				v_pjointid = v_exit_id;
+			END IF;
+
 			-- Update connect attributes
-			IF feature_type_aux ='CONNEC' THEN          
+			IF feature_type_aux ='CONNEC' THEN       
+		   
 				UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type=v_pjointtype, pjoint_id=v_pjointid
 				WHERE connec_id = connect_id_aux;
 

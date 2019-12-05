@@ -29,20 +29,13 @@ DECLARE
 	v_userdefined_geom boolean;
 	v_end_state integer;
 
-	
+
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_mantable:= TG_ARGV[0];
 	
-	/*
-	link_searchbuffer
-	This variable it is very important because it keeps to prevent connect links to nod2arc elements (in trimed arcs advanced model of go2epa). 
-	It acts in combination of nod2arc variable. Never nodarc variable must be > 2*v_link_searchbuffer
-	The problem is that nod2arc is managed by user at moment of simulations and v_link_searchbuffer it's managed by user at moment to edit network.
-	As a result simple way it is that variable must be harcoded 0.25 and nod2arc never higher that 0.5
-	*/
-	v_link_searchbuffer=0.25; 	
+	v_link_searchbuffer=0.01; 	
 
 	-- control of project type
 	SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
@@ -192,14 +185,21 @@ BEGIN
 			
 			-- vnode
 			SELECT * INTO v_vnode FROM vnode WHERE ST_DWithin(v_end_point, vnode.the_geom, 0.01) LIMIT 1;
+				
+			IF v_vnode.vnode_id IS NULL THEN -- there is no vnode on the new position
 
-			IF v_vnode.vnode_id IS NULL THEN
-				INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
-				VALUES ((SELECT nextval('vnode_vnode_id_seq')), v_arc.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, 'AUTO', v_end_point) RETURNING vnode_id INTO v_node_id;
+				v_node_id = (select vnode_id FROM vnode WHERE vnode_id::text = OLD.exit_id AND OLD.exit_type='VNODE');
+
+				IF v_node_id IS NULL THEN -- there is no vnode existing linked				
+					INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
+					VALUES ((SELECT nextval('vnode_vnode_id_seq')), v_arc.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, 'AUTO', v_end_point) RETURNING vnode_id INTO v_node_id;			
+				END IF;
 			ELSE
 				v_end_point = v_vnode.the_geom;
 				v_node_id = v_vnode.vnode_id;
 			END IF;
+
+			--raise exception 'vnode %', v_node_id;
 		
 			-- update connec
 			UPDATE connec SET arc_id=v_arc.arc_id, expl_id=v_arc.expl_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, 
@@ -337,8 +337,8 @@ BEGIN
 		IF NEW.ispsectorgeom IS FALSE THEN -- if geometry comes from link table
 
 			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
-				UPDATE link SET userdefined_geom='TRUE', the_geom=NEW.the_geom 	WHERE link_id=NEW.link_id;
-				UPDATE vnode SET the_geom=St_endpoint(NEW.the_geom) WHERE vnode_id=NEW.exit_id::integer AND NEW.exit_type='VNODE';
+				UPDATE link SET userdefined_geom='TRUE', exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom WHERE link_id=NEW.link_id;
+				UPDATE vnode SET the_geom=St_endpoint(NEW.the_geom) WHERE vnode_id=NEW.exit_id::integer;
 			END IF;
 						
 		ELSE -- if geometry comes from psector_plan tables then 
