@@ -1514,7 +1514,8 @@ class DrawProfiles(ParentMapTool):
         # Get values from dialog
         profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
         title = self.dlg_draw_profile.title.text()
-        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
+        rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, False, False)
+        rotation = 0 if rotation in (None, '', 'null') else rotation
         first_node = self.dlg_draw_profile.start_point.text()
         end_node = self.dlg_draw_profile.end_point.text()
 
