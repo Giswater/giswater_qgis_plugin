@@ -13,7 +13,7 @@
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
+from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QFileDialog
 from qgis.PyQt.QtXml import QDomDocument
 
 from functools import partial
@@ -92,6 +92,7 @@ class DrawProfiles(ParentMapTool):
         self.widget_start_point = self.dlg_draw_profile.findChild(QLineEdit, "start_point")
         self.widget_end_point = self.dlg_draw_profile.findChild(QLineEdit, "end_point")
         self.widget_additional_point = self.dlg_draw_profile.findChild(QListWidget, "list_additional_points")
+        self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")
 
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
@@ -114,14 +115,19 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.save_rotation_vdefault)
 
+        self.dlg_draw_profile.btn_update_path.clicked.connect(self.set_composer_path)
+
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
+        # Get qgis_composers_path
+        sql = "SELECT value FROM config_param_user WHERE parameter = 'qgis_composers_path'"
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText(self.dlg_draw_profile, self.composers_path, str(row[0]))
+
+
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        template_path = ""
-        row = self.controller.get_config('qgis_composers_path')
-        if row and row[0]:
-            template_path = row[0]
+        template_path = utils_giswater.getWidgetText(self.dlg_draw_profile, self.composers_path)
         template_files = []
         try:
             template_files = os.listdir(template_path)
@@ -142,6 +148,32 @@ class DrawProfiles(ParentMapTool):
         self.list_of_selected_nodes = []
 
         self.open_dialog(self.dlg_draw_profile)
+
+
+    def set_composer_path(self):
+
+        self.get_folder_dialog(self.dlg_draw_profile, 'composers_path')
+
+        template_path = utils_giswater.getWidgetText(self.dlg_draw_profile, self.composers_path)
+        sql = (f"UPDATE config_param_user "
+               f"SET value = '{template_path}' "
+               f"WHERE parameter = 'qgis_composers_path'")
+        self.controller.execute_sql(sql)
+        utils_giswater.setWidgetText(self.dlg_draw_profile, self.composers_path, str(template_path))
+
+        template_files = []
+        try:
+            template_files = os.listdir(template_path)
+        except FileNotFoundError as e:
+            pass
+
+        self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
+
+        self.dlg_draw_profile.cbx_template.clear()
+        self.dlg_draw_profile.cbx_template.addItem('')
+        for template in self.files_qpt:
+            self.dlg_draw_profile.cbx_template.addItem(str(template))
+            self.dlg_draw_profile.cbx_template.currentIndexChanged.connect(self.set_template)
 
 
     def save_profile(self):
@@ -355,6 +387,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.rotation.setDisabled(False)
         self.dlg_draw_profile.scale_vertical.setDisabled(False)
         self.dlg_draw_profile.scale_horizontal.setDisabled(False)
+        self.dlg_draw_profile.btn_update_path.setDisabled(False)
         self.close_dialog(self.dlg_load)
         self.rotation_vd_exist = True
 
@@ -1443,6 +1476,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.scale_horizontal.setDisabled(True)
         self.dlg_draw_profile.btn_export_pdf.setDisabled(True)
         self.dlg_draw_profile.cbx_template.setDisabled(True)
+        self.dlg_draw_profile.btn_update_path.setDisabled(True)
         self.dlg_draw_profile.start_point.clear()
         self.dlg_draw_profile.end_point.clear()
         self.dlg_draw_profile.profile_id.clear()
@@ -1515,7 +1549,8 @@ class DrawProfiles(ParentMapTool):
         profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
         title = self.dlg_draw_profile.title.text()
         rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, False, False)
-        rotation = 0 if rotation in (None, '', 'null') else rotation
+        rotation = 0 if rotation in (None, '', 'null') else int(rotation)
+
         first_node = self.dlg_draw_profile.start_point.text()
         end_node = self.dlg_draw_profile.end_point.text()
 
@@ -1565,7 +1600,7 @@ class DrawProfiles(ParentMapTool):
         # Save vdefault value from rotation
         tablename = "config_param_user"
         rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, False, False)
-        rotation = 0 if rotation in (None, '', 'null') else rotation
+        rotation = 0 if rotation in (None, '', 'null') else int(rotation)
 
         if self.rotation_vd_exist:
             sql = (f"UPDATE {tablename} "
@@ -1758,6 +1793,7 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.btn_save_profile.setDisabled(False)
             self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
             self.dlg_draw_profile.cbx_template.setDisabled(False)
+            self.dlg_draw_profile.btn_update_path.setDisabled(False)
 
         if str(self.start_end_node[0]) is not None and self.start_end_node[1] is not None:
             self.dlg_draw_profile.btn_delete_additional_point.setDisabled(False)
@@ -1826,3 +1862,22 @@ class DrawProfiles(ParentMapTool):
     def manage_rejected(self):
         self.close_dialog(self.dlg_draw_profile)
         self.remove_vertex()
+
+
+    def get_folder_dialog(self, dialog, widget):
+        """ Get folder dialog """
+
+        # Check if selected folder exists. Set default value if necessary
+        folder_path = utils_giswater.getWidgetText(dialog, widget)
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
+            folder_path = os.path.expanduser("~")
+
+        # Open dialog to select folder
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)
+        message = "Select folder"
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message),
+                                                       directory=folder_path)
+        if folder_path:
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
