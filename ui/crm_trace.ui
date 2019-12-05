@@ -14,6 +14,37 @@
    <string>Sincronización con comercial</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_accept">
+       <property name="text">
+        <string>Accept</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="0" column="1" colspan="2">
     <widget class="QTabWidget" name="tab_main">
      <property name="currentIndex">
@@ -24,7 +55,44 @@
        <string>Sincronización</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="4" column="0" colspan="2">
+       <item row="2" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="lbl_main">
+           <property name="maximumSize">
+            <size>
+             <width>65</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Explotación:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cbo_expl">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="maxVisibleItems">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLineEdit" name="buffer"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Buffer para la creación de las DMA's:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
         <widget class="QPlainTextEdit" name="txt_desc">
          <property name="font">
           <font>
@@ -57,39 +125,14 @@ PASO 1: Se updatea en CRM la zona de medición a la que pertenecen las acometida
 
 PASO 2: Se capturan en el CRM los valores de consumo para el período de cada abonado
 
-El proceso carga acometidas y tramos que se han quedado sin zona de medición (dma=0). El estilo de las capas es configurable mediante un archivo de estilo de QGIS  (*.qml) en el formulario de config.</string>
+El proceso carga acometidas y tramos que se han quedado sin zona de medición (dma=0). El estilo de las capas es configurable mediante un archivo de estilo de QGIS  (*.qml) en el formulario de config.
+
+Para el resto de elementos que si pertenecen a una DMA se genera una envolvente de forma dinàmica, a partir de un buffer de los tramos identificados. El buffer tiene el valor deseado por el usuario</string>
          </property>
          <property name="backgroundVisible">
           <bool>false</bool>
          </property>
         </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="lbl_main">
-           <property name="maximumSize">
-            <size>
-             <width>65</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Explotación:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="cbo_expl">
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-           <property name="maxVisibleItems">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
       </layout>
      </widget>
@@ -104,37 +147,6 @@ El proceso carga acometidas y tramos que se han quedado sin zona de medición (d
       </layout>
      </widget>
     </widget>
-   </item>
-   <item row="2" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_accept">
-       <property name="text">
-        <string>Accept</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_cancel">
-       <property name="text">
-        <string>Close</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>
