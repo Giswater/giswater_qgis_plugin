@@ -273,6 +273,8 @@ class ManNodeDialog(ParentDialog):
             if row:
                 if 'elev' in row[0]:
                     utils_giswater.setWidgetText(self.dialog, 'elev', row[0]['elev'])
+                if 'ymax' in row[0]:
+                    utils_giswater.setWidgetText(self.dialog, 'ymax', row[0]['ymax'])
                 if 'top_elev' in row[0]:
                     utils_giswater.setWidgetText(self.dialog, 'top_elev', row[0]['top_elev'])
 
