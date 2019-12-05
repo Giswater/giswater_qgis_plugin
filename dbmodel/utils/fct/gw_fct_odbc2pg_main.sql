@@ -46,9 +46,9 @@ BEGIN
 	
 	-- select config values
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
-
-	-- move data from audit table to other table
-	-- SELECT audit_log_data.feature_id, log_message->>'year' AS year, log_message->>'period' AS period, log_message->>'m3value' AS m3value FROM audit_log_data WHERE fprocesscat_id = 73;	
+	
+	-- data2gis
+	PERFORM gw_fct_odbc2pg_hydro_filldata(p_data);
 
 	-- check data and get result
 	SELECT gw_fct_odbc2pg_check_data(p_data) INTO v_result;
@@ -57,7 +57,6 @@ BEGIN
 	v_result_info = (((v_result->>'body')::json->>'data')::json->>'info')::json;	
 	v_result_point = (((v_result->>'body')::json->>'data')::json->>'point')::json;	
 	v_result_line = (((v_result->>'body')::json->>'data')::json->>'line')::json;	
-
 			
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
