@@ -144,8 +144,10 @@ BEGIN
 	
 	--Check if nodes that are final nodes of arc (node_1, node_2) don't have arc_id assigned
 
-	v_querytext ='(SELECT node_id, nodecat_id, '||v_edit||'node.the_geom from '||v_edit||'node join arc n1 on n1.node_1 = node.node_id join arc n2 on n2.node_2 = node.node_id
-	where node.arc_id is not null)';
+	v_querytext ='(SELECT node_id, nodecat_id, '||v_edit||'node.the_geom from '||v_edit||'node 
+	join arc n1 on n1.node_1 = '||v_edit||'node.node_id 
+	join arc n2 on n2.node_2 = '||v_edit||'node.node_id
+	where '||v_edit||'node.arc_id is not null)';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' a') INTO v_count;
 
@@ -625,7 +627,9 @@ BEGIN
 	--connec
 	IF v_project_type = 'WS' THEN 
 		v_querytext = 'with c as (
-					Select connec.connec_id as id, arc_id as arc,connec.connecat_id as feature_catalog, the_geom from '||v_edit||'connec
+					Select '||v_edit||'connec.connec_id as id, arc_id as arc, '||v_edit||'connec.connecat_id as 
+					feature_catalog, the_geom 
+					from '||v_edit||'connec
 					)
 					select c1.id, c1.feature_catalog, c1.the_geom
 					from link a
@@ -635,8 +639,10 @@ BEGIN
 					and c1.arc <> c2.arc';
 	ELSIF v_project_type = 'UD' THEN
 		v_querytext = 'with c as (
-					Select connec.connec_id as id, arc_id as arc,connec.connecat_id as feature_catalog, the_geom from '||v_edit||'connec
-					UNION select gully.gully_id as id, arc_id as arc,gully.gratecat_id, the_geom from '||v_edit||'gully
+					Select '||v_edit||'connec.connec_id as id, arc_id as arc,'||v_edit||'connec.connecat_id as 
+					feature_catalog, the_geom from '||v_edit||'connec
+					UNION select '||v_edit||'gully.gully_id as id, arc_id as arc,'||v_edit||'gully.gratecat_id, 
+					the_geom from '||v_edit||'gully
 					)
 					select c1.id, c1.feature_catalog, c1.the_geom
 					from link a
