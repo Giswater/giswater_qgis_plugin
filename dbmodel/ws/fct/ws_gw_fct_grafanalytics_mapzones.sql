@@ -40,7 +40,7 @@ TO EXECUTE
 
 -- SECTOR
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1]", 
-"updateFeature":"TRUE", "updateMapZone":"FALSE","concaveHullParam":0.85, "debug":"true"}}}');
+"updateFeature":"TRUE", "updateMapZone":"FALSE", "concaveHullParam":0.85, "buffer":15, "debug":"true"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -51,7 +51,8 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 -- DMA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "buffer":15, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", 
 "updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85,"debug":"false"}}}');
@@ -85,36 +86,32 @@ SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=48 AND use
 SELECT presszonecat_id, count(presszonecat_id) from v_edit_arc  group by presszonecat_id order by 1;
 
 
------------------
-TO CHECK PROBLEMS
------------------
-0) reset values
-UPDATE arc SET dma_id=0
+---------------------------------
+TO CHECK PROBLEMS, RUN MODE DEBUG
+---------------------------------
 
-1) Run function on 
-	mode debug
-	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
-	"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"false"}}}');
+1) CONTEXT 
+SET search_path='SCHEMA_NAME';
+UPDATE arc SET dma_id=0 where expl_id=524
 
-	only for one element	
-	SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1041", 
-	"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
-	SELECT * from temp_anlgraf order by id;
+2) RUN
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[524]", "updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"TRUE"}}}');
 
-2) Check final results
-SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
-SELECT sector_id, count(sector_id) from v_edit_arc  group by sector_id order by 1;
+ISTRUCTIONS
+flag: 0 open, 1 closed
+water: 0 dry, 1 wet
 
--3) Look graf flooders (flag=0 and grafdelimiter node)
-SELECT arc_id, node_1 FROM temp_anlgraf WHERE flag=0 AND node_1 IN (SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer
-WHERE graf_delimiter IN ('SECTOR'))
+3) ANALYZE: 
 
-SELECT arc_id, node_1 FROM temp_anlgraf WHERE flag=0 AND user_name=current_user AND node_1 IN (SELECT DISTINCT node_id FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id=e.node_1
-WHERE graf_delimiter IN ('SECTOR'))
+Look graf flooders (flag=0 and grafdelimiter node)
+SELECT node_1 AS node_id, arc_id AS to_arc FROM temp_anlgraf WHERE flag=0 AND node_1 IN (
+SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE graf_delimiter IN ('DMA')
+)
 
-4) Look for the graf stoppers (flag=1)
+Look for the graf stoppers (flag=1)
 SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
+
 
 */
 
@@ -151,6 +148,7 @@ v_input 		json;
 v_count1		integer;
 v_count2		integer;
 v_count3		integer;
+v_buffer		float;
 
 BEGIN
 	-- Search path
@@ -162,6 +160,7 @@ BEGIN
 	v_updatetattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_concavehull = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
+	v_buffer = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'buffer');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 
@@ -479,14 +478,23 @@ BEGIN
 		-- update geometry of mapzones
 		IF v_updatemapzgeom THEN
 
-			v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
+			IF v_buffer IS NOT NULL THEN
+
+				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
+					(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_buffer||')) as geom from arc where '||quote_ident(v_field)||' > 0 group by '||quote_ident(v_field)||')a 
+					WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
+
+			ELSIF v_concavehull IS NOT NULL THEN 
+
+				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
 					FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM arc group by '||quote_ident(v_field)||') 
 					SELECT '||quote_ident(v_field)||
 					', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
 					v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
 					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 					)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||'::text != 0::text';
-
+			END IF;
+			
 			EXECUTE v_querytext;	
 
 			-- message
