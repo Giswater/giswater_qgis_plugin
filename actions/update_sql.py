@@ -1524,6 +1524,8 @@ class UpdateSQL(ApiParent):
     def update_api(self):
 
         self.task1.setProgress(50)
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
         self.api(False)
         self.task1.setProgress(100)
 
@@ -1539,7 +1541,8 @@ class UpdateSQL(ApiParent):
 
 
     def implement_api(self):
-
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(50)
         self.api(True)
         self.task1.setProgress(100)
@@ -1548,6 +1551,8 @@ class UpdateSQL(ApiParent):
     def load_custom_sql_files(self, dialog, widget):
 
         folder_path = utils_giswater.getWidgetText(dialog, widget)
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(50)
         self.load_sql(folder_path)
         self.task1.setProgress(100)
@@ -1570,6 +1575,8 @@ class UpdateSQL(ApiParent):
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.task1.setProgress(50)
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
             status = self.load_updates(project_type, update_changelog=True)
             if status:
                 self.set_info_project()
@@ -2382,6 +2389,8 @@ class UpdateSQL(ApiParent):
                 return
 
             # Set wait cursor
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
 
             # Start read files
