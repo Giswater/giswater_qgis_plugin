@@ -1564,24 +1564,16 @@ class DrawProfiles(ParentMapTool):
 
         # Save vdefault value from rotation
         tablename = "config_param_user"
-        rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation)
+        rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, False, False)
+        rotation = 0 if rotation in (None, '', 'null') else rotation
 
         if self.rotation_vd_exist:
-            if str(rotation) != 'null':
-                sql = (f"UPDATE {tablename} "
-                       f"SET value = '{rotation}' "
-                       f"WHERE parameter = 'rotation_vdefault'")
-            else:
-                sql = (f"UPDATE {tablename} "
-                       f"SET value = '0' "
-                       f"WHERE parameter = 'rotation_vdefault'")
+            sql = (f"UPDATE {tablename} "
+                   f"SET value = '{rotation}' "
+                   f"WHERE parameter = 'rotation_vdefault'")
         else:
-            if str(rotation) != 'null':
-                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
-                       f"VALUES ('rotation_vdefault', '{rotation}', current_user)")
-            else:
-                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
-                       f"VALUES ('rotation_vdefault', '0', current_user)")
+            sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
+                   f"VALUES ('rotation_vdefault', '{rotation}', current_user)")
 
         if sql:
             self.controller.execute_sql(sql)
