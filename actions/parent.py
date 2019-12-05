@@ -7,22 +7,19 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsProject, QgsRectangle, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QVariant
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget, QSpacerItem, QLabel, QComboBox, QCheckBox, QSizePolicy, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget, QGridLayout
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
-from functools import partial
-import configparser
-import sys
+import configparser, json, os, re, sys, webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
+from collections import OrderedDict
+from functools import partial
+
 from .. import utils_giswater
 from ..ui_manager import GwDialog, GwMainWindow
-import os
-import re
-import webbrowser
 
 
 class ParentAction(object):
@@ -786,9 +783,9 @@ class ParentAction(object):
         return body
 
 
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1):
-
-        self.delete_layer_from_toc(function_name)
+    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True):
+        if del_old_layers:
+            self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == "info":
@@ -996,4 +993,5 @@ class ParentAction(object):
         layer.triggerRepaint()
 
         return True
+
 

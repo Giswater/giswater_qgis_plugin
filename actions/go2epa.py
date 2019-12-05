@@ -677,7 +677,7 @@ class Go2Epa(ApiParent):
             # Export to inp file
             if export_inp is True:
                 if complet_result[0]['status'] == "Accepted":
-                    self.add_temp_layer(self.dlg_go2epa, complet_result[0]['body']['data'], 'INP results', True, False)
+                    self.add_temp_layer(self.dlg_go2epa, complet_result[0]['body']['data'], 'INP results', True, False, 1, False)
                 message = complet_result[0]['message']['text']
 
                 # Get values from temp_csv2pg and insert into INP file
@@ -757,7 +757,7 @@ class Go2Epa(ApiParent):
                             if rpt_result[0]['status'] == "Accepted":
                                 if 'body' in rpt_result[0]:
                                     if 'data' in rpt_result[0]['body']:
-                                        self.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'], 'RPT results', force_tab, False)
+                                        self.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'], 'RPT results', True, False, 1, False)
                         message = rpt_result[0]['message']['text']
 
                     # final message
