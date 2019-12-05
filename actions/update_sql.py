@@ -1909,6 +1909,7 @@ class UpdateSQL(ApiParent):
                    "WHERE table_schema = '" + str(row[0]) + "' "
                    "AND table_name = 'version')")
             exists = self.controller.get_row(sql)
+
             if str(exists[0]) == 'True':
                 sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
                 result = self.controller.get_row(sql)
@@ -2703,7 +2704,7 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
-        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
 
         # Set listeners
         self.dlg_manage_sys_fields.btn_accept.clicked.connect(
