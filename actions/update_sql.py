@@ -1523,9 +1523,9 @@ class UpdateSQL(ApiParent):
 
     def update_api(self):
 
-        self.task1.setProgress(50)
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(50)
         self.api(False)
         self.task1.setProgress(100)
 
@@ -1574,6 +1574,8 @@ class UpdateSQL(ApiParent):
         msg = "Are you sure to update the project schema to last version?"
         result = self.controller.ask_question(msg, "Info")
         if result:
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2056,6 +2058,8 @@ class UpdateSQL(ApiParent):
     def schema_file_to_db(self):
 
         if self.chk_schema_funcion.isChecked():
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
             self.reload_fct_ftrg(self.project_type_selected)
             self.task1.setProgress(100)
@@ -2074,6 +2078,8 @@ class UpdateSQL(ApiParent):
     def api_file_to_db(self):
 
         if self.chk_api_funcion.isChecked():
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
             self.reload_fct_ftrg('api')
             self.task1.setProgress(100)
@@ -2341,6 +2347,8 @@ class UpdateSQL(ApiParent):
             body = self.create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
             if row:
                 complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
