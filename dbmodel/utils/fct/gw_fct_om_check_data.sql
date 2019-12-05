@@ -24,19 +24,8 @@ SELECT gw_fct_om_check_data($${
 
 
 DECLARE
-v_data 			json;
-valve_rec		record;
-v_countglobal		integer;
-v_record		record;
-setvalue_int		int8;
 v_project_type 		text;
 v_count			integer;
-v_count_2		integer;
-infiltration_aux	text;
-rgage_rec		record;
-scenario_aux		text;
-v_min_node2arc		float;
-v_arc			text;
 v_saveondatabase 	boolean;
 v_result 		text;
 v_version		text;
@@ -45,33 +34,11 @@ v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
 v_querytext		text;
-v_nodearc_real 		float;
-v_nodearc_user 		float;
 v_result_id 		text;
-v_min 			numeric (12,4);
-v_max			numeric (12,4);
-v_headloss		text;
-v_message		text;
-v_demandtype 		integer;
-v_patternmethod		integer;
-v_period		text;
-v_networkmode		integer;
-v_valvemode		integer;
-v_demandtypeval 	text;
-v_patternmethodval 	text;
-v_periodval 		text;
-v_valvemodeval 		text;
-v_networkmodeval	text;
-v_dwfscenario		text;
-v_allowponding		text;
-v_florouting		text;
-v_flowunits		text;
-v_hydrologyscenario	text;
-v_qualitymode		text;
-v_qualmodeval		text;
 v_features 		text;
 v_edit			text;
-v_onlygrafanalytics 	boolean;
+v_onlygrafanalytics boolean;
+v_config_param text;
 
 BEGIN
 
@@ -88,7 +55,7 @@ BEGIN
 
 	-- init variables
 	v_count=0;
-	v_countglobal=0;	
+
 
 	-- set v_edit_ variable
 	IF v_features='wholeSystem' THEN
@@ -119,7 +86,6 @@ BEGIN
 	-- delete config_param_user rows with deprecated variables
 	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user);
 	
-	
 	-- Check node_1 or node_2 nulls (fprocesscat = 4)
 	v_querytext = '(SELECT arc_id,arccat_id,the_geom FROM '||v_edit||'arc WHERE state > 0 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom FROM '
 	||v_edit||'arc WHERE state > 0 AND node_2 IS NULL) a';
@@ -127,7 +93,8 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		DELETE FROM anl_arc WHERE fprocesscat_id=4 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) SELECT 4, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom FROM ', v_querytext);
+		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) 
+			SELECT 4, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arc''s without node_1 or node_2.'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -144,7 +111,9 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		DELETE FROM anl_node WHERE fprocesscat_id=96 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 96, node_id, nodecat_id, ''nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+		SELECT 96, node_id, nodecat_id, ''nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 0. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -161,7 +130,9 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		DELETE FROM anl_node WHERE fprocesscat_id=97 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 97, node_id, nodecat_id, ''nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+		SELECT 97, node_id, nodecat_id, ''nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 0. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -171,6 +142,24 @@ BEGIN
 		VALUES (25, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
 	END IF;	
 	
+	--Check if nodes that are final nodes of arc (node_1, node_2) don't have arc_id assigned
+
+	v_querytext ='(SELECT node_id, nodecat_id, '||v_edit||'node.the_geom from '||v_edit||'node join arc n1 on n1.node_1 = node.node_id join arc n2 on n2.node_2 = node.node_id
+	where node.arc_id is not null)';
+
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' a') INTO v_count;
+
+	IF v_count > 0 THEN
+		DELETE FROM anl_node WHERE fprocesscat_id=103 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+		SELECT 103, node_id, nodecat_id, ''Final nodes with assigned arc_id'', the_geom FROM (', v_querytext,') a');
+
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes, which are arc''s finals and have assigned value of arc_id. Please, check your data before continue'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No final nodes have arc_id assigned.');
+	END IF;
 
 	-- Check state_type nulls (arc, node)
 	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 
@@ -210,7 +199,9 @@ BEGIN
 
 	IF v_count > 0 THEN
 		DELETE FROM anl_arc WHERE fprocesscat_id=88 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) SELECT 88, arc_id, arccat_id, ''arcs with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) 
+			SELECT 88, arc_id, arccat_id, ''arcs with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -220,7 +211,76 @@ BEGIN
 		VALUES (25, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.');
 	END IF;
 
-	
+	-- Check unique customer code for connecs with state=1 
+	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 group by customer_code having count(*) > 1';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
+
+	IF v_count > 0 THEN
+
+		DELETE FROM anl_connec WHERE fprocesscat_id=101 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
+		SELECT 101, connec_id, connecat_id, ''Connecs with customer code duplicated'', the_geom FROM connec WHERE customer_code IN (', v_querytext,')');
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' connec customer code duplicated. Please, check your data before continue'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No connecs with customer code duplicated.');
+	END IF;
+
+	--Check if all id are integers
+	IF v_project_type = 'WS' THEN
+		v_querytext = '(SELECT CASE WHEN arc_id~E''^\\d+$'' THEN CAST (arc_id AS INTEGER)
+						ELSE 0 END  as feature_id, ''ARC'' as type, arccat_id as featurecat, the_geom FROM '||v_edit||'arc
+						UNION SELECT CASE WHEN node_id~E''^\\d+$'' THEN CAST (node_id AS INTEGER)
+   						ELSE 0 END as feature_id, ''NODE'' as type, nodecat_id as featurecat, the_geom FROM '||v_edit||'node
+						UNION SELECT CASE WHEN connec_id~E''^\\d+$'' THEN CAST (connec_id AS INTEGER)
+   						ELSE 0 END as feature_id, ''CONNEC'' as type, connecat_id as featurecat, the_geom FROM '||v_edit||'connec) a';
+
+   		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' WHERE feature_id=0') INTO v_count;
+   	ELSIF v_project_type = 'UD' THEN
+   		v_querytext = ('(SELECT CASE WHEN arc_id~E''^\\d+$'' THEN CAST (arc_id AS INTEGER)
+						ELSE 0 END  as feature_id, ''ARC'' as type, arccat_id as featurecat,the_geom  FROM '||v_edit||'arc
+						UNION SELECT CASE WHEN node_id~E''^\\d+$'' THEN CAST (node_id AS INTEGER)
+   						ELSE 0 END as feature_id, ''NODE'' as type, nodecat_id as featurecat,the_geom FROM '||v_edit||'node
+						UNION SELECT CASE WHEN connec_id~E''^\\d+$'' THEN CAST (connec_id AS INTEGER)
+   						ELSE 0 END as feature_id, ''CONNEC'' as type, connecat_id as featurecat,the_geom FROM '||v_edit||'connec
+   						UNION SELECT CASE WHEN gully_id~E''^\\d+$'' THEN CAST (gully_id AS INTEGER)
+   						ELSE 0 END as feature_id, ''GULLY'' as type, gratecat_id as featurecat,the_geom FROM '||v_edit||'gully) a');
+   	END IF;
+
+   	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' WHERE feature_id=0') INTO v_count;
+
+   	IF v_count > 0 THEN
+
+   		DELETE FROM anl_connec WHERE fprocesscat_id=102 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
+		SELECT 102, feature_id, featurecat, ''Connecs with id which is not an integer'', the_geom FROM ', v_querytext,' 
+		WHERE  feature_id=0 AND type = ''CONNEC'' ');
+
+		DELETE FROM anl_arc WHERE fprocesscat_id=102 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) 
+		SELECT 102,  feature_id, featurecat, ''Arcs with id which is not an integer'', the_geom FROM ', v_querytext,' 
+		WHERE  feature_id=0 AND type = ''ARC'' ');
+
+		DELETE FROM anl_node WHERE fprocesscat_id=102 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+		SELECT 102,  feature_id, featurecat, ''Nodes with id which is not an integer'', the_geom FROM ', v_querytext,' 
+		WHERE  feature_id=0 AND type = ''NODE'' ');
+			
+		IF v_project_type = 'UD' THEN
+			EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+			SELECT 102, feature_id, featurecat, ''Gullies with id which is not an integer'', the_geom FROM ', v_querytext,' 
+			WHERE feature_id=0 AND type = ''GULLY'' ');
+		END IF;
+
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' which id is not an integer. Please, check your data before continue'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: All features with id integer.');
+	END IF;
+
 	-- only UD projects
 	IF 	v_project_type='UD' THEN
 
@@ -235,12 +295,13 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'));
+			
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No features without concordance againts state and state_type.');
 		END IF;
 
-		-- Check code wirh null values
+		-- Check code with null values
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
 					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
@@ -269,6 +330,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
 		IF v_count > 0 THEN
+
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
 		ELSE
@@ -502,7 +564,7 @@ BEGIN
 		END IF;
 
 		-- presszone : check coherence againts nodetype.grafdelimiter and nodeparent defined on cat_presszone.grafconfig (fprocesscat = 82)
-		v_querytext = 	'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
+		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
 				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
 				FROM cat_presszone WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''PRESSZONE'' AND a.node_id IS NULL 
 				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM cat_presszone)';
@@ -534,6 +596,181 @@ BEGIN
 		-- presszone, toArc (fprocesscat = 86)
 		
 	END IF;
+	
+	-- connec without link
+	IF v_project_type = 'WS' THEN 
+		v_querytext = 'SELECT connec_id,connecat_id,the_geom from '||v_edit||'connec WHERE state= 1 
+					AND connec_id NOT IN (select feature_id from link)';
+	ELSIF v_project_type = 'UD' THEN 
+		v_querytext = 'SELECT connec_id,connecat_id,the_geom from '||v_edit||'connec WHERE state= 1 
+					AND connec_id NOT IN (select feature_id from link)
+					UNION SELECT gully_id,gratecat_id,the_geom from '||v_edit||'gully WHERE state= 1 
+					AND gully_id NOT IN (select feature_id from link)';
+	END IF;
+	
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		DELETE FROM anl_connec WHERE fprocesscat_id=104 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
+		SELECT 104, connec_id, connecat_id, ''Connecs without links'', the_geom FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' connecs without links.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: All connecs have links.');
+	END IF;
+
+	--connec
+	IF v_project_type = 'WS' THEN 
+		v_querytext = 'with c as (
+					Select connec.connec_id as id, arc_id as arc,connec.connecat_id as feature_catalog, the_geom from '||v_edit||'connec
+					)
+					select c1.id, c1.feature_catalog, c1.the_geom
+					from link a
+					left join c c1 on a.feature_id = c1.id
+					left join c c2 on a.exit_id = c2.id
+					where (a.exit_type =''CONNEC'')
+					and c1.arc <> c2.arc';
+	ELSIF v_project_type = 'UD' THEN
+		v_querytext = 'with c as (
+					Select connec.connec_id as id, arc_id as arc,connec.connecat_id as feature_catalog, the_geom from '||v_edit||'connec
+					UNION select gully.gully_id as id, arc_id as arc,gully.gratecat_id, the_geom from '||v_edit||'gully
+					)
+					select c1.id, c1.feature_catalog, c1.the_geom
+					from link a
+					left join c c1 on a.feature_id = c1.id
+					left join c c2 on a.exit_id = c2.id
+					where (a.exit_type =''CONNEC'' OR a.exit_type =''GULLY'')
+					and c1.arc <> c2.arc;';
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	
+	IF v_count > 0 THEN
+		DELETE FROM anl_connec WHERE fprocesscat_id=101 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
+		SELECT 105, id, feature_catalog, ''Chained connecs or gullies with different arc_id'', the_geom FROM (', v_querytext,')a');
+
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' chained connecs or gullies with different arc_id.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: All chained connecs and gullies have the same arc_id');
+	END IF;
+
+	--features with state 1 and end date
+	IF v_project_type = 'WS' THEN
+		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 1 and enddate is not null
+					UNION SELECT node_id from '||v_edit||'node where state = 1 and enddate is not null
+					UNION SELECT connec_id from '||v_edit||'connec where state = 1 and enddate is not null';
+	ELSIF v_project_type = 'UD' THEN
+		v_querytext = 'SELECT arc_id as feature_id from '||v_edit||'arc where state = 1 and enddate is not null
+					UNION SELECT node_id from '||v_edit||'node where state = 1 and enddate is not null
+					UNION SELECT connec_id from '||v_edit||'connec where state = 1 and enddate is not null
+					UNION SELECT gully_id from '||v_edit||'gully where state = 1 and enddate is not null';
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' features on service with value of end date.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No features on service have value of end date');
+	END IF;
+
+	--features with state 0 and without end date
+	IF v_project_type = 'WS' THEN
+		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 0 and enddate is null
+					UNION SELECT node_id from '||v_edit||'node where state = 0 and enddate is null
+					UNION SELECT connec_id from '||v_edit||'connec where state = 0 and enddate is null';
+	ELSIF v_project_type = 'UD' THEN
+		v_querytext = 'SELECT arc_id as feature_id from '||v_edit||'arc where state = 0 and enddate is null
+					UNION SELECT node_id from '||v_edit||'node where state = 0 and enddate is null
+					UNION SELECT connec_id from '||v_edit||'connec where state = 0 and enddate is null
+					UNION SELECT gully_id from '||v_edit||'gully where state = 0 and enddate is null';
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' features with state 0 without value of end date.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No features with state 0 are missing the end date');
+	END IF;
+
+	--features with state 1 and end date
+	IF v_project_type = 'WS' THEN
+		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate
+					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
+					UNION SELECT connec_id from '||v_edit||'connec where enddate < builtdate';
+	ELSIF v_project_type = 'UD' THEN
+		v_querytext = 'SELECT arc_id as feature_id from '||v_edit||'arc where enddate < builtdate
+					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
+					UNION SELECT connec_id from '||v_edit||'connec where enddate < builtdate
+					UNION SELECT gully_id from '||v_edit||'gully where enddate < builtdate';
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' features with end date earlier than built date.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No features with end date earlier than built date');
+	END IF;
+
+	--config variables 
+	--state_topocontrol
+	SELECT value INTO v_config_param FROM config_param_system WHERE parameter = 'state_topocontrol';
+
+	IF v_config_param::BOOLEAN IS TRUE THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, concat('INFO: Value of parameter state topocontrol: ',v_config_param,'.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: Value of parameter state topocontrol: ',v_config_param,'. Control is disabled.'));
+	END IF;
+	
+	--edit_enable_arc_nodes_update
+	INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+	SELECT 25, 1, concat('INFO: Value of parameter edit enable arc nodes update: ',value,'.') 
+	FROM config_param_system WHERE parameter = 'edit_enable_arc_nodes_update';
+
+	--edit_topocontrol_dsbl_error
+	SELECT value INTO v_config_param FROM config_param_system WHERE parameter = 'edit_topocontrol_dsbl_error';
+
+	IF v_config_param::BOOLEAN IS FALSE THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, concat('INFO: Value of parameter edit topocontrol dbl error: ',v_config_param,'.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: Value of parameter edit topocontrol dbl error: ',v_config_param,'. Control is disabled.'));
+	END IF;
+
+	--sys_raster_dem	
+	INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+	SELECT 25, 1, concat('INFO: Value of parameter sys raster dem: ',value,'.') 
+	FROM config_param_system WHERE parameter = 'sys_raster_dem';
+
+	--sys_exploitation_x_user
+	INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+	SELECT 25, 1, concat('INFO: Value of parameter sys exploitation x user: ',value,'.') 
+	FROM config_param_system WHERE parameter = 'sys_exploitation_x_user';
+
+	IF v_project_type = 'UD' THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		SELECT 25, 1, concat('INFO: Value of parameter geom slope direction: ',value,'.') 
+		FROM config_param_system WHERE parameter = 'geom_slp_direction';
+	END IF;
+
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 4, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 3, '');	
@@ -549,20 +786,38 @@ BEGIN
 	
 	--points
 	v_result = null;
+
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() 
-	AND (fprocesscat_id=4 OR fprocesscat_id=87 OR fprocesscat_id=76 OR fprocesscat_id=79 OR fprocesscat_id=80 OR fprocesscat_id=81 OR fprocesscat_id=82)) row; 
+	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() 
+	AND (fprocesscat_id=4 OR fprocesscat_id=87 OR fprocesscat_id=76 OR fprocesscat_id=79 OR fprocesscat_id=80 OR 
+		fprocesscat_id=81 OR fprocesscat_id=82 OR fprocesscat_id=103)
+	UNION
+	SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() 
+	AND (fprocesscat_id=101 OR fprocesscat_id=102)) row;  
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	
+	IF v_result = '{}' THEN 
+		v_result_point = '{"geometryType":"", "values":[]}';
+	ELSE 
+		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	END IF;
 
 	--lines
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=88) row; 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() 
+	AND (fprocesscat_id=88  OR fprocesscat_id=102)) row; 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+	IF v_result = '{}' THEN 
+		v_result_line = '{"geometryType":"", "values":[]}';
+	ELSE 
+		v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+	END IF;
 
 	--polygons
+	v_result_polygon = '{"geometryType":"", "values":[]}';
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
