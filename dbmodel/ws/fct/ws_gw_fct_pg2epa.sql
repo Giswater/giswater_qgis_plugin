@@ -17,7 +17,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"resultId":"testbgeo4", "useNetworkGeom":"false", "skipCheckData":"true"}}$$)
+"data":{"resultId":"t3", "useNetworkGeom":"false"}}$$)
 
 */
 
@@ -42,7 +42,7 @@ BEGIN
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
 	v_usenetworkdemand =  (p_data->>'data')::json->>'useNetworkDemand';
-	v_skipcheckdata =  (p_data->>'data')::json->>'skipCheckData';
+	v_skipcheckdata =  FALSE;
 
 	v_usenetworkdemand = FALSE;
 
@@ -106,6 +106,9 @@ BEGIN
 				v_response, ' nodarc nodes have been renamed using vnode_id');
 			END IF;
 		END IF;
+
+		RAISE NOTICE '7-profilactic issue to repair topology when length has no longitude';
+		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 	ELSE 
 		v_usenetworkgeom = 'TRUE';
 

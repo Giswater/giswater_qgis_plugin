@@ -94,6 +94,9 @@ BEGIN
 	END LOOP;
 	-------------------------------------------------------------------------------------------------
 
+	-- set selectors
+	PERFORM gw_fct_rpt2pg (v_result);
+
 	-- return message
 	v_return = '{"message":{"priority":0, "text":"Rpt import done succesfully"}}';
 

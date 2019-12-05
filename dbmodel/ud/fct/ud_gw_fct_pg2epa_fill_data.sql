@@ -34,31 +34,39 @@ BEGIN
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
-	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, y0, ysur, apond, the_geom
-	FROM inp_selector_sector, node 
+	node.node_id, sys_top_elev, sys_ymax, node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
+	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
+	FROM inp_selector_sector, node  -- we need to use node to make more easy the relation sector againts exploitation
+		LEFT JOIN v_node USING (node_id) -- we need to use v_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
 	UNION
 	SELECT 
 	result_id_var,
-	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, y0, ysur, apond, node.the_geom
+	node.node_id, sys_top_elev, sys_ymax, node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
+	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
 	FROM inp_selector_sector, node 
+		LEFT JOIN v_node USING (node_id) 
 		JOIN inp_divider ON node.node_id=inp_divider.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
 	UNION
 	SELECT 
 	result_id_var,
-	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, y0, ysur, apond, node.the_geom
+	node.node_id, sys_top_elev, sys_ymax, node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
+	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
 	FROM inp_selector_sector, node 
+		LEFT JOIN v_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id)
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
 	UNION
 	SELECT 
 	result_id_var,
-	node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, node.sector_id, node.state, node.state_type, node.annotation, expl_id, null, null, null, node.the_geom
+	node.node_id, sys_top_elev, sys_ymax, node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
+	node.state, node.state_type, node.annotation, node.expl_id, null, null, null, node.the_geom
 	FROM inp_selector_sector, node 
+		LEFT JOIN v_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
-		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a USING (node_id);
+		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id;
 
 
 	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)

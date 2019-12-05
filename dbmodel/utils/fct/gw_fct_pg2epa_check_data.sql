@@ -1059,7 +1059,7 @@ BEGIN
 		
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-					VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values on curve_id OR pump_type columns).'));
+					VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values on (curve_id, pump_type) columns).'));
 					v_countglobal=v_countglobal+v_count; 
 					v_count=0;
 				ELSE
@@ -1072,11 +1072,11 @@ BEGIN
 			
 				--pumps
 				SELECT count(*) INTO v_count FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
-				WHERE (curve_id IS NULL OR inp_pump.status IS NULL OR pump_type IS NULL) AND result_id=v_result_id;
+				WHERE (curve_id IS NULL OR inp_pump.status IS NULL) AND result_id=v_result_id;
 		
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-					VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values at least on columns for pump (curve_id, status, pump_type).'));
+					VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values at least on columns for pump (curve_id, status).'));
 					v_countglobal=v_countglobal+v_count; 
 					v_count=0;
 				ELSE
@@ -1248,7 +1248,7 @@ BEGIN
 									
 				-- check dma-period table
 				SELECT count(*) INTO v_count FROM vi_parent_dma JOIN v_rtc_period_dma USING (dma_id);
-				SELECT count(*) INTO v_count_2 FROM (SELECT dma_id, count(*) FROM vi_parent_arc WHERE dma_id >0 GROUP BY dma_id) a;
+				SELECT count(*) INTO v_count_2 FROM (SELECT dma_id, count(*) FROM vi_parent_connec WHERE dma_id >0 GROUP BY dma_id) a;
 			
 				IF  v_count = 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
@@ -1259,7 +1259,7 @@ BEGIN
 				ELSIF v_count_2 > v_count THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 					VALUES (14, v_result_id, 2, concat('WARNING: There is/are ', v_count_2, 
-					' dma''s on this exportation but there is/are only ',v_count,' dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
+					' connec dma''s attribute on this exportation but there is/are only ',v_count,' dma''s defined on dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
 					v_countglobal=v_countglobal+v_count_2;
 					v_count=0;	
 				ELSE

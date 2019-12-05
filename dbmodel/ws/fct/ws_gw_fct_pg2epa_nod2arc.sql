@@ -108,20 +108,18 @@ BEGIN
 				' AND to_arc IS NOT NULL AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user)';
 			
 	ELSIF v_buildupmode > 1 AND p_only_mandatory_nodarc IS FALSE THEN
-		v_query_text = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
-				AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION 
-				SELECT a.node_id FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var)||' 
-				AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION 
-				SELECT a.node_id FROM rpt_inp_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id WHERE result_id='||quote_literal(result_id_var)
-				' AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user)';
+		v_query_text = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id ='||quote_literal(result_id_var)||' 
+				 AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION 
+				SELECT a.node_id FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id ='||quote_literal(result_id_var)||' 
+				 AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION 
+				SELECT a.node_id FROM rpt_inp_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id WHERE result_id ='||quote_literal(result_id_var)||'
+				 AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user)';
 	END IF;
-
 
     FOR node_id_aux IN EXECUTE v_query_text
     LOOP
     
 	v_count = v_count + 1;
-	--RAISE NOTICE 'nodarc number: %', node_id_aux;
 	
         -- Get node data
 	SELECT * INTO record_node FROM rpt_inp_node WHERE node_id = node_id_aux AND result_id=result_id_var;
@@ -130,8 +128,9 @@ BEGIN
         SELECT COUNT(*) INTO num_arcs FROM rpt_inp_arc WHERE (node_1 = node_id_aux OR node_2 = node_id_aux) AND result_id=result_id_var;
 
         -- Get arcs
-        SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux;
-        SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux;
+        SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var;
+        SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var;
+
 
         -- Just 1 arcs
         IF num_arcs = 1 THEN
@@ -240,8 +239,12 @@ BEGIN
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
+
+		-- control pipes
+                IF ST_Length(record_arc2.the_geom)/2 < v_nod2arc OR ST_Length(record_arc1.the_geom)/2 <  v_nod2arc THEN
+			RAISE EXCEPTION 'It''s impossible to continue. Nodarc % has close pipes with length:( %, % ) versus nodarc length ( % )', node_id_aux, ST_Length(record_arc2.the_geom), ST_Length(record_arc1.the_geom),v_nod2arc ;
+                END IF;
     
-                -- TODO: Control pipe shorter than 0.5 m!
                 valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom) / 2);
                 valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, v_nod2arc / ST_Length(record_arc1.the_geom) / 2);
 
