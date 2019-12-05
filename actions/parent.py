@@ -995,3 +995,31 @@ class ParentAction(object):
         return True
 
 
+    def add_layer_from_dxf(self):
+        """ Select a dxf file and add layers into toc """
+        msg = self.controller.tr("Select DXF file")
+        dxf_path, filter_ = QFileDialog.getOpenFileName(None, msg, "", '*.dxf')
+        srid = self.controller.plugin_settings_value('srid')
+
+        # Block the signals so that the window does not appear asking for crs / srid and / or alert message
+        self.iface.mainWindow().blockSignals(True)
+        for type_ in ['LineString', 'Point', 'Polygon']:
+            dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
+            dxf_layer = QgsVectorLayer(f"{dxf_path}|layername=entities|geometrytype={type_}",
+                                       f"{dxf_output_filename}_{type_}.dxf", 'ogr')
+            # Set crs to layer
+            crs = dxf_layer.crs()
+            crs.createFromId(srid)
+            dxf_layer.setCrs(crs)
+            if dxf_layer.isValid():
+                # Add layer to TOC
+                QgsProject.instance().addMapLayer(dxf_layer, False)
+                root = QgsProject.instance().layerTreeRoot()
+                my_group = root.findGroup(dxf_output_filename)
+                if my_group is None:
+                    my_group = root.insertGroup(0, dxf_output_filename)
+                my_group.insertLayer(0, dxf_layer)
+        # Unlock signals
+        self.iface.mainWindow().blockSignals(False)
+
+
