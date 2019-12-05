@@ -34,8 +34,7 @@ DECLARE
 	v_elev json;
 	v_ang210 float;
 	v_ang120 float;
-	v_ymax0 float;
-	v_ymax json;
+	v_ymax float;
 
 	
 BEGIN
@@ -44,15 +43,21 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get SRID
-	v_srid = (SELECT ST_srid (the_geom) FROM sector limit 1);
+	v_srid = (SELECT ST_srid (the_geom) FROM SCHEMA_NAME.sector limit 1);
 
 	-- Make geom point
 	v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));
           			
-	-- Get node1, node2 values
-	SELECT sys_top_elev, sys_elev, the_geom INTO v_top1, v_elev1, v_geom1 FROM v_edit_node WHERE node_id=p_node1;
-	SELECT sys_top_elev, sys_elev, the_geom INTO v_top2, v_elev2, v_geom2 FROM v_edit_node WHERE node_id=p_node2;
+	-- Get node1 values
+	v_geom1:= (SELECT the_geom FROM node WHERE node_id=p_node1);
+	v_top1:= (SELECT top_elev FROM node WHERE node_id=p_node1);
+	v_elev1:= (SELECT elev FROM node WHERE node_id=p_node1);
 	
+	-- Get node2 values
+	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
+	v_top2:= (SELECT top_elev FROM node WHERE node_id=p_node2);
+	v_elev2:= (SELECT elev FROM node WHERE node_id=p_node2);
+
 	-- Calculate distances
 	v_distance10 = (SELECT ST_distance (v_geom0 , v_geom1));
 	v_distance02 = (SELECT ST_distance (v_geom0 , v_geom2));
@@ -82,23 +87,23 @@ BEGIN
 			v_elev0 = v_elev2 + (v_elev2 - v_elev1)* v_proportion2;
 		END IF;	
 	END IF;
-
-	v_ymax0 = v_top0 - v_elev0;
+		
 		
 	v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
+	v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3))::text);		
 	v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
-	v_ymax:= (SELECT to_json(v_ymax0::numeric(12,3)::text));
 
 --      Control NULL's
 	v_top := COALESCE(v_top, '{}');
-	v_elev := COALESCE(v_elev, '{}');
 	v_ymax := COALESCE(v_ymax, '{}');
+	v_elev := COALESCE(v_elev, '{}');
+    
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
 	', "top_elev":' || v_top ||
+		', "ymax":' || v_ymax ||
         ', "elev":' || v_elev ||
-        ', "ymax":' || v_ymax ||
         '}')::json;
 
 --   Exception handling
