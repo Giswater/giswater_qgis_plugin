@@ -1254,6 +1254,9 @@ class ApiParent(ParentAction):
                         widget.setValue(value)
                     widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'button':
+                    widget = self.add_button(dialog, field)
+                    widget = self.set_widget_size(widget, field)
 
                 # Set editable/readonly
                 if type(widget) in (QLineEdit, QDoubleSpinBox):
