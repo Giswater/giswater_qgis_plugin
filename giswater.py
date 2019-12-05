@@ -952,14 +952,14 @@ class Giswater(QObject):
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.put_layer_into_toc, child_layers=child_layers))
+                    action.triggered.connect(partial(self.add_postgres_layer, child_layers=child_layers))
                 else:
-                    action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], "the_geom", child_layer[1]+"_id", None))
+                    action.triggered.connect(partial(self.add_postgres_layer, child_layer[0], "the_geom", child_layer[1]+"_id", None))
 
         main_menu.exec_(click_point)
 
 
-    def put_layer_into_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None):
+    def add_postgres_layer(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None):
         """ Put selected layer into TOC"""
         schema_name = self.controller.credentials['schema'].replace('"', '')
         uri = QgsDataSourceUri()
