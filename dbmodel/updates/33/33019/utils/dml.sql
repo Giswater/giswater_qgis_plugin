@@ -11,3 +11,5 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2780, 'gw_fct_odbc2pg_hydro_filldata', 'utils', 'function', null, null, null,'Function to assist the odbc2pg process', 'role_om',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_function SET istoolbox=false, isparametric=false, alias=null WHERE id=2774;
