@@ -56,7 +56,6 @@ DECLARE
 	v_field_length integer;
 	v_num_decimals integer;
 	v_label text;
-	v_add_widgettype text;
 	v_config_widgettype text;
 	v_param_name text;
 	v_feature_type text;
@@ -153,21 +152,6 @@ BEGIN
 
 
 	--Assign config widget types 
-	IF v_config_widgettype = 'combo' THEN
-		v_add_widgettype = 'QComboBox';
-
-	ELSIF v_config_widgettype = 'check' THEN
-		v_add_widgettype = 'QCheckBox';
-
-	ELSIF v_config_widgettype = 'datepickertime' THEN
-		v_add_widgettype='QDateTimeEdit';
-
-	ELSIF v_config_widgettype = 'textarea' THEN
-		v_add_widgettype = 'QTextEdit';
-	ELSE 
-		v_add_widgettype='QLineEdit';
-	END IF;
-
 	IF v_config_datatype='string' THEN
 		v_add_datatype = 'text';
 	ELSE 
@@ -180,6 +164,12 @@ BEGIN
 		v_audit_datatype=v_config_datatype;
 	END IF; 
 
+	IF v_config_datatype='double' THEN
+		v_audit_datatype=v_config_datatype;
+		v_config_datatype = 'numeric';
+		v_add_datatype = 'numeric';
+	END IF;
+	
 	IF v_config_widgettype='doubleSpinbox' THEN
 		v_audit_widgettype = 'spinbox';
 	ELSE
@@ -301,8 +291,7 @@ IF v_multi_create IS TRUE THEN
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		field_length=v_field_length, form_label=v_label, widgettype_id=v_add_widgettype,
-		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals, iseditable=v_iseditable 
+		field_length=v_field_length, active=v_active, orderby=v_orderby, num_decimals=v_num_decimals, iseditable=v_iseditable 
 		WHERE param_name=v_param_name and cat_feature_id IS NULL;
 
 		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
@@ -473,8 +462,7 @@ IF v_multi_create IS TRUE THEN
 	
 	ELSIF v_action='UPDATE' THEN 
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		field_length=v_field_length, form_label=v_label, widgettype_id=v_add_widgettype ,
-		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals WHERE param_name=v_param_name;		
+		field_length=v_field_length,active=v_active, orderby=v_orderby, num_decimals=v_num_decimals WHERE param_name=v_param_name;		
 	END IF;
 
 --SIMPLE ADDFIELDS
@@ -527,9 +515,9 @@ ELSE
 
 	--modify the configuration of the parameters and fields in config_api_form_fields
 	IF v_action = 'CREATE' THEN
-		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, field_length, num_decimals,
+		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, num_decimals,
 		active, orderby, iseditable)
-		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_field_length, v_num_decimals,
+		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_num_decimals,
 		v_active, v_orderby, v_iseditable);
 	
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
@@ -564,8 +552,7 @@ ELSE
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		field_length=v_field_length, form_label=v_label, widgettype_id=v_add_widgettype ,
-		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals,iseditable=v_iseditable 
+		field_length=v_field_length, active=v_active, orderby=v_orderby, num_decimals=v_num_decimals,iseditable=v_iseditable 
 		WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
 		
 		IF (SELECT cat_feature_id FROM man_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
