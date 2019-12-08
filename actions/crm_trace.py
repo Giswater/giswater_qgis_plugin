@@ -73,15 +73,17 @@ class CrmTrace(ApiParent):
             return False
 
         # Get python synchronization script path
-        if 'crm_daily_script_folderpath' in self.controller.cfgp_system:
-            script_folder = self.controller.cfgp_system['crm_daily_script_folderpath'].value
-        else:
-            script_folder = 'C:/gis/daily_script'
+        try:
+            param_name = 'crm_daily_script_folderpath'
+            script_folder = self.controller.cfgp_system[param_name].value
+            script_path = script_folder + os.sep + 'main.py'
+        except KeyError as e:
+            self.controller.show_warning(str(e))
+            return False
 
-         # Check if script path exists
-        script_path = script_folder + os.sep + 'main.py'
+        # Check if script path exists
         if not os.path.exists(script_path):
-            msg = "File not found: {}. Check config system parameter: '{}'".format(script_path, 'crm_daily_script_folderpath')
+            msg = "File not found: {}. Check config system parameter: '{}'".format(script_path, param_name)
             self.controller.show_warning(msg, duration=20)
             return False
 
@@ -92,19 +94,13 @@ class CrmTrace(ApiParent):
         python_path = 'python'
         if 'python_folderpath' in self.controller.cfgp_system:
             python_folderpath = self.controller.cfgp_system['python_folderpath'].value
-        else:
-            python_folderpath = 'c:/program files/qgis 3.4/apps/python37'
-
-        if os.path.exists(python_folderpath):
-            python_path = python_folderpath + os.sep + python_path
-        else:
-            self.controller.log_warning("Folder not found", parameter=python_folderpath)
-
-        # TODO: Get parameter 'buffer'
-        buffer = 10
+            if os.path.exists(python_folderpath):
+                python_path = python_folderpath + os.sep + python_path
+            else:
+                self.controller.log_warning("Folder not found", parameter=python_folderpath)
 
         # Execute script
-        args = [python_path, script_path, expl_name, buffer, self.schema_name, cur_user]
+        args = [python_path, script_path, expl_name, cur_user, self.schema_name]
         self.controller.log_info(str(args))
         status = True
 
