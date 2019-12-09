@@ -605,7 +605,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: All connecs have links.');
 	END IF;
-
+/*
 	IF v_project_type = 'UD' THEN 
 		v_querytext = 'SELECT gully_id,gratecat_id,the_geom from '||v_edit||'gully WHERE state= 1 
 						AND gully_id NOT IN (select feature_id from link)';
@@ -676,7 +676,7 @@ BEGIN
 			VALUES (25, 1, 'INFO: All gullies have correct arc_id.');
 		END IF;
 	END IF;
-
+*/
 	--Chained connecs/gullies which has different arc_id than the final connec/gully.
 	IF v_project_type = 'WS' THEN 
 		v_querytext = 'with c as (
