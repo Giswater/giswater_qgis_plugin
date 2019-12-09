@@ -959,7 +959,7 @@ class Giswater(QObject):
         main_menu.exec_(click_point)
 
 
-    def add_layer_from_postgres(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None):
+    def add_layer_from_postgres(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group=None):
         """ Put selected layer into TOC"""
         schema_name = self.controller.credentials['schema'].replace('"', '')
         uri = QgsDataSourceUri()
@@ -971,12 +971,23 @@ class Giswater(QObject):
                 if layer[0] != 'Load all':
                     uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
                     vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
-                    QgsProject.instance().addMapLayer(vlayer)
+                    self.check_for_group(vlayer, group)
         else:
             uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
             vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
-            QgsProject.instance().addMapLayer(vlayer)
+            self.check_for_group(vlayer, group)
         self.iface.mapCanvas().refresh()
+
+
+    def check_for_group(self, layer, group=None):
+        if group is None:
+            QgsProject.instance().addMapLayer(layer)
+        else:
+            root = QgsProject.instance().layerTreeRoot()
+            my_group = root.findGroup(group)
+            if my_group is None:
+                my_group = root.insertGroup(0, group)
+            my_group.insertLayer(0, layer)
 
 
     def get_new_layers_name(self, layers_list):
