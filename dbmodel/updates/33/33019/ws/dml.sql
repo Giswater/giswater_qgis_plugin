@@ -41,3 +41,7 @@ return_type = '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"
 {"widgetname":"buffer", "label":"1: Buffer for arc disolve approach:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":9, "ismandatory":false, "placeholder":"10", "value":""}
 {"widgetname":"concaveHullParam", "label":"2: Hull parameter for concave polygon approach:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":9, "ismandatory":false, "placeholder":"0.9", "value":""}]'
  WHERE id=2768;
+ 
+ 
+ --2019/12/11
+ UPDATE audit_cat_table SET context='Editable view', description='View to edit status of valves on field', sys_role_id='role_om', sys_criticity=0, sys_sequence=null, sys_sequence_field=null WHERE id='v_edit_field_valve'
