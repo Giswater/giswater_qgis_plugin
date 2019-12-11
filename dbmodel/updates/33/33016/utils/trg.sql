@@ -9,6 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --22/11/2019
-DROP FUNCTION IF EXISTS gw_trg_edit_man_arc();
-DROP FUNCTION IF EXISTS gw_trg_edit_man_node();
-DROP FUNCTION IF EXISTS gw_trg_edit_man_connec();
+DROP FUNCTION IF EXISTS gw_trg_edit_man_arc() CASCADE;
+DROP FUNCTION IF EXISTS gw_trg_edit_man_node() CASCADE;
+DROP FUNCTION IF EXISTS gw_trg_edit_man_connec() CASCADE;

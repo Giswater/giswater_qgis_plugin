@@ -10,4 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --22/11/2019
 
-DROP FUNCTION IF EXISTS gw_trg_edit_man_gully();
+DROP FUNCTION IF EXISTS gw_trg_edit_man_gully() CASCADE;
