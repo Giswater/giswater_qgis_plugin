@@ -232,9 +232,9 @@ BEGIN
 				EXECUTE 'SELECT user_id, endtime FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_record;
 				
 				IF v_record.endtime IS NULL AND v_record.user_id IS NOT NULL THEN
-					v_disable_widget_name = '{data_startbutton}';
+					v_disable_widget_name = '{data_startbutton, data_team_id, data_lot_id}';
 				ELSE
-					v_disable_widget_name = '{data_endbutton, data_updatebutton}';
+					v_disable_widget_name = '{data_endbutton}';
 				END IF;
 
 				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
@@ -254,7 +254,7 @@ BEGIN
 					array_index := array_index + 1;
 					v_fieldvalue := (v_values->>(aux_json->>'column_id'));
 					
-					IF (aux_json->>'widgetname') = v_disable_widget_name[1] OR (aux_json->>'widgetname') = v_disable_widget_name[2] THEN
+					IF (aux_json->>'widgetname') = v_disable_widget_name[1] OR (aux_json->>'widgetname') = v_disable_widget_name[2] OR (aux_json->>'widgetname') = v_disable_widget_name[3] THEN
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', True);
 					END IF;
 
@@ -387,36 +387,37 @@ BEGIN
 
 			END IF;
 
-				-- setting feature
-				p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
+			-- setting feature
+			p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
 
-				-- refactor fields by filterFields
-				v_filterfields := ((p_data->>'data')::json->>'fields')::json;
-				v_data := (p_data->>'data');
-				v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
-				
-				-- setting filter fields of feature id
-				IF v_featuretype IS NOT NULL THEN				
-
-					-- setting filterfeaturefields using feature id
-					v_filterfeature = (concat('{"',v_featuretype,'_id":"',v_featureid,'"}'))::json;
-					v_data := gw_fct_json_object_set_key(v_data, 'filterFeatureField', v_filterfeature);
-					p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
-
-				END IF;
-	
-				--refactor tabNames
-				p_data := replace (p_data::text, 'tabFeature', 'feature');
+			-- refactor fields by filterFields
+			v_filterfields := ((p_data->>'data')::json->>'fields')::json;
+			v_data := (p_data->>'data');
+			v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
 			
-				RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
-				SELECT gw_api_getlist (p_data) INTO v_fields_json;
-				
+			-- setting filter fields of feature id
+			IF v_featuretype IS NOT NULL THEN				
 
-				-- getting pageinfo and list values
-				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
-				v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
+				-- setting filterfeaturefields using feature id
+				v_filterfeature = (concat('{"',v_featuretype,'_id":"',v_featureid,'"}'))::json;
 				
-				v_fields_json := COALESCE(v_fields_json, '{}');
+				v_data := gw_fct_json_object_set_key(v_data, 'filterFeatureField', v_filterfeature);
+				p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
+
+			END IF;
+
+			--refactor tabNames
+			p_data := replace (p_data::text, 'tabFeature', 'feature');
+		
+			RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
+			SELECT gw_api_getlist (p_data) INTO v_fields_json;
+			raise notice 'TEST BBB -> %',p_data;
+
+			-- getting pageinfo and list values
+			v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
+			v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
+			
+			v_fields_json := COALESCE(v_fields_json, '{}');
 		END IF;
 
 		-- building

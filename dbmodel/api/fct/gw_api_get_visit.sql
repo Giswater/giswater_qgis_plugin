@@ -259,12 +259,11 @@ BEGIN
 
 	
 	--  get formname and tablename
-
 	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
-
-	-- getting if is new visit
+	
+	-- getting provisional visit id if is new visit
 	IF (SELECT id FROM om_visit WHERE id=v_id::int8) IS NULL OR v_id IS NULL THEN
 
 		v_id := (SELECT max(id)+1 FROM om_visit);
@@ -618,8 +617,9 @@ BEGIN
 		
 		--show tab only if it is not new visit or offline is true
 		
+		IF NOT isnewvisit THEN
 			--filling tab (only if it's active)
-
+			
 			IF v_activefilestab THEN
 
 				-- getting filterfields
@@ -675,9 +675,10 @@ BEGIN
 
 			RAISE NOTICE ' --- BUILDING tabFiles with v_tabaux  ---';
 
-	 		-- setting pageInfo
+			-- setting pageInfo
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'pageInfo', v_pageinfo);
 			v_formtabs := v_formtabs  || ',' || v_tabaux::text;
+		END IF;
 
 	--closing tabs array
 	v_formtabs := (v_formtabs ||']');
