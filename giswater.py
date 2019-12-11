@@ -11,8 +11,8 @@ from json import JSONDecodeError
 from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
 from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
-from qgis.PyQt.QtWidgets import QToolBar
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QApplication, QCheckBox, QDockWidget
+from qgis.PyQt.QtWidgets import QGridLayout, QMenu, QLabel, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel
 
@@ -23,6 +23,7 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
+from .actions.add_layer import AddLayer
 from .actions.basic import Basic
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
@@ -792,6 +793,7 @@ class Giswater(QObject):
         # Get SRID from table node
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
+        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Set common plugin toolbars (one action class per toolbar)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -952,42 +954,11 @@ class Giswater(QObject):
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.add_layer_from_postgres, child_layers=child_layers))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layers=child_layers, group=None))
                 else:
-                    action.triggered.connect(partial(self.add_layer_from_postgres, child_layer[0], "the_geom", child_layer[1]+"_id", None))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layer[0], "the_geom", child_layer[1]+"_id", None, None))
 
         main_menu.exec_(click_point)
-
-
-    def add_layer_from_postgres(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group=None):
-        """ Put selected layer into TOC"""
-        schema_name = self.controller.credentials['schema'].replace('"', '')
-        uri = QgsDataSourceUri()
-        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
-                          self.controller.credentials['db'], self.controller.credentials['user'],
-                          self.controller.credentials['password'])
-        if child_layers is not None:
-            for layer in child_layers:
-                if layer[0] != 'Load all':
-                    uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
-                    vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
-                    self.check_for_group(vlayer, group)
-        else:
-            uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-            vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
-            self.check_for_group(vlayer, group)
-        self.iface.mapCanvas().refresh()
-
-
-    def check_for_group(self, layer, group=None):
-        if group is None:
-            QgsProject.instance().addMapLayer(layer)
-        else:
-            root = QgsProject.instance().layerTreeRoot()
-            my_group = root.findGroup(group)
-            if my_group is None:
-                my_group = root.insertGroup(0, group)
-            my_group.insertLayer(0, layer)
 
 
     def get_new_layers_name(self, layers_list):
