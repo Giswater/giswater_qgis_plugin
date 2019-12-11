@@ -605,7 +605,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: All connecs have links.');
 	END IF;
-/*
+
 	IF v_project_type = 'UD' THEN 
 		v_querytext = 'SELECT gully_id,gratecat_id,the_geom from '||v_edit||'gully WHERE state= 1 
 						AND gully_id NOT IN (select feature_id from link)';
@@ -627,18 +627,18 @@ BEGIN
 	--connec/gully without arc_id or with arc_id different than the one to which points its link
 	v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom
 				FROM '||v_edit||'link
-				LEFT JOIN '||v_edit||'connec ON link.feature_id = connec.connec_id 
-				INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint(link.the_geom), 0.01)
-				WHERE exit_type = ''VNODE'' AND (arc.arc_id <> connec.arc_id or connec.arc_id is null) 
-				AND link.feature_type = ''CONNEC'' AND arc.state=1
-				and link.feature_id NOT IN (SELECT connec_id FROM node,link
-				LEFT JOIN connec ON link.feature_id = connec.connec_id 
-				LEFT JOIN vnode ON link.exit_id=vnode.vnode_id::text
+				LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
+				INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
+				WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'connec.arc_id or '||v_edit||'connec.arc_id is null) 
+				AND '||v_edit||'link.feature_type = ''CONNEC'' AND arc.state=1
+				and '||v_edit||'link.feature_id NOT IN (SELECT connec_id FROM node,link
+				LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
+				LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
 				WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
-				ORDER BY link.feature_type, link_id';
+				ORDER BY '||v_edit||'link.feature_type, link_id';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-
+	raise notice 'v_count,%',v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
 		SELECT 106, connec_id, connecat_id, ''Connecs without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
@@ -653,15 +653,15 @@ BEGIN
 	IF v_project_type = 'UD' THEN
 		v_querytext = 'SELECT  '||v_edit||'gully.gully_id,  '||v_edit||'gully.gratecat_id,  '||v_edit||'gully.the_geom
 					FROM '||v_edit||'link
-					LEFT JOIN '||v_edit||'gully ON link.feature_id = gully.gully_id 
-					INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint(link.the_geom), 0.01)
-					WHERE exit_type = ''VNODE'' AND (arc.arc_id <> gully.arc_id or gully.arc_id is null) 
-					AND link.feature_type = ''GULLY'' AND arc.state=1
-					and link.feature_id NOT IN (SELECT gully_id FROM node,link
-					LEFT JOIN gully ON link.feature_id = gully.gully_id 
-					LEFT JOIN vnode ON link.exit_id=vnode.vnode_id::text
+					LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
+					INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
+					WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'gully.arc_id or '||v_edit||'gully.arc_id is null) 
+					AND '||v_edit||'link.feature_type = ''GULLY'' AND arc.state=1
+					and '||v_edit||'link.feature_id NOT IN (SELECT gully_id FROM node,link
+					LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
+					LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
 					WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
-					ORDER BY link.feature_type, link_id';
+					ORDER BY '||v_edit||'link.feature_type, link_id';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -676,7 +676,7 @@ BEGIN
 			VALUES (25, 1, 'INFO: All gullies have correct arc_id.');
 		END IF;
 	END IF;
-*/
+
 	--Chained connecs/gullies which has different arc_id than the final connec/gully.
 	IF v_project_type = 'WS' THEN 
 		v_querytext = 'with c as (
