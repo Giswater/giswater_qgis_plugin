@@ -13,3 +13,7 @@ VALUES (2780, 'gw_fct_odbc2pg_hydro_filldata', 'utils', 'function', null, null, 
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
 UPDATE audit_cat_function SET istoolbox=false, isparametric=false, alias=null WHERE id=2774;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (106, 'Manage dxf file', 'Edit','Manage dxf file','utils')
+ON CONFLICT (id) DO NOTHING;
