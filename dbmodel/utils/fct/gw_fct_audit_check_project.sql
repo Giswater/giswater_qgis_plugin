@@ -116,7 +116,7 @@ BEGIN
 	END LOOP;
 
 	-- force hydrometer_selector
-	IF (select id FROM selector_hydrometer WHERE cur_user = current_user) IS NULL THEN
+	IF (select id FROM selector_hydrometer WHERE cur_user = current_user LIMIT 1) IS NULL THEN
 		INSERT INTO selector_hydrometer (state_id, cur_user) SELECT id, current_user FROM ext_rtc_hydrometer_state ON CONFLICT (state_id, cur_user) DO NOTHING;
 	END IF;
 	
