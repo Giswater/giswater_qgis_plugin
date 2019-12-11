@@ -108,7 +108,7 @@ class ManageNewPsector(ParentManage):
         # Populate combo expl_id
         sql = ("SELECT expl_id, name from exploitation "
                " JOIN selector_expl USING (expl_id) "
-               " WHERE exploitation.expl_id != 0")
+               " WHERE exploitation.expl_id != 0 and cur_user = current_user")
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.cmb_expl_id, rows, 1)
 
