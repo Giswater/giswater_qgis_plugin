@@ -673,7 +673,7 @@ class AddNewLot(ParentManage):
 
     def set_values(self, lot_id):
 
-        sql = ("SELECT * from ext_workorder LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie "
+        sql = ("SELECT om_visit_lot.*, ext_workorder.ct FROM om_visit_lot LEFT JOIN ext_workorder using (serie) "
                "WHERE id ='" + str(lot_id) + "'")
         lot = self.controller.get_row(sql, commit=True)
         if lot:
