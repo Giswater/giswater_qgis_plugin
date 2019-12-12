@@ -1323,13 +1323,6 @@ class DaoController(object):
         return layers
 
 
-    def set_search_path(self, dbname, schema_name):
-        """ Set parameter search_path for current QGIS project """
-
-        sql = ("ALTER DATABASE " + str(dbname) + " SET search_path = " + str(schema_name) + ", public;")
-        self.execute_sql(sql, log_sql=True)
-
-
     def set_path_from_qfiledialog(self, qtextedit, path):
 
         if path[0]:
