@@ -625,6 +625,7 @@ class Go2Epa(ApiParent):
                 msg_box.setIcon(3)
                 msg_box.setWindowTitle("Warning")
                 msg_box.setText(msg)
+                msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
                 msg_box.exec_()
                 return
 
