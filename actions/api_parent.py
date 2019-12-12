@@ -574,7 +574,8 @@ class ApiParent(ParentAction):
 
         widget = QPushButton()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
@@ -593,7 +594,14 @@ class ApiParent(ParentAction):
                 self.controller.show_message(msg, 2)
         # Call def gw_api_open_node(self, dialog, widget) of the class ApiCf
         # or def no_function_associated(self, widget=None, message_level=1)
-        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget))
+        """
+            functions called in -> partial(getattr(self, function_name), dialog, widget)
+                def no_function_associated(self, widget=None, message_level=1)
+                def gw_api_open_node(self, dialog, widget) of the class ApiCf
+                def open_file_path(self, dialog, widget):
+        """
+        params = {'dialog': dialog, 'widget': widget, 'message_level':1}
+        widget.clicked.connect(partial(getattr(self, function_name), **params))
         return widget
 
     def add_textarea(self, field):
@@ -699,8 +707,9 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def no_function_associated(self, widget=None, message_level=1):
-
+    def no_function_associated(self, **kwargs):
+        widget = kwargs['widget']
+        message_level = kwargs['message_level']
         msg = f"No function associated to {type(widget)} {widget.objectName()}: "
         self.controller.show_message(msg, message_level)
 
@@ -1477,6 +1486,14 @@ class ApiParent(ParentAction):
         else:
             webbrowser.open(path)
 
+    def open_file_path(self, **kwargs):
+        """ Open QFileDialog """
+        """ Function called in def add_button(self, dialog, field): -->  
+                widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
+        widget = kwargs['widget']
+        status = self.manage_dxf(True, True)
+        if status is not False:
+            widget.setText(status['path'])
 
 
     def get_selector(self, dialog, selector_type):

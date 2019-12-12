@@ -2663,7 +2663,9 @@ class ApiCF(ApiParent, QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def gw_api_open_node(self, dialog, widget=None):
+    def gw_api_open_node(self, **kwargs):
+        dialog = kwargs['dialog']
+        widget = kwargs['widget']
 
         feature_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
