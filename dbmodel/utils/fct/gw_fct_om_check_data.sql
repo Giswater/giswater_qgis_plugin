@@ -144,25 +144,6 @@ BEGIN
 		VALUES (25, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
 	END IF;	
 	
-	--Check if nodes that are final nodes of arc (node_1, node_2) don't have arc_id assigned
-
-	v_querytext ='(SELECT node_id, nodecat_id, '||v_edit||'node.the_geom from '||v_edit||'node 
-	join arc n1 on n1.node_1 = '||v_edit||'node.node_id 
-	join arc n2 on n2.node_2 = '||v_edit||'node.node_id
-	where '||v_edit||'node.arc_id is not null)';
-
-	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' a') INTO v_count;
-
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-		SELECT 103, node_id, nodecat_id, ''Final nodes with assigned arc_id'', the_geom FROM (', v_querytext,') a');
-
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes, which are arc''s finals and have assigned value of arc_id. Please, check your data before continue'));
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 1, 'INFO: No final nodes have arc_id assigned.');
-	END IF;
 
 	-- Check state_type nulls (arc, node)
 	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 
@@ -367,6 +348,26 @@ BEGIN
 	
 	
 	ELSIF v_project_type='WS' THEN
+
+		--Check if nodes that are final nodes of arc (node_1, node_2) don't have arc_id assigned
+
+		v_querytext ='(SELECT node_id, nodecat_id, '||v_edit||'node.the_geom from '||v_edit||'node 
+		join arc n1 on n1.node_1 = '||v_edit||'node.node_id 
+		join arc n2 on n2.node_2 = '||v_edit||'node.node_id
+		where '||v_edit||'node.arc_id is not null)';
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' a') INTO v_count;
+
+		IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+			SELECT 103, node_id, nodecat_id, ''Final nodes with assigned arc_id'', the_geom FROM (', v_querytext,') a');
+
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes, which are arc''s finals and have assigned value of arc_id. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No final nodes have arc_id assigned.');
+		END IF;
 
 		-- Check state not according with state_type	
 		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
