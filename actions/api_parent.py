@@ -16,7 +16,7 @@ from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
-from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit
+from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QFileDialog
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import json
@@ -603,6 +603,7 @@ class ApiParent(ParentAction):
         params = {'dialog': dialog, 'widget': widget, 'message_level':1}
         widget.clicked.connect(partial(getattr(self, function_name), **params))
         return widget
+
 
     def add_textarea(self, field):
         """ Add widgets QTextEdit type """
@@ -1218,7 +1219,7 @@ class ApiParent(ParentAction):
             return
 
         for field in row[pos][field_id]:
-
+            lbl = None
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['widgetname'])
@@ -1228,65 +1229,65 @@ class ApiParent(ParentAction):
                 if 'tooltip' in field:
                     lbl.setToolTip(field['tooltip'])
 
-                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
-                    widget = QLineEdit()
-                    if 'isMandatory' in field:
-                        widget.setProperty('is_mandatory', field['isMandatory'])
-                    else:
-                        widget.setProperty('is_mandatory', True)
-                    widget.setText(field['value'])
-                    if 'reg_exp' in field:
-                        if field['reg_exp'] is not None:
-                            reg_exp = QRegExp(str(field['reg_exp']))
-                            widget.setValidator(QRegExpValidator(reg_exp))
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'combo':
-                    widget = self.add_combobox(field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'check':
-                    widget = QCheckBox()
-                    if field['value'] is not None and field['value'].lower() == "true":
-                        widget.setChecked(True)
-                    else:
-                        widget.setChecked(False)
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'datepickertime':
-                    widget = QDateEdit()
-                    widget.setCalendarPopup(True)
-                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
-                    widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'spinbox':
-                    widget = QDoubleSpinBox()
-                    if 'value' in field and field['value'] not in(None, ""):
-                        value = float(str(field['value']))
-                        widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'button':
-                    widget = self.add_button(dialog, field)
-                    widget = self.set_widget_size(widget, field)
+            if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                widget = QLineEdit()
+                if 'isMandatory' in field:
+                    widget.setProperty('is_mandatory', field['isMandatory'])
+                else:
+                    widget.setProperty('is_mandatory', True)
+                widget.setText(field['value'])
+                if 'reg_exp' in field:
+                    if field['reg_exp'] is not None:
+                        reg_exp = QRegExp(str(field['reg_exp']))
+                        widget.setValidator(QRegExpValidator(reg_exp))
+                widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'combo':
+                widget = self.add_combobox(field)
+                widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'check':
+                widget = QCheckBox()
+                if field['value'] is not None and field['value'].lower() == "true":
+                    widget.setChecked(True)
+                else:
+                    widget.setChecked(False)
+                widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'datepickertime':
+                widget = QDateEdit()
+                widget.setCalendarPopup(True)
+                date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                widget.setDate(date)
+                widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'spinbox':
+                widget = QDoubleSpinBox()
+                if 'value' in field and field['value'] not in(None, ""):
+                    value = float(str(field['value']))
+                    widget.setValue(value)
+                widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'button':
+                widget = self.add_button(dialog, field)
+                widget = self.set_widget_size(widget, field)
 
-                # Set editable/readonly
-                if type(widget) in (QLineEdit, QDoubleSpinBox):
-                    if 'iseditable' in field:
-                        if str(field['iseditable']) == "False":
-                            widget.setReadOnly(True)
-                            widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                    if type(widget) == QLineEdit:
-                        if 'placeholder' in field:
-                            widget.setPlaceholderText(field['placeholder'])
-                elif type(widget) in (QComboBox, QCheckBox):
-                    if 'iseditable' in field:
-                        if str(field['iseditable']) == "False":
-                            widget.setEnabled(False)
-                widget.setObjectName(field['widgetname'])
+            # Set editable/readonly
+            if type(widget) in (QLineEdit, QDoubleSpinBox):
+                if 'iseditable' in field:
+                    if str(field['iseditable']) == "False":
+                        widget.setReadOnly(True)
+                        widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                if type(widget) == QLineEdit:
+                    if 'placeholder' in field:
+                        widget.setPlaceholderText(field['placeholder'])
+            elif type(widget) in (QComboBox, QCheckBox):
+                if 'iseditable' in field:
+                    if str(field['iseditable']) == "False":
+                        widget.setEnabled(False)
+            widget.setObjectName(field['widgetname'])
 
-                self.put_widgets(dialog, field, lbl, widget)
+            self.put_widgets(dialog, field, lbl, widget)
 
 
     def put_widgets(self, dialog, field,  lbl, widget):
@@ -1553,5 +1554,4 @@ class ApiParent(ParentAction):
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
         for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
-            print(layer_name)
             self.controller.indexing_spatial_layer(layer_name)
