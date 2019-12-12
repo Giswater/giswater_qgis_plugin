@@ -71,7 +71,7 @@ BEGIN
 	--lines
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4) row; 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fprocesscat_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, '}');
 
