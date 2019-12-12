@@ -21,8 +21,9 @@ SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
 SELECT * FROM anl_mincut_arc_x_node  where user_name=current_user;
 */
 
+
 DECLARE
-affected_roSCHEMA_NAME numeric;
+affected_rows numeric;
 cont1 integer default 0;
 BEGIN
 
@@ -64,9 +65,9 @@ BEGIN
 		where n.node_id = a.node_id and
 		n.arc_id = a.arc_id;
 
-		GET DIAGNOSTICS affected_roSCHEMA_NAME =row_count;
+		GET DIAGNOSTICS affected_rows =row_count;
 
-		exit when affected_roSCHEMA_NAME = 0;
+		exit when affected_rows = 0;
 		EXIT when cont1 = 200;
 
 	END LOOP;

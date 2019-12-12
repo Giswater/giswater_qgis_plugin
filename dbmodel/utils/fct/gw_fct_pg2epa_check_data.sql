@@ -826,7 +826,7 @@ BEGIN
 				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'));
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 
+				VALUES (14, v_result_id, 2, 
 				'WARNING: to_arc values checked for valves. It exists and it''s one of two closest arcs. Any way There are to possibilities to define sense, and must be defined by hand, be shure it''s OK.');
 			END IF;
 
@@ -846,7 +846,7 @@ BEGIN
 				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' pump(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'));
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 
+				VALUES (14, v_result_id, 2, 
 				'WARNING: to_arc values checked for pumps. It exists and it''s one of two closest arcs. Any way There are to possibilities to define sense, and must be defined by hand, be shure it''s OK.');
 			END IF;
 			

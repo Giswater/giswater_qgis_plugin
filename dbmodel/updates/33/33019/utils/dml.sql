@@ -27,3 +27,9 @@ UPDATE audit_cat_function SET return_type = '[{"widgetname":"grafClass", "label"
 {"widgetname":"buffer", "label":"1: Buffer for arc disolve approach:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":9, "ismandatory":false, "placeholder":"10", "value":""},
 {"widgetname":"concaveHullParam", "label":"2: Hull parameter for concave polygon approach:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":9, "ismandatory":false, "placeholder":"0.9", "value":""}]' 
 WHERE function_name ='gw_fct_grafanalytics_mapzones_advanced';
+
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2782, 'gw_fct_rpt2pg_log', 'utils', 'function', null, null, null,'Function to create log for results on import epa files', 'role_epa',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;

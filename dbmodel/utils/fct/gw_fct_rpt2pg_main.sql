@@ -34,6 +34,7 @@ DECLARE
 	v_projecttype text;
 	v_iterative text;
 	v_continue text;
+
 BEGIN
 
 --  Search path
@@ -95,10 +96,7 @@ BEGIN
 	-------------------------------------------------------------------------------------------------
 
 	-- set selectors
-	PERFORM gw_fct_rpt2pg (v_result);
-
-	-- return message
-	v_return = '{"message":{"priority":0, "text":"Rpt import done succesfully"}}';
+	SELECT gw_fct_rpt2pg (v_result) INTO v_return;
 
 RETURN v_return;
 		

@@ -11,6 +11,7 @@
 - Bug fix managing pjoint_id and pjoint_type for connect2network and trg_edit_link functions
 - Enhance grafanalytics_mapzones managing new strategy to built mapzone geometry using not only concave hull polygons but also collect and buffer from arc geometries
 - Enable hydrometer selector in case of user has nothing selected
+- When epa result is imported changed log message have been done using result epa file in spite of giswater export log
 
 
 

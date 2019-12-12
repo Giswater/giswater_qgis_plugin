@@ -9,11 +9,11 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying );
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg(result_id_var character varying)  
-RETURNS integer AS $BODY$
+RETURNS json AS $BODY$
+
 DECLARE
-   
-rec_var record;
-      
+   rec_var record;
+   v_return json;   
 
 BEGIN
 
@@ -31,9 +31,10 @@ BEGIN
 	-- NOTE: In spite of there are four selectors tables (rpt_selector_result, rpt_selector_compare, rpt_selector_hourly, rpt_selector_hourly_compare) only it's setted one
 	DELETE FROM rpt_selector_result WHERE cur_user=current_user;
 	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+
+	SELECT gw_fct_rpt2pg_log(result_id_var) INTO v_return;
 	
-	
-RETURN 0;
+RETURN v_return;
 		
 END;
 $BODY$
