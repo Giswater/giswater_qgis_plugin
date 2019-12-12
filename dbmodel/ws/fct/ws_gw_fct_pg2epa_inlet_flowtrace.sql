@@ -51,7 +51,7 @@ BEGIN
 	-- init inlets
 	UPDATE anl_mincut_arc_x_node
 		SET flag1=1, water=1 
-		WHERE node_id IN (SELECT node_id FROM rpt_inp_node WHERE epa_type='RESERVOIR' and result_id=p_result_id)
+		WHERE node_id IN (SELECT node_id FROM rpt_inp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET') and result_id=p_result_id)
 		AND anl_mincut_arc_x_node.user_name=current_user; 
 
 	-- inundation process
