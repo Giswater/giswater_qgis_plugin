@@ -27,10 +27,22 @@ class AddLayer(object):
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name
         self.project_type = None
+        self.uri = self.set_uri()
+
+
+    def set_uri(self):
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
+                          self.controller.credentials['db'], self.controller.credentials['user'],
+                          self.controller.credentials['password'])
+        return uri
 
 
     def manage_geometry(self, geometry):
-        """ Get QgsGeometry and return as text """
+        """ Get QgsGeometry and return as text
+         :param geometry: (QgsGeometry)
+         """
         geometry = geometry.asWkt().replace('Z (', ' (')
         geometry = geometry.replace(' 0)', ')')
         return geometry
@@ -38,9 +50,9 @@ class AddLayer(object):
 
     def from_dxf_to_toc(self, dxf_layer, dxf_output_filename):
         """  Read a dxf file and put result into TOC
-        :param dxf_layer:
-        :param dxf_output_filename:
-        :return:
+        :param dxf_layer: (QgsVectorLayer)
+        :param dxf_output_filename: Name of layer into TOC (string)
+        :return: dxf_layer (QgsVectorLayer)
         """
 
         QgsProject.instance().addMapLayer(dxf_layer, False)
@@ -53,55 +65,53 @@ class AddLayer(object):
         return dxf_layer
 
 
-    def set_datasource(self, layer):
-        schema_name = self.controller.credentials['schema'].replace('"', '')
-        uri = QgsDataSourceUri()
-        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
-                          self.controller.credentials['db'], self.controller.credentials['user'],
-                          self.controller.credentials['password'])
-        uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
-        return layer
-
-
     def export_layer_to_db(self, layer, crs):
+        """ Export layer to postgres database
+        :param layer: (QgsVectorLayer)
+        :param crs: QgsVectorLayer.crs() (crs)
+        """
         sql = f'DROP TABLE "{layer.name()}";'
         self.controller.execute_sql(sql, log_sql=True)
 
         schema_name = self.controller.credentials['schema'].replace('"', '')
-        uri = QgsDataSourceUri()
-        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
-                          self.controller.credentials['db'], self.controller.credentials['user'],
-                          self.controller.credentials['password'])
-        uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
-        error = QgsVectorLayerExporter.exportLayer(layer, uri.uri(), self.controller.credentials['user'], crs, False)
+        self.uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
+
+        error = QgsVectorLayerExporter.exportLayer(layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
 
         if error[0] != 0:
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
     def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group='GW Layers'):
-        """ Put selected layer into TOC"""
+        """ Put selected layer into TOC
+        :param tablename: Postgres table name (string)
+        :param the_geom: Geometry field of the table (string)
+        :param field_id: Field id of the table (string)
+        :param child_layers: List of layers (stringList)
+        :param group: Name of the group that will be created in the toc (string)
+        """
+
         schema_name = self.controller.credentials['schema'].replace('"', '')
-        uri = QgsDataSourceUri()
-        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
-                          self.controller.credentials['db'], self.controller.credentials['user'],
-                          self.controller.credentials['password'])
         if child_layers is not None:
             for layer in child_layers:
                 if layer[0] != 'Load all':
-                    uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
-                    vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
+                    self.uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
+                    vlayer = QgsVectorLayer(self.uri.uri(), f'{layer[0]}', "postgres")
                     self.check_for_group(vlayer, group)
         else:
-            uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-            vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
+            self.uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+            vlayer = QgsVectorLayer(self.uri.uri(), f'{tablename}', "postgres")
             self.check_for_group(vlayer, group)
         self.iface.mapCanvas().refresh()
 
 
     def check_for_group(self, layer, group=None):
-        """ If the function receives a group name, check if it exists or not and put the layer in this group """
+        """ If the function receives a group name, check if it exists or not and put the layer in this group
+        :param layer: (QgsVectorLayer)
+        :param group: Name of the group that will be created in the toc (string)
+        """
+
         if group is None:
             QgsProject.instance().addMapLayer(layer)
         else:
@@ -113,6 +123,16 @@ class AddLayer(object):
 
 
     def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True):
+        """ Add QgsVectorLayer into TOC
+        :param dialog:
+        :param data:
+        :param function_name:
+        :param force_tab:
+        :param reset_text:
+        :param tab_idx:
+        :param del_old_layers:
+        :return:
+        """
         if del_old_layers:
             self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
@@ -136,7 +156,10 @@ class AddLayer(object):
 
 
     def categoryze_layer(self, layer, cat_field):
-
+        """
+        :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
+        :param cat_field: Field to categorize (string)
+        """
         # get unique values
         fields = layer.fields()
         fni = fields.indexOf(cat_field)
@@ -173,7 +196,13 @@ class AddLayer(object):
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
-
+        """ Populate txt_infolog QTextEdit widget
+        :param data: Json
+        :param force_tab: Force show tab (boolean)
+        :param reset_text: Reset(or not) text for each iteration (boolean)
+        :param tab_idx: index of tab to force (integer)
+        :return:
+        """
         change_tab = False
         text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
@@ -198,7 +227,13 @@ class AddLayer(object):
 
 
     def populate_vlayer(self, virtual_layer, data, layer_type, counter):
-
+        """
+        :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
+        :param data: Json
+        :param layer_type: point, line, polygon...(string)
+        :param counter: control if json have values (integer)
+        :return:
+        """
         prov = virtual_layer.dataProvider()
 
         # Enter editing mode
@@ -237,7 +272,9 @@ class AddLayer(object):
 
 
     def delete_layer_from_toc(self, layer_name):
-        """ Delete layer from toc if exist """
+        """ Delete layer from toc if exist
+         :param layer_name: Name's layer (string)
+         """
 
         layer = None
         for lyr in list(QgsProject.instance().mapLayers().values()):
@@ -250,7 +287,10 @@ class AddLayer(object):
 
 
     def load_qml(self, layer, qml_path):
-        """ Apply QML style located in @qml_path in @layer """
+        """ Apply QML style located in @qml_path in @layer
+        :param layer: layer to set qml (QgsVectorLayer)
+        :param qml_path: desired path (string)
+        """
 
         if layer is None:
             return False
