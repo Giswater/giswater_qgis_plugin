@@ -1503,6 +1503,7 @@ class ApiParent(ParentAction):
         if complet_result['result']:
             data = complet_result['result']['body']['data']
             self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
+        dialog.btn_run.setEnabled(True)
 
 
     def manage_dxf(self, dxf_path, export_to_db=False, toc=False):

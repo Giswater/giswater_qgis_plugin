@@ -121,7 +121,10 @@ class GwToolBox(ApiParent):
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
                                                    self.dlg_functions.cmb_layers, complet_result[0]['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
-        
+
+        enable_btn_run = index.sibling(index.row(), 2).data()
+        bool_dict = {"True": True, "true": True, "False": False, "false": False}
+        self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
         self.open_dialog(self.dlg_functions)
 
 
@@ -521,7 +524,13 @@ class GwToolBox(ApiParent):
                         icon = QIcon(path_icon_blue)
                         label.setIcon(icon)
                         label.setToolTip(function['functionname'])
-                parent1.appendRow([label, func_name])
+                enable_run = QStandardItem("True")
+                if function['input_params'] is not None:
+                    if 'btnRunEnabled' in function['input_params']:
+                        bool_dict = {True: "True",  False:"False"}
+                        enable_run = QStandardItem(bool_dict[function['input_params']['btnRunEnabled']])
+
+                parent1.appendRow([label, func_name, enable_run])
             main_parent.appendRow(parent1)
         model.appendRow(main_parent)
         index = model.indexFromItem(main_parent)
