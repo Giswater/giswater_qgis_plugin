@@ -9,7 +9,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
-from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
+from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView, QPushButton
 
 import os
 import json
@@ -17,6 +17,7 @@ from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
+from .add_layer import AddLayer
 from .api_parent import ApiParent
 from ..ui_manager import ApiDlgToolbox, ApiFunctionTb
 
@@ -27,6 +28,7 @@ class GwToolBox(ApiParent):
         """ Class to control toolbar 'om_ws' """
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True
@@ -280,10 +282,10 @@ class GwToolBox(ApiParent):
                     for field in function[0]['return_type']:
                         widget = dialog.findChild(QWidget, field['widgetname'])
                         param_name = widget.objectName()
-                        if type(widget) in ('', QLineEdit):
+                        if type(widget) in ('', QLineEdit, QPushButton):
                             widget.setStyleSheet("border: 1px solid gray")
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                            extras += f'"{param_name}":"{value}", '
+                            extras += f'"{param_name}":"{value}", '.replace('""','null')
                             if value is '' and widget.property('is_mandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
@@ -329,7 +331,7 @@ class GwToolBox(ApiParent):
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
+        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function,True, True, 1, True)
 
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)

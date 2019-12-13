@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsProject, QgsRectangle, QgsVectorLayer
+from qgis.core import QgsVectorLayerExporter, QgsDataSourceUri, QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsProject, QgsRectangle, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QVariant
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget, QSpacerItem, QLabel, QComboBox, QCheckBox, QSizePolicy, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget, QGridLayout
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
@@ -19,6 +19,7 @@ from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
+from .add_layer import AddLayer
 from ..ui_manager import GwDialog, GwMainWindow
 
 
@@ -37,7 +38,7 @@ class ParentAction(object):
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
-
+        self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
     
     def set_controller(self, controller):
         """ Set controller class """
@@ -807,6 +808,7 @@ class ParentAction(object):
 
         change_tab = False
         text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+
         if reset_text:
             text = ""
         for item in data['info']['values']:
@@ -995,31 +997,14 @@ class ParentAction(object):
         return True
 
 
-    def add_layer_from_dxf(self):
-        """ Select a dxf file and add layers into toc """
+    def open_file_path(self, filter_="All (*.*)"):
+        """ Open QFileDialog """
         msg = self.controller.tr("Select DXF file")
-        dxf_path, filter_ = QFileDialog.getOpenFileName(None, msg, "", '*.dxf')
-        srid = self.controller.plugin_settings_value('srid')
+        path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
 
-        # Block the signals so that the window does not appear asking for crs / srid and / or alert message
-        self.iface.mainWindow().blockSignals(True)
-        for type_ in ['LineString', 'Point', 'Polygon']:
-            dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
-            dxf_layer = QgsVectorLayer(f"{dxf_path}|layername=entities|geometrytype={type_}",
-                                       f"{dxf_output_filename}_{type_}.dxf", 'ogr')
-            # Set crs to layer
-            crs = dxf_layer.crs()
-            crs.createFromId(srid)
-            dxf_layer.setCrs(crs)
-            if dxf_layer.isValid():
-                # Add layer to TOC
-                QgsProject.instance().addMapLayer(dxf_layer, False)
-                root = QgsProject.instance().layerTreeRoot()
-                my_group = root.findGroup(dxf_output_filename)
-                if my_group is None:
-                    my_group = root.insertGroup(0, dxf_output_filename)
-                my_group.insertLayer(0, dxf_layer)
-        # Unlock signals
-        self.iface.mainWindow().blockSignals(False)
+        return path, filter_
+
+
+
 
 

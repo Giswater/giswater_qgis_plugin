@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsPointXY
+from qgis.core import QgsPointXY, QgsVectorLayer
 from qgis.PyQt.QtCore import QStringListModel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
@@ -1492,6 +1492,7 @@ class ApiParent(ParentAction):
                 widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
 
         path, filter_ = self.open_file_path(filter_ = "DXF Files (*.dxf)")
+        if not path: return
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
@@ -1500,8 +1501,80 @@ class ApiParent(ParentAction):
         if complet_result is not False:
             widget.setText(complet_result['path'])
         if complet_result['result']:
-            # self.populate_info_text(dialog, complet_result['result']['body']['data'])
-            self.add_layer.add_temp_layer(dialog, complet_result['result']['body']['data'], function_name, True, False, 1, True)
+            data = complet_result['result']['body']['data']
+            self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
+
+
+    def manage_dxf(self, dxf_path, export_to_db=False, toc=False):
+        """ Select a dxf file and add layers into toc
+        :param dxf_path: path of dxf file
+        :param export_to_db: Export layers to database
+        :param toc: insert layers into TOC
+        :return:
+        """
+        srid = self.controller.plugin_settings_value('srid')
+        # Block the signals so that the window does not appear asking for crs / srid and / or alert message
+        self.iface.mainWindow().blockSignals(True)
+
+        sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
+        for type_ in ['LineString', 'Point', 'Polygon']:
+            # Get file name without extension
+            dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
+            # Create layer
+            dxf_layer = QgsVectorLayer(f"{dxf_path}|layername=entities|geometrytype={type_}", f"{dxf_output_filename}_{type_}", 'ogr')
+
+            # Set crs to layer
+            crs = dxf_layer.crs()
+            crs.createFromId(srid)
+            dxf_layer.setCrs(crs)
+
+            if not dxf_layer.hasFeatures():
+                continue
+
+            # Get the name of the columns
+            field_names = [field.name() for field in dxf_layer.fields()]
+
+            geom_types = {0:'geom_point', 1:'geom_line', 2:'geom_polygon'}
+            for count, feature in enumerate(dxf_layer.getFeatures()):
+                geom_type = feature.geometry().type()
+                sql += (f"INSERT INTO temp_table (fprocesscat_id, text_column, {geom_types[int(geom_type)]})"
+                        f" VALUES (106, '{{")
+                for att in field_names:
+                    if feature[att] in (None, 'NULL', ''):
+                        sql += f'"{att}":null , '
+                    else:
+                        sql += f'"{att}":"{feature[att]}" , '
+                geometry = self.add_layer.manage_geometry(feature.geometry())
+                sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n" #sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
+                if count % 500 == 0:
+                    status = self.controller.execute_sql(sql, commit=True)
+                    if not status:
+                        return False
+                    sql = ""
+            if sql != "":
+                status = self.controller.execute_sql(sql, commit=True)
+                if not status:
+                    return False
+
+
+            if export_to_db:
+                self.add_layer.export_layer_to_db(dxf_layer, crs)
+
+            if toc:
+                if dxf_layer.isValid():
+                    self.add_layer.from_dxf_to_toc(dxf_layer, dxf_output_filename)
+
+        # Unlock signals
+        self.iface.mainWindow().blockSignals(False)
+        sql = f"SELECT gw_fct_check_importdxf()::text;"
+        row = self.controller.get_row(sql, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_message("No results for: " + sql, 2)
+            result = None
+        else:
+            result = json.loads(row[0], object_pairs_hook=OrderedDict)
+
+        return {"path": dxf_path, "result":result}
 
 
 
