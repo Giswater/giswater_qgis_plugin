@@ -67,35 +67,44 @@ DECLARE
 	v_fileid text;
 	v_filefeature json;
 	v_client json;
+	v_addphotos json;
+	v_addphotos_array json[];
+	v_list_photos text[];
+	v_event_id bigint;
+	v_parameter_id text;
+	
 
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	INTO v_apiversion;
 
-    EXECUTE 'SELECT wsoftware FROM version'
+	EXECUTE 'SELECT wsoftware FROM version'
 	INTO v_version;
 	
 --  get input values
-    v_client = (p_data ->>'client')::json;
-    --v_id = ((p_data ->>'feature')::json->>'id');
-    v_feature = p_data ->>'feature';
-    v_class = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
-    v_visitextcode = ((p_data ->>'data')::json->>'fields')::json->>'ext_code';
-    v_visitcat = ((p_data ->>'data')::json->>'fields')::json->>'visitcat_id';
-    v_addfile = ((p_data ->>'data')::json->>'newFile')::json;
-    v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
-    v_status = ((p_data ->>'data')::json->>'fields')::json->>'status';
-    v_tablename = ((p_data ->>'feature')::json->>'tableName');
-    v_xcoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
-    v_ycoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
-    v_thegeom = st_setsrid(st_makepoint(v_xcoord, v_ycoord),25831);
-    v_node_id = ((p_data ->>'data')::json->>'fields')::json->>'node_id';
+	v_client = (p_data ->>'client')::json;
+	--v_id = ((p_data ->>'feature')::json->>'id');
+	v_feature = p_data ->>'feature';
+	v_class = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
+	v_visitextcode = ((p_data ->>'data')::json->>'fields')::json->>'ext_code';
+	v_visitcat = ((p_data ->>'data')::json->>'fields')::json->>'visitcat_id';
+	v_addfile = ((p_data ->>'data')::json->>'newFile')::json;
+	v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
+	v_status = ((p_data ->>'data')::json->>'fields')::json->>'status';
+	v_tablename = ((p_data ->>'feature')::json->>'tableName');
+	v_xcoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
+	v_ycoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
+	v_thegeom = st_setsrid(st_makepoint(v_xcoord, v_ycoord),25831);
+	v_node_id = ((p_data ->>'data')::json->>'fields')::json->>'node_id';
+	v_addphotos = (p_data ->>'data')::json->>'photos';
+	v_parameter_id = ((p_data ->>'data')::json->>'fields')::json->>'parameter_id';
 
+	
 	-- Get new visit id
 	v_id := (SELECT max(id)+1 FROM om_visit);
 
@@ -130,7 +139,6 @@ BEGIN
 	END IF;
 
 	--upsert visit
-	
 	
 	IF (SELECT id FROM om_visit WHERE id=v_id) IS NULL THEN
 
@@ -179,8 +187,28 @@ BEGIN
 
 	END IF;
 
+
+	-- Getting and manage array photos
+	SELECT array_agg(row_to_json(a)) FROM (SELECT json_array_elements(v_addphotos))a into v_addphotos_array;
+
+	IF v_addphotos_array IS NOT NULL THEN
+		EXECUTE 'SELECT id FROM om_visit_event WHERE id = ' || v_id || '' into v_event_id;
+		FOREACH v_addphotos IN ARRAY v_addphotos_array
+		LOOP
+			-- Inserting data
+			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text) VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'v_photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''', ''demo image'')';
+			
+			-- getting message
+			SELECT gw_api_getmessage(v_feature, 40) INTO v_message;
+			
+		END LOOP;
+
+	END IF;
+	
+/*
 	-- Manage ADD FILE / PHOTO
 	v_filefeature = '{"featureType":"file", "tableName":"om_visit_event_photo", "idName": "id"}';
+
 
 	IF v_addfile IS NOT NULL THEN
 
@@ -218,7 +246,7 @@ BEGIN
 		v_message = (v_deletefile ->>'message')::json;
 		
 	END IF;
-
+*/
 	-- update event with device parameters
 	RAISE NOTICE 'UPDATE EVENT USING deviceTrace %', ((p_data ->>'data')::json->>'deviceTrace');
 	UPDATE om_visit_event SET xcoord=(((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float,
@@ -228,6 +256,12 @@ BEGIN
 				  WHERE visit_id=v_id;
 
 	
+	-- Save paramenter_id as vdefault
+	IF (SELECT TRUE FROM config_param_user WHERE parameter = 'visitparameter_vdefault' and cur_user = current_user) THEN
+		UPDATE config_param_user SET value= v_parameter_id WHERE parameter = 'visitparameter_vdefault' AND cur_user = current_user;
+	ELSE
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitparameter_vdefault', v_parameter_id, current_user);
+	END IF;
 	
 	-- getting geometry
 	IF v_id IS NOT NULL THEN
