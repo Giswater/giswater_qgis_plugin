@@ -1518,7 +1518,9 @@ class ApiParent(ParentAction):
         self.iface.mainWindow().blockSignals(True)
 
         sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
+        self.controller.execute_sql(sql, commit=True)
         for type_ in ['LineString', 'Point', 'Polygon']:
+            sql = ""
             # Get file name without extension
             dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
             # Create layer
@@ -1546,8 +1548,8 @@ class ApiParent(ParentAction):
                     else:
                         sql += f'"{att}":"{feature[att]}" , '
                 geometry = self.add_layer.manage_geometry(feature.geometry())
-                sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n" #sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
-                if count % 500 == 0:
+                sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
+                if count != 0 and count % 500 == 0:
                     status = self.controller.execute_sql(sql, commit=True)
                     if not status:
                         return False
