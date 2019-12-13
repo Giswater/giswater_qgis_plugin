@@ -62,10 +62,10 @@ BEGIN
 		result_id_var,
 		text_column::json->>'vnode_id' as node_id, 
 		CASE 
-			WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) -- this elevation it's interpolated elevation againts node1 and node2 of pipe
-			ELSE connec.elevation END,
-		CASE	WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) - (text_column::json->>'depth')::numeric(12,3)-- this elevation it's interpolated elevation againts node1 and node2 of pipe
-			ELSE connec.elevation - connec.depth END,
+			WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) -- elevation it's interpolated elevation againts node1 and node2 of pipe
+			ELSE connec.elevation END as elevation,
+		CASE	WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) - (text_column::json->>'depth')::numeric(12,3)-- elev it's interpolated using elevation-depth againts node1 and node2 of pipe
+			ELSE connec.elevation - connec.depth END as elev,
 		'VNODE',
 		'VNODE',
 		'JUNCTION',
