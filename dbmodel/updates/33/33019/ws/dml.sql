@@ -45,3 +45,6 @@ return_type = '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"
  
  --2019/12/11
  UPDATE audit_cat_table SET context='Editable view', description='View to edit status of valves on field', sys_role_id='role_om', sys_criticity=0, sys_sequence=null, sys_sequence_field=null WHERE id='v_edit_field_valve'
+
+ --2019/12/13
+UPDATE audit_cat_function SET input_params='{"featureType":["node","connec"]}' WHERE function_name = 'gw_fct_update_elevation_from_dem';
