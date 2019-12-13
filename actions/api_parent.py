@@ -595,13 +595,13 @@ class ApiParent(ParentAction):
         # Call def gw_api_open_node(self, dialog, widget) of the class ApiCf
         # or def no_function_associated(self, widget=None, message_level=1)
         """
-            functions called in -> partial(getattr(self, function_name), dialog, widget)
-                def no_function_associated(self, widget=None, message_level=1)
-                def gw_api_open_node(self, dialog, widget) of the class ApiCf
-                def open_file_path(self, dialog, widget):
+            functions called in -> partial(getattr(self, function_name), **kwargs)
+                def no_function_associated(self, **kwargs)
+                def gw_api_open_node(self, **kwargs) of the class ApiCf
+                def gw_function_dxf(self, **kwargs):
         """
-        params = {'dialog': dialog, 'widget': widget, 'message_level':1}
-        widget.clicked.connect(partial(getattr(self, function_name), **params))
+        kwargs = {'dialog': dialog, 'widget': widget, 'message_level':1, 'function_name':function_name}
+        widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
         return widget
 
 
@@ -1219,7 +1219,6 @@ class ApiParent(ParentAction):
             return
 
         for field in row[pos][field_id]:
-            lbl = None
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['widgetname'])
@@ -1229,65 +1228,65 @@ class ApiParent(ParentAction):
                 if 'tooltip' in field:
                     lbl.setToolTip(field['tooltip'])
 
-            if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
-                widget = QLineEdit()
-                if 'isMandatory' in field:
-                    widget.setProperty('is_mandatory', field['isMandatory'])
-                else:
-                    widget.setProperty('is_mandatory', True)
-                widget.setText(field['value'])
-                if 'reg_exp' in field:
-                    if field['reg_exp'] is not None:
-                        reg_exp = QRegExp(str(field['reg_exp']))
-                        widget.setValidator(QRegExpValidator(reg_exp))
-                widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            elif field['widgettype'] == 'combo':
-                widget = self.add_combobox(field)
-                widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            elif field['widgettype'] == 'check':
-                widget = QCheckBox()
-                if field['value'] is not None and field['value'].lower() == "true":
-                    widget.setChecked(True)
-                else:
-                    widget.setChecked(False)
-                widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            elif field['widgettype'] == 'datepickertime':
-                widget = QDateEdit()
-                widget.setCalendarPopup(True)
-                date = QDate.fromString(field['value'], 'yyyy/MM/dd')
-                widget.setDate(date)
-                widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            elif field['widgettype'] == 'spinbox':
-                widget = QDoubleSpinBox()
-                if 'value' in field and field['value'] not in(None, ""):
-                    value = float(str(field['value']))
-                    widget.setValue(value)
-                widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            elif field['widgettype'] == 'button':
-                widget = self.add_button(dialog, field)
-                widget = self.set_widget_size(widget, field)
+                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                    widget = QLineEdit()
+                    if 'isMandatory' in field:
+                        widget.setProperty('is_mandatory', field['isMandatory'])
+                    else:
+                        widget.setProperty('is_mandatory', True)
+                    widget.setText(field['value'])
+                    if 'reg_exp' in field:
+                        if field['reg_exp'] is not None:
+                            reg_exp = QRegExp(str(field['reg_exp']))
+                            widget.setValidator(QRegExpValidator(reg_exp))
+                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'combo':
+                    widget = self.add_combobox(field)
+                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'check':
+                    widget = QCheckBox()
+                    if field['value'] is not None and field['value'].lower() == "true":
+                        widget.setChecked(True)
+                    else:
+                        widget.setChecked(False)
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'datepickertime':
+                    widget = QDateEdit()
+                    widget.setCalendarPopup(True)
+                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                    widget.setDate(date)
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'spinbox':
+                    widget = QDoubleSpinBox()
+                    if 'value' in field and field['value'] not in(None, ""):
+                        value = float(str(field['value']))
+                        widget.setValue(value)
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'button':
+                    widget = self.add_button(dialog, field)
+                    widget = self.set_widget_size(widget, field)
 
-            # Set editable/readonly
-            if type(widget) in (QLineEdit, QDoubleSpinBox):
-                if 'iseditable' in field:
-                    if str(field['iseditable']) == "False":
-                        widget.setReadOnly(True)
-                        widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                if type(widget) == QLineEdit:
-                    if 'placeholder' in field:
-                        widget.setPlaceholderText(field['placeholder'])
-            elif type(widget) in (QComboBox, QCheckBox):
-                if 'iseditable' in field:
-                    if str(field['iseditable']) == "False":
-                        widget.setEnabled(False)
-            widget.setObjectName(field['widgetname'])
+                # Set editable/readonly
+                if type(widget) in (QLineEdit, QDoubleSpinBox):
+                    if 'iseditable' in field:
+                        if str(field['iseditable']) == "False":
+                            widget.setReadOnly(True)
+                            widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                    if type(widget) == QLineEdit:
+                        if 'placeholder' in field:
+                            widget.setPlaceholderText(field['placeholder'])
+                elif type(widget) in (QComboBox, QCheckBox):
+                    if 'iseditable' in field:
+                        if str(field['iseditable']) == "False":
+                            widget.setEnabled(False)
+                widget.setObjectName(field['widgetname'])
 
-            self.put_widgets(dialog, field, lbl, widget)
+                self.put_widgets(dialog, field, lbl, widget)
 
 
     def put_widgets(self, dialog, field,  lbl, widget):
@@ -1487,14 +1486,25 @@ class ApiParent(ParentAction):
         else:
             webbrowser.open(path)
 
-    def open_file_path(self, **kwargs):
-        """ Open QFileDialog """
-        """ Function called in def add_button(self, dialog, field): -->  
+
+    def gw_function_dxf(self, **kwargs):
+        """ Function called in def add_button(self, dialog, field): -->
                 widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
+
+        path, filter_ = self.open_file_path(filter_ = "DXF Files (*.dxf)")
+
+        dialog = kwargs['dialog']
         widget = kwargs['widget']
-        status = self.manage_dxf(True, True)
-        if status is not False:
-            widget.setText(status['path'])
+        function_name = kwargs['function_name']
+        complet_result = self.manage_dxf(path, False, True)
+        if complet_result is not False:
+            widget.setText(complet_result['path'])
+        if complet_result['result']:
+            # self.populate_info_text(dialog, complet_result['result']['body']['data'])
+            self.add_layer.add_temp_layer(dialog, complet_result['result']['body']['data'], function_name, True, False, 1, True)
+
+
+
 
 
     def get_selector(self, dialog, selector_type):
