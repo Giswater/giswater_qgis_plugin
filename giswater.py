@@ -771,16 +771,8 @@ class Giswater(QObject):
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
         self.controller.log_info("Set search_path")
-        connection_status, not_version = self.controller.set_database_connection()
 
         self.set_info_button()
-        if not connection_status or not_version:
-            message = self.controller.last_error
-            if show_warning:
-                if message:
-                    self.controller.show_warning(message, 15)
-                self.controller.log_warning(str(self.controller.layer_source))
-            return
 
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)
