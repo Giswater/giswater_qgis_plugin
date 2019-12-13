@@ -154,6 +154,7 @@ DECLARE
 	v_tab_data boolean;
 	v_offline boolean;
 	v_lot integer;
+	v_userrole text;
 	
 
 BEGIN
@@ -190,6 +191,15 @@ BEGIN
 	v_featuretablename = (((p_data ->>'data')::json->>'relatedFeature')::json->>'tableName');
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
+	
+	--   Get editability of layer
+	EXECUTE 'SELECT r1.rolname as "role"
+		FROM pg_catalog.pg_roles r JOIN pg_catalog.pg_auth_members m
+		ON (m.member = r.oid)
+		JOIN pg_roles r1 ON (m.roleid=r1.oid)                                  
+		WHERE r.rolcanlogin AND r.rolname = ''' || current_user || '''
+		ORDER BY 1;'
+        INTO v_userrole;
 
 	--v_offline = 'true';
 
@@ -545,7 +555,12 @@ BEGIN
 					array_index := array_index + 1;
 
 					v_fieldvalue := (v_values->>(aux_json->>'column_id'));	
-		
+					
+					-- Disable widgets from visit form if user has no permisions
+					IF v_userrole LIKE '%role_basic%' THEN
+						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', True);
+					END IF;
+					
 					IF (aux_json->>'widgettype')='combo' THEN 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 
