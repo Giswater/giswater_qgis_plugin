@@ -192,11 +192,11 @@ BEGIN
 	SELECT array_agg(row_to_json(a)) FROM (SELECT json_array_elements(v_addphotos))a into v_addphotos_array;
 
 	IF v_addphotos_array IS NOT NULL THEN
-		EXECUTE 'SELECT id FROM om_visit_event WHERE id = ' || v_id || '' into v_event_id;
+		EXECUTE 'SELECT id FROM om_visit_event WHERE visit_id = ' || v_id || '' into v_event_id;
 		FOREACH v_addphotos IN ARRAY v_addphotos_array
 		LOOP
 			-- Inserting data
-			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text) VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'v_photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''', ''demo image'')';
+			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text) VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''', ''demo image'')';
 			
 			-- getting message
 			SELECT gw_api_getmessage(v_feature, 40) INTO v_message;
