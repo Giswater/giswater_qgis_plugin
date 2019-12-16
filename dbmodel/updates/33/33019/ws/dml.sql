@@ -48,3 +48,120 @@ return_type = '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"
 
  --2019/12/13
 UPDATE audit_cat_function SET input_params='{"featureType":["node","connec"]}' WHERE function_name = 'gw_fct_update_elevation_from_dem';
+
+--2019/12/16
+UPDATE audit_cat_table SET qgis_role_id=NULL, qgis_criticity=NULL, qgis_message=NULL;
+
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage macrodma' WHERE id='v_edit_macrodma';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage macrodqa' WHERE id='v_edit_macrodqa';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage macrosector' WHERE id='v_edit_macrosector';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage macroexploitation' WHERE id='macroexploitation';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage node material catalog' WHERE id='cat_mat_node';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage arc material catalog' WHERE id='cat_mat_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage node catalog' WHERE id='cat_node';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage arc catalog' WHERE id='cat_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage roughness catalog' WHERE id='inp_cat_mat_roughness';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage connec catalog' WHERE id='cat_connec';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage element material catalog' WHERE id='cat_mat_element';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage element catalog' WHERE id='cat_element';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage owner catalog' WHERE id='cat_owner';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage soil catalog' WHERE id='cat_soil';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage pavement catalog' WHERE id='cat_pavement';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage work catalog' WHERE id='cat_work';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage presszone catalog' WHERE id='cat_presszone';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage builder catalog' WHERE id='cat_builder';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage model catalog' WHERE id='cat_brand_model';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage brand catalog' WHERE id='cat_brand';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage users catalog' WHERE id='cat_users';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage peridods catalog' WHERE id='ext_cat_period';
+UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage hydrometer catalog' WHERE id='ext_cat_hydrometer';
+
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot view prices for nodes' WHERE id='v_plan_result_node';
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot view prices for arcs' WHERE id='v_plan_result_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot manage pavements related to arcs' WHERE id='plan_arc_x_pavement';
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot view the geometry of diferent psectors' WHERE id='v_edit_plan_psector';
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot view the geometry of the current psector' WHERE id='v_edit_plan_current_psector';
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot manage the table of prices' WHERE id='price_compost';
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot manage the table of values for create a new compost price' WHERE id='price_compost_value';
+UPDATE audit_cat_table SET qgis_role_id='role_master', qgis_criticity=2, qgis_message='Cannot manage the table of units for prices' WHERE id='price_value_unit';
+
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view reservoir related to EPA tables' WHERE id='v_edit_inp_reservoir';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view tanks related to EPA tables' WHERE id='v_edit_inp_tank';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view inlets related to EPA tables' WHERE id='v_edit_inp_inlet';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view junctions related to EPA tables' WHERE id='v_edit_inp_junction';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='' WHERE id='inp_mixing';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='' WHERE id='inp_emitter';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='' WHERE id='inp_source';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage demands related to EPA tables' WHERE id='v_edit_inp_demand';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view virtual valves related to EPA tables' WHERE id='v_edit_inp_virtualvalve';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view shortpipes valves related to EPA tables' WHERE id='v_edit_inp_shortpipe';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view valves related to EPA tables' WHERE id='v_edit_inp_valve';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view pumps related to EPA tables' WHERE id='v_edit_inp_pump';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view pipes related to EPA tables' WHERE id='v_edit_inp_pipes';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage additional pumps related to EPA tables' WHERE id='inp_pump_additional';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view connecs related to EPA tables' WHERE id='v_edit_inp_connec';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage controls for arcs' WHERE id='inp_controls_x_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage rules for arcs' WHERE id='inp_rules_x_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage rules for nodes' WHERE id='inp_rules_x_node';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage curve catalog related to EPA tables' WHERE id='inp_curve_id';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage curves related to EPA tables' WHERE id='inp_curve';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage pattern catalog related to EPA tables' WHERE id='inp_pattern';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage pattern values related to EPA tables' WHERE id='inp_pattern_value';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage energy values related to EPA tables' WHERE id='inp_energy';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage reaction values related to EPA tables' WHERE id='inp_reactions';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage quality values related to EPA tables' WHERE id='inp_quality';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage energy values related to EPA tables' WHERE id='inp_energy';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view node hourly values related to EPA results' WHERE id='v_rpt_node_hourly';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view node values related to EPA results' WHERE id='v_rpt_node';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view all node values related to EPA results' WHERE id='v_rpt_node_all';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view arc hourly values related to EPA results' WHERE id='v_rpt_arc_hourly';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view arc values related to EPA results' WHERE id='v_rpt_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view all arc values related to EPA results' WHERE id='v_rpt_arc_all';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage energy usage values related to EPA results' WHERE id='v_rpt_energy_usage';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage hydraulic status values related to EPA results' WHERE id='v_rpt_hydraulic_status';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view compared node hourly values related to EPA results' WHERE id='v_rpt_comp_node_hourly';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view compared node values related to EPA results' WHERE id='v_rpt_comp_node';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view compared arc hourly values related to EPA results' WHERE id='v_rpt_comp_arc_hourly';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot view compared arc values related to EPA results' WHERE id='v_rpt_comp_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage compared energy usage values related to EPA results' WHERE id='v_rpt_comp_energy_usage';
+UPDATE audit_cat_table SET qgis_role_id='role_epa', qgis_criticity=2, qgis_message='Cannot manage compared hydraulic status values related to EPA results' WHERE id='v_rpt_comp_hydraulic_status';
+
+UPDATE audit_cat_table SET qgis_role_id='role_edit', qgis_criticity=2, qgis_message='Cannot use Add circle tool' WHERE id='v_edit_cad_auxcircle';
+UPDATE audit_cat_table SET qgis_role_id='role_edit', qgis_criticity=2, qgis_message='Cannot use Add point tool' WHERE id='v_edit_cad_auxpoint';
+
+UPDATE audit_cat_table SET qgis_role_id='role_om', qgis_criticity=2, qgis_message='Cannot view the geometry of diferent visits' WHERE id='v_edit_om_visit';
+UPDATE audit_cat_table SET qgis_role_id='role_om', qgis_criticity=2, qgis_message='Cannot view the geometry of mincut initial points' WHERE id='v_anl_mincut_result_cat';
+UPDATE audit_cat_table SET qgis_role_id='role_om', qgis_criticity=2, qgis_message='Cannot view the geometry of mincut affected valves' WHERE id='v_anl_mincut_result_valve';
+UPDATE audit_cat_table SET qgis_role_id='role_om', qgis_criticity=2, qgis_message='Cannot view the geometry of mincut affected connecs' WHERE id='v_anl_mincut_result_connec';
+UPDATE audit_cat_table SET qgis_role_id='role_om', qgis_criticity=2, qgis_message='Cannot view the geometry of mincut affected nodes' WHERE id='v_anl_mincut_result_node';
+UPDATE audit_cat_table SET qgis_role_id='role_om', qgis_criticity=2, qgis_message='Cannot view the geometry of mincut affected arcs' WHERE id='v_anl_mincut_result_arc';
+
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage exploitations' WHERE id='v_edit_exploitation';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage dma''s' WHERE id='v_edit_dma';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage hydraulic sectors' WHERE id='v_edit_sector';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage dqa''s' WHERE id='v_edit_dqa';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage presszones' WHERE id='v_edit_presszone';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage exploitations' WHERE id='v_edit_exploitation';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=3, qgis_message='Cannot manage arcs. Imposible to use Giswater' WHERE id='v_edit_arc';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage connecs' WHERE id='v_edit_connec';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage links' WHERE id='v_edit_link';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot view polygons related to fountains' WHERE id='v_edit_man_fountain_pol';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot view polygons related to registers' WHERE id='v_edit_man_register_pol';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot view polygons related to tanks' WHERE id='v_edit_man_tank_pol';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot use dimensioning tool' WHERE id='v_edit_dimensions';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage related elements' WHERE id='v_edit_element';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage samplepoints' WHERE id='v_edit_samplepoint';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage municipality limits related to BASEMAP' WHERE id='ext_municipality';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage address related to BASEMAP' WHERE id='v_ext_address';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage streets related to BASEMAP' WHERE id='v_ext_streetaxis';
+UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage plots related to BASEMAP' WHERE id='v_ext_plot';
+
+
+
+
+
+
+
+
+
+
