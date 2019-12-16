@@ -75,10 +75,11 @@ class ApiParent(ParentAction):
         for layer in layers:
             if self.controller.is_layer_visible(layer):
                 table_name = self.controller.get_layer_source_table_name(layer)
-                sslmode = layer.dataProvider().dataSourceUri().lower().find('sslmode=')
+                table = layer.dataProvider().dataSourceUri()
                 # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
-                if sslmode == -1:
+                if 'SELECT row_number() over ()' in str(table):
                     continue
+
                 visible_layer += f'"{table_name}", '
         visible_layer = visible_layer[:-2]
 
