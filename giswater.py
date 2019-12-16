@@ -12,7 +12,7 @@ from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressio
 from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QApplication, QCheckBox, QDockWidget
-from qgis.PyQt.QtWidgets import QGridLayout, QMenu, QLabel, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel
 
@@ -23,6 +23,7 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
+from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
 from .actions.edit import Edit
@@ -31,6 +32,7 @@ from .actions.master import Master
 from .actions.mincut import MincutParent
 from .actions.notify_functions import NotifyFunctions
 from .actions.om import Om
+from .actions.parent import ParentAction
 from .actions.tm_basic import TmBasic
 from .actions.update_sql import UpdateSQL
 from .actions.utils import Utils
@@ -50,6 +52,7 @@ from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
 from .ui_manager import AuditCheckProjectResult
+
 
 
 class Giswater(QObject):  
@@ -785,6 +788,8 @@ class Giswater(QObject):
         # Get SRID from table node
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
+
+        self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Set common plugin toolbars (one action class per toolbar)
@@ -1141,15 +1146,10 @@ class Giswater(QObject):
                "\nINSERT INTO selector_expl (expl_id, cur_user)"
                " VALUES(" + expl_id + ", current_user);")
         self.controller.execute_sql(sql)        
-        
-        
+
+
     def populate_audit_check_project(self, layers):
         """ Fill table 'audit_check_project' with layers data """
-
-        self.dlg_audit_project = AuditCheckProjectResult()
-        self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
-
         sql = ("DELETE FROM audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
@@ -1170,72 +1170,74 @@ class Giswater(QObject):
         status = self.controller.execute_sql(sql)
         if not status:
             return False
-                
-        sql = ("SELECT gw_fct_audit_check_project(1);")
+
+        sql = ("SELECT gw_fct_audit_check_project(1)::text;")
         row = self.controller.get_row(sql, commit=True)
         if not row:
             return False
 
-        if row[0] == -1:
-            message = "This is not a valid Giswater project. Do you want to view problem details?"
-            answer = self.controller.ask_question(message, "Warning!")
-            if answer:
-                sql = ("SELECT * FROM audit_check_project"
-                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
-                rows = self.controller.get_rows(sql, commit=True)
-                if rows:
-                    self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
-                    # TODO .exec_() to open_dialog
-                    self.dlg_audit_project.exec_()
-                    # Fill log file with the names of the layers
-                    message = "This is not a valid Giswater project"
-                    self.controller.log_info(message)
-                    message = ""
-                    for row in rows:
-                        message += str(row["table_id"]) + "\n"
-                    self.controller.log_info(message)                    
-            return False
+        result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
-        elif row[0] > 0:
+        self.dlg_audit_project = AuditCheckProjectResult()
+        self.parent.load_settings(self.dlg_audit_project)
+        self.dlg_audit_project.rejected.connect(partial(self.parent.save_settings, self.dlg_audit_project))
+
+        # Manage tab txt_infolog, and hide for not user admin
+        cur_user = self.controller.get_current_user()
+        role_admin = self.controller.check_role_user("role_admin", cur_user)
+        if not role_admin:
+            utils_giswater.remove_tab_by_tabName(self.dlg_audit_project.mainTab, "tab_infolog")
+
+        # Populate info_log and missing layers
+        critical_level = 0
+        for res in result:
+            self.add_layer.populate_info_text(self.dlg_audit_project, res['body']['data'], True, False, 0)
+            if 'missingLayers' in res['body']['data']:
+                critical_level = self.get_missing_layers(self.dlg_audit_project, res['body']['data']['missingLayers'], critical_level)
+
+        if int(critical_level) > 0:
             show_msg = self.settings.value('system_variables/show_msg_layer')
             if show_msg == 'TRUE':
                 message = "Some layers of your role not found. Do you want to view them?"
                 answer = self.controller.ask_question(message, "Warning")
                 if answer:
-                    sql = ("SELECT * FROM audit_check_project"
-                           " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
-                    rows = self.controller.get_rows(sql, log_sql=True)
-                    if rows:
-                        self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                    self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+                    self.parent.open_dialog(self.dlg_audit_project)
 
-                        # TODO .exec_() to open_dialog
-                        self.dlg_audit_project.exec_()
-
-                        # Fill log file with the names of the layers
-                        message = "Layers of your role not found"
-                        self.controller.log_info(message)
-                        message = ""
-                        for row in rows:
-                            message += str(row["table_id"]) + "\n"
-                        self.controller.log_info(message)
-            
         return True
 
 
-    def populate_table_by_query(self, qtable, query):
-        """
-        :param qtable: QTableView to show
-        :param query: query to set model
-        """
-        
-        model = QSqlQueryModel()
-        model.setQuery(query)
-        qtable.setModel(model)
-        qtable.show()
+    def get_missing_layers(self, dialog, m_layers, critical_level):
 
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+        grl_critical = dialog.findChild(QGridLayout, "grl_critical")
+        grl_others = dialog.findChild(QGridLayout, "grl_others")
+
+        for pos, item in enumerate(m_layers):
+            widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+            if widget: continue
+            label = QLabel()
+            label.setObjectName(f"lbl_{item['layer']}")
+            label.setText(f"{item['layer']}")
+            critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
+            widget = QCheckBox()
+            widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            widget.setObjectName(f"{item['layer']}")
+            widget.setProperty('field_id', item['id'])
+            if int(item['criticity']) == 3:
+                grl_critical.addWidget(label, pos, 0)
+                grl_critical.addWidget(widget, pos, 1)
+            if int(item['criticity']) == 2:
+                grl_others.addWidget(label, pos, 0)
+                grl_others.addWidget(widget, pos, 1)
+
+        return critical_level
+
+
+    def add_selected_layers(self):
+        checks = self.dlg_audit_project.findChildren(QCheckBox)
+        for check in checks:
+            if check.isChecked():
+                self.add_layer.from_postgres_to_toc(check.objectName(), "the_geom", check.property('field_id'), None, "GW_layers")
 
 
     def project_read_pl(self, show_warning=True):

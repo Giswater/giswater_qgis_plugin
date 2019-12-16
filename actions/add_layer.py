@@ -5,9 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
+from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
 
 from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QTabWidget
 
 import os
@@ -152,33 +153,49 @@ class AddLayer(object):
                         self.load_qml(v_layer, qml_path)
                     elif 'category_field' in data[k] and data[k]['category_field']:
                         field = data[k]['category_field']
-                        self.categoryze_layer(v_layer, field)
+                        size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
+                        self.categoryze_layer(v_layer, field, size)
 
 
-    def categoryze_layer(self, layer, cat_field):
+    def categoryze_layer(self, layer, cat_field, size = 2):
         """
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
         :param cat_field: Field to categorize (string)
         """
+        cat_field = 'expl_id'
+        size = 4
         # get unique values
         fields = layer.fields()
         fni = fields.indexOf(cat_field)
         unique_values = layer.dataProvider().uniqueValues(fni)
-
         categories = []
         for unique_value in unique_values:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+            symbol.setSize(size)
 
             # configure a symbol layer
-            layer_style = {}
-            layer_style['color'] = '%d, %d, %d' % (randrange(0, 256), randrange(0, 256), randrange(0, 256))
-            layer_style['outline'] = '#000000'
-            symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
+            # layer_style = {}
+            # layer_style['color'] = '%d, %d, %d' % (randrange(0, 256), randrange(0, 256), randrange(0, 256))
+            # layer_style['color'] = '255,0,0'
+            # layer_style['outline'] = '#000000'
+            color = QColor(0, 0, 255)
+            if  unique_value == 1:
+                color = QColor(255, 0, 0)
+            symbol.setColor(color)
+            # layer_style['horizontal_anchor_point'] = '6'
+            # layer_style['offset_map_unit_scale'] = '6'
+            # layer_style['outline_width'] = '6'
+            # layer_style['outline_width_map_unit_scale'] = '6'
+            # layer_style['size'] = '6'
+            # layer_style['size_map_unit_scale'] = '6'
+            # layer_style['vertical_anchor_point'] = '6'
 
-            # replace default symbol layer with the configured one
-            if symbol_layer is not None:
-                symbol.changeSymbolLayer(0, symbol_layer)
+            # symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
+            # print(f"Symbollaye --> {symbol_layer}")
+            # # replace default symbol layer with the configured one
+            # if symbol_layer is not None:
+            #     symbol.changeSymbolLayer(0, symbol_layer)
 
             # create renderer object
             category = QgsRendererCategory(unique_value, symbol, str(unique_value))
@@ -194,6 +211,7 @@ class AddLayer(object):
 
         layer.triggerRepaint()
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
+
 
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
         """ Populate txt_infolog QTextEdit widget
