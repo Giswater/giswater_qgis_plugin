@@ -426,12 +426,14 @@ BEGIN
 				-- set value (from v_value)
 				IF v_filter_fields[i] IS NOT NULL THEN
 					
-					IF (v_filter_fields[i]->>'widgettype')='combo' THEN
-						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
-					ELSIF (v_filter_fields[i]->>'column_id')='limit' AND v_limit IS NOT NULL THEN
+					IF (v_filter_fields[i]->>'column_id')='limit' AND v_limit IS NOT NULL THEN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', COALESCE(v_limit));
 					ELSIF (v_filter_fields[i]->>'column_id')='startdate' AND v_startdate IS NOT NULL THEN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', COALESCE(v_startdate));
+					ELSIF (v_filter_fields[i]->>'column_id')='lot_id' AND v_filterlot IS NOT NULL THEN
+						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_filterlot::text);
+					ELSIF (v_filter_fields[i]->>'widgettype')='combo' THEN
+						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
 					ELSE
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
 					END IF;
