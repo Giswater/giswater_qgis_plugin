@@ -605,8 +605,12 @@ class ApiConfig(ApiParent):
         if not layers:
             return
         layers_name = '{"list_layers_name":"{'
+        tables_name = '"list_tables_name":"{'
         for layer in layers:
             layers_name += f"{layer.name()}, "
-        layers_name = layers_name[:-2] + '}"}'
-        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, user_name) VALUES (63, $${layers_name}$$, current_user);')
-        self.controller.execute_sql(sql)
+            tables_name += f"{self.controller.get_layer_source_table_name(layer)}, "
+
+        result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"}'
+
+        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, user_name) VALUES (63, $${result}$$, current_user);')
+        self.controller.execute_sql(sql, log_sql = True)
