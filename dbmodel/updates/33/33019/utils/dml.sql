@@ -33,3 +33,7 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2782, 'gw_fct_rpt2pg_log', 'utils', 'function', null, null, null,'Function to create log for results on import epa files', 'role_epa',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+-- 16/12/2019
+UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_column::json->>''list_tables_name'')::text[] from temp_table where fprocesscat_id = 63 and user_name = current_user)) as id, 
+UNNEST(ARRAY (select (text_column::json->>''list_layers_name'')::text[] FROM temp_table WHERE fprocesscat_id = 63 and user_name = current_user)) as idval ' WHERE id = 'cad_tools_base_layer_vdefault';
