@@ -126,23 +126,23 @@ class ManageNewPsector(ParentManage):
             self.cmb_result_id.setVisible(False)
             self.dlg_plan_psector.chk_enable_all.setEnabled(False)
 
-        # tab Bugdet
-        total_arc = self.dlg_plan_psector.findChild(QLineEdit, "total_arc")
-        self.double_validator(total_arc)
-        total_node = self.dlg_plan_psector.findChild(QLineEdit, "total_node")
-        self.double_validator(total_node)
-        total_other = self.dlg_plan_psector.findChild(QLineEdit, "total_other")
-        self.double_validator(total_other)
-        pem = self.dlg_plan_psector.findChild(QLineEdit, "pem")
-        self.double_validator(pem)
-        pec_pem = self.dlg_plan_psector.findChild(QLineEdit, "pec_pem")
-        self.double_validator(pec_pem)
-        pec = self.dlg_plan_psector.findChild(QLineEdit, "pec")
-        self.double_validator(pec)
-        pec_vat = self.dlg_plan_psector.findChild(QLineEdit, "pec_vat")
-        self.double_validator(pec_vat)
-        pca = self.dlg_plan_psector.findChild(QLineEdit, "pca")
-        self.double_validator(pca)
+        # # tab Bugdet
+        # total_arc = self.dlg_plan_psector.findChild(QLabel, "total_arc")
+        # self.double_validator(total_arc)
+        # total_node = self.dlg_plan_psector.findChild(QLabel, "total_node")
+        # self.double_validator(total_node)
+        # total_other = self.dlg_plan_psector.findChild(QLabel, "total_other")
+        # self.double_validator(total_other)
+        # pem = self.dlg_plan_psector.findChild(QLabel, "pem")
+        # self.double_validator(pem)
+        # pec_pem = self.dlg_plan_psector.findChild(QLabel, "pec_pem")
+        # self.double_validator(pec_pem)
+        # pec = self.dlg_plan_psector.findChild(QLabel, "pec")
+        # self.double_validator(pec)
+        # pec_vat = self.dlg_plan_psector.findChild(QLabel, "pec_vat")
+        # self.double_validator(pec_vat)
+        # pca = self.dlg_plan_psector.findChild(QLabel, "pca")
+        # self.double_validator(pca)
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
         self.double_validator(gexpenses)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
@@ -497,7 +497,7 @@ class ManageNewPsector(ParentManage):
             index = index + 1
 
         if records in ([], None):
-            # If no composer configurated, disable composer pdf file widgets
+            # If no composer configured, disable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(False)
             self.dlg_psector_rapport.chk_composer.setChecked(False)
             self.dlg_psector_rapport.cmb_templates.setEnabled(False)
@@ -506,7 +506,7 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setStyleSheet('color: red')
             return
         else:
-            # If composer configurated, enable composer pdf file widgets
+            # If composer configured, enable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(True)
             self.dlg_psector_rapport.cmb_templates.setEnabled(True)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(True)
@@ -677,43 +677,46 @@ class ManageNewPsector(ParentManage):
 
     def calc_pec_pem(self, dialog):
         
-        if str(utils_giswater.getWidgetText(dialog, 'pec')) != 'null':
+        if utils_giswater.getWidgetText(dialog, 'pec') not in('null', None):
             pec = float(utils_giswater.getWidgetText(dialog, 'pec'))
         else:
             pec = 0
-        if str(utils_giswater.getWidgetText(dialog, 'pem')) != 'null':
+
+        if utils_giswater.getWidgetText(dialog, 'pem') not in('null', None):
             pem = float(utils_giswater.getWidgetText(dialog, 'pem'))
         else:
             pem = 0
-        res = pec - pem
+
+        res = round(pec - pem, 2)
         utils_giswater.setWidgetText(dialog, 'pec_pem', res)
 
 
     def calc_pecvat_pec(self, dialog):
 
-        if str(utils_giswater.getWidgetText(dialog, 'pec_vat')) != 'null':
+        if utils_giswater.getWidgetText(dialog, 'pec_vat') not in('null', None):
             pec_vat = float(utils_giswater.getWidgetText(dialog, 'pec_vat'))
         else:
             pec_vat = 0
-        if str(utils_giswater.getWidgetText(dialog, 'pec')) != 'null':
+
+        if utils_giswater.getWidgetText(dialog, 'pec') not in('null', None):
             pec = float(utils_giswater.getWidgetText(dialog, 'pec'))
         else:
             pec = 0
-        res = pec_vat - pec
+        res = round(pec_vat - pec, 2)
         utils_giswater.setWidgetText(dialog, 'pecvat_pem', res)
 
 
     def calc_pca_pecvat(self, dialog):
         
-        if str(utils_giswater.getWidgetText(dialog, 'pca')) != 'null':
+        if utils_giswater.getWidgetText(dialog, 'pca') not in('null', None):
             pca = float(utils_giswater.getWidgetText(dialog, 'pca'))
         else:
             pca = 0
-        if str(utils_giswater.getWidgetText(dialog, 'pec_vat')) != 'null':
+        if utils_giswater.getWidgetText(dialog, 'pec_vat') not in('null', None):
             pec_vat = float(utils_giswater.getWidgetText(dialog, 'pec_vat'))
         else:
             pec_vat = 0
-        res = pca - pec_vat
+        res = round(pca - pec_vat, 2)
         utils_giswater.setWidgetText(dialog, 'pca_pecvat', res)
 
 

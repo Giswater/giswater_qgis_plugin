@@ -1121,28 +1121,10 @@
               </property>
              </spacer>
             </item>
-            <item alignment="Qt::AlignRight">
-             <widget class="QLineEdit" name="total_arc">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+            <item>
+             <widget class="QLabel" name="total_arc">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1176,28 +1158,10 @@
               </property>
              </spacer>
             </item>
-            <item alignment="Qt::AlignRight">
-             <widget class="QLineEdit" name="total_node">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+            <item>
+             <widget class="QLabel" name="total_node">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1231,22 +1195,10 @@
               </property>
              </spacer>
             </item>
-            <item alignment="Qt::AlignRight">
-             <widget class="QLineEdit" name="total_other">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+            <item>
+             <widget class="QLabel" name="total_otherl">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1287,22 +1239,10 @@
               </property>
              </widget>
             </item>
-            <item alignment="Qt::AlignRight">
-             <widget class="QLineEdit" name="pem">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+            <item>
+             <widget class="QLabel" name="pem">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1347,27 +1287,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="pec_pem">
-              <property name="enabled">
-               <bool>false</bool>
+             <widget class="QLabel" name="pec_pem">
+              <property name="text">
+               <string/>
               </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -1402,22 +1327,10 @@
               </property>
              </widget>
             </item>
-            <item alignment="Qt::AlignRight">
-             <widget class="QLineEdit" name="pec">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+            <item>
+             <widget class="QLabel" name="pec">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1462,27 +1375,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="pecvat_pem">
-              <property name="enabled">
-               <bool>false</bool>
+             <widget class="QLabel" name="pecvat_pem">
+              <property name="text">
+               <string/>
               </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -1518,27 +1416,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="pec_vat">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+             <widget class="QLabel" name="pec_vat">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1583,27 +1463,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="pca_pecvat">
-              <property name="enabled">
-               <bool>false</bool>
+             <widget class="QLabel" name="pca_pecvat">
+              <property name="text">
+               <string/>
               </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>160</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -1645,15 +1510,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="pca">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>20</height>
-               </size>
+             <widget class="QLabel" name="pca">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -1866,13 +1725,6 @@
   <tabstop>vat</tabstop>
   <tabstop>other</tabstop>
   <tabstop>btn_rapports</tabstop>
-  <tabstop>pem</tabstop>
-  <tabstop>pecvat_pem</tabstop>
-  <tabstop>pec_vat</tabstop>
-  <tabstop>pec_pem</tabstop>
-  <tabstop>pca_pecvat</tabstop>
-  <tabstop>pca</tabstop>
-  <tabstop>pec</tabstop>
   <tabstop>doc_id</tabstop>
   <tabstop>btn_doc_insert</tabstop>
   <tabstop>btn_doc_delete</tabstop>
@@ -1880,9 +1732,7 @@
   <tabstop>btn_open_doc</tabstop>
   <tabstop>tbl_document</tabstop>
   <tabstop>psector_id</tabstop>
-  <tabstop>total_node</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>total_arc</tabstop>
   <tabstop>feature_id</tabstop>
   <tabstop>btn_insert</tabstop>
   <tabstop>btn_delete</tabstop>
@@ -1892,7 +1742,6 @@
   <tabstop>chk_enable_all</tabstop>
   <tabstop>btn_unselect</tabstop>
   <tabstop>txt_name</tabstop>
-  <tabstop>total_other</tabstop>
   <tabstop>btn_snapping</tabstop>
   <tabstop>tab_feature</tabstop>
  </tabstops>
