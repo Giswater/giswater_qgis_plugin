@@ -98,8 +98,8 @@ BEGIN
 				v_fieldvalue := (v_values->>(aux_json->>'column_id'));
 				IF (aux_json->>'column_id') = 'lot_id' THEN
 					v_fieldvalue = (v_values->>('idval'));
-				ELSIF (aux_json->>'column_id') = 'team_id' OR (aux_json->>'column_id') = 'visitclass_id' THEN
-					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'iseditable', FALSE);
+				ELSIF (aux_json->>'column_id') IN ('team_id', 'visitclass_id', 'descript') THEN
+					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', TRUE);
 				END IF;
 				
 				IF (aux_json->>'widgettype')='combo' THEN 
