@@ -1155,6 +1155,7 @@ class Giswater(QObject):
         self.controller.execute_sql(sql)
         sql = ""
         for layer in layers:
+            if layer is None: continue
             if layer.providerType() in ('memory', 'ogr'): continue
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
             uri = layer.dataProvider().dataSourceUri()
@@ -1200,11 +1201,12 @@ class Giswater(QObject):
         # Populate info_log and missing layers
         critical_level = 0
         # for res in result:
-        self.add_layer.populate_info_text(self.dlg_audit_project, result['body']['data'], True, False, 0)
+        have_info = self.add_layer.populate_info_text(self.dlg_audit_project, result['body']['data'], True, False, 0)
+
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
-
-        if int(critical_level) > 0:
+        self.parent.hide_void_groupbox(self.dlg_audit_project)
+        if int(critical_level) > 0 or have_info:
             show_msg = self.settings.value('system_variables/show_msg_layer')
             if show_msg == 'TRUE':
                 self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
@@ -1232,7 +1234,7 @@ class Giswater(QObject):
             if int(item['criticity']) == 3:
                 grl_critical.addWidget(label, pos, 0)
                 grl_critical.addWidget(widget, pos, 1)
-            if int(item['criticity']) == 2:
+            else:
                 grl_others.addWidget(label, pos, 0)
                 grl_others.addWidget(widget, pos, 1)
 
