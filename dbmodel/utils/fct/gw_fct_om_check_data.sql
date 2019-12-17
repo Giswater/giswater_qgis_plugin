@@ -610,19 +610,21 @@ BEGIN
 	IF v_project_type = 'UD' THEN 
 		v_querytext = 'SELECT gully_id,gratecat_id,the_geom from '||v_edit||'gully WHERE state= 1 
 						AND gully_id NOT IN (select feature_id from link)';
-	END IF;
-
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
-		SELECT 104, gully_id, gratecat_id, ''Gullies without links'', the_geom FROM (', v_querytext,')a');
 
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' gullies without links.'));
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 1, 'INFO: All gullies have links.');
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+		
+		IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
+			SELECT 104, gully_id, gratecat_id, ''Gullies without links'', the_geom FROM (', v_querytext,')a');
+
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' gullies without links.'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: All gullies have links.');
+		END IF;
+	
 	END IF;
 
 	--connec/gully without arc_id or with arc_id different than the one to which points its link
