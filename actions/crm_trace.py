@@ -73,8 +73,9 @@ class CrmTrace(ApiParent):
             return False
 
         # Get python synchronization script path
-        if 'crm_daily_script_folderpath' in self.controller.cfgp_system:
-            script_folder = self.controller.cfgp_system['crm_daily_script_folderpath'].value
+        row = self.controller.get_config('crm_daily_script_folderpath', 'value', 'config_param_system')
+        if row:
+            script_folder = row[0]
         else:
             script_folder = 'C:/gis/daily_script'
 
@@ -90,8 +91,9 @@ class CrmTrace(ApiParent):
 
         # Get python folder path
         python_path = 'python'
-        if 'python_folderpath' in self.controller.cfgp_system:
-            python_folderpath = self.controller.cfgp_system['python_folderpath'].value
+        row = self.controller.get_config('python_folderpath', 'value', 'config_param_system')
+        if row:
+            python_folderpath = row[0]
         else:
             python_folderpath = 'c:/program files/qgis 3.4/apps/python37'
 

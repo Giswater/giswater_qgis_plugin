@@ -39,8 +39,6 @@ class DaoController(object):
         self.dao = None
         self.credentials = None
         self.current_user = None
-        self.cfgp_user = {}
-        self.cfgp_system = {}
         self.min_log_level = 20
         self.min_message_level = 0
 

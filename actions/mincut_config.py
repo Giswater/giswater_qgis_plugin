@@ -87,7 +87,8 @@ class MincutConfig(ParentAction):
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
         self.set_icon(self.btn_notify, "307")
         try:
-            self.custom_action_sms = json.loads(self.controller.cfgp_system['sys_mincutalerts_enable'].value, object_pairs_hook=OrderedDict)
+            row = self.controller.get_config('sys_mincutalerts_enable', 'value', 'config_param_system')
+            self.custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.btn_notify.setVisible(self.custom_action_sms['show_mincut_sms'])
         except KeyError as e:
             self.btn_notify.setVisible(False)
