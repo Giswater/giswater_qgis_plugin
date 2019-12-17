@@ -102,8 +102,10 @@ class CrmTrace(ApiParent):
         else:
             self.controller.log_warning("Folder not found", parameter=python_folderpath)
 
-        # TODO: Get parameter 'buffer'
-        buffer = str(10)
+        # Get parameter 'buffer'
+        buffer = utils_giswater.getWidgetText(self.dlg_trace, 'buffer', return_string_null=False)
+        if buffer is None or buffer == "":
+            buffer = str(10)
 
         # Execute script
         args = [python_path, script_path, expl_name, buffer, self.schema_name, cur_user]
@@ -121,7 +123,7 @@ class CrmTrace(ApiParent):
             self.controller.log_info("result: " + str(result))
             if result != 0:
                 # Show warning message with button to open script log file
-                msg = "Process finished with some errorss"
+                msg = "Process finished with some errors"
                 inf_msg = "Open script .log file to get more details"
                 self.controller.show_warning_open_file(msg, inf_msg, log_path)
                 status = False
@@ -140,9 +142,6 @@ class CrmTrace(ApiParent):
         if not exists:
             self.controller.show_warning("Function not found", parameter=function_name)
             return False
-
-        # SELECT gw_fct_odbc2pg_main($${"client": {"device":3, "infoType":100, "lang":"ES"},
-        # "feature": {}, "data": {"parameters": {"exploitation":"557", "period":"4T", "year":"2019"} } }$$)
 
         # Get expl_id, year and period from table 'audit_log'
         sql = ("SELECT to_json(log_message) as log_message "
@@ -218,7 +217,6 @@ class CrmTrace(ApiParent):
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
                     self.controller.log_info("populate_vlayer")
                     self.populate_vlayer(v_layer, data, k)
-                    # TODO delete this 'if' when all functions are refactored
                     if 'qmlPath' in data[k]:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
