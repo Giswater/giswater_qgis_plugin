@@ -1434,16 +1434,6 @@ class ApiParent(ParentAction):
         self.draw_polyline(points)
 
 
-    def hide_void_groupbox(self, dialog):
-        """ Hide empty grupbox """
-
-        grbox_list = dialog.findChildren(QGroupBox)
-        for grbox in grbox_list:
-            widget_list = grbox.findChildren(QWidget)
-            if len(widget_list) == 0:
-                grbox.setVisible(False)
-
-
     def set_setStyleSheet(self, field, widget, wtype='label'):
 
         if field['stylesheet'] is not None:
