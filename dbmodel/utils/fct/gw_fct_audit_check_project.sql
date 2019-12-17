@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2464
 
---SELECT SCHEMA_NAME.gw_fct_audit_check_project();
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_check_project(INTEGER);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.3.019", "fprocesscat_id":1}}$$)::text;
+SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.3.019", "fprocesscat_id":1}}$$);
 */
 
 DECLARE 
@@ -35,38 +35,26 @@ v_psector_vdef text;
 v_errortext text;
 v_result_id text;
 rec_table record;
-v_om_check_result json;
-v_plan_check_result json;
-v_edit_check_result json;
-v_admin_check_result json;
-v_audit_result 		json;
-v_audit_result_point		text;
-v_audit_result_line 		json;
-v_audit_result_polygon	json;
-v_audit_result_info json;
 v_version text;
 v_srid integer;
 v_result_layers_criticity3 json;
 v_result_layers_criticity2 json;
+v_return json;
 v_missing_layers json;
 v_schema text;
-v_om_check_result_info json;
-v_plan_check_result_info json;
-v_admin_check_result_info json;
-v_om_check_result_point json;
-v_om_check_result_line json;
-v_om_check_result_polygon json;
 v_layer_list text;
-v_epa_check_result json;
-v_epa_check_result_info json;
-v_epa_check_result_point json;
-v_epa_check_result_line json;
-v_epa_check_result_polygon json;
-v_result_agg json;
-v_audit_check_result json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_result json;
+v_result_info json;
 v_project_role_control boolean;
 v_fprocesscat_id_aux integer;
 v_qgis_version text;
+v_qmlpointpath	text = '';
+v_qmllinepath	text = '';
+v_qmlpolpath	text = '';
+
 
 BEGIN 
 
@@ -80,6 +68,11 @@ BEGIN
 	-- Get input parameters
 	v_fprocesscat_id_aux := (p_data ->> 'data')::json->> 'fprocesscat_id';
 	v_qgis_version := (p_data ->> 'data')::json->> 'version';
+
+	-- get user parameters
+	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
+	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
+	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 	
 	SELECT value::boolean INTO v_project_role_control FROM config_param_user where parameter='project_role_control' and cur_user=current_user;
 	v_project_role_control=true;
@@ -91,7 +84,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fprocesscat_id=101 AND user_name=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 4, concat('AUDIT CHECK PROJECT'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 4, 'AUDIT CHECK PROJECT');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 4, '-------------------------------------------------------------');
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 3, 'CRITICAL ERRORS');	
@@ -215,12 +208,9 @@ BEGIN
 		IF'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
 			"client":{"device":3, "infoType":100, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)'
-			INTO v_om_check_result;
-			v_om_check_result_info = ((((v_om_check_result->>'body')::json->>'data')::json->>'info')::json->>'values')::json;
-			v_om_check_result_point = ((((v_om_check_result->>'body')::json->>'data')::json->>'point')::json->>'values')::json;
-			v_om_check_result_line = (((v_om_check_result->>'body')::json->>'data')::json->>'line')::json;
-			v_om_check_result_polygon = (((v_om_check_result->>'body')::json->>'data')::json->>'polygon')::json;
+			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
+			-- insert results 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB OM):') FROM audit_check_data WHERE fprocesscat_id=25 offset 8;
 
 		END IF;
 
@@ -228,12 +218,9 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 			"client":{"device":3, "infoType":100, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"t1":"check_project","saveOnDatabase":true, 
-			"useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)'
-			INTO v_epa_check_result;
-			v_epa_check_result_info = (((v_epa_check_result->>'body')::json->>'data')::json->>'info')::json;
-			v_epa_check_result_point = ((((v_epa_check_result->>'body')::json->>'data')::json->>'point')::json->>'values')::json;
-			v_epa_check_result_line = (((v_epa_check_result->>'body')::json->>'data')::json->>'line')::json;
-			v_epa_check_result_polygon = (((v_epa_check_result->>'body')::json->>'data')::json->>'polygon')::json;
+			"useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)';
+			-- insert results 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB EPA):') FROM audit_check_data WHERE fprocesscat_id=14 offset 10;
 
 		END IF;
 
@@ -241,18 +228,18 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_plan_audit_check_data($${
 			"client":{"device":3, "infoType":100, "lang":"ES"},
 			"feature":{},
-			"data":{"parameters":{"resultId":"check_project"},"saveOnDatabase":true}}$$)'
-			INTO v_plan_check_result;
-			v_plan_check_result_info = (((v_plan_check_result->>'body')::json->>'data')::json->>'info')::json;
+			"data":{"parameters":{"resultId":"check_project"},"saveOnDatabase":true}}$$)';
+			-- insert results 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB PLAN):') FROM audit_check_data WHERE fprocesscat_id=15 offset 8;
 			
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_admin_check_data($${"client":
 			{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
-			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text'
-			INTO v_admin_check_result;
-			v_admin_check_result_info = ((((v_admin_check_result->>'body')::json->>'data')::json->>'info')::json->>'values')::json;
+			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
+			-- insert results 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB ADMIN):') FROM audit_check_data WHERE fprocesscat_id=95 offset 8;
 			
 		END IF;
 	END IF;
@@ -274,51 +261,52 @@ BEGIN
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_host != v_table_host;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR: There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO: All layers come from current host');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
 		END IF;
+		
 		--check layers database
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_dbname != v_table_dbname;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR: There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO: All layers come from current database');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
 		END IF;
 
 		--check layers database
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_schema != v_table_schema;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR: There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO: All layers come from current schema');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
 		END IF;
 
 		--check layers user
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE user_name != table_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR: There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO: All layers have been added by current user');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
 		END IF;
 
 		-- start process
@@ -355,157 +343,65 @@ BEGIN
 
 
 	END IF;
-/*
-	-- Checking user value_default
-	ELSIF v_fprocesscat_id_aux=19 THEN
 
-	DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=v_fprocesscat_id_aux;
-
-	FOR rec_table IN SELECT * FROM audit_cat_param_user WHERE dv_table IS NOT NULL AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))
-	LOOP 
-		RAISE NOTICE '%', rec_table;
-		SELECT value INTO v_parameter FROM config_param_user WHERE parameter=rec_table.id AND cur_user=current_user;
-		
-		IF v_parameter IS NOT NULL THEN
-				
-			IF rec_table.dv_clause IS NOT NULL THEN
-				EXECUTE rec_table.dv_clause||'''||v_parameter||''';
-			ELSE 
-				EXECUTE 'SELECT '||rec_table.dv_column||' FROM '||rec_table.dv_table|| ' WHERE '''||v_parameter||'''='||rec_table.dv_column INTO v_query_string;
-			END IF;
-
-			IF v_query_string IS NULL THEN
-
-				INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) 
-				VALUES (rec_table.id, 19, NULL, FALSE, rec_table.qgis_message);
-				v_count=v_count+1;
-			END IF;
-			
-		ELSE
-			INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) 
-			VALUES (rec_table.id, 19, NULL, FALSE, rec_table.qgis_message);
-			v_count=v_count+1;
-		END IF;
-		
-	END LOOP;
-
-	RETURN v_count;
-
-
-	-- Checking data consistency
-	ELSIF v_fprocesscat_id_aux=2 THEN
-
-	DELETE FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=v_fprocesscat_id_aux;
-
-
-		-- start process
-		FOR rec_table IN SELECT * FROM audit_cat_table WHERE sys_criticity>0
-		LOOP	
-			-- audit rows
-			v_querytext:= 'SELECT count(*) FROM '||rec_table.id;
-			EXECUTE v_querytext INTO v_audit_rows;
-	
-			-- system rows
-			v_compare_sign= substring(rec_table.sys_rows from 1 for 1);
-			v_sys_rows=substring(rec_table.sys_rows from 2 for 999);
-			IF (v_sys_rows>='0' and v_sys_rows<'9999999') THEN
-	
-			ELSIF v_sys_rows like'@%' THEN 
-				v_querytext=substring(rec_table.sys_rows from 3 for 999);
-				IF v_querytext IS NULL THEN
-					RETURN audit_function(2078,2464,(rec_table.id)::text);
-				END IF;
-				EXECUTE v_querytext INTO v_sys_rows;
-			ELSE
-				v_querytext='SELECT count(*) FROM '||v_sys_rows;
-				IF v_querytext IS NULL THEN
-					RETURN audit_function(2078,2464,(rec_table.id)::text);
-				END IF;
-				EXECUTE v_querytext INTO v_sys_rows;
-			END IF;
-	
-			IF v_compare_sign='>'THEN 
-				v_compare_sign='=>';
-			END IF;
-	
-			v_diference=v_audit_rows-v_sys_rows::integer;
-		
-			-- compare audit rows & system rows
-			IF v_compare_sign='=' THEN
-					IF v_diference=0 THEN
-					v_isenabled=TRUE;
-				ELSE
-					v_isenabled=FALSE;
-				END IF;
-					
-			ELSIF v_compare_sign='=>' THEN
-				IF v_diference >= 0 THEN
-					v_isenabled=TRUE;
-				ELSE	
-					v_isenabled=FALSE;
-				END IF;	
-			END IF;
-
-			
-			INSERT INTO audit_check_project ( table_id, fprocesscat_id, criticity,enabled, message,user_name)
-			VALUES (rec_table.id,  v_fprocesscat_id_aux, rec_table.sys_criticity, v_isenabled, 
-			concat('Table needs ',v_compare_sign,' ',v_sys_rows,' rows and it has ',v_audit_rows,' rows'), (SELECT current_user));
-		END LOOP;
-
-		SELECT count(*) INTO v_error FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=2 AND enabled=FALSE;	
-
-		RETURN v_error;
-		
-	END IF;
-*/
-
--- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_audit_result
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=101 order by criticity desc, id asc) row; 
-	v_audit_result_info := COALESCE(v_audit_result, '{}'); 
-	v_audit_result_info = concat ('{"geometryType":"", "values":',v_audit_result_info, '}');
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
 
+
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=101 order by criticity desc, id asc) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (
+	SELECT id, node_id, nodecat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (7,14,64,66,70,71,98) -- epa
+	UNION
+	SELECT id, node_id, nodecat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103)  -- om
+	UNION
+	SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id IN (101,102,104,105,106) -- om
+	) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (
+	SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (3, 14, 39)  -- epa
+	UNION
+	SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (4, 88, 102) -- om 
+	) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, '}');
+
+
 	--    Control null	
-	v_audit_result_info:=COALESCE(v_audit_result_info,'{}');
-	v_audit_result_point:=COALESCE(v_audit_result_point,'{}');
-	v_audit_result_line:=COALESCE(v_audit_result_line,'{}');
-	v_audit_result_polygon:=COALESCE(v_audit_result_polygon,'{}');
+	v_result_info:=COALESCE(v_result_info,'{}');
+	v_result_point:=COALESCE(v_result_point,'{}');
+	v_result_line:=COALESCE(v_result_line,'{}');
+	v_result_polygon:=COALESCE(v_result_polygon,'{}');
 	v_missing_layers:=COALESCE(v_missing_layers,'{}');
 
 
 	--return definition for v_audit_check_result
-	v_audit_check_result= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 		     ',"body":{"form":{}'||
-			     ',"data":{ "info":'||v_audit_result_info||','||
-					'"point":'||v_audit_result_point||','||
-					'"line":'||v_audit_result_line||','||
-					'"polygon":'||v_audit_result_polygon||','||
+			     ',"data":{ "info":'||v_result_info||','||
+					'"point":'||v_result_point||','||
+					'"line":'||v_result_line||','||
+					'"polygon":'||v_result_polygon||','||
 					'"missingLayers":'||v_missing_layers||'}'||
 			      '}}')::json;
-	      
-	IF v_project_role_control THEN
-	--    Control null	
-		v_om_check_result := COALESCE(v_om_check_result,'{}');
-		v_epa_check_result := COALESCE(v_epa_check_result,'{}');
-		v_plan_check_result := COALESCE(v_plan_check_result,'{}');
-		v_admin_check_result:= COALESCE(v_admin_check_result,'{}');
-
-		--concatenate returns from the executed functions
-		v_result_agg = concat('[',v_audit_check_result,',',v_om_check_result::text,',',v_epa_check_result::text,',',
-		v_plan_check_result::text,',',v_admin_check_result::text,']');
-
-	ELSE
-		v_result_agg = v_audit_check_result;
-	END IF;
---  Return
-    	   
-	RETURN v_result_agg;
+	--  Return	   
+	RETURN v_return;
 
 END;
 

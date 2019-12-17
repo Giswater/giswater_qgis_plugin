@@ -314,33 +314,8 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-	--points
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom 
-	FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=15 AND result_id=v_result_id) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
-
-	--lines
-	--frpocesscat_id=39 gets arcs without source of water
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom 
-	FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=39 OR fprocesscat_id=15) AND result_id=v_result_id) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
 
-	--polygons
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom 
-	FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=15 AND result_id=v_result_id) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
-
-		
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
