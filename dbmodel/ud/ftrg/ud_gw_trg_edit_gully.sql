@@ -568,6 +568,9 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
 	
 	PERFORM gw_fct_check_delete(OLD.gully_id, 'GULLY');
+
+	-- delete from polygon table (before the deletion of gully)
+	DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully WHERE gully_id=OLD.gully_id);
 	
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 

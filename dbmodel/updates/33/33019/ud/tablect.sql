@@ -12,6 +12,7 @@ ALTER TABLE cat_node DROP CONSTRAINT IF EXISTS cat_node_node_type_fkey;
 ALTER TABLE cat_arc DROP CONSTRAINT IF EXISTS cat_arc_arc_type_fkey;
 ALTER TABLE cat_connec DROP CONSTRAINT IF EXISTS cat_connec_connec_type_fkey;
 ALTER TABLE cat_grate DROP CONSTRAINT IF EXISTS cat_grate_gully_type_fkey;
+ALTER TABLE gully DROP CONSTRAINT gully_pol_id_fkey;
 
 
 
@@ -19,4 +20,4 @@ ALTER TABLE cat_node ADD CONSTRAINT cat_node_node_type_fkey FOREIGN KEY (node_ty
 ALTER TABLE cat_arc ADD CONSTRAINT cat_arc_arc_type_fkey FOREIGN KEY (arc_type) REFERENCES arc_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE cat_connec ADD CONSTRAINT cat_connec_connec_type_fkey FOREIGN KEY (connec_type) REFERENCES connec_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE cat_grate ADD CONSTRAINT cat_grate_gully_type_fkey FOREIGN KEY (gully_type) REFERENCES gully_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
+ALTER TABLE gully ADD CONSTRAINT gully_pol_id_fkey FOREIGN KEY (pol_id) REFERENCES polygon (pol_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
