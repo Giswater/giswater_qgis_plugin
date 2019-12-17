@@ -49,6 +49,21 @@ return_type = '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"
  --2019/12/13
 UPDATE audit_cat_function SET input_params='{"featureType":["node","connec"]}' WHERE function_name = 'gw_fct_update_elevation_from_dem';
 
+INSERT INTO audit_cat_function (id, function_name, project_type, function_type, input_params, 
+       return_type, context, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2780,'gw_fct_insert_importdxf','utils','function','{"featureType":[], "btnRunEnabled":false}',
+'[{"widgetname": "btn_path", "label": "Select DXF file:", "widgettype": "button",  "datatype": "text", "layoutname": "grl_option_parameters", "layout_order": 2, "value": "...","widgetfunction":"gw_function_dxf" }]',
+null,'Function to manage DXF files','role_admin',FALSE,TRUE,'Manage dxf files',TRUE) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function (id, function_name, project_type, function_type, input_params, 
+       return_type, context, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2782,'gw_fct_check_importdxf','utils','function',null,null, null,'Function to check the quality of imported DXF files',
+	'role_admin',FALSE,false,null,false) ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE IF EXISTS ext_raster_dem ALTER COLUMN rastercat_id TYPE text;
+
+ALTER TABLE IF EXISTS ext_cat_raster ALTER COLUMN id TYPE text;
+
 --2019/12/16
 UPDATE audit_cat_table SET qgis_role_id=NULL, qgis_criticity=NULL, qgis_message=NULL;
 
