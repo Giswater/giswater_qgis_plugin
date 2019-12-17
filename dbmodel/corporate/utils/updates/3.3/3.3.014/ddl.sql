@@ -11,11 +11,11 @@ SET search_path = "utils", public, pg_catalog;
 CREATE TABLE raster_dem(
   id serial NOT NULL PRIMARY KEY,
   rast raster,
-  rastercat_id varchar(16));
+  rastercat_id text);
 
 
 CREATE TABLE cat_raster(
-  id varchar(16) NOT NULL PRIMARY KEY,
+  id text NOT NULL PRIMARY KEY,
   code varchar(30),
   alias varchar(50),
   raster_type varchar(30), 
