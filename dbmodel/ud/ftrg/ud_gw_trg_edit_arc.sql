@@ -437,41 +437,12 @@ BEGIN
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
-		
-		-- y1, y2
-		IF NEW.y1*NEW.y2*OLD.y1*OLD.y2 IS NOT NULL THEN
-			IF (NEW.y1 <> OLD.y1) OR (NEW.y2 <> OLD.y2) THEN
-				UPDATE arc SET y1=NEW.y1, y2=NEW.y2 WHERE arc_id=NEW.arc_id;
-			END IF;
-		ELSE
-			UPDATE arc SET y1=NEW.y1, y2=NEW.y2 WHERE arc_id=NEW.arc_id;
-		END IF;
 
-		--custom_y1,custom_y2
-		IF NEW.custom_y1*NEW.custom_y2*OLD.custom_y1*OLD.custom_y2 IS NOT NULL THEN
-			IF (NEW.custom_y1 <> OLD.custom_y1) OR (NEW.custom_y2 <> OLD.custom_y2) THEN
-				UPDATE arc SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2 WHERE arc_id=NEW.arc_id;
-			END IF;	
-		ELSE
-			UPDATE arc SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2 WHERE arc_id=NEW.arc_id;
-		END IF;
-
-		--elev1,elev2
-		IF NEW.elev1*NEW.elev2*OLD.elev1*OLD.elev2 IS NOT NULL THEN
-			IF (NEW.elev1 <> OLD.elev1) OR (NEW.elev2 <> OLD.elev2) THEN
-				UPDATE arc SET elev1=NEW.elev1, elev2=NEW.elev2 WHERE arc_id=NEW.arc_id;
-			END IF;
-		ELSE
-			UPDATE arc SET elev1=NEW.elev1, elev2=NEW.elev2 WHERE arc_id=NEW.arc_id;
-		END IF;
-
-		--custom_elev1,custom_elev2
-		IF NEW.custom_elev1*NEW.custom_elev2*OLD.custom_elev1*OLD.custom_elev2 IS NOT NULL THEN
-			IF (NEW.custom_elev1 <> OLD.custom_elev1) OR (NEW.custom_elev2 <> OLD.custom_elev2) THEN
-				UPDATE arc SET custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2 WHERE arc_id=NEW.arc_id;
-			END IF;	
-		ELSE
-			UPDATE arc SET custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2 WHERE arc_id=NEW.arc_id;
+		-- Update of topocontrol fields only when one if it has changed in order to prevent to be triggered the topocontrol without changes
+		IF (NEW.y1 <> OLD.y1) OR (NEW.y2 <> OLD.y2) OR (NEW.custom_y1 <> OLD.custom_y1) OR (NEW.custom_y2 <> OLD.custom_y2) OR 
+		(NEW.elev1 <> OLD.elev1) OR (NEW.elev2 <> OLD.elev2) OR (NEW.custom_elev1 <> OLD.custom_elev1) OR (NEW.custom_elev2 <> OLD.custom_elev2) THEN 
+			UPDATE arc SET y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2, 
+			custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2 WHERE arc_id=NEW.arc_id;
 		END IF;
 
 		
