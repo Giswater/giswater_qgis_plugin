@@ -1235,6 +1235,7 @@ class Giswater(QObject):
         for check in checks:
             if check.isChecked():
                 self.add_layer.from_postgres_to_toc(check.objectName(), "the_geom", check.property('field_id'), None, "GW_layers")
+        self.parent.close_dialog(self.dlg_audit_project)
 
 
     def project_read_pl(self, show_warning=True):
