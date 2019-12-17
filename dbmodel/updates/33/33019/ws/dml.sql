@@ -65,6 +65,8 @@ ALTER TABLE IF EXISTS ext_raster_dem ALTER COLUMN rastercat_id TYPE text;
 ALTER TABLE IF EXISTS ext_cat_raster ALTER COLUMN id TYPE text;
 
 --2019/12/16
+
+INSERT INTO audit_cat_table VALUES ('v_edit_inp_connec', 'Hydraulic feature', 'Shows editable information about connecs', 'role_epa', 0, NULL, NULL, NULL, NULL, NULL, NULL, false);
 UPDATE audit_cat_table SET qgis_role_id=NULL, qgis_criticity=NULL, qgis_message=NULL;
 
 UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage macrodma' WHERE id='v_edit_macrodma';

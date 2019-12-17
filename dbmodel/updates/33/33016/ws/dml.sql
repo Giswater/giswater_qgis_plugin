@@ -9,8 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --23/11/2019
-INSERT INTO audit_cat_table VALUES ('inp_virtualvalve', 'Hydraulic input data', 'Used to store valves originally defined as arcs', 'role_epa', 0, 'role_epa', NULL, 0, NULL, NULL, NULL, false);
-INSERT INTO audit_cat_table VALUES ('v_edit_inp_virtualvalve', 'Hydraulic feature', 'Shows editable information about virtualvalves', 'role_epa', 0, 'role_epa', NULL, 2, 'Basic operation', NULL, NULL, false);
+INSERT INTO audit_cat_table VALUES ('inp_virtualvalve', 'Hydraulic input data', 'Used to store valves originally defined as arcs', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_table VALUES ('v_edit_inp_virtualvalve', 'Hydraulic feature', 'Shows editable information about virtualvalves', 'role_epa', 0, NULL, NULL, 2, 'Basic operation', NULL, NULL, false);
 
 
 INSERT INTO inp_junction (node_id) SELECT node_id FROM node WHERE epa_type='JUNCTION' on conflict (node_id) DO nothing;

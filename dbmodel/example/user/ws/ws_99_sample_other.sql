@@ -69,7 +69,7 @@ update arc set link='https://www.giswater.org';
 update connec set link='https://www.giswater.org';
 update rtc_hydrometer set link='https://www.giswater.org';
 
-
+update node_type SET isarcdivide=FALSE, num_arcs=0 WHERE id='AIR_VALVE';
 UPDATE node_type SET graf_delimiter='NONE';
 UPDATE node_type SET graf_delimiter='MINSECTOR' WHERE id IN('CHECK_VALVE', 'FL_CONTR_VALVE', 'GEN_PURP_VALVE', 'SHUTOFF_VALVE', 'THROTTLE_VALVE');
 UPDATE node_type SET graf_delimiter='PRESSZONE' WHERE id IN('PR_BREAK_VALVE', 'PR_REDUC_VALVE', 'PR_SUSTA_VALVE');
