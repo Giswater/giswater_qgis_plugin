@@ -31,16 +31,17 @@ class AddLayer(object):
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name
         self.project_type = None
-        self.uri = self.set_uri()
+        self.uri = None
 
 
     def set_uri(self):
 
-        uri = QgsDataSourceUri()
-        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
+        self.uri = QgsDataSourceUri()
+        x = self.uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
                           self.controller.credentials['db'], self.controller.credentials['user'],
                           self.controller.credentials['password'])
-        return uri
+        print(f"X -> {x}")
+        return self.uri
 
 
     def manage_geometry(self, geometry):
@@ -78,7 +79,7 @@ class AddLayer(object):
         self.controller.execute_sql(sql, log_sql=True)
 
         schema_name = self.controller.credentials['schema'].replace('"', '')
-
+        self.set_uri()
         self.uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
         error = QgsVectorLayerExporter.exportLayer(layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
@@ -95,7 +96,7 @@ class AddLayer(object):
         :param child_layers: List of layers (stringList)
         :param group: Name of the group that will be created in the toc (string)
         """
-
+        self.set_uri()
         schema_name = self.controller.credentials['schema'].replace('"', '')
         if child_layers is not None:
             for layer in child_layers:
