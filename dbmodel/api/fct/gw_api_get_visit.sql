@@ -403,7 +403,7 @@ BEGIN
 	--IF v_offline != 'true' THEN
 	
 	v_filefeature = '{"featureType":"file", "tableName":"om_visit_event_photo", "idName": "id"}';	
-	
+	/*
 	IF v_addfile IS NOT NULL THEN
 
 		RAISE NOTICE '--- ACTION ADD FILE /PHOTO ---';
@@ -440,7 +440,7 @@ BEGIN
 		v_message = (v_deletefile ->>'message')::json;
 		
 	END IF;
-	
+	*/
 	--END IF;
 	--  Create tabs array	
 	v_formtabs := '[';
