@@ -5,6 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+from collections import OrderedDict
+
 from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
 
 from qgis.PyQt.QtCore import QVariant
@@ -102,7 +105,7 @@ class AddLayer(object):
                     self.check_for_group(vlayer, group)
         else:
             self.uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-            vlayer = QgsVectorLayer(self.uri.uri(), f'{tablename}', "postgres")
+            vlayer = QgsVectorLayer(self.uri.uri(), f'{tablename}', 'postgres')
             self.check_for_group(vlayer, group)
         self.iface.mapCanvas().refresh()
 
@@ -116,6 +119,7 @@ class AddLayer(object):
         if group is None:
             QgsProject.instance().addMapLayer(layer)
         else:
+            QgsProject.instance().addMapLayer(layer, False)
             root = QgsProject.instance().layerTreeRoot()
             my_group = root.findGroup(group)
             if my_group is None:
@@ -134,6 +138,7 @@ class AddLayer(object):
         :param del_old_layers:
         :return:
         """
+        colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
         if del_old_layers:
             self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
