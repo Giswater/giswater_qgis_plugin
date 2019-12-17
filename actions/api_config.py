@@ -587,18 +587,6 @@ class ApiConfig(ApiParent):
             widget_child.setChecked(False)
 
 
-    # TODO:
-    def remove_empty_groupBox(self, layout):
-
-        groupBox_list = layout.findChild(QWidget)
-        if groupBox_list is None:
-            return
-        for groupBox in groupBox_list:
-            widget_list = groupBox.findChildren(QWidget)
-            if not widget_list:
-                groupBox.setVisible(False)
-
-
     def set_layers_name(self):
         """ Insert the name of all the TOC layers, then populate the cad_combo_layers """
         layers = self.iface.mapCanvas().layers()
