@@ -45,7 +45,7 @@ BEGIN
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
 	-- getting input data 	
-	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean; -- deprecated parameter (not used after 3.3.019)
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	
 	-- delete old values on result table
@@ -340,15 +340,6 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
 
-
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=15;
-	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=15 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (15, current_user);
-	END IF;
 		
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

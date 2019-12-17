@@ -891,15 +891,6 @@ BEGIN
 
 	--polygons
 	v_result_polygon = '{"geometryType":"", "values":[]}';
-
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25;
-	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=25 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (25, current_user);
-	END IF;
 		
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

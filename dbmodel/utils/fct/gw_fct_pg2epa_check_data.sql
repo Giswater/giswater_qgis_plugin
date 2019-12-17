@@ -92,7 +92,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
-	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
+	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;  -- deprecated parameter (not used after 3.3.019)
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_message:= ((p_data ->>'data')::json->>'parameters')::json->>'message'::text;
 	v_usenetworkgeom:= ((p_data ->>'data')::json->>'parameters')::json->>'useNetworkGeom';
@@ -1438,6 +1438,7 @@ BEGIN
 	
 		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM vi_pipes;
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
+
 	
 	END IF;
 	
@@ -1473,16 +1474,6 @@ BEGIN
 	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=14) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_polygon = concat ('{"geometryType":"Polygon","qmlPath":"',v_qmlpolpath,'", "values":',v_result, '}');
-
-
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=14;
-	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=14 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (14, current_user);
-	END IF;
 		
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
