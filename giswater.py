@@ -1198,11 +1198,8 @@ class Giswater(QObject):
         if int(critical_level) > 0:
             show_msg = self.settings.value('system_variables/show_msg_layer')
             if show_msg == 'TRUE':
-                message = "Some layers of your role not found. Do you want to view them?"
-                answer = self.controller.ask_question(message, "Warning")
-                if answer:
-                    self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
-                    self.parent.open_dialog(self.dlg_audit_project)
+                self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+                self.parent.open_dialog(self.dlg_audit_project)
 
         return True
 
