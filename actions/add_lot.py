@@ -37,9 +37,9 @@ from .. import utils_giswater
 from .manage_visit import ManageVisit
 from .parent_manage import ParentManage
 from ..ui_manager import AddLot
+from ..ui_manager import Lot_selector
 from ..ui_manager import BasicTable
 from ..ui_manager import LotManagement
-from ..ui_manager import Multirow_selector
 from ..ui_manager import UserManagement
 
 
@@ -1562,7 +1562,7 @@ class AddNewLot(ParentManage):
 
     def lot_selector(self):
 
-        self.dlg_lot_sel = Multirow_selector()
+        self.dlg_lot_sel = Lot_selector()
         self.load_settings(self.dlg_lot_sel)
 
         self.dlg_lot_sel.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_lot_sel))
@@ -1576,20 +1576,113 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_selected',
                                      self.controller.tr('Lots seleccionats', context_name='labels'))
 
-        tableleft = "om_visit_lot"
+        tableleft = "v_ui_om_visit_lot"
         tableright = "selector_lot"
         field_id_left = "id"
         field_id_right = "lot_id"
-        hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-        hide_right = [0, 1, 2]
+        #
+        hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16]
+        hide_right = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
-        self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id',
-                                hide_left=hide_left, hide_right=hide_right)
+        self.populate_lot_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right,
+                                hide_left, hide_right)
         self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers, True))
         self.dlg_lot_sel.btn_unselect.clicked.connect(partial(self.set_visible_lot_layers, True))
 
         # Open dialog
         self.open_dialog(self.dlg_lot_sel, maximize_button=False)
+
+
+    def populate_lot_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, hide_left, hide_right):
+
+        # fill QTableView all_rows
+        tbl_all_rows = dialog.findChild(QTableView, "all_rows")
+        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        query_left = "SELECT * FROM "+tableleft+" WHERE id NOT IN "
+        query_left += "(SELECT "+tableleft+".id FROM "+tableleft+""
+        query_left += " RIGHT JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_left += " WHERE cur_user = current_user)"
+        query_left += " AND  "+field_id_left+" > -1"
+
+        self.fill_table_by_query(tbl_all_rows, query_left)
+        self.hide_colums(tbl_all_rows, hide_left)
+        tbl_all_rows.setColumnWidth(1, 200)
+
+        # fill QTableView selected_rows
+        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
+        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        query_right = "SELECT "+tableright+".lot_id, * FROM " + tableleft + ""
+        query_right += " JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_right += " WHERE cur_user = current_user"
+
+        self.fill_table_by_query(tbl_selected_rows, query_right)
+        self.hide_colums(tbl_selected_rows, hide_right)
+        tbl_selected_rows.setColumnWidth(0, 200)
+        # Button select
+        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
+
+        # Button unselect
+        query_delete = "DELETE FROM "+tableright+""
+        query_delete += " WHERE current_user = cur_user AND "+tableright+"."+field_id_right+"="
+        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+        # QLineEdit
+        dialog.txt_name.textChanged.connect(
+            partial(self.filter_lot_selector, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright,
+                    field_id_right, field_id_left))
+        dialog.txt_status_filter.textChanged.connect(
+            partial(self.filter_lot_selector, dialog, dialog.txt_status_filter, tbl_all_rows, tableleft, tableright,
+                    field_id_right, field_id_left))
+        dialog.txt_wotype_filter.textChanged.connect(
+            partial(self.filter_lot_selector, dialog, dialog.txt_wotype_filter, tbl_all_rows, tableleft, tableright,
+                    field_id_right, field_id_left))
+
+        # Order control
+        # tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
+        # tbl_selected_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_selected_rows, query_right))
+
+
+    def filter_lot_selector(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l):
+        """ Fill the QTableView by filtering through the QLineEdit"""
+        filter_id = utils_giswater.getWidgetText(dialog, dialog.txt_name)
+        filter_status = utils_giswater.getWidgetText(dialog, dialog.txt_status_filter)
+        filter_wotype = utils_giswater.getWidgetText(dialog, dialog.txt_wotype_filter)
+
+        if str(filter_id) == 'null':
+            filter_id = ''
+        if str(filter_status) == 'null':
+            filter_status = ''
+        if str(filter_wotype) == 'null':
+            filter_wotype = ''
+
+        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE id::text NOT IN "
+                "(SELECT " + tableleft + ".id::text FROM " + self.schema_name + "." + tableleft + ""
+                " RIGHT JOIN " + self.schema_name + "." + tableright + ""
+                " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
+                " WHERE cur_user = current_user) AND LOWER(id::text) LIKE '%" + str(filter_id) + "%'"
+                " AND LOWER("+'"Estat"'+"::text) LIKE '%" + str(filter_status) + "%'"
+                " AND (LOWER("+'"Nom actuacio"'+"::text) LIKE '%" + str(filter_wotype) + "%'")
+        if filter_wotype in (None, ''):
+            sql += " OR LOWER("+'"Nom actuacio"'+"::text) IS NULL)"
+        else:
+            sql += ")"
+        self.fill_table_by_query(qtable, sql)
+
+
+    def order_by_column(self, qtable, query, idx):
+        """
+        :param qtable: QTableView widget
+        :param query: Query for populate QsqlQueryModel
+        :param idx: The index of the clicked column
+        :return:
+        """
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable.horizontalHeader().sortIndicatorOrder()
+        col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
+        query +=" ORDER BY " +col_to_sort + " " + oder_by[sort_order]+""
+        self.fill_table_by_query(qtable, query)
+        self.refresh_map_canvas()
 
 
     def set_visible_lot_layers(self, zoom=False):

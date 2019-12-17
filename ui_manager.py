@@ -216,6 +216,13 @@ class BasicTable(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('lot_selector.ui')
+class Lot_selector(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('lot_management.ui')
 class LotManagement(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
