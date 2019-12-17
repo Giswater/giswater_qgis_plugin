@@ -96,6 +96,9 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
 
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, 'NETWORK ANALYTICS');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '-------');
+	
 	v_errortext=concat('INFO: Giswater version: ',v_version,'.');
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 	VALUES (101, 1, v_errortext);
@@ -210,7 +213,8 @@ BEGIN
 			"client":{"device":3, "infoType":100, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB OM):') FROM audit_check_data WHERE fprocesscat_id=25 offset 8;
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB OM):') FROM audit_check_data 
+			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' offset 6;
 
 		END IF;
 
@@ -220,7 +224,8 @@ BEGIN
 			"feature":{},"data":{"parameters":{"t1":"check_project","saveOnDatabase":true, 
 			"useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB EPA):') FROM audit_check_data WHERE fprocesscat_id=14 offset 10;
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB EPA):') FROM audit_check_data 
+			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' offset 8;
 
 		END IF;
 
@@ -230,7 +235,8 @@ BEGIN
 			"feature":{},
 			"data":{"parameters":{"resultId":"check_project"},"saveOnDatabase":true}}$$)';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB PLAN):') FROM audit_check_data WHERE fprocesscat_id=15 offset 8;
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB PLAN):') FROM audit_check_data 
+			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' OFFSET 6;
 			
 		END IF;
 
@@ -239,7 +245,8 @@ BEGIN
 			{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB ADMIN):') FROM audit_check_data WHERE fprocesscat_id=95 offset 8;
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB ADMIN):') FROM audit_check_data 
+			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' offset 6;
 			
 		END IF;
 	END IF;
@@ -338,6 +345,9 @@ BEGIN
 		FROM '||v_schema||'.audit_check_project JOIN information_schema.columns ON table_name = table_id 
 		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 WHERE criticity=2 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity2;
+
+		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
+		v_result_layers_criticity2 := COALESCE(v_result_layers_criticity2, '{}'); 
 
 		v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
 
