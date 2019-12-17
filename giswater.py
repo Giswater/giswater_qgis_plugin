@@ -1155,6 +1155,7 @@ class Giswater(QObject):
         self.controller.execute_sql(sql)
         sql = ""
         for layer in layers:
+            if layer.providerType() in ('memory', 'ogr'): continue
             layer_source = self.controller.get_layer_source(layer)
             schema_name = layer_source['schema']
             if schema_name is not None:
