@@ -1171,8 +1171,13 @@ class Giswater(QObject):
         if not status:
             return False
 
-        sql = ("SELECT gw_fct_audit_check_project(1)::text;")
-        row = self.controller.get_row(sql, commit=True)
+        version = self.parent.get_plugin_version()
+        extras = f'"version":"{version}"'
+        extras += f', "fprocesscat_id":1'
+        body = self.create_body(extras=extras)
+        sql = f"SELECT gw_fct_audit_check_project($${{{body}}}$$)::text"
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        
         if not row:
             return False
 
