@@ -209,10 +209,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-
-
-
-
--- tramos sin nodo final, pero en un buffer hay un nodo existente
--- tramos sin nodo y no hay nada cerca
--- crear nodo que falta y mostarlo de otro color

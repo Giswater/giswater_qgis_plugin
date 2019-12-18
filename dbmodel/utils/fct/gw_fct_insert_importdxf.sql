@@ -95,7 +95,8 @@ BEGIN
 
 		INSERT INTO v_edit_node (nodecat_id,state,state_type,the_geom)
 		SELECT (text_column::json)->>'Layer'::text, 1, 2, geom_point
-		FROM temp_table WHERE fprocesscat_id=106 and geom_point IS NOT NULL;
+		FROM temp_table WHERE fprocesscat_id=106 and geom_point IS NOT NULL
+		AND geom_point NOT IN (SELECT the_geom FROM anl_node WHERE fprocesscat_id=106 AND descript='DUPLICATED') ;
 
 
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
@@ -177,10 +178,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-
-
-
-
--- tramos sin nodo final, pero en un buffer hay un nodo existente
--- tramos sin nodo y no hay nada cerca
--- crear nodo que falta y mostarlo de otro color
