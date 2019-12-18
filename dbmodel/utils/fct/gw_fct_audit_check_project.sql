@@ -99,9 +99,15 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, 'NETWORK ANALYTICS');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '-------');
 	
-	v_errortext=concat('INFO: Giswater version: ',v_version,'.');
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-	VALUES (101, 1, v_errortext);
+	IF v_qgis_version = v_version THEN
+		v_errortext=concat('INFO: Giswater version: ',v_version,'.');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (101, 1, v_errortext);
+	ELSE
+		v_errortext=concat('ERROR: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (101, 3, v_errortext);
+	END IF;
 
 	v_errortext=concat('INFO: Project type: ',v_project_type,'.');
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
