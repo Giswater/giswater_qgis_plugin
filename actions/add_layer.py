@@ -167,8 +167,6 @@ class AddLayer(object):
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
         :param cat_field: Field to categorize (string)
         """
-        cat_field = 'expl_id'
-        size = 4
         # get unique values
         fields = layer.fields()
         fni = fields.indexOf(cat_field)
