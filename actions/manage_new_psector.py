@@ -689,7 +689,7 @@ class ManageNewPsector(ParentManage):
             for column_name in columns:
                 if column_name in row:
                     if row[column_name] is not None:
-                        utils_giswater.setText(dialog, column_name, row[column_name])
+                        utils_giswater.setText(dialog, column_name, round(float(row[column_name]), 2))
                     else:
                         utils_giswater.setText(dialog, column_name, 0)
 
