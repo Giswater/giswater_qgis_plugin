@@ -147,12 +147,19 @@ BEGIN
 	    
 	  ELSIF v_view='vi_times' THEN 
 	    IF NEW.value IS NULL THEN
-	      INSERT INTO config_param_user (parameter, value, cur_user) VALUES (concat('inp_times_',(lower(split_part(NEW.parameter,'_',1)))), split_part(NEW.parameter,'_',2), current_user) ;
+	      INSERT INTO config_param_user (parameter, value, cur_user) 
+	      VALUES (concat('inp_times_',(lower(split_part(NEW.parameter,'_',1)))), split_part(NEW.parameter,'_',2), current_user)
+	      ON CONFLICT (parameter,cur_user) DO NOTHING;
 	    ELSE
-	      INSERT INTO config_param_user (parameter, value, cur_user) VALUES (concat('inp_times_',(lower(NEW.parameter))), NEW.value, current_user) ;
+	      INSERT INTO config_param_user (parameter, value, cur_user) 
+	      VALUES (concat('inp_times_',(lower(NEW.parameter))), NEW.value, current_user) 
+	     ON CONFLICT (parameter,cur_user) DO NOTHING;
 	    END IF;
 	  ELSIF v_view='vi_report' THEN
-	    INSERT INTO config_param_user (parameter, value, cur_user) SELECT id, vdefault, current_user FROM audit_cat_param_user WHERE layoutname IN ('grl_reports_17', 'grl_reports_18') AND ismandatory=true AND vdefault IS NOT NULL;
+	    INSERT INTO config_param_user (parameter, value, cur_user) 
+	    SELECT id, vdefault, current_user FROM audit_cat_param_user 
+	    WHERE layoutname IN ('grl_reports_17', 'grl_reports_18') AND ismandatory=true AND vdefault IS NOT NULL
+	    ON CONFLICT (parameter,cur_user) DO NOTHING;
 	    
 	  ELSIF v_view='vi_coordinates' THEN
 	    UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(NEW.xcoord,NEW.ycoord),v_epsg) WHERE node_id=NEW.node_id;
@@ -164,7 +171,9 @@ BEGIN
 	    INSERT INTO inp_backdrop(text) VALUES (NEW.text);
 	    
 	  ELSIF v_view='vi_options' THEN
-	    INSERT INTO config_param_user (parameter, value, cur_user) VALUES (concat('inp_options_',(lower(NEW.parameter))), NEW.value, current_user) ;
+	    INSERT INTO config_param_user (parameter, value, cur_user) 
+	    VALUES (concat('inp_options_',(lower(NEW.parameter))), NEW.value, current_user) 
+	    ON CONFLICT (parameter,cur_user) DO NOTHING;
 	  END IF;
 	  
 	  RETURN NEW; 	
