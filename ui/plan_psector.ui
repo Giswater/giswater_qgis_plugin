@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
+    <width>738</width>
     <height>621</height>
    </rect>
   </property>
@@ -936,7 +936,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>504</width>
+                 <width>676</width>
                  <height>454</height>
                 </rect>
                </property>
@@ -1196,7 +1196,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="total_otherl">
+             <widget class="QLabel" name="total_other">
               <property name="text">
                <string/>
               </property>
@@ -1241,6 +1241,13 @@
             </item>
             <item>
              <widget class="QLabel" name="pem">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="cur_pem">
               <property name="text">
                <string/>
               </property>
@@ -1296,6 +1303,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="cur_pec_pem">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1329,6 +1343,13 @@
             </item>
             <item>
              <widget class="QLabel" name="pec">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="cur_pec">
               <property name="text">
                <string/>
               </property>
@@ -1384,6 +1405,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="cur_pecvat_pem">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1417,6 +1445,13 @@
             </item>
             <item>
              <widget class="QLabel" name="pec_vat">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="cur_pec_vat">
               <property name="text">
                <string/>
               </property>
@@ -1472,6 +1507,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="cur_pca_pecvat">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1511,6 +1553,13 @@
             </item>
             <item>
              <widget class="QLabel" name="pca">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="cur_pca">
               <property name="text">
                <string/>
               </property>

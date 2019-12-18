@@ -13,12 +13,15 @@ from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLabel
 from qgis.PyQt.QtWidgets import QLineEdit, QTableView
 
-import os
-import sys
 import csv
+import json
+import os
 import operator
-import webbrowser
 import subprocess
+import sys
+import webbrowser
+
+from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -38,6 +41,8 @@ class ManageNewPsector(ParentManage):
 
     def new_psector(self, psector_id=None, plan_om=None, is_api=False):
         """ Buttons 45 and 81: New psector """
+        row = self.controller.get_config(parameter='sys_currency', columns='value::text', table='config_param_system')
+        self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
         self.dlg_plan_psector = Plan_psector()
@@ -390,9 +395,20 @@ class ManageNewPsector(ParentManage):
                f"WHERE psector_id = '{psector_id}'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
+            other = float(row[0]) if row[0] is not None else 0
+            gexpenses = float(row[1]) if row[1] is not None else 0
+            vat = float(row[2]) if row[2] is not None else 0
+
+            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
+            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
+            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pem',  self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec',  self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
         self.geom_type = "arc"
@@ -712,6 +728,7 @@ class ManageNewPsector(ParentManage):
             pca = float(utils_giswater.getWidgetText(dialog, 'pca'))
         else:
             pca = 0
+
         if utils_giswater.getWidgetText(dialog, 'pec_vat') not in('null', None):
             pec_vat = float(utils_giswater.getWidgetText(dialog, 'pec_vat'))
         else:
