@@ -38,7 +38,7 @@ return_type = '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"
 {"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"text","datatype":"json","layoutname":"grl_option_parameters","layout_order":2, "placeholder":"[1,2]", "value":""},
 {"widgetname":"updateFeature", "label":"Update feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":7, "value":"FALSE"},
 {"widgetname":"updateMapZone", "label":"Update geometry (if true choose only one parameter belove)","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":8, "value":"FALSE"},
-{"widgetname":"buffer", "label":"1: Buffer for arc disolve approach:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":9, "ismandatory":false, "placeholder":"10", "value":""}
+{"widgetname":"buffer", "label":"1: Buffer for arc disolve approach:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":9, "ismandatory":false, "placeholder":"10", "value":""},
 {"widgetname":"concaveHullParam", "label":"2: Hull parameter for concave polygon approach:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":9, "ismandatory":false, "placeholder":"0.9", "value":""}]'
  WHERE id=2768;
  
@@ -51,13 +51,13 @@ UPDATE audit_cat_function SET input_params='{"featureType":["node","connec"]}' W
 
 INSERT INTO audit_cat_function (id, function_name, project_type, function_type, input_params, 
        return_type, context, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
-VALUES (2780,'gw_fct_insert_importdxf','utils','function','{"featureType":[], "btnRunEnabled":false}',
+VALUES (2784,'gw_fct_insert_importdxf','utils','function','{"featureType":[], "btnRunEnabled":false}',
 '[{"widgetname": "btn_path", "label": "Select DXF file:", "widgettype": "button",  "datatype": "text", "layoutname": "grl_option_parameters", "layout_order": 2, "value": "...","widgetfunction":"gw_function_dxf" }]',
 null,'Function to manage DXF files','role_admin',FALSE,TRUE,'Manage dxf files',TRUE) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function (id, function_name, project_type, function_type, input_params, 
        return_type, context, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
-VALUES (2782,'gw_fct_check_importdxf','utils','function',null,null, null,'Function to check the quality of imported DXF files',
+VALUES (2786,'gw_fct_check_importdxf','utils','function',null,null, null,'Function to check the quality of imported DXF files',
 	'role_admin',FALSE,false,null,false) ON CONFLICT (id) DO NOTHING;
 
 ALTER TABLE IF EXISTS ext_raster_dem ALTER COLUMN rastercat_id TYPE text;
@@ -66,7 +66,9 @@ ALTER TABLE IF EXISTS ext_cat_raster ALTER COLUMN id TYPE text;
 
 --2019/12/16
 
-INSERT INTO audit_cat_table VALUES ('v_edit_inp_connec', 'Hydraulic feature', 'Shows editable information about connecs', 'role_epa', 0, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_table 
+VALUES ('v_edit_inp_connec', 'Hydraulic feature', 'Shows editable information about connecs', 'role_epa', 0, 
+	NULL, NULL, NULL, NULL, NULL, NULL, false)ON CONFLICT (id) DO NOTHING;;
 UPDATE audit_cat_table SET qgis_role_id=NULL, qgis_criticity=NULL, qgis_message=NULL;
 
 UPDATE audit_cat_table SET qgis_role_id='role_admin', qgis_criticity=2, qgis_message='Cannot manage macrodma' WHERE id='v_edit_macrodma';
