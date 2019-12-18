@@ -85,8 +85,9 @@ BEGIN
 		v_querytext, lower(v_projecttype),false,false,'text', 'combo',false,false)
 		ON CONFLICT (id) DO NOTHING;
 
-		DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
-
+		IF TG_OP = 'UPDATE' THEN
+			DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
+		END IF;
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
@@ -98,11 +99,11 @@ BEGIN
 		-- update child views
 		--on update and change of cat_feature.id or child layer name		
 		IF NEW.child_layer != OLD.child_layer or NEW.id != OLD.id THEN
+		
+			SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 
 			--if cat_feature has changed, rename the id in the definition of a child view
 			IF NEW.id != OLD.id THEN
-
-				SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 				
 				IF v_viewname IS NOT NULL THEN
 					--get the old view definition
@@ -122,7 +123,7 @@ BEGIN
 			--if child layer name has changed, rename it
 			IF NEW.child_layer != OLD.child_layer THEN
 
-				SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
+				--SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 
 				IF v_viewname IS NOT NULL THEN
 					--get the old view definition
@@ -134,10 +135,12 @@ BEGIN
 					EXECUTE 'DROP VIEW '||v_schemaname||'.'||OLD.child_layer||';';
 				END IF;
 			END IF;
-			
+		
 			--create the trigger
-			EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
-			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_node('''||NEW.id||''');';
+			IF v_viewname IS NOT NULL THEN
+				EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
+				INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_node('''||NEW.id||''');';
+			END IF;
 		END IF;
 		
 		RETURN NEW;
