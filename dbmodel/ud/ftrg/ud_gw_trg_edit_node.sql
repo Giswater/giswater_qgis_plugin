@@ -491,7 +491,7 @@ BEGIN
 		END IF;
 		
 		--check relation state - state_type
-		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 			RETURN audit_function(3036,1212,NEW.state::text);
 		END IF;		
 

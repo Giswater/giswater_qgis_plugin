@@ -114,7 +114,7 @@ BEGIN
 		-- Sector ID
 		IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-				RETURN audit_function(1008,1216);  
+				RETURN audit_function(1008,1206);  
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -127,14 +127,14 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-				RETURN audit_function(1010,1216,NEW.gully_id);          
+				RETURN audit_function(1010,1206,NEW.gully_id);          
 			END IF;            
 		END IF;
         
 		-- Dma ID
 		IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-				RETURN audit_function(1012,1216);  
+				RETURN audit_function(1012,1206);  
 			END IF;
 			SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -147,7 +147,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
 			IF (NEW.dma_id IS NULL) THEN
-				RETURN audit_function(1014,1216,NEW.gully_id);  
+				RETURN audit_function(1014,1206,NEW.gully_id);  
 			END IF;            
 		END IF;
 
@@ -168,7 +168,7 @@ BEGIN
 
 		--check relation state - state_type
 	    IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	      	RETURN audit_function(3036,1212,NEW.state::text);
+	      	RETURN audit_function(3036,1206,NEW.state::text);
 	   	END IF;		
 
 		-- Workcat_id
@@ -208,7 +208,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1216,NEW.gully_id);
+					PERFORM audit_function(2012,1206,NEW.gully_id);
 				END IF;		
 			END IF;
 		END IF;	
@@ -219,7 +219,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM audit_function(2024,1216,NEW.gully_id);
+					PERFORM audit_function(2024,1206,NEW.gully_id);
 				END IF;	
 			END IF;
 		END IF;
@@ -440,7 +440,7 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					RETURN audit_function(2110,1318);
+					RETURN audit_function(2110,1206);
 					END IF;
 				END IF;
 			END IF;
@@ -467,8 +467,8 @@ BEGIN
 		END IF;
 
 		--check relation state - state_type
-	    IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	      	RETURN audit_function(3036,1212,NEW.state::text);
+	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+	      	RETURN audit_function(3036,1206,NEW.state::text);
 	    END IF;		
 
 		-- rotation
@@ -525,8 +525,8 @@ BEGIN
 		connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
 		annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
 		fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-		ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
-		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, arc_id=NEW.arc_id,
+		ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
+		descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, 
 		label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, 
         postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user
 		WHERE gully_id = OLD.gully_id;
