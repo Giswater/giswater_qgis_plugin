@@ -1455,6 +1455,9 @@ class UpdateSQL(ApiParent):
 
         self.manage_process_result(project_name_schema)
 
+        # Update comoposer path on config_param_user
+        self.manage_user_params()
+
 
     def manage_process_result(self, schema_name=None):
 
@@ -3286,4 +3289,12 @@ class UpdateSQL(ApiParent):
             partial(self.set_credentials, self.dlg_credentials, new_connecton=True))
         self.dlg_credentials.open()
 
+
+    def manage_user_params(self):
+
+        # Update variable composer_path on config_param_user
+        folder_name = os.path.dirname(os.path.abspath(__file__))
+        composers_path_vdef = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'templates' + os.sep + 'qgiscomposer' + os.sep + 'en'
+        sql = f"UPDATE config_param_user SET value = '{composers_path_vdef}' WHERE parameter = 'qgis_composers_path' AND cur_user = current_user"
+        self.controller.execute_sql(sql)
 
