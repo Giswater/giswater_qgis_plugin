@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>738</width>
+    <width>736</width>
     <height>621</height>
    </rect>
   </property>
@@ -936,7 +936,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>676</width>
+                 <width>674</width>
                  <height>454</height>
                 </rect>
                </property>
@@ -1076,7 +1076,7 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,0,0">
+           <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,0,0,0">
             <property name="sizeConstraint">
              <enum>QLayout::SetDefaultConstraint</enum>
             </property>
@@ -1128,6 +1128,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="cur_total_arc">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1165,6 +1172,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="cur_total_node">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1197,6 +1211,13 @@
             </item>
             <item>
              <widget class="QLabel" name="total_other">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="cur_total_other">
               <property name="text">
                <string/>
               </property>
@@ -1305,6 +1326,12 @@
             </item>
             <item>
              <widget class="QLabel" name="cur_pec_pem">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -1407,6 +1434,12 @@
             </item>
             <item>
              <widget class="QLabel" name="cur_pecvat_pem">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -1509,6 +1542,12 @@
             </item>
             <item>
              <widget class="QLabel" name="cur_pca_pecvat">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string/>
               </property>

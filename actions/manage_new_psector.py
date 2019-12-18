@@ -394,14 +394,21 @@ class ManageNewPsector(ParentManage):
                f"FROM {self.plan_om}_psector "
                f"WHERE psector_id = '{psector_id}'")
         row = self.controller.get_row(sql)
+
+        other = 0
+        gexpenses = 0
+        vat = 0
         if row:
             other = float(row[0]) if row[0] is not None else 0
             gexpenses = float(row[1]) if row[1] is not None else 0
             vat = float(row[2]) if row[2] is not None else 0
+        utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
+        utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
+        utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
 
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pem',  self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec',  self.sys_currency['symbol'])
