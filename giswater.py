@@ -1221,6 +1221,7 @@ class Giswater(QObject):
         grl_others = dialog.findChild(QGridLayout, "grl_others")
 
         for pos, item in enumerate(m_layers):
+            if not item: continue
             widget = dialog.findChild(QCheckBox, f"{item['layer']}")
             if widget: continue
             label = QLabel()
