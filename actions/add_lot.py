@@ -269,7 +269,6 @@ class AddNewLot(ParentManage):
     def open_photo(self, qtable):
 
         selected_list = qtable.selectionModel().selectedRows()
-        print(str(selected_list))
 
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -283,10 +282,8 @@ class AddNewLot(ParentManage):
 
         sql = ("SELECT value FROM om_visit_event_photo WHERE visit_id = " + visit_id)
         rows = self.controller.get_rows(sql, commit=True)
-        print(str(rows))
         # TODO:: Open manage photos when visit have more than one
         for row in rows:
-            print(str(row))
             webbrowser.open(row[0])
 
 
