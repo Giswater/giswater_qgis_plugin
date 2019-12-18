@@ -28,6 +28,9 @@ DECLARE
     v_force_canvasrefresh text = 'FALSE';
     v_enable_editgeom text = 'TRUE';
     v_enable_delfeaeture text = 'TRUE';
+    v_array text[];
+    v_dv_querytext text;
+    
     
 
 BEGIN
@@ -82,28 +85,27 @@ BEGIN
     
 
 --    Get fields
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = '||quote_literal(p_table_id)||' order by orderby) a'
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = $1 order by orderby) a'
         INTO fields_array
-        USING (p_table_id);    
+        USING table_id;    
 
 --    Get combo rows
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, name, type, dv_table, dv_id_column, dv_name_column, ROW_NUMBER() OVER() AS rownum 
-        FROM config_web_fields WHERE table_id = $1) a WHERE type = $2'
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, name, type, dv_table, dv_id_column, dv_name_column, dv_querytext, ROW_NUMBER() OVER(ORDER BY orderby) AS rownum 
+        FROM config_web_fields WHERE table_id = $1 order by orderby) a WHERE type = $2'
     INTO combo_rows
-    USING p_table_id, 'combo';
+    USING table_id, 'combo';
     combo_rows := COALESCE(combo_rows, '{}');
-
-
 
 --    Update combos
     FOREACH aux_json IN ARRAY combo_rows
     LOOP
-	IF aux_json->>'dv_id_column' IS NULL OR aux_json->>'dv_table' IS NULL THEN
-
+	
+	IF aux_json->>'dv_id_column' IS NULL OR aux_json->>'aux_json' IS NULL THEN
+		
 		v_dv_querytext=(aux_json->>'dv_querytext');
-
+		
 		-- Get combo id's
-		EXECUTE 'SELECT (array_agg(id)) FROM ('||(v_dv_querytext)||' ORDER BY '||quote_ident(v_orderby)||')a'
+		EXECUTE 'SELECT (array_agg(id)) FROM ('||(v_dv_querytext)||')a'
 			INTO v_array;
 		combo_json = array_to_json(v_array);
 		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
