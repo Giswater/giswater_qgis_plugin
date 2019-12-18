@@ -157,21 +157,23 @@ class AddLayer(object):
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
                     elif 'category_field' in data[k] and data[k]['category_field']:
-                        field = data[k]['category_field']
-                        size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
-                        self.categoryze_layer(v_layer, field, size)
+                        cat_field = data[k]['category_field']
+                        size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 4
+                        self.categoryze_layer(v_layer, cat_field, size)
 
 
-    def categoryze_layer(self, layer, cat_field, size = 2):
+    def categoryze_layer(self, layer, cat_field, size = 4):
         """
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
         :param cat_field: Field to categorize (string)
         """
+
         # get unique values
         fields = layer.fields()
         fni = fields.indexOf(cat_field)
         unique_values = layer.dataProvider().uniqueValues(fni)
         categories = []
+        color_values={'NEW':QColor(0, 255, 0), 'DUPLICATED':QColor(255, 0, 0), 'EXISTS':QColor(240, 150, 0)}
         for unique_value in unique_values:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
@@ -182,10 +184,12 @@ class AddLayer(object):
             # layer_style['color'] = '%d, %d, %d' % (randrange(0, 256), randrange(0, 256), randrange(0, 256))
             # layer_style['color'] = '255,0,0'
             # layer_style['outline'] = '#000000'
-            color = QColor(0, 0, 255)
-            if  unique_value == 1:
-                color = QColor(255, 0, 0)
-            symbol.setColor(color)
+            try:
+                color = color_values.get(unique_value)
+                symbol.setColor(color)
+            except:
+                color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
+                symbol.setColor(color)
             # layer_style['horizontal_anchor_point'] = '6'
             # layer_style['offset_map_unit_scale'] = '6'
             # layer_style['outline_width'] = '6'

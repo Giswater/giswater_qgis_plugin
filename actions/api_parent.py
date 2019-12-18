@@ -1497,11 +1497,12 @@ class ApiParent(ParentAction):
         dialog.btn_run.setEnabled(True)
 
 
-    def manage_dxf(self, dxf_path, export_to_db=False, toc=False):
+    def manage_dxf(self, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
         """ Select a dxf file and add layers into toc
         :param dxf_path: path of dxf file
         :param export_to_db: Export layers to database
         :param toc: insert layers into TOC
+        :param del_old_layers: look for a layer with the same name as the one to be inserted and delete it
         :return:
         """
         srid = self.controller.plugin_settings_value('srid')
@@ -1550,9 +1551,11 @@ class ApiParent(ParentAction):
                 if not status:
                     return False
 
-
             if export_to_db:
                 self.add_layer.export_layer_to_db(dxf_layer, crs)
+
+            if del_old_layers:
+                self.delete_layer_from_toc(dxf_layer.name())
 
             if toc:
                 if dxf_layer.isValid():
