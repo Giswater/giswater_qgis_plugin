@@ -187,7 +187,7 @@ BEGIN
 	IF v_result::text = '{}' THEN 
 		v_result_point = '{"geometryType":"", "values":[]}';
 	ELSE 
-		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, ',"category_field":"descript"}');
+		v_result_point = concat ('{"geometryType":"Point", "values":',v_result,',"category_field":"descript","size":4}');
 	END IF;
 
 	v_result_line = '{"geometryType":"", "values":[],"category_field":""}';

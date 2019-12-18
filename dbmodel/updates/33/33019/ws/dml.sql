@@ -53,7 +53,7 @@ INSERT INTO audit_cat_function (id, function_name, project_type, function_type, 
        return_type, context, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
 VALUES (2784,'gw_fct_insert_importdxf','utils','function','{"featureType":[], "btnRunEnabled":false}',
 '[{"widgetname": "btn_path", "label": "Select DXF file:", "widgettype": "button",  "datatype": "text", "layoutname": "grl_option_parameters", "layout_order": 2, "value": "...","widgetfunction":"gw_function_dxf" }]',
-null,'Function to manage DXF files','role_admin',FALSE,TRUE,'Manage dxf files',TRUE) ON CONFLICT (id) DO NOTHING;
+null,'Function to manage DXF files','role_admin',FALSE,FALSE,'Manage dxf files',TRUE) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function (id, function_name, project_type, function_type, input_params, 
        return_type, context, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
