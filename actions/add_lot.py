@@ -145,6 +145,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.btn_validate_all.clicked.connect(partial(self.validate_all, self.dlg_lot.tbl_visit))
+        self.dlg_lot.btn_open_photo.clicked.connect(partial(self.open_photo, self.dlg_lot.tbl_visit))
         self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
@@ -263,6 +264,30 @@ class AddNewLot(ParentManage):
             chk_list = widget.findChildren(QCheckBox)
             if str(value) == 'True':
                 chk_list[0].setChecked(True)
+
+
+    def open_photo(self, qtable):
+
+        selected_list = qtable.selectionModel().selectedRows()
+        print(str(selected_list))
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        index = selected_list[0]
+        row = index.row()
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'visit_id')
+        visit_id = index.sibling(row, column_index).data()
+
+        sql = ("SELECT value FROM om_visit_event_photo WHERE visit_id = " + visit_id)
+        rows = self.controller.get_rows(sql, commit=True)
+        print(str(rows))
+        # TODO:: Open manage photos when visit have more than one
+        for row in rows:
+            print(str(row))
+            webbrowser.open(row[0])
 
 
     def validate_all(self, qtable):

@@ -966,6 +966,13 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="btn_open_photo">
+              <property name="text">
+               <string>Open Photo</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="btn_validate_all">
               <property name="text">
                <string>Validar totes</string>
