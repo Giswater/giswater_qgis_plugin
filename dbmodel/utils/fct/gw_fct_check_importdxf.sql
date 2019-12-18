@@ -59,7 +59,7 @@ BEGIN
 
 
 	--check if there are nodes coming from dxf that overlap nodes existing in the network
-	v_count=0
+	v_count=0;
 	FOR rec IN SELECT * FROM temp_table WHERE temp_table.geom_point IS NOT NULL LOOP
 		IF (SELECT node_id FROM node WHERE ST_DWithin(rec.geom_point,node.the_geom,0.01)) IS NOT NULL THEN
 			v_count=+1;
