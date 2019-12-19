@@ -234,10 +234,11 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', '(DB OM):') FROM audit_check_data 
-			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' offset 6;
+			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 6 ;
 
 			DELETE FROM audit_check_data WHERE fprocesscat_id=25 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
+			AND user_name=current_user;
 
 		END IF;
 
@@ -249,10 +250,11 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', '(DB EPA):') FROM audit_check_data 
-			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' offset 8;
+			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 8;
 
 			DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
+			AND user_name=current_user;
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -263,10 +265,11 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', '(DB PLAN):') FROM audit_check_data 
-			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' OFFSET 6;
+			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;
 			
 			DELETE FROM audit_check_data WHERE fprocesscat_id=15 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
+			AND user_name=current_user;
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -276,10 +279,11 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', '(DB ADMIN):') FROM audit_check_data 
-			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' offset 6;
+			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 6;
 			
 			DELETE FROM audit_check_data WHERE fprocesscat_id=95 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
+			AND user_name=current_user;
 		END IF;
 	END IF;
 
