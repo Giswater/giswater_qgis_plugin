@@ -48,13 +48,16 @@ v_result_line json;
 v_result_polygon json;
 v_result json;
 v_result_info json;
-v_project_role_control boolean;
 v_fprocesscat_id_aux integer;
 v_qgis_version text;
 v_qmlpointpath	text = '';
 v_qmllinepath	text = '';
 v_qmlpolpath	text = '';
 
+v_user_control boolean = false;
+v_user_control_json json[];
+v_user text;
+rec_json json;
 
 BEGIN 
 
@@ -74,8 +77,16 @@ BEGIN
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 	
-	SELECT value::boolean INTO v_project_role_control FROM config_param_user where parameter='project_role_control' and cur_user=current_user;
+	SELECT ARRAY(SELECT json_array_elements_text(value::json)) INTO v_user_control_json FROM config_param_system t  where parameter='audit_project_user_control';
 
+	FOREACH rec_json IN ARRAY v_user_control_json LOOP
+		v_user = (rec_json->>'user')::text;
+		IF current_user = v_user THEN
+			v_user_control=(rec_json->>'enabled')::boolean; 
+		END IF;
+	END LOOP;
+	
+	
 	-- init process
 	v_isenabled:=FALSE;
 	v_count=0;
@@ -96,7 +107,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
 
-	IF v_project_role_control is true and 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) then
+	IF v_user_control is true and 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) then
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, 'NETWORK ANALYTICS');
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '-------');
 	END IF;
@@ -214,7 +225,7 @@ BEGIN
 	END LOOP;
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
-	IF v_project_role_control THEN
+	IF v_user_control THEN
 	
 		IF'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${

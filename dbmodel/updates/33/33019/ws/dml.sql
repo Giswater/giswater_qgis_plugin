@@ -176,8 +176,9 @@ UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_mes
 UPDATE audit_cat_table SET qgis_role_id='role_basic', qgis_criticity=2, qgis_message='Cannot manage plots related to BASEMAP' WHERE id='v_ext_plot';
 
 
-
-
+--2019/12/19
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, sys_rows, isdeprecated)
+VALUES ('anl_mincut_arc_x_node','Mincut','Table of minimum cut analysis related to arcs and its final nodes', 'role_om',0,null, false) ON CONFLICT (id) DO NOTHING;
 
 
 

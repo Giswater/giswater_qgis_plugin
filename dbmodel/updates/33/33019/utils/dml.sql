@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
+
+
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2780, 'gw_fct_odbc2pg_hydro_filldata', 'utils', 'function', null, null, null,'Function to assist the odbc2pg process', 'role_om',
@@ -37,3 +40,8 @@ false, false, null, false) ON CONFLICT (id) DO NOTHING;
 -- 16/12/2019
 UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_column::json->>''list_tables_name'')::text[] from temp_table where fprocesscat_id = 63 and user_name = current_user)) as id, 
 UNNEST(ARRAY (select (text_column::json->>''list_layers_name'')::text[] FROM temp_table WHERE fprocesscat_id = 63 and user_name = current_user)) as idval ' WHERE id = 'cad_tools_base_layer_vdefault';
+
+--19/12/2019
+INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, project_type, isdeprecated) 
+VALUES ('audit_project_user_control', '[{"user":"postgres","enabled":"true"}]', 'json', 'system', 'Defines which user gets full audit check project log', null, 'utils', 'false')
+ON CONFLICT(parameter) DO NOTHING;
