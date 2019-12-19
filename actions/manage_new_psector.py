@@ -689,9 +689,9 @@ class ManageNewPsector(ParentManage):
             for column_name in columns:
                 if column_name in row:
                     if row[column_name] is not None:
-                        utils_giswater.setText(dialog, column_name, round(float(row[column_name]), 2))
+                        utils_giswater.setText(dialog, column_name, f"{row[column_name]:.02f}")
                     else:
-                        utils_giswater.setText(dialog, column_name, 0)
+                        utils_giswater.setText(dialog, column_name, f"{0:.02f}")
 
         self.calc_pec_pem(dialog)
         self.calc_pecvat_pec(dialog)
@@ -710,7 +710,7 @@ class ManageNewPsector(ParentManage):
         else:
             pem = 0
 
-        res = round(pec - pem, 2)
+        res = f"{round(pec - pem, 2):.02f}"
         utils_giswater.setWidgetText(dialog, 'pec_pem', res)
 
 
@@ -725,7 +725,7 @@ class ManageNewPsector(ParentManage):
             pec = float(utils_giswater.getWidgetText(dialog, 'pec'))
         else:
             pec = 0
-        res = round(pec_vat - pec, 2)
+        res = f"{round(pec_vat - pec, 2):.02f}"
         utils_giswater.setWidgetText(dialog, 'pecvat_pem', res)
 
 
@@ -740,7 +740,7 @@ class ManageNewPsector(ParentManage):
             pec_vat = float(utils_giswater.getWidgetText(dialog, 'pec_vat'))
         else:
             pec_vat = 0
-        res = round(pca - pec_vat, 2)
+        res = f"{round(pca - pec_vat, 2):.02f}"
         utils_giswater.setWidgetText(dialog, 'pca_pecvat', res)
 
 
