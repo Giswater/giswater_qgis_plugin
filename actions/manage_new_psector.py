@@ -909,10 +909,14 @@ class ManageNewPsector(ParentManage):
 
     def reload_states_selector(self):
         self.delete_psector_selector('selector_state')
-        for x in range(0, len(self.all_states)):
-            sql = (f"INSERT INTO selector_state (state_id, cur_user)"
-                   f" VALUES ('{self.all_states[x][0]}', current_user)")
-            self.controller.execute_sql(sql)
+        try :
+            for x in range(0, len(self.all_states)):
+                sql = (f"INSERT INTO selector_state (state_id, cur_user)"
+                       f" VALUES ('{self.all_states[x][0]}', current_user)")
+                self.controller.execute_sql(sql)
+        except TypeError:
+            # Control if self.all_states is None (object of type 'NoneType' has no len())
+            pass
 
 
     def close_psector(self, cur_active_layer=None):
