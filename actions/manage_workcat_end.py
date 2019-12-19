@@ -380,6 +380,9 @@ class ManageWorkcatEnd(ParentManage):
     def fill_table_relations(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
 
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
         filter_ = ""
         for row in self.selected_list:
             filter_ += f"arc_id = '{row}' OR "

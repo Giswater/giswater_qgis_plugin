@@ -162,10 +162,12 @@ class TmBasic(TmParentAction):
         """ Set a model with selected filter and attach it to selected table
         @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         """
+        if self.schema_name not in table_view:
+            table_view = self.schema_name + "." + table_view
 
         # Set model
         model = QSqlTableModel()
-        model.setTable(self.schema_name + "." + table_view)
+        model.setTable(table_view)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(2, 0)
         model.select()
@@ -316,9 +318,12 @@ class TmBasic(TmParentAction):
         @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         """
 
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
-        model.setTable(self.schema_name + "." + table_name)
+        model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         
         dialog.all_rows.setEditTriggers(set_edit_triggers)
@@ -361,9 +366,12 @@ class TmBasic(TmParentAction):
         @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         """
 
+        if self.schema_name not in table_view:
+            table_view = self.schema_name + "." + table_view
+
         # Set model
         model = QSqlTableModel()
-        model.setTable(self.schema_name + "." + table_view)
+        model.setTable(table_view)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setSort(2, 0)
         model.select()
@@ -737,10 +745,12 @@ class TmBasic(TmParentAction):
         """ Set a model with selected filter and attach it to selected table
         @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         """
+        if self.schema_name not in tableright:
+            tableright = f"{self.schema_name}.{tableright}"
 
         # Set model
         model = QSqlTableModel()
-        model.setTable(self.schema_name + "." + tableright)
+        model.setTable(tableright)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setSort(2, 0)
         model.select()

@@ -626,9 +626,12 @@ class ApiSearch(ApiParent):
             2: OnManualSubmit
         """
 
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
-        model.setTable(self.schema_name+"."+table_name)
+        model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()

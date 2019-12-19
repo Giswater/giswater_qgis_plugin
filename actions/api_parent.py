@@ -1026,6 +1026,7 @@ class ApiParent(ParentAction):
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)

@@ -1160,7 +1160,7 @@ class MincutParent(ParentAction):
             (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
             if not is_valid:
                 return expr
-        # TODO: schema_name
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
