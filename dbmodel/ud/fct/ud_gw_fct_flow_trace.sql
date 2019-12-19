@@ -24,6 +24,10 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 	
+	    -- Reset values
+    DELETE FROM anl_flow_node WHERE cur_user="current_user"() AND context='Flow trace';
+    DELETE FROM anl_flow_arc WHERE cur_user="current_user"() AND context='Flow trace' ; 
+
 	-- Compute the tributary area using recursive function
 	PERFORM gw_fct_flow_trace_recursive(p_node_id);
 	
