@@ -79,8 +79,8 @@ INSERT INTO doc VALUES ('Demo document 2', 'OTHER', 'https://github.com/Giswater
 
 DELETE FROM selector_psector;
 
-UPDATE connec SET state=2 WHERE connec_id='3080';
-UPDATE gully SET state=2 WHERE gully_id IN ('30070','30072','30110');
+UPDATE connec SET state=2, state_type=3 WHERE connec_id='3080';
+UPDATE gully SET state=2, state_type=3 WHERE gully_id IN ('30070','30072','30110');
 
 select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'CONNEC');
 select gw_fct_connect_to_network((select array_agg(gully_id)from gully ), 'GULLY');
