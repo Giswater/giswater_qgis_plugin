@@ -228,15 +228,13 @@ class ParentAction(object):
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        query_left = f"SELECT * FROM {tableleft} WHERE {name} NOT IN "
-        query_left += f"(SELECT {tableleft}.{name} FROM {tableleft}"
-        query_left += f" RIGHT JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
+        schema_name = self.schema_name.replace('"', '')
+        query_left = f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
+        query_left += f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+        query_left += f" RIGHT JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
         query_left += f" WHERE cur_user = current_user)"
         query_left += f" AND  {field_id_left} > -1"
         query_left += aql
-
-
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
@@ -246,8 +244,9 @@ class ParentAction(object):
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right} FROM {tableleft}"
-        query_right += f" JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
+        query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right}"
+        query_right += f" FROM {schema_name}.{tableleft}"
+        query_right += f" JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
 
         query_right += " WHERE cur_user = current_user"
 
@@ -258,7 +257,7 @@ class ParentAction(object):
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
-        query_delete = f"DELETE FROM {tableright}"
+        query_delete = f"DELETE FROM {schema_name}.{tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
 

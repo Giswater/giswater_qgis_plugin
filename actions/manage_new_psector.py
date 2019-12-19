@@ -1198,11 +1198,11 @@ class ManageNewPsector(ParentManage):
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit"""
-        
+        schema_name = self.schema_name.replace('"','')
         query = utils_giswater.getWidgetText(dialog, text_line).lower()
         if query == 'null':
             query = ""
-        sql = (f"SELECT * FROM {tableleft} WHERE LOWER ({field_id})"
+        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE LOWER ({field_id})"
                f" LIKE '%{query}%' AND {field_id} NOT IN ("
                f" SELECT price_id FROM {tableright}"
                f" WHERE psector_id = '{utils_giswater.getWidgetText(dialog, 'psector_id')}')")
