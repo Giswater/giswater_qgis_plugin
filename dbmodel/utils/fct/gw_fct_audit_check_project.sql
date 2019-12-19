@@ -96,9 +96,11 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, 'NETWORK ANALYTICS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '-------');
-	
+	IF v_project_role_control is true and 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) then
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, 'NETWORK ANALYTICS');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '-------');
+	END IF;
+
 	IF v_qgis_version = v_version THEN
 		v_errortext=concat('INFO: Giswater version: ',v_version,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
@@ -219,8 +221,12 @@ BEGIN
 			"client":{"device":3, "infoType":100, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB OM):') FROM audit_check_data 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+			SELECT 101, criticity, replace(error_message,':', '(DB OM):') FROM audit_check_data 
 			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' offset 6;
+
+			DELETE FROM audit_check_data WHERE fprocesscat_id=25 AND (error_message ILIKE '----%' 
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
 
 		END IF;
 
@@ -230,9 +236,12 @@ BEGIN
 			"feature":{},"data":{"parameters":{"t1":"check_project","saveOnDatabase":true, 
 			"useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB EPA):') FROM audit_check_data 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+			SELECT 101, criticity, replace(error_message,':', '(DB EPA):') FROM audit_check_data 
 			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' offset 8;
 
+			DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND (error_message ILIKE '----%' 
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -241,9 +250,12 @@ BEGIN
 			"feature":{},
 			"data":{"parameters":{"resultId":"check_project"},"saveOnDatabase":true}}$$)';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB PLAN):') FROM audit_check_data 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+			SELECT 101, criticity, replace(error_message,':', '(DB PLAN):') FROM audit_check_data 
 			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' OFFSET 6;
 			
+			DELETE FROM audit_check_data WHERE fprocesscat_id=15 AND (error_message ILIKE '----%' 
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -251,9 +263,12 @@ BEGIN
 			{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
 			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) SELECT 101, criticity, replace(error_message,':', '(DB ADMIN):') FROM audit_check_data 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+			SELECT 101, criticity, replace(error_message,':', '(DB ADMIN):') FROM audit_check_data 
 			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' offset 6;
 			
+			DELETE FROM audit_check_data WHERE fprocesscat_id=95 AND (error_message ILIKE '----%' 
+			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO');
 		END IF;
 	END IF;
 
@@ -274,53 +289,53 @@ BEGIN
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_host != v_table_host;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
+			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
+			VALUES (101, 1, 'INFO(QGIS PROJ): All layers come from current host');
 		END IF;
 		
 		--check layers database
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_dbname != v_table_dbname;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
+			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
+			VALUES (101, 1, 'INFO(QGIS PROJ): All layers come from current database');
 		END IF;
 
 		--check layers database
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_schema != v_table_schema;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
+			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
+			VALUES (101, 1, 'INFO(QGIS PROJ): All layers come from current schema');
 		END IF;
 
-		--check layers user
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE user_name != table_user;
+		--check layers user--TODO
+		/*SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE user_name != table_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
+			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
-		END IF;
+			VALUES (101, 1, 'INFO(QGIS PROJ): All layers have been added by current user');
+		END IF;*/
 
 		-- start process
 		FOR rec_table IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))
@@ -430,6 +445,3 @@ $BODY$
   COST 100;
 
 
-
---que nestor muestre la info si hay missingLayers o si hay algo de ERRORS
---en missing layer mostar el context en funcion del role de usuario (que no le va a funcionar sin la capa)
