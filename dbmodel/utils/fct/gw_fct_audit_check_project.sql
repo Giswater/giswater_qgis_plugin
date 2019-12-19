@@ -75,7 +75,7 @@ BEGIN
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 	
 	SELECT value::boolean INTO v_project_role_control FROM config_param_user where parameter='project_role_control' and cur_user=current_user;
-	v_project_role_control=true;
+
 	-- init process
 	v_isenabled:=FALSE;
 	v_count=0;
@@ -341,15 +341,19 @@ BEGIN
 		--list missing layers with criticity 3 and 2
 
 		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,column_name as id,'''||v_srid||''' as srid,
-		''3'' as criticity
+		''3'' as criticity, qgis_message
 		FROM '||v_schema||'.audit_check_project JOIN information_schema.columns ON table_name = table_id 
-		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 WHERE criticity=3 and enabled IS NOT TRUE) a'
+		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
+		LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
+		WHERE criticity=3 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity3;
 
 		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,column_name as id,'''||v_srid||''' as srid,
-		''2'' as criticity 
+		''2'' as criticity, qgis_message
 		FROM '||v_schema||'.audit_check_project JOIN information_schema.columns ON table_name = table_id 
-		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 WHERE criticity=2 and enabled IS NOT TRUE) a'
+		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
+		LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
+		WHERE criticity=2 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity2;
 
 		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
