@@ -1222,10 +1222,13 @@ class Giswater(QObject):
         for pos, item in enumerate(m_layers):
             if not item: continue
             widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+            # If it is the case that a layer is necessary for two functions,
+            # and the widget has already been put in another iteration
             if widget: continue
             label = QLabel()
             label.setObjectName(f"lbl_{item['layer']}")
-            label.setText(f"{item['layer']}")
+            label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
+
             critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
             widget = QCheckBox()
             widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
