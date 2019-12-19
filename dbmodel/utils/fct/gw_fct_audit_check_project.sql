@@ -204,7 +204,7 @@ BEGIN
 			INSERT INTO config_param_user (parameter, value, cur_user) 
 			SELECT audit_cat_param_user.id, vdefault, current_user FROM audit_cat_param_user WHERE audit_cat_param_user.id = rec_table.id;	
 
-			v_errortext=concat('INFO: Set value in config param user: ',rec_table.sys_sequence,'.');
+			v_errortext=concat('INFO: Set value in config param user: ',rec_table.id,'.');
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 1, v_errortext);
