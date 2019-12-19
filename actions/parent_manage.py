@@ -941,7 +941,9 @@ class ParentManage(ParentAction, object):
         :param qtable: QTableView to show
         :param expr: expression to set model
         """
-
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+            
         model = QSqlTableModel()
         model.setTable(table_name)
         model.setFilter(expr)
