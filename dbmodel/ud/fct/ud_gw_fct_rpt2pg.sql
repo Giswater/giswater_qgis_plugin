@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2232
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying, boolean);
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_rpt2pg (result_id_var character varying)  
 RETURNS json AS $BODY$
 
