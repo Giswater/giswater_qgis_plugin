@@ -1251,9 +1251,19 @@ class Giswater(QObject):
 
     def add_selected_layers(self):
         checks = self.dlg_audit_project.findChildren(QCheckBox)
+        schemaname = self.schema_name.replace('"','')
         for check in checks:
             if check.isChecked():
-                self.add_layer.from_postgres_to_toc(check.objectName(), "the_geom", check.property('field_id'), None, "GW_layers")
+                sql = (f"SELECT attname FROM pg_attribute a "
+                       f" JOIN pg_class t on a.attrelid = t.oid "
+                       f" JOIN pg_namespace s on t.relnamespace = s.oid "
+                       f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
+                       f" AND s.nspname = '{schemaname}' "
+                       f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
+                       f" ORDER BY a.attnum limit 1")
+                the_geom = self.controller.get_row(sql, commit=True)
+                if not the_geom: the_geom = [None]
+                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom[0], check.property('field_id'), None, "GW_layers")
         self.parent.close_dialog(self.dlg_audit_project)
 
 
