@@ -229,3 +229,8 @@ UPDATE link SET the_geom=the_geom;
 --update audit_cat_param_user with cat_feature vdefaults
 UPDATE cat_feature SET id=id;
 
+--set enddate NULL for on service features
+UPDATE node SET enddate=NULL WHERE state=1;
+UPDATE arc SET enddate=NULL WHERE state=1;
+UPDATE connec SET enddate=NULL WHERE state=1;
+

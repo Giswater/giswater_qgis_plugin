@@ -9,12 +9,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/12/20
 INSERT INTO audit_cat_param_user VALUES 
-('qgis_form_initproject_hidden', 'config', 'Hide initial form when project is loaded', 'role_basic', NULL, NULL, 'Hide initproject form', NULL, NULL, true, 8, 9, 'utils', false, NULL, NULL, NULL, 
+('qgis_form_initproject_hidden', 'config', 'Hide initial form when project is loaded', 'role_basic', NULL, NULL, 'Hide initproject form', NULL, NULL, true, 8, 12, 'utils', false, NULL, NULL, NULL, 
 false, 'boolean', 'check', true, NULL, 'false', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
 
 INSERT INTO audit_cat_param_user VALUES 
-('audit_project_user_control', 'config', 'Check database on load project', 'role_edit', NULL, NULL, 'Check database on load project', NULL, NULL, true, 8, 10, 'utils', false, NULL, NULL, NULL, 
+('audit_project_user_control', 'config', 'Check database on load project', 'role_edit', NULL, NULL, 'Check database on load project', NULL, NULL, true, 8, 13, 'utils', false, NULL, NULL, NULL, 
 false, 'boolean', 'check', true, NULL, 'false', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
 

@@ -111,6 +111,9 @@ SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1
 
 
 -- lastprocess
+delete from link where link_id=197;
+delete from link where link_id=211;
+
 select gw_fct_connect_to_network((select array_agg(connec_id)from connec where connec_id IN ('3076', '3177')), 'CONNEC');
 
 update connec set pjoint_id = exit_id, pjoint_type='VNODE' FROM link WHERE link.feature_id=connec_id;
@@ -118,5 +121,4 @@ update connec set pjoint_id = exit_id, pjoint_type='VNODE' FROM link WHERE link.
 UPDATE connec SET label_rotation=24.5, label_x=3 WHERE connec_id='3014';
 
 
-delete from link where link_id=197;
-delete from link where link_id=211;
+

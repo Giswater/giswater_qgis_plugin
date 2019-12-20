@@ -13,6 +13,3 @@
 - Enable hydrometer selector in case of user has nothing selected
 - When epa result is imported changed log message have been done using result epa file in spite of giswater export log
 - Harmonize *_type on UD as WS has in terms of be parent of catalogs
-
-
-

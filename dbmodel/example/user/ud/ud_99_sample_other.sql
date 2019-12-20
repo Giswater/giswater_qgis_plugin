@@ -250,3 +250,11 @@ UPDATE gully SET connec_length=ST_Length(link.the_geom) FROM link WHERE link.fea
 -- gully connec_depth
 UPDATE gully SET connec_depth='1.2';
 
+--set enddate NULL for on service features
+UPDATE node SET enddate=NULL WHERE state=1;
+UPDATE arc SET enddate=NULL WHERE state=1;
+UPDATE connec SET enddate=NULL WHERE state=1;
+UPDATE gully SET enddate=NULL WHERE state=1;
+
+-- set customer_code NULL
+UPDATE connec SET customer_code=NULL;
