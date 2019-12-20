@@ -473,9 +473,6 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 3, concat('ERROR: There is/are at least ',v_count,' 
 			exploitation(s) bad configured on the anl_mincut_inlet_x_exploitation table. Please check your data before continue'));
-		ELSIF v_count=0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: The table anl_mincut_inlet_x_exploitation is not configured.')); 
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: It seems anl_mincut_inlet_x_exploitation table is well configured. At least, table is filled with nodes from all exploitations.');
@@ -495,13 +492,13 @@ BEGIN
 		v_querytext = 	'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
 				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
 				FROM sector WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''SECTOR'' AND a.node_id IS NULL 
-				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM sector)';
+				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM sector) AND '||v_edit||'node.state > 0';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
 			EXECUTE concat 
-			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 79, node_id, nodecat_id, ''Node_type is SECTOR but node is not configured on sector.grafconfig'', the_geom FROM (', v_querytext,')a');
+			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 79, node_id, nodecat_id, ''The node_type.grafdelimiter of this node is SECTOR but it is not configured on sector.grafconfig'', the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
 			' node(s) with node_type.graf_delimiter=''SECTOR'' not configured on the sector table.'));
@@ -516,7 +513,7 @@ BEGIN
 		v_querytext = 	'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
 				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
 				FROM dma WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''DMA'' AND a.node_id IS NULL 
-				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM dma)';
+				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM dma) AND '||v_edit||'node.state > 0';
 
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
