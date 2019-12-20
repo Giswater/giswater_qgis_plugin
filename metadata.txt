@@ -12,6 +12,10 @@ version=3.3.020
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Xavier Torret
 # End of mandatory metadata
+changelog=Version 3.3.020 (20/12/2019)
+    - New mincut selector
+    - New audit check project result ui and utilities
+    - Minor bugs and issues solved
 
 # Tags are comma separated with spaces allowed
 tags=giswater, water, hydraulic, model, water supply, urban drainage
