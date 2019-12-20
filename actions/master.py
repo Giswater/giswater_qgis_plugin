@@ -489,6 +489,7 @@ class Master(ParentAction):
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         self.duplicate_psector = DuplicatePsector(self.iface, self.settings, self.controller, self.plugin_dir)
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'plan_psector'))
+        self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
 
