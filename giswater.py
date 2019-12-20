@@ -1191,12 +1191,6 @@ class Giswater(QObject):
         self.parent.load_settings(self.dlg_audit_project)
         self.dlg_audit_project.rejected.connect(partial(self.parent.save_settings, self.dlg_audit_project))
 
-        # Manage tab txt_infolog, and hide for not user admin
-        cur_user = self.controller.get_current_user()
-        role_admin = self.controller.check_role_user("role_admin", cur_user)
-        if not role_admin:
-            utils_giswater.remove_tab_by_tabName(self.dlg_audit_project.mainTab, "tab_infolog")
-
         # Populate info_log and missing layers
         critical_level = 0
         text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'], 'gw_fct_audit_check_project_result', True, False, 0, True)
@@ -1204,14 +1198,26 @@ class Giswater(QObject):
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
         self.parent.hide_void_groupbox(self.dlg_audit_project)
+
         if int(critical_level) > 0 or text_result:
-            show_msg = self.settings.value('system_variables/show_msg_layer')
-            if show_msg == 'TRUE':
+            row = self.controller.get_config('qgis_form_initproject_hidden')
+            if row and row[0].lower() == 'false':
                 self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+                self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
                 self.parent.open_dialog(self.dlg_audit_project)
 
         return True
 
+
+    def update_config(self, state):
+        """ Set qgis_form_initproject_hidden True or False into config_param_user """
+        value = {0:"False", 2:"True"}
+        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+               f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
+               f" ON CONFLICT  (parameter, cur_user) "
+               f" DO UPDATE SET value='{value[state]}'")
+        self.controller.execute_sql(sql, log_sql=True)
+        
 
     def get_missing_layers(self, dialog, m_layers, critical_level):
 
