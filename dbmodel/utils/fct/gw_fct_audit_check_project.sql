@@ -53,11 +53,8 @@ v_qgis_version text;
 v_qmlpointpath	text = '';
 v_qmllinepath	text = '';
 v_qmlpolpath	text = '';
-
 v_user_control boolean = false;
-v_user_control_json json[];
-v_user text;
-rec_json json;
+
 
 BEGIN 
 
@@ -76,17 +73,8 @@ BEGIN
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
-	
-	SELECT ARRAY(SELECT json_array_elements_text(value::json)) INTO v_user_control_json FROM config_param_system t  where parameter='audit_project_user_control';
+	SELECT value INTO v_user_control FROM config_param_user where parameter='audit_project_user_control' AND cur_user=current_user;
 
-	FOREACH rec_json IN ARRAY v_user_control_json LOOP
-		v_user = (rec_json->>'user')::text;
-		IF current_user = v_user THEN
-			v_user_control=(rec_json->>'enabled')::boolean; 
-		END IF;
-	END LOOP;
-	
-	
 	-- init process
 	v_isenabled:=FALSE;
 	v_count=0;
