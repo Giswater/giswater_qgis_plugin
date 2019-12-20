@@ -5,10 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
@@ -189,13 +185,8 @@ class Utils(ParentAction):
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
 
         try:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                with open(path, "r") as file_input:
-                    self.read_csv_file(model, file_input, delimiter, _unicode)
-            else:
-                with open(path, "r", encoding=_unicode) as file_input:
-                    self.read_csv_file(model, file_input, delimiter, _unicode)
-
+            with open(path, "r", encoding=_unicode) as file_input:
+                self.read_csv_file(model, file_input, delimiter, _unicode)
         except Exception as e:
             self.controller.show_warning(str(e))
 
@@ -204,10 +195,7 @@ class Utils(ParentAction):
 
         rows = csv.reader(file_input, delimiter=delimiter)
         for row in rows:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                unicode_row = [x.decode(str(_unicode)) for x in row]
-            else:
-                unicode_row = [x for x in row]
+            unicode_row = [x for x in row]
             items = [QStandardItem(field) for field in unicode_row]
             model.appendRow(items)
 
@@ -235,16 +223,10 @@ class Utils(ParentAction):
         _unicode = utils_giswater.getWidgetText(dialog, dialog.cmb_unicode_list)
 
         try:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                with open(path, 'r') as csvfile:
-                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
-                    csvfile.close()
-                    del csvfile
-            else:
-                with open(path, 'r', encoding=_unicode) as csvfile:
-                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
-                    csvfile.close()
-                    del csvfile
+            with open(path, 'r', encoding=_unicode) as csvfile:
+                insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
+                csvfile.close()
+                del csvfile
         except Exception as e:
             self.controller.show_warning("EXCEPTION: " + str(e))
 
@@ -265,9 +247,7 @@ class Utils(ParentAction):
         else:
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             if complet_result[0]['status'] == "Accepted":
-                qtabwidget = dialog.mainTab
-                qtextedit = dialog.txt_infolog
-                self.populate_info_text(dialog, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+                self.populate_info_text(dialog, complet_result[0]['body']['data'])
             message = complet_result[0]['message']['text']
             self.controller.show_info_box(message)
 
@@ -297,10 +277,7 @@ class Utils(ParentAction):
                 for x in range(0, len(row)):
                         sql += f"csv{x + 1}, "
                         value = f"$$" + row[x].strip().replace("\n", "") + "$$, "
-                        if Qgis.QGIS_VERSION_INT < 29900:
-                            value = str(value.decode(str(_unicode)))
-                        else:
-                            value = str(value)
+                        value = str(value)
                         values += value.replace("$$$$", "null")
                 sql = sql[:-2] + ") "
                 values = values[:-2] + ");\n"
@@ -364,10 +341,7 @@ class Utils(ParentAction):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select CSV file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
-        else:
-            file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+        file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 
         self.save_settings_values()

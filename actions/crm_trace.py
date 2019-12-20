@@ -73,17 +73,16 @@ class CrmTrace(ApiParent):
             return False
 
         # Get python synchronization script path
-        try:
-            param_name = 'crm_daily_script_folderpath'
-            script_folder = self.controller.cfgp_system[param_name].value
-            script_path = script_folder + os.sep + 'main.py'
-        except KeyError as e:
-            self.controller.show_warning(str(e))
-            return False
+        row = self.controller.get_config('crm_daily_script_folderpath', 'value', 'config_param_system')
+        if row:
+            script_folder = row[0]
+        else:
+            script_folder = 'C:/gis/daily_script'
 
-        # Check if script path exists
+         # Check if script path exists
+        script_path = script_folder + os.sep + 'main.py'
         if not os.path.exists(script_path):
-            msg = "File not found: {}. Check config system parameter: '{}'".format(script_path, param_name)
+            msg = "File not found: {}. Check config system parameter: '{}'".format(script_path, 'crm_daily_script_folderpath')
             self.controller.show_warning(msg, duration=20)
             return False
 
@@ -92,15 +91,24 @@ class CrmTrace(ApiParent):
 
         # Get python folder path
         python_path = 'python'
-        if 'python_folderpath' in self.controller.cfgp_system:
-            python_folderpath = self.controller.cfgp_system['python_folderpath'].value
-            if os.path.exists(python_folderpath):
-                python_path = python_folderpath + os.sep + python_path
-            else:
-                self.controller.log_warning("Folder not found", parameter=python_folderpath)
+        row = self.controller.get_config('python_folderpath', 'value', 'config_param_system')
+        if row:
+            python_folderpath = row[0]
+        else:
+            python_folderpath = 'c:/program files/qgis 3.4/apps/python37'
+
+        if os.path.exists(python_folderpath):
+            python_path = python_folderpath + os.sep + python_path
+        else:
+            self.controller.log_warning("Folder not found", parameter=python_folderpath)
+
+        # Get parameter 'buffer'
+        buffer = utils_giswater.getWidgetText(self.dlg_trace, 'buffer', return_string_null=False)
+        if buffer is None or buffer == "":
+            buffer = str(10)
 
         # Execute script
-        args = [python_path, script_path, expl_name, cur_user, self.schema_name]
+        args = [python_path, script_path, expl_name, buffer, self.schema_name, cur_user]
         self.controller.log_info(str(args))
         status = True
 
@@ -115,7 +123,7 @@ class CrmTrace(ApiParent):
             self.controller.log_info("result: " + str(result))
             if result != 0:
                 # Show warning message with button to open script log file
-                msg = "Process finished with some errorss"
+                msg = "Process finished with some errors"
                 inf_msg = "Open script .log file to get more details"
                 self.controller.show_warning_open_file(msg, inf_msg, log_path)
                 status = False
@@ -134,9 +142,6 @@ class CrmTrace(ApiParent):
         if not exists:
             self.controller.show_warning("Function not found", parameter=function_name)
             return False
-
-        # SELECT gw_fct_odbc2pg_main($${"client": {"device":3, "infoType":100, "lang":"ES"},
-        # "feature": {}, "data": {"parameters": {"exploitation":"557", "period":"4T", "year":"2019"} } }$$)
 
         # Get expl_id, year and period from table 'audit_log'
         sql = ("SELECT to_json(log_message) as log_message "
@@ -212,7 +217,6 @@ class CrmTrace(ApiParent):
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
                     self.controller.log_info("populate_vlayer")
                     self.populate_vlayer(v_layer, data, k)
-                    # TODO delete this 'if' when all functions are refactored
                     if 'qmlPath' in data[k]:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)

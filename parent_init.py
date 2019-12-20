@@ -5,35 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.gui import QgsMapCanvasSnapper
-    import ConfigParser as configparser
-else:
-    from qgis.gui import QgsMapCanvas
-    import configparser
-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsMapToPixel
 from qgis.utils import iface
 
 from qgis.PyQt.QtCore import QSettings, Qt, QUrl, QDate, QDateTime
 from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor, QIcon
-from qgis.PyQt.QtWidgets import QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QWidget, QDialog, QTextEdit
-
-from functools import partial
 
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
+import configparser
 import os
 
-from . import utils_giswater
 from .dao.controller import DaoController
 
 
@@ -54,11 +39,6 @@ class ParentDialog(QDialog):
         self.init_config()     
         self.set_signals()
         self.dlg_is_destroyed = None
-
-        # Set default encoding 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            reload(sys)
-            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
 
         super(ParentDialog, self).__init__()
 

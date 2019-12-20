@@ -101,7 +101,11 @@
     <message>
         <source>17_text</source>
         <translation>Fusionar arco</translation>
-    </message> 
+    </message>
+    <message>
+        <source>18_text</source>
+        <translation>Conexión con comercial</translation>
+    </message>
 	<message>
         <source>19_text</source>
         <translation>Caja de herramientas</translation>

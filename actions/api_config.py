@@ -5,10 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy
@@ -45,7 +41,6 @@ class ApiConfig(ApiParent):
         self.set_layers_name()
 
         # Get user and role
-        user_role = self.controller.get_restriction()
         super_users = self.settings.value('system_variables/super_users')
         cur_user = self.controller.get_current_user()
 
@@ -216,7 +211,8 @@ class ApiConfig(ApiParent):
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
         self.hide_void_groupbox(self.dlg_config)
         # Check user/role and remove tabs
-        if user_role != 'role_admin' and cur_user not in super_users:
+        role_admin = self.controller.check_role_user("role_admin", cur_user)
+        if not role_admin and cur_user not in super_users:
             utils_giswater.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
@@ -247,18 +243,12 @@ class ApiConfig(ApiParent):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    if Qgis.QGIS_VERSION_INT < 29900:
-                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
-                    else:
-                        widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'textarea':
                     widget = QTextEdit()
                     widget.setText(field['value'])
-                    if Qgis.QGIS_VERSION_INT < 29900:
-                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
-                    else:
-                        widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
@@ -352,18 +342,12 @@ class ApiConfig(ApiParent):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    if Qgis.QGIS_VERSION_INT < 29900:
-                        widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
-                    else:
-                        widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'textarea':
                     widget = QTextEdit()
                     widget.setText(field['value'])
-                    if Qgis.QGIS_VERSION_INT < 29900:
-                        widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
-                    else:
-                        widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
@@ -603,26 +587,18 @@ class ApiConfig(ApiParent):
             widget_child.setChecked(False)
 
 
-    # TODO:
-    def remove_empty_groupBox(self, layout):
-
-        groupBox_list = layout.findChild(QWidget)
-        if groupBox_list is None:
-            return
-        for groupBox in groupBox_list:
-            widget_list = groupBox.findChildren(QWidget)
-            if not widget_list:
-                groupBox.setVisible(False)
-
-
     def set_layers_name(self):
         """ Insert the name of all the TOC layers, then populate the cad_combo_layers """
         layers = self.iface.mapCanvas().layers()
         if not layers:
             return
         layers_name = '{"list_layers_name":"{'
+        tables_name = '"list_tables_name":"{'
         for layer in layers:
             layers_name += f"{layer.name()}, "
-        layers_name = layers_name[:-2] + '}"}'
-        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, user_name) VALUES (63, $${layers_name}$$, current_user);')
-        self.controller.execute_sql(sql)
+            tables_name += f"{self.controller.get_layer_source_table_name(layer)}, "
+
+        result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"}'
+
+        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, user_name) VALUES (63, $${result}$$, current_user);')
+        self.controller.execute_sql(sql, log_sql = True)

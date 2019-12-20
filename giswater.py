@@ -11,10 +11,9 @@ from json import JSONDecodeError
 from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
 from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
-from qgis.PyQt.QtWidgets import QToolBar
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QApplication, QCheckBox, QDockWidget
+from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
-from qgis.PyQt.QtSql import QSqlQueryModel
 
 import configparser
 import os.path
@@ -23,6 +22,8 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
+from . import utils_giswater
+from .actions.add_layer import AddLayer
 from .actions.basic import Basic
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
@@ -30,6 +31,7 @@ from .actions.master import Master
 from .actions.mincut import MincutParent
 from .actions.notify_functions import NotifyFunctions
 from .actions.om import Om
+from .actions.parent import ParentAction
 from .actions.tm_basic import TmBasic
 from .actions.update_sql import UpdateSQL
 from .actions.utils import Utils
@@ -49,6 +51,7 @@ from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
 from .ui_manager import AuditCheckProjectResult
+
 
 
 class Giswater(QObject):  
@@ -770,16 +773,8 @@ class Giswater(QObject):
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
         self.controller.log_info("Set search_path")
-        connection_status, not_version = self.controller.set_database_connection()
 
         self.set_info_button()
-        if not connection_status or not_version:
-            message = self.controller.last_error
-            if show_warning:
-                if message:
-                    self.controller.show_warning(message, 15)
-                self.controller.log_warning(str(self.controller.layer_source))
-            return
 
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)
@@ -792,6 +787,9 @@ class Giswater(QObject):
         # Get SRID from table node
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
+
+        self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Set common plugin toolbars (one action class per toolbar)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -952,31 +950,11 @@ class Giswater(QObject):
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.put_layer_into_toc, child_layers=child_layers))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layers=child_layers, group=None))
                 else:
-                    action.triggered.connect(partial(self.put_layer_into_toc, child_layer[0], "the_geom", child_layer[1]+"_id", None))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layer[0], "the_geom", child_layer[1]+"_id", None, None))
 
         main_menu.exec_(click_point)
-
-
-    def put_layer_into_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None):
-        """ Put selected layer into TOC"""
-        schema_name = self.controller.credentials['schema'].replace('"', '')
-        uri = QgsDataSourceUri()
-        uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
-                          self.controller.credentials['db'], self.controller.credentials['user'],
-                          self.controller.credentials['password'])
-        if child_layers is not None:
-            for layer in child_layers:
-                if layer[0] != 'Load all':
-                    uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
-                    vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
-                    QgsProject.instance().addMapLayer(vlayer)
-        else:
-            uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-            vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', "postgres")
-            QgsProject.instance().addMapLayer(vlayer)
-        self.iface.mapCanvas().refresh()
 
 
     def get_new_layers_name(self, layers_list):
@@ -1167,20 +1145,20 @@ class Giswater(QObject):
                "\nINSERT INTO selector_expl (expl_id, cur_user)"
                " VALUES(" + expl_id + ", current_user);")
         self.controller.execute_sql(sql)        
-        
-        
+
+
     def populate_audit_check_project(self, layers):
         """ Fill table 'audit_check_project' with layers data """
-
-        self.dlg_audit_project = AuditCheckProjectResult()
-        self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
-
         sql = ("DELETE FROM audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
         sql = ""
         for layer in layers:
+            if layer is None: continue
+            if layer.providerType() in ('memory', 'ogr'): continue
+            # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
+            uri = layer.dataProvider().dataSourceUri()
+            if 'SELECT row_number() over ()' in str(uri): continue
             layer_source = self.controller.get_layer_source(layer)
             schema_name = layer_source['schema']
             if schema_name is not None:
@@ -1188,79 +1166,105 @@ class Giswater(QObject):
                 table_name = layer_source['table']
                 db_name = layer_source['db']
                 host_name = layer_source['host']
+                table_user = layer_source['user']
                 sql += ("\nINSERT INTO audit_check_project"
-                        " (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
-                        " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1);")
+                        " (table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user)"
+                        " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1, '"+str(table_user)+"');")
                 
         status = self.controller.execute_sql(sql)
         if not status:
             return False
-                
-        sql = ("SELECT gw_fct_audit_check_project(1);")
-        row = self.controller.get_row(sql, commit=True)
+
+        version = self.parent.get_plugin_version()
+        extras = f'"version":"{version}"'
+        extras += f', "fprocesscat_id":1'
+        body = self.create_body(extras=extras)
+        sql = f"SELECT gw_fct_audit_check_project($${{{body}}}$$)::text"
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        
         if not row:
             return False
 
-        if row[0] == -1:
-            message = "This is not a valid Giswater project. Do you want to view problem details?"
-            answer = self.controller.ask_question(message, "Warning!")
-            if answer:
-                sql = ("SELECT * FROM audit_check_project"
-                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
-                rows = self.controller.get_rows(sql, commit=True)
-                if rows:
-                    self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
-                    # TODO .exec_() to open_dialog
-                    self.dlg_audit_project.exec_()
-                    # Fill log file with the names of the layers
-                    message = "This is not a valid Giswater project"
-                    self.controller.log_info(message)
-                    message = ""
-                    for row in rows:
-                        message += str(row["table_id"]) + "\n"
-                    self.controller.log_info(message)                    
-            return False
+        result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
-        elif row[0] > 0:
-            show_msg = self.settings.value('system_variables/show_msg_layer')
-            if show_msg == 'TRUE':
-                message = "Some layers of your role not found. Do you want to view them?"
-                answer = self.controller.ask_question(message, "Warning")
-                if answer:
-                    sql = ("SELECT * FROM audit_check_project"
-                           " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
-                    rows = self.controller.get_rows(sql, log_sql=True)
-                    if rows:
-                        self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+        self.dlg_audit_project = AuditCheckProjectResult()
+        self.parent.load_settings(self.dlg_audit_project)
+        self.dlg_audit_project.rejected.connect(partial(self.parent.save_settings, self.dlg_audit_project))
 
-                        # TODO .exec_() to open_dialog
-                        self.dlg_audit_project.exec_()
+        # Populate info_log and missing layers
+        critical_level = 0
+        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'], 'gw_fct_audit_check_project_result', True, False, 0, True)
 
-                        # Fill log file with the names of the layers
-                        message = "Layers of your role not found"
-                        self.controller.log_info(message)
-                        message = ""
-                        for row in rows:
-                            message += str(row["table_id"]) + "\n"
-                        self.controller.log_info(message)
-            
+        if 'missingLayers' in result['body']['data']:
+            critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
+        self.parent.hide_void_groupbox(self.dlg_audit_project)
+
+        if int(critical_level) > 0 or text_result:
+            row = self.controller.get_config('qgis_form_initproject_hidden')
+            if row and row[0].lower() == 'false':
+                self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+                self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
+                self.parent.open_dialog(self.dlg_audit_project)
+
         return True
 
 
-    def populate_table_by_query(self, qtable, query):
-        """
-        :param qtable: QTableView to show
-        :param query: query to set model
-        """
+    def update_config(self, state):
+        """ Set qgis_form_initproject_hidden True or False into config_param_user """
+        value = {0:"False", 2:"True"}
+        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+               f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
+               f" ON CONFLICT  (parameter, cur_user) "
+               f" DO UPDATE SET value='{value[state]}'")
+        self.controller.execute_sql(sql, log_sql=True)
         
-        model = QSqlQueryModel()
-        model.setQuery(query)
-        qtable.setModel(model)
-        qtable.show()
 
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+    def get_missing_layers(self, dialog, m_layers, critical_level):
+
+        grl_critical = dialog.findChild(QGridLayout, "grl_critical")
+        grl_others = dialog.findChild(QGridLayout, "grl_others")
+
+        for pos, item in enumerate(m_layers):
+            if not item: continue
+            widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+            # If it is the case that a layer is necessary for two functions,
+            # and the widget has already been put in another iteration
+            if widget: continue
+            label = QLabel()
+            label.setObjectName(f"lbl_{item['layer']}")
+            label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
+
+            critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
+            widget = QCheckBox()
+            widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            widget.setObjectName(f"{item['layer']}")
+            widget.setProperty('field_id', item['id'])
+            if int(item['criticity']) == 3:
+                grl_critical.addWidget(label, pos, 0)
+                grl_critical.addWidget(widget, pos, 1)
+            else:
+                grl_others.addWidget(label, pos, 0)
+                grl_others.addWidget(widget, pos, 1)
+
+        return critical_level
+
+
+    def add_selected_layers(self):
+        checks = self.dlg_audit_project.findChildren(QCheckBox)
+        schemaname = self.schema_name.replace('"','')
+        for check in checks:
+            if check.isChecked():
+                sql = (f"SELECT attname FROM pg_attribute a "
+                       f" JOIN pg_class t on a.attrelid = t.oid "
+                       f" JOIN pg_namespace s on t.relnamespace = s.oid "
+                       f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
+                       f" AND s.nspname = '{schemaname}' "
+                       f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
+                       f" ORDER BY a.attnum limit 1")
+                the_geom = self.controller.get_row(sql, commit=True)
+                if not the_geom: the_geom = [None]
+                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom[0], check.property('field_id'), None, "GW_layers")
+        self.parent.close_dialog(self.dlg_audit_project)
 
 
     def project_read_pl(self, show_warning=True):

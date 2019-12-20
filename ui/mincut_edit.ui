@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>989</width>
+    <width>998</width>
     <height>501</height>
    </rect>
   </property>
@@ -172,13 +172,6 @@
        <widget class="QTableView" name="tbl_mincut_edit">
         <property name="sortingEnabled">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="12">
-       <widget class="QPushButton" name="btn_show">
-        <property name="text">
-         <string>Show selection</string>
         </property>
        </widget>
       </item>

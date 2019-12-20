@@ -9,15 +9,11 @@
  ***************************************************************************/
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
+from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QFileDialog
 from qgis.PyQt.QtXml import QDomDocument
 
 from functools import partial
@@ -65,6 +61,7 @@ class DrawProfiles(ParentMapTool):
 
         self.list_of_selected_nodes = []
         self.nodes = []
+        self.rotation_vd_exist = False
 
 
     def activate(self):
@@ -95,6 +92,7 @@ class DrawProfiles(ParentMapTool):
         self.widget_start_point = self.dlg_draw_profile.findChild(QLineEdit, "start_point")
         self.widget_end_point = self.dlg_draw_profile.findChild(QLineEdit, "end_point")
         self.widget_additional_point = self.dlg_draw_profile.findChild(QListWidget, "list_additional_points")
+        self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")
 
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
@@ -117,14 +115,19 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.save_rotation_vdefault)
 
+        self.dlg_draw_profile.btn_update_path.clicked.connect(self.set_composer_path)
+
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
+        # Get qgis_composers_path
+        sql = "SELECT value FROM config_param_user WHERE parameter = 'qgis_composers_path'"
+        row = self.controller.get_row(sql)
+        utils_giswater.setWidgetText(self.dlg_draw_profile, self.composers_path, str(row[0]))
+
+
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        template_path = ""
-        row = self.controller.get_config('qgis_composers_path')
-        if row and row[0]:
-            template_path = row[0]
+        template_path = utils_giswater.getWidgetText(self.dlg_draw_profile, self.composers_path)
         template_files = []
         try:
             template_files = os.listdir(template_path)
@@ -145,6 +148,32 @@ class DrawProfiles(ParentMapTool):
         self.list_of_selected_nodes = []
 
         self.open_dialog(self.dlg_draw_profile)
+
+
+    def set_composer_path(self):
+
+        self.get_folder_dialog(self.dlg_draw_profile, 'composers_path')
+
+        template_path = utils_giswater.getWidgetText(self.dlg_draw_profile, self.composers_path)
+        sql = (f"UPDATE config_param_user "
+               f"SET value = '{template_path}' "
+               f"WHERE parameter = 'qgis_composers_path'")
+        self.controller.execute_sql(sql)
+        utils_giswater.setWidgetText(self.dlg_draw_profile, self.composers_path, str(template_path))
+
+        template_files = []
+        try:
+            template_files = os.listdir(template_path)
+        except FileNotFoundError as e:
+            pass
+
+        self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
+
+        self.dlg_draw_profile.cbx_template.clear()
+        self.dlg_draw_profile.cbx_template.addItem('')
+        for template in self.files_qpt:
+            self.dlg_draw_profile.cbx_template.addItem(str(template))
+            self.dlg_draw_profile.cbx_template.currentIndexChanged.connect(self.set_template)
 
 
     def save_profile(self):
@@ -358,7 +387,9 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.rotation.setDisabled(False)
         self.dlg_draw_profile.scale_vertical.setDisabled(False)
         self.dlg_draw_profile.scale_horizontal.setDisabled(False)
+        self.dlg_draw_profile.btn_update_path.setDisabled(False)
         self.close_dialog(self.dlg_load)
+        self.rotation_vd_exist = True
 
 
     def activate_snapping(self, emit_point):
@@ -434,29 +465,30 @@ class DrawProfiles(ParentMapTool):
                         self.start_end_node[1] = str(self.element_id)
                     self.exec_path()
                 self.layer_feature = self.layer_node
-        # widget = clicked button
-        # self.widget_start_point | self.widget_end_point : QLabels
-        # start_end_node = [0] : node start | start_end_node = [1] : node end
-        aux = ""
-        if str(self.widget_point.objectName()) == "start_point":
-            self.start_end_node[0] = self.widget_point.text()
-            aux = f"node_id = '{self.start_end_node[0]}'"
+            # widget = clicked button
+            # self.widget_start_point | self.widget_end_point : QLabels
+            # start_end_node = [0] : node start | start_end_node = [1] : node end
 
-        if str(self.widget_point.objectName()) == "end_point":
-            self.start_end_node[1] = self.widget_point.text()
-            aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
+            aux = ""
+            if str(self.widget_point.objectName()) == "start_point":
+                self.start_end_node[0] = self.widget_point.text()
+                aux = f"node_id = '{self.start_end_node[0]}'"
 
-        if str(self.widget_point.objectName()) == "list_sdditional_points":
-            # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
-            aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
-            for i in range(2, len(self.start_end_node)):
-                aux += f" OR node_id = '{self.start_end_node[i]}'"
+            if str(self.widget_point.objectName()) == "end_point":
+                self.start_end_node[1] = self.widget_point.text()
+                aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
 
-        # Select snapped features
-        selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-        self.layer_feature.selectByIds([k.id() for k in selection])
+            if str(self.widget_point.objectName()) == "list_sdditional_points":
+                # After start_point and end_point in self.start_end_node add list of additional points from "cbx_additional_point"
+                aux = f"node_id = '{self.start_end_node[0]}' OR node_id = '{self.start_end_node[1]}'"
+                for i in range(2, len(self.start_end_node)):
+                    aux += f" OR node_id = '{self.start_end_node[i]}'"
 
-        self.exec_path()
+            # Select snapped features
+            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
+            self.layer_feature.selectByIds([k.id() for k in selection])
+
+            self.exec_path()
 
 
     def paint_event(self, arc_id, node_id):
@@ -1444,10 +1476,12 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.scale_horizontal.setDisabled(True)
         self.dlg_draw_profile.btn_export_pdf.setDisabled(True)
         self.dlg_draw_profile.cbx_template.setDisabled(True)
+        self.dlg_draw_profile.btn_update_path.setDisabled(True)
         self.dlg_draw_profile.start_point.clear()
         self.dlg_draw_profile.end_point.clear()
         self.dlg_draw_profile.profile_id.clear()
-
+        self.rotation_vd_exist = False
+        
         # Get data from DB for selected item| tbl_list_arc
         self.dlg_draw_profile.tbl_list_arc.clear()
 
@@ -1514,7 +1548,9 @@ class DrawProfiles(ParentMapTool):
         # Get values from dialog
         profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
         title = self.dlg_draw_profile.title.text()
-        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
+        rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, False, False)
+        rotation = 0 if rotation in (None, '', 'null') else int(rotation)
+
         first_node = self.dlg_draw_profile.start_point.text()
         end_node = self.dlg_draw_profile.end_point.text()
 
@@ -1563,24 +1599,16 @@ class DrawProfiles(ParentMapTool):
 
         # Save vdefault value from rotation
         tablename = "config_param_user"
-        rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation)
+        rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, False, False)
+        rotation = 0 if rotation in (None, '', 'null') else int(rotation)
 
         if self.rotation_vd_exist:
-            if str(rotation) != 'null':
-                sql = (f"UPDATE {tablename} "
-                       f"SET value = '{rotation}' "
-                       f"WHERE parameter = 'rotation_vdefault'")
-            else:
-                sql = (f"UPDATE {tablename} "
-                       f"SET value = '0' "
-                       f"WHERE parameter = 'rotation_vdefault'")
+            sql = (f"UPDATE {tablename} "
+                   f"SET value = '{rotation}' "
+                   f"WHERE parameter = 'rotation_vdefault'")
         else:
-            if str(rotation) != 'null':
-                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
-                       f"VALUES ('rotation_vdefault', '{rotation}', current_user)")
-            else:
-                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
-                       f"VALUES ('rotation_vdefault', '0', current_user)")
+            sql = (f"INSERT INTO {tablename} (parameter, value, cur_user) "
+                   f"VALUES ('rotation_vdefault', '{rotation}', current_user)")
 
         if sql:
             self.controller.execute_sql(sql)
@@ -1765,6 +1793,7 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.btn_save_profile.setDisabled(False)
             self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
             self.dlg_draw_profile.cbx_template.setDisabled(False)
+            self.dlg_draw_profile.btn_update_path.setDisabled(False)
 
         if str(self.start_end_node[0]) is not None and self.start_end_node[1] is not None:
             self.dlg_draw_profile.btn_delete_additional_point.setDisabled(False)
@@ -1833,3 +1862,22 @@ class DrawProfiles(ParentMapTool):
     def manage_rejected(self):
         self.close_dialog(self.dlg_draw_profile)
         self.remove_vertex()
+
+
+    def get_folder_dialog(self, dialog, widget):
+        """ Get folder dialog """
+
+        # Check if selected folder exists. Set default value if necessary
+        folder_path = utils_giswater.getWidgetText(dialog, widget)
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
+            folder_path = os.path.expanduser("~")
+
+        # Open dialog to select folder
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)
+        message = "Select folder"
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message),
+                                                       directory=folder_path)
+        if folder_path:
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))

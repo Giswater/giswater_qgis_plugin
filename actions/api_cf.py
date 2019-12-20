@@ -575,7 +575,7 @@ class ApiCF(ApiParent, QObject):
         try:
 
             row = self.controller.get_config('qgis_toggledition_forceopen')
-            if not row or row[0].upper() != "TRUE" and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+            if (not row or row[0].upper() != "TRUE") and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
                 self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         except  KeyError as e:
             pass
@@ -700,7 +700,8 @@ class ApiCF(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_checkbox(dialog, field)
+        widget = self.add_checkbox(field)
+        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         widget = self.set_auto_update_checkbox(field, dialog, widget)
         return widget
 
@@ -1379,6 +1380,7 @@ class ApiCF(ApiParent, QObject):
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -2662,7 +2664,9 @@ class ApiCF(ApiParent, QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def gw_api_open_node(self, dialog, widget=None):
+    def gw_api_open_node(self, **kwargs):
+        dialog = kwargs['dialog']
+        widget = kwargs['widget']
 
         feature_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)

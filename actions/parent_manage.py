@@ -5,31 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QDate, QDateTime
+from qgis.PyQt.QtCore import Qt, QDate, QDateTime, QStringListModel
 
 from functools import partial
 
 from .. import utils_giswater
 from .parent import ParentAction
 from .multiple_selection import MultipleSelection
-
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 class ParentManage(ParentAction, object):
 
@@ -952,7 +941,9 @@ class ParentManage(ParentAction, object):
         :param qtable: QTableView to show
         :param expr: expression to set model
         """
-
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+            
         model = QSqlTableModel()
         model.setTable(table_name)
         model.setFilter(expr)
@@ -1178,6 +1169,9 @@ class ParentManage(ParentAction, object):
     def set_model_to_table(self, widget, table_name, expr_filter):
         """ Set a model with selected filter.
         Attach that model to selected table """
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
 
         # Set model
         model = QSqlTableModel();

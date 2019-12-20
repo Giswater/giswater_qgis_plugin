@@ -5,33 +5,23 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
 
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsComposition
-    from qgis.PyQt.QtGui import QStringListModel
-    from qgis.core import QgsPoint as QgsPointXY
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-    from qgis.core import QgsPointXY, QgsLayoutExporter
-
-from qgis.core import QgsRectangle, QgsProject
-from qgis.PyQt.QtCore import Qt
+from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
+from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLabel
 from qgis.PyQt.QtWidgets import QLineEdit, QTableView
 
-import os
-import sys
 import csv
+import json
+import os
 import operator
-import webbrowser
 import subprocess
+import sys
+import webbrowser
+
+from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -51,6 +41,8 @@ class ManageNewPsector(ParentManage):
 
     def new_psector(self, psector_id=None, plan_om=None, is_api=False):
         """ Buttons 45 and 81: New psector """
+        row = self.controller.get_config(parameter='sys_currency', columns='value::text', table='config_param_system')
+        self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
         self.dlg_plan_psector = Plan_psector()
@@ -121,7 +113,7 @@ class ManageNewPsector(ParentManage):
         # Populate combo expl_id
         sql = ("SELECT expl_id, name from exploitation "
                " JOIN selector_expl USING (expl_id) "
-               " WHERE exploitation.expl_id != 0")
+               " WHERE exploitation.expl_id != 0 and cur_user = current_user")
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.cmb_expl_id, rows, 1)
 
@@ -139,23 +131,23 @@ class ManageNewPsector(ParentManage):
             self.cmb_result_id.setVisible(False)
             self.dlg_plan_psector.chk_enable_all.setEnabled(False)
 
-        # tab Bugdet
-        total_arc = self.dlg_plan_psector.findChild(QLineEdit, "total_arc")
-        self.double_validator(total_arc)
-        total_node = self.dlg_plan_psector.findChild(QLineEdit, "total_node")
-        self.double_validator(total_node)
-        total_other = self.dlg_plan_psector.findChild(QLineEdit, "total_other")
-        self.double_validator(total_other)
-        pem = self.dlg_plan_psector.findChild(QLineEdit, "pem")
-        self.double_validator(pem)
-        pec_pem = self.dlg_plan_psector.findChild(QLineEdit, "pec_pem")
-        self.double_validator(pec_pem)
-        pec = self.dlg_plan_psector.findChild(QLineEdit, "pec")
-        self.double_validator(pec)
-        pec_vat = self.dlg_plan_psector.findChild(QLineEdit, "pec_vat")
-        self.double_validator(pec_vat)
-        pca = self.dlg_plan_psector.findChild(QLineEdit, "pca")
-        self.double_validator(pca)
+        # # tab Bugdet
+        # total_arc = self.dlg_plan_psector.findChild(QLabel, "total_arc")
+        # self.double_validator(total_arc)
+        # total_node = self.dlg_plan_psector.findChild(QLabel, "total_node")
+        # self.double_validator(total_node)
+        # total_other = self.dlg_plan_psector.findChild(QLabel, "total_other")
+        # self.double_validator(total_other)
+        # pem = self.dlg_plan_psector.findChild(QLabel, "pem")
+        # self.double_validator(pem)
+        # pec_pem = self.dlg_plan_psector.findChild(QLabel, "pec_pem")
+        # self.double_validator(pec_pem)
+        # pec = self.dlg_plan_psector.findChild(QLabel, "pec")
+        # self.double_validator(pec)
+        # pec_vat = self.dlg_plan_psector.findChild(QLabel, "pec_vat")
+        # self.double_validator(pec_vat)
+        # pca = self.dlg_plan_psector.findChild(QLabel, "pca")
+        # self.double_validator(pca)
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
         self.double_validator(gexpenses)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
@@ -402,10 +394,28 @@ class ManageNewPsector(ParentManage):
                f"FROM {self.plan_om}_psector "
                f"WHERE psector_id = '{psector_id}'")
         row = self.controller.get_row(sql)
+
+        other = 0
+        gexpenses = 0
+        vat = 0
         if row:
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
-            utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
+            other = float(row[0]) if row[0] is not None else 0
+            gexpenses = float(row[1]) if row[1] is not None else 0
+            vat = float(row[2]) if row[2] is not None else 0
+        utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
+        utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
+        utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
+
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pem',  self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec',  self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
         self.geom_type = "arc"
@@ -502,22 +512,15 @@ class ManageNewPsector(ParentManage):
         
         index = 0
         records = []
-        if Qgis.QGIS_VERSION_INT < 29900:
-            composers = self.iface.activeComposers()
-            for comp_view in composers:
-                elem = [index, comp_view.composerWindow().windowTitle()]
-                records.append(elem)
-                index = index + 1
-        else:
-            layout_manager = QgsProject.instance().layoutManager()
-            layouts = layout_manager.layouts()  # QgsPrintLayout
-            for layout in layouts:
-                elem = [index, layout.name()]
-                records.append(elem)
-                index = index + 1
+        layout_manager = QgsProject.instance().layoutManager()
+        layouts = layout_manager.layouts()  # QgsPrintLayout
+        for layout in layouts:
+            elem = [index, layout.name()]
+            records.append(elem)
+            index = index + 1
 
         if records in ([], None):
-            # If no composer configurated, disable composer pdf file widgets
+            # If no composer configured, disable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(False)
             self.dlg_psector_rapport.chk_composer.setChecked(False)
             self.dlg_psector_rapport.cmb_templates.setEnabled(False)
@@ -526,7 +529,7 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setStyleSheet('color: red')
             return
         else:
-            # If composer configurated, enable composer pdf file widgets
+            # If composer configured, enable composer pdf file widgets
             self.dlg_psector_rapport.chk_composer.setEnabled(True)
             self.dlg_psector_rapport.cmb_templates.setEnabled(True)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(True)
@@ -597,65 +600,42 @@ class ManageNewPsector(ParentManage):
 
 
     def generate_composer(self, path):
+        # Get layout manager object
+        layout_manager = QgsProject.instance().layoutManager()
 
-        if Qgis.QGIS_VERSION_INT < 29900:
+        # Get our layout
+        layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
+        layout = layout_manager.layoutByName(layout_name)
 
-            index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
-            comp_view = self.iface.activeComposers()[index]
-            my_comp = comp_view.composition()
-            if my_comp is not None:
-                my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
-                try:
-                    result = my_comp.exportAsPDF(path)
-                    if result:
-                        message = "Document PDF created in"
-                        self.controller.show_info(message, parameter=path)
-                        os.startfile(path)
-                    else:
-                        message = "Cannot create file, check if its open"
-                        self.controller.show_warning(message, parameter=path)
-                except Exception as e:
-                    self.controller.log_warning(str(e))
-                    msg = "Cannot create file, check if selected composer is the correct composer"
-                    self.controller.show_warning(msg, parameter=path)
+        # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
+        # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
+        # close the layout designer again (finally sentence)
+        designer = self.iface.openLayoutDesigner(layout)
+        layout_view = designer.view()
+        designer_window = layout_view.window()
+        action = designer_window.findChild(QAction, 'mActionAtlasPreview')
+        action.trigger()
 
+        # Export to PDF file
+        if layout:
+            try:
+                exporter = QgsLayoutExporter(layout)
+                exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
+                if os.path.exists(path):
+                    message = "Document PDF created in"
+                    self.controller.show_info(message, parameter=path)
+                    os.startfile(path)
+                else:
+                    message = "Cannot create file, check if its open"
+                    self.controller.show_warning(message, parameter=path)
+            except Exception as e:
+                self.controller.log_warning(str(e))
+                msg = "Cannot create file, check if selected composer is the correct composer"
+                self.controller.show_warning(msg, parameter=path)
+            finally:
+                designer_window.close()
         else:
-            # Get layout manager object
-            layout_manager = QgsProject.instance().layoutManager()
-
-            # Get our layout
-            layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
-            layout = layout_manager.layoutByName(layout_name)
-
-            # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
-            # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
-            # close the layout designer again (finally sentence)
-            designer = self.iface.openLayoutDesigner(layout)
-            layout_view = designer.view()
-            designer_window = layout_view.window()
-            action = designer_window.findChild(QAction, 'mActionAtlasPreview')
-            action.trigger()
-
-            # Export to PDF file
-            if layout:
-                try:
-                    exporter = QgsLayoutExporter(layout)
-                    exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
-                    if os.path.exists(path):
-                        message = "Document PDF created in"
-                        self.controller.show_info(message, parameter=path)
-                        os.startfile(path)
-                    else:
-                        message = "Cannot create file, check if its open"
-                        self.controller.show_warning(message, parameter=path)
-                except Exception as e:
-                    self.controller.log_warning(str(e))
-                    msg = "Cannot create file, check if selected composer is the correct composer"
-                    self.controller.show_warning(msg, parameter=path)
-                finally:
-                    designer_window.close()
-            else:
-                self.controller.show_warning("Layout not found", parameter=layout_name)
+            self.controller.show_warning("Layout not found", parameter=layout_name)
 
 
     def generate_csv(self, path, viewname):
@@ -709,9 +689,9 @@ class ManageNewPsector(ParentManage):
             for column_name in columns:
                 if column_name in row:
                     if row[column_name] is not None:
-                        utils_giswater.setText(dialog, column_name, row[column_name])
+                        utils_giswater.setText(dialog, column_name, f"{row[column_name]:.02f}")
                     else:
-                        utils_giswater.setText(dialog, column_name, 0)
+                        utils_giswater.setText(dialog, column_name, f"{0:.02f}")
 
         self.calc_pec_pem(dialog)
         self.calc_pecvat_pec(dialog)
@@ -720,43 +700,47 @@ class ManageNewPsector(ParentManage):
 
     def calc_pec_pem(self, dialog):
         
-        if str(utils_giswater.getWidgetText(dialog, 'pec')) != 'null':
+        if utils_giswater.getWidgetText(dialog, 'pec') not in('null', None):
             pec = float(utils_giswater.getWidgetText(dialog, 'pec'))
         else:
             pec = 0
-        if str(utils_giswater.getWidgetText(dialog, 'pem')) != 'null':
+
+        if utils_giswater.getWidgetText(dialog, 'pem') not in('null', None):
             pem = float(utils_giswater.getWidgetText(dialog, 'pem'))
         else:
             pem = 0
-        res = pec - pem
+
+        res = f"{round(pec - pem, 2):.02f}"
         utils_giswater.setWidgetText(dialog, 'pec_pem', res)
 
 
     def calc_pecvat_pec(self, dialog):
 
-        if str(utils_giswater.getWidgetText(dialog, 'pec_vat')) != 'null':
+        if utils_giswater.getWidgetText(dialog, 'pec_vat') not in('null', None):
             pec_vat = float(utils_giswater.getWidgetText(dialog, 'pec_vat'))
         else:
             pec_vat = 0
-        if str(utils_giswater.getWidgetText(dialog, 'pec')) != 'null':
+
+        if utils_giswater.getWidgetText(dialog, 'pec') not in('null', None):
             pec = float(utils_giswater.getWidgetText(dialog, 'pec'))
         else:
             pec = 0
-        res = pec_vat - pec
+        res = f"{round(pec_vat - pec, 2):.02f}"
         utils_giswater.setWidgetText(dialog, 'pecvat_pem', res)
 
 
     def calc_pca_pecvat(self, dialog):
         
-        if str(utils_giswater.getWidgetText(dialog, 'pca')) != 'null':
+        if utils_giswater.getWidgetText(dialog, 'pca') not in('null', None):
             pca = float(utils_giswater.getWidgetText(dialog, 'pca'))
         else:
             pca = 0
-        if str(utils_giswater.getWidgetText(dialog, 'pec_vat')) != 'null':
+
+        if utils_giswater.getWidgetText(dialog, 'pec_vat') not in('null', None):
             pec_vat = float(utils_giswater.getWidgetText(dialog, 'pec_vat'))
         else:
             pec_vat = 0
-        res = pca - pec_vat
+        res = f"{round(pca - pec_vat, 2):.02f}"
         utils_giswater.setWidgetText(dialog, 'pca_pecvat', res)
 
 
@@ -925,10 +909,14 @@ class ManageNewPsector(ParentManage):
 
     def reload_states_selector(self):
         self.delete_psector_selector('selector_state')
-        for x in range(0, len(self.all_states)):
-            sql = (f"INSERT INTO selector_state (state_id, cur_user)"
-                   f" VALUES ('{self.all_states[x][0]}', current_user)")
-            self.controller.execute_sql(sql)
+        try :
+            for x in range(0, len(self.all_states)):
+                sql = (f"INSERT INTO selector_state (state_id, cur_user)"
+                       f" VALUES ('{self.all_states[x][0]}', current_user)")
+                self.controller.execute_sql(sql)
+        except TypeError:
+            # Control if self.all_states is None (object of type 'NoneType' has no len())
+            pass
 
 
     def close_psector(self, cur_active_layer=None):
@@ -1210,11 +1198,11 @@ class ManageNewPsector(ParentManage):
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit"""
-        
+        schema_name = self.schema_name.replace('"','')
         query = utils_giswater.getWidgetText(dialog, text_line).lower()
         if query == 'null':
             query = ""
-        sql = (f"SELECT * FROM {tableleft} WHERE LOWER ({field_id})"
+        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE LOWER ({field_id})"
                f" LIKE '%{query}%' AND {field_id} NOT IN ("
                f" SELECT price_id FROM {tableright}"
                f" WHERE psector_id = '{utils_giswater.getWidgetText(dialog, 'psector_id')}')")
@@ -1410,7 +1398,8 @@ class ManageNewPsector(ParentManage):
 
 
     def show_status_warning(self):
-        msg = "WARNING: You have been updated the status value.  If you click OK on the main dialog, a process will be " \
-              "triggered to update the state & state_type values of all that features that belongs on the psector " \
-              "according with the system variables plan_psector_statetype, plan_statetype_planned, plan_statetype_ficticious"
+        msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
+              "a process that updates the state & state_type values of all that features that belong to the psector, " \
+              "according to the system variables plan_psector_statetype, " \
+              "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
         result = self.controller.show_details(msg, 'Message warning')

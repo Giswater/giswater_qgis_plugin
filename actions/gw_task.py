@@ -5,7 +5,7 @@ from ..ui_manager import SelectorDate
 from qgis.core import QgsApplication, QgsTask, QgsMessageLog, Qgis
 
 
-MESSAGE_CATEGORY = 'Executing task'
+MESSAGE_CATEGORY = 'giswater'
 class GwTask(QgsTask, QObject):
     """This shows how to subclass QgsTask"""
     fake_progress = pyqtSignal()
@@ -48,12 +48,10 @@ class GwTask(QgsTask, QObject):
                 #     # this would crash QGIS
                 #     self.exception = Exception('bad value!')
                 #     return False
+
             return True
 
 
-    def open_form(self):
-        dlg =SelectorDate()
-        dlg.open()
 
 
     def finished(self, result):
@@ -66,17 +64,17 @@ class GwTask(QgsTask, QObject):
         operations and raise Python exceptions here.
         """
         if result:
-            QgsMessageLog.logMessage(f'Task "{self.description()}" completed', MESSAGE_CATEGORY, Qgis.Success)
+            QgsMessageLog.logMessage(f'Task {self.description()} completed', MESSAGE_CATEGORY, Qgis.Success)
         else:
             if self.exception is None:
-                QgsMessageLog.logMessage(f'Task "{self.description()}" not successful but without exception ',
+                QgsMessageLog.logMessage(f'Task {self.description()} not successful but without exception ',
                                          MESSAGE_CATEGORY, Qgis.Warning)
             else:
-                QgsMessageLog.logMessage(f'Task "{self.description()}" Exception: {self.exception}',
+                QgsMessageLog.logMessage(f'Task {self.description()} Exception: {self.exception}',
                                          MESSAGE_CATEGORY, Qgis.Critical)
                 raise self.exception
 
 
     def cancel(self):
-        QgsMessageLog.logMessage(f'Task "{self.description()}" was cancelled', MESSAGE_CATEGORY, Qgis.Info)
+        QgsMessageLog.logMessage(f'Task {self.description()} was cancelled', MESSAGE_CATEGORY, Qgis.Info)
         super().cancel()

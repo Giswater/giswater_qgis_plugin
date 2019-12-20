@@ -325,9 +325,7 @@ class Master(ParentAction):
         else:
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             if complet_result[0]['status'] == "Accepted":
-                qtabwidget = dialog.mainTab
-                qtextedit = dialog.txt_infolog
-                self.populate_info_text(dialog, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+                self.populate_info_text(dialog, complet_result[0]['body']['data'])
             message = complet_result[0]['message']['text']
             if message is not None:
                 self.controller.show_info_box(message)
@@ -491,6 +489,7 @@ class Master(ParentAction):
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         self.duplicate_psector = DuplicatePsector(self.iface, self.settings, self.controller, self.plugin_dir)
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'plan_psector'))
+        self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
 

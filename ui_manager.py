@@ -107,36 +107,6 @@ def get_ui_class(ui_file_name, subfolder=None):
     return uic.loadUiType(ui_file_path)[0]
 
 
-FORM_CLASS = get_ui_class('api_basic_info.ui')
-class ApiBasicInfo(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('api_catalog.ui')
-class ApiCatalogUi(GwMainWindow, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('api_cf.ui')
-class ApiCfUi(GwMainWindow, FORM_CLASS):
-    key_pressed = QtCore.pyqtSignal()
-
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Escape:
-            self.key_pressed.emit()
-            return super(ApiCfUi, self).keyPressEvent(event)
-
-
-FORM_CLASS = get_ui_class('api_dimensioning.ui')
-class ApiDimensioningUi(GwMainWindow, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('api_search.ui')
-class ApiSearchUi(GwDockWidget, FORM_CLASS):
-    pass
-        
-
 FORM_CLASS = get_ui_class('add_doc.ui')
 class AddDoc(GwDialog, FORM_CLASS):
     pass
@@ -157,13 +127,68 @@ class AddPicture(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('add_sum.ui')
+class AddSum(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('add_visit.ui')
+class AddVisit(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('api_basic_info.ui')
+class ApiBasicInfo(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('api_catalog.ui')
+class ApiCatalogUi(GwMainWindow, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('api_cf.ui')
+class ApiCfUi(GwMainWindow, FORM_CLASS):
+    key_pressed = QtCore.pyqtSignal()
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.key_pressed.emit()
+            return super(ApiCfUi, self).keyPressEvent(event)
+
+
+FORM_CLASS = get_ui_class('api_composers.ui')
+class ApiComposerUi(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('api_config.ui')
+class ApiConfigUi(GwMainWindow, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('api_dimensioning.ui')
+class ApiDimensioningUi(GwMainWindow, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('api_epa_options.ui')
+class ApiEpaOptions(GwDialog, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('api_import_inp.ui')
 class ApiImportInp(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_composers.ui')
-class ApiComposerUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('api_search.ui')
+class ApiSearchUi(GwDockWidget, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('api_selector.ui')
+class ApiSelector(GwDialog, FORM_CLASS):
     pass
 
 
@@ -176,25 +201,6 @@ FORM_CLASS = get_ui_class('api_toolbox_functions.ui')
 class ApiFunctionTb(GwDialog, FORM_CLASS):
     pass
 
-
-FORM_CLASS = get_ui_class('add_sum.ui')
-class AddSum(GwDialog, FORM_CLASS):
-    pass
-        
-        
-FORM_CLASS = get_ui_class('add_visit.ui')
-class AddVisit(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('api_config.ui')
-class ApiConfigUi(GwMainWindow, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('api_epa_options.ui')
-class ApiEpaOptions(GwDialog, FORM_CLASS):
-    pass
 
 
 FORM_CLASS = get_ui_class('arc_fusion.ui')
@@ -227,11 +233,6 @@ class ChangeNodeType(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('crm_trace.ui')
-class DlgTrace(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('credentials.ui')
 class Credentials(GwDialog, FORM_CLASS):
     def __init__(self, subtag=None):
@@ -259,6 +260,11 @@ class Credentials(GwDialog, FORM_CLASS):
             icon = QIcon(icon_path)
             self.action.setIcon(icon)
             self.action.setText(text)
+
+
+FORM_CLASS = get_ui_class('crm_trace.ui')
+class DlgTrace(GwDialog, FORM_CLASS):
+    pass
 
 
 FORM_CLASS = get_ui_class('csv2pg.ui')
@@ -434,11 +440,6 @@ class Mincut_edit(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('mincut_fin.ui')
 class Mincut_fin(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('mincut_selector.ui')
-class Multi_selector(GwDialog, FORM_CLASS):
     pass
 
 

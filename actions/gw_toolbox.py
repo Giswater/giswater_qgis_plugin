@@ -5,21 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry, QgsProject
-else:
-    from qgis.core import QgsProject
-
-from qgis.core import QgsFeature, QgsGeometry, QgsVectorLayer, QgsField
-from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
-from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
+from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView, QPushButton
 
 import os
 import json
@@ -27,6 +17,7 @@ from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
+from .add_layer import AddLayer
 from .api_parent import ApiParent
 from ..ui_manager import ApiDlgToolbox, ApiFunctionTb
 
@@ -37,6 +28,7 @@ class GwToolBox(ApiParent):
         """ Class to control toolbar 'om_ws' """
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True
@@ -129,7 +121,10 @@ class GwToolBox(ApiParent):
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
                                                    self.dlg_functions.cmb_layers, complet_result[0]['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
-        
+
+        enable_btn_run = index.sibling(index.row(), 2).data()
+        bool_dict = {"True": True, "true": True, "False": False, "false": False}
+        self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
         self.open_dialog(self.dlg_functions)
 
 
@@ -290,10 +285,10 @@ class GwToolBox(ApiParent):
                     for field in function[0]['return_type']:
                         widget = dialog.findChild(QWidget, field['widgetname'])
                         param_name = widget.objectName()
-                        if type(widget) in ('', QLineEdit):
+                        if type(widget) in ('', QLineEdit, QPushButton):
                             widget.setStyleSheet("border: 1px solid gray")
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                            extras += f'"{param_name}":"{value}", '
+                            extras += f'"{param_name}":"{value}", '.replace('""','null')
                             if value is '' and widget.property('is_mandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
@@ -339,7 +334,7 @@ class GwToolBox(ApiParent):
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
+        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function,True, True, 1, True, 'GW Functions result')
 
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
@@ -529,7 +524,13 @@ class GwToolBox(ApiParent):
                         icon = QIcon(path_icon_blue)
                         label.setIcon(icon)
                         label.setToolTip(function['functionname'])
-                parent1.appendRow([label, func_name])
+                enable_run = QStandardItem("True")
+                if function['input_params'] is not None:
+                    if 'btnRunEnabled' in function['input_params']:
+                        bool_dict = {True: "True",  False:"False"}
+                        enable_run = QStandardItem(bool_dict[function['input_params']['btnRunEnabled']])
+
+                parent1.appendRow([label, func_name, enable_run])
             main_parent.appendRow(parent1)
         model.appendRow(main_parent)
         index = model.indexFromItem(main_parent)
@@ -546,67 +547,4 @@ class GwToolBox(ApiParent):
             return 0
 
 
-    def add_temp_layer(self, dialog, data, function_name):
-
-        self.delete_layer_from_toc(function_name)
-        srid = self.controller.plugin_settings_value('srid')
-        qtabwidget = dialog.mainTab
-        qtextedit = dialog.txt_infolog
-        for k, v in list(data.items()):
-            if str(k) == "info":
-                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
-            else:
-                counter = len(data[k]['values'])
-                if counter > 0:
-                    counter = len(data[k]['values'])
-                    geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
-                    self.populate_vlayer(v_layer, data, k, counter)
-                    # TODO delete this 'if' when all functions are refactored
-                    if 'qmlPath' in data[k]:
-                        qml_path = data[k]['qmlPath']
-                        self.load_qml(v_layer, qml_path)
-
-
-    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
-
-        prov = virtual_layer.dataProvider()
-
-        # Enter editing mode
-        virtual_layer.startEditing()
-        if counter > 0:
-            for key, value in list(data[layer_type]['values'][0].items()):
-                # add columns
-                if str(key) != 'the_geom':
-                    prov.addAttributes([QgsField(str(key), QVariant.String)])
-
-        # Add features
-        for item in data[layer_type]['values']:
-            attributes = []
-            fet = QgsFeature()
-
-            for k, v in list(item.items()):
-                if str(k) != 'the_geom':
-                    attributes.append(v)
-                if str(k) in 'the_geom':
-                    sql = f"SELECT St_AsText('{v}')"
-                    row = self.controller.get_row(sql, log_sql=False)
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
-            fet.setAttributes(attributes)
-            prov.addFeatures([fet])
-
-        # Commit changes
-        virtual_layer.commitChanges()
-        if Qgis.QGIS_VERSION_INT < 29900:
-            QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
-        else:
-            QgsProject.instance().addMapLayer(virtual_layer, False)
-
-        root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup('GW Functions results')
-        if my_group is None:
-            my_group = root.insertGroup(0, 'GW Functions results')
-
-        my_group.insertLayer(0, virtual_layer)
 

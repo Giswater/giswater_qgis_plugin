@@ -5,28 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-from collections import OrderedDict
 
-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
+from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
-from ..ui_manager import DelFeature
+
+import json
+from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
 from .api_parent import ApiParent
+from ..ui_manager import DelFeature
 
 
 class DeleteFeature(ApiParent):
@@ -147,12 +139,10 @@ class DeleteFeature(ApiParent):
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         # Populate tab info
-        qtabwidget = self.dlg_delete_feature.mainTab
-        qtextedit = self.dlg_delete_feature.txt_infolog_delete
         data = complet_result[0]['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.populate_info_text(self.dlg_delete_feature, qtabwidget, qtextedit, data)
+                change_tab = self.populate_info_text(self.dlg_delete_feature, data)
 
         self.dlg_delete_feature.btn_cancel.setText('Accept')
         # Close dialog

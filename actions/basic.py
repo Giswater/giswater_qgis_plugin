@@ -53,11 +53,11 @@ class Basic(ParentAction):
         tableright = "selector_expl"
         field_id_left = "expl_id"
         field_id_right = "expl_id"
-
+        schema_name = self.schema_name.replace('"', '')
         query = ""
         row = self.controller.get_config('sys_exploitation_x_user', 'value', 'config_param_system')
         if row and row[0].lower() == 'true':
-            query = f" AND expl_id IN (SELECT expl_id FROM exploitation_x_user WHERE username = current_user)"
+            query = f" AND expl_id IN (SELECT expl_id FROM {schema_name}.exploitation_x_user WHERE username = current_user)"
         query += f" AND expl_id != 0 AND active IS NOT FALSE"
 
         self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, aql=query)

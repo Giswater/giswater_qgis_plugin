@@ -113,7 +113,11 @@
     <message>
         <source>17_text</source>
         <translation>Fusionar arc</translation>
-    </message> 
+    </message>
+    <message>
+        <source>18_text</source>
+        <translation>Connexió amb comercial</translation>
+    </message>
 	<message>
         <source>19_text</source>
         <translation>Caixa d'eines</translation>

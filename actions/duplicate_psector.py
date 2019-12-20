@@ -5,20 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 import json
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import pyqtSignal, QObject
 from .. import utils_giswater
 from .parent_manage import ParentManage
 from ..ui_manager import DupPsector
-
 
 
 class DuplicatePsector(ParentManage, QObject):
@@ -70,12 +65,10 @@ class DuplicatePsector(ParentManage, QObject):
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         # Populate tab info
-        qtabwidget = self.dlg_duplicate_psector.mainTab
-        qtextedit = self.dlg_duplicate_psector.txt_infolog
         data = complet_result[0]['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.populate_info_text(self.dlg_duplicate_psector, qtabwidget, qtextedit, data)
+                change_tab = self.populate_info_text(self.dlg_duplicate_psector, data)
         # Close dialog
         if not change_tab:
             self.close_dialog(self.dlg_duplicate_psector)

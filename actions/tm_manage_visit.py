@@ -4,17 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-
-from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject
+from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QTableView, QComboBox, QTabWidget, QDialogButtonBox
 from qgis.PyQt.QtSql import QSqlTableModel
 
@@ -540,6 +531,9 @@ class TmManageVisit(TmParentManage, QObject):
 
     def fill_table_visit(self, widget, table_name, filter_):
         """ Set a model with selected filter. Attach that model to selected table """
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
 
         # Set model
         model = QSqlTableModel()

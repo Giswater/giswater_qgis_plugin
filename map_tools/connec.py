@@ -18,10 +18,6 @@
 """
 
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
 from qgis.core import QgsVectorLayer, QgsRectangle
 from qgis.PyQt.QtCore import QRect, Qt

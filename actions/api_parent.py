@@ -5,19 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint as QgsPointXY
-    from qgis.PyQt.QtGui import QStringListModel
-    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
-else:
-    from qgis.core import QgsPointXY
-    from qgis.PyQt.QtCore import QStringListModel
-    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from qgis.core import QgsPointXY, QgsVectorLayer
+from qgis.PyQt.QtCore import QStringListModel
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsGeometry, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
@@ -25,7 +16,7 @@ from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
-from qgis.PyQt.QtWidgets import QTableView, QPushButton, QTextEdit
+from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QFileDialog
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import json
@@ -65,10 +56,7 @@ class ApiParent(ParentAction):
         
         editable_project = False
         try:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                editable_project = QgsExpressionContextUtils.projectScope().variable('editable_project')
-            else:
-                editable_project = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('editable_project')
+            editable_project = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('editable_project')
             if editable_project is None:
                 return False
         except:
@@ -87,6 +75,11 @@ class ApiParent(ParentAction):
         for layer in layers:
             if self.controller.is_layer_visible(layer):
                 table_name = self.controller.get_layer_source_table_name(layer)
+                table = layer.dataProvider().dataSourceUri()
+                # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
+                if 'SELECT row_number() over ()' in str(table):
+                    continue
+
                 visible_layer += f'"{table_name}", '
         visible_layer = visible_layer[:-2]
 
@@ -582,7 +575,8 @@ class ApiParent(ParentAction):
 
         widget = QPushButton()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
@@ -601,8 +595,16 @@ class ApiParent(ParentAction):
                 self.controller.show_message(msg, 2)
         # Call def gw_api_open_node(self, dialog, widget) of the class ApiCf
         # or def no_function_associated(self, widget=None, message_level=1)
-        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget))
+        """
+            functions called in -> partial(getattr(self, function_name), **kwargs)
+                def no_function_associated(self, **kwargs)
+                def gw_api_open_node(self, **kwargs) of the class ApiCf
+                def gw_function_dxf(self, **kwargs):
+        """
+        kwargs = {'dialog': dialog, 'widget': widget, 'message_level':1, 'function_name':function_name}
+        widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
         return widget
+
 
     def add_textarea(self, field):
         """ Add widgets QTextEdit type """
@@ -707,8 +709,9 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def no_function_associated(self, widget=None, message_level=1):
-
+    def no_function_associated(self, **kwargs):
+        widget = kwargs['widget']
+        message_level = kwargs['message_level']
         msg = f"No function associated to {type(widget)} {widget.objectName()}: "
         self.controller.show_message(msg, message_level)
 
@@ -780,7 +783,7 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def add_checkbox(self, dialog, field):
+    def add_checkbox(self, field):
 
         widget = QCheckBox()
         widget.setObjectName(field['widgetname'])
@@ -790,7 +793,6 @@ class ApiParent(ParentAction):
                 widget.setChecked(True)
         if 'iseditable' in field:
             widget.setEnabled(field['iseditable'])
-        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
 
@@ -978,10 +980,7 @@ class ApiParent(ParentAction):
          """
 
         rb = self.rubber_polygon
-        if Qgis.QGIS_VERSION_INT < 29900:
-            polyline = QgsGeometry.fromPolyline(points)
-        else:
-            polyline = QgsGeometry.fromPolylineXY(points)
+        polyline = QgsGeometry.fromPolylineXY(points)
         rb.setToGeometry(polyline, None)
         rb.setColor(color)
         rb.setWidth(width)
@@ -1000,10 +999,7 @@ class ApiParent(ParentAction):
         """
 
         rb = self.rubber_polygon
-        if Qgis.QGIS_VERSION_INT < 29900:
-            polygon = QgsGeometry.fromPolygon([points])
-        else:
-            polygon = QgsGeometry.fromPolygonXY([points])
+        polygon = QgsGeometry.fromPolygonXY([points])
         rb.setToGeometry(polygon, None)
         rb.setColor(border)
         if fill_color:
@@ -1030,6 +1026,7 @@ class ApiParent(ParentAction):
 
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -1086,7 +1083,7 @@ class ApiParent(ParentAction):
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] in ('check','checkbox'):
                 widget = self.add_checkbox(dialog, field)
-
+                widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
             grid_layout.addWidget(label,x, 0)
             grid_layout.addWidget(widget, x, 1)
 
@@ -1224,7 +1221,6 @@ class ApiParent(ParentAction):
             return
 
         for field in row[pos][field_id]:
-
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['widgetname'])
@@ -1245,15 +1241,8 @@ class ApiParent(ParentAction):
                         if field['reg_exp'] is not None:
                             reg_exp = QRegExp(str(field['reg_exp']))
                             widget.setValidator(QRegExpValidator(reg_exp))
-                    if Qgis.QGIS_VERSION_INT < 29900:
-                        widget.lostFocus.connect(
-                            partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-                    else:
-                        widget.editingFinished.connect(
-                            partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
-
+                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
@@ -1280,6 +1269,9 @@ class ApiParent(ParentAction):
                         widget.setValue(value)
                     widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'button':
+                    widget = self.add_button(dialog, field)
+                    widget = self.set_widget_size(widget, field)
 
                 # Set editable/readonly
                 if type(widget) in (QLineEdit, QDoubleSpinBox):
@@ -1382,12 +1374,8 @@ class ApiParent(ParentAction):
             widget = self.add_lineedit(field)
             widget = self.set_widget_size(widget, field)
             widget = self.set_data_type(field, widget)
-            if Qgis.QGIS_VERSION_INT < 29900:
-                widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
-                widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
-            else:
-                widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
-                widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
+            widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+            widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
@@ -1430,12 +1418,8 @@ class ApiParent(ParentAction):
 
         if type(widget) == QLineEdit:
             # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
-            if Qgis.QGIS_VERSION_INT < 29900:
-                widget.lostFocus.connect(partial(getattr(self, function_name), dialog, self.my_json))
-                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
-            else:
-                widget.editingFinished.connect(partial(getattr(self, function_name), dialog, self.my_json))
-                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
+            widget.editingFinished.connect(partial(getattr(self, function_name), dialog, self.my_json))
+            widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
 
         return widget
 
@@ -1449,16 +1433,6 @@ class ApiParent(ParentAction):
         list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
         points = self.get_points(list_coord)
         self.draw_polyline(points)
-
-
-    def hide_void_groupbox(self, dialog):
-        """ Hide empty grupbox """
-
-        grbox_list = dialog.findChildren(QGroupBox)
-        for grbox in grbox_list:
-            widget_list = grbox.findChildren(QWidget)
-            if len(widget_list) == 0:
-                grbox.setVisible(False)
 
 
     def set_setStyleSheet(self, field, widget, wtype='label'):
@@ -1505,3 +1479,160 @@ class ApiParent(ParentAction):
             webbrowser.open(path)
 
 
+    def gw_function_dxf(self, **kwargs):
+        """ Function called in def add_button(self, dialog, field): -->
+                widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
+
+        path, filter_ = self.open_file_path(filter_ = "DXF Files (*.dxf)")
+        if not path: return
+
+        dialog = kwargs['dialog']
+        widget = kwargs['widget']
+        function_name = kwargs['function_name']
+        complet_result = self.manage_dxf(path, False, True)
+        if complet_result is not False:
+            widget.setText(complet_result['path'])
+        if complet_result['result']:
+            data = complet_result['result']['body']['data']
+            self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
+        dialog.btn_run.setEnabled(True)
+
+
+    def manage_dxf(self, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
+        """ Select a dxf file and add layers into toc
+        :param dxf_path: path of dxf file
+        :param export_to_db: Export layers to database
+        :param toc: insert layers into TOC
+        :param del_old_layers: look for a layer with the same name as the one to be inserted and delete it
+        :return:
+        """
+        srid = self.controller.plugin_settings_value('srid')
+        # Block the signals so that the window does not appear asking for crs / srid and / or alert message
+        self.iface.mainWindow().blockSignals(True)
+
+        sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
+        self.controller.execute_sql(sql, commit=True)
+        for type_ in ['LineString', 'Point', 'Polygon']:
+            sql = ""
+            # Get file name without extension
+            dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
+            # Create layer
+            dxf_layer = QgsVectorLayer(f"{dxf_path}|layername=entities|geometrytype={type_}", f"{dxf_output_filename}_{type_}", 'ogr')
+
+            # Set crs to layer
+            crs = dxf_layer.crs()
+            crs.createFromId(srid)
+            dxf_layer.setCrs(crs)
+
+            if not dxf_layer.hasFeatures():
+                continue
+
+            # Get the name of the columns
+            field_names = [field.name() for field in dxf_layer.fields()]
+
+            geom_types = {0:'geom_point', 1:'geom_line', 2:'geom_polygon'}
+            for count, feature in enumerate(dxf_layer.getFeatures()):
+                geom_type = feature.geometry().type()
+                sql += (f"INSERT INTO temp_table (fprocesscat_id, text_column, {geom_types[int(geom_type)]})"
+                        f" VALUES (106, '{{")
+                for att in field_names:
+                    if feature[att] in (None, 'NULL', ''):
+                        sql += f'"{att}":null , '
+                    else:
+                        sql += f'"{att}":"{feature[att]}" , '
+                geometry = self.add_layer.manage_geometry(feature.geometry())
+                sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
+                if count != 0 and count % 500 == 0:
+                    status = self.controller.execute_sql(sql, commit=True)
+                    if not status:
+                        return False
+                    sql = ""
+            if sql != "":
+                status = self.controller.execute_sql(sql, commit=True)
+                if not status:
+                    return False
+
+            if export_to_db:
+                self.add_layer.export_layer_to_db(dxf_layer, crs)
+
+            if del_old_layers:
+                self.delete_layer_from_toc(dxf_layer.name())
+
+            if toc:
+                if dxf_layer.isValid():
+                    self.add_layer.from_dxf_to_toc(dxf_layer, dxf_output_filename)
+
+        # Unlock signals
+        self.iface.mainWindow().blockSignals(False)
+        sql = f"SELECT gw_fct_check_importdxf()::text;"
+        row = self.controller.get_row(sql, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_message("No results for: " + sql, 2)
+            result = None
+        else:
+            result = json.loads(row[0], object_pairs_hook=OrderedDict)
+
+        return {"path": dxf_path, "result":result}
+
+
+
+
+
+    def get_selector(self, dialog, selector_type):
+        """ Ask to DB for selectors and make dialog
+        :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
+        :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
+        """
+
+        main_tab = dialog.findChild(QTabWidget, 'main_tab')
+        extras = f'"selector_type":{selector_type}'
+        body = self.create_body(extras=extras)
+        sql = ("SELECT gw_api_getselectors($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if not row:
+            return
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        for form_tab in complet_result[0]['body']['form']['formTabs']:
+            # Create one tab for each form_tab and add to QTabWidget
+            tab_widget = QWidget(main_tab)
+            tab_widget.setObjectName(form_tab['tabName'])
+            main_tab.addTab(tab_widget, form_tab['tabLabel'])
+
+            # Create a new QGridLayout and put it into tab
+            gridlayout = QGridLayout()
+            gridlayout.setObjectName("grl_" + form_tab['tabName'])
+            tab_widget.setLayout(gridlayout)
+
+            for order, field in enumerate(form_tab['fields']):
+                label = QLabel()
+                label.setObjectName('lbl_' + field['label'])
+                label.setText(field['label'])
+                widget = self.add_checkbox(field)
+                widget.setProperty('selector_type', form_tab['selectorType'])
+                widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['tableName'], field['column_id'], form_tab['selectorType']))
+                widget.setLayoutDirection(Qt.RightToLeft)
+                field['layoutname'] = gridlayout.objectName()
+                field['layout_order'] = order
+                self.put_widgets(dialog, field, label, widget)
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            gridlayout.addItem(vertical_spacer1)
+
+
+    def set_selector(self, widget, table_name, column_name, selector_type, state):
+        """ Send values to DB
+        :param widget: QCheckBox that has changed status
+        :param table_name: name of the table that we have to update
+        :param column_name: name of the column that we have to update
+        :param state: sent by widget when stateChange
+        """
+        extras = f'"selector_type":"{widget.property("selector_type")}", '
+        extras += f'"tableName":"{table_name}", '
+        extras += f'"column_id":"{column_name}", '
+        extras += f'"result_name":"{widget.objectName()}", '
+        extras += f'"result_value":"{widget.isChecked()}"'
+        body = self.create_body(extras=extras)
+        sql = ("SELECT gw_api_setselectors($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
+            self.controller.indexing_spatial_layer(layer_name)

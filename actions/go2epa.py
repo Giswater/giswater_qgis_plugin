@@ -5,19 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
 
 
 from qgis.core import Qgis, QgsApplication
-from qgis.PyQt.QtCore import QTime, QDate, Qt
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog, QMessageBox
 
@@ -425,13 +416,8 @@ class Go2Epa(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.file_inp = QFileDialog.getSaveFileName(None, message, "", '*.inp')
-        else:
-            self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
-
+        self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
         utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
-
 
 
     def go2epa_select_file_rpt(self):
@@ -447,11 +433,7 @@ class Go2Epa(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select RPT file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
-        else:
-            self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
-
+        self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
         utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 
@@ -517,10 +499,10 @@ class Go2Epa(ApiParent):
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
-        task_rpt_to_db = GwTask('Import RPT to database')
-        QgsApplication.taskManager().addTask(task_rpt_to_db)
+        self.task_rpt_to_db = GwTask('Import RPT to database')
+        QgsApplication.taskManager().addTask(self.task_rpt_to_db)
         for line_number, row in enumerate(full_file):
-            task_rpt_to_db.setProgress((line_number * 100) / row_count)
+            self.task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
             row = row.rstrip()
@@ -643,6 +625,7 @@ class Go2Epa(ApiParent):
                 msg_box.setIcon(3)
                 msg_box.setWindowTitle("Warning")
                 msg_box.setText(msg)
+                msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
                 msg_box.exec_()
                 return
 
@@ -655,7 +638,7 @@ class Go2Epa(ApiParent):
         self.show_widgets(True)
 
         counter = 0
-        force_tab = False
+
         extras = '"iterative":"off"'
         if is_iterative:
             extras = '"iterative":"start"'
@@ -695,10 +678,7 @@ class Go2Epa(ApiParent):
             # Export to inp file
             if export_inp is True:
                 if complet_result[0]['status'] == "Accepted":
-                    qtabwidget = self.dlg_go2epa.mainTab
-                    qtextedit = self.dlg_go2epa.txt_infolog
-                    self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'],
-                                            force_tab, False)
+                    self.add_temp_layer(self.dlg_go2epa, complet_result[0]['body']['data'], 'INP results', True, True, 1, False)
                 message = complet_result[0]['message']['text']
 
                 # Get values from temp_csv2pg and insert into INP file
@@ -776,11 +756,9 @@ class Go2Epa(ApiParent):
                         rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
                         if 'status' in rpt_result[0]:
                             if rpt_result[0]['status'] == "Accepted":
-                                qtabwidget = self.dlg_go2epa.mainTab
-                                qtextedit = self.dlg_go2epa.txt_infolog
                                 if 'body' in rpt_result[0]:
                                     if 'data' in rpt_result[0]['body']:
-                                        self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit,  rpt_result[0]['body']['data'], force_tab, False)
+                                        self.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'], 'RPT results', True, True, 1, False)
                         message = rpt_result[0]['message']['text']
 
                     # final message

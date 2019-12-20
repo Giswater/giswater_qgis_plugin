@@ -5,37 +5,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    import ConfigParser as configparser
-    from qgis.PyQt.QtGui import QStringListModel
-    from qgis.core import QgsMapLayerRegistry as QgsProject
-else:
-    import configparser
-    from qgis.PyQt.QtCore import QStringListModel
-    from qgis.core import QgsProject
-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QDate
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
+from qgis.core import QgsVectorLayerExporter, QgsDataSourceUri, QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsProject, QgsRectangle, QgsVectorLayer
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QVariant
+from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget, QSpacerItem, QLabel, QComboBox, QCheckBox, QSizePolicy, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget, QGridLayout
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
-from functools import partial
-import sys
+import configparser, json, os, re, sys, webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
+from collections import OrderedDict
+from functools import partial
+
 from .. import utils_giswater
+from .add_layer import AddLayer
 from ..ui_manager import GwDialog, GwMainWindow
-import os
-import re
-import webbrowser
 
 
 class ParentAction(object):
@@ -53,7 +38,7 @@ class ParentAction(object):
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
-
+        self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
     
     def set_controller(self, controller):
         """ Set controller class """
@@ -110,11 +95,7 @@ class ParentAction(object):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)        
         message = "Select file"
-        if Qgis.QGIS_VERSION_INT < 29900:
-            folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
-        else:
-            folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
-
+        folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
                 
@@ -247,15 +228,13 @@ class ParentAction(object):
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        query_left = f"SELECT * FROM {tableleft} WHERE {name} NOT IN "
-        query_left += f"(SELECT {tableleft}.{name} FROM {tableleft}"
-        query_left += f" RIGHT JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
+        schema_name = self.schema_name.replace('"', '')
+        query_left = f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
+        query_left += f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+        query_left += f" RIGHT JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
         query_left += f" WHERE cur_user = current_user)"
         query_left += f" AND  {field_id_left} > -1"
         query_left += aql
-
-
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
@@ -265,8 +244,9 @@ class ParentAction(object):
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right} FROM {tableleft}"
-        query_right += f" JOIN {tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
+        query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right}"
+        query_right += f" FROM {schema_name}.{tableleft}"
+        query_right += f" JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
 
         query_right += " WHERE cur_user = current_user"
 
@@ -277,7 +257,7 @@ class ParentAction(object):
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
-        query_delete = f"DELETE FROM {tableright}"
+        query_delete = f"DELETE FROM {schema_name}.{tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
 
@@ -657,6 +637,17 @@ class ParentAction(object):
                 layer.removeSelection()
 
 
+
+    def hide_void_groupbox(self, dialog):
+        """ Hide empty grupbox """
+
+        grbox_list = dialog.findChildren(QGroupBox)
+        for grbox in grbox_list:
+            widget_list = grbox.findChildren(QWidget)
+            if len(widget_list) == 0:
+                grbox.setVisible(False)
+
+
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
 
@@ -803,10 +794,30 @@ class ParentAction(object):
         return body
 
 
-    def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
+    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True):
+        if del_old_layers:
+            self.delete_layer_from_toc(function_name)
+        srid = self.controller.plugin_settings_value('srid')
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
+            else:
+                counter = len(data[k]['values'])
+                if counter > 0:
+                    counter = len(data[k]['values'])
+                    geometry_type = data[k]['geometryType']
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
+                    self.populate_vlayer(v_layer, data, k, counter)
+                    if 'qmlPath' in data[k]:
+                        qml_path = data[k]['qmlPath']
+                        self.load_qml(v_layer, qml_path)
+
+
+    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
 
         change_tab = False
-        text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
+        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+
         if reset_text:
             text = ""
         for item in data['info']['values']:
@@ -818,32 +829,58 @@ class ParentAction(object):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
+        utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
+        qtabwidget = dialog.findChild(QTabWidget,'mainTab')
         if change_tab and qtabwidget is not None:
-            qtabwidget.setCurrentIndex(1)
+            qtabwidget.setCurrentIndex(tab_idx)
 
         return change_tab
 
 
+    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
+
+        prov = virtual_layer.dataProvider()
+
+        # Enter editing mode
+        virtual_layer.startEditing()
+        if counter > 0:
+            for key, value in list(data[layer_type]['values'][0].items()):
+                # add columns
+                if str(key) != 'the_geom':
+                    prov.addAttributes([QgsField(str(key), QVariant.String)])
+
+        # Add features
+        for item in data[layer_type]['values']:
+            attributes = []
+            fet = QgsFeature()
+
+            for k, v in list(item.items()):
+                if str(k) != 'the_geom':
+                    attributes.append(v)
+                if str(k) in 'the_geom':
+                    sql = f"SELECT St_AsText('{v}')"
+                    row = self.controller.get_row(sql, log_sql=False)
+                    geometry = QgsGeometry.fromWkt(str(row[0]))
+                    fet.setGeometry(geometry)
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        # Commit changes
+        virtual_layer.commitChanges()
+        QgsProject.instance().addMapLayer(virtual_layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup('GW Functions results')
+        if my_group is None:
+            my_group = root.insertGroup(0, 'GW Functions results')
+
+        my_group.insertLayer(0, virtual_layer)
+
+
     def get_composers_list(self):
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            active_composers = self.iface.activeComposers()
-        else:
-            layour_manager = QgsProject.instance().layoutManager().layouts()
-            active_composers = [layout for layout in layour_manager]
-
+        layour_manager = QgsProject.instance().layoutManager().layouts()
+        active_composers = [layout for layout in layour_manager]
         return active_composers
-
-
-    def get_composer_name(self, composer):
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            composer_name = composer.composerWindow().windowTitle()
-        else:
-            composer_name = composer.name()
-
-        return composer_name
 
 
     def get_composer_index(self, name):
@@ -851,7 +888,7 @@ class ParentAction(object):
         index = 0
         composers = self.get_composers_list()
         for comp_view in composers:
-            composer_name = self.get_composer_name(comp_view)
+            composer_name = comp_view.name()
             if composer_name == name:
                 break
             index += 1
@@ -967,4 +1004,16 @@ class ParentAction(object):
         layer.triggerRepaint()
 
         return True
+
+
+    def open_file_path(self, filter_="All (*.*)"):
+        """ Open QFileDialog """
+        msg = self.controller.tr("Select DXF file")
+        path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
+
+        return path, filter_
+
+
+
+
 

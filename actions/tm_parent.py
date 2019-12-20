@@ -5,24 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    import ConfigParser as configparser
-    from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap, QCompleter, QStringListModel, QApplication, QTableView
-else:
-    import configparser
-    from qgis.PyQt.QtCore import QStringListModel
-    from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
-    from qgis.PyQt.QtWidgets import QCompleter, QApplication, QTableView
-
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsExpression
+from qgis.PyQt.QtCore import QStringListModel, Qt
+from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QCompleter, QApplication, QTableView
 
+
+import configparser
 import os
 import sys
 if 'nt' in sys.builtin_module_names:

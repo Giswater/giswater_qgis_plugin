@@ -93,7 +93,8 @@ class NotifyFunctions(ParentAction):
             # Check if any notification to process
             conn = self.controller.dao.conn
             conn.poll()
-            for notify in conn.notifies:
+            while conn.notifies:
+                notify = conn.notifies.pop()
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
@@ -104,8 +105,6 @@ class NotifyFunctions(ParentAction):
                     except Exception as e:
                         pass
 
-            # Clear list of notifications already processed
-            conn.notifies.clear()
         except AttributeError:
             self.conn_failed = True
 

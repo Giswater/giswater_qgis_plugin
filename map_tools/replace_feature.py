@@ -6,19 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-
-from qgis.core import QgsProject
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 
 import json
 from collections import OrderedDict
@@ -71,7 +60,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if rows:
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
@@ -110,7 +99,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             feature_type = feature.attribute(self.feature_type_ud)
             if self.geom_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
-                rows = self.controller.get_rows(sql)
+                rows = self.controller.get_rows(sql, commit=True)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
@@ -122,13 +111,13 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT(id) FROM {self.geom_type}_type "
                f"WHERE active is True "
                f"ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
         self.dlg_replace.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_replace))
-
+        self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
         self.open_dialog(self.dlg_replace, maximize_button=False)
 
@@ -159,7 +148,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
-            row = self.controller.get_row(sql)
+            row = self.controller.get_row(sql, commit=True)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
                 builtdate = self.manage_dates(row[0])
@@ -180,7 +169,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
         table_object = "cat_work"
-        self.set_completer_object(table_object,self.dlg_new_workcat.cat_work_id,'id')
+        self.set_completer_object(table_object, self.dlg_new_workcat.cat_work_id, 'id')
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
@@ -238,7 +227,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
                     self.controller.execute_sql(sql, log_sql=True)
 
                     sql = "SELECT id FROM cat_work ORDER BY id"
-                    rows = self.controller.get_rows(sql)
+                    rows = self.controller.get_rows(sql, commit=True)
                     if rows:
                         utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
@@ -266,7 +255,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT({field_id}) "
                f"FROM {tablename} "
                f"ORDER BY {field_id}")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if rows is None:
             return
 
@@ -361,9 +350,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Fill tab 'Info log'
             if complet_result and complet_result[0]['status'] == "Accepted":
-                qtabwidget = self.dlg_replace.info_log
-                qtextedit = self.dlg_replace.txt_infolog
-                self.populate_info_text(self.dlg_replace, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+                self.populate_info_text(self.dlg_replace, complet_result[0]['body']['data'])
 
             # Refresh canvas
             self.refresh_map_canvas()
@@ -494,7 +481,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
-            rows = self.controller.get_rows(sql)
+            rows = self.controller.get_rows(sql, commit=True)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
 
@@ -527,7 +514,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql += f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
 
         sql += " ORDER BY matcat_id"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.matcat_id, rows)
 
         sql = (f"SELECT DISTINCT({self.field2}) "
@@ -536,7 +523,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql += f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
 
         sql += f" ORDER BY {self.field2}"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
 
         self.fill_filter3(wsoftware, geom_type)
@@ -586,7 +573,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql_where += f" {geom_type}type_id = '{self.feature_type_new}'"
         sql += sql_where + " ORDER BY " + self.field2
 
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
         self.fill_filter3(wsoftware, geom_type)
 
@@ -630,7 +617,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         else:
             sql += sql_where + f" ORDER BY {self.field3}"
 
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter3, rows)
 
         self.fill_catalog_id(wsoftware, geom_type)
@@ -673,26 +660,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql_where += f" {self.field3} = '{filter3}'"
         sql += sql_where + " ORDER BY id"
 
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.id, rows)
         
 
-    def populate_info_text(self, dialog, qtabwidget, qtextedit, data, force_tab=True, reset_text=True):
-
-        change_tab = False
-        text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
-        if reset_text:
-            text = ""
-        for item in data['info']['values']:
-            if 'message' in item:
-                if item['message'] is not None:
-                    text += str(item['message']) + "\n"
-                    if force_tab:
-                        change_tab = True
-                else:
-                    text += "\n"
-
-        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
-        if change_tab:
-            qtabwidget.setCurrentIndex(1)
 

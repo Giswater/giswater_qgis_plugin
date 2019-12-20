@@ -112,7 +112,11 @@
     <message>
         <source>17_text</source>
         <translation>Arc fusion</translation>
-    </message> 
+    </message>
+    <message>
+        <source>18_text</source>
+        <translation>Commercial connection</translation>
+    </message>
 	<message>
         <source>19_text</source>
         <translation>Topo tools</translation>

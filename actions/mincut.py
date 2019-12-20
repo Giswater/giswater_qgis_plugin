@@ -5,23 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsComposition
-    from qgis.PyQt.QtGui import QStringListModel
-    from ..map_tools.snapping_utils_v2 import SnappingConfigManager
-else:
-    from qgis.PyQt.QtCore import QStringListModel
-    from qgis.core import QgsPrintLayout, QgsReadWriteContext
-    from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-
-from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils, QgsFeatureRequest, QgsProject, QgsVectorLayer
+from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils, QgsFeatureRequest, QgsPrintLayout, \
+    QgsProject, QgsReadWriteContext, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
-from qgis.PyQt.QtCore import Qt, QDate, QTime
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -38,6 +26,7 @@ from .. import utils_giswater
 from .parent import ParentAction
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import Mincut
 from ..ui_manager import Mincut_fin
 from ..ui_manager import Mincut_add_hydrometer
@@ -193,7 +182,8 @@ class MincutParent(ParentAction):
         self.show_notified = action
 
         try:
-            custom_action_sms = json.loads(self.controller.cfgp_system['sys_mincutalerts_enable'].value, object_pairs_hook=OrderedDict)
+            row = self.controller.get_config('sys_mincutalerts_enable', 'value', 'config_param_system')
+            custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.show_notified.setVisible(custom_action_sms['show_sms_info'])
         except KeyError as e:
             self.show_notified.setVisible(False)
@@ -1170,7 +1160,7 @@ class MincutParent(ParentAction):
             (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
             if not is_valid:
                 return expr
-        # TODO: schema_name
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -2009,12 +1999,8 @@ class MincutParent(ParentAction):
         # Get features
         layer = self.layers[layername]
         records = [(-1, '', '')]
-        if Qgis.QGIS_VERSION_INT < 29900:
-            idx_field_code = layer.fieldNameIndex(self.params[field_code])
-            idx_field_name = layer.fieldNameIndex(self.params[field_name])
-        else:
-            idx_field_code = layer.fields().indexFromName(self.params[field_code])
-            idx_field_name = layer.fields().indexFromName(self.params[field_name])
+        idx_field_code = layer.fields().indexFromName(self.params[field_code])
+        idx_field_name = layer.fields().indexFromName(self.params[field_name])
 
         if idx_field_code < 0:
             message = "Adress configuration. Field not found"
@@ -2053,10 +2039,7 @@ class MincutParent(ParentAction):
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
             if value_code is not None and geom is not None:
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    elem = [value_code, value_name, geom.exportToWkt()]
-                else:
-                    elem = [value_code, value_name, geom.asWkt()]
+                elem = [value_code, value_name, geom.asWkt()]
             else:
                 elem = [value_code, value_name, None]
             records.append(elem)
@@ -2095,12 +2078,8 @@ class MincutParent(ParentAction):
         
         # Set filter expression
         layer = self.layers['portal_layer']
-        if Qgis.QGIS_VERSION_INT < 29900:
-            idx_field_code = layer.fieldNameIndex(field_code)
-            idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
-        else:
-            idx_field_code = layer.fields().indexFromName(field_code)
-            idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
+        idx_field_code = layer.fields().indexFromName(field_code)
+        idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
         expr_filter = f"{field_code} = '{code}'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
@@ -2219,11 +2198,7 @@ class MincutParent(ParentAction):
             return
 
         # Get project variable 'expl_id'
-        if Qgis.QGIS_VERSION_INT < 29900:
-            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
-        else:
-            expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable(str(self.street_field_expl[0]))
-
+        expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable(str(self.street_field_expl[0]))
         if expl_id:
             # Set SQL to get 'expl_name'
             sql = (f"SELECT {self.params['expl_field_name']}"
@@ -2360,17 +2335,12 @@ class MincutParent(ParentAction):
             document = QDomDocument()
             document.setContent(template_content)
 
-            # TODO: Test it!
-            if Qgis.QGIS_VERSION_INT < 29900:
-                comp_view = self.iface.createNewComposer(str(self.template))
-                comp_view.composition().loadFromTemplate(document)
-            else:
-                project = QgsProject.instance()
-                comp_view = QgsPrintLayout(project)
-                comp_view.loadFromTemplate(document,  QgsReadWriteContext())
+            project = QgsProject.instance()
+            comp_view = QgsPrintLayout(project)
+            comp_view.loadFromTemplate(document,  QgsReadWriteContext())
 
-                layout_manager = project.layoutManager()
-                layout_manager.addLayout(comp_view)
+            layout_manager = project.layoutManager()
+            layout_manager.addLayout(comp_view)
 
         else:
             comp_view = composers[index]

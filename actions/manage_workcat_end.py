@@ -5,18 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.core import QgsExpression, QgsFeatureRequest
-from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 
@@ -388,6 +379,9 @@ class ManageWorkcatEnd(ParentManage):
 
     def fill_table_relations(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
 
         filter_ = ""
         for row in self.selected_list:

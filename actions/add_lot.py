@@ -5,23 +5,14 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsPoint as QgsPointXY
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.core import QgsPointXY
-    from qgis.PyQt.QtCore import QStringListModel
+from qgis.core import QgsPointXY
+from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout
-from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget
+from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget, QDateEdit, QPushButton
 from qgis.core import QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsRubberBand
 
@@ -29,6 +20,8 @@ import csv
 import os
 import re
 from functools import partial
+import urllib.parse
+import webbrowser
 
 from .. import utils_giswater
 from .manage_visit import ManageVisit
@@ -52,7 +45,7 @@ class AddNewLot(ParentManage):
         self.rb_red.setIconSize(20)
         self.rb_list = []
         self.lot_date_format = 'yyyy-MM-dd'
-        self.max_team_id = 0
+        self.max_id = 0
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
@@ -114,6 +107,10 @@ class AddNewLot(ParentManage):
         # Fill QWidgets of the form
         self.fill_fields(lot_id)
 
+        # Tab 'Loads'
+        self.tbl_load = self.dlg_lot.findChild(QTableView, "tbl_load")
+        utils_giswater.set_qtv_config(self.tbl_load)
+
         new_lot_id = lot_id
         if lot_id is None:
             new_lot_id = self.get_next_id('om_visit_lot', 'id')
@@ -148,6 +145,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.btn_validate_all.clicked.connect(partial(self.validate_all, self.dlg_lot.tbl_visit))
+        self.dlg_lot.btn_open_photo.clicked.connect(partial(self.open_photo, self.dlg_lot.tbl_visit))
         self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
@@ -160,6 +158,10 @@ class AddNewLot(ParentManage):
         self.dlg_lot.cmb_man_team.clicked.connect(self.manage_team)
         self.set_lot_headers()
         self.set_active_layer()
+
+        self.set_icon(self.dlg_lot.btn_open_image, "136b")
+        self.dlg_lot.btn_open_image.clicked.connect(self.open_load_image)
+
         if lot_id is not None:
             self.set_values(lot_id)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
@@ -208,7 +210,6 @@ class AddNewLot(ParentManage):
             result = ''
 
         # Set listeners for export csv
-
         self.dlg_lot.btn_export_visits.clicked.connect(
             partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_visit, 'txt_path', result_visit,
                     self.lot_date_format))
@@ -265,6 +266,27 @@ class AddNewLot(ParentManage):
                 chk_list[0].setChecked(True)
 
 
+    def open_photo(self, qtable):
+
+        selected_list = qtable.selectionModel().selectedRows()
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        index = selected_list[0]
+        row = index.row()
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'visit_id')
+        visit_id = index.sibling(row, column_index).data()
+
+        sql = ("SELECT value FROM om_visit_event_photo WHERE visit_id = " + visit_id)
+        rows = self.controller.get_rows(sql, commit=True)
+        # TODO:: Open manage photos when visit have more than one
+        for row in rows:
+            webbrowser.open(row[0])
+
+
     def validate_all(self, qtable):
         """ Set all QComboBox with validated option """
 
@@ -278,9 +300,10 @@ class AddNewLot(ParentManage):
     def manage_team(self):
         """ Open dialog of teams """
 
-        self.max_team_id = self.get_max_id('cat_team')
+        self.max_id = self.get_max_id('cat_team')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
+        self.dlg_basic_table.setWindowTitle("Team management")
         table_name = 'cat_team'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
@@ -288,7 +311,7 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table)
@@ -316,10 +339,10 @@ class AddNewLot(ParentManage):
     def add_row(self, qtable):
         """ Append new record to model with correspondent id """
 
-        self.max_team_id += 1
+        self.max_id += 1
         model = qtable.model()
         record = model.record()
-        record.setValue("id", self.max_team_id)
+        record.setValue("id", self.max_id)
         model.insertRecord(model.rowCount(), record)
 
 
@@ -333,12 +356,15 @@ class AddNewLot(ParentManage):
         return 0
 
 
-    def save_basic_table(self, qtable):
+    def save_basic_table(self, qtable, manage_type=None):
 
         model = qtable.model()
         if model.submitAll():
             self.close_dialog(self.dlg_basic_table)
-            self.populate_cmb_team()
+            if manage_type == 'team':
+                self.populate_cmb_team()
+            else:
+                print(str(model.lastError().text()))
 
 
     def manage_widget_lot(self, lot_id):
@@ -654,11 +680,11 @@ class AddNewLot(ParentManage):
 
     def set_values(self, lot_id):
 
-        sql = (f"SELECT * FROM om_visit_lot "
-               f"WHERE id ='{lot_id}'")
+        sql = ("SELECT om_visit_lot.*, ext_workorder.ct FROM om_visit_lot LEFT JOIN ext_workorder using (serie) "
+               "WHERE id ='" + str(lot_id) + "'")
         lot = self.controller.get_row(sql, commit=True)
         if lot:
-            value = f"{lot['serie']} {lot['class_id']}"
+            value = lot['ct']
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot, value)
             index = self.dlg_lot.cmb_ot.currentIndex()
             self.set_ot_fields(index)
@@ -778,12 +804,10 @@ class AddNewLot(ParentManage):
                 item.append(1)  # Set status field of the table relation
                 item.append('No visitat')
                 item.append('')
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    item.append(feature.geometry().asWkb().encode('hex').upper())
-                else:
-                    sql = f"SELECT ST_GeomFromText('{feature.geometry().asWkt()}', {self.srid})"
-                    the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
-                    item.append(the_geom[0])
+
+                sql = f"SELECT ST_GeomFromText('{feature.geometry().asWkt()}', {self.srid})"
+                the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+                item.append(the_geom[0])
                 row = []
                 for value in item:
                     row.append(QStandardItem(str(value)))
@@ -899,7 +923,8 @@ class AddNewLot(ParentManage):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         index = 0
         for x in range(0, self.dlg_lot.tab_widget.count()):
-            if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab' or self.dlg_lot.tab_widget.widget(x).objectName() == 'VisitsTab':
+            if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab' or self.dlg_lot.tab_widget.widget(
+                    x).objectName() == 'VisitsTab' or self.dlg_lot.tab_widget.widget(x).objectName() == 'LoadsTab':
                 index = x
 
                 if feature_type in('', 'null', None, -1):
@@ -908,6 +933,7 @@ class AddNewLot(ParentManage):
                 else:
                     self.dlg_lot.tab_widget.setTabEnabled(index, True)
         utils_giswater.set_combo_itemData(self.feature_type, feature_type, 1)
+        self.fill_tab_load()
 
 
     def reload_table_visit(self):
@@ -1049,7 +1075,7 @@ class AddNewLot(ParentManage):
         self.tbl_relation.setModel(standard_model)
         self.tbl_relation.horizontalHeader().setStretchLastSection(True)
 
-        # # Get headers
+        # Get headers
         headers = []
         for x in columns_name:
             headers.append(x[0])
@@ -1288,10 +1314,7 @@ class AddNewLot(ParentManage):
 
         self.rb_red.reset()
         rb = self.rb_red
-        if Qgis.QGIS_VERSION_INT < 29900:
-            polyline = QgsGeometry.fromPolyline(points)
-        else:
-            polyline = QgsGeometry.fromPolylineXY(points)
+        polyline = QgsGeometry.fromPolylineXY(points)
         rb.setToGeometry(polyline, None)
         rb.setColor(color)
         rb.setWidth(width)
@@ -1368,6 +1391,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_manage_user.clicked.connect(partial(self.open_user_manage))
+        self.dlg_lot_man.btn_manage_vehicle.clicked.connect(partial(self.open_vehicle_manage))
 
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
@@ -1380,6 +1404,64 @@ class AddNewLot(ParentManage):
 
         # Open form
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
+
+
+    def open_vehicle_manage(self):
+
+        self.max_id = self.get_max_id('om_team_x_vehicle')
+        self.dlg_basic_table = BasicTable()
+        self.load_settings(self.dlg_basic_table)
+        self.dlg_basic_table.setWindowTitle("Vehicle management")
+        table_name = 'v_om_team_x_vehicle'
+        # TODO:: Add trigger editable view into v_om_team_x_vehicle
+        # table_name = 'om_team_x_vehicle'
+
+        widget = QPushButton()
+        widget.setText(str('Test'))
+        widget.setStyleSheet("Text-align:left")
+        widget.setFlat(True)
+        widget.setObjectName("test")
+
+        # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
+        self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
+        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
+        self.open_dialog(self.dlg_basic_table)
+
+        # Populate model visit
+        sql = ("SELECT * FROM v_om_team_x_vehicle")
+        rows = self.controller.get_rows(sql, commit=True)
+
+        if rows is None:
+            return
+
+        # Add combo into column team_id
+        sql = ("SELECT id, idval"
+               " FROM cat_team"
+               " ORDER BY id")
+        combo_values = self.controller.get_rows(sql, commit=True)
+
+        if combo_values is None:
+            return
+
+        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 0, 1, combo_values)
+
+        # Add combo into column vehicle_id
+        sql = ("SELECT id, idval"
+               " FROM ext_cat_vehicle"
+               " ORDER BY id")
+        combo_values = self.controller.get_rows(sql, commit=True)
+
+        if combo_values is None:
+            return
+
+        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 0, 2, combo_values)
+
+
 
 
     def open_user_manage(self):
@@ -1547,10 +1629,7 @@ class AddNewLot(ParentManage):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select CSV file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            csv_path = QFileDialog.getSaveFileName(None, message, "", '*.csv')
-        else:
-            csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
+        csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
         utils_giswater.setWidgetText(dialog, widget, csv_path)
 
 
@@ -1716,3 +1795,98 @@ class AddNewLot(ParentManage):
                 layer.removeSelection()
             self.iface.actionPan().trigger()
             self.visit_class.setEnabled(True)
+
+    """ FUNCTIONS RELATED WITH TAB LOAD"""
+    def fill_tab_load(self):
+        """ Fill tab 'Load' """
+        table_load = "om_vehicle_x_parameters"
+        filter = "lot_id = '" + str(utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.lot_id)) + "'"
+
+        self.fill_tbl_load_man(self.dlg_lot, self.tbl_load, table_load, filter)
+        self.set_columns_config(self.tbl_load, table_load)
+
+    def set_columns_config(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False, commit=True)
+        if not rows:
+            return widget
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                if row['alias'] is not None:
+                    widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        if isQStandardItemModel:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+        else:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+
+        return widget
+
+
+    def fill_tbl_load_man(self, dialog, widget, table_name, expr_filter):
+        """ Fill the table control to show documents """
+
+        # Get widgets
+        self.date_load_to = self.dlg_lot.findChild(QDateEdit, "date_load_to")
+        self.date_load_from = self.dlg_lot.findChild(QDateEdit, "date_load_from")
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
+
+
+    def open_load_image(self):
+
+        selected_list = self.tbl_load.selectionModel().selectedRows(0)
+        if selected_list == 0 or str(selected_list) == '[]':
+            message = "Any load selected"
+            self.controller.show_info_box(message)
+            return
+
+        elif len(selected_list) > 1:
+            message = "More then one event selected. Select just one"
+            self.controller.show_warning(message)
+            return
+        # Get path of selected image
+        sql = ("SELECT image FROM om_vehicle_x_parameters"
+               " WHERE id = '" + str(selected_list[0].data()) + "'")
+        row = self.controller.get_row(sql, commit=True)
+        if not row:
+            return
+
+        path = str(row[0])
+
+        # Parse a URL into components
+        url = parse.urlsplit(path)
+
+        # Open selected image
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
+            # If path is URL open URL in browser
+            webbrowser.open(path)
+        else:
+            # If its not URL ,check if file exist
+            if not os.path.exists(path):
+                message = "File not found"
+                self.controller.show_warning(message, parameter=path)
+            else:
+                # Open the image
+                os.startfile(path)
