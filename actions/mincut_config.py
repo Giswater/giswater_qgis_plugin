@@ -185,14 +185,14 @@ class MincutConfig(ParentAction):
                 list_clients = list_clients[:-2]
 
             # Call script
-            status_code = subprocess.call([path, _cause, from_date, to_date, list_clients])
+            result = subprocess.call([path, _cause, from_date, to_date, list_clients])
 
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
             if row[4] is None:
-                sql += f"SET notified = ('[{{\"code\":\"{status_code}\",\"date\":\"{_date_sended}\"}}]') "
+                sql += f"SET notified = ('[{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]') "
             else:
-                sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{status_code}\",\"date\":\"{_date_sended}\"}}]')::json "
+                sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]')::json "
             sql += f"WHERE id = '{id_}'"
             row = self.controller.execute_sql(sql, commit=True)
 
