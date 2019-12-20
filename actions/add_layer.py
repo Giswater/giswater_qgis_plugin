@@ -128,7 +128,7 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True):
+    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW layers'):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
@@ -137,22 +137,25 @@ class AddLayer(object):
         :param reset_text:
         :param tab_idx:
         :param del_old_layers:
+        :param group:
         :return:
         """
         colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
+        text_result = None
         if del_old_layers:
             self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == "info":
-                self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
-            else:
+                text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
+            elif k in ('point', 'line', 'polygon'):
+                if not 'values' in data[k]: continue
                 counter = len(data[k]['values'])
                 if counter > 0:
                     counter = len(data[k]['values'])
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
-                    self.populate_vlayer(v_layer, data, k, counter)
+                    self.populate_vlayer(v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
@@ -161,11 +164,14 @@ class AddLayer(object):
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                         self.categoryze_layer(v_layer, cat_field, size)
 
+        return {'text_result':text_result}
+
 
     def categoryze_layer(self, layer, cat_field, size):
         """
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
         :param cat_field: Field to categorize (string)
+        :param size: Size of feature (integer)
         """
 
         # get unique values
@@ -247,16 +253,17 @@ class AddLayer(object):
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
 
-        return change_tab
+        return text
 
 
 
-    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
+    def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW_layers'):
         """
         :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
         :param data: Json
         :param layer_type: point, line, polygon...(string)
         :param counter: control if json have values (integer)
+        :param group: group to which we want to add the layer (string)
         :return:
         """
         prov = virtual_layer.dataProvider()
@@ -289,9 +296,9 @@ class AddLayer(object):
         virtual_layer.commitChanges()
         QgsProject.instance().addMapLayer(virtual_layer, False)
         root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup('GW Functions results')
+        my_group = root.findGroup(group)
         if my_group is None:
-            my_group = root.insertGroup(0, 'GW Functions results')
+            my_group = root.insertGroup(0, group)
 
         my_group.insertLayer(0, virtual_layer)
 
