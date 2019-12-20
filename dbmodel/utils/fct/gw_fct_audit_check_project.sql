@@ -221,7 +221,7 @@ BEGIN
 			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-			SELECT 101, criticity, replace(error_message,':', '(DB OM):') FROM audit_check_data 
+			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
 			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 6 ;
 
 			DELETE FROM audit_check_data WHERE fprocesscat_id=25 AND (error_message ILIKE '----%' 
@@ -237,7 +237,7 @@ BEGIN
 			"useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)';
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-			SELECT 101, criticity, replace(error_message,':', '(DB EPA):') FROM audit_check_data 
+			SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
 			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 8;
 
 			DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND (error_message ILIKE '----%' 
@@ -252,7 +252,7 @@ BEGIN
 			"data":{"parameters":{"resultId":"check_project"},"saveOnDatabase":true}}$$)';
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-			SELECT 101, criticity, replace(error_message,':', '(DB PLAN):') FROM audit_check_data 
+			SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
 			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;
 			
 			DELETE FROM audit_check_data WHERE fprocesscat_id=15 AND (error_message ILIKE '----%' 
@@ -266,7 +266,7 @@ BEGIN
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-			SELECT 101, criticity, replace(error_message,':', '(DB ADMIN):') FROM audit_check_data 
+			SELECT 101, criticity, replace(error_message,':', ' (DB ADMIN):') FROM audit_check_data 
 			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 6;
 			
 			DELETE FROM audit_check_data WHERE fprocesscat_id=95 AND (error_message ILIKE '----%' 
@@ -293,13 +293,13 @@ BEGIN
 		FROM audit_check_project WHERE table_host != v_table_host AND user_name=current_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
+			v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO(QGIS PROJ): All layers come from current host');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
 		END IF;
 		
 		--check layers database
@@ -307,13 +307,13 @@ BEGIN
 		FROM audit_check_project WHERE table_dbname != v_table_dbname AND user_name=current_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO(QGIS PROJ): All layers come from current database');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
 		END IF;
 
 		--check layers database
@@ -321,13 +321,13 @@ BEGIN
 		FROM audit_check_project WHERE table_schema != v_table_schema AND user_name=current_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO(QGIS PROJ): All layers come from current schema');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
 		END IF;
 
 		--check layers user
@@ -335,13 +335,13 @@ BEGIN
 		FROM audit_check_project WHERE user_name != table_user AND table_user != 'None' AND user_name=current_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
 		
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 3,v_errortext );
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO(QGIS PROJ): All layers have been added by current user');
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
 		END IF;
 
 		-- start process
