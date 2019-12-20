@@ -334,7 +334,7 @@ class GwToolBox(ApiParent):
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function,True, True, 1, True)
+        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function,True, True, 1, True, 'GW Functions result')
 
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
