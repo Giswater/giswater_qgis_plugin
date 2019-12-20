@@ -40,8 +40,3 @@ false, false, null, false) ON CONFLICT (id) DO NOTHING;
 -- 16/12/2019
 UPDATE audit_cat_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_column::json->>''list_tables_name'')::text[] from temp_table where fprocesscat_id = 63 and user_name = current_user)) as id, 
 UNNEST(ARRAY (select (text_column::json->>''list_layers_name'')::text[] FROM temp_table WHERE fprocesscat_id = 63 and user_name = current_user)) as idval ' WHERE id = 'cad_tools_base_layer_vdefault';
-
---19/12/2019
-INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, project_type, isdeprecated) 
-VALUES ('audit_project_user_control', '[{"user":"postgres","enabled":"true"}]', 'json', 'system', 'Defines which user gets full audit check project log', null, 'utils', 'false')
-ON CONFLICT(parameter) DO NOTHING;
