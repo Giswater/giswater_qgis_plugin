@@ -37,10 +37,9 @@ class AddLayer(object):
     def set_uri(self):
 
         self.uri = QgsDataSourceUri()
-        x = self.uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
+        self.uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
                           self.controller.credentials['db'], self.controller.credentials['user'],
                           self.controller.credentials['password'])
-        print(f"X -> {x}")
         return self.uri
 
 
