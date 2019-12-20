@@ -1,6 +1,6 @@
 3.3.020
 *************
-
+Bug fix for v_rtc_hydrometer view
 
 
 
