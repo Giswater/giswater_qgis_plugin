@@ -301,7 +301,8 @@ BEGIN
 		SELECT current_schema() INTO v_table_schema;
 		
 		--check layers host
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_host != v_table_host;
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE table_host != v_table_host AND user_name=current_user;
 		
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
@@ -314,7 +315,8 @@ BEGIN
 		END IF;
 		
 		--check layers database
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_dbname != v_table_dbname;
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE table_dbname != v_table_dbname AND user_name=current_user;
 		
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
@@ -327,7 +329,8 @@ BEGIN
 		END IF;
 
 		--check layers database
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE table_schema != v_table_schema;
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE table_schema != v_table_schema AND user_name=current_user;
 		
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
@@ -339,8 +342,9 @@ BEGIN
 			VALUES (101, 1, 'INFO(QGIS PROJ): All layers come from current schema');
 		END IF;
 
-		--check layers user--TODO
-		/*SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list FROM audit_check_project WHERE user_name != table_user;
+		--check layers user
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE user_name != table_user AND table_user != 'None' AND user_name=current_user;
 		
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR(QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
@@ -350,7 +354,7 @@ BEGIN
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 			VALUES (101, 1, 'INFO(QGIS PROJ): All layers have been added by current user');
-		END IF;*/
+		END IF;
 
 		-- start process
 		FOR rec_table IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))
