@@ -1199,13 +1199,12 @@ class Giswater(QObject):
 
         # Populate info_log and missing layers
         critical_level = 0
-        # for res in result:
-        have_info = self.add_layer.populate_info_text(self.dlg_audit_project, result['body']['data'], True, False, 0)
+        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'], 'gw_fct_audit_check_project_result', True, False, 0, True)
 
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
         self.parent.hide_void_groupbox(self.dlg_audit_project)
-        if int(critical_level) > 0 or have_info:
+        if int(critical_level) > 0 or text_result:
             show_msg = self.settings.value('system_variables/show_msg_layer')
             if show_msg == 'TRUE':
                 self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
