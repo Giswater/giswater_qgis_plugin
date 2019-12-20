@@ -117,6 +117,7 @@ BEGIN
 
 	END IF;
 
+RETURN NEW;
 
 END;
 $BODY$
