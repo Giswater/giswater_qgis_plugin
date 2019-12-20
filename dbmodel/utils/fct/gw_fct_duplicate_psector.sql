@@ -100,6 +100,9 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
 	VALUES (53, v_result_id, concat('Copy psector ',v_old_psector_id,' as ',v_new_psector_name,' -> Done' ));
 
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+	VALUES (53, v_result_id, concat('Set ',v_new_psector_name,' as current psector -> Done' ));
+
 	--copy features with state 0 inside plan_psector tables
 	INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript) 
 	SELECT arc_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_arc WHERE psector_id=v_old_psector_id and state=0;
