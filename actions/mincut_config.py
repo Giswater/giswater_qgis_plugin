@@ -172,15 +172,15 @@ class MincutConfig(ParentAction):
                 list_clients = list_clients[:-2]
 
             # Call script
-            status_code = subprocess.call([path, _cause, from_date, to_date, list_clients])
+            result = subprocess.call([path, _cause, from_date, to_date, list_clients])
 
             # Update table with results
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
             if row[4] is None:
-                sql += ("SET notified = ('[{\"code\":\""+str(status_code)+"\",\"date\":\""+str(_date_sended)+"\"}]') ")
+                sql += ("SET notified = ('[{\"code\":\""+str(result[0])+"\",\"date\":\""+str(_date_sended)+"\",\"avisats\":\""+str(result[1])+"\",\"afectats\":\""+str(result[2])+"\"}]') ")
             else:
-                sql += ("SET notified= concat(replace(notified::text,']',','),'{\"code\":\""+str(status_code)+"\",\"date\":\""+str(_date_sended)+"\"}]')::json ")
+                sql += ("SET notified= concat(replace(notified::text,']',','),'{\"code\":\""+str(result[0])+"\",\"date\":\""+str(_date_sended)+"\",\"avisats\":\""+str(result[1])+"\",\"afectats\":\""+str(result[2])+"\"}]')::json ")
             sql += ("WHERE id = '"+str(id_)+"'")
             row = self.controller.execute_sql(sql, commit=True, log_sql=True)
 
