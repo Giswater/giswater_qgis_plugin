@@ -13,13 +13,11 @@ $BODY$
 /*
 SELECT gw_fct_update_elevation_from_dem($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":["3235", "3239", "3197"]}, 
-"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection",
-"parameters":{"exploitation":"1", "updateValues":"allValues"}}}$$)::text
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"1", "updateValues":"allValues"}}}$$)::text
 
-SELECT gw_fct_update_elevation_from_dem($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+SELECT SCHEMA_NAME.gw_fct_update_elevation_from_dem($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 "feature":{"tableName":"node", "featureType":"NODE"}, 
-"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection",
-"parameters":{"exploitation":"557", "updateValues":"allValues"}}}$$)::text
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"524", "updateValues":"allValues"}}}$$)::text
 */
 
 DECLARE
@@ -113,21 +111,15 @@ BEGIN
 
 		END IF;
 
-
 		--loop over selected nodes, intersect node with raster
 		FOR rec IN EXECUTE v_query LOOP
 
-			EXECUTE 'SELECT public.ST_Value(rast,1,$1,false) FROM ext_raster_dem WHERE id =
-					(SELECT id FROM ext_raster_dem WHERE
-					st_dwithin (ST_MakeEnvelope(
-					ST_UpperLeftX(rast), 
-					ST_UpperLeftY(rast),
-					ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
-					ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), $1, 1) LIMIT 1)'
+			EXECUTE 'SELECT ST_Value(rast,1,$1,false) FROM ext_raster_dem WHERE id =
+					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, $1, 1) LIMIT 1)'
 				USING rec.the_geom
 				INTO v_elevation;
 
-			raise notice 'rec  %', rec ;
+			raise notice 'elevation %', v_elevation;
 			
 			--if node is out of raster, add warning, if it's inside update value of node layer
 			IF v_elevation = -9999 OR v_elevation IS NULL THEN

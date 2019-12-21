@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION NODE: 1320
 
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_node();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node()
   RETURNS trigger AS
@@ -276,13 +275,7 @@ BEGIN
 		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND 
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 			NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id =
-				(SELECT id FROM ext_raster_dem WHERE
-				st_dwithin (ST_MakeEnvelope(
-				ST_UpperLeftX(rast), 
-				ST_UpperLeftY(rast),
-				ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
-				ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
-
+				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 		END IF;   	
 
 		-- FEATURE INSERT      
@@ -535,15 +528,10 @@ BEGIN
 			END IF;
 			
 			--update elevation from raster
-			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation IS NULL) AND 
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation = OLD.elevation) AND 
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id =
-					(SELECT id FROM ext_raster_dem WHERE
-					st_dwithin (ST_MakeEnvelope(
-					ST_UpperLeftX(rast), 
-					ST_UpperLeftY(rast),
-					ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
-					ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
+							(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;
 		END IF;
 	
