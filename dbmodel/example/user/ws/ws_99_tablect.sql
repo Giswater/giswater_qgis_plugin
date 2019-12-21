@@ -109,7 +109,6 @@ SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1
 "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
 
 
-
 -- lastprocess
 delete from link where link_id=197;
 delete from link where link_id=211;
@@ -120,5 +119,10 @@ update connec set pjoint_id = exit_id, pjoint_type='VNODE' FROM link WHERE link.
 
 UPDATE connec SET label_rotation=24.5, label_x=3 WHERE connec_id='3014';
 
+INSERT INTO inp_selector_sector (sector_id, cur_user)
+SELECT sector_id, current_user FROM sector
+ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-
+SELECT gw_fct_pg2epa_main($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"data":{"iterative":"off", "resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);

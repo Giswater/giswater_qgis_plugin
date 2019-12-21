@@ -258,3 +258,12 @@ UPDATE gully SET enddate=NULL WHERE state=1;
 
 -- set customer_code NULL
 UPDATE connec SET customer_code=NULL;
+
+
+INSERT INTO inp_selector_sector (sector_id, cur_user)
+SELECT sector_id, current_user FROM sector
+ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
+SELECT gw_fct_pg2epa_main($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"data":{"iterative":"off", "resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);
