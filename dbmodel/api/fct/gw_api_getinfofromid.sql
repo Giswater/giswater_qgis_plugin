@@ -258,7 +258,8 @@ BEGIN
             AND t.relname = $1
             AND s.nspname = $2
             AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-            ORDER BY a.attnum' 
+            ORDER BY a.attnum
+			LIMIT 1'
             INTO v_the_geom
             USING v_tablename, schemas_array[1];
            
