@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2019/12/20
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (107,'Role upsertuser','admin','Role upsertuser','utils') ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_function set function_name = 'fct_plan_check_data' WHERE id = 2436;

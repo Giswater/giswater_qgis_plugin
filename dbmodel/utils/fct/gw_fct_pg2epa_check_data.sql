@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"t1":"testbgeo","saveOnDatabase":true, "useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)
+"feature":{},"data":{"parameters":{"resultId":"testbgeo","saveOnDatabase":true, "useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)
 
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -108,7 +108,7 @@ BEGIN
 	-- call go2epa function in case of new result
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
 
-		v_data = '{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"false"}}';
+		v_data = '{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"'||v_result_id||'","useNetworkGeom":"false"}}';
 
 		IF v_project_type = 'WS' THEN
 			PERFORM gw_fct_pg2epa_main(v_data);
@@ -827,7 +827,7 @@ BEGIN
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, 
-				'WARNING: to_arc values checked for valves. It exists and it''s one of two closest arcs. Any way There are to possibilities to define sense, and must be defined by hand, be shure it''s OK.');
+				'WARNING: to_arc values checked for valves. It exists and it''s one of two closest arcs. Any way There are two possibilities to define sense, and must be defined by hand, be shure it''s OK.');
 			END IF;
 
 
@@ -847,7 +847,7 @@ BEGIN
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, 
-				'WARNING: to_arc values checked for pumps. It exists and it''s one of two closest arcs. Any way There are to possibilities to define sense, and must be defined by hand, be shure it''s OK.');
+				'WARNING: to_arc values checked for pumps. It exists and it''s one of two closest arcs. Any way There are two possibilities to define sense, and must be defined by hand, be shure it''s OK.');
 			END IF;
 			
 

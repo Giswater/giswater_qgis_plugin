@@ -62,7 +62,7 @@ BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schema = 'SCHEMA_NAME';
-	
+
 	SELECT wsoftware, giswater, epsg INTO v_project_type, v_version, v_srid FROM version order by id desc limit 1;
 	
 	-- Get input parameters
@@ -81,6 +81,8 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=101 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id IN (14,15,25,95) AND user_name=current_user;
+
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 4, 'AUDIT CHECK PROJECT');
@@ -214,7 +216,7 @@ BEGIN
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
 	IF v_user_control THEN
-	
+		
 		IF'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
 			"client":{"device":3, "infoType":100, "lang":"ES"},
@@ -222,42 +224,32 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
-			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 6 ;
-
-			DELETE FROM audit_check_data WHERE fprocesscat_id=25 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
-			AND user_name=current_user;
+			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
 
 		END IF;
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 			"client":{"device":3, "infoType":100, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"t1":"check_project","saveOnDatabase":true, 
-			"useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)';
+			"feature":{},"data":{"parameters":{"resultId":"gw_check_project","saveOnDatabase":true, 
+			"useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)';
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 8;
+			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' AND result_id ='gw_check_project' OFFSET 8;
 
-			DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
-			AND user_name=current_user;
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
-			EXECUTE 'SELECT gw_fct_plan_audit_check_data($${
+			EXECUTE 'SELECT gw_fct_plan_check_data($${
 			"client":{"device":3, "infoType":100, "lang":"ES"},
 			"feature":{},
-			"data":{"parameters":{"resultId":"check_project"},"saveOnDatabase":true}}$$)';
+			"data":{"parameters":{"resultId":"gw_check_project"},"saveOnDatabase":true}}$$)';
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
-			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;
+			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !=''  AND result_id ='gw_check_project' OFFSET 6;
 			
-			DELETE FROM audit_check_data WHERE fprocesscat_id=15 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
-			AND user_name=current_user;
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -267,11 +259,8 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', ' (DB ADMIN):') FROM audit_check_data 
-			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' AND user_name=current_user offset 6;
+			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;
 			
-			DELETE FROM audit_check_data WHERE fprocesscat_id=95 AND (error_message ILIKE '----%' 
-			OR error_message = 'CRITICAL ERRORS' or error_message = 'WARNINGS' or error_message = 'INFO')
-			AND user_name=current_user;
 		END IF;
 	END IF;
 
@@ -425,7 +414,8 @@ BEGIN
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, ',"category_field":"descript"}');
 
 
-	--    Control null	
+	--    Control null
+	v_version:=COALESCE(v_version,'{}');
 	v_result_info:=COALESCE(v_result_info,'{}');
 	v_result_point:=COALESCE(v_result_point,'{}');
 	v_result_line:=COALESCE(v_result_line,'{}');
