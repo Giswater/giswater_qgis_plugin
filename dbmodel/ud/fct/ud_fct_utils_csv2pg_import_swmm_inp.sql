@@ -108,9 +108,6 @@ BEGIN
 		DELETE FROM man_conduit;
 		DELETE FROM man_varc;
 
-	
-		DELETE FROM config_param_user ;
-
 		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_edit' AND id NOT LIKE 'v%') 
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
@@ -235,6 +232,8 @@ BEGIN
 	INSERT INTO cat_arc VALUES ('EPAOUTL-CAT', 'EPAMAT');
 
 
+	-- enable temporary the constraint in order to use ON CONFLICT on insert
+	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
@@ -259,8 +258,12 @@ BEGIN
 		--raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;
 	END LOOP;
+	
+	-- enable temporary the constraint in order to use ON CONFLICT on insert
+	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);	
 
 	RAISE NOTICE 'step 4/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Values of options / times / report are not updated. Default values of Giswater are keeped');
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data into tables using vi_* views -> Done');
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Controls rules will be stored on inp_controls_inmortinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
 

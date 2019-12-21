@@ -324,7 +324,9 @@ BEGIN
 	INSERT INTO cat_node VALUES ('EPAPRV-CATA2N', 'EPAPRVA2N', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPAPUMP-CATA2N', 'EPAPUMPA2N', 'EPAMAT');
 
+	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
+		
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
 	LOOP
@@ -353,9 +355,11 @@ BEGIN
 		EXECUTE v_sql;		
 	END LOOP;
 
+	-- disable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 	
 	RAISE NOTICE 'step 4/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Values of options / times / report are not updated. Default values of Giswater are keeped');
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data into tables using vi_* views -> Done');
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Rules will be stored on inp_rules_importinp table. This is a temporary table. Data need to be moved to inp_rules_x_arc, inp_rules_x_node and inp_rules_x_sector tables to be used later');
 	
