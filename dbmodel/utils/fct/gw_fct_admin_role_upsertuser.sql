@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2780
 
- DROP FUNCTION SCHEMA_NAME.gw_fct_admin_role_upsertuser(json);
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_role_upsertuser(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_role_upsertuser(p_data json)
   RETURNS json AS
 $BODY$
+
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
