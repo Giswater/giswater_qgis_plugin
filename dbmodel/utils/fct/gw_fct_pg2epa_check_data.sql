@@ -679,7 +679,7 @@ BEGIN
 				v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts.'));
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-				VALUES (14, v_result_id, 1, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value:', v_nodearc_user::numeric(12,3)));
+				VALUES (14, v_result_id, 1, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value is ', v_nodearc_user::numeric(12,3)));
 			END IF;
 			
 

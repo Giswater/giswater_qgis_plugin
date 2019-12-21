@@ -267,3 +267,5 @@ ON CONFLICT (sector_id, cur_user) DO NOTHING;
 SELECT gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"off", "resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);
+
+UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
