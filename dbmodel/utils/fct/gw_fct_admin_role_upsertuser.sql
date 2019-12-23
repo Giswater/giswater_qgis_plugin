@@ -16,24 +16,24 @@ SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
 "data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":"123", "role":"role_basic", "action":"insert", 
-"manager_id":["1","2"], "gw_schema":["SCHEMA_NAME","ud_sample"]}}$$);
+"manager_id":["1","2"], "gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
 "data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":"32", "role":"role_edit", "action":"update","manager_id":["1"],
-"gw_schema":["SCHEMA_NAME","ud_sample"]}}$$);
+"gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
 "data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":"456", "role":null, "action":"update",
-"gw_schema":["SCHEMA_NAME","ud_sample"]}}$$);
+"gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, "data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":null, "role":null, "action":"delete","manager_id":null,
-"gw_schema":["SCHEMA_NAME","ud_sample"]}}$$);
+"gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
 */
 
 
