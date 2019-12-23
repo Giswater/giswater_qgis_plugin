@@ -642,7 +642,7 @@ class Giswater(QObject):
         try:
             # Unlisten notify channel and stop thread
             if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
-                list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+                list_channels = ['desktop', self.controller.current_user]
                 self.notify.stop_listening(list_channels)
 
             # Remove icon of action 'Info'
@@ -870,7 +870,7 @@ class Giswater(QObject):
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-            list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+            list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
 
         # Save toolbar position after closing QGIS
