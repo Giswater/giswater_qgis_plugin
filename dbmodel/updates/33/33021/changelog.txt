@@ -2,3 +2,4 @@
 *************
 - Refactor plan_check_data function
 - Enhance audit_check_project managing epa and plan data
+- New function of API get_widgetcontrols

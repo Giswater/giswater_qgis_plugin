@@ -61,7 +61,13 @@ DECLARE
     v_bmapsclient boolean;
     v_array text[];
     v_array_child text[];
-    
+    v_min float;
+    v_max float;
+    v_widgetcontrols json;
+    v_noderecord1 record;
+    v_noderecord2 record;
+    v_input json;
+       
 BEGIN
 
 --   Set search path to local schema
@@ -133,24 +139,34 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'orderById', (aux_json->>'dv_orderby_id'));
 		END IF;
 
+
 		-- Refactor widget
 		IF (aux_json->>'widgettype')='image' THEN
 		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 		END IF;
-
-		-- setting the not updateable fields
-		IF p_tgop ='UPDATE' THEN
-			IF (aux_json->>'isnotupdate')::boolean IS TRUE THEN
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isEditable','False');
-			END IF;		
-		END IF;
-		
+			
 		-- for image widgets
 		IF (aux_json->>'widgettype')='image' THEN
 		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 		END IF;
+
+		--setting widgetcontrols when null (user has not configurated form fields table)
+		IF (aux_json->>'widgetcontrols') IS NULL THEN
+			v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||p_tablename||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tgop||'","json":'||aux_json||'}}';		
+			SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetcontrols;
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetcontrols, '{}'));
+		END IF;
+
+		IF p_tgop ='UPDATE' THEN
+
+			-- setting the not updateable fields
+			IF (aux_json->>'isnotupdate')::boolean IS TRUE THEN
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isEditable','False');
+			END IF;		
+		END IF;
+
 	
 		-- looking for parents and for combo not parent
 		IF (aux_json->>'isparent')::boolean IS TRUE OR ((aux_json->>'widgettype') = 'combo' AND (aux_json->>'dv_parent_id') IS NULL) THEN
@@ -209,7 +225,8 @@ BEGIN
 					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
 						INTO field_value_parent;
 				ELSIF p_tgop ='UPDATE' THEN
-					EXECUTE 'SELECT ' || quote_ident(aux_json->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' || quote_literal(p_id) || ' AS ' || COALESCE(p_columntype, 'character varying') || ')' 
+					EXECUTE 'SELECT ' || quote_ident(aux_json->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) ||
+					 ' = CAST(' || quote_literal(p_id) || ' AS ' || COALESCE(p_columntype, 'character varying') || ')' 
 						INTO field_value_parent; 
 				END IF;
 
