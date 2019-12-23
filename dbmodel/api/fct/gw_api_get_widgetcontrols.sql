@@ -73,7 +73,7 @@ BEGIN
 			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
 				
 		ELSIF (v_json->>'column_id') = 'ymax'  OR (v_json->>'column_id') = 'custom_ymax' THEN
-			v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=p_id UNION SELECT y2 FROM arc WHERE node_2=p_id)a);
+			v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=v_id UNION SELECT y2 FROM arc WHERE node_2=v_id)a);
 			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":999}';
 		END IF;
 	END IF;	
