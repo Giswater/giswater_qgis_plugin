@@ -128,3 +128,12 @@ SELECT gw_fct_pg2epa_main($${
 "data":{"iterative":"off", "resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
+
+--deprecated fields
+UPDATE arc SET _sys_length_=NULL;
+UPDATE sys_fprocess_cat SET fprocess_i18n= NULL;
+UPDATE sector SET nodeparent= NULL;
+UPDATE dma SET nodeparent= NULL;
+UPDATE dqa SET nodeparent= NULL;
+UPDATE cat_presszone SET nodeparent= NULL;
+UPDATE anl_mincut_x_exploitation SET toarc= NULL;

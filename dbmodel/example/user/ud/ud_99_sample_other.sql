@@ -260,7 +260,8 @@ UPDATE gully SET enddate=NULL WHERE state=1;
 UPDATE connec SET customer_code=NULL;
 
 
-INSERT INTO inp_selector_sector (sector_id, cur_user)
+INSERT INTO inp_selector_sector (sector_id, cur_user);
+
 SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
@@ -269,3 +270,9 @@ SELECT gw_fct_pg2epa_main($${
 "data":{"iterative":"off", "resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
+
+--deprecated fields
+UPDATE arc SET _sys_length_=NULL;
+UPDATE node SET _sys_elev_=NULL;
+UPDATE sys_fprocess_cat SET _fprocess_i18n_= NULL;
+UPDATE node SET elev = null WHERE top_elev IS NOT NULL AND ymax IS NOT NULL;
