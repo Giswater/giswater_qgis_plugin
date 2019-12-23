@@ -171,28 +171,39 @@ BEGIN
 		ELSE
 			-- Calculate system parameters
 			is_reversed= FALSE;
-			-- sys_y1
-			sys_y1_aux:= (CASE WHEN (NEW.custom_y1 IS NOT NULL) THEN NEW.custom_y1::numeric (12,3) ELSE NEW.y1::numeric (12,3) END);
-			sys_y2_aux:= (CASE WHEN (NEW.custom_y2 IS NOT NULL) THEN NEW.custom_y2::numeric (12,3) ELSE NEW.y2::numeric (12,3) END);
 
-			-- sys_elev
-			sys_elev1_aux:= (CASE WHEN (NEW.custom_elev1 IS NOT NULL) THEN NEW.custom_elev1 ELSE NEW.elev1 END);
-			sys_elev2_aux:= (CASE WHEN (NEW.custom_elev2 IS NOT NULL) THEN NEW.custom_elev2 ELSE NEW.elev2 END);
+			-- node_1 (sys_y1_aux and sys_elev1_aux)
+			SELECT * INTO nodeRecord1 FROM v_edit_node WHERE node_id = nodeRecord1.node_id;
 
-			-- in case of sys_elev_aux null
-			sys_elev1_aux:= (CASE WHEN sys_elev1_aux IS NOT NULL THEN sys_elev1_aux ELSE 
-					(SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord1.node_id) - (CASE WHEN sys_y1_aux IS NOT NULL THEN sys_y1_aux 
-					ELSE (SELECT sys_ymax FROM v_node WHERE node_id=nodeRecord1.node_id) END) END);
-					
-			sys_elev2_aux:= (CASE WHEN sys_elev2_aux IS NOT NULL THEN sys_elev2_aux ELSE
-					(SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord2.node_id) - (CASE WHEN sys_y2_aux IS NOT NULL THEN sys_y2_aux 
-					ELSE (SELECT sys_ymax FROM v_node WHERE node_id=nodeRecord2.node_id) END) END);
-		
+			IF (nodeRecord1.elev IS NOT NULL OR nodeRecord1.custom_elev IS NOT NULL) THEN -- when elev is used on node only elev must be used on arc
+				sys_elev1_aux = nodeRecord1.sys_elev;
+				sys_y1_aux = null;
+			ELSE
+				sys_y1_aux:= (CASE WHEN NEW.custom_y1 IS NOT NULL THEN NEW.custom_y1
+						   WHEN NEW.y1 IS NOT NULL THEN NEW.y1
+						   ELSE nodeRecord1.sys_ymax END);
+				sys_elev1_aux := nodeRecord1.sys_top_elev - sys_y1_aux;
+			END IF;
+
+			-- node_2 (sys_y2_aux and sys_elev2_aux)
+			SELECT * INTO nodeRecord2 FROM v_edit_node WHERE node_id = nodeRecord2.node_id;
+			
+			IF (nodeRecord2.elev IS NOT NULL OR nodeRecord2.custom_elev IS NOT NULL) THEN -- when elev is used on node only elev must be used on arc
+				sys_elev2_aux = nodeRecord2.sys_elev;
+				sys_y2_aux = null;
+			ELSE
+				sys_y2_aux:= (CASE WHEN NEW.custom_y2 IS NOT NULL THEN NEW.custom_y2
+						   WHEN NEW.y2 IS NOT NULL THEN NEW.y2
+						   ELSE nodeRecord2.sys_ymax END);
+				sys_elev2_aux := nodeRecord2.sys_top_elev - sys_y2_aux;
+			END IF;
+	
 			-- Update coordinates
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
  
-			IF (((sys_elev1_aux >= sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE)) OR (geom_slp_direction_bool IS FALSE)) THEN
+			IF (((sys_elev1_aux >= sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE)) 
+			OR (geom_slp_direction_bool IS FALSE)) THEN
 				NEW.node_1 := nodeRecord1.node_id; 
 				NEW.node_2 := nodeRecord2.node_id;
 				NEW.sys_elev1 := sys_elev1_aux;

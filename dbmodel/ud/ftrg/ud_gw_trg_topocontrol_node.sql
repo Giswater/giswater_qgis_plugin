@@ -192,13 +192,13 @@ BEGIN
 			--updating arcs
 			FOR arcrec IN EXECUTE querystring
 			LOOP
-		
+
 				-- Initial and final node of the arc
 				SELECT * INTO nodeRecord1 FROM node WHERE node.node_id = arcrec.node_1;
 				SELECT * INTO nodeRecord2 FROM node WHERE node.node_id = arcrec.node_2;
-
+		
 				-- Control de lineas de longitud 0
-				IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+				IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) AND st_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
 		
 					-- Update arc node coordinates, node_id and direction
 					IF (nodeRecord1.node_id = NEW.node_id) THEN
@@ -236,13 +236,12 @@ BEGIN
 								z1 = (nodeRecord1.custom_top_elev - arcrec.y1);
 							END IF;
 						END IF;
-		
-					END IF;
-
-					-- Force a simple update on arc in order to update direction if necessary
-					EXECUTE 'UPDATE arc SET the_geom = the_geom WHERE arc_id = ' || quote_literal(arcrec."arc_id");					
-					
+					END IF;				
 				END IF;
+
+				-- Force a simple update on arc in order to update direction
+				EXECUTE 'UPDATE arc SET the_geom = the_geom WHERE arc_id = ' || quote_literal(arcrec."arc_id");	
+				
 			END LOOP; 
 
 			--updating links
