@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2788
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetcontrols(p_data json)
   RETURNS json AS
@@ -62,17 +62,17 @@ BEGIN
 		SELECT * INTO v_noderecord1 FROM v_edit_node WHERE node_id=v_node_1;
 		SELECT * INTO v_noderecord2 FROM v_edit_node WHERE node_id=v_node_2;
  
-		IF (v_json->>'column_id') = 'y1' THEN
+		IF (v_json->>'column_id') = 'y1' OR (v_json->>'column_id') = 'custom_y1' THEN
 			v_min = 0;
 			v_max = v_noderecord1.sys_ymax;
 			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
 			
-		ELSIF (v_json->>'column_id') = 'y2' THEN
+		ELSIF (v_json->>'column_id') = 'y2'  OR (v_json->>'column_id') = 'custom_y2' THEN
 			v_min = 0;
 			v_max = v_noderecord2.sys_ymax;
 			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
 				
-		ELSIF (v_json->>'column_id') = 'ymax' THEN
+		ELSIF (v_json->>'column_id') = 'ymax'  OR (v_json->>'column_id') = 'custom_ymax' THEN
 			v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=p_id UNION SELECT y2 FROM arc WHERE node_2=p_id)a);
 			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":999}';
 		END IF;
