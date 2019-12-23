@@ -8,5 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2019/12/23
-UPDATE config_api_form_fields SET isreload=TRUE, isautoupdate=TRUE WHERE column_id IN ('y1', 'y2', 'custom_y1', 'custom_y2', 'elev1', 'elev2', 'custom_elev1', 'custom_elev2') AND formname LIKE '%arc%';
-UPDATE config_api_form_fields SET isreload=TRUE, isautoupdate=TRUE WHERE column_id IN ('top_elev','custom_top_elev', 'ymax', 'custom_ymax', 'elev', 'custom_elev') AND formname LIKE '%node%';
+UPDATE config_api_form_fields SET isreload=TRUE, isautoupdate=TRUE WHERE column_id IN ('y1', 'y2', 'custom_y1', 'custom_y2', 'elev1', 'elev2', 'custom_elev1', 'custom_elev2') AND formname LIKE 've_arc%';
+UPDATE config_api_form_fields SET isreload=TRUE, isautoupdate=TRUE WHERE column_id IN ('top_elev','custom_top_elev', 'ymax', 'custom_ymax', 'elev', 'custom_elev') AND formname LIKE 've_node%';
+
+UPDATE SCHEMA_NAME.config_api_form_fields SET iseditable=false where column_id='gully_id' AND formname LIKE 've_gully%';
