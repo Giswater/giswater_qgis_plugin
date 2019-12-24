@@ -70,7 +70,7 @@ BEGIN
 	-- delete old values on anl table
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fprocesscat_id IN (101,102,104,105,106);
 	DELETE FROM anl_arc WHERE cur_user=current_user AND fprocesscat_id IN (4,88,102);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103, 108);
 
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
@@ -315,8 +315,7 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No features missed on inp_tables found.');
 		END IF;
-		
-	
+			
 		-- Check for orphan polygons on polygon table
 		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from gully UNION select pol_id from man_chamber 
 					   UNION select pol_id from man_netgully UNION select pol_id from man_storage UNION select pol_id from man_wwtp) a) b';
@@ -346,27 +345,28 @@ BEGIN
 			VALUES (25, 1, 'INFO: No rows without feature found on man_addfields_value table.');
 		END IF;
 	
-	
+
 	ELSIF v_project_type='WS' THEN
+		
+		-- Check if there are reductions without chage of diameter
+		v_querytext = '(SELECT n.node_id, count(*), the_geom FROM (SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc WHERE node_1 IN (SELECT node_id FROM vu_node WHERE sys_type=''REDUCTION'')
+						UNION
+						SELECT node_2, arccat_id FROM '||v_edit||'arc WHERE node_2 IN (SELECT node_id FROM vu_node WHERE sys_type=''REDUCTION'')
+						GROUP BY 1,2) a
+						JOIN node n USING (node_id) 
+						GROUP BY 1,3 HAVING count(*) <> 2)';
 
-		--Check if nodes that are final nodes of arc (node_1, node_2) don't have arc_id assigned
-
-		v_querytext ='(SELECT node_id, nodecat_id, '||v_edit||'node.the_geom from '||v_edit||'node 
-		join arc n1 on n1.node_1 = '||v_edit||'node.node_id 
-		join arc n2 on n2.node_2 = '||v_edit||'node.node_id
-		where '||v_edit||'node.arc_id is not null)';
-
-		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' a') INTO v_count;
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-			SELECT 103, node_id, nodecat_id, ''Final nodes with assigned arc_id'', the_geom FROM (', v_querytext,') a');
+			SELECT 108, node_id, nodecat_id, ''Node reduction without variation of dnom'', the_geom FROM (', v_querytext,') b');
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes, which are arc''s finals and have assigned value of arc_id. Please, check your data before continue'));
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes, without variation of dnom. Please, check your data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No final nodes have arc_id assigned.');
+			VALUES (25, 1, 'INFO: No node reduction without variation of dnom founded.');
 		END IF;
 
 		-- Check state not according with state_type	
@@ -860,12 +860,10 @@ BEGIN
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() 
-	AND (fprocesscat_id=4  OR fprocesscat_id=76 OR fprocesscat_id=79 OR fprocesscat_id=80 OR 
-		fprocesscat_id=81 OR fprocesscat_id=82 OR fprocesscat_id=87 OR fprocesscat_id=96 OR 
-		fprocesscat_id=87 OR fprocesscat_id=102 OR fprocesscat_id=103)
+	AND fprocesscat_id IN (4,76,79,80,81,82,87,96,87,102,103,108)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() 
-	AND (fprocesscat_id=101 OR fprocesscat_id=102 OR fprocesscat_id=104 OR fprocesscat_id=105 OR fprocesscat_id=106)) row;  
+	AND fprocesscat_id IN (101,102,104,105,106)) row;  
 
 	v_result := COALESCE(v_result, '{}'); 
 	

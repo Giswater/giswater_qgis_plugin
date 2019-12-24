@@ -15,3 +15,8 @@ UPDATE audit_cat_function set function_name = 'fct_plan_check_data' WHERE id = 2
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
 VALUES (2788, 'gw_api_get_widgetcontrols', 'api', 'function', 'role_om', false, false, null,false);
+
+
+-- 2019/12/23
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (108,'Node reduction without variation of dnom','edit','Node reduction without variation of dnom','ws') ON CONFLICT (id) DO NOTHING;
