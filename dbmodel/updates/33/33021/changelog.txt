@@ -4,3 +4,4 @@
 - Enhance audit_check_project managing epa and plan data
 - New function of API get_widgetcontrols
 - New 'ischange' capability for WS with column on cat_node according with new controls (108,109) to detect changes of dn/material/pn on arccat_id without nodes 'ischange'
+- New approach for manage the polygon geometry of lots
