@@ -70,7 +70,7 @@ BEGIN
 	-- delete old values on anl table
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fprocesscat_id IN (101,102,104,105,106);
 	DELETE FROM anl_arc WHERE cur_user=current_user AND fprocesscat_id IN (4,88,102);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103, 108);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103,108,109);
 
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
@@ -348,13 +348,11 @@ BEGIN
 
 	ELSIF v_project_type='WS' THEN
 		
-		-- Check if there are reductions without chage of diameter
-		v_querytext = '(SELECT n.node_id, count(*), the_geom FROM (SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc WHERE node_1 IN (SELECT node_id FROM vu_node WHERE sys_type=''REDUCTION'')
-						UNION
-						SELECT node_2, arccat_id FROM '||v_edit||'arc WHERE node_2 IN (SELECT node_id FROM vu_node WHERE sys_type=''REDUCTION'')
-						GROUP BY 1,2) a
-						JOIN node n USING (node_id) 
-						GROUP BY 1,3 HAVING count(*) <> 2)';
+		-- Check if there are nodes type 'ischange' without changing catalog of acs (108)
+		v_querytext = '(SELECT n.node_id, count(*), the_geom FROM 
+				(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc WHERE node_1 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=TRUE) UNION
+				SELECT node_2, arccat_id FROM '||v_edit||'arc WHERE node_2 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=TRUE)
+				GROUP BY 1,2) a	JOIN node n USING (node_id) GROUP BY 1,3 HAVING count(*) <> 2)';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
 
@@ -368,6 +366,29 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No node reduction without variation of dnom founded.');
 		END IF;
+
+		-- Check if there are change of catalog without node_type 'ischange'
+		v_querytext = '(SELECT node_id, nodecat_id, array_agg(arccat_id) as arccat_id, the_geom FROM ( SELECT count(*), node_id, arccat_id FROM 
+				(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc UNION ALL SELECT node_2, arccat_id FROM '||v_edit||'arc)a GROUP BY 2,3 HAVING count(*) <> 2 ORDER BY 2) b
+				JOIN node USING (node_id) JOIN cat_node ON id=nodecat_id WHERE ischange=false GROUP By 1,2,4 HAVING count(*)=2)';
+				
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
+
+		IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+			SELECT 109, node_id, nodecat_id, concat(''Node where arc catalog changes without nodecat_id with ischange on true:'',arccat_id), the_geom FROM (', v_querytext,') b');
+
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' node where arc catalog changes without nodecat with ischange on true. Please, check your data before continue.'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No node where arc catalog changes without ischange bad defined.');
+		END IF;
+
+
+
+
 
 		-- Check state not according with state_type	
 		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
@@ -860,7 +881,7 @@ BEGIN
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() 
-	AND fprocesscat_id IN (4,76,79,80,81,82,87,96,87,102,103,108)
+	AND fprocesscat_id IN (4,76,79,80,81,82,87,96,87,102,103,108,109)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() 
 	AND fprocesscat_id IN (101,102,104,105,106)) row;  

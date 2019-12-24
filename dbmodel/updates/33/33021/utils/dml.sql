@@ -19,4 +19,7 @@ VALUES (2788, 'gw_api_get_widgetcontrols', 'api', 'function', 'role_om', false, 
 
 -- 2019/12/23
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
-VALUES (108,'Node reduction without variation of dnom','edit','Node reduction without variation of dnom','ws') ON CONFLICT (id) DO NOTHING;
+VALUES (108,'Nodes ischange without change of dn/pn/material','edit','Nodes ischange without change of dn/pn/material','ws') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (109,'Change of dn/pn/material without node ischange','edit','Change of dn/pn/material without node ischange','ws') ON CONFLICT (id) DO NOTHING;

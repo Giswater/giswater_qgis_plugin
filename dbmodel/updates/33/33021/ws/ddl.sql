@@ -13,3 +13,6 @@ COMMENT ON TABLE dma IS 'FIELD nodeparent IS DEPRECATED';
 COMMENT ON TABLE dqa IS 'FIELD nodeparent IS DEPRECATED';
 COMMENT ON TABLE cat_presszone IS 'FIELD nodeparent IS DEPRECATED';
 COMMENT ON TABLE anl_mincut_x_exploitation IS 'FIELD toarc IS DEPRECATED';
+
+-- 2019/12/24
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_node", "column":"ischange", "dataType":"boolean","isUtils":"False"}}$$);

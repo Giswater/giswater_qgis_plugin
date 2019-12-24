@@ -88,12 +88,11 @@ INSERT INTO cat_element VALUES ('VREGISTER200X200', 'REGISTER', 'BRICK+IRON', '2
 UPDATE node_type SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE' 
 OR id = 'VALVE_REGISTER' OR id = 'TAP' OR id = 'ADAPTATION' OR id = 'BYPASS_REGISTER' OR id = 'CONTROLREGISTER' OR id = 'THROTTLE_VALVE';
 
+
 INSERT INTO cat_node VALUES ('REGISTER', 'REGISTER', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Register', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REGISTER', true);
 INSERT INTO cat_node VALUES ('WATER-CONNECTION', 'WATER_CONNECTION', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netwjoin', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_WATER-CONNECT', true);
-INSERT INTO cat_node VALUES ('REDUC_110-90 PN16', 'REDUCTION', 'PVC', '16', '110', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_110-90', true);
 INSERT INTO cat_node VALUES ('XDN110 PN16', 'X', 'FD', '16', '110', NULL, NULL, NULL, 'X', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_XDN110_PN16', true);
 INSERT INTO cat_node VALUES ('XDN110-90 PN16', 'X', 'FD', '16', '110', NULL, NULL, NULL, 'X', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_XDN110-90_PN16', true);
-INSERT INTO cat_node VALUES ('REDUC_160-90 PN16', 'REDUCTION', 'PVC', '16', '160', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_160-90', true);
 INSERT INTO cat_node VALUES ('FLEXUNION', 'FLEXUNION', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Flexunion', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_FLEXUNION', true);
 INSERT INTO cat_node VALUES ('FILTER-01-DN200', 'FILTER', 'FD', '16', '200', 186.00000, NULL, NULL, 'Filter 200', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_FILTER-01', true);
 INSERT INTO cat_node VALUES ('PRV-VALVE100-PN6/16', 'PR_REDUC_VALVE', 'FD', '6', '100', 86.00000, NULL, NULL, 'Pressure reduction valve', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PRVAL100_6/16', true);
@@ -152,6 +151,14 @@ INSERT INTO cat_node VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'N/I', NULL, NU
 INSERT INTO cat_node VALUES ('NETELEMENT', 'NETELEMENT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netelement', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_NETELEMENT', true);
 INSERT INTO cat_node VALUES ('ETAP', 'WTP', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_ETAP', true);
 INSERT INTO cat_node VALUES ('MANHOLE', 'MANHOLE', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SOURCE-01', true);
+
+INSERT INTO cat_node VALUES ('REDUC_110-90 PN16', 'REDUCTION', 'PVC', '16', '110', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_110-90', true, null, true;
+INSERT INTO cat_node VALUES ('REDUC_160-90 PN16', 'REDUCTION', 'PVC', '16', '160', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_160-90', true, null, true);
+
+INSERT INTO cat_node VALUES ('CHANGEMAT', 'JUNCTION', 'N/I', '16', '160', NULL, NULL, NULL, 'Change of arc catalog', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', null, true, null, true);
+INSERT INTO cat_node VALUES ('CHANGEPN', 'JUNCTION', 'FD', NULL, '160', NULL, NULL, NULL, 'Change of arc nompressure', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', null, true, null, true);
+
+UPDATE cat_node SET ischange=FALSE where ischange IS NULL;
 
 
 INSERT INTO cat_owner VALUES ('owner1');
