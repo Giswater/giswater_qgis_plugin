@@ -157,8 +157,8 @@ BEGIN
 		END IF;
 	
     END IF;
-	
-	--  Control of start/end node
+    
+    	--  Control of start/end node
 	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 
         -- Control of same node initial and final
@@ -173,7 +173,7 @@ BEGIN
 			is_reversed= FALSE;
 
 			-- node_1 (sys_y1_aux and sys_elev1_aux)
-			SELECT * INTO nodeRecord1 FROM v_edit_node WHERE node_id = nodeRecord1.node_id;
+			SELECT * INTO nodeRecord1 FROM vu_node WHERE node_id = nodeRecord1.node_id;  -- vu_node is used because topology have been ckecked before and sys_* fields are needed
 
 			IF (nodeRecord1.elev IS NOT NULL OR nodeRecord1.custom_elev IS NOT NULL) THEN -- when elev is used on node only elev must be used on arc
 				sys_elev1_aux = nodeRecord1.sys_elev;
@@ -186,7 +186,7 @@ BEGIN
 			END IF;
 
 			-- node_2 (sys_y2_aux and sys_elev2_aux)
-			SELECT * INTO nodeRecord2 FROM v_edit_node WHERE node_id = nodeRecord2.node_id;
+			SELECT * INTO nodeRecord2 FROM vu_node WHERE node_id = nodeRecord2.node_id;-- vu_node is used because topology have been ckecked before and sys_* fields are needed
 			
 			IF (nodeRecord2.elev IS NOT NULL OR nodeRecord2.custom_elev IS NOT NULL) THEN -- when elev is used on node only elev must be used on arc
 				sys_elev2_aux = nodeRecord2.sys_elev;
