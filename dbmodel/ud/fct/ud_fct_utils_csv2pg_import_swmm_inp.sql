@@ -260,7 +260,7 @@ BEGIN
 	END LOOP;
 	
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
-	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);	
+	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 	RAISE NOTICE 'step 4/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Values of options / times / report are not updated. Default values of Giswater are keeped');
