@@ -151,14 +151,21 @@ INSERT INTO cat_node VALUES ('NETSAMPLEPOINT', 'NETSAMPLEPOINT', 'N/I', NULL, NU
 INSERT INTO cat_node VALUES ('NETELEMENT', 'NETELEMENT', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Netelement', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_NETELEMENT', true);
 INSERT INTO cat_node VALUES ('ETAP', 'WTP', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_ETAP', true);
 INSERT INTO cat_node VALUES ('MANHOLE', 'MANHOLE', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Wtp', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SOURCE-01', true);
+INSERT INTO cat_node VALUES ('REDUC_110-90 PN16', 'REDUCTION', 'PVC', '16', '110', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_110-90', true, null, 1);
+INSERT INTO cat_node VALUES ('REDUC_160-90 PN16', 'REDUCTION', 'PVC', '16', '160', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_160-90', true, null, 1);
+INSERT INTO cat_node VALUES ('REDUC_110-63 PN16', 'REDUCTION', 'PVC', '16', '110', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_110-63', true, null, 1);
+INSERT INTO cat_node VALUES ('REDUC_200-110 PN16', 'REDUCTION', 'PVC', '16', '110', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_200-110', true, null, 1);
+INSERT INTO cat_node VALUES ('REDUC_160-110 PN16', 'REDUCTION', 'PVC', '16', '110', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_160-110', true, null, 1);
+INSERT INTO cat_node VALUES ('JUNCTION CHNGMAT', 'JUNCTION', 'N/I', '16', '160', NULL, NULL, NULL, 'Change of arc material', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_JUNCT_CHNGMAT', true, null, 1);
 
-INSERT INTO cat_node VALUES ('REDUC_110-90 PN16', 'REDUCTION', 'PVC', '16', '110', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_110-90', true, null, true;
-INSERT INTO cat_node VALUES ('REDUC_160-90 PN16', 'REDUCTION', 'PVC', '16', '160', NULL, NULL, NULL, 'Reduction', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REDUC_160-90', true, null, true);
-
-INSERT INTO cat_node VALUES ('CHANGEMAT', 'JUNCTION', 'N/I', '16', '160', NULL, NULL, NULL, 'Change of arc catalog', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', null, true, null, true);
-INSERT INTO cat_node VALUES ('CHANGEPN', 'JUNCTION', 'FD', NULL, '160', NULL, NULL, NULL, 'Change of arc nompressure', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', null, true, null, true);
-
-UPDATE cat_node SET ischange=FALSE where ischange IS NULL;
+UPDATE cat_node SET ischange=2 where id LIKE '%HYDRANT%';
+UPDATE cat_node SET ischange=1 where id ='TDN160-63 PN16';
+UPDATE cat_node SET ischange=1 where id ='XDN110-90 PN16';
+UPDATE cat_node SET ischange=2 where id ='TDN63-63 PN16';
+UPDATE cat_node SET ischange=2 where id ='XDN110 PN16';
+UPDATE cat_node SET ischange=2 where id ='TDN110-110 PN16';
+UPDATE cat_node SET ischange=1 where id LIKE '%REDUC%';
+UPDATE cat_node SET ischange=0 where ischange IS NULL;
 
 
 INSERT INTO cat_owner VALUES ('owner1');

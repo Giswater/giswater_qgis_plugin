@@ -130,10 +130,35 @@ SELECT gw_fct_pg2epa_main($${
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
 --deprecated fields
-UPDATE arc SET _sys_length_=NULL;
+UPDATE arc SET sys_length=NULL;
 UPDATE sys_fprocess_cat SET fprocess_i18n= NULL;
 UPDATE sector SET nodeparent= NULL;
 UPDATE dma SET nodeparent= NULL;
 UPDATE dqa SET nodeparent= NULL;
 UPDATE cat_presszone SET nodeparent= NULL;
-UPDATE anl_mincut_x_exploitation SET toarc= NULL;
+UPDATE anl_mincut_inlet_x_exploitation SET to_arc= NULL;
+
+
+-- adjustment of ischange
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1006';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1025';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1039';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1040';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1057';
+
+
+UPDATE node SET nodecat_id='REDUC_110-63 PN16' WHERE node_id='1044';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1063';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1067';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1069';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1044';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1063';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1067';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1069';
+UPDATE node SET nodecat_id='REDUC_200-110 PN16' WHERE node_id='113873';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113880';
+UPDATE node SET nodecat_id='REDUC_160-110 PN16' WHERE node_id='113883';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113954';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113955';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113994';
+UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='114016';

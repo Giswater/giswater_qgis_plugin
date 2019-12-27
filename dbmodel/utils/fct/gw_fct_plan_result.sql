@@ -45,7 +45,7 @@ BEGIN
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
-	SELECT gw_fct_plan_audit_check_data (p_data) INTO v_return;
+	SELECT gw_fct_plan_check_data (p_data) INTO v_return;
 
 	-- insert into result_cat table
 	INSERT INTO om_result_cat (name, result_type, network_price_coeff, tstamp, cur_user, descript, pricecat_id) 

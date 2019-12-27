@@ -70,6 +70,10 @@ INSERT INTO price_compost VALUES ('N_T110-63_PN16', 'u', 'PVC derivation DN110mm
 INSERT INTO price_compost VALUES ('A_PVC63_PN10', 'm', 'PVC tube of 63 mm of nominal external diameter, of 16 bar of nominal pressure', 'PVC tube of 63 mm of nominal external diameter, of 16 bar of nominal pressure, elastic union with elastomeric ring of watertight, according to the norm UNE-EN 1452-2 and placed at the bottom of the ditch', 12.2100, NULL);
 INSERT INTO price_compost VALUES ('N_FLEXUNION', 'u', 'Flexunion, nominal pressure of 10 bar', 'Flexunion, nominal pressure of 10 bar', 15.5000, NULL);
 INSERT INTO price_compost VALUES ('N_REDUC_110-90', 'u', 'Iron reduction form 110mm to 90mm, nominal pressure of 16 bar', 'Iron reduction form 110mm to 90mm, nominal pressure of 16 bar', 125.1500, NULL);
+INSERT INTO price_compost VALUES ('N_REDUC_110-63', 'u', 'Iron reduction form 110mm to 90mm, nominal pressure of 16 bar', 'Iron reduction form 110mm to 63mm, nominal pressure of 16 bar', 125.1500, NULL);
+INSERT INTO price_compost VALUES ('N_REDUC_200-110', 'u', 'Iron reduction form 200mm to 110mm, nominal pressure of 16 bar', 'Iron reduction form 200mm to 110mm, nominal pressure of 16 bar', 188.3100, NULL);
+INSERT INTO price_compost VALUES ('N_REDUC_160-110', 'u', 'Iron reduction form 180mm to 110mm, nominal pressure of 16 bar', 'Iron reduction form 160mm to 110mm, nominal pressure of 16 bar', 125.1500, NULL);
+INSERT INTO price_compost VALUES ('N_JUNCT_CHNGMAT', 'u', 'Change of material', 'Change of material', 100.0000, NULL);
 INSERT INTO price_compost VALUES ('N_REDUC_160-90', 'u', 'Iron reduction form 160mm to 90mm, nominal pressure of 16 bar', 'Iron reduction form 160mm to 90mm, nominal pressure of 16 bar', 198.5000, NULL);
 INSERT INTO price_compost VALUES ('N_REGISTER', 'u', 'Register of 57x57x90cm, of brick and interior batter, with frame and cover of 60x60x5cm of ductile i', 'Register of 57x57x90cm, of brick and interior batter, with frame and cover of 60x60x5cm of ductile i', 155.5000, NULL);
 INSERT INTO price_compost VALUES ('N_WATER-CONNECT', 'u', 'Connection point of connec', 'Connection point of connec', 135.5000, NULL);

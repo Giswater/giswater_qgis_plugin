@@ -7,9 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 2019/12/21
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_raster_dem", "column":"envelope", "dataType":"geometry (polygon, SRID_VALUE)","isUtils":"True"}}$$);
 
--- 2019/12/23
-COMMENT ON TABLE sys_fprocess_cat IS 'FIELD fprocess_i18n IS DEPRECATED';
-COMMENT ON TABLE sys_fprocess_cat IS 'FIELD sys_length IS NOT USED. Value is calculated on the fly on views';
+-- 2019/12/27
+UPDATE cat_node SET ischange=2; -- 2: it means maybe
+

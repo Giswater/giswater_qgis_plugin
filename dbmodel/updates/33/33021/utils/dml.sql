@@ -14,7 +14,7 @@ VALUES (107,'Role upsertuser','admin','Role upsertuser','utils') ON CONFLICT (id
 UPDATE audit_cat_function set function_name = 'fct_plan_check_data' WHERE id = 2436;
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
-VALUES (2788, 'gw_api_get_widgetcontrols', 'api', 'function', 'role_om', false, false, null,false);
+VALUES (2788, 'gw_api_get_widgetcontrols', 'api', 'function', 'Api function to manage widgetcontrols', 'role_om', false, false, null,false);
 
 
 -- 2019/12/23

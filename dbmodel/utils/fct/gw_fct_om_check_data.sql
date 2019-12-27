@@ -25,20 +25,20 @@ SELECT gw_fct_om_check_data($${
 
 DECLARE
 v_project_type 		text;
-v_count			integer;
+v_count				integer;
 v_saveondatabase 	boolean;
-v_result 		text;
-v_version		text;
+v_result 			text;
+v_version			text;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
-v_querytext		text;
+v_querytext			text;
 v_result_id 		text;
-v_features 		text;
-v_edit			text;
+v_features 			text;
+v_edit				text;
 v_onlygrafanalytics boolean;
-v_config_param text;
+v_config_param 		text;
 
 BEGIN
 
@@ -348,46 +348,44 @@ BEGIN
 
 	ELSIF v_project_type='WS' THEN
 		
-		-- Check if there are nodes type 'ischange' without changing catalog of acs (108)
-		v_querytext = '(SELECT n.node_id, count(*), the_geom FROM 
-				(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc WHERE node_1 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=TRUE) UNION
-				SELECT node_2, arccat_id FROM '||v_edit||'arc WHERE node_2 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=TRUE)
-				GROUP BY 1,2) a	JOIN node n USING (node_id) GROUP BY 1,3 HAVING count(*) <> 2)';
+		-- Check if there are nodes type 'ischange=1 or 2 (true or maybe)' without changing catalog of acs (108)
+		v_querytext = '(SELECT n.node_id, count(*), nodecat_id, the_geom FROM 
+				(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc WHERE node_1 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
+				  UNION
+				 SELECT node_2, arccat_id FROM '||v_edit||'arc WHERE node_2 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
+				GROUP BY 1,2) a	JOIN node n USING (node_id) GROUP BY 1,3,4 HAVING count(*) <> 2)';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-			SELECT 108, node_id, nodecat_id, ''Node reduction without variation of dnom'', the_geom FROM (', v_querytext,') b');
+			SELECT 108, node_id, nodecat_id, ''Node with ischange=1 without any variation of arcs in terms of diameter, pn or material'', the_geom FROM (', v_querytext,') b');
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes, without variation of dnom. Please, check your data before continue.'));
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes with ischange on 1,2 (true or maybe) without any variation of arcs in terms of diameter, pn or material. Please, check your data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No node reduction without variation of dnom founded.');
+			VALUES (25, 1, 'INFO: No nodes ''ischange'' without real change have been found.');
 		END IF;
+		
 
-		-- Check if there are change of catalog without node_type 'ischange'
+		-- Check if there are change of catalog with node_type 'ischange=0 (false)' (109)
 		v_querytext = '(SELECT node_id, nodecat_id, array_agg(arccat_id) as arccat_id, the_geom FROM ( SELECT count(*), node_id, arccat_id FROM 
 				(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc UNION ALL SELECT node_2, arccat_id FROM '||v_edit||'arc)a GROUP BY 2,3 HAVING count(*) <> 2 ORDER BY 2) b
-				JOIN node USING (node_id) JOIN cat_node ON id=nodecat_id WHERE ischange=false GROUP By 1,2,4 HAVING count(*)=2)';
-				
+				JOIN node USING (node_id) JOIN cat_node ON id=nodecat_id WHERE ischange=0 GROUP By 1,2,4 HAVING count(*)=2)';	
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-			SELECT 109, node_id, nodecat_id, concat(''Node where arc catalog changes without nodecat_id with ischange on true:'',arccat_id), the_geom FROM (', v_querytext,') b');
+			SELECT 109, node_id, nodecat_id, concat(''Nodes with catalog changes without nodecat_id ischange:'',arccat_id), the_geom FROM (', v_querytext,') b');
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' node where arc catalog changes without nodecat with ischange on true. Please, check your data before continue.'));
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' node where arc catalog changes without nodecat with ischange on 1,2 (true or maybe). Please, check your data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No node where arc catalog changes without ischange bad defined.');
+			VALUES (25, 1, 'INFO: No nodes without ''ischange'' where arc changes have been found');
 		END IF;
-
-
-
 
 
 		-- Check state not according with state_type	
