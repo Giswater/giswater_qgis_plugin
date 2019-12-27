@@ -9,5 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/12/27
 ALTER TABLE cat_node ALTER COLUMN ischange SET DEFAULT 2;
-ALTER TABLE inp_pump ALTER COLUMN minorloss SET DEFAULT 0.2;
 ALTER TABLE inp_valve ALTER COLUMN minorloss SET DEFAULT 0.2;
