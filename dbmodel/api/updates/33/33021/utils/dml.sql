@@ -11,3 +11,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE SCHEMA_NAME.config_api_form_fields SET iseditable=false where column_id='arc_id' AND formname LIKE 've_arc%';
 UPDATE SCHEMA_NAME.config_api_form_fields SET iseditable=false where column_id='node_id' AND formname LIKE 've_node%';
 UPDATE SCHEMA_NAME.config_api_form_fields SET iseditable=false where column_id='connec_id' AND formname LIKE 've_connec%';
+
+UPDATE config_param_system SET context='api_search_visit' WHERE parameter='api_search_visit';
