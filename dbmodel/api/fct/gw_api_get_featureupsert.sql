@@ -400,7 +400,7 @@ BEGIN
 			ELSIF  (aux_json->>'column_id')='epa_type' THEN
 				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'
 					INTO field_value
-					USING v_catfeature.system_id;
+					USING v_catfeature.id;
 					
 			-- mapzones values
 			ELSIF (aux_json->>'column_id') = 'sector_id' THEN
