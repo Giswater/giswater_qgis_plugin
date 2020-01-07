@@ -118,11 +118,11 @@ INSERT INTO cat_node VALUES ('FLOWMETER-01-DN200', 'FLOWMETER', 'FD', '16', '200
 INSERT INTO cat_node VALUES ('FLOWMETER-02-DN110', 'FLOWMETER', 'FD', '16', '110', 98.00000, NULL, NULL, 'Flow meter 110', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_FLOWMETER200', true);
 INSERT INTO cat_node VALUES ('GREENVALVEDN63 PN16', 'GREEN_VALVE', 'FD', '16', '63', NULL, NULL, NULL, 'Green valve 63mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_GREVAL63_PN16', true);
 INSERT INTO cat_node VALUES ('GREENVALVEDN110 PN16', 'GREEN_VALVE', 'FD', '16', '110', NULL, NULL, NULL, 'Green valve 110mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_GREVAL110_PN16', true);
-INSERT INTO cat_node VALUES ('GREENVALVEDN50 PN16', 'GREEN_VALVE', 'FD', '16', '50 mm', NULL, NULL, NULL, 'Green valve 110mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_GREVAL50_PN16', true);
-INSERT INTO cat_node VALUES ('AIR VALVE DN50', 'AIR_VALVE', 'FD', '16', '50 mm', NULL, NULL, NULL, 'Air valve 50mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_AIRVAL_DN50', true);
+INSERT INTO cat_node VALUES ('GREENVALVEDN50 PN16', 'GREEN_VALVE', 'FD', '16', '50', NULL, NULL, NULL, 'Green valve 110mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_GREVAL50_PN16', true);
+INSERT INTO cat_node VALUES ('AIR VALVE DN50', 'AIR_VALVE', 'FD', '16', '50', NULL, NULL, NULL, 'Air valve 50mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_AIRVAL_DN50', true);
 INSERT INTO cat_node VALUES ('TDN63-63-110 PN16', 'T', 'PVC', '16', '63', NULL, NULL, NULL, 'PVC T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_T63-63-110', true);
 INSERT INTO cat_node VALUES ('SOURCE-01', 'SOURCE', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Source', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_SOURCE-01', true);
-INSERT INTO cat_node VALUES ('PUMP-02', 'PUMP', 'FD', '16', '125 mm', 110.00000, NULL, NULL, 'Pump tank', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PUMP-01', true);
+INSERT INTO cat_node VALUES ('PUMP-02', 'PUMP', 'FD', '16', '125', 110.00000, NULL, NULL, 'Pump tank', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PUMP-01', true);
 INSERT INTO cat_node VALUES ('TDN110-90 PN16', 'T', 'FD', '16', '110', NULL, NULL, NULL, 'FD T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_T110-63_PN16', true);
 INSERT INTO cat_node VALUES ('JUNCTION DN63', 'JUNCTION', 'FD', '16', '63', NULL, NULL, NULL, 'Juntion 63mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_JUN63', true);
 INSERT INTO cat_node VALUES ('JUNCTION DN110', 'JUNCTION', 'FD', '16', '110', NULL, NULL, NULL, 'Juntion 110mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_JUN110', true);
@@ -137,7 +137,7 @@ INSERT INTO cat_node VALUES ('CHK-VALVE63-PN16', 'CHECK_VALVE', 'FD', '16', '63'
 INSERT INTO cat_node VALUES ('CHK-VALVE150-PN16', 'CHECK_VALVE', 'FD', '16', '150', 154.00000, NULL, NULL, 'Check valve 150mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_CHKVAL150_PN10', true);
 INSERT INTO cat_node VALUES ('CHK-VALVE100-PN16', 'CHECK_VALVE', 'FD', '16', '100', 102.00000, NULL, NULL, 'Check valve 110mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_CHKVAL100_PN10', true);
 INSERT INTO cat_node VALUES ('CHK-VALVE200-PN16', 'CHECK_VALVE', 'FD', '16', '200', 205.00000, NULL, NULL, 'Check valve 200mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_CHKVAL200_PN10', true);
-INSERT INTO cat_node VALUES ('CHK-VALVE300-PN16', 'CHECK_VALVE', 'FD', '16', '300 mm', 306.00000, NULL, NULL, 'Check valve 300mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_CHKVAL300_PN10', true);
+INSERT INTO cat_node VALUES ('CHK-VALVE300-PN16', 'CHECK_VALVE', 'FD', '16', '300', 306.00000, NULL, NULL, 'Check valve 300mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_CHKVAL300_PN10', true);
 INSERT INTO cat_node VALUES ('PRESMETER-63-PN16', 'PRESSURE_METER', 'FD', '16', '63', 65.00000, NULL, NULL, 'Pressure meter 63', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PRESME200_PN16', true);
 INSERT INTO cat_node VALUES ('PRESMETER-110-PN16', 'PRESSURE_METER', 'FD', '16', '110', 115.00000, NULL, NULL, 'Pressure meter 110', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PRESME110_PN16', true);
 INSERT INTO cat_node VALUES ('EXPANTANK', 'EXPANTANK', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Expansiontank', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_EXPANTANK', true);
