@@ -19560,7 +19560,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" labelsEnabled="0" simplifyAlgorithm="0" simplifyDrawingTol="1" type="vector" refreshOnNotifyMessage="" hasScaleBasedVisibilityFlag="0" autoRefreshEnabled="0" geometry="Point" styleCategories="AllStyleCategories" maxScale="0" simplifyDrawingHints="1" refreshOnNotifyEnabled="0" minScale="1e+08" simplifyMaxScale="1" readOnly="0" simplifyLocal="1">
       <id>v_edit_inp_connec_e3d8bfb1_1402_4e55_bceb_051385151325</id>
-      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__  password='postgres' sslmode=disable key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_connec" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_connec" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -24061,7 +24061,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" labelsEnabled="0" simplifyAlgorithm="0" simplifyDrawingTol="1" type="vector" refreshOnNotifyMessage="" hasScaleBasedVisibilityFlag="0" autoRefreshEnabled="0" geometry="Line" styleCategories="AllStyleCategories" maxScale="0" simplifyDrawingHints="1" refreshOnNotifyEnabled="0" minScale="1e+08" simplifyMaxScale="1" readOnly="0" simplifyLocal="1">
       <id>v_edit_inp_virtualvalve_11a6f2b5_05e2_4323_b42e_5d29c6ed2097</id>
-      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__  password='postgres' sslmode=disable key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_virtualvalve" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_inp_virtualvalve" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
