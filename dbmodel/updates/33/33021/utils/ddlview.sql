@@ -88,3 +88,51 @@ CREATE OR REPLACE VIEW v_anl_node AS
      JOIN exploitation ON anl_node.expl_id = exploitation.expl_id
   WHERE anl_node.fprocesscat_id = selector_audit.fprocesscat_id AND selector_audit.cur_user = "current_user"()::text AND anl_node.cur_user::name = "current_user"();
 
+  
+ -- 2020/01/07
+CREATE OR REPLACE VIEW v_state_arc AS 
+   SELECT arc.arc_id
+    FROM selector_state,
+    selector_expl,
+    arc
+    WHERE arc.state = selector_state.state_id AND arc.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+  EXCEPT
+    SELECT plan_psector_x_arc.arc_id
+    FROM selector_psector,
+    selector_expl,
+    plan_psector_x_arc
+    JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
+    WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_arc.state = 0
+	AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = current_user
+  UNION
+    SELECT plan_psector_x_arc.arc_id
+    FROM selector_psector,
+    selector_expl,
+    plan_psector_x_arc
+    JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
+    WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_arc.state = 1
+	AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = current_user;
+	
+	
+CREATE OR REPLACE VIEW v_state_node AS 
+SELECT node.node_id
+    FROM selector_state,
+    selector_expl,
+    node
+    WHERE node.state = selector_state.state_id AND node.expl_id = selector_expl.expl_id AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text
+ EXCEPT
+    SELECT plan_psector_x_node.node_id
+    FROM selector_psector,
+    selector_expl,
+    plan_psector_x_node
+    JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id
+    WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_node.state = 0
+	AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = current_user
+UNION
+    SELECT plan_psector_x_node.node_id
+    FROM selector_psector,
+    selector_expl,
+    plan_psector_x_node
+	JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id
+	WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_node.state = 1 
+	AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = current_user;
