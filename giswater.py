@@ -639,6 +639,12 @@ class Giswater(QObject):
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions())-1])
             self.btn_add_layers = None
 
+        # Save toolbar position after unload plugin
+        try:
+            self.save_toolbars_position()
+        except Exception as e:
+            pass
+
         try:
             # Unlisten notify channel and stop thread
             if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
@@ -873,8 +879,8 @@ class Giswater(QObject):
             list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
 
-        # Save toolbar position after closing QGIS
-        self.iface.actionExit().triggered.connect(self.save_toolbars_position)
+        # Save toolbar position after save project
+        self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
 
         # Set config layer fields when user add new layer into the TOC
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
