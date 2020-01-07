@@ -199,7 +199,7 @@ END IF;
 	END IF;
 
 	--check if all ve_node_*,ve_arc_* etc views created in schema are related to any feature in cat_feature
-	FOR rec IN (SELECT table_schema, table_name from information_schema.views where table_schema='ws_sample' AND 
+	FOR rec IN (SELECT table_schema, table_name from information_schema.views where table_schema=v_schemaname AND 
 	(table_name ilike 've_node_%' OR table_name ilike 've_arc_%' OR table_name ilike 've_connec_%'OR table_name ilike 've_gully_%'))
 	LOOP
 
