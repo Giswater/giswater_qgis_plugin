@@ -23,3 +23,17 @@ VALUES (108,'Nodes ischange without change of dn/pn/material','edit','Nodes isch
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (109,'Change of dn/pn/material without node ischange','edit','Change of dn/pn/material without node ischange','ws') ON CONFLICT (id) DO NOTHING;
+
+
+INSERT INTO audit_cat_param_user VALUES 
+('audit_project_epa_result', 'config', 'Id of EPA results to analyze when audit check project function', 'role_epa', NULL, NULL, 'EPA result to check database on load project', NULL, NULL, true, 8, 14, 'utils', false, NULL, NULL, NULL, 
+false, 'string', 'text', true, NULL, 'gw_check_project', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
+ON conflict (id) DO NOTHING;
+
+INSERT INTO audit_cat_param_user VALUES 
+('audit_project_plan_result', 'config', 'Id of PLAN results to analyze when audit check project function', 'role_plan', NULL, NULL, 'PLAN result to check database on load project', NULL, NULL, true, 8, 15, 'utils', false, NULL, NULL, NULL, 
+false, 'string', 'text', true, NULL, 'gw_check_project', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
+ON conflict (id) DO NOTHING;
+
+UPDATE config_param_system SET vdefault = 'FALSE' WHERE parameter IN ('edit_enable_arc_nodes_update');
+UPDATE config_param_system SET vdefault = 'TRUE' WHERE parameter IN ('edit_topocontrol_dsbl_error','om_mincut_use_pgrouting');

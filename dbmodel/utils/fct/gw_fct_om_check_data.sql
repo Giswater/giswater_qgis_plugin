@@ -88,8 +88,20 @@ BEGIN
 		
 	-- UTILS
 
-	-- delete config_param_user rows with deprecated variables
-	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user);
+	-- system variables
+	v_querytext = 'SELECT parameter FROM config_param_system WHERE value != vdefault AND vdefault IS NOT NULL';
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	EXECUTE concat('SELECT (array_agg(parameter))::text FROM (',v_querytext,')a') INTO v_result;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There are ',v_count,' system variables with out-of-standard values. This variables are ',v_result,'.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No system variables with values out-of-standars found.');
+	END IF;
+
+	
 	
 	-- Check node_1 or node_2 nulls (fprocesscat = 4)
 	v_querytext = '(SELECT arc_id,arccat_id,the_geom FROM '||v_edit||'arc WHERE state > 0 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom FROM '
@@ -362,7 +374,7 @@ BEGIN
 			SELECT 108, node_id, nodecat_id, ''Node with ischange=1 without any variation of arcs in terms of diameter, pn or material'', the_geom FROM (', v_querytext,') b');
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes with ischange on 1,2 (true or maybe) without any variation of arcs in terms of diameter, pn or material. Please, check your data before continue.'));
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes with ischange on 1 (true) without any variation of arcs in terms of diameter, pn or material. Please, check your data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No nodes ''ischange'' without real change have been found.');
@@ -381,7 +393,7 @@ BEGIN
 			SELECT 109, node_id, nodecat_id, concat(''Nodes with catalog changes without nodecat_id ischange:'',arccat_id), the_geom FROM (', v_querytext,') b');
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' node where arc catalog changes without nodecat with ischange on 1,2 (true or maybe). Please, check your data before continue.'));
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' nodes where arc catalog changes without nodecat with ischange on 0 or 2 (false or maybe). Please, check your data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No nodes without ''ischange'' where arc changes have been found');

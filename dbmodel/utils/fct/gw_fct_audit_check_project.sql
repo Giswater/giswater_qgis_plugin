@@ -54,7 +54,8 @@ v_qmlpointpath	text = '';
 v_qmllinepath	text = '';
 v_qmlpolpath	text = '';
 v_user_control boolean = false;
-
+v_eparesult text;
+v_planresult text;
 
 BEGIN 
 
@@ -74,6 +75,9 @@ BEGIN
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 	SELECT value INTO v_user_control FROM config_param_user where parameter='audit_project_user_control' AND cur_user=current_user;
+	SELECT value INTO v_eparesult FROM config_param_user WHERE parameter='audit_project_epa_result' AND cur_user=current_user;
+	SELECT value INTO v_planresult FROM config_param_user WHERE parameter='audit_project_plan_result' AND cur_user=current_user;
+
 
 	-- init process
 	v_isenabled:=FALSE;
@@ -111,10 +115,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (101, 3, v_errortext);
 	END IF;
-
-	v_errortext=concat('INFO: Project type: ',v_project_type,'.');
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-	VALUES (101, 1, v_errortext);
+	
 
 	--REFRESH MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
@@ -229,7 +230,7 @@ BEGIN
 	END IF;
 
 	-- sincronize config_param_user & audit_cat_param_user
-	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user) AND cur_user = current_user;;
+	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user) AND cur_user = current_user;
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
 	IF v_user_control THEN
@@ -246,27 +247,41 @@ BEGIN
 		END IF;
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
-			EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
-			"client":{"device":3, "infoType":100, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"resultId":"gw_check_project","saveOnDatabase":true, 
-			"useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)';
-			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-			SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-			WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' AND result_id ='gw_check_project' OFFSET 8;
+
+			-- control if result id exists
+			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
+				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) VALUES
+				(101, 1, 'INFO (DB EPA): Check for EPA result not executed due result_id does not exists. Take a look on config form and update result_id');
+			ELSE
+				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
+				"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{},"data":{"parameters":{"resultId":"'||v_eparesult||'","saveOnDatabase":true, 
+				"useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)';
+				-- insert results 
+				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
+				WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' AND result_id ='gw_check_project' OFFSET 8;
+			END IF;
 
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
-			EXECUTE 'SELECT gw_fct_plan_check_data($${
-			"client":{"device":3, "infoType":100, "lang":"ES"},
-			"feature":{},
-			"data":{"parameters":{"resultId":"gw_check_project"},"saveOnDatabase":true}}$$)';
-			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-			SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
-			WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !=''  AND result_id ='gw_check_project' OFFSET 6;
-			
+
+			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
+				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message)  VALUES
+				(101, 1, 'INFO (DB PLAN): Check for PLAN result not executed due result_id does not exists. Take a look on config form and update result_id');
+			ELSE
+		
+				EXECUTE 'SELECT gw_fct_plan_check_data($${
+				"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{},
+				"data":{"parameters":{"resultId":"'||v_planresult||'"},"saveOnDatabase":true}}$$)';
+				-- insert results 
+				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+				SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
+				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !=''  AND result_id ='gw_check_project' OFFSET 6;
+			END IF;
+				
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
