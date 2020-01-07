@@ -115,10 +115,12 @@ END IF;
 			END IF;
 
 		ELSE 
-			v_errortext=concat('ERROR: View ',rec.child_layer,' is defined in cat_feature table but is not created');
+			IF rec.child_layer is not null then
+				v_errortext=concat('ERROR: View ',rec.child_layer,' is defined in cat_feature table but is not created in a DB');
 
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (95, 3, v_errortext);
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (95, 3, v_errortext);
+			END IF;
 		END IF;
 
 	END LOOP;
@@ -136,7 +138,7 @@ END IF;
 	END IF;
 
 	IF v_count > 0 THEN
-		v_errortext=concat('ERROR: There is/are ',v_count,' active features which views names are not present in cat_feature table. Features: ',v_feature_list::text,'.');
+		v_errortext=concat('ERROR: There is/are ',v_count,' active features which views names are not present in cat_feature table. Features - ',v_feature_list::text,'.');
 
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3, v_errortext);
@@ -196,6 +198,19 @@ END IF;
 		VALUES (95, 1, 'INFO: All active features have child view defined in config_api_form_fields');
 	END IF;
 
+	--check if all ve_node_*,ve_arc_* etc views created in schema are related to any feature in cat_feature
+	FOR rec IN (SELECT table_schema, table_name from information_schema.views where table_schema='ws_sample' AND 
+	(table_name ilike 've_node_%' OR table_name ilike 've_arc_%' OR table_name ilike 've_connec_%'OR table_name ilike 've_gully_%'))
+	LOOP
+
+	v_querytext = (select string_agg(child_layer,',') FROM cat_feature where child_layer IS NOT NULL);
+
+		IF position(rec.table_name IN v_querytext) = 0 THEN
+			v_errortext=concat('WARNING: View ',rec.table_name,' is defined in a DB but is not related to any feature in cat_feature.');
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (95, 2, v_errortext);
+		END IF;
+	END LOOP;
 
 	--CHECK CONFIG API FORM FIELDS
 
