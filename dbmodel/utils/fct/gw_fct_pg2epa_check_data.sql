@@ -140,7 +140,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 1, '-------');	
 	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 'NETWORK ANALYSIS');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 'NETWORK ANALYTICS');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, '-------------------------');	
 
 
