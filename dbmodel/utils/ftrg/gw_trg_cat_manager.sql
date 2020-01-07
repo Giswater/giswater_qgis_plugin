@@ -123,5 +123,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION gw_trg_cat_manager()
-  OWNER TO postgres;
