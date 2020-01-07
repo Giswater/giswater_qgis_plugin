@@ -70,7 +70,8 @@ BEGIN
 		-- get layout_order
 		SELECT max(layout_order)+1 INTO v_layout_order FROM audit_cat_param_user WHERE formname='config' and layout_id=v_layout;
 	
-		v_partialquerytext =  concat('JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',lower(NEW.feature_type),'type_id WHERE nodetype_id = ',quote_literal(NEW.id));
+		v_partialquerytext =  concat('JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
+		lower(NEW.feature_type),'type_id WHERE ',lower(NEW.feature_type),'_type.id = ',quote_literal(NEW.id));
 				
 		v_table = concat ('cat_',lower(NEW.feature_type));
 
@@ -82,7 +83,7 @@ BEGIN
 		INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id, label, isenabled, layout_id, layout_order, 
 		dv_querytext, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated)
 		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default for ',v_id,' cat_feature'), 'role_edit', concat ('Default value for ', v_id), true, v_layout ,v_layout_order,
-		v_querytext, lower(v_projecttype),false,false,'text', 'combo',false,false)
+		v_querytext, lower(v_projecttype),false,false,'text', 'combo',true,false)
 		ON CONFLICT (id) DO NOTHING;
 
 		IF TG_OP = 'UPDATE' THEN
