@@ -9,5 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2019/12/27
-UPDATE cat_node SET ischange=2; -- 2: it means maybe
+UPDATE cat_node SET ischange=2; -- 2: it means maybe, and due this all it works....
 
+-- 2020/01/07
+DELETE FROM audit_cat_param_user WHERE id='hydrant_vdefault';
