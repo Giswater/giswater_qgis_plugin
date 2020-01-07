@@ -85,12 +85,15 @@ END IF;
 			INTO v_definition;
 
 			--check if the view has well defined man_table
-			IF position(concat('man_',lower(rec.system_id)) in v_definition) = 0 THEN
+			IF v_project_type = 'WS' OR (v_project_type = 'UD' AND rec.system_id!='GULLY' AND rec.system_id!='CONNEC') THEN
+			
+				IF position(concat('man_',lower(rec.system_id)) in v_definition) = 0 THEN
 
-				v_errortext=concat('ERROR: View ',rec.child_layer,' has wrongly defined man_table');
+					v_errortext=concat('ERROR: View ',rec.child_layer,' has wrongly defined man_table');
 
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (95, 3, v_errortext);
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (95, 3, v_errortext);
+				END IF;
 			END IF;
 
 			--check if all active addfields are present on the view
