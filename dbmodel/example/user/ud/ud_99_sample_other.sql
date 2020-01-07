@@ -276,3 +276,5 @@ UPDATE arc SET sys_length=NULL;
 UPDATE node SET sys_elev=NULL;
 UPDATE sys_fprocess_cat SET fprocess_i18n= NULL;
 UPDATE node SET elev = null WHERE top_elev IS NOT NULL AND ymax IS NOT NULL;
+
+UPDATE connec SET customer_code = concat('cc',connec_id);
