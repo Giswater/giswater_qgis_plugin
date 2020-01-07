@@ -1236,21 +1236,24 @@ class Giswater(QObject):
             # If it is the case that a layer is necessary for two functions,
             # and the widget has already been put in another iteration
             if widget: continue
-            label = QLabel()
-            label.setObjectName(f"lbl_{item['layer']}")
-            label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
+            try:
+                label = QLabel()
+                label.setObjectName(f"lbl_{item['layer']}")
+                label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
 
-            critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
-            widget = QCheckBox()
-            widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            widget.setObjectName(f"{item['layer']}")
-            widget.setProperty('field_id', item['id'])
-            if int(item['criticity']) == 3:
-                grl_critical.addWidget(label, pos, 0)
-                grl_critical.addWidget(widget, pos, 1)
-            else:
-                grl_others.addWidget(label, pos, 0)
-                grl_others.addWidget(widget, pos, 1)
+                critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
+                widget = QCheckBox()
+                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                widget.setObjectName(f"{item['layer']}")
+                widget.setProperty('field_id', item['id'])
+                if int(item['criticity']) == 3:
+                    grl_critical.addWidget(label, pos, 0)
+                    grl_critical.addWidget(widget, pos, 1)
+                else:
+                    grl_others.addWidget(label, pos, 0)
+                    grl_others.addWidget(widget, pos, 1)
+            except KeyError:
+                pass
 
         return critical_level
 
