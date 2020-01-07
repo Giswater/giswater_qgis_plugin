@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/12/27
-COMMENT ON TABLE node IS 'FIELD sys_elev IS NOT USED. Value is calculated on the fly on views';
-COMMENT ON TABLE arc IS 'FIELD sys_length IS NOT USED. Value is calculated on the fly on views';
-COMMENT ON TABLE arc IS 'FIELDS sys_y1, sys_y2 ARE IS NOT USED. Values are calculated on the fly on views';
+COMMENT ON TABLE node IS 'FIELD _sys_elev IS NOT USED. Value is calculated on the fly on views (3.3.021)';
+COMMENT ON TABLE arc IS 'FIELD _sys_length IS NOT USED. Value is calculated on the fly on views (3.3.021)';
+COMMENT ON TABLE arc IS 'FIELDS _sys_y1, _sys_y2 ARE IS NOT USED. Values are calculated on the fly on views (3.3.021)';
+COMMENT ON TABLE cat_arc_shape IS 'FIELDS _tsect_id, _curve_id ARE NOT USED. Values are stored on cat_arc table (3.3.021)';
