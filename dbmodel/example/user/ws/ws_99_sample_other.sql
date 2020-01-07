@@ -234,3 +234,10 @@ UPDATE node SET enddate=NULL WHERE state=1;
 UPDATE arc SET enddate=NULL WHERE state=1;
 UPDATE connec SET enddate=NULL WHERE state=1;
 
+UPDATE cat_node SET ischange=2 WHERE id IN ('TDN160-63 PN16', 'XDN110-90 PN16');
+UPDATE cat_node SET ischange=0 WHERE id LIKE '%JUNCTION%';
+UPDATE cat_node SET ischange=0 WHERE id LIKE '%ENDLINE%';
+UPDATE cat_node SET ischange=1 WHERE id LIKE '%JUNCTION CHNG%';
+
+UPDATE node SET enddate = '2017-12-06' WHERE node_id='18';
+UPDATE arc SET enddate = '2017-12-06' WHERE arc_id='113913';
