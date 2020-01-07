@@ -86,7 +86,7 @@ BEGIN
 		v_querytext, lower(v_projecttype),false,false,'text', 'combo',true,false)
 		ON CONFLICT (id) DO NOTHING;
 
-		IF TG_OP = 'UPDATE' THEN
+		IF TG_OP = 'UPDATE' AND OLD.id != NEW.id THEN
 			DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
 		END IF;
 	END IF;
