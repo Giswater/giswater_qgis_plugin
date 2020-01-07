@@ -25,6 +25,7 @@ INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_
 VALUES (109,'Change of dn/pn/material without node ischange','edit','Change of dn/pn/material without node ischange','ws') ON CONFLICT (id) DO NOTHING;
 
 
+-- 2020/01/07
 INSERT INTO audit_cat_param_user VALUES 
 ('audit_project_epa_result', 'config', 'Id of EPA results to analyze when audit check project function', 'role_epa', NULL, NULL, 'EPA result to check database on load project', NULL, NULL, true, 8, 14, 'utils', false, NULL, NULL, NULL, 
 false, 'string', 'text', true, NULL, 'gw_check_project', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
@@ -35,5 +36,7 @@ INSERT INTO audit_cat_param_user VALUES
 false, 'string', 'text', true, NULL, 'gw_check_project', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
 
-UPDATE config_param_system SET vdefault = 'FALSE' WHERE parameter IN ('edit_enable_arc_nodes_update');
-UPDATE config_param_system SET vdefault = 'TRUE' WHERE parameter IN ('edit_topocontrol_dsbl_error','om_mincut_use_pgrouting');
+UPDATE config_param_system SET vdefault = 'FALSE' WHERE parameter IN ('edit_enable_arc_nodes_update','edit_topocontrol_dsbl_error', 'state_topocontrol', 'sys_exploitation_x_user', 'sys_raster_dem', 'geom_slp_direction');
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (110,'Connecs with customer code null','edit','Connecs with customer code null','utils') ON CONFLICT (id) DO NOTHING;

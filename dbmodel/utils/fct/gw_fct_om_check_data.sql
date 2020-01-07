@@ -95,7 +95,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 2, concat('WARNING: There are ',v_count,' system variables with out-of-standard values. This variables are ',v_result,'.'));
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' system variables with out-of-standard values ',v_result,'.'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: No system variables with values out-of-standars found.');
@@ -206,8 +206,25 @@ BEGIN
 		VALUES (25, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.');
 	END IF;
 
+
+	-- Check nulls customer code for connecs (110)
+	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 and customer_code IS NULL';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
+
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) 
+		SELECT 110, connec_id, connecat_id, ''Connecs with null customer code'', the_geom FROM connec WHERE customer_code IN (', v_querytext,')');
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' connec with customer code null. Please, check your data before continue'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No connecs with null customer code.');
+	END IF;
+
+
 	-- Check unique customer code for connecs with state=1 
-	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 group by customer_code having count(*) > 1';
+	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 and customer_code IS NOT NULL group by customer_code having count(*) > 1';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 
@@ -828,51 +845,7 @@ BEGIN
 		VALUES (25, 1, 'INFO: No features with end date earlier than built date');
 	END IF;
 
-	--config variables 
-	--state_topocontrol
-	SELECT value INTO v_config_param FROM config_param_system WHERE parameter = 'state_topocontrol';
-
-	IF v_config_param::BOOLEAN IS TRUE THEN
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 1, concat('INFO: Value of parameter state topocontrol: ',v_config_param,'.'));
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 2, concat('WARNING: Value of parameter state topocontrol: ',v_config_param,'. Control is disabled.'));
-	END IF;
 	
-	--edit_enable_arc_nodes_update
-	INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-	SELECT 25, 1, concat('INFO: Value of parameter edit enable arc nodes update: ',value,'.') 
-	FROM config_param_system WHERE parameter = 'edit_enable_arc_nodes_update';
-
-	--edit_topocontrol_dsbl_error
-	SELECT value INTO v_config_param FROM config_param_system WHERE parameter = 'edit_topocontrol_dsbl_error';
-
-	IF v_config_param::BOOLEAN IS FALSE THEN
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 1, concat('INFO: Value of parameter edit topocontrol dbl error: ',v_config_param,'.'));
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 2, concat('WARNING: Value of parameter edit topocontrol dbl error: ',v_config_param,'. Control is disabled.'));
-	END IF;
-
-	--sys_raster_dem	
-	INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-	SELECT 25, 1, concat('INFO: Value of parameter sys raster dem: ',value,'.') 
-	FROM config_param_system WHERE parameter = 'sys_raster_dem';
-
-	--sys_exploitation_x_user
-	INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-	SELECT 25, 1, concat('INFO: Value of parameter sys exploitation x user: ',value,'.') 
-	FROM config_param_system WHERE parameter = 'sys_exploitation_x_user';
-
-	IF v_project_type = 'UD' THEN
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		SELECT 25, 1, concat('INFO: Value of parameter geom slope direction: ',value,'.') 
-		FROM config_param_system WHERE parameter = 'geom_slp_direction';
-	END IF;
-
-
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 4, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 3, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 2, '');	
