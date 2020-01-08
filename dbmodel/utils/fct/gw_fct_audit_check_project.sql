@@ -307,10 +307,10 @@ BEGIN
 
 	-- check qgis project (1)
 	IF v_fprocesscat_id_aux=1 THEN
-
-		SELECT boot_val INTO v_table_host FROM pg_settings WHERE name='listen_addresses';
-		SELECT current_database() INTO v_table_dbname;
-		SELECT current_schema() INTO v_table_schema;
+	
+		-- get values using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
+		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
+		FROM audit_check_project where table_id = 'v_edit_node' and user_name=current_user;
 		
 		--check layers host
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
