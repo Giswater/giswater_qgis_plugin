@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>577</width>
-            <height>1113</height>
+            <width>565</width>
+            <height>1328</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -293,7 +293,7 @@
                 <item row="4" column="0">
                  <widget class="QLabel" name="lbl_75">
                   <property name="text">
-                   <string>Reload:</string>
+                   <string>Reload field:</string>
                   </property>
                  </widget>
                 </item>
@@ -311,13 +311,6 @@
                  <widget class="QLabel" name="lbl_66">
                   <property name="text">
                    <string>Action function:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QCheckBox" name="isreload">
-                  <property name="text">
-                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -448,6 +441,13 @@
                 </item>
                 <item row="14" column="1">
                  <widget class="QComboBox" name="action_function"/>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QLineEdit" name="reload_field">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;reload&amp;quot;:[&amp;quot;cat_pnom&amp;quot;, &amp;quot;cat_matcat_id&amp;quot;]}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
