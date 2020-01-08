@@ -1491,6 +1491,17 @@ class UpdateSQL(ApiParent):
             close_dlg_rename = False
             self.schema = str(create_project)
 
+        sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
+        rows = self.controller.get_rows(sql, commit=True)
+
+        for row in rows:
+            if str(self.schema) == str(row[0]):
+                msg = "This project name alredy exist."
+                self.controller.show_info_box(msg, "Info")
+                return
+            else:
+                continue
+
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
