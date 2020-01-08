@@ -505,12 +505,13 @@ class Giswater(QObject):
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
 
-        for w in own_toolbars:
-            parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
-            x+=1
-        with open(path, 'w') as configfile:
-            parser.write(configfile)
-            configfile.close()
+        if len(own_toolbars)==8:
+            for w in own_toolbars:
+                parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
+                x+=1
+            with open(path, 'w') as configfile:
+                parser.write(configfile)
+                configfile.close()
 
 
     def set_toolbar_position(self, tb_name, x, y):
