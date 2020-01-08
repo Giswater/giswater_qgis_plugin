@@ -2001,7 +2001,7 @@ class UpdateSQL(ApiParent):
         self.lbl_schema_name.setText(str(schema_name))
 
         # Get parameters
-        sql = "SELECT " + schema_name + "version();"
+        sql = "SELECT version();"
         result = self.controller.get_row(sql)
         if result:
             database_version = result[0].split(',')
