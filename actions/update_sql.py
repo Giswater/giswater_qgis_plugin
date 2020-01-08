@@ -1392,8 +1392,8 @@ class UpdateSQL(ApiParent):
                     self.filter_srid_value = '25831'
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', '25831')
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', 'EN')
-
-
+                    self.task1 = GwTask('Manage schema')
+                    QgsApplication.taskManager().addTask(self.task1)
                 else:
                     return
 
@@ -1402,6 +1402,7 @@ class UpdateSQL(ApiParent):
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
+
         self.task1.setProgress(10)
         status = self.update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
