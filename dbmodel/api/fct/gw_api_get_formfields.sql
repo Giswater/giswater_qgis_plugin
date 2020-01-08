@@ -99,7 +99,7 @@ BEGIN
 
 			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
 			layout_name as layoutname, layout_order, dv_parent_id, isparent, ismandatory, action_function, dv_querytext, dv_querytext_filterc, 
-			isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead, widgetcontrols FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 
+			isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, reload_field, stylesheet, typeahead, widgetcontrols FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 
 			AND isenabled IS TRUE ORDER BY orderby) a'
 				INTO fields_array
 				USING p_formname, p_formtype;

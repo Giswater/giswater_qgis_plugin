@@ -25,7 +25,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 "data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "multi_create":false, 
 "parameters":{"label": "pump1", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
 "datatype": "boolean", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "check", "dv_isnullvalue": false, 
-"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "isreload": false, 
+"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
 "isnotupdate": false, "isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
 "stylesheet": null, "widgetdim": null}}}$$)::text
 
@@ -35,7 +35,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 	"data":{"filterFields":{}, "pageInfo":{}, "action":"UPDATE", "multi_create":false, 
 	"parameters":{"label": "pump111", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
 	"datatype": "integer", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "text", "dv_isnullvalue": false, 
-	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "isreload": false, 
+	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
 	"isnotupdate": false, "isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
 	"stylesheet": null, "widgetdim": null}}}$$)::text
 
@@ -88,7 +88,7 @@ DECLARE
 	v_stylesheet json;
 	v_multi_create boolean;
 	v_dv_querytext_filterc text;
-	v_isreload boolean;
+	v_reload_field text;
 	v_widgetfunction text;
 	v_widgetdim integer;
 	v_isautoupdate boolean;
@@ -143,7 +143,7 @@ BEGIN
 	v_stylesheet = (((p_data ->>'data')::json->>'parameters')::json ->>'stylesheet')::json;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
 	v_dv_querytext_filterc = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext_filterc')::text;
-	v_isreload = (((p_data ->>'data')::json->>'parameters')::json ->>'isreload')::text;
+	v_reload_field = (((p_data ->>'data')::json->>'parameters')::json ->>'reload_field')::text;
 	v_widgetfunction = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetfunction')::text;
 	v_widgetdim = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetdim')::integer;
 	v_isautoupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isautoupdate')::text;
@@ -316,10 +316,10 @@ IF v_multi_create IS TRUE THEN
 
 		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, 
 		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
-		isautoupdate, isreload, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
+		isautoupdate, reload_field, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
 		VALUES (v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
-		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_isreload, 'layout_data_1',
+		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_reload_field, 'layout_data_1',
 		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
 
@@ -327,7 +327,7 @@ IF v_multi_create IS TRUE THEN
 		UPDATE config_api_form_fields SET isenabled=v_isenabled,datatype=v_config_datatype,
 		widgettype=v_config_widgettype, label=v_label,field_length=v_field_length, num_decimals=v_num_decimals, 
 		ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
-		isreload=v_isreload, placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
+		reload_field=v_reload_field, placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
 		widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
 		dv_parent_id=v_dv_parent_id, isnotupdate=v_isnotupdate, dv_querytext_filterc=v_dv_querytext_filterc, 
 		dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,action_function=v_action_function,editability=v_editability 
@@ -529,10 +529,10 @@ ELSE
 
 		INSERT INTO config_api_form_fields (id, formname, formtype, column_id, layout_id, layout_order, isenabled, 
 		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
-		isautoupdate, isreload, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
+		isautoupdate, reload_field, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
 		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
-		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_isreload, 'layout_data_1',
+		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_reload_field, 'layout_data_1',
 		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
 
@@ -559,7 +559,7 @@ ELSE
 			UPDATE config_api_form_fields SET isenabled=v_isenabled,datatype=v_config_datatype,
 			widgettype=v_config_widgettype, label=v_label,field_length=v_field_length, num_decimals=v_num_decimals, 
 			ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
-			isreload=v_isreload, placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
+			reload_field=v_reload_field, placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
 			widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
 			dv_parent_id=v_dv_parent_id, isnotupdate=v_isnotupdate, dv_querytext_filterc=v_dv_querytext_filterc, 
 			dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,action_function=v_action_function,editability=v_editability 
