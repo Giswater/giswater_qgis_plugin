@@ -1237,6 +1237,7 @@ class Giswater(QObject):
             # If it is the case that a layer is necessary for two functions,
             # and the widget has already been put in another iteration
             if widget: continue
+
             try:
                 label = QLabel()
                 label.setObjectName(f"lbl_{item['layer']}")

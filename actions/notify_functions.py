@@ -84,6 +84,7 @@ class NotifyFunctions(ParentAction):
             if self.conn_failed:
                 for channel_name in self.list_channels:
                     self.controller.execute_sql(f'LISTEN "{channel_name}";')
+
                 self.conn_failed = False
 
             # Initialize thread
