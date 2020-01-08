@@ -75,8 +75,10 @@ INSERT INTO price_compost VALUES ('F9G1A732', 'm3', 'Concrete flooring without a
 INSERT INTO price_compost VALUES ('F9H11251', 't', 'Continuous bituminous mixing pavement type AC 16 surf B50 / 70 D (D-12)', 'Continuous bituminous mixing pavement type AC 16 surf B50 / 70 D (D-12), with asphalt penetration bitumen, dense granulometry for tread and granite granulate, extended and compacted', 55.8791, NULL);
 INSERT INTO price_compost VALUES ('F9H118E1', 't', 'Continuous bituminous mixing flooring type AC 22 surf BC50 / 70 S (S-20)', 'Continuous bituminous mixing flooring type AC 22 surf BC50 / 70 S (S-20)', 57.3861, NULL);
 INSERT INTO price_compost VALUES ('F9J13Y40', 'm2', 'Adhesive irrigation with modified bituminous emulsion with fast cationic polymer', 'Adhesive irrigation with modified bituminous emulsion with fast cationic polymers, ECR-1d-m type, with a 1 kg / m2', 0.4334, NULL);
-
-
+INSERT INTO price_compost VALUES ('VIRTUAL_U', 'u', 'Null price for unitary virtual elements', 'Null price for unitary virtual elements', 0, NULL);
+INSERT INTO price_compost VALUES ('VIRTUAL_M', 'm', 'Null price for  m virtual elements', 'Null price for m virtual elements', 0, NULL);
+INSERT INTO price_compost VALUES ('VIRTUAL_M2', 'm2', 'Null price for m2 virtual elements', 'Null price for m2 virtual elements', 0, NULL);
+INSERT INTO price_compost VALUES ('VIRTUAL_M3', 'm3', 'Null price for m3 virtual elements', 'Null price for m3 virtual elements', 0, NULL);
 
 
 INSERT INTO price_compost_value VALUES (1, 'P_ASPHALT-10', 'F931201F', 0.2500);

@@ -100,6 +100,10 @@ INSERT INTO price_compost VALUES ('A_PELD110_PN10', 'm', 'Polyethylene pipe, wit
 INSERT INTO price_compost VALUES ('A_PVC90_PN16', 'm', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar', 'PVC sewer pipe with nominal exterior diameter of 90mm, nominal pressure of 16 bar, with elastic join and elastomeric ring, according to the UNE-EN 1452-2; placed on the bottom trench.', 16.9000, NULL);
 INSERT INTO price_compost VALUES ('N_CUR30_PVC110', 'u', 'Connection of DN 110mm, on the 30° angle', 'Connection of DN 110mm, on the 30° angle,  with 2 bell unions with with an elastomeric ring for water and counter flange,placed on the trench bottom.', 103.0900, NULL);
 INSERT INTO price_compost VALUES ('N_CUR45_PVC110', 'u', 'Connection of DN 110mm, on the 45° angle', 'Connection of DN 110mm, on the 45° angle,  with 2 bell unions with with an elastomeric ring for water and counter flange,placed on the trench bottom.', 103.0900, NULL);
+INSERT INTO price_compost VALUES ('VIRTUAL_U', 'u', 'Null price for unitary virtual elements', 'Null price for unitary virtual elements', 0, NULL);
+INSERT INTO price_compost VALUES ('VIRTUAL_M', 'm', 'Null price for  m virtual elements', 'Null price for m virtual elements', 0, NULL);
+INSERT INTO price_compost VALUES ('VIRTUAL_M2', 'm2', 'Null price for m2 virtual elements', 'Null price for m2 virtual elements', 0, NULL);
+INSERT INTO price_compost VALUES ('VIRTUAL_M3', 'm3', 'Null price for m3 virtual elements', 'Null price for m3 virtual elements', 0, NULL);
 
 
 

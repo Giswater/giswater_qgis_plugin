@@ -278,3 +278,7 @@ UPDATE sys_fprocess_cat SET fprocess_i18n= NULL;
 UPDATE node SET elev = null WHERE top_elev IS NOT NULL AND ymax IS NOT NULL;
 
 UPDATE connec SET customer_code = concat('cc',connec_id);
+
+UPDATE cat_grate SET cost_ut = 'N_BGRT1' WHERE id='N/I';
+
+UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_cost = 'VIRTUAL_M3' WHERE id = 'VIRTUAL';

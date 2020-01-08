@@ -241,3 +241,5 @@ UPDATE cat_node SET ischange=1 WHERE id LIKE '%JUNCTION CHNG%';
 
 UPDATE node SET enddate = '2017-12-06' WHERE node_id='18';
 UPDATE arc SET enddate = '2017-12-06' WHERE arc_id='113913';
+
+UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_cost = 'VIRTUAL_M3' WHERE id = 'VIRTUAL';
