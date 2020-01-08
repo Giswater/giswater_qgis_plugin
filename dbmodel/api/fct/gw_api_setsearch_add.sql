@@ -99,8 +99,8 @@ IF v_tab = 'address' THEN
 		JOIN '||quote_ident(v_street_layer)||' ON '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' = 
 		'||quote_ident(v_address_layer)||'.'||quote_ident(v_address_street_id_field) ||'
 		WHERE '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' = '||quote_literal(v_idarg)||'
-		AND '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' ILIKE '||quote_literal(v_searchtext)||' LIMIT 10 
-		)a'
+		AND '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' ILIKE '||quote_literal(v_searchtext)||' 
+		ORDER BY regexp_replace(postnumber,''[^0-9]+'','''',''g'')::integer LIMIT 10)a'
 		INTO v_response;
 END IF;
 
