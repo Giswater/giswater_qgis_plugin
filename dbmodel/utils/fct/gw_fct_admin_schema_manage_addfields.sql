@@ -88,7 +88,7 @@ DECLARE
 	v_stylesheet json;
 	v_multi_create boolean;
 	v_dv_querytext_filterc text;
-	v_reload_field text;
+	v_reload_field json;
 	v_widgetfunction text;
 	v_widgetdim integer;
 	v_isautoupdate boolean;
@@ -143,7 +143,7 @@ BEGIN
 	v_stylesheet = (((p_data ->>'data')::json->>'parameters')::json ->>'stylesheet')::json;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
 	v_dv_querytext_filterc = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext_filterc')::text;
-	v_reload_field = (((p_data ->>'data')::json->>'parameters')::json ->>'reload_field')::text;
+	v_reload_field = (((p_data ->>'data')::json->>'parameters')::json ->>'reload_field')::json;
 	v_widgetfunction = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetfunction')::text;
 	v_widgetdim = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetdim')::integer;
 	v_isautoupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isautoupdate')::text;
