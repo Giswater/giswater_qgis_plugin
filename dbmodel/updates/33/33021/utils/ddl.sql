@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/12/21
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_raster_dem", "column":"envelope", "dataType":"geometry (polygon, SRID_VALUE)","isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_param_system", "column":"vdefault", "dataType":"text","isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_param_system", "column":"standardvalue", "dataType":"text","isUtils":"False"}}$$);
 
 
 -- 2019/12/23
