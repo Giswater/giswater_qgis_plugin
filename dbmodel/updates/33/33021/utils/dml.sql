@@ -36,8 +36,8 @@ INSERT INTO audit_cat_param_user VALUES
 false, 'string', 'text', true, NULL, 'gw_check_project', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
 
-UPDATE config_param_system SET vdefault = 'FALSE' WHERE parameter IN ('edit_enable_arc_nodes_update','edit_topocontrol_dsbl_error', 'sys_raster_dem', 'geom_slp_direction');
-UPDATE config_param_system SET vdefault = 'TRUE' WHERE parameter IN ('state_topocontrol', 'sys_exploitation_x_user');
+UPDATE config_param_system SET vdefault = 'FALSE' WHERE parameter IN ('edit_enable_arc_nodes_update','edit_topocontrol_dsbl_error', 'sys_raster_dem', 'geom_slp_direction', 'sys_exploitation_x_user');
+UPDATE config_param_system SET vdefault = 'TRUE' WHERE parameter IN ('state_topocontrol');
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (110,'Connecs with customer code null','edit','Connecs with customer code null','utils') ON CONFLICT (id) DO NOTHING;

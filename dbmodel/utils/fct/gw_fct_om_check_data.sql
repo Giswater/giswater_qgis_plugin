@@ -89,7 +89,7 @@ BEGIN
 	-- UTILS
 
 	-- system variables
-	v_querytext = 'SELECT parameter FROM config_param_system WHERE value != vdefault AND vdefault IS NOT NULL';
+	v_querytext = 'SELECT parameter FROM config_param_system WHERE lower(value) != lower(vdefault) AND vdefault IS NOT NULL';
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	EXECUTE concat('SELECT (array_agg(parameter))::text FROM (',v_querytext,')a') INTO v_result;
 
