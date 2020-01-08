@@ -104,7 +104,7 @@ BEGIN
 	IF v_user_control is true and 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) then
 	
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, 'NETWORK ANALYTICS (USING EPA RESULT)');
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '-------------------------------------');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '---------------------------------------------------');
 	END IF;
 
 	IF v_qgis_version = v_version THEN
