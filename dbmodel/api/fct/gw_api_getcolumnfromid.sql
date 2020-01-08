@@ -1,13 +1,13 @@
--- Function: api_ws_sample.gw_api_getcolumnfromid(json)
+-- Function: SCHEMA_NAME.gw_api_getcolumnfromid(json)
 
--- DROP FUNCTION api_ws_sample.gw_api_getcolumnfromid(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_api_getcolumnfromid(json);
 
-CREATE OR REPLACE FUNCTION api_ws_sample.gw_api_getcolumnfromid(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getcolumnfromid(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT api_ws_sample.gw_api_getcolumnfromid($${
+SELECT SCHEMA_NAME.gw_api_getcolumnfromid($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe", "columnId":"elevation1", "id":"114050"},
@@ -34,7 +34,7 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "api_ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get schema name
 	schemas_array := current_schemas(FALSE);
@@ -83,5 +83,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION api_ws_sample.gw_api_getcolumnfromid(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_getcolumnfromid(json)
   OWNER TO postgres;
