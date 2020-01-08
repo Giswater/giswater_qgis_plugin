@@ -980,7 +980,6 @@ class ApiCF(ApiParent, QObject):
         try:
             getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         except AttributeError as e:
-            print(e)
             """If the function called by getattr don't exist raise this exception"""
             pass
 
