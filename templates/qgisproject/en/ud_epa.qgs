@@ -2831,11 +2831,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyEnabled="0" type="vector" minScale="1e+08" refreshOnNotifyMessage="" maxScale="0" autoRefreshTime="0" autoRefreshEnabled="0" readOnly="0" hasScaleBasedVisibilityFlag="0" geometry="No geometry" styleCategories="AllStyleCategories">
       <id>inp_controls_x_arc_db856c1c_eae0_4163_913c_4f80fa907649</id>
-<<<<<<< HEAD
       <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."inp_controls_x_arc" sql=</datasource>
-=======
-      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__  password='postgres' sslmode=disable key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."inp_controls_x_arc" sql=</datasource>
->>>>>>> master-3.3
       <keywordList>
         <value></value>
       </keywordList>
@@ -2990,11 +2986,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer refreshOnNotifyEnabled="0" type="vector" minScale="1e+08" refreshOnNotifyMessage="" maxScale="0" autoRefreshTime="0" autoRefreshEnabled="0" readOnly="0" hasScaleBasedVisibilityFlag="0" geometry="No geometry" styleCategories="AllStyleCategories">
       <id>inp_controls_x_node_22825a2d_5e25_41e9_b95a_7d01fb356f17</id>
-<<<<<<< HEAD
       <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."inp_controls_x_node" sql=</datasource>
-=======
-      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__  password='postgres' sslmode=disable key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."inp_controls_x_node" sql=</datasource>
->>>>>>> master-3.3
       <keywordList>
         <value></value>
       </keywordList>
