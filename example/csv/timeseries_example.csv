@@ -1,0 +1,42 @@
+-- INSTRUCTIONS
+---------------
+-- code; external code or internal identifier. An example of code could be CCCCCCCC-YYYYMMDDHHMMSS-15M-0000096. CCCCCCCC it means the name of the source. 15M tstepvalue, 96 tstep number
+-- operator_id; to indetify different operators
+-- tscatalog_id; imdp, t15, t85, fireindex, sworksindex, treeindex, qualhead, pressure, flow, inflow
+-- tselement; {"type":"exploitation", 
+--			 "id":[1,2,3,4]} expl_id, muni_id, arc_id, node_id, dma_id, sector_id, dqa_id
+-- param; { "isUnitary":false, it means if sumatory of all values of ts is 1
+--			"units":"mca"  in case of no units put any value you want (adimensional, nounits...)
+--  		"epa":{"projectType":"WS", "class":"pattern", "id":"test1", "type":"UNITARY", "dmaRtcParameters":{"dmaId":"" "periodId":""} 
+--				If this timeseries is used for EPA, please fill this projectType and PatterType. Use ''UNITARY'', for sum of values = 1 or ''VOLUME'', when are real volume values
+--				If pattern is related to dma x rtc period please fill dmaRtcParameters parameters--			 
+--			"source":{"type":"flowmeter", "id":"V2323", "import":{"type":"file", "id":"test.csv"}},
+-- period; {"type":"monthly", "id":201903", "start":"2019-01-01", "end":"2019-01-02"} 
+-- timestep; {"units":"minute", "value":"15", "number":2345}};
+-- val; any rows any columns with values
+-- descript; free text';
+
+--WARNINGS
+----------
+-- The codificacion of csv file must be utf-8 without boom
+-- the ';' it's forbidden to use on descriptors because is the separator of the csv
+-- If timeseries is adimensional please use "units":adimensional
+-- The tsparam->'timestep'->'number' must be the same of number of values. On the opposite will not be imported
+-- The number of rows and columns for val is not defined. Up to you. We an affordable number of rows/columns to make easy the visual check of timeseries
+
+-- EXAMPLE
+----------
+code;201711150000V000 
+operator;1
+catalog_id;flow
+element;{"type":"node", "id":"n4"}
+param;{"isUnitary":"true", "units":"ADMENSIONAL", "epaPattern":"UNITARY", "source":{"import":{"type":"file", "id":"2018.csv"}}}
+period;{"type":"monthly", "id":"201905", "start":"2019-05-01", "end":"2019-05-31"}
+timestep;{"units":"minute", "value":15, "number":96}
+val;48.1176;51.8873;51.6861;48.9647;49.2083;47.2704;45.5338;45.1632;44.5172;41.8170;41.8805;41.7746;40.5251;40.5780;39.7838;39.4238
+val;37.9413;36.8400;36.3000;36.4482;38.4919;39.1379;39.8156;42.0393;45.4067;50.1083;54.3758;63.6414;73.3412;81.2831;81.5690;83.6233
+val;80.8172;81.6325;82.9350;79.3347;73.3722;75.6620;76.0308;77.7251;78.9922;79.9781;81.1031;77.3161;78.6252;74.6436;77.7675;72.3976
+val;73.3835;70.3973;75.7606;75.8932;70.4477;70.2703;72.3246;69.1332;72.7164;72.8248;72.5510;72.1340;69.3702;69.2961;67.4218;67.9724
+val;66.2146;64.2873;60.5176;60.8035;59.9881;58.6750;59.5751;58.4844;58.8974;60.8670;62.2224;66.4899;66.4687;68.7772;69.9632;71.6892
+val;73.0870;74.8448;76.0202;77.1745;71.7634;73.5953;70.3973;66.9770;64.6686;58.9292;52.8827;49.8330;46.4656;45.8620;44.8878;44.1572
+descript;sample timeseries

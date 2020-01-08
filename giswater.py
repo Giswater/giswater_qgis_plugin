@@ -505,12 +505,13 @@ class Giswater(QObject):
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
 
-        for w in own_toolbars:
-            parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
-            x+=1
-        with open(path, 'w') as configfile:
-            parser.write(configfile)
-            configfile.close()
+        if len(own_toolbars)==8:
+            for w in own_toolbars:
+                parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
+                x+=1
+            with open(path, 'w') as configfile:
+                parser.write(configfile)
+                configfile.close()
 
 
     def set_toolbar_position(self, tb_name, x, y):
@@ -639,10 +640,16 @@ class Giswater(QObject):
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions())-1])
             self.btn_add_layers = None
 
+        # Save toolbar position after unload plugin
+        try:
+            self.save_toolbars_position()
+        except Exception as e:
+            pass
+
         try:
             # Unlisten notify channel and stop thread
             if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
-                list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+                list_channels = ['desktop', self.controller.current_user]
                 self.notify.stop_listening(list_channels)
 
             # Remove icon of action 'Info'
@@ -870,11 +877,11 @@ class Giswater(QObject):
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-            list_channels = ['desktop', self.controller.current_user.replace(".", "_")]
+            list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
 
-        # Save toolbar position after closing QGIS
-        self.iface.actionExit().triggered.connect(self.save_toolbars_position)
+        # Save toolbar position after save project
+        self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
 
         # Set config layer fields when user add new layer into the TOC
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
@@ -1230,21 +1237,25 @@ class Giswater(QObject):
             # If it is the case that a layer is necessary for two functions,
             # and the widget has already been put in another iteration
             if widget: continue
-            label = QLabel()
-            label.setObjectName(f"lbl_{item['layer']}")
-            label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
 
-            critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
-            widget = QCheckBox()
-            widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            widget.setObjectName(f"{item['layer']}")
-            widget.setProperty('field_id', item['id'])
-            if int(item['criticity']) == 3:
-                grl_critical.addWidget(label, pos, 0)
-                grl_critical.addWidget(widget, pos, 1)
-            else:
-                grl_others.addWidget(label, pos, 0)
-                grl_others.addWidget(widget, pos, 1)
+            try:
+                label = QLabel()
+                label.setObjectName(f"lbl_{item['layer']}")
+                label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
+
+                critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
+                widget = QCheckBox()
+                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                widget.setObjectName(f"{item['layer']}")
+                widget.setProperty('field_id', item['id'])
+                if int(item['criticity']) == 3:
+                    grl_critical.addWidget(label, pos, 0)
+                    grl_critical.addWidget(widget, pos, 1)
+                else:
+                    grl_others.addWidget(label, pos, 0)
+                    grl_others.addWidget(widget, pos, 1)
+            except KeyError:
+                pass
 
         return critical_level
 

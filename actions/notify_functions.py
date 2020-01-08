@@ -38,7 +38,7 @@ class NotifyFunctions(ParentAction):
         """
         self.list_channels = list_channels
         for channel_name in list_channels:
-            self.controller.execute_sql(f"LISTEN {channel_name};")
+            self.controller.execute_sql(f'LISTEN "{channel_name}";')
 
         thread = threading.Thread(target=self.wait_notifications)
         thread.start()
@@ -76,14 +76,15 @@ class NotifyFunctions(ParentAction):
         """
 
         for channel_name in list_channels:
-            self.controller.execute_sql(f"UNLISTEN {channel_name};")
+            self.controller.execute_sql(f'UNLISTEN "{channel_name}";')
 
 
     def wait_notifications(self):
         try:
             if self.conn_failed:
                 for channel_name in self.list_channels:
-                    self.controller.execute_sql(f"LISTEN {channel_name};")
+                    self.controller.execute_sql(f'LISTEN "{channel_name}";')
+
                 self.conn_failed = False
 
             # Initialize thread

@@ -59,10 +59,9 @@ class PgDao(object):
         self.dbname = dbname
         self.user = user
         self.password = password
-        self.conn_string = "host="+self.host+" port="+self.port
-        self.conn_string += " dbname="+self.dbname+" user="+self.user
+        self.conn_string = f"host={self.host} port={self.port} dbname={self.dbname} user='{self.user}'"
         if self.password is not None:
-            self.conn_string += " password="+self.password
+            self.conn_string += f"password={self.password}"
         
         
     def mogrify(self, sql, params):
