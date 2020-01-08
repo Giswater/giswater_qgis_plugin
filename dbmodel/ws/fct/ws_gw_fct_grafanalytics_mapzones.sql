@@ -454,7 +454,7 @@ BEGIN
 				-- update connec table
 				UPDATE v_edit_connec SET staticpressure = (b.elevation-v_edit_connec.elevation) FROM 
 					(SELECT connec_id, a.elevation FROM connec JOIN (SELECT a.sector_id, node_id, elevation FROM 
-						(SELECT unnest(nodeparent) as node_id, sector_id FROM sector)a JOIN node USING (node_id))a
+						(SELECT json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id, sector_id FROM sector)a JOIN node USING (node_id))a
 					USING (sector_id)) b
 					WHERE v_edit_connec.connec_id=b.connec_id;
 			END IF;
