@@ -493,19 +493,23 @@ class ApiConfig(ApiParent):
     def get_values_checked_param_user(self, chk, widget, field, value=None):
 
         elem = {}
+
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str(chk.objectName())
 
         if type(widget) is QLineEdit:
             value = utils_giswater.getWidgetText(self.dlg_config, widget, return_string_null=False)
+            elem['widget_type'] = 'text'
         elif type(widget) is QComboBox:
             value = utils_giswater.get_item_data(self.dlg_config, widget, 0)
+            elem['widget_type'] = 'combo'
         elif type(widget) is QCheckBox:
             value = utils_giswater.isChecked(self.dlg_config, chk)
+            elem['widget_type'] = 'check'
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-        elem['widget'] = str(widget.objectName())
-        elem['chk'] = str(chk.objectName())
+            elem['widget_type'] = 'datepickertime'
+
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
         if 'sys_role_id' in field:
