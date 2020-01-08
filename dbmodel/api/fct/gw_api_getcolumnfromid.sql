@@ -20,6 +20,7 @@ DECLARE
     v_result text;
     v_fields json;
     v_childs text;
+    v_json json;
     v_fields_array text[];
     v_field text;
     v_json_array json[];
@@ -53,12 +54,16 @@ BEGIN
 		INTO v_result;
 	
 	-- Get fields array
-	EXECUTE 'SELECT isreload FROM config_api_form_fields WHERE formname = '''||quote_ident(v_tablename)||''' AND column_id = '''||quote_ident(v_column_id::text)||''''
-		INTO v_fields_array;
-				
+	EXECUTE 'SELECT reload_field FROM config_api_form_fields WHERE formname = '''||quote_ident(v_tablename)||''' AND column_id = '''||quote_ident(v_column_id::text)||''''
+		INTO v_json;
+		
+	SELECT ARRAY(SELECT json_array_elements(('["elevation2", "elevation3"]')::json))
+	FROM  config_api_form_fields where  column_id='arccat_id' and formtype='feature' limit 1 INTO v_fields_array;
+
 	FOREACH v_field IN array v_fields_array
 	LOOP	
-		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], v_field, v_result);
+		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetName', 'data_' || replace(v_field, '"',''));
+		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', v_result);
 		i = i+1;
 	END LOOP;
 	
