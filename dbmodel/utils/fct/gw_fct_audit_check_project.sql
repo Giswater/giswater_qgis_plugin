@@ -78,6 +78,7 @@ BEGIN
 	SELECT value INTO v_eparesult FROM config_param_user WHERE parameter='audit_project_epa_result' AND cur_user=current_user;
 	SELECT value INTO v_planresult FROM config_param_user WHERE parameter='audit_project_plan_result' AND cur_user=current_user;
 
+	
 
 	-- init process
 	v_isenabled:=FALSE;
@@ -103,8 +104,8 @@ BEGIN
 
 	IF v_user_control is true and 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) then
 	
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, 'NETWORK ANALYTICS (USING EPA RESULT)');
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '---------------------------------------------------');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, concat('NETWORK ANALYTICS WITH EPA RESULT: ', quote_nullable(v_eparesult)));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '------------------------------------------------------------------------');
 	END IF;
 
 	IF v_qgis_version = v_version THEN
@@ -250,7 +251,7 @@ BEGIN
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
 			-- control if result id exists
-			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
+			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_eparesult) IS NULL THEN
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) VALUES
 				(101, 1, 'INFO (DB EPA): Check for EPA result not executed due result_id does not exists. Take a look on config form and update result_id');
 			ELSE
@@ -268,7 +269,8 @@ BEGIN
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
-			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
+			-- control if result id exists
+			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_planresult) IS NULL THEN	
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message)  VALUES
 				(101, 1, 'INFO (DB PLAN): Check for PLAN result not executed due result_id does not exists. Take a look on config form and update result_id');
 			ELSE

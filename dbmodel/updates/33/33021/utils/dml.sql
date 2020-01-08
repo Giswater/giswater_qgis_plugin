@@ -32,7 +32,7 @@ false, 'string', 'text', true, NULL, 'gw_check_project', NULL, NULL, NULL, NULL,
 ON conflict (id) DO NOTHING;
 
 INSERT INTO audit_cat_param_user VALUES 
-('audit_project_plan_result', 'config', 'Id of PLAN results to analyze when audit check project function', 'role_plan', NULL, NULL, 'PLAN result to check database on load project', NULL, NULL, true, 8, 15, 'utils', false, NULL, NULL, NULL, 
+('audit_project_plan_result', 'config', 'Id of PLAN results to analyze when audit check project function', 'role_master', NULL, NULL, 'PLAN result to check database on load project', NULL, NULL, true, 8, 15, 'utils', false, NULL, NULL, NULL, 
 false, 'string', 'text', true, NULL, 'gw_check_project', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
 
