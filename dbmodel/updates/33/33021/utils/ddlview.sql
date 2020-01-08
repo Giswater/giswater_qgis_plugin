@@ -87,6 +87,22 @@ CREATE OR REPLACE VIEW v_anl_node AS
    FROM selector_audit, anl_node
      JOIN exploitation ON anl_node.expl_id = exploitation.expl_id
   WHERE anl_node.fprocesscat_id = selector_audit.fprocesscat_id AND selector_audit.cur_user = "current_user"()::text AND anl_node.cur_user::name = "current_user"();
+ 
+ 
+DROP VIEW IF EXISTS v_anl_arc_x_node;
+CREATE OR REPLACE VIEW v_anl_arc_x_node AS 
+ SELECT anl_arc_x_node.id,
+    anl_arc_x_node.arc_id,
+    anl_arc_x_node.arccat_id AS arc_type,
+    anl_arc_x_node.state,
+    anl_arc_x_node.node_id,
+    anl_arc_x_node.fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_arc_x_node.the_geom
+   FROM selector_audit, anl_arc_x_node
+     JOIN exploitation ON anl_arc_x_node.expl_id = exploitation.expl_id
+  WHERE anl_arc_x_node.fprocesscat_id = selector_audit.fprocesscat_id AND selector_audit.cur_user = "current_user"()::text AND anl_arc_x_node.cur_user::name = "current_user"();
+
 
   
  -- 2020/01/07

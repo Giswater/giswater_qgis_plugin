@@ -8,10 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/12/23
-COMMENT ON TABLE sector IS 'FIELD _nodeparent IS DEPRECATED';
-COMMENT ON TABLE dma IS 'FIELD _nodeparent IS DEPRECATED';
-COMMENT ON TABLE dqa IS 'FIELD _nodeparent IS DEPRECATED';
-COMMENT ON TABLE cat_presszone IS 'FIELD _nodeparent IS DEPRECATED';
 COMMENT ON TABLE anl_mincut_inlet_x_exploitation IS 'FIELD _toarc IS DEPRECATED';
 
 -- 2019/12/24

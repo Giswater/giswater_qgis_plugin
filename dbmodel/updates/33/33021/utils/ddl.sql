@@ -13,5 +13,4 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_para
 
 
 -- 2019/12/23
-COMMENT ON TABLE sys_fprocess_cat IS 'FIELD _fprocess_i18n IS DEPRECATED (3.3.021)';
 COMMENT ON TABLE arc IS 'FIELD _sys_length IS NOT USED. Value is calculated on the fly on views (3.3.021)';
