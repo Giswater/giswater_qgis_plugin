@@ -1,0 +1,4 @@
+3.3.022
+*************
+- Deprecate nodeparent on mapzones changing for grafconfig on editable views. Deprecate also fprocess_i18n (sys_fprocess_cat) and to_arc (anl_mincut_inlet_x_exploitation)
+- Solve search for postnumber when target number is short and other results may appear
