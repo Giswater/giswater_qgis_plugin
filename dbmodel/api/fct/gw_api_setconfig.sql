@@ -43,6 +43,7 @@ DECLARE
     v_return text;
     v_formname text;
     text text;
+    v_widgettype text;
 
 BEGIN
 
@@ -80,6 +81,7 @@ BEGIN
 	v_chk:= (SELECT (v_json ->> 'chk')) ;
 	v_value:= (SELECT (v_json ->> 'value')) ;
 	v_isChecked:= (SELECT (v_json ->> 'isChecked')) ;
+	v_widgettype:= (SELECT (v_json ->> 'widget_type')) ;
 		
 	IF v_json ->> 'sysRoleId' = 'role_admin' THEN
 		v_table:= 'config_param_system';
@@ -119,11 +121,16 @@ BEGIN
 			
 		ELSIF v_isChecked = 'False' THEN
 
-			IF result IS NOT NULL THEN
+			IF v_widgettype = 'check' THEN
+				EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
+				USING  v_value, v_widget;
+			ELSE
+				IF result IS NOT NULL THEN
 
-			EXECUTE 'DELETE FROM '|| quote_ident(v_table) ||' WHERE parameter = $1 AND cur_user=current_user'
-			USING v_widget;
-			
+				EXECUTE 'DELETE FROM '|| quote_ident(v_table) ||' WHERE parameter = $1 AND cur_user=current_user'
+				USING v_widget;
+				
+				END IF;
 			END IF;
 		ELSIF v_formname = 'epaoptions' THEN
 			EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
