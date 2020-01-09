@@ -56,6 +56,23 @@ CREATE OR REPLACE VIEW v_edit_dma AS
   WHERE dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
   
+  CREATE OR REPLACE VIEW vi_parent_dma AS 
+ SELECT DISTINCT ON (dma.dma_id) dma.dma_id,
+    dma.name,
+    dma.expl_id,
+    dma.macrodma_id,
+    dma.descript,
+    dma.undelete,
+    dma.the_geom,
+    dma.minc,
+    dma.maxc,
+    dma.effc,
+    dma.pattern_id,
+    dma.link,
+    dma.grafconfig
+   FROM dma
+     JOIN vi_parent_arc USING (dma_id);
+  
   
 CREATE OR REPLACE VIEW v_edit_sector AS 
  SELECT sector.sector_id,

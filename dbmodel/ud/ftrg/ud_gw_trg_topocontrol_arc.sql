@@ -240,8 +240,8 @@ BEGIN
 				is_reversed = TRUE;	
 			END IF;
 	
-			NEW.sys_length:= ST_length(NEW.the_geom);
-			sys_length_aux:=NEW.sys_length;			
+			sys_length_aux:= ST_length(NEW.the_geom);
+		
 			
 			IF NEW.custom_length IS NOT NULL THEN
 				sys_length_aux=NEW.custom_length;

@@ -9,6 +9,3 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/01/10
 ALTER TABLE node RENAME sys_elev TO _sys_elev;
-ALTER TABLE arc RENAME sys_length TO _sys_length;
-ALTER TABLE arc RENAME sys_y1 TO _sys_y1;
-ALTER TABLE arc RENAME sys_y2 TO _sys_y2;
