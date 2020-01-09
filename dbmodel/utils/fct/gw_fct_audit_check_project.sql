@@ -217,9 +217,9 @@ BEGIN
 		END IF;
 	END LOOP;
 
-	-- delete mandatory values of config_param_user where feature is deprecated
-	IF v_project_type='WS' THEN
-
+	-- manage mandatory values of config_param_user where feature is deprecated
+	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_project_type='WS' THEN
+	
 		DELETE FROM audit_cat_param_user WHERE id IN (SELECT audit_cat_param_user.id FROM audit_cat_param_user, node_type 
 		WHERE active=false AND concat(lower(node_type.id),'_vdefault') = audit_cat_param_user.id);
 
@@ -231,7 +231,7 @@ BEGIN
 		
 	END IF;
 
-	-- sincronize config_param_user & audit_cat_param_user
+	-- delete on config_param_user fron updated values on audit_cat_param_user
 	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user) AND cur_user = current_user;
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
