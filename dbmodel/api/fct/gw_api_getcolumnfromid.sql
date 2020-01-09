@@ -35,6 +35,7 @@ DECLARE
     v_message text;
     v_parentname text;
     v_parentid integer;
+    v_featureType text;
     
 
 
@@ -67,7 +68,8 @@ BEGIN
 
 		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetName', 'data_' || replace(v_field, '"',''));
 		IF v_exists is not null THEN
-			EXECUTE 'SELECT '|| replace(v_field, '"','') ||' FROM ' || v_tablename ||' WHERE arc_id = '''|| v_feature_id ||'''' INTO v_result;
+			EXECUTE 'SELECT LOWER(feature_type) FROM cat_feature WHERE child_layer = '''||v_tablename||'''' INTO v_featureType;
+			EXECUTE 'SELECT '|| replace(v_field, '"','') ||' FROM ' || v_tablename ||' WHERE '||v_featureType||'_id = '''|| v_feature_id ||'''' INTO v_result;
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', v_result);
 			i = i+1;
 		ELSE
