@@ -29,12 +29,12 @@ BEGIN
 
                    
 		-- Loop for all the upstream arcs
-		FOR rec_table IN SELECT arc_id, node_1, the_geom, expl_id FROM v_edit_arc WHERE node_2 = node_id_arg
+		FOR rec_table IN SELECT arc_id, arc_type, node_1, the_geom, expl_id FROM v_edit_arc WHERE node_2 = node_id_arg
 		LOOP
 	
 			-- Insert into tables
-			INSERT INTO anl_flow_arc (arc_id, expl_id, context, the_geom) VALUES
-			(rec_table.arc_id, rec_table.expl_id, 'Flow trace', rec_table.the_geom);
+			INSERT INTO anl_flow_arc (arc_id, arc_type, expl_id, context, the_geom) VALUES
+			(rec_table.arc_id, rec_table.arc_type, rec_table.expl_id, 'Flow trace', rec_table.the_geom);
 	
 			-- Call recursive function weighting with the pipe capacity
 			PERFORM gw_fct_flow_trace_recursive(rec_table.node_1);

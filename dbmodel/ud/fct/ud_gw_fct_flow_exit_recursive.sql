@@ -28,12 +28,12 @@ BEGIN
         (node_id_arg, (SELECT expl_id FROM v_edit_node WHERE node_id = node_id_arg), 'Flow exit', (SELECT the_geom FROM v_edit_node WHERE node_id = node_id_arg));
         
         -- Loop for all the upstream nodes
-        FOR rec_table IN SELECT arc_id, node_2, the_geom, expl_id FROM v_edit_arc WHERE node_1 = node_id_arg
+        FOR rec_table IN SELECT arc_id, arc_type, node_2, the_geom, expl_id FROM v_edit_arc WHERE node_1 = node_id_arg
         LOOP
 
             -- Insert into tables
-            INSERT INTO anl_flow_arc (arc_id, expl_id, context, the_geom) VALUES
-            (rec_table.arc_id, rec_table.expl_id, 'Flow exit', rec_table.the_geom);
+            INSERT INTO anl_flow_arc (arc_id, arc_type, expl_id, context, the_geom) VALUES
+            (rec_table.arc_id, rec_table.arc_type, rec_table.expl_id, 'Flow exit', rec_table.the_geom);
 
             -- Call recursive function weighting with the pipe capacity
             PERFORM gw_fct_flow_exit_recursive(rec_table.node_2);
