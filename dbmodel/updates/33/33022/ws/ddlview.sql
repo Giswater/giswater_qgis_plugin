@@ -85,3 +85,16 @@ CREATE OR REPLACE VIEW v_edit_sector AS
    FROM inp_selector_sector,
     sector
   WHERE sector.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+  
+  
+CREATE OR REPLACE VIEW v_minsector AS 
+ SELECT minsector_id,
+    minsector.dma_id,
+    minsector.dqa_id,
+    minsector.presszonecat_id,
+    minsector.sector_id,
+    minsector.expl_id,
+    minsector.the_geom
+   FROM selector_expl, minsector
+  WHERE minsector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
