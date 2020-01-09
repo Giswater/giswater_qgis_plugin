@@ -868,9 +868,9 @@ class ApiCF(ApiParent, QObject):
             feature += f'"id":"{feature_id}"'
             extras = f'"fields":{my_json}'
             body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
+            sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
 
-        row = self.controller.execute_returning(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row:
             msg = f"Fail in: {sql}"
@@ -880,11 +880,12 @@ class ApiCF(ApiParent, QObject):
 
         if clear_json:
             _json = {}
+        result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
-        if "Accepted" in str(row[0]['status']):
+        if "Accepted" in result['status']:
             msg = "OK"
             self.controller.show_message(msg, message_level=3)
-        elif "Failed" in str(row[0]['status']):
+        elif "Failed" in result['status']:
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
         if close_dialog:
