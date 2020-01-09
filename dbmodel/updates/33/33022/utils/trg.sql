@@ -21,3 +21,7 @@ DROP TRIGGER IF EXISTS gw_trg_edit_streetaxis ON v_ext_streetaxis;
 CREATE TRIGGER gw_trg_edit_streetaxis INSTEAD OF INSERT OR UPDATE OR DELETE
 ON SCHEMA_NAME.v_ext_streetaxis
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_streetaxis();
+
+DROP TRIGGER IF EXISTS gw_trg_edit_samplepoint ON v_edit_samplepoint;
+CREATE TRIGGER gw_trg_edit_samplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON SCHEMA_NAME.v_edit_samplepoint 
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_samplepoint('samplepoint');
