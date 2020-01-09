@@ -54,6 +54,8 @@ DECLARE
     v_schemaname text;
     v_featuretype text;
     v_jsonfield json;
+    v_fieldsreload text;
+    v_columnfromid json;
 
 
 BEGIN
@@ -70,7 +72,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-    p_data = REPLACE (p_data::text, '''''', 'null');
+	p_data = REPLACE (p_data::text, '''''', 'null');
       
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -79,7 +81,8 @@ BEGIN
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
-
+	v_fieldsreload := (p_data ->> 'feature')::json->> 'fieldsReload';
+	
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
 
@@ -167,10 +170,19 @@ BEGIN
 
 		-- execute query text
 		EXECUTE v_querytext;
+
+		EXECUTE 'SELECT gw_api_getcolumnfromid($${
+			"client":{"device":3, "infoType":100, "lang":"ES"},
+			"form":{},
+			"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||json_object_keys(v_fields)||'"},
+			"data":{}}$$)' INTO v_columnfromid;
+
+		raise notice 'v_columnfromid %', v_columnfromid;
+		
 	END IF;
 
 --    Return
-    RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||'}')::json;    
+    RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||', "fields":'|| v_columnfromid ||'}')::json;    
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 

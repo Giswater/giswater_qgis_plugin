@@ -17,7 +17,6 @@ SELECT SCHEMA_NAME.gw_api_getcolumnfromid($${
 DECLARE
 
 --    Variables
-    v_result text;
     v_fields json;
     v_childs text;
     v_json json;
@@ -30,6 +29,13 @@ DECLARE
     v_feature_id integer;
     v_column_id text;
     i integer = 0;
+    v_fieldsreload text;
+    v_result text;
+    v_exists text;
+    v_message text;
+    v_parentname text;
+    v_parentid integer;
+    
 
 
 BEGIN
@@ -47,24 +53,31 @@ BEGIN
 	--  get parameters from input
 	v_tablename = ((p_data ->>'feature')::json->>'tableName')::text;
 	v_feature_id = ((p_data ->>'feature')::json->>'id')::text;
-	v_column_id =((p_data ->>'feature')::json->>'columnId')::text;
+	v_fieldsreload =((p_data ->>'feature')::json->>'fieldsReload')::text;
+	v_parentname =((p_data ->>'feature')::json->>'parentField')::text;
 
-	-- Get value result
-	EXECUTE 'SELECT '||quote_ident(v_column_id)||' FROM '||quote_ident(v_tablename)||' WHERE arc_id = '||quote_literal(v_feature_id::text)||''
-		INTO v_result;
 	
-	-- Get fields array
-	EXECUTE 'SELECT reload_field FROM config_api_form_fields WHERE formname = '''||quote_ident(v_tablename)||''' AND column_id = '''||quote_ident(v_column_id::text)||''''
-		INTO v_json;
-		
-	SELECT ARRAY(SELECT json_array_elements(('["elevation2", "elevation3"]')::json))
+	SELECT ARRAY(SELECT json_array_elements((replace(v_fieldsreload, '''','"'))::json))
 	FROM  config_api_form_fields where  column_id='arccat_id' and formtype='feature' limit 1 INTO v_fields_array;
 
+	
 	FOREACH v_field IN array v_fields_array
 	LOOP	
+		EXECUTE 'SELECT column_name  FROM information_schema.columns WHERE table_name='''||v_tablename||''' and column_name='''|| replace(v_field, '"','') ||''' LIMIT 1' INTO v_exists;
+
 		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetName', 'data_' || replace(v_field, '"',''));
-		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', v_result);
-		i = i+1;
+		IF v_exists is not null THEN
+			EXECUTE 'SELECT '|| replace(v_field, '"','') ||' FROM ' || v_tablename ||' WHERE arc_id = '''|| v_feature_id ||'''' INTO v_result;
+			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', v_result);
+			i = i+1;
+		ELSE
+			EXECUTE 'SELECT id FROM config_api_form_fields WHERE formname ='''||v_tablename||''' AND column_id = '''||v_parentname||'''' INTO v_parentid;
+			v_message := 'API is bad configurated. Check column ''reload_fields'' for parameter '''|| v_parentname ||''' with id -> '''||v_parentid||''' on config_api_form_fields';
+			v_result := '{"message":{"level":0, "text":"'||v_message||'"}}';
+			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', ''::text);
+			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'message', v_result::json);
+			i = i+1;
+		END IF;
 	END LOOP;
 	
 	--    Convert to json
@@ -88,5 +101,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_getcolumnfromid(json)
-  OWNER TO postgres;
+  
