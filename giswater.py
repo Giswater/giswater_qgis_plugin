@@ -1274,7 +1274,7 @@ class Giswater(QObject):
                        f" ORDER BY a.attnum limit 1")
                 the_geom = self.controller.get_row(sql, commit=True)
                 if not the_geom: the_geom = [None]
-                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom[0], check.property('field_id'), None, "GW_layers")
+                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom[0], check.property('field_id'), None, "GW layers")
         self.parent.close_dialog(self.dlg_audit_project)
 
 
