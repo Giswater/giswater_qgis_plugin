@@ -121,6 +121,10 @@ BEGIN
 		DELETE FROM rpt_inp_pattern_value WHERE result_id = v_result;	
 	END IF;
 
+	-- Upsert on node rpt_inp result manager table
+	DELETE FROM inp_selector_result WHERE cur_user=current_user;
+	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+
 	RAISE NOTICE '7 - update demands & patterns';
 	IF v_usenetworkdemand IS NOT TRUE THEN
 
@@ -134,9 +138,6 @@ BEGIN
 	RAISE NOTICE '7 - Calling for modify the valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
 	
-	-- Upsert on node rpt_inp result manager table
-	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
 
 	IF v_skipcheckdata IS NOT TRUE THEN
 	

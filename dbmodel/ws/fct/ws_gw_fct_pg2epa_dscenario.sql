@@ -22,7 +22,7 @@ BEGIN
 
 	-- 
 	IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
-		UPDATE rpt_inp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
+		UPDATE rpt_inp_node SET demand=a.demand, pattern_id=a.pattern_id FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
 
 	ELSIF v_demandpriority = 2 THEN -- Ignore Dscenario when base demand exists
 		UPDATE rpt_inp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var AND rpt_inp_node.demand =0;
