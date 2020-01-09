@@ -57,8 +57,8 @@ BEGIN
 					UNION
 					select the_geom from connec join om_visit_lot_x_connec ON om_visit_lot_x_connec.connec_id=connec.connec_id where lot_id=NEW.lot_id) f)
 					SELECT CASE 
-					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,epsg_val)
-					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,25831) END AS the_geom FROM polygon) a;
+					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,SRID_VALUE)
+					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,SRID_VALUE) END AS the_geom FROM polygon) a;
 			END IF;
 
 		ELSIF v_projecttype = 'UD' THEN 
@@ -80,8 +80,8 @@ BEGIN
 					UNION
 					select the_geom from gully join om_visit_lot_x_gully ON om_visit_lot_x_gully.gully_id=gully.gully_id where lot_id=NEW.lot_id) f)
 					SELECT CASE 
-					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,epsg_val)
-					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,25831) END AS the_geom FROM polygon) a;
+					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,SRID_VALUE)
+					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,SRID_VALUE) END AS the_geom FROM polygon) a;
 			END IF;
 		END IF;
 		
@@ -170,8 +170,8 @@ BEGIN
 					UNION
 					select the_geom from connec join om_visit_lot_x_connec ON om_visit_lot_x_connec.connec_id=connec.connec_id where lot_id=OLD.lot_id) f)
 					SELECT CASE 
-					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,epsg_val)
-					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,25831) END AS the_geom FROM polygon) a;
+					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,SRID_VALUE)
+					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,SRID_VALUE) END AS the_geom FROM polygon) a;
 			END IF;
 
 		ELSIF v_projecttype = 'UD' THEN 
@@ -193,8 +193,8 @@ BEGIN
 					UNION
 					select the_geom from gully join om_visit_lot_x_gully ON om_visit_lot_x_gully.gully_id=gully.gully_id where lot_id=OLD.lot_id) f)
 					SELECT CASE 
-					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,epsg_val)
-					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,25831) END AS the_geom FROM polygon) a; 
+					WHEN st_geometrytype(st_concavehull(g, 0.85)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(g, 0.85), 3)::geometry(Polygon,SRID_VALUE)
+					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,SRID_VALUE) END AS the_geom FROM polygon) a; 
 			END IF;
 		END IF;
 		
