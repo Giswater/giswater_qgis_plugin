@@ -416,3 +416,28 @@ ELSE 'text' END AS widgettype,
 column_name, false, true, false, false FROM information_schema.columns
 WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('v_edit_link') AND 
 column_name not in (select column_id from config_api_form_fields where formname='v_edit_link') AND column_name !='the_geom';
+
+
+--om
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('v_edit_om_visit') AND 
+column_name not in (select column_id from config_api_form_fields where formname='v_edit_om_visit') AND column_name !='the_geom';
+
+UPDATE config_api_form_fields set widgettype='combo', 
+dv_querytext='SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL'
+WHERE column_id='expl_id' AND formname IN ('v_edit_om_visit');
+
+UPDATE config_api_form_fields set widgettype='combo', 
+dv_querytext='SELECT id as id, name as idval FROM om_visit_cat WHERE id IS NOT NULL'
+WHERE column_id='visitcat_id' AND formname IN ('v_edit_om_visit');
