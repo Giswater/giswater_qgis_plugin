@@ -39,8 +39,8 @@ TO EXECUTE
 ----------
 
 -- SECTOR
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1]", 
-"updateFeature":"TRUE", "updateMapZone":"FALSE", "concaveHullParam":0.85, "buffer":15, "debug":"true"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"FALSE", "concaveHullParam":0.85, "buffer":15, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -50,7 +50,6 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 
 -- DMA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
 "updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "buffer":15, "debug":"false"}}}');
 
@@ -65,8 +64,8 @@ UPDATE arc SET dma_id=0
 
 
 -- DQA
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -76,8 +75,8 @@ SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
 
 -- PRESZZONE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
-"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
+"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -92,13 +91,14 @@ TO CHECK PROBLEMS, RUN MODE DEBUG
 
 1) CONTEXT 
 SET search_path='SCHEMA_NAME';
-UPDATE arc SET dma_id=0 where expl_id=524
+UPDATE arc SET dma_id=0 where expl_id IN (1,2)
 
 
 2) RUN
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[524]", "updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "debug":"TRUE"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "buffer":15, "debug":"TRUE"}}}');
 
-ISTRUCTIONS
+INSTRUCTIONS
 flag: 0 open, 1 closed
 water: 0 dry, 1 wet
 
@@ -106,8 +106,7 @@ water: 0 dry, 1 wet
 
 Look graf flooders (flag=0 and grafdelimiter node)
 SELECT node_1 AS node_id, arc_id AS to_arc FROM temp_anlgraf WHERE flag=0 AND node_1 IN (
-SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE graf_delimiter IN ('DMA')
-)
+SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer WHERE graf_delimiter IN ('DMA', 'SECTOR'))
 
 Look for the graf stoppers (flag=1)
 SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
