@@ -3242,7 +3242,11 @@ class UpdateSQL(ApiParent):
         postgresql_version = self.controller.get_postgresql_version()
         postgis_version = self.controller.get_postgis_version()
         plugin_version = self.get_plugin_version()
-        project_version = self.controller.get_project_version()
+        project_version = 0
+        sql = (f"SELECT giswater FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1")
+        row = self.controller.get_row(sql)
+        if row:
+            project_version = row[0]
 
         message = ("Plugin version:     " + str(plugin_version) + "\n"
                    "Project version:    " + str(project_version) + "\n"
