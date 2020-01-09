@@ -16,7 +16,7 @@ $BODY$
 delete from temp_anlgraf
 TO EXECUTE
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85, "buffer":15}}}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
@@ -54,8 +54,7 @@ v_version		text;
 v_updatemapzgeom 	boolean;
 v_concavehull		float;
 v_srid			integer;
-
-
+v_buffer		float;
 
 BEGIN
 
@@ -68,6 +67,8 @@ BEGIN
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_concavehull = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
+	v_buffer = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'buffer');
+
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
@@ -76,7 +77,7 @@ BEGIN
 	v_fprocesscat_id=34;  
 	v_featuretype='arc';
 
-		-- reset graf & audit_log tables
+	-- reset graf & audit_log tables
 	DELETE FROM temp_anlgraf;
 	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id=34 AND cur_user=current_user;
@@ -190,13 +191,6 @@ BEGIN
 		INSERT INTO minsector (minsector_id, dma_id, dqa_id, presszonecat_id, sector_id, expl_id) 
 		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, presszonecat_id::integer, sector_id, expl_id FROM arc WHERE minsector_id is not null;
 
-		-- update geometry of minsector table
-		EXECUTE 'UPDATE minsector set the_geom = (a.the_geom) 
-			FROM (with polygon AS (SELECT st_collect (the_geom) as g, minsector_id FROM arc group by minsector_id)
-			SELECT minsector_id, CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||v_concavehull||'), 3)::geometry(Polygon,'||v_srid||')
-			ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon, '||v_srid||') END AS the_geom FROM polygon
-			)a WHERE a.minsector_id = minsector.minsector_id';	
-
 		-- update graf on minsector_graf
 		DELETE FROM minsector_graf;
 		INSERT INTO minsector_graf 
@@ -216,6 +210,32 @@ BEGIN
 		VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_node WHERE fprocesscat_id = 34  AND cur_user=current_user;'));
 	
 	END IF;
+
+	-- update geometry of mapzones
+	IF v_updatemapzgeom THEN
+
+			IF v_buffer IS NOT NULL THEN
+
+				v_querytext = '	UPDATE minsector set the_geom = geom FROM
+					(SELECT minsector_id, (st_buffer(st_collect(the_geom),'||v_buffer||')) as geom from arc where minsector_id > 0 group by minsector_id)a 
+					WHERE a.minsector_id = minsector.minsector_id';
+
+			ELSIF v_concavehull IS NOT NULL THEN 
+
+				v_querytext = 'UPDATE minsector set the_geom = (a.the_geom) 
+					FROM (with polygon AS (SELECT st_collect (the_geom) as g, minsector_id FROM arc group by minsector_id)
+					SELECT minsector_id, CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||v_concavehull||'), 3)::geometry(Polygon,'||v_srid||')
+					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon, '||v_srid||') END AS the_geom FROM polygon
+					)a WHERE a.minsector_id = minsector.minsector_id';
+			END IF;
+			
+			EXECUTE v_querytext;	
+
+			-- message
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of minsector ',v_class ,' have been modified by this process'));
+		END IF;
+	
 	
 	-- set selector
 	DELETE FROM selector_audit WHERE cur_user=current_user;
