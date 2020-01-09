@@ -443,3 +443,53 @@ ELSE 'text' END AS widgettype,
 column_name, false, false, false, false FROM information_schema.columns
 WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('v_rpt_comp_hydraulic_status') AND 
 column_name not in (select column_id from config_api_form_fields where formname='v_rpt_comp_hydraulic_status') AND column_name!='the_geom';
+
+
+--map zones
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' THEN 'integer'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'ws_sample' AND table_name IN ('v_edit_dqa') AND 
+column_name not in (select column_id from config_api_form_fields where formname='v_edit_dqa') AND column_name !='the_geom';
+
+UPDATE config_api_form_fields set widgettype='combo', dv_isnullvalue=true,
+dv_querytext='SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL'
+WHERE column_id='pattern_id' AND formname IN ('v_edit_dqa');
+
+UPDATE config_api_form_fields set widgettype='combo', dv_isnullvalue=true,
+dv_querytext='SELECT DISTINCT id,  idval FROM edit_typevalue WHERE id IS NOT NULL AND typevalue=''dqa_type'''
+WHERE column_id='dqa_type' AND formname IN ('v_edit_dqa');
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' THEN 'integer'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'ws_sample' AND table_name IN ('v_edit_presszone') AND 
+column_name not in (select column_id from config_api_form_fields where formname='v_edit_presszone') AND column_name !='the_geom';
+
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' THEN 'integer'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'ws_sample' AND table_name IN ('v_edit_macrodqa') AND 
+column_name not in (select column_id from ws_sample.config_api_form_fields where formname='v_edit_macrodqa') AND column_name !='the_geom';
