@@ -1246,7 +1246,7 @@ BEGIN
 			
 				IF  v_count = 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-					VALUES (14, v_result_id, 2, concat('WARNING: There is not any dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
+					VALUES (14, v_result_id, 2, concat('WARNING: There aren''t dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
 					v_countglobal=v_countglobal+1;
 					v_count=0;	
 				
