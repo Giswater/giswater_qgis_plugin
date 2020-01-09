@@ -142,7 +142,7 @@ UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1040';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1057';
 
 
-UPDATE node SET nodecat_id='REDUC_110-63 PN16' WHERE node_id='1044';
+UPDATE node SET nodecat_id='TDN63-63 PN16' WHERE node_id='1044';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1063';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1067';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='1069';
