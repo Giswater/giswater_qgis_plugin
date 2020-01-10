@@ -342,6 +342,18 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setMaximum(1)
         dialog.progressBar.setValue(1)
 
+        try:
+            self.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
+        except Exception as e:
+            msg = f"{type(e).__name__} --> {e}"
+            self.show_exceptions_msg(__name__, self.execute_function.__name__, msg)
+
+
+    def set_layers_visible(self, layers):
+        for layer in layers:
+            lyr = self.controller.get_layer_by_tablename(layer)
+            if lyr:
+                self.controller.set_layer_visible(lyr)
 
     def execute_no_parametric(self, dialog, function_name):
 
