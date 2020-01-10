@@ -241,15 +241,16 @@ BEGIN
 			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
 			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
 
-			EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
-			"client":{"device":3, "infoType":100, "lang":"ES"},
-			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
-			-- insert results 
-			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
-			WHERE fprocesscat_id=111 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
+			IF v_project_type = 'WS' THEN
 
-
+				EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
+				"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
+				-- insert results 
+				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+				SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+				WHERE fprocesscat_id=111 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
+			END IF;
 		END IF;
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -449,8 +450,8 @@ BEGIN
 	RETURN v_return;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+  --  EXCEPTION WHEN OTHERS THEN 
+    --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
     
 END;
 
