@@ -1256,7 +1256,7 @@ class Giswater(QObject):
             except Exception as e:
                 msg  += f"Exception: {type(e).__name__} --> {e}\n"
         if msg != "":
-            self.parent.manage_exception_KeyError(__name__, self.get_missing_layers.__name__, msg)
+            self.parent.show_exceptions_msg(__name__, self.get_missing_layers.__name__, msg)
 
         return critical_level
 
