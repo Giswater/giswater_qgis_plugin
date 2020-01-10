@@ -11,3 +11,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE sys_fprocess_cat DROP fprocess_i18n;
 ALTER TABLE arc RENAME sys_length TO _sys_length;
 
+ALTER TABLE rpt_cat_result ADD COLUMN inpoptions json;
+ALTER TABLE rpt_cat_result ADD COLUMN stats json;

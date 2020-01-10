@@ -9,3 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/01/10
 DELETE FROM audit_cat_param_user WHERE id IN ('audit_project_plan_result', 'audit_project_epa_result');
+
+
+UPDATE audit_cat_param_user SET formname='hidden_value', label='Skip demand pattern' WHERE id= 'inp_options_skipdemandpattern';
+		

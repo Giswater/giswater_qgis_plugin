@@ -27,18 +27,17 @@ v_qmllinepath		text;
 v_qmlpolpath		text;
 v_project_type		text;
 v_version		text;
+v_stats			json;
 
 BEGIN
-
 	--  Search path	
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND user_name=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id IN (3, 14, 39) AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id IN (7, 14, 64, 66, 70, 71, 98) AND cur_user=current_user;
-
 
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
@@ -46,31 +45,67 @@ BEGIN
 	-- Header
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 4, concat('IMPORT RPT FILE LOG'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 4, '-------------------------------------------');
-
-	-- TODO:
-	--INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 3, 'CRITICAL ERRORS');	
-	--INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 3, '----------------------');	
-
-	--INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 2, 'WARNINGS');	
-	--INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 2, '--------------');	
-
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '-------');	
-	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 4, concat('Result id: ', p_result));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 4, concat('Imported by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH:MM:SS')));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 4, '');
 
+	-- basic statistics
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'BASIC STATISTICS');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '-----------------------');	
 
+	IF v_project_type = 'WS' THEN
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, 'stats', 1, concat ('FLOW : Max.(',max(flow)::numeric(12,3), ') , Avg.(', avg(flow)::numeric(12,3), ') , Standard dev(', stddev(flow)::numeric(12,3)
+		, ') , Min(', min (flow)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, 'stats', 1, concat ('VELOCITY : Max.(',max(vel)::numeric(12,3), ') , Avg.(', avg(vel)::numeric(12,3), ') , Standard dev(', stddev(vel)::numeric(12,3)
+		, ') , Min(', min (vel)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, 'stats', 1, concat ('PRESSURE : Max.(',max(press)::numeric(12,3), ') , Avg.(', avg(press)::numeric(12,3), ') , Standard dev(', stddev(press)::numeric(12,3)
+		, ') , Min(', min (press)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result;
+
+	ELSIF v_project_type = 'UD' THEN
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, p_result, 1, concat ('FLOW : Max.(',max(flow)::numeric(12,3), ') , Avg.(', avg(flow)::numeric(12,3), ') , Standard dev(', stddev(flow)::numeric(12,3)
+		, ') , Min(', min (flow)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, p_result, 1, concat ('VELOCITY : Max.(',max(velocity)::numeric(12,3), ') , Avg.(', avg(velocity)::numeric(12,3), ') , Standard dev(', stddev(velocity)::numeric(12,3)
+		, ') , Min(', min (velocity)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, p_result, 1, concat ('FULL PERCENT. : Max.(',max(fullpercent)::numeric(12,3), ') , Avg.(', avg(fullpercent)::numeric(12,3), ') , Standard dev(', stddev(fullpercent)::numeric(12,3)
+		, ') , Min(', min (fullpercent)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, p_result, 1, concat ('FLOODING : Max.(',max(flooding)::numeric(12,3), ') , Number (', avg(flooding)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result AND flooding > 0;
+	
+	END IF;
+
+	v_stats = (SELECT array_to_json(array_agg(error_message)) FROM audit_check_data WHERE result_id='stats' AND fprocesscat_id=14 AND user_name=current_user);
+
+	UPDATE rpt_cat_result SET stats = v_stats WHERE result_id=p_result;
+
+	-- rpt file info
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'RPT FILE INFO');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '------------------');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-	SELECT 14, p_result, 1, concat('INFO: ', csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
+	SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
 	where csv2pgcat_id=11 and source='rpt_cat_result' and user_name=current_user;
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 4, '');
+	-- detalied user inp options
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'DETAILED USER INPUT OPTIONS');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '----------------------------------------');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+	SELECT 14, p_result, 1, concat (label, ' : ', value) FROM config_param_user 
+	JOIN audit_cat_param_user a ON a.id=parameter WHERE cur_user=current_user AND formname='epaoptions' AND value is not null;
 	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 0, 'See the full input data file for more details....');
-
-		
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 

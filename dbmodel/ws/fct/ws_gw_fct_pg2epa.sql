@@ -34,6 +34,7 @@ DECLARE
 	v_buildupmode integer;
 	v_usenetworkgeom boolean;
 	v_skipcheckdata boolean;
+	v_inpoptions json;
 	
 BEGIN
 
@@ -73,9 +74,13 @@ BEGIN
 	-- use previous network geometry
 	IF v_usenetworkgeom IS FALSE THEN
 
+		v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
+				FROM (SELECT parameter, value FROM config_param_user 
+				JOIN audit_cat_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
+
 		-- Upsert on rpt_cat_table
 		DELETE FROM rpt_cat_result WHERE result_id=v_result;
-		INSERT INTO rpt_cat_result (result_id) VALUES (v_result);
+		INSERT INTO rpt_cat_result (result_id, inpoptions) VALUES (v_result, v_inpoptions);
 
 		v_usenetworkgeom = 'FALSE';
 
