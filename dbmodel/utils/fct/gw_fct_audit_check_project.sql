@@ -369,7 +369,8 @@ BEGIN
 		END IF;
 
 		-- start process
-		FOR rec_table IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))
+		FOR rec_table IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN 
+		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') AND isdeprecated IS FALSE)
 		LOOP
 		
 			--RAISE NOTICE 'v_count % id % ', v_count, rec_table.id;
