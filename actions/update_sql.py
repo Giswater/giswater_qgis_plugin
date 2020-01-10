@@ -1436,7 +1436,7 @@ class UpdateSQL(ApiParent):
         self.task1.setProgress(70)
         # Custom execution
         if self.rdb_import_data.isChecked():
-            #TODO::
+            #TODO:
             self.task1.setProgress(100)
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
@@ -1456,7 +1456,7 @@ class UpdateSQL(ApiParent):
 
         self.manage_process_result(project_name_schema)
 
-        # Update comoposer path on config_param_user
+        # Update composer path on config_param_user
         self.manage_user_params()
 
 
@@ -1468,7 +1468,7 @@ class UpdateSQL(ApiParent):
         if status:
             self.controller.dao.commit()
             self.close_dialog(self.dlg_readsql_create_project)
-            # Referesh data main dialog
+            # Refresh data main dialog
             self.event_change_connection()
             if schema_name is not None:
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)

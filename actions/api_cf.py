@@ -2252,7 +2252,6 @@ class ApiCF(ApiParent, QObject):
         if complet_list is False:
             return False
         self.set_listeners(complet_result, self.dlg_cf, widget_list)
-        #self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
         return complet_list
 
 
@@ -2260,7 +2259,6 @@ class ApiCF(ApiParent, QObject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
-        # qtable = dialog.findChild(QTableView, qtv_name)
         self.clear_gridlayout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
@@ -2271,8 +2269,6 @@ class ApiCF(ApiParent, QObject):
         # Put widgets into layout
         widget_list = []
         for field in complet_list[0]['body']['data']['fields']:
-            if field['column_id'] =='depth':
-                print(f"{field['column_id']} --> {field['hidden']}")
             if 'hidden' in field and field['hidden']:
                 continue
             label, widget = self.set_widgets(dialog, complet_list, field)
