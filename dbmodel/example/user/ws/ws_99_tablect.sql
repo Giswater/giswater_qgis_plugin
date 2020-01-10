@@ -55,10 +55,10 @@ INSERT INTO dma VALUES (5, 'source-2', 2, NULL, NULL, NULL, NULL, NULL, NULL, NU
 
 
 delete from dqa;
-INSERT INTO dqa VALUES (1, 'dqa1-1d', 1, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"113766", "toArc":[113906]}], "ignore":[]}');
-INSERT INTO dqa VALUES (2, 'dqa2-1d', 2, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"113952", "toArc":[114146]}], "ignore":[]}');
-INSERT INTO dqa VALUES (3, 'dqa1-1s', 1, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"1101", "toArc":[2205]},{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
-INSERT INTO dqa VALUES (4, 'dqa2-1s', 2, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"111111", "toArc":[114025]}], "ignore":[]}');
+INSERT INTO dqa VALUES (1, 'dqa1-1d', 1, NULL, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"113766", "toArc":[113906]}], "ignore":[]}');
+INSERT INTO dqa VALUES (2, 'dqa2-1d', 2, NULL, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"113952", "toArc":[114146]}], "ignore":[]}');
+INSERT INTO dqa VALUES (3, 'dqa1-1s', 1, NULL, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"1101", "toArc":[2205]},{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
+INSERT INTO dqa VALUES (4, 'dqa2-1s', 2, NULL, NULL, NULL, NULL, NULL, NULL, 'chlorine','{"use":[{"nodeParent":"111111", "toArc":[114025]}], "ignore":[]}');
 
 
 delete from sector;
@@ -93,20 +93,20 @@ SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action"
 
 
 -- sectorization
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
-"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85}}}');
-
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
-
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
-
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
 "updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
 
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE","buffer":30}}}');
+
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
+"updateFeature":"TRUE","updateMapZone":"TRUE","buffer":20}}}');
+
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
+"updateFeature":"TRUE", "updateMapZone":"TRUE","buffer":15}}}');
+
 SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", 
-"updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
+"updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","buffer":10}}}');
 
 
 -- lastprocess
@@ -157,3 +157,7 @@ UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113954';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113955';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113994';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='114016';
+
+
+UPDATE config_param_system SET value = '{"SECTOR":true, "DMA":true, "PRESSZONE":true, "DQA":true, "MINSECTOR":true}'
+WHERE parameter = 'om_dynamicmapzones_status';

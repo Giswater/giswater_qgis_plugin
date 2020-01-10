@@ -36,18 +36,20 @@ TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
 */
 
 DECLARE
-v_count1 			integer = 0;
-v_expl 				json;
-v_data 				json;
-v_arc 				text;
+v_count1 		integer = 0;
+v_expl 			json;
+v_data 			json;
+v_arc 			text;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
-v_result 			text;
-v_count				json;
-v_version			text;
+v_result 		text;
+v_count			json;
+v_version		text;
 v_fprocesscat_id	integer = 29;
+v_input			json;
+
 
 BEGIN
 	-- Search path
@@ -59,6 +61,28 @@ BEGIN
 	-- select config values
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
+	-- data quality analysis
+	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+	PERFORM gw_fct_om_check_data(v_input);
+
+	-- check criticity of data in order to continue or not
+	SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
+	IF v_count > 3 THEN
+	
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+		-- Control nulls
+		v_result_info := COALESCE(v_result_info, '{}'); 
+		
+		--  Return
+		RETURN ('{"status":"Accepted", "message":{"priority":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
+		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+	END IF;
+ 
 	-- reset previous data
 	DELETE FROM audit_log_data WHERE user_name=current_user AND fprocesscat_id IN (29,49,34);
 	DELETE FROM audit_check_data WHERE user_name=current_user AND fprocesscat_id =v_fprocesscat_id;

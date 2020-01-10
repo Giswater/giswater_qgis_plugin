@@ -49,12 +49,14 @@ v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
 v_result 		text;
-v_count			json;
+v_count			integer;
 v_version		text;
 v_updatemapzgeom 	boolean;
 v_concavehull		float;
 v_srid			integer;
 v_buffer		float;
+v_input			json;
+v_visible_layer		text;
 
 BEGIN
 
@@ -72,10 +74,34 @@ BEGIN
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
+	v_visible_layer = 'v_minsector';
 
 	-- set variables
 	v_fprocesscat_id=34;  
 	v_featuretype='arc';
+
+	-- data quality analysis
+	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+	PERFORM gw_fct_om_check_data(v_input);
+
+	-- check criticity of data in order to continue or not
+	SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
+	IF v_count > 3 THEN
+	
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+		-- Control nulls
+		v_result_info := COALESCE(v_result_info, '{}'); 
+		
+		--  Return
+		RETURN ('{"status":"Accepted", "message":{"priority":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
+		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+	END IF;
+ 
 
 	-- reset graf & audit_log tables
 	DELETE FROM temp_anlgraf;
@@ -250,28 +276,22 @@ BEGIN
 	
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
 
 	--lines
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
 	--polygons
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
-
 	
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_visible_layer := COALESCE(v_visible_layer, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
@@ -281,6 +301,7 @@ BEGIN
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
+				'"setVisibleLayers":["'||v_visible_layer||'"],'||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
