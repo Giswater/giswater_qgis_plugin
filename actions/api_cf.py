@@ -814,7 +814,17 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
+    def accept(self, dialog, complet_result, feature_id, _json, p_widget=None, clear_json=False, close_dialog=True):
+        """
+        :param dialog:
+        :param complet_result:
+        :param feature_id:
+        :param _json:
+        :param p_widget:
+        :param clear_json:
+        :param close_dialog:
+        :return:
+        """
 
         if _json == '' or str(_json) == '{}':
             self.close_dialog(dialog)
@@ -823,11 +833,14 @@ class ApiCF(ApiParent, QObject):
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
         parent_fields = complet_result['body']['data']['parentFields']
-
+        fields_reload = ""
         list_mandatory = []
-        for result in complet_result['body']['data']['fields']:
-            if result['ismandatory'] == True:
-                widget_name = 'data_' + result['column_id']
+        for field in complet_result['body']['data']['fields']:
+            if p_widget and field['widgetname'] == p_widget.objectName() and field['reload_field']:
+                fields_reload = field['reload_field']['reload']
+
+            if field['ismandatory'] == True:
+                widget_name = 'data_' + field['column_id']
                 widget = self.dlg_cf.findChild(QWidget, widget_name)
                 widget.setStyleSheet("border: 1px solid gray")
                 value = utils_giswater.getWidgetText(self.dlg_cf, widget)
@@ -839,7 +852,7 @@ class ApiCF(ApiParent, QObject):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
             return
-        # If we make an info
+        # If we create a new feature
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -857,16 +870,17 @@ class ApiCF(ApiParent, QObject):
             feature = f'"featureType":"{self.feature_type}", '
             feature += f'"tableName":"{p_table_id}", '
             feature += f'"id":"{self.new_feature.attribute(id_name)}"'
-            extras = '"fields":' + my_json + ''
+            extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
+
             body = self.create_body(feature=feature, extras=extras)
             sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
-        # If we make an insert
+        # If we make an info
         else:
             my_json = json.dumps(_json)
             feature = f'"featureType":"{self.feature_type}", '
             feature += f'"tableName":"{p_table_id}", '
             feature += f'"id":"{feature_id}"'
-            extras = f'"fields":{my_json}'
+            extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
             body = self.create_body(feature=feature, extras=extras)
             sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
 
@@ -885,6 +899,7 @@ class ApiCF(ApiParent, QObject):
         if "Accepted" in result['status']:
             msg = "OK"
             self.controller.show_message(msg, message_level=3)
+            self.reload_fields(dialog, row, p_widget)
         elif "Failed" in result['status']:
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
@@ -1028,17 +1043,39 @@ class ApiCF(ApiParent, QObject):
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
-                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, widget, True, False))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
             widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
 
         return widget
 
+
+    def reload_fields(self, dialog, result, p_widget):
+        """
+        :param dialog: QDialog where find and set widgets
+        :param result: row with info (json)
+        :param p_widget: Widget that has changed
+        """
+        if not p_widget: return
+        result = json.loads(result[0], object_pairs_hook=OrderedDict)
+
+        for field in result['body']['data']['fields']:
+            widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
+            if widget:
+                value = field["value"]
+                utils_giswater.setText(dialog, widget, value)
+            elif "message" in field:
+                level = field['message']['level'] if 'level' in field['message'] else 0
+                self.controller.show_message(field['message']['text'], level)
+
+
     def enabled_accept(self, dialog):
         dialog.btn_accept.setEnabled(True)
+
 
     def set_auto_update_combobox(self, field, dialog, widget):
 
@@ -1048,7 +1085,7 @@ class ApiCF(ApiParent, QObject):
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1063,7 +1100,7 @@ class ApiCF(ApiParent, QObject):
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1078,7 +1115,7 @@ class ApiCF(ApiParent, QObject):
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1093,7 +1130,7 @@ class ApiCF(ApiParent, QObject):
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
