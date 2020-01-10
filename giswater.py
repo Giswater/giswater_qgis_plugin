@@ -1230,15 +1230,14 @@ class Giswater(QObject):
 
         grl_critical = dialog.findChild(QGridLayout, "grl_critical")
         grl_others = dialog.findChild(QGridLayout, "grl_others")
-
+        msg = ""
         for pos, item in enumerate(m_layers):
-            if not item: continue
-            widget = dialog.findChild(QCheckBox, f"{item['layer']}")
-            # If it is the case that a layer is necessary for two functions,
-            # and the widget has already been put in another iteration
-            if widget: continue
-
             try:
+                if not item: continue
+                widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+                # If it is the case that a layer is necessary for two functions,
+                # and the widget has already been put in another iteration
+                if widget: continue
                 label = QLabel()
                 label.setObjectName(f"lbl_{item['layer']}")
                 label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
@@ -1254,8 +1253,10 @@ class Giswater(QObject):
                 else:
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
-            except KeyError:
-                pass
+            except Exception as e:
+                msg  += f"Exception: {type(e).__name__} --> {e}\n"
+        if msg != "":
+            self.parent.manage_exception_KeyError(__name__, self.get_missing_layers.__name__, msg)
 
         return critical_level
 

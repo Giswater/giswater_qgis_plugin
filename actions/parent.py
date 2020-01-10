@@ -1014,6 +1014,10 @@ class ParentAction(object):
         return path, filter_
 
 
+    def manage_exception_KeyError(self, file_name, func_name, msg=""):
+        self.controller.show_info_box(f"Some exceptions occurred, please contact with support team\n"
+                                      f"File: {file_name}\n"
+                                      f"Function: {func_name}\n", inf_text=msg)
 
 
 
