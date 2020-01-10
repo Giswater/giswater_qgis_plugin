@@ -1319,3 +1319,109 @@ column_name not in (select column_id from config_api_form_fields where formname=
 UPDATE config_api_form_fields set widgettype='combo', 
 dv_querytext='SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL'
 WHERE column_id='expl_id' AND formname IN ('v_anl_flow_connec','v_anl_flow_arc');
+
+--catalogs
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('cat_mat_arc') AND 
+column_name not in (select column_id from config_api_form_fields where formname='cat_mat_arc') AND column_name !='the_geom';
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('cat_node') AND 
+column_name not in (select column_id from config_api_form_fields where formname='cat_node') AND column_name !='the_geom';
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('cat_connec') AND 
+column_name not in (select column_id from config_api_form_fields where formname='cat_connec') AND column_name !='the_geom';
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('cat_mat_grate') AND 
+column_name not in (select column_id from config_api_form_fields where formname='cat_mat_grate') AND column_name !='the_geom';
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('cat_node_shape') AND 
+column_name not in (select column_id from config_api_form_fields where formname='cat_node_shape') AND column_name !='the_geom';
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('cat_arc_shape') AND 
+column_name not in (select column_id from config_api_form_fields where formname='cat_arc_shape') AND column_name !='the_geom' 
+AND column_name != '_tsect_id' AND column_name != '_curve_id';
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id,isenabled, datatype, widgettype, label, ismandatory, 
+iseditable, isparent, isautoupdate)
+SELECT table_name, 'form',column_name, true, 
+CASE WHEN data_type = 'character varying' or data_type = 'json' or data_type IS NULL THEN 'string'
+WHEN data_type = 'numeric' THEN 'double' 
+WHEN data_type = 'smallint' or data_type = 'bigint' THEN 'integer'
+WHEN data_type='timestamp without time zone' THEN 'date'
+else data_type END AS datattype,
+CASE WHEN data_type='boolean' THEN 'check'
+ELSE 'text' END AS widgettype,
+column_name, false, true, false, false FROM information_schema.columns
+WHERE table_schema = 'SCHEMA_NAME' AND table_name IN ('cat_grate') AND 
+column_name not in (select column_id from config_api_form_fields where formname='cat_grate') AND column_name !='the_geom' 
+AND column_name != '_tsect_id' AND column_name != '_curve_id';
+
+UPDATE config_api_form_fields set widgettype='combo', dv_isnullvalue=true,
+dv_querytext='SELECT id as id, id as idval FROM gully_type WHERE id IS NOT NULL'
+WHERE column_id='gully_type' AND formname IN ('cat_grate');
