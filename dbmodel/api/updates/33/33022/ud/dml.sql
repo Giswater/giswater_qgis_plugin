@@ -8,26 +8,29 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/01/07
-UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_grate_matcat"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_grate_matcat"]}', isautoupdate = TRUE
 WHERE column_id='gratecat_id ' and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id"]}', isautoupdate = TRUE
 WHERE column_id='connecat_id' and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id"]}', isautoupdate = TRUE
 WHERE column_id='nodecat_id' and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_shape", "cat_geom1", "cat_geom2"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_shape", "cat_geom1", "cat_geom2"]}',
+isautoupdate = TRUE
 WHERE column_id='arccat_id ' and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_top_elev", "sys_ymax", "sys_elev"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_top_elev", "sys_ymax", "sys_elev"]}', isautoupdate = TRUE
 WHERE (column_id='top_elev' or column_id='custom_top_elev' or column_id='ymax' or column_id='custom_ymax' or 
 column_id='elev' or column_id='custom_elev') and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y1", "sys_elev1", "z1", "r1", "slope"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y1", "sys_elev1", "z1", "r1", "slope"]}',
+isautoupdate = TRUE
 WHERE (column_id='y1' or column_id='custom_y1' or column_id='elev1' or column_id='custom_elev1') and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y2", "sys_elev2", "z2", "r2", "slope"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y2", "sys_elev2", "z2", "r2", "slope"]}',
+isautoupdate = TRUE
 WHERE (column_id='y2' or column_id='custom_y2' or column_id='elev2' or column_id='custom_elev2') and formtype='feature';
 
 

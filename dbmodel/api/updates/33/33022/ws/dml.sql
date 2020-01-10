@@ -8,13 +8,13 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/01/07
-UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_pnom", "cat_dnom"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_pnom", "cat_dnom"]}', isautoupdate = TRUE
 WHERE column_id='arccat_id' and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_pnom", "cat_dnom"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_pnom", "cat_dnom"]}', isautoupdate = TRUE
 WHERE column_id='nodecat_id' and formtype='feature';
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_pnom", "cat_dnom"]}'
+UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_pnom", "cat_dnom"]}', isautoupdate = TRUE
 WHERE column_id='connecat_id' and formtype='feature';
 
 
