@@ -155,6 +155,7 @@ DECLARE
 	v_offline boolean;
 	v_lot integer;
 	v_userrole text;
+	v_code text;
 	
 
 BEGIN
@@ -325,7 +326,8 @@ BEGIN
 		v_visitextcode =  (SELECT value FROM config_param_user WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user)::text;		
 		--visitcat
 		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user)::integer;
-
+		--code
+		EXECUTE 'SELECT code FROM '||v_featuretablename||' WHERE ' || (v_featuretype) || '_id = '||v_featureid||'::text' INTO v_code;
 		-- lot
 		v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);		
 	
@@ -466,6 +468,13 @@ BEGIN
 					-- setting feature id value
 					IF (aux_json->>'column_id') = 'arc_id' OR (aux_json->>'column_id')='node_id' OR (aux_json->>'column_id')='connec_id' OR (aux_json->>'column_id') ='gully_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_featureid);
+						RAISE NOTICE ' --- SETTING feature id VALUE % ---',v_featureid ;
+
+					END IF;
+
+					-- setting code value
+					IF (aux_json->>'column_id') = 'code' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_code);
 						RAISE NOTICE ' --- SETTING feature id VALUE % ---',v_featureid ;
 
 					END IF;
