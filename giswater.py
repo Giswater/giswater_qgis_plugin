@@ -1230,6 +1230,7 @@ class Giswater(QObject):
         grl_critical = dialog.findChild(QGridLayout, "grl_critical")
         grl_others = dialog.findChild(QGridLayout, "grl_others")
         msg = ""
+        exceptions = []
         for pos, item in enumerate(m_layers):
             try:
                 if not item: continue
@@ -1253,7 +1254,9 @@ class Giswater(QObject):
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
             except Exception as e:
-                msg  += f"Exception: {type(e).__name__} --> {e}\n"
+                if type(e).__name__ not in exceptions:
+                    exceptions.append(type(e).__name__)
+                    msg  += f"Exception: {type(e).__name__} --> {e}\n"
         if msg != "":
             self.parent.show_exceptions_msg(__name__, self.get_missing_layers.__name__, msg)
 
