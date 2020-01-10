@@ -81,7 +81,7 @@ BEGIN
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
-	v_fieldsreload := (p_data ->> 'feature')::json->> 'fieldsReload';
+	v_fieldsreload := (p_data ->> 'data')::json->> 'reload';
 	
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
@@ -182,7 +182,9 @@ BEGIN
 	END IF;
 
 --    Return
-    RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||', "fields":'|| v_columnfromid ||'}')::json;    
+    RETURN ('{"status":"Accepted", "apiVersion":' || api_version ||
+	      ',"body":{"data":{"fields":' || v_columnfromid || '}'||
+	      '}'||'}')::json; 
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 

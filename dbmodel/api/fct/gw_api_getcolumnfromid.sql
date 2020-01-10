@@ -66,16 +66,17 @@ BEGIN
 	LOOP	
 		EXECUTE 'SELECT column_name  FROM information_schema.columns WHERE table_name='''||v_tablename||''' and column_name='''|| replace(v_field, '"','') ||''' LIMIT 1' INTO v_exists;
 
-		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetName', 'data_' || replace(v_field, '"',''));
+		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetname', 'data_' || replace(v_field, '"',''));
 		IF v_exists is not null THEN
 			EXECUTE 'SELECT LOWER(feature_type) FROM cat_feature WHERE child_layer = '''||v_tablename||'''' INTO v_featureType;
 			EXECUTE 'SELECT '|| replace(v_field, '"','') ||' FROM ' || v_tablename ||' WHERE '||v_featureType||'_id = '''|| v_feature_id ||'''' INTO v_result;
+			
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', v_result);
 			i = i+1;
 		ELSE
 			EXECUTE 'SELECT id FROM config_api_form_fields WHERE formname ='''||v_tablename||''' AND column_id = '''||v_parentname||'''' INTO v_parentid;
 			v_message := 'API is bad configurated. Check column ''reload_fields'' for parameter '''|| v_parentname ||''' with id -> '''||v_parentid||''' on config_api_form_fields';
-			v_result := '{"message":{"level":0, "text":"'||v_message||'"}}';
+			v_result := '{"level":0, "text":"'||v_message||'"}';
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', ''::text);
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'message', v_result::json);
 			i = i+1;
@@ -90,9 +91,7 @@ BEGIN
 	    v_fields := COALESCE(v_fields, '[]');   
 	    
 	--    Return
-	    RETURN ('{"status":"Accepted"' ||
-	       ', "apiVersion":'|| api_version ||
-		', "data":' || v_fields || '}')::json;
+		RETURN v_fields::json;
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
