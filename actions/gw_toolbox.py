@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-
+from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
@@ -303,6 +303,9 @@ class GwToolBox(ApiParent):
                         elif type(widget) in ('', QCheckBox):
                             value = utils_giswater.isChecked(dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
+                        elif type(widget) in ('', QgsDateTimeEdit):
+                            value = utils_giswater.getCalendarDate(dialog, widget)
+                            extras += f'"{param_name}":"{value}", '
 
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"
