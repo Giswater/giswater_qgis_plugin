@@ -106,7 +106,7 @@ SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", 
 "updateFeature":"TRUE", "updateMapZone":"TRUE","buffer":15}}}');
 
 SELECT gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", 
-"updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","buffer":10}}}');
+"updateFeature":"TRUE", "updateMapZone":"TRUE","buffer":10}}}');
 
 
 -- lastprocess
