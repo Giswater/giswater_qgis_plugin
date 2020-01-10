@@ -1121,7 +1121,6 @@ BEGIN
 				END IF;
 
 
-
 			RAISE NOTICE '25 - advanced network mode (vnodes)';
 
 			IF v_networkmode = 3 OR v_networkmode = 4 THEN
@@ -1160,6 +1159,23 @@ BEGIN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 					VALUES (14, v_result_id, 3, ' Change the pattern method using some of the CONNEC method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
 				END IF;		
+			END IF;
+
+			-- Check for missed features on inp tables
+			v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) 
+				AND state > 0 AND epa_type !=''NOT DEFINED'' UNION SELECT node_id FROM node WHERE node_id 
+				NOT IN (select node_id from inp_shortpipe UNION select node_id from inp_valve UNION select node_id from inp_tank 
+				UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump UNION SELECT node_id from inp_inlet 
+				UNION SELECT node_id from inp_junction) AND state >0 AND epa_type !=''NOT DEFINED'') a';
+		
+			EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (14, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+				VALUES (14, 1, 'INFO: No features missed on inp_tables found.');
 			END IF;
 			
 		END IF;
