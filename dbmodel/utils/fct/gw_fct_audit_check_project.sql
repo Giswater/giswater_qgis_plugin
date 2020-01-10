@@ -31,7 +31,7 @@ v_table_schema text;
 v_query_string text;
 v_max_seq_id int8;
 v_project_type text;
-v_psector_vdef text;
+v_psector_vdef integer;
 v_errortext text;
 v_result_id text;
 rec_table record;
@@ -54,11 +54,9 @@ v_qmlpointpath	text = '';
 v_qmllinepath	text = '';
 v_qmlpolpath	text = '';
 v_user_control boolean = false;
-v_eparesult text;
-v_planresult text;
+
 
 BEGIN 
-
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -75,10 +73,6 @@ BEGIN
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 	SELECT value INTO v_user_control FROM config_param_user where parameter='audit_project_user_control' AND cur_user=current_user;
-	SELECT value INTO v_eparesult FROM config_param_user WHERE parameter='audit_project_epa_result' AND cur_user=current_user;
-	SELECT value INTO v_planresult FROM config_param_user WHERE parameter='audit_project_plan_result' AND cur_user=current_user;
-
-	
 
 	-- init process
 	v_isenabled:=FALSE;
@@ -104,35 +98,15 @@ BEGIN
 
 
 	IF v_qgis_version = v_version THEN
-		v_errortext=concat('INFO: Giswater version: ',v_version,'.');
+		v_errortext=concat('Giswater version: ',v_version,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (101, 1, v_errortext);
+		VALUES (101, 4, v_errortext);
 	ELSE
 		v_errortext=concat('ERROR: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (101, 3, v_errortext);
 	END IF;
 	
-
-	--REFRESH MATERIALIZED VIEW v_ui_workcat_polygon_aux;
-
-	-- Force psector vdefault visible to current_user (only to => role_master)
-	SELECT value INTO v_psector_vdef FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user;
-
-	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) and  v_psector_vdef is not null THEN
-	  	IF (SELECT psector_id FROM plan_psector WHERE psector_id=(SELECT value FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer) IS NOT NULL THEN
-			DELETE FROM selector_psector WHERE psector_id =(SELECT value FROM config_param_user 
-			WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer AND cur_user=current_user;
-			INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT value FROM config_param_user 
-			WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer, current_user);
-
-			v_errortext=concat('INFO: Psector ',v_psector_vdef,' set as default.');
-
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, v_errortext);
-		END IF;
-	END IF;
-
 	-- Reset urn sequence
 	IF v_project_type='WS' THEN
 		SELECT GREATEST (
@@ -152,24 +126,19 @@ BEGIN
 		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
 		) INTO v_max_seq_id;
 	END IF;	
+
+	v_errortext=concat('Logged as ', current_user,' on ', now());
+	
+	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
+
 	IF v_max_seq_id IS NOT null THEN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||v_max_seq_id||', true)';
-
-		v_errortext=concat('INFO: Reset urn id sequence.');
-
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (101, 1, v_errortext);
 	END IF;
 	
 	-- Special cases (doc_seq. inp_vertice_seq)
 	SELECT max(id::integer) FROM doc WHERE id ~ '^\d+$' into v_max_seq_id;
 	IF v_max_seq_id IS NOT null THEN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.doc_seq'','||v_max_seq_id||', true)';
-
-		v_errortext=concat('INFO: Reset doc id sequence.');
-
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (101, 1, v_errortext);
 	END IF;
 	
 	IF v_project_type='WS' THEN 
@@ -177,26 +146,19 @@ BEGIN
 	ELSE 
 		PERFORM setval('SCHEMA_NAME.inp_vertice_seq', 1, true);
 	END IF;
-	
-	v_errortext=concat('INFO: Reset vertice id sequence.');
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-	VALUES (101, 1, v_errortext);
 
-	--Reset the  rest of sequences
+	--Reset the rest of sequences
 	FOR rec_table IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq' AND isdeprecated IS NOT TRUE
 	LOOP 
 		v_query_string:= 'SELECT max('||rec_table.sys_sequence_field||') FROM '||rec_table.id||';' ;
 		EXECUTE v_query_string INTO v_max_seq_id;	
 		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||rec_table.sys_sequence||' '','||v_max_seq_id||', true)';
-
-			
+			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||rec_table.sys_sequence||' '','||v_max_seq_id||', true)';			
 		END IF;
 	END LOOP;
 
-	v_errortext=concat('INFO: Reset other sequences.');
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-	VALUES (101, 1, v_errortext);
+	v_errortext=concat('Reset all sequences on project data schema.');
+	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
 	FOR rec_table IN SELECT * FROM audit_cat_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
@@ -205,10 +167,9 @@ BEGIN
 			INSERT INTO config_param_user (parameter, value, cur_user) 
 			SELECT audit_cat_param_user.id, vdefault, current_user FROM audit_cat_param_user WHERE audit_cat_param_user.id = rec_table.id;	
 
-			v_errortext=concat('INFO: Set value in config param user: ',rec_table.id,'.');
+			v_errortext=concat('Set value for new variable in config param user: ',rec_table.id,'.');
 
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, v_errortext);
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
 	END LOOP;
 
@@ -223,11 +184,55 @@ BEGIN
 
 		DELETE FROM audit_cat_param_user WHERE id IN (SELECT audit_cat_param_user.id FROM audit_cat_param_user, connec_type 
 		WHERE active=false AND concat(lower(connec_type.id),'_vdefault') = audit_cat_param_user.id);
+
+		v_errortext=concat('Checked on audit_cat_param_user table possible deprecated vdefault parameters.');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		
 	END IF;
 
 	-- delete on config_param_user fron updated values on audit_cat_param_user
 	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user) AND cur_user = current_user;
+
+	-- Force exploitation selector in case of null values
+	IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN 
+	  	INSERT INTO selector_expl (expl_id, cur_user) VALUES ((SELECT expl_id FROM exploitation WHERE active IS NOT FALSE limit 1),current_user);
+		v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
+	END IF;
+
+	-- Force state selector in case of null values
+	IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
+	  	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
+		v_errortext=concat('Set feature state = 1 for user');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
+	END IF;
+	
+	-- Force hydrometer selector in case of null values
+	IF (SELECT count(*) FROM selector_hydrometer WHERE cur_user=current_user) < 1 THEN 
+	  	INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, current_user);
+		v_errortext=concat('Set hydrometer state = 1 for user');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);	
+	END IF;
+	
+	-- Force psector vdefault visible to current_user (only to => role_master)
+	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+	
+		SELECT value::integer INTO v_psector_vdef FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user;
+
+		IF v_psector_vdef IS NULL THEN
+			SELECT psector_id INTO v_psector_vdef FROM plan_psector WHERE status=2 LIMIT 1;
+			IF v_psector_vdef IS NULL THEN
+				v_errortext=concat('No current psector have been set. There are not psectors with status=2 on project');
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
+			END IF;
+		END IF;
+
+		IF v_psector_vdef IS NOT NULL THEN
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdef, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
+			v_errortext=concat('Current psector is ',v_psector_vdef);
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
+		END IF;
+	END IF;
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
 	IF v_user_control THEN
@@ -386,15 +391,12 @@ BEGIN
 
 		v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
 
-
 	END IF;
-
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
-
 
 	-- get results
 	-- info
@@ -435,7 +437,6 @@ BEGIN
 	v_result_line:=COALESCE(v_result_line,'{}');
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');
 	v_missing_layers:=COALESCE(v_missing_layers,'{}');
-
 
 	--return definition for v_audit_check_result
 	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
