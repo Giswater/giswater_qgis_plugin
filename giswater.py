@@ -965,9 +965,8 @@ class Giswater(QObject):
 
 
     def get_new_layers_name(self, layers_list):
-        self.get_layers_to_config()
         layers_name = [layer.name() for layer in layers_list]
-        self.get_layer_added(layers_name, self.available_layers)
+        self.set_layer_config(layers_name)
 
 
     def manage_layers(self):
@@ -1358,18 +1357,9 @@ class Giswater(QObject):
         finally:
             return value
 
-    def get_layer_added(self, table_name, available_layers):
-        layer_list = []
-        if table_name:
-            for t_name in table_name:
-                if t_name in available_layers:
-                    layer_list.append(t_name)
-        if not layer_list:
-            return
-        self.set_layer_config(layer_list)
-
 
     def get_layers_to_config(self):
+
         """ Get available layers to be configured """
         schema_name = self.schema_name.replace('"','')
         sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature " 
@@ -1382,10 +1372,10 @@ class Giswater(QObject):
         self.available_layers = [layer[0] for layer in rows]
 
         self.set_form_suppress(self.available_layers)
-
-        layers_list = self.settings.value('system_variables/set_layer_config')
-        for layer in layers_list:
-            self.available_layers.append(layer)
+        all_layers_toc = self.controller.get_layers()
+        for layer in all_layers_toc:
+            table_name = f"{self.controller.get_layer_source_table_name(layer)}"
+            self.available_layers.append(table_name)
 
 
     def set_form_suppress(self, layers_list):
