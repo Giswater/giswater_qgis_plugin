@@ -17,7 +17,7 @@ SELECT gw_fct_rpt2pg_log('test')
 
 DECLARE
 
-v_result		json;
+v_result			json;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
@@ -26,8 +26,8 @@ v_qmlpointpath		text;
 v_qmllinepath		text;
 v_qmlpolpath		text;
 v_project_type		text;
-v_version		text;
-v_stats			json;
+v_version			text;
+v_stats				json;
 
 BEGIN
 	--  Search path	
@@ -70,19 +70,25 @@ BEGIN
 	ELSIF v_project_type = 'UD' THEN
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, p_result, 1, concat ('FLOW : Max.(',max(flow)::numeric(12,3), ') , Avg.(', avg(flow)::numeric(12,3), ') , Standard dev(', stddev(flow)::numeric(12,3)
-		, ') , Min(', min (flow)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+		SELECT 14, p_result, 1, concat ('MAX. FLOW : Max.(',max(max_flow)::numeric(12,3), ') , Avg.(', avg(max_flow)::numeric(12,3), ') , Standard dev(', stddev(max_flow)::numeric(12,3)
+		, ') , Min(', min (max_flow)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, p_result, 1, concat ('VELOCITY : Max.(',max(velocity)::numeric(12,3), ') , Avg.(', avg(velocity)::numeric(12,3), ') , Standard dev(', stddev(velocity)::numeric(12,3)
-		, ') , Min(', min (velocity)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+		SELECT 14, p_result, 1, concat ('VELOCITY : Max.(',max(max_veloc)::numeric(12,3), ') , Avg.(', avg(max_veloc)::numeric(12,3), ') , Standard dev(', stddev(max_veloc)::numeric(12,3)
+		, ') , Min(', min (max_veloc)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, p_result, 1, concat ('FULL PERCENT. : Max.(',max(fullpercent)::numeric(12,3), ') , Avg.(', avg(fullpercent)::numeric(12,3), ') , Standard dev(', stddev(fullpercent)::numeric(12,3)
-		, ') , Min(', min (fullpercent)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+		SELECT 14, p_result, 1, concat ('FULL PERCENT. : Max.(',max(mfull_dept)::numeric(12,3), ') , Avg.(', avg(mfull_dept)::numeric(12,3), ') , Standard dev(', stddev(mfull_dept)::numeric(12,3)
+		, ') , Min(', min (mfull_dept)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, p_result, 1, concat ('FLOODING : Max.(',max(flooding)::numeric(12,3), ') , Number (', avg(flooding)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result AND flooding > 0;
+		SELECT 14, p_result, 1, concat ('NODE SURCHARGE : Number of nodes (', count(*)::integer,').') 
+		FROM rpt_nodesurcharge_sum WHERE result_id = p_result;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, p_result, 1, concat ('NODE FLOODING: Number of nodes (', count(*)::integer,'), Max. rate (',max(max_rate)::numeric(12,3), '), Total flood (' ,sum(tot_flood), 
+		'), Max. flood', max(tot_flood),').')
+		FROM rpt_nodeflooding_sum WHERE result_id = p_result;
 	
 	END IF;
 
