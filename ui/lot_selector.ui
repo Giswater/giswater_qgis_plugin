@@ -53,7 +53,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Close</string>
+           <string>Tancar</string>
           </property>
          </widget>
         </item>

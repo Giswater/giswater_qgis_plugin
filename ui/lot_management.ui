@@ -25,7 +25,7 @@
         <item row="1" column="6">
          <widget class="QPushButton" name="btn_manage_user">
           <property name="text">
-           <string>User management</string>
+           <string>Gestor d'usuaris</string>
           </property>
          </widget>
         </item>
@@ -61,7 +61,7 @@
         <item row="0" column="1">
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Tipus d'actuacio:</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tipus d'actuació:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -82,7 +82,7 @@
         <item row="1" column="4">
          <widget class="QCheckBox" name="chk_assignacio">
           <property name="text">
-           <string>Feines pendents d'assignacio a OT</string>
+           <string>Feines pendents d'assignació a OT</string>
           </property>
          </widget>
         </item>
@@ -99,7 +99,7 @@
         <item row="2" column="6">
          <widget class="QPushButton" name="btn_manage_vehicle">
           <property name="text">
-           <string>Vehicle management</string>
+           <string>Gestor de vehicles</string>
           </property>
          </widget>
         </item>
@@ -123,7 +123,7 @@
              <enum>QFrame::Plain</enum>
             </property>
             <property name="text">
-             <string>From:</string>
+             <string>Des de:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -141,15 +141,15 @@
           </item>
           <item row="1" column="0">
            <widget class="QDateEdit" name="date_event_from">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
             <property name="date">
              <date>
               <year>2016</year>
               <month>1</month>
               <day>1</day>
              </date>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -171,7 +171,7 @@
              <enum>QFrame::Raised</enum>
             </property>
             <property name="text">
-             <string>To:</string>
+             <string>Fins:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -186,15 +186,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
             <property name="date">
              <date>
               <year>2017</year>
               <month>1</month>
               <day>1</day>
              </date>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -207,14 +207,14 @@
         <item>
          <widget class="QPushButton" name="btn_open">
           <property name="text">
-           <string>Open lot</string>
+           <string>Obrir Lot</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btn_delete">
           <property name="text">
-           <string>Delete lot</string>
+           <string>Eliminar Lot</string>
           </property>
          </widget>
         </item>
@@ -269,14 +269,14 @@
      <item>
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
-        <string>Aceptar</string>
+        <string>Acceptar</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancelar</string>
+        <string>Cancel·lar</string>
        </property>
       </widget>
      </item>

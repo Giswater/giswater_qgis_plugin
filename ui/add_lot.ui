@@ -693,7 +693,7 @@
              <enum>QFrame::Plain</enum>
             </property>
             <property name="text">
-             <string>Descripcio:</string>
+             <string>Descripció:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -716,7 +716,7 @@
         </widget>
         <widget class="QWidget" name="RelationsTab">
          <attribute name="title">
-          <string>Relations</string>
+          <string>Relació d'elements</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
@@ -735,7 +735,7 @@
                <enum>QFrame::Plain</enum>
               </property>
               <property name="text">
-               <string>Feature type:</string>
+               <string>Tipus d'element:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -859,7 +859,7 @@
         </widget>
         <widget class="QWidget" name="VisitsTab">
          <attribute name="title">
-          <string>Visits</string>
+          <string>Visites</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
@@ -896,7 +896,7 @@
               <item>
                <widget class="QLabel" name="label_data_event_from">
                 <property name="text">
-                 <string>From:</string>
+                 <string>Des de:</string>
                 </property>
                </widget>
               </item>
@@ -914,21 +914,21 @@
               <item>
                <widget class="QLabel" name="label_data_event_to">
                 <property name="text">
-                 <string>To:</string>
+                 <string>Fins:</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QDateEdit" name="date_event_to">
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
                 <property name="date">
                  <date>
                   <year>3000</year>
                   <month>1</month>
                   <day>1</day>
                  </date>
-                </property>
-                <property name="calendarPopup">
-                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -941,14 +941,14 @@
             <item>
              <widget class="QPushButton" name="btn_open_visit">
               <property name="text">
-               <string>Open visit</string>
+               <string>Obrir visita</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_delete_visit">
               <property name="text">
-               <string>Delete visit</string>
+               <string>Eliminar visita</string>
               </property>
              </widget>
             </item>
@@ -968,7 +968,7 @@
             <item>
              <widget class="QPushButton" name="btn_open_photo">
               <property name="text">
-               <string>Open Photo</string>
+               <string>Obrir foto</string>
               </property>
              </widget>
             </item>
@@ -1017,7 +1017,7 @@
         </widget>
         <widget class="QWidget" name="LoadsTab">
          <attribute name="title">
-          <string>Loads</string>
+          <string>Residus</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
@@ -1076,14 +1076,14 @@
      <item>
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
-        <string>Accept</string>
+        <string>Acceptar</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancel</string>
+        <string>Cancel·lar</string>
        </property>
       </widget>
      </item>
