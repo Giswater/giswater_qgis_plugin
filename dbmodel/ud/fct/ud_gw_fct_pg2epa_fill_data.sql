@@ -22,7 +22,7 @@ BEGIN
    DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
    
 -- set all timeseries of raingage using user's value
-   v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages');
+   v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
 	
 	IF v_rainfall IS NOT NULL THEN
 		UPDATE raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
