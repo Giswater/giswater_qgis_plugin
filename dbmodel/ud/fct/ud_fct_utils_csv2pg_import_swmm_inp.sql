@@ -108,14 +108,14 @@ BEGIN
 		DELETE FROM man_conduit;
 		DELETE FROM man_varc;
 
-		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_edit' AND id NOT LIKE 'v%') 
+		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_edit' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);
 		END LOOP;
 
 		
-		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_epa' AND id NOT LIKE 'v%') 
+		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_epa' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);
@@ -402,5 +402,5 @@ BEGIN
 	
 END;
 $BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
