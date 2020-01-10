@@ -102,11 +102,6 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
 
-	IF v_user_control is true and 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) then
-	
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, concat('NETWORK ANALYTICS WITH EPA RESULT: ', quote_nullable(v_eparesult)));
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, null, 0, '------------------------------------------------------------------------');
-	END IF;
 
 	IF v_qgis_version = v_version THEN
 		v_errortext=concat('INFO: Giswater version: ',v_version,'.');
@@ -246,45 +241,27 @@ BEGIN
 			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
 			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
 
+			EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
+			"client":{"device":3, "infoType":100, "lang":"ES"},
+			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
+			-- insert results 
+			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+			WHERE fprocesscat_id=111 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
+
+
 		END IF;
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
-			-- control if result id exists
-			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_eparesult) IS NULL THEN
-				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) VALUES
-				(101, 1, 'INFO (DB EPA): Check for EPA result not executed due result_id does not exists. Take a look on config form and update result_id');
-			ELSE
-				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
-				"client":{"device":3, "infoType":100, "lang":"ES"},
-				"feature":{},"data":{"parameters":{"resultId":"'||v_eparesult||'","saveOnDatabase":true, 
-				"useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)';
-				-- insert results 
-				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-				WHERE fprocesscat_id=14 AND criticity < 4 AND error_message !='' AND result_id ='gw_check_project' OFFSET 8;
-			END IF;
+			-- TODO: function to check data without result need to be developed. Unique function gw_fct_epa_check_data to check data must be divided into two functions
 
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
-			-- control if result id exists
-			IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_planresult) IS NULL THEN	
-				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message)  VALUES
-				(101, 1, 'INFO (DB PLAN): Check for PLAN result not executed due result_id does not exists. Take a look on config form and update result_id');
-			ELSE
-		
-				EXECUTE 'SELECT gw_fct_plan_check_data($${
-				"client":{"device":3, "infoType":100, "lang":"ES"},
-				"feature":{},
-				"data":{"parameters":{"resultId":"'||v_planresult||'"},"saveOnDatabase":true}}$$)';
-				-- insert results 
-				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-				SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
-				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !=''  AND result_id ='gw_check_project' OFFSET 6;
-			END IF;
-				
+			-- TODO: function to check data without result need to be developed. Unique function gw_fct_plan_check_data to check data must be divided into two functions
+			
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -471,6 +448,10 @@ BEGIN
 	--  Return	   
 	RETURN v_return;
 
+--    Exception handling
+    EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    
 END;
 
 $BODY$

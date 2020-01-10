@@ -25,19 +25,18 @@ SELECT gw_fct_om_check_data($${
 
 DECLARE
 v_project_type 		text;
-v_count				integer;
+v_count			integer;
 v_saveondatabase 	boolean;
-v_result 			text;
-v_version			text;
+v_result 		text;
+v_version		text;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
 v_result_polygon	json;
-v_querytext			text;
+v_querytext		text;
 v_result_id 		text;
-v_features 			text;
-v_edit				text;
-v_onlygrafanalytics boolean;
+v_features 		text;
+v_edit			text;
 v_config_param 		text;
 
 BEGIN
@@ -47,8 +46,6 @@ BEGIN
 
 	-- getting input data 	
 	v_features := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
-	v_onlygrafanalytics := ((p_data ->>'data')::json->>'parameters')::json->>'onlyGrafAnalytics';
-
 	
 	-- select config values
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
@@ -70,7 +67,7 @@ BEGIN
 	-- delete old values on anl table
 	DELETE FROM anl_connec WHERE cur_user=current_user AND fprocesscat_id IN (101,102,104,105,106);
 	DELETE FROM anl_arc WHERE cur_user=current_user AND fprocesscat_id IN (4,88,102);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103,108,109);
+	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id IN (4,87,96,97,102,103);
 
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
@@ -288,10 +285,8 @@ BEGIN
 		VALUES (25, 1, 'INFO: All features with id integer.');
 	END IF;
 
-	-- only UD projects
-	IF 	v_project_type='UD' THEN
-
-		-- Check state not according with state_type	
+	-- Check state not according with state_type	
+	IF v_project_type = 'UD' THEN
 		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
 				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
 				UNION SELECT a.state, state_type FROM '||v_edit||'connec a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
@@ -307,8 +302,27 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No features without concordance againts state and state_type.');
 		END IF;
+		
+	ELSIF v_project_type = 'WS' THEN
+	
+		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
+				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
+				UNION SELECT a.state, state_type FROM '||v_edit||'connec a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
+				UNION SELECT a.state, state_type FROM '||v_edit||'element a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state';
 
-		-- Check code with null values
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No features without concordance againts state and state_type.');
+		END IF;
+	END IF;
+	
+	-- Check code with null values
+	IF v_project_type ='UD' THEN
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
 					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
@@ -324,28 +338,27 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.');
 		END IF;
-		
-		
-		-- Check for missed features on inp tables
-		v_querytext = '(SELECT arc_id, ''arc'' as feature_tpe FROM arc WHERE arc_id NOT IN (select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir 
-						UNION select arc_id from inp_pump UNION select arc_id from inp_outlet UNION select arc_id from inp_orifice) AND state > 0 AND epa_type !=''NOT DEFINED''
-						UNION
-						SELECT node_id, ''node'' FROM node WHERE node_id NOT IN(
-						select node_id from inp_junction UNION select node_id from inp_storage UNION select node_id from inp_outfall UNION select node_id from inp_divider)
-						AND state >0 AND epa_type !=''NOT DEFINED'') a';
-		
-		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		
-		IF v_count > 0 THEN
 
+	ELSIF v_project_type ='WS' THEN
+
+		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
+				UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
+				UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
+				UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
+
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No features missed on inp_tables found.');
+			VALUES (25, 1, 'INFO: No features (arc, node, connec, element) with NULL values on code found.');
 		END IF;
+	END IF;
 			
-		-- Check for orphan polygons on polygon table
+	-- Check for orphan polygons on polygon table
+	IF v_project_type ='UD' THEN
+
 		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from gully UNION select pol_id from man_chamber 
 					   UNION select pol_id from man_netgully UNION select pol_id from man_storage UNION select pol_id from man_wwtp) a) b';
 
@@ -358,9 +371,13 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.');
 		END IF;
-		
-	
-		-- Check for orphan rows on man_addfields values table
+	ELSIF v_project_type ='WS' THEN
+
+	END IF;
+
+	-- Check for orphan rows on man_addfields values table
+	IF v_project_type ='UD' THEN
+
 		v_querytext = 'SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -372,269 +389,21 @@ BEGIN
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 1, 'INFO: No rows without feature found on man_addfields_value table.');
-		END IF;
-	
+		END IF;	
 
 	ELSIF v_project_type='WS' THEN
-		
-		-- Check if there are nodes type 'ischange=1 or 2 (true or maybe)' without changing catalog of acs (108)
-		v_querytext = '(SELECT n.node_id, count(*), nodecat_id, the_geom FROM 
-				(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc WHERE node_1 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
-				  UNION
-				 SELECT node_2, arccat_id FROM '||v_edit||'arc WHERE node_2 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
-				GROUP BY 1,2) a	JOIN node n USING (node_id) GROUP BY 1,3,4 HAVING count(*) <> 2)';
-
-		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
-
-		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-			SELECT 108, node_id, nodecat_id, ''Node with ischange=1 without any variation of arcs in terms of diameter, pn or material'', the_geom FROM (', v_querytext,') b');
-
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' nodes with ischange on 1 (true) without any variation of arcs in terms of diameter, pn or material. Please, check your data before continue.'));
-			-- is defined as warning because error (3) will break topologic issues of mapzones
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No nodes ''ischange'' without real change have been found.');
-		END IF;
-		
-
-		-- Check if there are change of catalog with node_type 'ischange=0 (false)' (109)
-		v_querytext = '(SELECT node_id, nodecat_id, array_agg(arccat_id) as arccat_id, the_geom FROM ( SELECT count(*), node_id, arccat_id FROM 
-				(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc UNION ALL SELECT node_2, arccat_id FROM '||v_edit||'arc)a GROUP BY 2,3 HAVING count(*) <> 2 ORDER BY 2) b
-				JOIN node USING (node_id) JOIN cat_node ON id=nodecat_id WHERE ischange=0 GROUP By 1,2,4 HAVING count(*)=2)';	
-
-		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
-
-		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-			SELECT 109, node_id, nodecat_id, concat(''Nodes with catalog changes without nodecat_id ischange:'',arccat_id), the_geom FROM (', v_querytext,') b');
-
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' nodes where arc catalog changes without nodecat with ischange on 0 or 2 (false or maybe). Please, check your data before continue.'));
-			-- is defined as warning because error (3) will break topologic issues of mapzones
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No nodes without ''ischange'' where arc changes have been found');
-		END IF;
-
-
-		-- Check state not according with state_type	
-		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
-				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
-				UNION SELECT a.state, state_type FROM '||v_edit||'connec a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state	
-				UNION SELECT a.state, state_type FROM '||v_edit||'element a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state';
-
-		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'));
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No features without concordance againts state and state_type.');
-		END IF;
-
-
-		IF v_onlygrafanalytics::boolean IS FALSE THEN
-
-			-- Check code with null values
-			v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
-					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
-					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
-					UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
-
-			EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (25, 3, concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'));
-			ELSE
-				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-				VALUES (25, 1, 'INFO: No features (arc, node, connec, element) with NULL values on code found.');
-			END IF;
-	
-			-- Check for missed features on inp tables
-			v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) 
-					AND state > 0 AND epa_type !=''NOT DEFINED'' UNION SELECT node_id FROM node WHERE node_id 
-					NOT IN (select node_id from inp_shortpipe UNION select node_id from inp_valve UNION select node_id from inp_tank 
-					UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump UNION SELECT node_id from inp_inlet 
-					UNION SELECT node_id from inp_junction) AND state >0 AND epa_type !=''NOT DEFINED'') a';
-		
-			EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (25, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
-			ELSE
-				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-				VALUES (25, 1, 'INFO: No features missed on inp_tables found.');
-			END IF;
-	
-	
-			-- Check for orphan polygons on polygon table
-			v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a) b';
-
-			EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (25, 2, concat('WARNING: There is/are ',v_count,' polygons without parent (register, tank, fountain).  We recommend you to clean data before continue.'));
-			ELSE
-				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-				VALUES (25, 1, 'INFO: No polygons without parent feature (register, tank, fountain) found.');
-			END IF;
-	
-	
-			-- Check for orphan rows on man_addfields values table
-			v_querytext = 'SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec)';
-
-			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	
-			IF v_count > 0 THEN
-				VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows without feature on man_addfields_value table.  We recommend you to clean data before continue.'));
-				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-				VALUES (25, 2, concat('SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec)'));
-			ELSE
-				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-				VALUES (25, 1, 'INFO: No rows without feature found on man_addfields_value table.');
-			END IF;
-
-		END IF;
-	
-		
-		-- valves closed/broken with null values (fprocesscat = 76)
-		v_querytext = '(SELECT n.node_id, n.nodecat_id, n.the_geom FROM '||v_edit||'man_valve JOIN node n USING (node_id) WHERE n.state > 0 AND (broken IS NULL OR closed IS NULL)) a';
+		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a) b';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 76, node_id, nodecat_id, ''valves closed/broken with null values'', the_geom FROM ', v_querytext);
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' valve''s (state=1) with broken or closed with NULL values.'));
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 3, concat('SELECT * FROM anl_node WHERE fprocesscat_id=76 AND cur_user=current_user'));
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: No valves''s (state=1) with null values on closed and broken fields.');
-		END IF;
-
-		-- inlet_x_exploitation
-		SELECT count(*) INTO v_count FROM anl_mincut_inlet_x_exploitation WHERE expl_id NOT IN (SELECT expl_id FROM exploitation);
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 3, concat('ERROR: There is/are at least ',v_count,' 
-			exploitation(s) bad configured on the anl_mincut_inlet_x_exploitation table. Please check your data before continue'));
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: It seems anl_mincut_inlet_x_exploitation table is well configured. At least, table is filled with nodes from all exploitations.');
-		END IF;
-	
-		-- nodetype.grafdelimiter configuration
-		SELECT count(*) INTO v_count FROM node_type where graf_delimiter IS NULL;
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows on the node_type table with null values on graf_delimiter. Please check your data before continue'));
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: The graf_delimiter column on node_type table has values for all rows.');
-		END IF;
-
-		-- Sector : check coherence againts nodetype.grafdelimiter and nodeparent defined on sector.grafconfig (fprocesscat = 79)
-		v_querytext = 	'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
-				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
-				FROM sector WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''SECTOR'' AND a.node_id IS NULL 
-				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM sector) AND '||v_edit||'node.state > 0';
-
-		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-
-		IF v_count > 0 THEN
-			EXECUTE concat 
-			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 79, node_id, nodecat_id, ''The node_type.grafdelimiter of this node is SECTOR but it is not configured on sector.grafconfig'', the_geom FROM (', v_querytext,')a');
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with node_type.graf_delimiter=''SECTOR'' not configured on the sector table.'));
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=79 AND cur_user=current_user'));
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: All nodes with node_type.grafdelimiter=''SECTOR'' are defined as nodeParent on sector.grafconfig');
-		END IF;
 		
-		-- dma : check coherence againts nodetype.grafdelimiter and nodeparent defined on dma.grafconfig (fprocesscat = 80)
-		v_querytext = 	'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
-				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
-				FROM dma WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''DMA'' AND a.node_id IS NULL 
-				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM dma) AND '||v_edit||'node.state > 0';
-
-
-		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-
 		IF v_count > 0 THEN
-			EXECUTE concat 
-			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 80, node_id, nodecat_id, ''Node_type is DMA but node is not configured on dma.grafconfig'', the_geom FROM ('
-			, v_querytext,')a');
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with node_type.graf_delimiter=''DMA'' not configured on the dma table.'));
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=80 AND cur_user=current_user'));
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' polygons without parent (register, tank, fountain).  We recommend you to clean data before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: All nodes with node_type.grafdelimiter=''DMA'' are defined as nodeParent on dma.grafconfig');
+			VALUES (25, 1, 'INFO: No polygons without parent feature (register, tank, fountain) found.');
 		END IF;
 
-		-- dqa : check coherence againts nodetype.grafdelimiter and nodeparent defined on dqa.grafconfig (fprocesscat = 81)
-		v_querytext = 	'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
-				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
-				FROM dqa WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''DQA'' AND a.node_id IS NULL 
-				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM dqa)';
-
-
-		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-
-		IF v_count > 0 THEN
-			EXECUTE concat 
-			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 81, node_id, nodecat_id, ''Node_type is DQA but node is not configured on dqa.grafconfig'', the_geom FROM (', v_querytext,')a');
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with node_type.graf_delimiter=''DQA'' not configured on the dqa table.'));
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=81 AND cur_user=current_user'));
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: All nodes with node_type.grafdelimiter=''DQA'' are defined as nodeParent on dqa.grafconfig');
-		END IF;
-
-		-- presszone : check coherence againts nodetype.grafdelimiter and nodeparent defined on cat_presszone.grafconfig (fprocesscat = 82)
-		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
-				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
-				FROM cat_presszone WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''PRESSZONE'' AND a.node_id IS NULL 
-				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM cat_presszone)';
-
-
-		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-
-		IF v_count > 0 THEN
-			EXECUTE concat 
-			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 82, node_id, nodecat_id, ''Node_type is PRESSZONE but node is not configured on cat_presszone.grafconfig'', the_geom FROM (', v_querytext,')a');
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with node_type.graf_delimiter=''PRESSZONE'' not configured on the cat_presszone table.'));
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=82 AND cur_user=current_user'));
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (25, 1, 'INFO: All nodes with node_type.grafdelimiter=''PRESSZONE'' are defined as nodeParent on cat_presszone.grafconfig');
-		END IF;
-		
-
-		-- sector, toArc (fprocesscat = 83)
-
-		-- dma, toArc (fprocesscat = 84)
-
-		-- dqa, toArc (fprocesscat = 85)
-
-		-- presszone, toArc (fprocesscat = 86)
-		
 	END IF;
 	
 	-- connec/gully without link
@@ -846,8 +615,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: No features with end date earlier than built date');
 	END IF;
-
-	
+		
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 4, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 3, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 2, '');	
@@ -866,7 +634,7 @@ BEGIN
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() 
-	AND fprocesscat_id IN (4,76,79,80,81,82,87,96,87,102,103,108,109)
+	AND fprocesscat_id IN (4,87,96,87,102,103)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() 
 	AND fprocesscat_id IN (101,102,104,105,106)) row;  
