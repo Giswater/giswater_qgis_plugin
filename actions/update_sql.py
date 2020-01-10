@@ -2346,7 +2346,7 @@ class UpdateSQL(ApiParent):
             elif schema_type.lower() == 'ud':
                 function_name = 'gw_fct_utils_csv2pg_import_swmm_inp'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
-                extras = '"parameters":{"createSubcGeom":' + str(createSubcGeom.isChecked()) + '}'
+                extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '"}'
             else:
                 self.error_count = self.error_count + 1
                 return
