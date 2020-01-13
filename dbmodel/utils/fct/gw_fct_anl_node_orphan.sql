@@ -125,7 +125,8 @@ BEGIN
 	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||
+				'"point":'||v_result_point||','||
+				'"setVisibleLayers":[]'||
 			'}}'||
 	    '}')::json;
 

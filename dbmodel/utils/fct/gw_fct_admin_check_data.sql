@@ -300,6 +300,7 @@ END IF;
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
+		    	'"setVisibleLayers":[]'||','||
 				'"point":{"geometryType":"", "values":[]}'||','||
 				'"line":{"geometryType":"", "values":[]}'||','||
 				'"polygon":{"geometryType":"", "values":[]}'||

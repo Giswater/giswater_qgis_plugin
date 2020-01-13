@@ -32,11 +32,26 @@ v_version text;
 v_cat_feature text;
 rec text;
 
+v_topocontrol boolean;
+v_workcat text;
+v_state integer;
+v_state_type integer;
+
 BEGIN 
 
+SELECT gw_fct_insert_importdxf($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
+	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"btn_path":"C:/dev/import_dxf/ws_sample_dxf2.dxf", 
+	"state":"0", "workcat_id":"work4", "topocontrol":"false"}}}$$)::text
+	
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
+
+	-- get input data 	
+	v_workcat := ((p_data ->>'data')::json->>'parameters')::json->>'workcat_id'::text;
+	v_topocontrol := ((p_data ->>'data')::json->>'parameters')::json->>'topocontrol'::boolean;
+	v_state := ((p_data ->>'data')::json->>'parameters')::json->>'state'::integer;
+	v_state_type := ((p_data ->>'data')::json->>'parameters')::json->>'state_type'::integer;
 
 	-- select config values
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
@@ -165,6 +180,7 @@ BEGIN
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
+		     	'"setVisibleLayers":[]'||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||

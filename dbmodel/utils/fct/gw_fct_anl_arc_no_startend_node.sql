@@ -133,7 +133,8 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||
+				'"line":'||v_result_line||','||
+				'"setVisibleLayers":[]'||
 		       '}}'||
 	    '}')::json;
 	 

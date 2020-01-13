@@ -94,7 +94,8 @@ BEGIN
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-				'"line":'||v_result_line||
+				'"line":'||v_result_line||','||
+				'"setVisibleLayers":[]'||
 		       '}}'||
 	    '}')::json; 
 
