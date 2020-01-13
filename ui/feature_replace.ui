@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="2">
-    <widget class="QTabWidget" name="info_log">
+    <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
       <number>0</number>
      </property>
