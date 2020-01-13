@@ -10,7 +10,7 @@ from qgis.core import Qgis, QgsVectorLayer, QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
-from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtCore import QSettings, Qt, QDate
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
@@ -1219,10 +1219,10 @@ class UpdateSQL(ApiParent):
         if new_project is True:
             if str(self.title) != 'null':
                 extras += ', ' + '"title":"' + str(self.title) + '"'
-            if str(self.author) != 'null':
-                extras += ', ' + '"author":"' + str(self.author) + '"'
-            if str(self.date) != 'null':
-                extras += ', ' + '"date":"' + str(self.date) + '"'
+            extras += ', ' + '"author":"' + str(self.controller.current_user) + '"'
+            current_date = QDate.currentDate().toString('dd-MM-yyyy')
+            extras += ', ' + '"date":"' + str(current_date) + '"'
+
         extras += ', "superUsers":' + str(self.super_users).replace("'",'"') + ''
 
         self.schema_name = schema_name
@@ -1319,8 +1319,6 @@ class UpdateSQL(ApiParent):
         self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
 
         self.title = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_title)
-        self.author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
-        self.date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
         project_name = str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name))
         schema_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
         self.filter_srid_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'srid_id')
@@ -2122,8 +2120,6 @@ class UpdateSQL(ApiParent):
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
         self.project_title = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_title')
-        self.project_author = self.dlg_readsql_create_project.findChild(QLineEdit, 'author')
-        self.project_date = self.dlg_readsql_create_project.findChild(QLineEdit, 'date')
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
         self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
