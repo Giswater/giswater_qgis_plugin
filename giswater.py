@@ -256,21 +256,9 @@ class Giswater(QObject):
         menu = QMenu()
         # List of nodes from node_type_cat_type - nodes which we are using
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
-        help_added = False
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
                     index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
-                if not help_added:
-                    icon_path = self.plugin_dir + '/icons/308.png'
-                    icon = QIcon(icon_path)
-                    if feature_cat.feature_type.upper() in ('NODE', 'CONNEC', 'GULLY'):
-                        obj_action = QAction(icon, f'Insert point \t           ?', self)
-                    else:
-                        obj_action = QAction(icon, f'Insert arc \t           ?', self)
-                    obj_action.triggered.connect(partial(self.open_browser, f'insert-{feature_cat.feature_type.lower()}'))
-                    menu.addAction(obj_action)
-                    menu.addSeparator()
-                    help_added = True
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
