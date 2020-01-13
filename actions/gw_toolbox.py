@@ -305,7 +305,10 @@ class GwToolBox(ApiParent):
                             extras += f'"{param_name}":"{str(value).lower()}", '
                         elif type(widget) in ('', QgsDateTimeEdit):
                             value = utils_giswater.getCalendarDate(dialog, widget)
-                            extras += f'"{param_name}":"{value}", '
+                            if value == "" or value is None:
+                                extras += f'"{param_name}":null, '
+                            else:
+                                extras += f'"{param_name}":"{value}", '
 
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"

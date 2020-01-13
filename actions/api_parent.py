@@ -1260,7 +1260,9 @@ class ApiParent(ParentAction):
                     widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
                     widget.setDisplayFormat('yyyy/MM/dd')
-                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                    date = QDate.currentDate()
+                    if 'value' in field and field['value'] not in ('', None, 'null'):
+                        date = QDate.fromString(field['value'], 'yyyy-MM-dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
