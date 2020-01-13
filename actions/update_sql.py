@@ -1436,6 +1436,7 @@ class UpdateSQL(ApiParent):
         if self.rdb_import_data.isChecked():
             #TODO:
             self.task1.setProgress(100)
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             self.controller.show_info_box(msg, "Info")
@@ -1443,13 +1444,16 @@ class UpdateSQL(ApiParent):
             return
 
         elif self.rdb_sample.isChecked():
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
             self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
             self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
             pass
 
         self.manage_process_result(project_name_schema)
@@ -2129,6 +2133,10 @@ class UpdateSQL(ApiParent):
         #Load user values
         self.project_name.setText(str(self.controller.plugin_settings_value('project_name_schema')))
         self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
+        create_schema_type = self.controller.plugin_settings_value('create_schema_type')
+        if create_schema_type:
+            utils_giswater.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
+
         if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
             self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
 
