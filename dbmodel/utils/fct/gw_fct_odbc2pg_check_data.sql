@@ -55,7 +55,9 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=73 AND user_name=current_user;
-	
+	DELETE FROM anl_arc WHERE fprocesscat_id=90 and cur_user=current_user;
+	DELETE FROM anl_connec WHERE fprocesscat_id=92 and cur_user=current_user;
+
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (73, NULL, 4, concat('DATA ANALYSIS ACORDING ODBC IMPORT-EXPORT RULES'));
@@ -88,7 +90,6 @@ BEGIN
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		DELETE FROM anl_connec WHERE fprocesscat_id=92 and cur_user=current_user;
 		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) SELECT 92, connec_id, connecat_id, ''Connecs without DMA'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (73, 2, concat('WARNING: There is/are ',v_count,' connec(s) NOT exported through the ODBC system. Please check your data before continue'));
