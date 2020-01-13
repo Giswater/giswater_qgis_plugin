@@ -41,28 +41,20 @@ BEGIN
         NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
 
 
-	IF visit_table IS NULL THEN
-	v_query_text=' SELECT * FROM om_visit_parameter 
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
-			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-			WHERE om_visit_parameter.feature_type IS NULL AND om_visit_class.ismultievent is true';
-	ELSE
+	-- Get related parameters(events) from visit_class
 	v_query_text='	SELECT * FROM om_visit_parameter 
 			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
 			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
 			WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
-	END IF;
 
-	FOR v_parameters IN EXECUTE  v_query_text
+	FOR v_parameters IN EXECUTE v_query_text
         LOOP
-          
                 EXECUTE 'SELECT $1.' || v_parameters.id
                     USING NEW
                     INTO v_new_value_param;
                      
                     EXECUTE 'INSERT INTO om_visit_event (visit_id, parameter_id, value) VALUES ($1, $2, $3)'
                     USING NEW.visit_id, v_parameters.id, v_new_value_param;
-
             END LOOP;
 
             IF visit_table = 'arc' THEN
@@ -82,37 +74,29 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
  
  
- 	    IF  NEW.enddate IS NOT NULL THEN
+	IF  NEW.enddate IS NOT NULL THEN
 		UPDATE om_visit SET enddate=left (date_trunc('second', NEW.enddate::date)::text, 19)::timestamp WHERE id=NEW.visit_id;	
-	    END IF;
+	END IF;
     
-            UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, 
-            webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
-            lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
+	UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, 
+	webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
+	lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
 
-            IF visit_table IS NULL THEN
-		v_query_text=' SELECT * FROM om_visit_parameter 
-				JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
-				JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-				WHERE om_visit_parameter.feature_type IS NULL AND om_visit_class.ismultievent is true';
-	    ELSE
-		v_query_text='	SELECT * FROM om_visit_parameter 
-				JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
-				JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-				WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
-	    END IF;
+   	-- Get related parameters(events) from visit_class
+	v_query_text='	SELECT * FROM om_visit_parameter 
+			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
+			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
+			WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
 
-            FOR v_parameters IN EXECUTE v_query_text 
-            LOOP
-                EXECUTE 'SELECT $1.' || v_parameters.id
-                    USING NEW
+	FOR v_parameters IN EXECUTE v_query_text 
+	LOOP
+		EXECUTE 'SELECT $1.' || v_parameters.id
+		    USING NEW
                     INTO v_new_value_param;
-
-                  EXECUTE 'UPDATE om_visit_event SET  value=$3 WHERE visit_id=$1 AND parameter_id=$2'
-                    USING NEW.visit_id, v_parameters.id, v_new_value_param;
-                       
+        
+		EXECUTE 'UPDATE om_visit_event SET  value=$3 WHERE visit_id=$1 AND parameter_id=$2'
+                    USING NEW.visit_id, v_parameters.id, v_new_value_param;  
         END LOOP;
-
         
     RETURN NEW;
     
