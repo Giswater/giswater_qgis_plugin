@@ -1398,12 +1398,17 @@ class ApiParent(ParentAction):
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
             value = utils_giswater.get_item_data(dialog, widget, 0)
-
-        if str(value) == '' or value is None:
-            _json[str(widget.property('column_id'))] = None
-        else:
-            _json[str(widget.property('column_id'))] = str(value)
-
+        elif type(widget) is QCheckBox and widget.isEnabled():
+            value = utils_giswater.isChecked(dialog, widget)
+        elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+            value = utils_giswater.getCalendarDate(dialog, widget)
+        # Only get values if layer is editable
+        if self.layer.isEditable():
+            # If widget.isEditable(False) return None, here control it.
+            if str(value) == '' or value is None:
+                _json[str(widget.property('column_id'))] = None
+            else:
+                _json[str(widget.property('column_id'))] = str(value)
 
     def set_function_associated(self, dialog, widget, field):
 

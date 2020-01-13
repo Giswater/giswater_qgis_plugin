@@ -965,26 +965,6 @@ class ApiCF(ApiParent, QObject):
                 action.setEnabled(enabled)
 
 
-    def get_values(self, dialog, widget, _json=None):
-
-        value = None
-        if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
-            value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
-        elif type(widget) is QComboBox and widget.isEnabled():
-            value = utils_giswater.get_item_data(dialog, widget, 0)
-        elif type(widget) is QCheckBox and widget.isEnabled():
-            value = utils_giswater.isChecked(dialog, widget)
-        elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
-            value = utils_giswater.getCalendarDate(dialog, widget)
-
-        # Only get values if layer is editable
-        if self.layer.isEditable():
-            # If widget.isEditable(False) return None, here control it.
-            if str(value) == '' or value is None:
-                _json[str(widget.property('column_id'))] = None
-            else:
-                _json[str(widget.property('column_id'))] = str(value)
-
 
     def check_datatype_validator(self, dialog, widget, btn):
         """
