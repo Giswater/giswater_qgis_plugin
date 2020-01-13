@@ -156,6 +156,7 @@ DECLARE
 	v_lot integer;
 	v_userrole text;
 	v_code text;
+	v_check_code text;
 	
 
 BEGIN
@@ -327,7 +328,12 @@ BEGIN
 		--visitcat
 		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user)::integer;
 		--code
-		EXECUTE 'SELECT code FROM '||v_featuretablename||' WHERE ' || (v_featuretype) || '_id = '||v_featureid||'::text' INTO v_code;
+		EXECUTE 'SELECT feature_type FROM om_visit_class WHERE id = '||v_visitclass INTO v_check_code;
+		IF v_check_code IS NOT NULL THEN
+			EXECUTE 'SELECT code FROM '||v_featuretablename||' WHERE ' || (v_featuretype) || '_id = '||v_featureid||'::text' INTO v_code;
+		END IF;
+		
+
 		-- lot
 		v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);		
 	
