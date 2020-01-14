@@ -1257,6 +1257,7 @@ class Giswater(QObject):
         checks = self.dlg_audit_project.findChildren(QCheckBox)
         schemaname = self.schema_name.replace('"','')
         for check in checks:
+            if check.objectName() == 'chk_hide_form': continue
             if check.isChecked():
                 sql = (f"SELECT attname FROM pg_attribute a "
                        f" JOIN pg_class t on a.attrelid = t.oid "
