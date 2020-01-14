@@ -322,17 +322,21 @@ BEGIN
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 			v_formtabs := v_formtabs || v_tabaux::text;
 
-	
 			-- Active lots tab
 			------------------
 			   IF v_activelotstab THEN
-
 				-- setting table feature
 				v_feature := '{"tableName":"om_visit_lot"}';		
 				
 				-- setting feature
 				p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
 
+				-- setting filterFields
+				v_filterfields := (((p_data->>'data')::json->>'fields')::json)->>'team_id';
+				v_data := (p_data->>'data');
+				v_data := gw_fct_json_object_set_key(v_data, 'filterFields', '{"team_id":'||v_filterfields||'}');
+				p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
+				
 				--refactor tabNames
 				p_data := replace (p_data::text, 'tabFeature', 'feature');
 				
@@ -387,37 +391,36 @@ BEGIN
 
 			END IF;
 
-			-- setting feature
-			p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
+				-- setting feature
+				p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
 
-			-- refactor fields by filterFields
-			v_filterfields := ((p_data->>'data')::json->>'fields')::json;
-			v_data := (p_data->>'data');
-			v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
-			
-			-- setting filter fields of feature id
-			IF v_featuretype IS NOT NULL THEN				
-
-				-- setting filterfeaturefields using feature id
-				v_filterfeature = (concat('{"',v_featuretype,'_id":"',v_featureid,'"}'))::json;
+				-- refactor fields by filterFields
+				v_filterfields := ((p_data->>'data')::json->>'fields')::json;
+				v_data := (p_data->>'data');
+				v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
 				
-				v_data := gw_fct_json_object_set_key(v_data, 'filterFeatureField', v_filterfeature);
-				p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
+				-- setting filter fields of feature id
+				IF v_featuretype IS NOT NULL THEN				
 
-			END IF;
+					-- setting filterfeaturefields using feature id
+					v_filterfeature = (concat('{"',v_featuretype,'_id":"',v_featureid,'"}'))::json;
+					v_data := gw_fct_json_object_set_key(v_data, 'filterFeatureField', v_filterfeature);
+					p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
 
-			--refactor tabNames
-			p_data := replace (p_data::text, 'tabFeature', 'feature');
-		
-			RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
-			SELECT gw_api_getlist (p_data) INTO v_fields_json;
-			raise notice 'TEST BBB -> %',p_data;
-
-			-- getting pageinfo and list values
-			v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
-			v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
+				END IF;
+	
+				--refactor tabNames
+				p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-			v_fields_json := COALESCE(v_fields_json, '{}');
+				RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
+				SELECT gw_api_getlist (p_data) INTO v_fields_json;
+				
+
+				-- getting pageinfo and list values
+				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
+				v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
+				
+				v_fields_json := COALESCE(v_fields_json, '{}');
 		END IF;
 
 		-- building
@@ -435,7 +438,6 @@ BEGIN
 		ELSIF v_isfeaturemanager THEN 
 			v_formtabs := v_formtabs || v_tabaux::text;
 		END IF;
-
 
 
 		-- Team tab
@@ -494,13 +496,13 @@ BEGIN
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
 		'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activeteamtab);
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+		
 		IF v_isusermanager THEN
 			v_formtabs := v_formtabs || ',' || v_tabaux::text;
 		ELSIF v_isfeaturemanager THEN 
 			v_formtabs := v_formtabs || v_tabaux::text;
 		END IF;
 
-	
 		--closing tabs array
 		v_formtabs := (v_formtabs ||']');
 

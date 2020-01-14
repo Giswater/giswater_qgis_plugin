@@ -53,15 +53,21 @@ BEGIN
     v_hash = ((p_data ->>'data')::json->>'fields')::json->>'hash';
     v_photo_url = ((p_data ->>'data')::json->>'fields')::json->>'photo_url';
 	
-
+	
 	-- Get vehicle id
 	--EXECUTE 'SELECT id FROM ext_cat_vehicle WHERE idval = '''|| v_vehicle_name ||'''' INTO v_vehicle_id;
 
 	-- Get user_id and team_id
-	EXECUTE 'SELECT user_id, team_id, lot_id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_record;
+	EXECUTE 'SELECT user_id, team_id, lot_id, endtime FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_record;
 	
-	-- Inserting data
-	EXECUTE 'INSERT INTO om_vehicle_x_parameters (vehicle_id, lot_id, team_id, image, load, cur_user, tstamp) VALUES('''||v_vehicle_name||''','||v_record.lot_id||','||v_record.team_id::integer||', '''|| COALESCE(v_photo_url, '') ||COALESCE(v_hash, '') ||''','''||COALESCE(v_load, '0')||''', current_user,'''||NOW()||''')';
+	IF v_record.endtime IS NULL THEN
+		-- Inserting data (With started lot)
+		EXECUTE 'INSERT INTO om_vehicle_x_parameters (vehicle_id, team_id, image, load, cur_user, tstamp) VALUES('''||v_vehicle_name||''','||v_record.team_id::integer||', '''|| COALESCE(v_photo_url, '') ||COALESCE(v_hash, '') ||''','''||COALESCE(v_load, '0')||''', current_user,'''||NOW()||''')';
+	ELSE
+		-- Inserting data (Without started lot)
+		EXECUTE 'INSERT INTO om_vehicle_x_parameters (vehicle_id, lot_id, team_id, image, load, cur_user, tstamp) VALUES('''||COALESCE(v_vehicle_name, '')||''','||v_record.lot_id||','||v_record.team_id::integer||', '''|| COALESCE(v_photo_url, '') ||COALESCE(v_hash, '') ||''','''||COALESCE(v_load, '0')||''', current_user,'''||NOW()||''')';
+	END IF;
+	
 	
 	-- getting message
 	SELECT gw_api_getmessage(v_feature, 40) INTO v_message;

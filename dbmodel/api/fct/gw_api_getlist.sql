@@ -113,6 +113,8 @@ DECLARE
 	v_orderby varchar;
 	v_ordertype varchar;
 	v_limit integer;
+	v_filterlot integer;
+	v_filterteam integer;
 	v_offset integer;
 	v_currentpage integer;
 	v_lastpage integer;
@@ -179,8 +181,10 @@ BEGIN
 	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
 	v_startdate = ((p_data ->>'data')::json->>'fields')::json->>'startdate'::text;
 	v_limit = ((p_data ->>'data')::json->>'fields')::json->>'limit'::text;
+	v_filterlot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id'::text;
+	v_filterteam = ((p_data ->>'data')::json->>'fields')::json->>'team_id'::text;
 
-
+	
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
 	END IF;
@@ -304,32 +308,46 @@ BEGIN
 				v_sign = '=';
 			END IF;
 
-			
+		    
 		    -- Get column type
 		    
 		    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = %s AND column_name = $2', quote_literal(v_tablename))
 			USING v_schemaname, v_field
 			INTO v_columntype;
-
 			
 			-- creating the query_text
-			IF v_value IS NOT NULL AND v_field != 'limit' THEN
-				IF v_startdate IS NOT NULL THEN
-					v_query_result := v_query_result || ' AND '||v_field||'::'||v_columntype||' '||v_sign||' '||quote_literal(v_startdate) ||'::'||v_columntype;
-				ELSE
-					v_query_result := v_query_result || ' AND '||v_field||'::'||v_columntype||' '||v_sign||' '||quote_literal(v_value) ||'::'||v_columntype;
-				END IF;
-
-			ELSIF v_field='limit' THEN
+			
+			IF v_field='limit' THEN
 				IF v_limit IS NULL THEN
 					v_limit := v_value;
 				END IF;
+			ELSIF v_field='lot_id' THEN
+				IF v_filterlot IS NULL THEN
+					v_filterlot := v_value;
+				END IF;
+				
+				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterlot) ||'::text';
+			ELSIF v_field='team_id' THEN
+			
+				IF v_filterteam IS NULL THEN
+					v_filterteam := v_value;
+				END IF;
+				
+				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterteam) ||'::text';
+			ELSIF v_value IS NOT NULL  THEN
+				IF v_startdate IS NULL THEN
+					v_startdate := v_value;			
+				END IF;
+				v_query_result := v_query_result || ' AND '||v_field||'::'||COALESCE(v_columntype, 'text')||' '||v_sign||' '||quote_literal(v_startdate) ||'::'||COALESCE(v_columntype, 'text');
 			END IF;
 		END LOOP;
+		
 	END IF;
-
+	raise notice 'V_QUERY_RESULT -> %',v_query_result;
+	
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
+	
 	IF v_text IS NOT NULL THEN
 		FOREACH text IN ARRAY v_text
 		LOOP
@@ -498,7 +516,6 @@ BEGIN
 -- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
 	v_fields_json_ = array_to_json (v_filter_fields_);
-
 --    Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_featuretype := COALESCE(v_featuretype, '');
