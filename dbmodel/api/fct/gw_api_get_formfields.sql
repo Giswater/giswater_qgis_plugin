@@ -276,7 +276,7 @@ BEGIN
 						
 						-- Get combo id's
 						
-						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL AND p_id != '' AND (field_value_parent IS NOT NULL AND p_filterfield IS NOT NULL) THEN	
+						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL AND p_id != '' AND (field_value_parent IS NOT NULL /*AND p_filterfield IS NOT NULL*/) THEN	
 							query_text= 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext_child || (aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY '||v_orderby_child||') a';
 							execute query_text INTO v_array_child;	
 						ELSE 	
@@ -293,7 +293,7 @@ BEGIN
 						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
 						
 						-- Get combo values
-						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL AND p_id != '' AND (field_value_parent IS NOT NULL AND p_filterfield IS NOT NULL) THEN
+						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL AND p_id != '' AND (field_value_parent IS NOT NULL /*AND p_filterfield IS NOT NULL*/) THEN
 							query_text= 'SELECT (array_agg(idval)) FROM ('|| v_dv_querytext_child ||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY '||v_orderby_child||') a';
 							execute query_text INTO v_array_child;
 						ELSE 	
