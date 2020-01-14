@@ -1190,7 +1190,8 @@ class Giswater(QObject):
         text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'], 'gw_fct_audit_check_project_result', True, False, 0, True)
 
         if 'missingLayers' in result['body']['data']:
-            critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
+            critical_level= self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
+
         self.parent.hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
@@ -1241,13 +1242,14 @@ class Giswater(QObject):
                 else:
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
-            except Exception as e:
+            except KeyError as e:
                 if type(e).__name__ not in exceptions:
                     exceptions.append(type(e).__name__)
-                    msg  += f"Exception: {type(e).__name__} --> {e}\n"
-        if msg != "":
-            self.parent.show_exceptions_msg(__name__, self.get_missing_layers.__name__, msg)
-
+                    msg += f"Key: {e}\n"
+                    msg += f"Python file: {__name__} \n"
+                    msg += f"Python function: {self.get_missing_layers.__name__} \n"
+        if "KeyError" in exceptions:
+            self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
         return critical_level
 
 

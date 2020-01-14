@@ -1014,10 +1014,9 @@ class ParentAction(object):
         return path, filter_
 
 
-    def show_exceptions_msg(self, file_name, func_name, msg=""):
-        self.controller.show_info_box(f"Some exceptions occurred, please contact with support team\n"
-                                      f"File: {file_name}\n"
-                                      f"Function: {func_name}\n", inf_text=msg)
+    def show_exceptions_msg(self, title, msg=""):
+        cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
+        self.controller.show_info_box(f"{title}", inf_text=msg)
 
 
 
