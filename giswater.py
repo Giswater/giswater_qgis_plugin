@@ -1254,10 +1254,9 @@ class Giswater(QObject):
 
 
     def add_selected_layers(self):
-        checks = self.dlg_audit_project.findChildren(QCheckBox)
+        checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
         schemaname = self.schema_name.replace('"','')
         for check in checks:
-            if check.objectName() == 'chk_hide_form': continue
             if check.isChecked():
                 sql = (f"SELECT attname FROM pg_attribute a "
                        f" JOIN pg_class t on a.attrelid = t.oid "
