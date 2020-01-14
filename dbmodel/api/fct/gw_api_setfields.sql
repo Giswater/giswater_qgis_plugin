@@ -170,16 +170,21 @@ BEGIN
 
 		-- execute query text
 		EXECUTE v_querytext;
+		IF v_fieldsreload IS NOT NULL THEN
+			EXECUTE 'SELECT gw_api_getcolumnfromid($${
+				"client":{"device":3, "infoType":100, "lang":"ES"},
+				"form":{},
+				"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||json_object_keys(v_fields)||'"},
+				"data":{}}$$)' INTO v_columnfromid;
 
-		EXECUTE 'SELECT gw_api_getcolumnfromid($${
-			"client":{"device":3, "infoType":100, "lang":"ES"},
-			"form":{},
-			"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||json_object_keys(v_fields)||'"},
-			"data":{}}$$)' INTO v_columnfromid;
-
-		raise notice 'v_columnfromid %', v_columnfromid;
+			raise notice 'v_columnfromid %', v_columnfromid;
+		END IF;
 		
 	END IF;
+
+	--    Control NULL's
+	api_version := COALESCE(api_version, '[]');
+	v_columnfromid := COALESCE(v_columnfromid, '{}');   
 
 --    Return
     RETURN ('{"status":"Accepted", "apiVersion":' || api_version ||
