@@ -510,7 +510,7 @@ class ApiCF(ApiParent, QObject):
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
-                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
+                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
@@ -1116,31 +1116,10 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def fill_child(self, dialog, widget):
-        """ Find QComboBox child and populate it
-        :param widget: QComboBox parent
-        """
-
-        combo_parent = widget.property('column_id')
-        combo_id = utils_giswater.get_item_data(dialog, widget)
-
-        feature = f'"featureType":"{self.feature_type}", '
-        feature += f'"tableName":"{self.tablename}", '
-        feature += f'"idName":"{self.field_id}"'
-        extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
-        body = self.create_body(feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getchilds($${{{body}}}$$)"
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
-        for combo_child in row[0]['body']['data']:
-            if combo_child is not None:
-                self.populate_child(combo_child)
 
 
-    def populate_child(self, combo_child):
 
-        child = self.dlg_cf.findChild(QComboBox, str(combo_child['widgetname']))
-        if child:
-            self.populate_combo(child, combo_child)
+
 
 
     def open_catalog(self, tab_type, feature_type):
@@ -2271,7 +2250,7 @@ class ApiCF(ApiParent, QObject):
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
-                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
+                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget, self.feature_type, self.tablename, self.field_id))
 
         return complet_list, widget_list
 
