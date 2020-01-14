@@ -35,6 +35,7 @@ class TmBasic(TmParentAction):
         self.campaign_id = None
         self.campaign_name = None
         self.rows_cmb_poda_type = None
+        self.rows_cmb_builder = None
 
 
     def set_tree_manage(self, tree_manage):
@@ -69,6 +70,10 @@ class TmBasic(TmParentAction):
         
         if self.rows_cmb_poda_type is None:
             self.update_cmb_poda_type()     
+
+
+        if self.rows_cmb_builder is None:
+            self.update_cmb_builder()
 
         self.open_dialog(self.dlg_new_campaign)
 
@@ -155,7 +160,17 @@ class TmBasic(TmParentAction):
         self.rows_cmb_poda_type = self.controller.get_rows(sql)
         
         if not self.rows_cmb_poda_type:
-            self.controller.log_info("Error in update_cmb_poda_type")                 
+            self.controller.log_info("Error in update_cmb_poda_type")           
+
+    def update_cmb_builder(self):
+
+        sql = ("SELECT DISTINCT(id), name"
+               " FROM cat_builder"
+               " ORDER BY name")
+        self.rows_cmb_builder = self.controller.get_rows(sql)
+        
+        if not self.rows_cmb_builder:
+            self.controller.log_info("Error in update_cmb_builder")
 
 
     def fill_table_prices(self, qtable, table_view, new_camp, set_edit_triggers=QTableView.NoEditTriggers):
@@ -195,6 +210,7 @@ class TmBasic(TmParentAction):
         field_id = 'id'
         field_name = 'name'
         self.populate_cmb_years(table_name,  field_id, field_name, dlg_tree_manage.cbx_campaigns)
+        self.populate_cmb_years(table_name,  field_id, field_name, dlg_tree_manage.cbx_pendientes)
 
         dlg_tree_manage.rejected.connect(partial(self.close_dialog, dlg_tree_manage))
         dlg_tree_manage.btn_cancel.clicked.connect(partial(self.close_dialog, dlg_tree_manage))
@@ -273,6 +289,12 @@ class TmBasic(TmParentAction):
             self.update_cmb_poda_type()   
 
         utils_giswater.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1, sort_combo=False)
+
+        # Get data to fill combo from memory
+        if self.rows_cmb_builder is None:
+            self.update_cmb_builder()   
+
+        utils_giswater.set_item_data(dlg_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
 
         # Populate QTableView
         self.fill_table(dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers, update=True)
@@ -433,12 +455,12 @@ class TmBasic(TmParentAction):
             function_values = ""
             if row['mu_id'] is not None:
                 insert_values += f"'{row['mu_id']}', "
-                function_values += f"'{row['mu_id']}', "
+                function_values += f"{int(row['mu_id'])}, "
             else:
                 insert_values += 'null, '
             if row['work_id'] is not None:
                 insert_values += f"'{row['work_id']}', "
-                function_values += f"{row['work_id']}', "
+                function_values += f"{row['work_id']}, "
             else:
                 insert_values += 'null, '
             if str(row['price']) != 'NULL':
