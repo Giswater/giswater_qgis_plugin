@@ -351,11 +351,12 @@ class GwToolBox(ApiParent):
         try:
             self.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
         except KeyError as e:
-            msg = f"Key: {e}\n"
-            msg += f"key container: 'body/data/ \n"
-            msg += f"Python file: {__name__} \n"
-            msg += f"Python function: {self.execute_function.__name__} \n"
-            msg += f"DB call: {sql}\n"
+
+            msg = f"<b>Key: </b>{e}<br>"
+            msg += f"<b>key container: </b>'body/data/ <br>"
+            msg += f"<b>Python file: </b>{__name__} <br>"
+            msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
+            msg += f"<b>DB call: </b>{sql}<br>"
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
 
 

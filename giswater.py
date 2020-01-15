@@ -1245,9 +1245,9 @@ class Giswater(QObject):
             except KeyError as e:
                 if type(e).__name__ not in exceptions:
                     exceptions.append(type(e).__name__)
-                    msg += f"Key: {e}\n"
-                    msg += f"Python file: {__name__} \n"
-                    msg += f"Python function: {self.get_missing_layers.__name__} \n"
+                    msg += f"<b>Key: </b>{e}<br>"
+                    msg += f"<b>Python file: </b>{__name__} <br>"
+                    msg += f"<b>Python function: </b>{self.get_missing_layers.__name__} <br>"
         if "KeyError" in exceptions:
             self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
         return critical_level

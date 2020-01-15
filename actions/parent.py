@@ -20,7 +20,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .add_layer import AddLayer
-from ..ui_manager import GwDialog, GwMainWindow
+from ..ui_manager import BasicInfo, GwDialog, GwMainWindow
 
 
 class ParentAction(object):
@@ -1016,7 +1016,8 @@ class ParentAction(object):
 
     def show_exceptions_msg(self, title, msg=""):
         cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
-        self.controller.show_info_box(f"{title}", inf_text=msg)
-
-
+        self.dlg_info = BasicInfo()
+        self.dlg_info.setWindowTitle(title)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
+        self.open_dialog(self.dlg_info)
 
