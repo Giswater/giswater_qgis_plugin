@@ -8,7 +8,8 @@ or (at your option) any later version.
 import json
 from collections import OrderedDict
 
-from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
+from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
+    QgsLineSymbol, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
@@ -182,7 +183,10 @@ class AddLayer(object):
         for unique_value in unique_values:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-            symbol.setSize(size)
+            if type(symbol) in (QgsLineSymbol, ):
+                symbol.setWidth(size)
+            else:
+                symbol.setSize(size)
 
             # configure a symbol layer
             # layer_style = {}
