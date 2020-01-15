@@ -505,16 +505,15 @@ class Go2Epa(ApiParent):
             self.task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
-            row = row.rstrip()
+            if '**' in row or '--' in row:
+                continue
 
-            if row.find("WARNING") != -1:
-                dirty_list = [row]
-            else:
-                dirty_list = row.split(' ')
+            row = row.rstrip()
+            dirty_list = row.split(' ')
 
             # Clean unused items
             for x in range(len(dirty_list) - 1, -1, -1):
-                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
+                if dirty_list[x] == '':
                     dirty_list.pop(x)
 
             sp_n = []
@@ -553,7 +552,7 @@ class Go2Epa(ApiParent):
             # Find strings into dict and set source column
             for k, v in sources.items():
                 try:
-                    if k == f'{sp_n[0]} {sp_n[1]}':
+                    if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
                         source = "'" + v + "'"
                         _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
                         if _time.search(sp_n[3]):
