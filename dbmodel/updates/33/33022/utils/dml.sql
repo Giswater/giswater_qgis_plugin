@@ -36,7 +36,9 @@ VALUES ('om_dynamicmapzones_status', '{"SECTOR":false, "DMA":false, "PRESSZONE":
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
 VALUES (2790, 'gw_fct_grafanalytics_check_data', 'ws','function', '{"featureType":[]}',
 '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
-"comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"DMA"}]',
+"comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"DMA"},
+{"widgetname":"selectionMode", "label":"Selection mode:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":2,"comboIds":["userSelectors","wholeSystem"],
+"comboNames":["Users selection (expl & state & psector)", "Whole system"], "selectedId":"userSelectors"}]',
 'Function to analyze data quality of grafclass', 'role_om',FALSE, TRUE, 'Check data for grafanalytics process', TRUE)
 ON conflict (id) DO NOTHING;
 

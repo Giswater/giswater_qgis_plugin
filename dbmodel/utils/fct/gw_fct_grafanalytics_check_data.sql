@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:2670
+--FUNCTION CODE:2790
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_check_data(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_check_data(p_data json)
