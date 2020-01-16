@@ -80,7 +80,7 @@
          <property name="plainText">
           <string>
 INSTRUCCIONES:
---------------------
+---------------------------
 
 Escogiendo una explotación, se comunica la base de datos del GIS con la base de datos de comercial (CRM) realizando para el último período facturado:
 
