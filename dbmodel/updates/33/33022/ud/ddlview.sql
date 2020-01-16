@@ -113,7 +113,7 @@ SELECT distinct on (element.element_id) element.element_id,
     case when element.the_geom is not null then element.the_geom
         when node.the_geom is not null then node.the_geom
 		when connec.the_geom is not null then connec.the_geom
-		when arc.the_geom is not null then st_lineinterpolatepoint(gully.the_geom, 0.5)::geometry(point,SRID_VALUE)
+		when arc.the_geom is not null then st_lineinterpolatepoint(arc.the_geom, 0.5)::geometry(point,SRID_VALUE)
 		when gully.the_geom is not null then gully.the_geom
 		else null::geometry(point,SRID_VALUE)
     end as the_geom,
