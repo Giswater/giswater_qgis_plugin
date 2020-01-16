@@ -13,10 +13,10 @@ $BODY$
 /*
 INSTRUCTIONS
 ------------
-CREATE, creates a backup for all data on related table on temp_table with fprocesscat_id = 111
-RESTORE, delete all rows on original table and restore all rows from backup name.
-	It is mandatory to fill two keys (backupName and table) as as security check
-	Before backup is restored rows from original table are saved using a backupName of concat(tablename, _backup). As result, if you try to restore two times same table, you will need to delete this system backup before.
+CREATE, create a backup for all data for related table into temp_table with fprocesscat_id = 111
+RESTORE, delete all rows from original table and restore all rows from backup name. To prevent damages into original table two strategies have been developed:
+	1 - It is mandatory to fill both keys (backupName and table) as as security check
+	2- Before restore the backup , a new backup from original table is created with backupName of concat(tablename, _backup). As result, if you try to restore two times the same table, you will need to delete this system backup before because it wiil exists there.
 DELETE A backup name on temp_table
 	It is mandatory to fill two keys (backupName and table) as as security check.
 	
