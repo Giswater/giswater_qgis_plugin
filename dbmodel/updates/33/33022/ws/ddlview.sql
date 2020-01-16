@@ -98,3 +98,56 @@ CREATE OR REPLACE VIEW v_minsector AS
     minsector.the_geom
    FROM selector_expl, minsector
   WHERE minsector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+  
+
+-- 2020/01/16  
+CREATE OR REPLACE VIEW v_edit_element AS 
+SELECT distinct on (element.element_id) element.element_id,
+    element.code,
+    element.elementcat_id,
+    cat_element.elementtype_id,
+    element.serial_number,
+    element.state,
+    element.state_type,
+    element.num_elements,
+    element.observ,
+    element.comment,
+    element.function_type,
+    element.category_type,
+    element.location_type,
+    element.fluid_type,
+    element.workcat_id,
+    element.workcat_id_end,
+    element.buildercat_id,
+    element.builtdate,
+    element.enddate,
+    element.ownercat_id,
+    element.rotation,
+    concat(element_type.link_path, element.link) AS link,
+    element.verified,
+    case when element.the_geom is not null then element.the_geom
+		when node.the_geom is not null then node.the_geom
+		when connec.the_geom is not null then connec.the_geom
+		when arc.the_geom is not null then st_lineinterpolatepoint (arc.the_geom, 0.5)::geometry(point,SRID_VALUE)
+		else null::geometry(point,SRID_VALUE)
+    end as the_geom,
+    element.label_x,
+    element.label_y,
+    element.label_rotation,
+    element.publish,
+    element.inventory,
+    element.undelete,
+    element.expl_id
+   FROM selector_expl, element
+     JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
+     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+     JOIN element_type ON element_type.id::text = cat_element.elementtype_id::text
+     LEFT JOIN element_x_node c ON c.element_id=element.element_id
+     LEFT JOIN element_x_arc a ON a.element_id=element.element_id
+     LEFT JOIN element_x_connec b ON b.element_id=element.element_id
+     LEFT JOIN node USING (node_id)
+     LEFT JOIN connec USING (connec_id)
+     LEFT JOIN arc ON arc.arc_id = a.arc_id
+  WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+  
