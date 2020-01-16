@@ -25,6 +25,7 @@ DECLARE
 	v_partialquerytext text;
 	v_querytext text;
 	v_table text;
+	v_feature_field_id text;
 
 BEGIN	
 
@@ -74,16 +75,26 @@ BEGIN
 		lower(NEW.feature_type),'type_id WHERE ',lower(NEW.feature_type),'_type.id = ',quote_literal(NEW.id));
 				
 		v_table = concat ('cat_',lower(NEW.feature_type));
+		
+		IF v_table = 'cat_node' OR v_table = 'cat_arc' THEN
+			v_feature_field_id = concat (lower(NEW.feature_type), 'cat_id');
+			
+		ELSIF v_table = 'cat_connec' THEN
+			v_feature_field_id = concat (lower(NEW.feature_type), 'at_id');
 
-		IF v_table = 'cat_gully' then v_table ='cat_grate'; end if;
+		ELSIF v_table = 'cat_gully' then 
+			v_table ='cat_grate'; 
+			v_feature_field_id = 'gratecat_id';
+			
+		END IF;
 		
 		v_querytext = concat('SELECT ',v_table,'.id, ', v_table,'.id AS idval FROM ', v_table,' ', v_partialquerytext);
 
 		-- insert parameter
 		INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id, label, isenabled, layout_id, layout_order, 
-		dv_querytext, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated)
+		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated)
 		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default for ',v_id,' cat_feature'), 'role_edit', concat ('Default value for ', v_id), true, v_layout ,v_layout_order,
-		v_querytext, lower(v_projecttype),false,false,'text', 'combo',true,false)
+		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo',true,false)
 		ON CONFLICT (id) DO NOTHING;
 
 		IF TG_OP = 'UPDATE' AND OLD.id != NEW.id THEN

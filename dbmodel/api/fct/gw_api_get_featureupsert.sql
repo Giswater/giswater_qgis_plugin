@@ -373,7 +373,7 @@ BEGIN
 
 			-- getting values from config_param_user
 			EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text 
-				FROM (SELECT feature_field_id as param, value::text AS vdef, feature_dv_parent_value as aux_param, parameter as parameter FROM audit_cat_param_user 
+				FROM (SELECT feature_field_id as param, value::text AS vdef, parameter as parameter FROM audit_cat_param_user 
 				JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL)a'
 				INTO v_values_array_aux;
 
@@ -429,7 +429,7 @@ BEGIN
 				field_value = v_geom1;
 			ELSIF (aux_json->>'column_id')='cat_geom2' THEN
 				field_value = v_geom2;
-			ELSIF (aux_json->>'column_id')='cat_shape' THEN  -- comprobar
+			ELSIF (aux_json->>'column_id')='cat_shape' THEN
 				field_value = v_shape;
 			ELSIF (aux_json->>'column_id')='matcat_id' THEN	
 				field_value = v_matcat_id;
@@ -437,8 +437,8 @@ BEGIN
 			-- catalog
 			ELSIF (aux_json->>'column_id') = 'arccat_id' OR (aux_json->>'column_id') = 'nodecat_id' OR  (aux_json->>'column_id') = 'connecat_id'  THEN	
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
-					WHERE ((a->>'aux_param') = v_catfeature.system_id OR (a->>'aux_param') IS NULL) AND 
-					((a->>'param') = concat(lower(v_catfeature.feature_type),'cat_id') OR (a->>'param') = concat(lower(v_catfeature.feature_type),'at_id'));
+					WHERE (reverse(substring(reverse(a->>'parameter'),10)) = lower(v_catfeature.id)); -- 10 = '_vefault'
+			
 			-- *_type
 			ELSIF (aux_json->>'column_id') =  'fluid_type' OR  (aux_json->>'column_id') =  'function_type' OR (aux_json->>'column_id') =  'location_type' OR (aux_json->>'column_id') =  'category_type' THEN
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
@@ -463,6 +463,10 @@ BEGIN
 
 				ELSIF (aux_json->>'column_id') = 'sys_elev2' THEN
 					field_value =v_noderecord2.sys_elev;	
+					
+				ELSIF (aux_json->>'column_id') = 'gratecat_id' THEN
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
+					WHERE (a->>'param') = 'gratecat_id';
 				END IF;
 			END IF;
 
