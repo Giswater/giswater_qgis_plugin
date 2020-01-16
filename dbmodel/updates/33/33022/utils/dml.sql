@@ -42,3 +42,12 @@ ON conflict (id) DO NOTHING;
 
 UPDATE audit_cat_param_user SET isenabled = true , description = 'If true, allows to force arcs downgrade although they have other connected elements. Is a dynamic param because only code switchs the values (when is used tool to downgrade features',
 formname='dynamic_param' WHERE id = 'edit_arc_downgrade_force';
+
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (111,'Backup and restore tables','admin', 'utils') ON CONFLICT (id) DO NOTHING;
+
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role_id, isdeprecated, istoolbox, alias, isparametric)
+VALUES (2792, 'gw_fct_admin_manage_backup', 'utils','function', null, null, 'Function to manage backups for specific table to use it to help admin when does a complex operation with data', 'role_om',FALSE, FALSE, null, FALSE)
+ON conflict (id) DO NOTHING;
