@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/01/17
-DROP FUNCTION IF EXISTS gw_api_getcolumnfromid;
+DROP FUNCTION IF EXISTS gw_api_getcolumnfromid (json);
