@@ -174,7 +174,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
-        
+        self.snap_to_selected_layer = False
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
         
@@ -201,8 +201,6 @@ class CadAddPoint(ParentMapTool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
-
-        self.iface.setActiveLayer(self.current_layer)
 
         # Check for default base layer
         self.vdefault_layer = None

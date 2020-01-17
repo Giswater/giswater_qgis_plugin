@@ -152,7 +152,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def activate(self):
-
+        self.snap_to_selected_layer = False
         # Check button
         self.action().setChecked(True)
 
@@ -178,8 +178,6 @@ class CadAddCircle(ParentMapTool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
-
-        self.iface.setActiveLayer(self.current_layer)
 
         # Check for default base layer
         self.vdefault_layer = None
