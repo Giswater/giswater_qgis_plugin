@@ -1113,7 +1113,7 @@ class ApiParent(ParentAction):
                 self.populate_combo(widget, field)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] in ('check','checkbox'):
-                widget = self.add_checkbox(dialog, field)
+                widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
             grid_layout.addWidget(label,x, 0)
             grid_layout.addWidget(widget, x, 1)
