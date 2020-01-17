@@ -187,7 +187,7 @@ class CadAddCircle(ParentMapTool):
         row = self.controller.get_config('cad_tools_base_layer_vdefault')
         if row:
             self.snap_to_selected_layer = True
-            self.vdefault_layer = self.controller.get_layer_by_layername(row[0], True)
+            self.vdefault_layer = self.controller.get_layer_by_tablename(row[0], True)
             if self.vdefault_layer:
                 self.iface.setActiveLayer(self.vdefault_layer)
 
