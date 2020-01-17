@@ -1435,8 +1435,8 @@ class ApiParent(ParentAction):
             value = utils_giswater.isChecked(dialog, widget)
         elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
             value = utils_giswater.getCalendarDate(dialog, widget)
-        # Only get values if layer is editable
-        if self.layer.isEditable():
+        # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
+        if not hasattr(self, 'layer') or self.layer.isEditable():
             # If widget.isEditable(False) return None, here control it.
             if str(value) == '' or value is None:
                 _json[str(widget.property('column_id'))] = None
