@@ -179,7 +179,7 @@ class CadAddCircle(ParentMapTool):
             self.iface.setActiveLayer(self.current_layer)
             return
 
-        self.iface.setActiveLayer(self.layer_circle)
+        self.iface.setActiveLayer(self.current_layer)
 
         # Check for default base layer
         self.vdefault_layer = None

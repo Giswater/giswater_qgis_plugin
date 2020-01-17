@@ -202,7 +202,7 @@ class CadAddPoint(ParentMapTool):
             self.iface.setActiveLayer(self.current_layer)
             return
 
-        self.iface.setActiveLayer(self.layer_points)
+        self.iface.setActiveLayer(self.current_layer)
 
         # Check for default base layer
         self.vdefault_layer = None
