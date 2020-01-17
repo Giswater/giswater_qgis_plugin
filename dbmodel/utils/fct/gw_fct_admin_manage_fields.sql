@@ -84,6 +84,10 @@ BEGIN
 		RAISE NOTICE 'Process not executed. Check data';
 	END IF;
 
+	-- recover search_path in case utils = true in order to reset value fixed before
+	SET search_path = "SCHEMA_NAME", public;
+
+
 RETURN ;
 
 END;
