@@ -360,12 +360,6 @@ class GwToolBox(ApiParent):
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
 
 
-    def set_layers_visible(self, layers):
-        for layer in layers:
-            lyr = self.controller.get_layer_by_tablename(layer)
-            if lyr:
-                self.controller.set_layer_visible(lyr)
-
     def execute_no_parametric(self, dialog, function_name):
 
         dialog.progressBar.setMinimum(0)

@@ -793,6 +793,11 @@ class ParentAction(object):
 
         return body
 
+    def set_layers_visible(self, layers):
+        for layer in layers:
+            lyr = self.controller.get_layer_by_tablename(layer)
+            if lyr:
+                self.controller.set_layer_visible(lyr)
 
     def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True):
         if del_old_layers:
