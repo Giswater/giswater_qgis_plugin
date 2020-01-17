@@ -171,7 +171,7 @@ BEGIN
 		-- execute query text
 		EXECUTE v_querytext;
 		IF v_fieldsreload IS NOT NULL THEN
-			EXECUTE 'SELECT gw_api_getcolumnfromid($${
+			EXECUTE 'SELECT gw_api_getcolumnsfrom_id($${
 				"client":{"device":3, "infoType":100, "lang":"ES"},
 				"form":{},
 				"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||json_object_keys(v_fields)||'"},

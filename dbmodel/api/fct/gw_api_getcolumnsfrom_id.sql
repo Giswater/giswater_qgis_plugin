@@ -1,13 +1,13 @@
--- Function: SCHEMA_NAME.gw_api_getcolumnfromid(json)
+-- Function: SCHEMA_NAME.gw_api_getcolumnsfrom_id(json)
 
--- DROP FUNCTION SCHEMA_NAME.gw_api_getcolumnfromid(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_api_getcolumnsfrom_id(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getcolumnfromid(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getcolumnsfrom_id(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_api_getcolumnfromid($${
+SELECT SCHEMA_NAME.gw_api_getcolumnsfrom_id($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe", "columnId":"elevation1", "id":"114050"},
