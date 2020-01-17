@@ -804,7 +804,9 @@ class ParentAction(object):
             self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
-            if str(k) == "info":
+            if str(k) == 'setVisibleLayers':
+                self.set_layers_visible(v)
+            elif str(k) == "info":
                 self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
             else:
                 counter = len(data[k]['values'])
