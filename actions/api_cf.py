@@ -329,7 +329,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def open_generic_form(self, complet_result):
-
+        self.draw(complet_result, zoom=False)
         self.hydro_info_dlg = ApiBasicInfo()
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -339,7 +339,7 @@ class ApiCF(ApiParent, QObject):
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
-
+        self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
         # Open dialog
         self.open_dialog(self.hydro_info_dlg)
         
