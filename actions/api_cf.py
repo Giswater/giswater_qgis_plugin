@@ -873,7 +873,7 @@ class ApiCF(ApiParent, QObject):
             extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
 
             body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
+            sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
         # If we make an info
         else:
             my_json = json.dumps(_json)
