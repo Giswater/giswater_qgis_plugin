@@ -77,8 +77,14 @@ BEGIN
 		'||v_filter_name||' ORDER BY label) a'
 		INTO v_formTabs_minuct; 
 		
+		
 		-- Add tab name to json
-		v_formTabs_minuct := ('{"fields":' || v_formTabs_minuct || '}')::json;
+		IF v_formTabs_minuct IS NULL THEN
+			v_formTabs_minuct := ('{"fields":[]}')::json;
+		ELSE
+			v_formTabs_minuct := ('{"fields":' || v_formTabs_minuct || '}')::json;
+		END IF;
+
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabName', rec_tab.tabname::TEXT);
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tableName', ((v_selectors_list->>rec_tab.formname)::json->>'table'));
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabLabel', rec_tab.tablabel::TEXT);
