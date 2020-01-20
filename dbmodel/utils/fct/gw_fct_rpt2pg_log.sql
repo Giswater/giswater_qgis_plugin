@@ -104,7 +104,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 		SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
 		where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 		SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
 		where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
 

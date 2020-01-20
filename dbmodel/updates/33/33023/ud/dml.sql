@@ -10,4 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/01/10
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, csvversion) 
-VALUES (80, 'rpt_control_actions_taken', 'Control Actions', '{"from":"5.0.022", "to":null,"language":"english"}';
+VALUES (80, 11, 'rpt_control_actions_taken', 'Control Actions', '{"from":"5.0.022", "to":null,"language":"english"}');
