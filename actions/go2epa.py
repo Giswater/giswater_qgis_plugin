@@ -17,6 +17,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 
 from collections import OrderedDict
 from functools import partial
@@ -89,6 +90,13 @@ class Go2Epa(ApiParent):
         elif self.project_type == 'ud':
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
+
+        # Check OS and enable/disable checkbox execute EPA software
+        if sys.platform != "win32":
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
+            self.dlg_go2epa.chk_exec.setEnabled(False)
+            self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
+
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
