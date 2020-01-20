@@ -27,7 +27,6 @@ DECLARE
     api_version json;
     v_tablename text;
     v_feature_id integer;
-    v_column_id text;
     i integer = 0;
     v_fieldsreload text;
     v_result text;
@@ -36,6 +35,7 @@ DECLARE
     v_parentname text;
     v_parentid integer;
     v_featureType text;
+    v_iseditable boolean;
     
 
 
@@ -57,21 +57,19 @@ BEGIN
 	v_fieldsreload =((p_data ->>'feature')::json->>'fieldsReload')::text;
 	v_parentname =((p_data ->>'feature')::json->>'parentField')::text;
 
-	
 	SELECT ARRAY(SELECT json_array_elements((replace(v_fieldsreload, '''','"'))::json))
-	FROM  config_api_form_fields where  column_id='arccat_id' and formtype='feature' limit 1 INTO v_fields_array;
-
+	FROM  config_api_form_fields LIMIT 1 INTO v_fields_array;
 	
 	FOREACH v_field IN array v_fields_array
 	LOOP	
 		EXECUTE 'SELECT column_name  FROM information_schema.columns WHERE table_name='''||v_tablename||''' and column_name='''|| replace(v_field, '"','') ||''' LIMIT 1' INTO v_exists;
-
 		v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'widgetname', 'data_' || replace(v_field, '"',''));
 		IF v_exists is not null THEN
 			EXECUTE 'SELECT LOWER(feature_type) FROM cat_feature WHERE child_layer = '''||v_tablename||'''' INTO v_featureType;
 			EXECUTE 'SELECT '|| replace(v_field, '"','') ||' FROM ' || v_tablename ||' WHERE '||v_featureType||'_id = '''|| v_feature_id ||'''' INTO v_result;
-			
-			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', v_result);
+			EXECUTE 'SELECT iseditable FROM config_api_form_fields WHERE formname = '''|| v_tablename ||''' AND column_id = '''|| replace(v_field, '"','') ||'''' INTO v_iseditable;
+			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', COALESCE(v_result, ''));
+			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'iseditable', v_iseditable);
 			i = i+1;
 		ELSE
 			EXECUTE 'SELECT id FROM config_api_form_fields WHERE formname ='''||v_tablename||''' AND column_id = '''||v_parentname||'''' INTO v_parentid;
