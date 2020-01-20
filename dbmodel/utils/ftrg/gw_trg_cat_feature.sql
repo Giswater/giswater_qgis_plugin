@@ -105,9 +105,11 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		--insert definition into config_api_tableinfo_x_infotype if its not present already
-		INSERT INTO config_api_tableinfo_x_infotype (tableinfo_id,infotype_id,tableinfotype_id)
-		VALUES (NEW.child_layer,100,NEW.child_layer) ON CONFLICT (tableinfo_id) DO NOTHING;
-
+		IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_api_tableinfo_x_infotype)
+		and NEW.child_layer IS NOT NULL THEN
+			INSERT INTO config_api_tableinfo_x_infotype (tableinfo_id,infotype_id,tableinfotype_id)
+			VALUES (NEW.child_layer,100,NEW.child_layer);
+		END IF;
 		RETURN new;
 
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -134,10 +136,11 @@ BEGIN
 					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';		
 
 				END IF;
+
 			END IF;
 
 			--if child layer name has changed, rename it
-			IF NEW.child_layer != OLD.child_layer THEN
+			IF NEW.child_layer != OLD.child_layer  AND NEW.child_layer IS NOT NULL THEN
 
 				--SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 
@@ -151,6 +154,10 @@ BEGIN
 					EXECUTE 'DROP VIEW '||v_schemaname||'.'||OLD.child_layer||';';
 				END IF;
 
+				--rename config_api_form_fields formname
+				UPDATE config_api_form_fields SET formname=NEW.child_layer WHERE formname=OLD.child_layer AND formtype='feature';
+
+				--rename config_api_tableinfo_x_infotype tableinfo_id and tableinfotype_id
 				UPDATE config_api_tableinfo_x_infotype SET tableinfo_id=v_viewname WHERE tableinfo_id=OLD.child_layer;
 				UPDATE config_api_tableinfo_x_infotype SET tableinfotype_id=v_viewname WHERE tableinfotype_id=OLD.child_layer;
 			END IF;
