@@ -11,3 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_api_form_fields SET reload_field = '{"reload":["cat_matcat_id", "cat_shape", "cat_geom1", "cat_geom2"]}',
 isautoupdate = TRUE
 WHERE column_id='arccat_id' and formtype='feature';
+
+
+UPDATE config_api_form_fields SET iseditable = 'FALSE'
+WHERE column_id='slope' and formtype='feature';

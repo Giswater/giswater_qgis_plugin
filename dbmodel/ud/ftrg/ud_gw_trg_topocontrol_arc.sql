@@ -197,7 +197,46 @@ BEGIN
 						   ELSE nodeRecord2.sys_ymax END);
 				sys_elev2_aux := nodeRecord2.sys_top_elev - sys_y2_aux;
 			END IF;
-	
+
+
+			IF TG_OP  = 'INSERT' THEN
+
+				-- sys elev1
+				IF NEW.custom_elev1 IS NOT NULL THEN
+					sys_elev1_aux = NEW.custom_elev1;
+				ELSIF NEW.elev1 IS NOT NULL THEN
+					sys_elev1_aux = NEW.elev1;
+				END IF;
+
+				-- sys_elev2
+				IF NEW.custom_elev2 IS NOT NULL THEN
+					sys_elev2_aux = NEW.custom_elev2;
+				ELSIF NEW.elev1 IS NOT NULL THEN
+					sys_elev2_aux = NEW.elev2;
+				END IF;
+
+			
+			ELSIF TG_OP = 'UPDATE' THEN
+
+				-- sys elev1
+				IF (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NOT NULL)
+				OR (NEW.custom_elev1 IS NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) THEN
+					sys_elev1_aux = NEW.custom_elev1;
+				ELSIF (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NOT NULL)
+				OR (NEW.elev1 IS NULL AND OLD.elev1 IS NOT NULL) OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) THEN
+					sys_elev1_aux = NEW.elev1;
+				END IF;
+
+				-- sys elev2
+				IF (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NOT NULL)
+				OR (NEW.custom_elev2 IS NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) THEN
+					sys_elev2_aux = NEW.custom_elev2;
+				ELSIF (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NOT NULL)
+				OR (NEW.elev2 IS NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) THEN
+					sys_elev2_aux = NEW.elev2;
+				END IF;
+			END IF;
+						   	
 			-- Update coordinates
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
@@ -252,11 +291,6 @@ BEGIN
 			END IF;
 			
 			NEW.sys_slope:= (NEW.sys_elev1-NEW.sys_elev2)/sys_length_aux;
-				
-			IF NEW.sys_slope > 1 THEN 
-				NEW.sys_slope=NULL;	
-			END IF;
-
 		END IF;
 		
 	-- Check auto insert end nodes
