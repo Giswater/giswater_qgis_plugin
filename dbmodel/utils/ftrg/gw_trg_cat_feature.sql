@@ -146,6 +146,9 @@ BEGIN
 					EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||NEW.child_layer||' AS '||v_definition||';';   
 					EXECUTE 'DROP VIEW '||v_schemaname||'.'||OLD.child_layer||';';
 				END IF;
+
+				UPDATE config_api_tableinfo_x_infotype SET tableinfo_id=v_viewname WHERE tableinfo_id=OLD.child_layer;
+				UPDATE config_api_tableinfo_x_infotype SET tableinfotype_id=v_viewname WHERE tableinfotype_id=OLD.child_layer;
 			END IF;
 		
 			--create the trigger
