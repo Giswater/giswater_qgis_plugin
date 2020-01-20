@@ -105,13 +105,20 @@ BEGIN
 
 	-- energy_usage
 	INSERT INTO rpt_energy_usage(result_id, nodarc_id, usage_fact, avg_effic, kwhr_mgal, avg_kw, peak_kw, cost_day)
-	SELECT v_result_id, csv1,csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric
-	FROM temp_csv2pg WHERE source='energy_usage' AND csv2pgcat_id=11 AND user_name=current_user ORDER BY id;
+	SELECT v_result_id, csv1, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric
+	FROM temp_csv2pg WHERE source='rpt_energy_usage' AND csv2pgcat_id=11 AND user_name=current_user AND csv1 NOT IN ('Energy', 'Pump', 'Demand', 'Total') ORDER BY id;
 
 	-- hydraulic_status
-	INSERT INTO rpt_hydraulic_status (result_id, text)
-	SELECT v_result_id, concat (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, csv14, csv15, csv16, csv17, csv18)
-	FROM temp_csv2pg WHERE source='hydraulic_status' AND csv2pgcat_id=11 AND user_name=current_user ORDER BY id;
+	INSERT INTO rpt_hydraulic_status (result_id, time, text)
+	SELECT v_result_id, csv1, concat (csv2, ' ', csv3,' ', csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11,' ', csv12,' ', csv13, ' ',
+	csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18)
+	FROM temp_csv2pg WHERE source='rpt_hydraulic_status' AND csv2pgcat_id=11 AND user_name=current_user AND csv1 = 'WARNING' ORDER BY id;
+
+	INSERT INTO rpt_hydraulic_status (result_id, time, text)
+	SELECT v_result_id, csv1, concat (csv2, ' ', csv3,' ', csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11,' ', csv12,' ', csv13, ' ',
+	csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18)
+	FROM temp_csv2pg WHERE source='rpt_hydraulic_status' AND csv2pgcat_id=11 AND user_name=current_user ORDER BY id;
+
 
 	-- rpt_cat_result
 	v_njunction = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Junctions%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND user_name=current_user);
@@ -138,9 +145,6 @@ BEGIN
 	--v_qtimestep text;
 	--v_qtolerance text;
 
-	raise notice ' % % % % % % % % % % % % % % % % % % % %',v_njunction, v_nreservoir, v_ntanks, v_npipes, v_npumps, v_nvalves, v_headloss, v_htstep, v_haccuracy, v_statuscheck, 
-	v_mcheck, v_dthreshold, v_mtrials, v_qanalysis, v_sgravity v_rkinematic, v_rchemical, v_dmultiplier, v_tduration, v_qtimestep, v_qtolerance;
-	
 	UPDATE rpt_cat_result set n_junction=v_njunction, n_reservoir=v_nreservoir, n_tank=v_ntanks, n_pipe=v_npipes, n_pump=v_npumps, n_valve=v_nvalves, head_form=v_headloss, hydra_time=v_htstep
 				, hydra_acc=v_haccuracy, st_ch_freq=v_statuscheck, max_tr_ch=v_mcheck, dam_li_thr=v_dthreshold, max_trials=v_mtrials, q_analysis=v_qanalysis, spec_grav=v_sgravity
 				, r_kin_visc=v_rkinematic, r_che_diff=v_rchemical, dem_multi=v_dmultiplier, total_dura=v_tduration, q_timestep=v_qtimestep, q_tolerance=v_qtolerance;

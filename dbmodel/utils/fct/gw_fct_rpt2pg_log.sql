@@ -51,7 +51,7 @@ BEGIN
 
 	-- basic statistics
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'BASIC STATISTICS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '-----------------------');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '-----------------------');		
 
 	IF v_project_type = 'WS' THEN
 
@@ -66,6 +66,13 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 		SELECT 14, 'stats', 1, concat ('PRESSURE : Max.(',max(press)::numeric(12,3), ') , Avg.(', avg(press)::numeric(12,3), ') , Standard dev.(', stddev(press)::numeric(12,3)
 		, ') , Min.(', min (press)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result;
+
+		-- warnings
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'WARNINGS');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '-----------------------');	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, p_result, 1, concat (time, ' ', text) FROM rpt_hydraulic_status WHERE result_id = p_result AND time = 'WARNING:';
 
 	ELSIF v_project_type = 'UD' THEN
 
@@ -89,6 +96,18 @@ BEGIN
 		SELECT 14, p_result, 1, concat ('NODE FLOODING: Number of nodes (', count(*)::integer,'), Max. rate (',max(max_rate)::numeric(12,3), '), Total flood (' ,sum(tot_flood), 
 		'), Max. flood (', max(tot_flood),').')
 		FROM rpt_nodeflooding_sum WHERE result_id = p_result;
+
+		-- warnings
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'WARNINGS');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '-----------------------');	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+		SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
+		where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+		SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
+		where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
+
 	
 	END IF;
 
@@ -100,10 +119,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, 'RPT FILE INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '------------------');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-	SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
-	where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 	SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
 	where csv2pgcat_id=11 and source='rpt_cat_result' and user_name=current_user;
