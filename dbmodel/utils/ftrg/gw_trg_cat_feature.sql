@@ -38,22 +38,23 @@ BEGIN
 
 	--  Get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
+		--Controls on update or insert of cat_feature.id check if the new id or child layer has accents, dots or dashes. If so, give an error.
+		v_id = array_to_string(ts_lexize('unaccent',NEW.id),',','*');
+		
+		IF v_id IS NOT NULL OR NEW.id ilike '%.%' OR NEW.id ilike '%-%' THEN
+			PERFORM audit_function(3038,2758,NEW.id);
+		END IF;
 
-	--Controls on update or insert of cat_feature.id check if the new id or child layer has accents, dots or dashes. If so, give an error.
-	v_id = array_to_string(ts_lexize('unaccent',NEW.id),',','*');
-	
-	IF v_id IS NOT NULL OR NEW.id ilike '%.%' OR NEW.id ilike '%-%' THEN
-		PERFORM audit_function(3038,2758,NEW.id);
+		v_id = array_to_string(ts_lexize('unaccent',NEW.child_layer),',','*');
+		
+		IF v_id IS NOT NULL OR NEW.child_layer ilike '%-%' OR NEW.child_layer ilike '%.%' THEN
+		 	PERFORM audit_function(3038,2758,NEW.child_layer);
+		END IF;	
+
+		-- set v_id
+		v_id = (lower(NEW.id));
 	END IF;
-
-	v_id = array_to_string(ts_lexize('unaccent',NEW.child_layer),',','*');
-	
-	IF v_id IS NOT NULL OR NEW.child_layer ilike '%-%' OR NEW.child_layer ilike '%.%' THEN
-	 	PERFORM audit_function(3038,2758,NEW.child_layer);
-	END IF;	
-
-	-- set v_id
-	v_id = (lower(NEW.id));
 
 
 	-- manage audit_cat_param_user parameters
@@ -103,6 +104,9 @@ BEGIN
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
+		--insert definition into config_api_tableinfo_x_infotype if its not present already
+		INSERT INTO config_api_tableinfo_x_infotype (tableinfo_id,infotype_id,tableinfotype_id)
+		VALUES (NEW.child_layer,100,NEW.child_layer) ON CONFLICT (tableinfo_id) DO NOTHING;
 
 		RETURN new;
 
@@ -163,6 +167,9 @@ BEGIN
 	ELSIF TG_OP = 'DELETE' THEN
 
 		-- delete child views
+
+		--delete definition from config_api_tableinfo_x_infotype
+		DELETE FROM config_api_tableinfo_x_infotype where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
 		-- delete audit_cat_param_user parameters
 		IF v_projecttype='WS' THEN
