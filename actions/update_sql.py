@@ -2289,6 +2289,7 @@ class UpdateSQL(ApiParent):
                 self.controller.dao.rollback()
             status = False
         finally:
+            f.close()
             return status
 
 
