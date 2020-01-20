@@ -17,7 +17,7 @@ SELECT gw_fct_rpt2pg_log('test')
 
 DECLARE
 
-v_result			json;
+v_result		json;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
@@ -26,8 +26,8 @@ v_qmlpointpath		text;
 v_qmllinepath		text;
 v_qmlpolpath		text;
 v_project_type		text;
-v_version			text;
-v_stats				json;
+v_version		text;
+v_stats			json;
 
 BEGIN
 	--  Search path	
@@ -56,30 +56,30 @@ BEGIN
 	IF v_project_type = 'WS' THEN
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, 'stats', 1, concat ('FLOW : Max.(',max(flow)::numeric(12,3), ') , Avg.(', avg(flow)::numeric(12,3), ') , Standard dev(', stddev(flow)::numeric(12,3)
-		, ') , Min(', min (flow)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+		SELECT 14, 'stats', 1, concat ('FLOW : Max.(',max(flow)::numeric(12,3), ') , Avg.(', avg(flow)::numeric(12,3), ') , Standard dev.(', stddev(flow)::numeric(12,3)
+		, ') , Min.(', min (flow)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, 'stats', 1, concat ('VELOCITY : Max.(',max(vel)::numeric(12,3), ') , Avg.(', avg(vel)::numeric(12,3), ') , Standard dev(', stddev(vel)::numeric(12,3)
-		, ') , Min(', min (vel)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+		SELECT 14, 'stats', 1, concat ('VELOCITY : Max.(',max(vel)::numeric(12,3), ') , Avg.(', avg(vel)::numeric(12,3), ') , Standard dev.(', stddev(vel)::numeric(12,3)
+		, ') , Min.(', min (vel)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, 'stats', 1, concat ('PRESSURE : Max.(',max(press)::numeric(12,3), ') , Avg.(', avg(press)::numeric(12,3), ') , Standard dev(', stddev(press)::numeric(12,3)
-		, ') , Min(', min (press)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result;
+		SELECT 14, 'stats', 1, concat ('PRESSURE : Max.(',max(press)::numeric(12,3), ') , Avg.(', avg(press)::numeric(12,3), ') , Standard dev.(', stddev(press)::numeric(12,3)
+		, ') , Min.(', min (press)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result;
 
 	ELSIF v_project_type = 'UD' THEN
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, p_result, 1, concat ('MAX. FLOW : Max.(',max(max_flow)::numeric(12,3), ') , Avg.(', avg(max_flow)::numeric(12,3), ') , Standard dev(', stddev(max_flow)::numeric(12,3)
-		, ') , Min(', min (max_flow)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
+		SELECT 14, p_result, 1, concat ('MAX. FLOW : Max.(',max(max_flow)::numeric(12,3), ') , Avg.(', avg(max_flow)::numeric(12,3), ') , Standard dev.(', stddev(max_flow)::numeric(12,3)
+		, ') , Min.(', min (max_flow)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, p_result, 1, concat ('VELOCITY : Max.(',max(max_veloc)::numeric(12,3), ') , Avg.(', avg(max_veloc)::numeric(12,3), ') , Standard dev(', stddev(max_veloc)::numeric(12,3)
-		, ') , Min(', min (max_veloc)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
+		SELECT 14, p_result, 1, concat ('VELOCITY : Max.(',max(max_veloc)::numeric(12,3), ') , Avg.(', avg(max_veloc)::numeric(12,3), ') , Standard dev.(', stddev(max_veloc)::numeric(12,3)
+		, ') , Min.(', min (max_veloc)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-		SELECT 14, p_result, 1, concat ('FULL PERCENT. : Max.(',max(mfull_dept)::numeric(12,3), ') , Avg.(', avg(mfull_dept)::numeric(12,3), ') , Standard dev(', stddev(mfull_dept)::numeric(12,3)
-		, ') , Min(', min (mfull_dept)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
+		SELECT 14, p_result, 1, concat ('FULL PERCENT. : Max.(',max(mfull_dept)::numeric(12,3), ') , Avg.(', avg(mfull_dept)::numeric(12,3), ') , Standard dev.(', stddev(mfull_dept)::numeric(12,3)
+		, ') , Min.(', min (mfull_dept)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 		SELECT 14, p_result, 1, concat ('NODE SURCHARGE : Number of nodes (', count(*)::integer,').') 
@@ -87,7 +87,7 @@ BEGIN
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 		SELECT 14, p_result, 1, concat ('NODE FLOODING: Number of nodes (', count(*)::integer,'), Max. rate (',max(max_rate)::numeric(12,3), '), Total flood (' ,sum(tot_flood), 
-		'), Max. flood', max(tot_flood),').')
+		'), Max. flood (', max(tot_flood),').')
 		FROM rpt_nodeflooding_sum WHERE result_id = p_result;
 	
 	END IF;
@@ -102,7 +102,12 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '------------------');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 	SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
+	where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+	SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
 	where csv2pgcat_id=11 and source='rpt_cat_result' and user_name=current_user;
+
 
 	-- detalied user inp options
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '');
