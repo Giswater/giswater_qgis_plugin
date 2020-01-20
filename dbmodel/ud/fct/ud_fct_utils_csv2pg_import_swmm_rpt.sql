@@ -76,6 +76,8 @@ BEGIN
 
 		IF (SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id) IS NOT NULL THEN
 			type_aux=(SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id);
+		ELSIF rpt_rec.csv1 = 'WARNING' THEN
+			type_aux = 'rpt_warning_summary';
 		END IF;	
 						
 		IF type_aux='rpt_cat_result' THEN
@@ -187,7 +189,7 @@ BEGIN
 			INSERT INTO rpt_nodedepth_sum(result_id, node_id, swnod_type, aver_depth, max_depth, max_hgl,time_days, time_hour)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6,
 			rpt_rec.csv7);
-
+			
 		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node) AND type_aux='rpt_nodeinflow_sum' then
 			INSERT INTO rpt_nodeinflow_sum(result_id, node_id, swnod_type, max_latinf, max_totinf, time_days, 
 			time_hour, latinf_vol, totinf_vol, flow_balance_error, other_info)
@@ -237,19 +239,23 @@ BEGIN
 			VALUES (v_result_id,rpt_rec.csv1, rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric);
 
-		ELSIF rpt_rec.csv1='WARNING' THEN
-			INSERT INTO rpt_warning_summary(result_id,warning_number, text)
+		ELSIF type_aux LIKE 'rpt_warning_summary' THEN
+			INSERT INTO rpt_warning_summary(result_id, warning_number, text)
 			VALUES (v_result_id,concat(rpt_rec.csv1,' ',rpt_rec.csv2), concat(rpt_rec.csv3,' ',rpt_rec.csv4,'',rpt_rec.csv5,' ' ,rpt_rec.csv6,' ',rpt_rec.csv7,' ',
 			rpt_rec.csv8,' ',rpt_rec.csv9,' ',rpt_rec.csv10,' ',rpt_rec.csv11,' ',rpt_rec.csv12,' ',rpt_rec.csv13,' ',rpt_rec.csv14,' ',rpt_rec.csv15));
-   				
+
+		ELSIF type_aux LIKE 'rpt_control_actions_taken' THEN
+			INSERT INTO rpt_warning_summary(result_id, warning_number, text)
+			VALUES (v_result_id,concat(rpt_rec.csv1,' ',rpt_rec.csv2), concat(rpt_rec.csv3,' ',rpt_rec.csv4,'',rpt_rec.csv5,' ' ,rpt_rec.csv6,' ',rpt_rec.csv7,' ',
+			rpt_rec.csv8,' ',rpt_rec.csv9,' ',rpt_rec.csv10,' ',rpt_rec.csv11,' ',rpt_rec.csv12,' ',rpt_rec.csv13,' ',rpt_rec.csv14,' ',rpt_rec.csv15));
+
 		ELSIF type_aux='rpt_instability_index' THEN
 			INSERT INTO rpt_instability_index(result_id, text)
    			VALUES (v_result_id,  concat(rpt_rec.csv1,' ',rpt_rec.csv2,'',rpt_rec.csv3));
    		
 		ELSIF rpt_rec.csv1 IN (SELECT poll_id FROM inp_pollutant) AND type_aux='rpt_outfallload_sum' THEN
    			INSERT INTO rpt_outfallload_sum(result_id, poll_id, node_id, value)
-			VALUES (v_result_id, rpt_rec.csv1,null,null);-- update poll_id, que es el value? compare rpt and table
-	
+			VALUES (v_result_id, rpt_rec.csv1,null,null);-- update poll_id, que es el value? compare rpt and table	
 		END IF;
 	END LOOP;
 	
