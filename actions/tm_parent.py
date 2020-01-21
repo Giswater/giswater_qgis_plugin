@@ -10,12 +10,12 @@ from qgis.core import QgsExpression
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QCompleter, QApplication, QTableView
+from qgis.PyQt.QtWidgets import QApplication, QComboBox, QCompleter, QTableView
 
 
-import configparser
-import os
-import sys
+import configparser, os, sys
+from functools import partial
+
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -337,3 +337,43 @@ class TmParentAction(object):
 
         return False
 
+
+    def put_combobox(self, qtable, rows, combo_values, field, combo_pos, col_update):
+        """ Set one column of a QtableView as QComboBox with values from database.
+        :param qtable: QTableView to fill
+        :param rows: List of items to set QComboBox (["..", "..."])
+        :param combo_values: List of items to populate QComboBox (["..", "..."])
+        :param field: Field to set QComboBox (String)
+        :param combo_pos: Position of the column where we want to put the QComboBox (integer)
+        :param col_update: Column to update into QTableView.Model() (integer)
+        :return:
+        """
+        self.controller.log_info(str())
+        for x, row in enumerate(rows):
+            combo = QComboBox()
+            combo.setSizeAdjustPolicy(2)
+            # Populate QComboBox
+            utils_giswater.set_item_data(combo, combo_values, 1)
+            # Set QCombobox to wanted item
+            utils_giswater.set_combo_itemData(combo, str(row[field]), 0)
+            # Get index and put QComboBox into QTableView at index position
+            idx = qtable.model().index(x, combo_pos)
+            qtable.setIndexWidget(idx, combo)
+            combo.currentIndexChanged.connect(partial(self.update_real_field, qtable, combo, x, combo_pos, col_update))
+
+
+    def update_real_field(self, qtable, combo, pos_x, combo_pos, col_update):
+        """ Update values from QComboBox to QTableView
+        :param qtable: QTableView Where update values
+         :param combo: QComboBox from which we will take the value
+        :param pos_x: Position of the row where we want to update value (integer)
+        :param combo_pos: Position of the column where we want to put the QComboBox (integer)
+        :param col_update: Column to update into QTableView.Model() (integer)
+        :return:
+        """
+
+        elem = combo.itemData(combo.currentIndex())
+        i = qtable.model().index(pos_x, combo_pos)
+        qtable.model().setData(i, elem[0])
+        i = qtable.model().index(pos_x, col_update)
+        qtable.model().setData(i, elem[0])

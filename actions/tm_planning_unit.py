@@ -91,7 +91,8 @@ class TmPlanningUnit(TmParentAction):
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_priority, rows, 1)
         self.load_default_values()
-        table_name = "planning_unit"
+        table_name = "v_ui_planning_unit"
+        # table_name = "planning_unit"
         self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
         # Signals
@@ -258,7 +259,7 @@ class TmPlanningUnit(TmParentAction):
 
     def insert_row(self, qtable, selected_id):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
-
+        self.controller.log_info(str("TEST 1"))
         model = qtable.model()
         record = model.record()
         campaign_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
@@ -268,6 +269,7 @@ class TmPlanningUnit(TmParentAction):
             if times is None or int(times) < 1 or times == "":
                 times = "1"
         except:
+            self.controller.log_info(str("TEST 10"))
             times = "1"
         finally:
             record.setValue("node_id", selected_id)
@@ -276,6 +278,7 @@ class TmPlanningUnit(TmParentAction):
             record.setValue("frequency", str(times))
             model.insertRecord(-1, record)
             model.select()
+            self.controller.log_info(str("TEST 20"))
 
 
     def update_table(self, dialog, qtable, table_name):
@@ -295,10 +298,23 @@ class TmPlanningUnit(TmParentAction):
 
         if work_id: expr_filter += " AND work_id =" + str(work_id)
         if builder: expr_filter += " AND builder_id =" + str(builder)
-        if priority: expr_filter += " AND priority_id =" + str(priority)
-
+        # if priority: expr_filter += " AND priority_id =" + str(priority)
+        self.controller.log_info(f"expr_filter --> {expr_filter}")
         self.fill_table_unit(qtable, table_name, expr_filter=expr_filter)
+
+        self.manage_combos(qtable, table_name, expr_filter)
+        qtable.model().dataChanged.connect(partial(self.update_table, dialog, qtable, table_name))
         self.get_id_list()
+
+    def manage_combos(self, qtable, table_name, expr_filter):
+        sql = "SELECT id, name FROM cat_builder"
+        combo_values = self.controller.get_rows(sql, add_empty_row=True)
+        sql = f"SELECT builder_id FROM {table_name}  "
+        sql += f" WHERE {expr_filter} ORDER BY id ASC"
+        rows = self.controller.get_rows(sql, log_sql=True)
+        self.controller.log_info(str(rows))
+        if rows:
+            self.put_combobox(qtable, rows, combo_values, 0, 10, 11)
 
 
     def fill_table_unit(self, qtable, table_name,  expr_filter=None):
@@ -315,7 +331,6 @@ class TmPlanningUnit(TmParentAction):
         if expr_filter:
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-            self.controller.show_info(f"ISVALID --> {is_valid}")
             if not is_valid:
                 return expr
 
@@ -331,14 +346,13 @@ class TmPlanningUnit(TmParentAction):
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_info(f"model.lastError().isValid() --> {model.lastError().isValid()}")
             self.controller.show_warning(model.lastError().text())
-        # Attach model to table view
-        self.controller.show_info(f"expr_filter --> {expr_filter}")
 
         if expr:
             model.setFilter(expr_filter)
+
         model.select()
+        # Attach model to table view
         qtable.setModel(model)
 
         return expr
