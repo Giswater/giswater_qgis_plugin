@@ -201,7 +201,7 @@ class DaoController(object):
                 credentials['user'] = settings.value('username')
                 credentials['password'] = settings.value('password')
                 settings.endGroup()
-                status, credentials = self.connect_to_database_credentials(credentials)
+                status, credentials = self.connect_to_database_credentials(credentials, max_attempts=0)
                 if not status:
                     self.log_warning("Error connecting to database (settings)")
                     self.last_error = self.tr("Error connecting to database")
