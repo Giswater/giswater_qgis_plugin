@@ -8,7 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/01/10
-DROP VIEW IF EXISTS v_anl_arc_x_node;
 ALTER TABLE sys_fprocess_cat DROP fprocess_i18n;
 ALTER TABLE arc RENAME sys_length TO _sys_length;
 
