@@ -1936,7 +1936,7 @@ class UpdateSQL(ApiParent):
                    "AND table_name = 'version')")
             exists = self.controller.get_row(sql)
 
-            if str(exists[0]) == 'True':
+            if exists and str(exists[0]) == 'True':
                 sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
                 result = self.controller.get_row(sql)
                 if result is not None and result[0] == filter_.upper():
