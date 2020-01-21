@@ -1028,3 +1028,41 @@ class ParentAction(object):
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
         self.open_dialog(self.dlg_info)
 
+
+    def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
+        """ Set one column of a QtableView as QComboBox with values from database.
+        :param qtable: QTableView to fill
+        :param rows: List of items to set QComboBox (["..", "..."])
+        :param field: Field to set QComboBox (String)
+        :param widget_pos: Position of the column where we want to put the QComboBox (integer)
+        :param combo_values: List of items to populate QComboBox (["..", "..."])
+        :return:
+        """
+
+        for x in range(0, len(rows)):
+            combo = QComboBox()
+            row = rows[x]
+            # Populate QComboBox
+            utils_giswater.set_item_data(combo, combo_values, 1)
+            # Set QCombobox to wanted item
+            utils_giswater.set_combo_itemData(combo, str(row[field]), 1)
+            # Get index and put QComboBox into QTableView at index position
+            idx = qtable.model().index(x, widget_pos)
+            qtable.setIndexWidget(idx, combo)
+            combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x, widget_pos))
+
+
+    def update_status(self, combo, qtable, pos_x, widget_pos):
+        """ Update values from QComboBox to QTableView
+        :param combo: QComboBox from which we will take the value
+        :param qtable: QTableView Where update values
+        :param pos_x: Position of the row where we want to update value (integer)
+        :param widget_pos:Position of the widget where we want to update value (integer)
+        :return:
+        """
+
+        elem = combo.itemData(combo.currentIndex())
+        i = qtable.model().index(pos_x, widget_pos)
+        qtable.model().setData(i, elem[0])
+        i = qtable.model().index(pos_x, widget_pos+1)
+        qtable.model().setData(i, elem[1])
