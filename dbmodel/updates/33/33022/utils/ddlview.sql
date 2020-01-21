@@ -15,7 +15,7 @@ ext_streetaxis.code,
 ext_streetaxis.type,
 ext_streetaxis.name,
 ext_streetaxis.text,
-ext_streetaxis.the_geom::geometry(MultiLinestring,25831),
+ext_streetaxis.the_geom::geometry(MultiLinestring,SRID_VALUE),
 ext_streetaxis.expl_id,
 ext_streetaxis.muni_id,
 CASE
