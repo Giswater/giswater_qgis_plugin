@@ -26,3 +26,17 @@ ELSE (((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) |
 END AS descript
 FROM selector_expl, ext_streetaxis
 WHERE ext_streetaxis.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_anl_arc_x_node AS 
+ SELECT anl_arc_x_node.id,
+    anl_arc_x_node.arc_id,
+    anl_arc_x_node.arccat_id AS arc_type,
+    anl_arc_x_node.state,
+    anl_arc_x_node.node_id,
+    anl_arc_x_node.fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_arc_x_node.the_geom
+   FROM selector_audit, anl_arc_x_node
+     JOIN sys_fprocess_cat ON anl_arc_x_node.fprocesscat_id = sys_fprocess_cat.id
+     JOIN exploitation ON anl_arc_x_node.expl_id = exploitation.expl_id
+  WHERE anl_arc_x_node.fprocesscat_id = selector_audit.fprocesscat_id AND selector_audit.cur_user = "current_user"()::text AND anl_arc_x_node.cur_user::name = "current_user"();
