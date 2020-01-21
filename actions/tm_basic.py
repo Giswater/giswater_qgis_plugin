@@ -11,7 +11,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from qgis.PyQt.QtSql import QSqlTableModel
-
+from .parent import ParentAction
 from .tm_parent import TmParentAction
 from .tm_manage_visit import TmManageVisit
 from .tm_planning_unit import TmPlanningUnit
@@ -36,7 +36,7 @@ class TmBasic(TmParentAction):
         self.campaign_name = None
         self.rows_cmb_poda_type = None
         self.rows_cmb_builder = None
-
+        self.parent = ParentAction(iface, settings, controller, plugin_dir)
 
     def set_tree_manage(self, tree_manage):
         self.tree_manage = tree_manage
@@ -70,7 +70,6 @@ class TmBasic(TmParentAction):
         
         if self.rows_cmb_poda_type is None:
             self.update_cmb_poda_type()     
-
 
         if self.rows_cmb_builder is None:
             self.update_cmb_builder()
@@ -137,7 +136,10 @@ class TmBasic(TmParentAction):
 
         # Close perevious dialog
         self.close_dialog(self.dlg_new_campaign)
+        self.manage_prices(id_new_camp)
 
+
+    def manage_prices(self, id_camp):
         # Set dialog and signals
         dlg_prices_management = PriceManagement()
         self.load_settings(dlg_prices_management)
@@ -146,7 +148,7 @@ class TmBasic(TmParentAction):
         
         # Populate QTableView
         table_view = 'v_edit_price'
-        self.fill_table_prices(dlg_prices_management.tbl_price_list, table_view, id_new_camp, set_edit_triggers=QTableView.DoubleClicked)
+        self.fill_table_prices(dlg_prices_management.tbl_price_list, table_view, id_camp, set_edit_triggers=QTableView.DoubleClicked)
         self.set_table_columns(dlg_prices_management, dlg_prices_management.tbl_price_list, table_view, 'basic_cat_price')
 
         self.open_dialog(dlg_prices_management)
@@ -215,8 +217,10 @@ class TmBasic(TmParentAction):
         dlg_tree_manage.rejected.connect(partial(self.close_dialog, dlg_tree_manage))
         dlg_tree_manage.btn_cancel.clicked.connect(partial(self.close_dialog, dlg_tree_manage))
         dlg_tree_manage.btn_accept.clicked.connect(partial(self.get_year, dlg_tree_manage))
-        self.set_completer_object(table_name, dlg_tree_manage.txt_campaign, field_name)
+        dlg_tree_manage.btn_update_price.clicked.connect(partial(self.get_campaing_id, dlg_tree_manage))
+        dlg_tree_manage.btn_update_price.clicked.connect(partial(self.manage_prices, self.campaign_id))
 
+        self.set_completer_object(table_name, dlg_tree_manage.txt_campaign, field_name)
         self.open_dialog(dlg_tree_manage)
 
 
@@ -232,21 +236,26 @@ class TmBasic(TmParentAction):
         utils_giswater.set_item_data(combo, rows, 1, reverse)
 
 
+    def get_campaing_id(self, dialog):
+        sql = (f"SELECT id FROM cat_campaign "
+               f" WHERE name = '{dialog.txt_campaign.text()}'")
+        row = self.controller.get_row(sql)
+        if row is None:
+            message = "No hi ha preus per aquest any"
+            self.controller.show_warning(message)
+            return None
+        self.campaign_id = row[0]
+        return True
+
+    
     def get_year(self, dialog):
                
         update = False
         self.selected_camp = None
 
         if dialog.txt_campaign.text() != '':
-            
-            sql = (f"SELECT id FROM cat_campaign "
-                   f" WHERE name = '{dialog.txt_campaign.text()}'")
-            row = self.controller.get_row(sql)
-            if row is None:
-                message = "No hi ha preus per aquest any"
-                self.controller.show_warning(message)
-                return None
-            self.campaign_id = row[0]
+            status = self.get_campaing_id(dialog)
+            if not status: return None
 
             if utils_giswater.isChecked(dialog, dialog.chk_campaign) and utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
                 self.selected_camp = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0)
@@ -257,9 +266,23 @@ class TmBasic(TmParentAction):
                     update = True
             else:
                 self.selected_camp = self.campaign_id
-                
+
             self.campaign_name = dialog.txt_campaign.text()
             self.close_dialog(dialog)
+            bool_dic = {False: "false", True: "true"}
+            cmb_pending = utils_giswater.get_item_data(dialog, dialog.cbx_pendientes)
+            chk_pending = utils_giswater.isChecked(dialog, dialog.chk_pendiente)
+            cmb_campaign = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns)
+            chk_campaign = utils_giswater.isChecked(dialog, dialog.chk_campaign)
+            extras = f'"parameters":{{'
+            extras += f'"txt_campaign":{self.campaign_id}, '
+            extras += f'"cbx_pendientes":{cmb_pending}, '
+            extras += f'"chk_pendiente":{bool_dic[chk_pending]}, '
+            extras += f'"cbx_campaigns":{cmb_campaign}, '
+            extras += f'"chk_campaign":{bool_dic[chk_campaign]}}}'
+            body = self.parent.create_body(extras=extras)
+            sql = ("SELECT tm_fct_copy_planning($${" + body + "}$$)::text")
+            row = self.controller.get_row(sql, commit=True)
             self.tree_selector(update)
 
         else:
@@ -367,8 +390,7 @@ class TmBasic(TmParentAction):
         expr = (f" mu_name ILIKE '%{dialog.txt_search.text()}%'"
                 f" AND mu_id NOT IN ({ids})"
                 f" AND campaign_id::text = '{self.campaign_id}'"
-                f" OR campaign_id IS null")
-        self.controller.log_info(expr)
+                f" OR (campaign_id IS null AND mu_id NOT IN ({ids}))")
         # (is_valid, expr) = self.check_expression(expr)  # @UnusedVariable
         # # if not is_valid:
         # #     return
@@ -485,8 +507,19 @@ class TmBasic(TmParentAction):
                 self.controller.execute_sql(sql)
 
 
-    def rows_selector(self, dialog, id_table_left, tableright, id_table_right, tableleft, table_view):
-        """ Copy the selected lines in the qtable_all_rows and in the table """
+    def rows_selector(self, dialog, id_table_left, table_view, id_table_right, tableleft, tableright):
+        """ Copy the selected lines in the qtable_all_rows and in the table
+        :param dialog: QDialog
+        :param id_table_left: Field id of table left
+        :param tableright: Name of table or view used to populate QtableView on right side
+        :param id_table_right: Field id of table right
+        :param tableleft: Name of table or view used to populate QtableView on left side
+        :param table_view: Table or view where find and insert values
+        :return:
+        """
+        # tableleft = 'v_plan_mu'
+        # tableright = 'planning'
+        # table_view = 'v_plan_mu_year'
         
         left_selected_list = dialog.all_rows.selectionModel().selectedRows()
         if len(left_selected_list) == 0:
@@ -518,51 +551,53 @@ class TmBasic(TmParentAction):
                        f" SET work_id = '{current_poda_type}'"
                        f" WHERE id = '{dialog.all_rows.model().record(row).value('mu_id')}'")
                 self.controller.execute_sql(sql)
-
+        builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder, 0)
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
             values = ""
             function_values = ""
             if dialog.all_rows.model().record(row).value('mu_id') is not None:
-                values += f"'{dialog.all_rows.model().record(row).value('mu_id')}', "
-                function_values += f"'{dialog.all_rows.model().record(row).value('mu_id')}', "
+                values += f"{dialog.all_rows.model().record(row).value('mu_id')}, "
+                function_values += f"{dialog.all_rows.model().record(row).value('mu_id')}, "
             else:
                 values += 'null, '
 
             if dialog.all_rows.model().record(row).value('work_id') is not None:
                 if utils_giswater.isChecked(dialog, dialog.chk_current):
-                    values += f"'{current_poda_type}', "
-                    function_values += f"'{current_poda_type}', "
+                    values += f"{current_poda_type}, "
+                    function_values += f"{current_poda_type}, "
                 else:
-                    values += f"'{dialog.all_rows.model().record(row).value('work_id')}', "
-                    function_values += f"'{dialog.all_rows.model().record(row).value('work_id')}', "
+                    values += f"{dialog.all_rows.model().record(row).value('work_id')}, "
+                    function_values += f"{dialog.all_rows.model().record(row).value('work_id')}, "
             else:
                 values += 'null, '
 
-            values += f"'{self.campaign_id}', "
+            values += f"{self.campaign_id}, "
+            values += f"{builder}, "
             values = values[:len(values) - 2]
-            function_values += f"'{self.campaign_id}', "
+            function_values += f"{self.campaign_id}, "
             function_values = function_values[:len(function_values) - 2]
 
             # Check if mul_id and year_ already exists in planning
             sql = (f"SELECT {id_table_right}"
-                   f" FROM {tableright}"
+                   f" FROM {table_view}"
                    f" WHERE {id_table_right} = '{field_list[i]}'"
                    f" AND campaign_id = '{self.campaign_id}';")
             row = self.controller.get_row(sql, log_sql=True)
+
             if row is not None:
                 # if exist - show warning
                 message = "Aquest registre ja esta seleccionat"
                 self.controller.show_info_box(message, "Info", parameter=str(field_list[i]))
             else:
-                sql = (f"INSERT INTO {tableright}"
-                       f" (mu_id, work_id, campaign_id) VALUES ({values})")
+                sql = (f"INSERT INTO {table_view}"
+                       f" (mu_id, work_id, campaign_id, builder_id) VALUES ({values})")
                 self.controller.execute_sql(sql)
                 sql = f"SELECT set_plan_price({function_values})"
-                self.controller.execute_sql(sql)
+                self.controller.execute_sql(sql, log_sql=True)
 
         # Refresh tables
-        self.fill_table(dialog, table_view, set_edit_triggers=QTableView.NoEditTriggers)
+        self.fill_table(dialog, tableright, set_edit_triggers=QTableView.NoEditTriggers)
         self.fill_main_table(dialog, tableleft)
 
 
@@ -685,6 +720,11 @@ class TmBasic(TmParentAction):
 
         self.calculate_total_price(month_selector, self.planned_camp_id)
 
+        # Get data to fill combo from memory
+        if self.rows_cmb_builder is None:
+            self.update_cmb_builder()
+            utils_giswater.set_item_data(month_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
+
         month_selector.btn_close.clicked.connect(partial(self.close_dialog, month_selector))
         month_selector.rejected.connect(partial(self.close_dialog, month_selector))
 
@@ -709,17 +749,20 @@ class TmBasic(TmParentAction):
         # Get dates
         plan_month_start = utils_giswater.getCalendarDate(dialog, dialog.date_inici)
         plan_month_end = utils_giswater.getCalendarDate(dialog, dialog.date_fi)
-
+        chk_builder = utils_giswater.isChecked(dialog, dialog.chk_builder)
+        builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder)
         # Update values
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
             sql = (f"UPDATE {tableleft} "
                    f" SET plan_code ='{self.plan_code}', "
                    f" plan_month_start = '{plan_month_start}', "
-                   f" plan_month_end = '{plan_month_end}' "
-                   f" WHERE id='{dialog.all_rows.model().record(row).value('id')}'"
-                   f" AND mu_id ='{dialog.all_rows.model().record(row).value('mu_id')}'"
-                   f" AND campaign_id = '{self.planned_camp_id}'")
+                   f" plan_month_end = '{plan_month_end}' ")
+            if chk_builder:
+                sql += f", builder_id = {builder} "
+            sql += (f" WHERE id='{dialog.all_rows.model().record(row).value('id')}'"
+                    f" AND mu_id ='{dialog.all_rows.model().record(row).value('mu_id')}'"
+                    f" AND campaign_id = '{self.planned_camp_id}'")
             self.controller.execute_sql(sql)
 
         # Refresh QTableViews and recalculate price
@@ -744,15 +787,18 @@ class TmBasic(TmParentAction):
             row = left_selected_list[i].row()
             id_ = dialog.selected_rows.model().record(row).value(id_table_left)
             field_list.append(id_)
-
+        chk_builder = utils_giswater.isChecked(dialog, dialog.chk_builder)
+        builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder)
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
             sql = (f"UPDATE {tableleft} "
                    f" SET plan_code = null, "
                    f" plan_month_start = null, "
-                   f" plan_month_end = null "
-                   f" WHERE mu_id = '{dialog.selected_rows.model().record(row).value('mu_id')}'"
-                   f" AND campaign_id = '{self.planned_camp_id}'")
+                   f" plan_month_end = null ")
+            if chk_builder:
+                sql += f", builder_id = {builder} "
+            sql += (f" WHERE mu_id = '{dialog.selected_rows.model().record(row).value('mu_id')}'"
+                    f" AND campaign_id = '{self.planned_camp_id}'")
             self.controller.execute_sql(sql)
 
         # Refresh QTableViews and recalculate price

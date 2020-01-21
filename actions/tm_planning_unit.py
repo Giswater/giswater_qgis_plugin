@@ -84,16 +84,21 @@ class TmPlanningUnit(TmParentAction):
         sql = "SELECT id, name FROM cat_work"
         rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_unit.cmb_work, rows, 1)
+        sql = "SELECT id, name FROM cat_builder"
+        rows = self.controller.get_rows(sql, add_empty_row=True)
+        utils_giswater.set_item_data(self.dlg_unit.cmb_builder, rows, 1)
+        sql = "SELECT id, name FROM cat_priority"
+        rows = self.controller.get_rows(sql, add_empty_row=True)
+        utils_giswater.set_item_data(self.dlg_unit.cmb_priority, rows, 1)
         self.load_default_values()
-        table_name = "v_ui_planning_unit"
-        self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name, self.dlg_unit.cmb_campaign, self.dlg_unit.cmb_work)
+        table_name = "planning_unit"
+        self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
         # Signals
-        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(
-            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name, self.dlg_unit.cmb_campaign, self.dlg_unit.cmb_work))
-
-        self.dlg_unit.cmb_work.currentIndexChanged.connect(
-            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name, self.dlg_unit.cmb_campaign, self.dlg_unit.cmb_work))
+        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_work.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_builder.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_priority.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
 
         completer = QCompleter()
         self.dlg_unit.txt_id.textChanged.connect(
@@ -167,8 +172,7 @@ class TmPlanningUnit(TmParentAction):
             for index in records_sorted:
                 model.removeRow(index.row())
 
-        self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name, self.dlg_unit.cmb_campaign,
-                          self.dlg_unit.cmb_work)
+        self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
 
     def selection_init(self,  qtable):
@@ -271,21 +275,27 @@ class TmPlanningUnit(TmParentAction):
             record.setValue("work_id", work_id)
             record.setValue("frequency", str(times))
             model.insertRecord(-1, record)
+            model.select()
 
 
-    def update_table(self, dialog, qtable, table_name, combo1, combo2):
+    def update_table(self, dialog, qtable, table_name):
 
-        campaign_id = utils_giswater.get_item_data(dialog, combo1, 0)
-        work_id = utils_giswater.get_item_data(dialog, combo2, 0)
+        campaign_id = utils_giswater.get_item_data(dialog, dialog.cmb_campaign, 0)
+        work_id = utils_giswater.get_item_data(dialog, dialog.cmb_work, 0, add_quote=True)
+        builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder, 0)
+        priority = utils_giswater.get_item_data(dialog, dialog.cmb_priority, 0)
 
-        expr_filter = "campaign_id =" + str(campaign_id)
-        if work_id is None or work_id == "":
+        if work_id  in (None, "") or builder in (None, "") or priority in (None, ""):
             self.dlg_unit.btn_insert.setEnabled(False)
             self.dlg_unit.btn_snapping.setEnabled(False)
         else:
             self.dlg_unit.btn_insert.setEnabled(True)
             self.dlg_unit.btn_snapping.setEnabled(True)
-            expr_filter += " AND work_id =" + str(work_id)
+        expr_filter = "campaign_id =" + str(campaign_id)
+
+        if work_id: expr_filter += " AND work_id =" + str(work_id)
+        if builder: expr_filter += " AND builder_id =" + str(builder)
+        if priority: expr_filter += " AND priority_id =" + str(priority)
 
         self.fill_table_unit(qtable, table_name, expr_filter=expr_filter)
         self.get_id_list()
@@ -305,6 +315,7 @@ class TmPlanningUnit(TmParentAction):
         if expr_filter:
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            self.controller.show_info(f"ISVALID --> {is_valid}")
             if not is_valid:
                 return expr
 
@@ -317,17 +328,18 @@ class TmPlanningUnit(TmParentAction):
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
-        model.select()
 
         # Check for errors
         if model.lastError().isValid():
+            self.controller.show_info(f"model.lastError().isValid() --> {model.lastError().isValid()}")
             self.controller.show_warning(model.lastError().text())
         # Attach model to table view
+        self.controller.show_info(f"expr_filter --> {expr_filter}")
+
         if expr:
-            qtable.setModel(model)
-            qtable.model().setFilter(expr_filter)
-        else:
-            qtable.setModel(model)
+            model.setFilter(expr_filter)
+        model.select()
+        qtable.setModel(model)
 
         return expr
 
@@ -379,9 +391,12 @@ class TmPlanningUnit(TmParentAction):
         cur_user = self.controller.get_current_user()
         campaign = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
         work = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
+        builder = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_builder, 0)
+        priority = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_priority, 0)
         self.controller.plugin_settings_set_value("PlanningUnit_cmb_campaign_" + cur_user, campaign)
         self.controller.plugin_settings_set_value("PlanningUnit_cmb_work_" + cur_user, work)
-
+        self.controller.plugin_settings_set_value("PlanningUnit_cmb_builder_" + cur_user, builder)
+        self.controller.plugin_settings_set_value("PlanningUnit_cmb_priority_" + cur_user, priority)
 
     def load_default_values(self):
         """ Load QGIS settings related with csv options """
@@ -389,6 +404,10 @@ class TmPlanningUnit(TmParentAction):
         cur_user = self.controller.get_current_user()
         campaign = self.controller.plugin_settings_value('PlanningUnit_cmb_campaign_' + cur_user)
         work = self.controller.plugin_settings_value('PlanningUnit_cmb_work_' + cur_user)
+        builder = self.controller.plugin_settings_value('PlanningUnit_cmb_builder_' + cur_user)
+        priority = self.controller.plugin_settings_value('PlanningUnit_cmb_priority_' + cur_user)
         utils_giswater.set_combo_itemData(self.dlg_unit.cmb_campaign, str(campaign), 0)
         utils_giswater.set_combo_itemData(self.dlg_unit.cmb_work, str(work), 0)
+        utils_giswater.set_combo_itemData(self.dlg_unit.cmb_builder, str(builder), 0)
+        utils_giswater.set_combo_itemData(self.dlg_unit.cmb_priority, str(priority), 0)
 

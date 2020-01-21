@@ -94,7 +94,11 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <widget class="QTableView" name="all_rows"/>
+             <widget class="QTableView" name="all_rows">
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <spacer name="horizontalSpacer_6">
@@ -339,7 +343,11 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
-             <widget class="QTableView" name="selected_rows"/>
+             <widget class="QTableView" name="selected_rows">
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <spacer name="horizontalSpacer_8">
