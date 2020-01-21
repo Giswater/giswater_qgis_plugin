@@ -10,7 +10,7 @@ from qgis.core import Qgis, QgsVectorLayer, QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
-from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtCore import QSettings, Qt, QDate
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
@@ -1219,10 +1219,10 @@ class UpdateSQL(ApiParent):
         if new_project is True:
             if str(self.title) != 'null':
                 extras += ', ' + '"title":"' + str(self.title) + '"'
-            if str(self.author) != 'null':
-                extras += ', ' + '"author":"' + str(self.author) + '"'
-            if str(self.date) != 'null':
-                extras += ', ' + '"date":"' + str(self.date) + '"'
+            extras += ', ' + '"author":"' + str(self.controller.current_user) + '"'
+            current_date = QDate.currentDate().toString('dd-MM-yyyy')
+            extras += ', ' + '"date":"' + str(current_date) + '"'
+
         extras += ', "superUsers":' + str(self.super_users).replace("'",'"') + ''
 
         self.schema_name = schema_name
@@ -1319,8 +1319,6 @@ class UpdateSQL(ApiParent):
         self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
 
         self.title = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_title)
-        self.author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
-        self.date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
         project_name = str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name))
         schema_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
         self.filter_srid_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'srid_id')
@@ -1392,8 +1390,8 @@ class UpdateSQL(ApiParent):
                     self.filter_srid_value = '25831'
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', '25831')
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', 'EN')
-
-
+                    self.task1 = GwTask('Manage schema')
+                    QgsApplication.taskManager().addTask(self.task1)
                 else:
                     return
 
@@ -1402,6 +1400,7 @@ class UpdateSQL(ApiParent):
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
+
         self.task1.setProgress(10)
         status = self.update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
@@ -1435,8 +1434,9 @@ class UpdateSQL(ApiParent):
         self.task1.setProgress(70)
         # Custom execution
         if self.rdb_import_data.isChecked():
-            #TODO::
+            #TODO:
             self.task1.setProgress(100)
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             self.controller.show_info_box(msg, "Info")
@@ -1444,18 +1444,21 @@ class UpdateSQL(ApiParent):
             return
 
         elif self.rdb_sample.isChecked():
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
             self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
             self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
+            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
             pass
 
         self.manage_process_result(project_name_schema)
 
-        # Update comoposer path on config_param_user
+        # Update composer path on config_param_user
         self.manage_user_params()
 
 
@@ -1467,7 +1470,7 @@ class UpdateSQL(ApiParent):
         if status:
             self.controller.dao.commit()
             self.close_dialog(self.dlg_readsql_create_project)
-            # Referesh data main dialog
+            # Refresh data main dialog
             self.event_change_connection()
             if schema_name is not None:
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
@@ -1490,6 +1493,17 @@ class UpdateSQL(ApiParent):
         else:
             close_dlg_rename = False
             self.schema = str(create_project)
+
+        sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
+        rows = self.controller.get_rows(sql, commit=True)
+
+        for row in rows:
+            if str(self.schema) == str(row[0]):
+                msg = "This project name alredy exist."
+                self.controller.show_info_box(msg, "Info")
+                return
+            else:
+                continue
 
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
@@ -1922,7 +1936,7 @@ class UpdateSQL(ApiParent):
                    "AND table_name = 'version')")
             exists = self.controller.get_row(sql)
 
-            if str(exists[0]) == 'True':
+            if exists and str(exists[0]) == 'True':
                 sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
                 result = self.controller.get_row(sql)
                 if result is not None and result[0] == filter_.upper():
@@ -2110,8 +2124,6 @@ class UpdateSQL(ApiParent):
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
         self.project_title = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_title')
-        self.project_author = self.dlg_readsql_create_project.findChild(QLineEdit, 'author')
-        self.project_date = self.dlg_readsql_create_project.findChild(QLineEdit, 'date')
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
         self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
@@ -2121,6 +2133,10 @@ class UpdateSQL(ApiParent):
         #Load user values
         self.project_name.setText(str(self.controller.plugin_settings_value('project_name_schema')))
         self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
+        create_schema_type = self.controller.plugin_settings_value('create_schema_type')
+        if create_schema_type:
+            utils_giswater.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
+
         if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
             self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
 
@@ -2273,6 +2289,7 @@ class UpdateSQL(ApiParent):
                 self.controller.dao.rollback()
             status = False
         finally:
+            f.close()
             return status
 
 
@@ -2334,7 +2351,7 @@ class UpdateSQL(ApiParent):
             elif schema_type.lower() == 'ud':
                 function_name = 'gw_fct_utils_csv2pg_import_swmm_inp'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
-                extras = '"parameters":{"createSubcGeom":' + str(createSubcGeom.isChecked()) + '}'
+                extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '"}'
             else:
                 self.error_count = self.error_count + 1
                 return
@@ -3230,7 +3247,11 @@ class UpdateSQL(ApiParent):
         postgresql_version = self.controller.get_postgresql_version()
         postgis_version = self.controller.get_postgis_version()
         plugin_version = self.get_plugin_version()
-        project_version = self.controller.get_project_version()
+        project_version = 0
+        sql = (f"SELECT giswater FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1")
+        row = self.controller.get_row(sql)
+        if row:
+            project_version = row[0]
 
         message = ("Plugin version:     " + str(plugin_version) + "\n"
                    "Project version:    " + str(project_version) + "\n"
@@ -3296,5 +3317,6 @@ class UpdateSQL(ApiParent):
         folder_name = os.path.dirname(os.path.abspath(__file__))
         composers_path_vdef = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'templates' + os.sep + 'qgiscomposer' + os.sep + 'en'
         sql = f"UPDATE {self.schema_name}.config_param_user SET value = '{composers_path_vdef}' WHERE parameter = 'qgis_composers_path' AND cur_user = current_user"
+        
         self.controller.execute_sql(sql)
 

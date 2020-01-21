@@ -347,7 +347,7 @@ class ApiDimensioning(ApiParent):
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
-            widget = self.add_checkbox(dialog, field)
+            widget = self.add_checkbox(field)
         elif field['widgettype'] == 'datepickertime':
             widget = self.add_calendar(dialog, field)
         elif field['widgettype'] == 'button':

@@ -1026,7 +1026,7 @@ class AddNewLot(ParentManage):
             # Populate QComboBox
             utils_giswater.set_item_data(combo, combo_values, 1)
             # Set QCombobox to wanted item
-            utils_giswater.set_combo_itemData(combo, str(row[field]), 0)
+            utils_giswater.set_combo_itemData(combo, str(row[field]), 1)
             # Get index and put QComboBox into QTableView at index position
             idx = qtable.model().index(x, widget_pos)
             qtable.setIndexWidget(idx, combo)
@@ -1433,7 +1433,7 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_basic_table)
 
         # Populate model visit
-        sql = ("SELECT * FROM v_om_team_x_vehicle")
+        sql = ("SELECT * FROM v_om_team_x_vehicle ORDER BY id")
         rows = self.controller.get_rows(sql, commit=True)
 
         if rows is None:
@@ -1448,7 +1448,7 @@ class AddNewLot(ParentManage):
         if combo_values is None:
             return
 
-        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 0, 1, combo_values)
+        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 1, 1, combo_values)
 
         # Add combo into column vehicle_id
         sql = ("SELECT id, idval"
@@ -1459,9 +1459,7 @@ class AddNewLot(ParentManage):
         if combo_values is None:
             return
 
-        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 0, 2, combo_values)
-
-
+        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 2, 2, combo_values)
 
 
     def open_user_manage(self):

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>708</width>
-    <height>382</height>
+    <width>990</width>
+    <height>388</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,49 +53,10 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item row="1" column="5">
-      <widget class="QPushButton" name="btn_delete">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>24</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>24</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cmb_work"/>
-     </item>
      <item row="1" column="0">
       <widget class="QComboBox" name="cmb_campaign"/>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Campanya:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
+     <item row="1" column="6">
       <widget class="QPushButton" name="btn_insert">
        <property name="minimumSize">
         <size>
@@ -125,14 +86,50 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
+     <item row="1" column="7">
+      <widget class="QPushButton" name="btn_delete">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Campanya:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Nº de regs:</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item row="1" column="4">
       <widget class="QLineEdit" name="txt_times">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -163,7 +160,10 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="6">
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmb_work"/>
+     </item>
+     <item row="1" column="8">
       <widget class="QPushButton" name="btn_snapping">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -192,7 +192,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="3">
+     <item row="1" column="5">
       <widget class="QLineEdit" name="txt_id">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -220,10 +220,30 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="5">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Id:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="cmb_builder"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Builder:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QComboBox" name="cmb_priority"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Prioritat:</string>
        </property>
       </widget>
      </item>

@@ -343,7 +343,7 @@ class MincutConfig(ParentAction):
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from:')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to:')
         expr += f" (id::text ILIKE '%{id_}%'"
-        expr += f" OR work_order::text ILIKE '%{id_}%' OR work_order IS null)"
+        expr += f" OR work_order::text ILIKE '%{id_}%')"
         expr += f" {dates_filter}"
         if state != '':
             expr += f" AND state::text ILIKE '%{state}%' OR state IS null"

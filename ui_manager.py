@@ -213,6 +213,11 @@ class AuditCheckProjectResult(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('basic_info.ui')
+class BasicInfo(GwDialog, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('basic_table.ui')
 class BasicTable(GwDialog, FORM_CLASS):
     pass

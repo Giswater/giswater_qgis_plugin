@@ -807,6 +807,37 @@ class ApiParent(ParentAction):
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
         return widget
 
+
+    def fill_child(self, dialog, widget, feature_type, tablename, field_id):
+        """ Find QComboBox child and populate it
+        :param dialog: QDialog
+        :param widget: QComboBox parent
+        :param feature_type: PIPE, ARC, JUNCTION, VALVE...
+        :param tablename: view of DB
+        :param field_id: Field id of tablename
+        """
+
+        combo_parent = widget.property('column_id')
+        combo_id = utils_giswater.get_item_data(dialog, widget)
+
+        feature = f'"featureType":"{feature_type}", '
+        feature += f'"tableName":"{tablename}", '
+        feature += f'"idName":"{field_id}"'
+        extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
+        body = self.create_body(feature=feature, extras=extras)
+        sql = f"SELECT gw_api_getchilds($${{{body}}}$$)"
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
+        for combo_child in row[0]['body']['data']:
+            if combo_child is not None:
+                self.populate_child(dialog, combo_child)
+
+
+    def populate_child(self, dialog, combo_child):
+
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+        if child:
+            self.populate_combo(child, combo_child)
+
         
     def populate_combo(self, widget, field):
         # Generate list of items to add into combo
@@ -1082,7 +1113,7 @@ class ApiParent(ParentAction):
                 self.populate_combo(widget, field)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] in ('check','checkbox'):
-                widget = self.add_checkbox(dialog, field)
+                widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
             grid_layout.addWidget(label,x, 0)
             grid_layout.addWidget(widget, x, 1)
@@ -1256,9 +1287,13 @@ class ApiParent(ParentAction):
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datepickertime':
-                    widget = QDateEdit()
+                    widget = QgsDateTimeEdit()
+                    widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
-                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                    widget.setDisplayFormat('yyyy/MM/dd')
+                    date = QDate.currentDate()
+                    if 'value' in field and field['value'] not in ('', None, 'null'):
+                        date = QDate.fromString(field['value'], 'yyyy-MM-dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -1396,12 +1431,17 @@ class ApiParent(ParentAction):
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
             value = utils_giswater.get_item_data(dialog, widget, 0)
-
-        if str(value) == '' or value is None:
-            _json[str(widget.property('column_id'))] = None
-        else:
-            _json[str(widget.property('column_id'))] = str(value)
-
+        elif type(widget) is QCheckBox and widget.isEnabled():
+            value = utils_giswater.isChecked(dialog, widget)
+        elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+            value = utils_giswater.getCalendarDate(dialog, widget)
+        # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
+        if not hasattr(self, 'layer') or self.layer.isEditable():
+            # If widget.isEditable(False) return None, here control it.
+            if str(value) == '' or value is None:
+                _json[str(widget.property('column_id'))] = None
+            else:
+                _json[str(widget.property('column_id'))] = str(value)
 
     def set_function_associated(self, dialog, widget, field):
 

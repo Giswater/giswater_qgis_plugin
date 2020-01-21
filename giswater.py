@@ -256,21 +256,9 @@ class Giswater(QObject):
         menu = QMenu()
         # List of nodes from node_type_cat_type - nodes which we are using
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
-        help_added = False
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
                     index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
-                if not help_added:
-                    icon_path = self.plugin_dir + '/icons/308.png'
-                    icon = QIcon(icon_path)
-                    if feature_cat.feature_type.upper() in ('NODE', 'CONNEC', 'GULLY'):
-                        obj_action = QAction(icon, f'Insert point \t           ?', self)
-                    else:
-                        obj_action = QAction(icon, f'Insert arc \t           ?', self)
-                    obj_action.triggered.connect(partial(self.open_browser, f'insert-{feature_cat.feature_type.lower()}'))
-                    menu.addAction(obj_action)
-                    menu.addSeparator()
-                    help_added = True
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
@@ -965,9 +953,8 @@ class Giswater(QObject):
 
 
     def get_new_layers_name(self, layers_list):
-        self.get_layers_to_config()
         layers_name = [layer.name() for layer in layers_list]
-        self.get_layer_added(layers_name, self.available_layers)
+        self.set_layer_config(layers_name)
 
 
     def manage_layers(self):
@@ -1203,7 +1190,8 @@ class Giswater(QObject):
         text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'], 'gw_fct_audit_check_project_result', True, False, 0, True)
 
         if 'missingLayers' in result['body']['data']:
-            critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
+            critical_level= self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
+
         self.parent.hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
@@ -1230,15 +1218,15 @@ class Giswater(QObject):
 
         grl_critical = dialog.findChild(QGridLayout, "grl_critical")
         grl_others = dialog.findChild(QGridLayout, "grl_others")
-
+        msg = ""
+        exceptions = []
         for pos, item in enumerate(m_layers):
-            if not item: continue
-            widget = dialog.findChild(QCheckBox, f"{item['layer']}")
-            # If it is the case that a layer is necessary for two functions,
-            # and the widget has already been put in another iteration
-            if widget: continue
-
             try:
+                if not item: continue
+                widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+                # If it is the case that a layer is necessary for two functions,
+                # and the widget has already been put in another iteration
+                if widget: continue
                 label = QLabel()
                 label.setObjectName(f"lbl_{item['layer']}")
                 label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
@@ -1254,14 +1242,19 @@ class Giswater(QObject):
                 else:
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
-            except KeyError:
-                pass
-
+            except KeyError as e:
+                if type(e).__name__ not in exceptions:
+                    exceptions.append(type(e).__name__)
+                    msg += f"<b>Key: </b>{e}<br>"
+                    msg += f"<b>Python file: </b>{__name__} <br>"
+                    msg += f"<b>Python function: </b>{self.get_missing_layers.__name__} <br>"
+        if "KeyError" in exceptions:
+            self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
         return critical_level
 
 
     def add_selected_layers(self):
-        checks = self.dlg_audit_project.findChildren(QCheckBox)
+        checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
         schemaname = self.schema_name.replace('"','')
         for check in checks:
             if check.isChecked():
@@ -1274,7 +1267,7 @@ class Giswater(QObject):
                        f" ORDER BY a.attnum limit 1")
                 the_geom = self.controller.get_row(sql, commit=True)
                 if not the_geom: the_geom = [None]
-                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom[0], check.property('field_id'), None, "GW_layers")
+                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom[0], check.property('field_id'), None, "GW layers")
         self.parent.close_dialog(self.dlg_audit_project)
 
 
@@ -1357,18 +1350,9 @@ class Giswater(QObject):
         finally:
             return value
 
-    def get_layer_added(self, table_name, available_layers):
-        layer_list = []
-        if table_name:
-            for t_name in table_name:
-                if t_name in available_layers:
-                    layer_list.append(t_name)
-        if not layer_list:
-            return
-        self.set_layer_config(layer_list)
-
 
     def get_layers_to_config(self):
+
         """ Get available layers to be configured """
         schema_name = self.schema_name.replace('"','')
         sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature " 
@@ -1381,10 +1365,10 @@ class Giswater(QObject):
         self.available_layers = [layer[0] for layer in rows]
 
         self.set_form_suppress(self.available_layers)
-
-        layers_list = self.settings.value('system_variables/set_layer_config')
-        for layer in layers_list:
-            self.available_layers.append(layer)
+        all_layers_toc = self.controller.get_layers()
+        for layer in all_layers_toc:
+            table_name = f"{self.controller.get_layer_source_table_name(layer)}"
+            self.available_layers.append(table_name)
 
 
     def set_form_suppress(self, layers_list):

@@ -13,7 +13,7 @@ from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringLis
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit
-from qgis.PyQt.QtWidgets import QPushButton, QPlainTextEdit
+from qgis.PyQt.QtWidgets import QPushButton, QPlainTextEdit, QRadioButton
 
 from functools import partial
 import os
@@ -238,7 +238,7 @@ def setChecked(dialog, widget, checked=True):
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
-    if type(widget) is QCheckBox:
+    if type(widget) is QCheckBox or type(widget) is QRadioButton:
         widget.setChecked(bool(checked))
 
 

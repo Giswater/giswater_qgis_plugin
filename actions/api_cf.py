@@ -329,7 +329,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def open_generic_form(self, complet_result):
-
+        self.draw(complet_result, zoom=False)
         self.hydro_info_dlg = ApiBasicInfo()
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -339,7 +339,7 @@ class ApiCF(ApiParent, QObject):
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
-
+        self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
         # Open dialog
         self.open_dialog(self.hydro_info_dlg)
         
@@ -510,7 +510,7 @@ class ApiCF(ApiParent, QObject):
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
-                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
+                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
@@ -814,7 +814,17 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
+    def accept(self, dialog, complet_result, feature_id, _json, p_widget=None, clear_json=False, close_dialog=True):
+        """
+        :param dialog:
+        :param complet_result:
+        :param feature_id:
+        :param _json:
+        :param p_widget:
+        :param clear_json:
+        :param close_dialog:
+        :return:
+        """
 
         if _json == '' or str(_json) == '{}':
             self.close_dialog(dialog)
@@ -823,11 +833,14 @@ class ApiCF(ApiParent, QObject):
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
         parent_fields = complet_result['body']['data']['parentFields']
-
+        fields_reload = ""
         list_mandatory = []
-        for result in complet_result['body']['data']['fields']:
-            if result['ismandatory'] == True:
-                widget_name = 'data_' + result['column_id']
+        for field in complet_result['body']['data']['fields']:
+            if p_widget and field['widgetname'] == p_widget.objectName() and field['reload_field']:
+                fields_reload = field['reload_field']['reload']
+
+            if field['ismandatory'] == True:
+                widget_name = 'data_' + field['column_id']
                 widget = self.dlg_cf.findChild(QWidget, widget_name)
                 widget.setStyleSheet("border: 1px solid gray")
                 value = utils_giswater.getWidgetText(self.dlg_cf, widget)
@@ -839,7 +852,7 @@ class ApiCF(ApiParent, QObject):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
             return
-        # If we make an info
+        # If we create a new feature
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -857,20 +870,21 @@ class ApiCF(ApiParent, QObject):
             feature = f'"featureType":"{self.feature_type}", '
             feature += f'"tableName":"{p_table_id}", '
             feature += f'"id":"{self.new_feature.attribute(id_name)}"'
-            extras = '"fields":' + my_json + ''
+            extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
+
             body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
-        # If we make an insert
+            sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
+        # If we make an info
         else:
             my_json = json.dumps(_json)
             feature = f'"featureType":"{self.feature_type}", '
             feature += f'"tableName":"{p_table_id}", '
             feature += f'"id":"{feature_id}"'
-            extras = f'"fields":{my_json}'
+            extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
             body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_setfields($${{{body}}}$$)"
+            sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
 
-        row = self.controller.execute_returning(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row:
             msg = f"Fail in: {sql}"
@@ -880,11 +894,13 @@ class ApiCF(ApiParent, QObject):
 
         if clear_json:
             _json = {}
+        result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
-        if "Accepted" in str(row[0]['status']):
+        if "Accepted" in result['status']:
             msg = "OK"
             self.controller.show_message(msg, message_level=3)
-        elif "Failed" in str(row[0]['status']):
+            self.reload_fields(dialog, row, p_widget)
+        elif "Failed" in result['status']:
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
         if close_dialog:
@@ -949,26 +965,6 @@ class ApiCF(ApiParent, QObject):
                 action.setEnabled(enabled)
 
 
-    def get_values(self, dialog, widget, _json=None):
-
-        value = None
-        if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
-            value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
-        elif type(widget) is QComboBox and widget.isEnabled():
-            value = utils_giswater.get_item_data(dialog, widget, 0)
-        elif type(widget) is QCheckBox and widget.isEnabled():
-            value = utils_giswater.isChecked(dialog, widget)
-        elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
-            value = utils_giswater.getCalendarDate(dialog, widget)
-
-        # Only get values if layer is editable
-        if self.layer.isEditable():
-            # If widget.isEditable(False) return None, here control it.
-            if str(value) == '' or value is None:
-                _json[str(widget.property('column_id'))] = None
-            else:
-                _json[str(widget.property('column_id'))] = str(value)
-
 
     def check_datatype_validator(self, dialog, widget, btn):
         """
@@ -980,7 +976,6 @@ class ApiCF(ApiParent, QObject):
         try:
             getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         except AttributeError as e:
-            print(e)
             """If the function called by getattr don't exist raise this exception"""
             pass
 
@@ -1028,17 +1023,43 @@ class ApiCF(ApiParent, QObject):
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
-                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, widget, True, False))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
             widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
 
         return widget
 
+
+    def reload_fields(self, dialog, result, p_widget):
+        """
+        :param dialog: QDialog where find and set widgets
+        :param result: row with info (json)
+        :param p_widget: Widget that has changed
+        """
+        if not p_widget: return
+        result = json.loads(result[0], object_pairs_hook=OrderedDict)
+
+        for field in result['body']['data']['fields']:
+            widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
+            if widget:
+                value = field["value"]
+                utils_giswater.setText(dialog, widget, value)
+                if not field['iseditable']:
+                    widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                else:
+                    widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
+            elif "message" in field:
+                level = field['message']['level'] if 'level' in field['message'] else 0
+                self.controller.show_message(field['message']['text'], level)
+
+
     def enabled_accept(self, dialog):
         dialog.btn_accept.setEnabled(True)
+
 
     def set_auto_update_combobox(self, field, dialog, widget):
 
@@ -1048,7 +1069,7 @@ class ApiCF(ApiParent, QObject):
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1063,7 +1084,7 @@ class ApiCF(ApiParent, QObject):
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1078,7 +1099,7 @@ class ApiCF(ApiParent, QObject):
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1093,37 +1114,16 @@ class ApiCF(ApiParent, QObject):
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
             else:
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
 
-    def fill_child(self, dialog, widget):
-        """ Find QComboBox child and populate it
-        :param widget: QComboBox parent
-        """
-
-        combo_parent = widget.property('column_id')
-        combo_id = utils_giswater.get_item_data(dialog, widget)
-
-        feature = f'"featureType":"{self.feature_type}", '
-        feature += f'"tableName":"{self.tablename}", '
-        feature += f'"idName":"{self.field_id}"'
-        extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
-        body = self.create_body(feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getchilds($${{{body}}}$$)"
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
-        for combo_child in row[0]['body']['data']:
-            if combo_child is not None:
-                self.populate_child(combo_child)
 
 
-    def populate_child(self, combo_child):
 
-        child = self.dlg_cf.findChild(QComboBox, str(combo_child['widgetname']))
-        if child:
-            self.populate_combo(child, combo_child)
+
 
 
     def open_catalog(self, tab_type, feature_type):
@@ -2215,7 +2215,6 @@ class ApiCF(ApiParent, QObject):
         if complet_list is False:
             return False
         self.set_listeners(complet_result, self.dlg_cf, widget_list)
-        #self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
         return complet_list
 
 
@@ -2223,7 +2222,6 @@ class ApiCF(ApiParent, QObject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
-        # qtable = dialog.findChild(QTableView, qtv_name)
         self.clear_gridlayout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
@@ -2234,8 +2232,6 @@ class ApiCF(ApiParent, QObject):
         # Put widgets into layout
         widget_list = []
         for field in complet_list[0]['body']['data']['fields']:
-            if field['column_id'] =='depth':
-                print(f"{field['column_id']} --> {field['hidden']}")
             if 'hidden' in field and field['hidden']:
                 continue
             label, widget = self.set_widgets(dialog, complet_list, field)
@@ -2258,7 +2254,7 @@ class ApiCF(ApiParent, QObject):
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
-                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
+                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget, self.feature_type, self.tablename, self.field_id))
 
         return complet_list, widget_list
 

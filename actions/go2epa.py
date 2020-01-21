@@ -17,6 +17,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 
 from collections import OrderedDict
 from functools import partial
@@ -89,6 +90,13 @@ class Go2Epa(ApiParent):
         elif self.project_type == 'ud':
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
+
+        # Check OS and enable/disable checkbox execute EPA software
+        if sys.platform != "win32":
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
+            self.dlg_go2epa.chk_exec.setEnabled(False)
+            self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
+
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
@@ -505,16 +513,15 @@ class Go2Epa(ApiParent):
             self.task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
-            row = row.rstrip()
+            if '**' in row or '--' in row:
+                continue
 
-            if row.find("WARNING") != -1:
-                dirty_list = [row]
-            else:
-                dirty_list = row.split(' ')
+            row = row.rstrip()
+            dirty_list = row.split(' ')
 
             # Clean unused items
             for x in range(len(dirty_list) - 1, -1, -1):
-                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
+                if dirty_list[x] == '':
                     dirty_list.pop(x)
 
             sp_n = []
@@ -553,7 +560,7 @@ class Go2Epa(ApiParent):
             # Find strings into dict and set source column
             for k, v in sources.items():
                 try:
-                    if k == f'{sp_n[0]} {sp_n[1]}':
+                    if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
                         source = "'" + v + "'"
                         _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
                         if _time.search(sp_n[3]):

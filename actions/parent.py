@@ -20,7 +20,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .add_layer import AddLayer
-from ..ui_manager import GwDialog, GwMainWindow
+from ..ui_manager import BasicInfo, GwDialog, GwMainWindow
 
 
 class ParentAction(object):
@@ -793,13 +793,20 @@ class ParentAction(object):
 
         return body
 
+    def set_layers_visible(self, layers):
+        for layer in layers:
+            lyr = self.controller.get_layer_by_tablename(layer)
+            if lyr:
+                self.controller.set_layer_visible(lyr)
 
     def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True):
         if del_old_layers:
             self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
-            if str(k) == "info":
+            if str(k) == 'setVisibleLayers':
+                self.set_layers_visible(v)
+            elif str(k) == "info":
                 self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
             else:
                 counter = len(data[k]['values'])
@@ -1014,6 +1021,10 @@ class ParentAction(object):
         return path, filter_
 
 
-
-
+    def show_exceptions_msg(self, title, msg=""):
+        cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
+        self.dlg_info = BasicInfo()
+        self.dlg_info.setWindowTitle(title)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
+        self.open_dialog(self.dlg_info)
 

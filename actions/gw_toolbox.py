@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-
+from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
@@ -303,6 +303,12 @@ class GwToolBox(ApiParent):
                         elif type(widget) in ('', QCheckBox):
                             value = utils_giswater.isChecked(dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
+                        elif type(widget) in ('', QgsDateTimeEdit):
+                            value = utils_giswater.getCalendarDate(dialog, widget)
+                            if value == "" or value is None:
+                                extras += f'"{param_name}":null, '
+                            else:
+                                extras += f'"{param_name}":"{value}", '
 
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"
@@ -341,6 +347,17 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
         dialog.progressBar.setValue(1)
+
+        try:
+            self.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
+        except KeyError as e:
+
+            msg = f"<b>Key: </b>{e}<br>"
+            msg += f"<b>key container: </b>'body/data/ <br>"
+            msg += f"<b>Python file: </b>{__name__} <br>"
+            msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
+            msg += f"<b>DB call: </b>{sql}<br>"
+            self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
 
 
     def execute_no_parametric(self, dialog, function_name):

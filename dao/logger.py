@@ -22,8 +22,8 @@ class Logger(object):
         self.logger_file = logging.getLogger(log_name)
         self.logger_file.setLevel(log_level)
         
-        # Define log folder
-        main_folder = os.path.join(os.path.dirname(__file__), os.pardir)
+        # Define log folder in users folder
+        main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
         log_folder = main_folder + os.sep + "log" + os.sep
         if folder_has_tstamp:
             tstamp = str(time.strftime(log_suffix))        

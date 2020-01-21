@@ -1772,13 +1772,20 @@ class DrawProfiles(ParentMapTool):
 
         # Shortest path - if additional point doesn't exist
         if str(self.start_end_node[0]) is not None and self.start_end_node[1] is not None:
-            self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
-            self.dlg_draw_profile.btn_add_additional_point.setDisabled(False)
-            self.dlg_draw_profile.list_additional_points.setDisabled(False)
-            self.dlg_draw_profile.title.setDisabled(False)
-            self.dlg_draw_profile.rotation.setDisabled(False)
-            self.dlg_draw_profile.scale_vertical.setDisabled(False)
-            self.dlg_draw_profile.scale_horizontal.setDisabled(False)
+            if str(self.start_end_node[0]) == self.start_end_node[1]:
+                msg = "Start and End point must be different."
+                self.controller.show_info_box(msg, "Info")
+                disabled = True
+                self.dlg_draw_profile.tbl_list_arc.clear()
+            else:
+                disabled = False
+                self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
+            self.dlg_draw_profile.btn_add_additional_point.setDisabled(disabled)
+            self.dlg_draw_profile.list_additional_points.setDisabled(disabled)
+            self.dlg_draw_profile.title.setDisabled(disabled)
+            self.dlg_draw_profile.rotation.setDisabled(disabled)
+            self.dlg_draw_profile.scale_vertical.setDisabled(disabled)
+            self.dlg_draw_profile.scale_horizontal.setDisabled(disabled)
 
             # Get rotation vdefaut if exist
             row = self.controller.get_config('rotation_vdefault')
@@ -1789,11 +1796,11 @@ class DrawProfiles(ParentMapTool):
                 utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, '0')
 
             # After executing of path enable btn_draw and open_composer
-            self.dlg_draw_profile.btn_draw.setDisabled(False)
-            self.dlg_draw_profile.btn_save_profile.setDisabled(False)
-            self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
-            self.dlg_draw_profile.cbx_template.setDisabled(False)
-            self.dlg_draw_profile.btn_update_path.setDisabled(False)
+            self.dlg_draw_profile.btn_draw.setDisabled(disabled)
+            self.dlg_draw_profile.btn_save_profile.setDisabled(disabled)
+            self.dlg_draw_profile.btn_export_pdf.setDisabled(disabled)
+            self.dlg_draw_profile.cbx_template.setDisabled(disabled)
+            self.dlg_draw_profile.btn_update_path.setDisabled(disabled)
 
         if str(self.start_end_node[0]) is not None and self.start_end_node[1] is not None:
             self.dlg_draw_profile.btn_delete_additional_point.setDisabled(False)
