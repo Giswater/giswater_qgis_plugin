@@ -442,6 +442,13 @@ class UDtimes(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('vehicle_management.ui')
+class VehicleManagement(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('visit_management.ui')
 class VisitManagement(QtGui.QDialog, FORM_CLASS):
     def __init__(self):

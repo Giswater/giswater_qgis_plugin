@@ -25,6 +25,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox
 from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget, QDateEdit, QPushButton
 from qgis.core import QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsRubberBand
+from collections import OrderedDict
 
 import csv
 import os
@@ -32,6 +33,8 @@ import re
 from functools import partial
 import urlparse as parse
 import webbrowser
+import json
+
 
 from .. import utils_giswater
 from .manage_visit import ManageVisit
@@ -39,6 +42,7 @@ from .parent_manage import ParentManage
 from ..ui_manager import AddLot
 from ..ui_manager import Lot_selector
 from ..ui_manager import BasicTable
+from ..ui_manager import VehicleManagement
 from ..ui_manager import LotManagement
 from ..ui_manager import UserManagement
 
@@ -328,7 +332,7 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table)
@@ -353,7 +357,7 @@ class AddNewLot(ParentManage):
         model.database().rollback()
 
 
-    def add_row(self, qtable):
+    def add_row(self, qtable, populate=False):
         """ Append new record to model with correspondent id """
 
         self.max_id += 1
@@ -361,6 +365,17 @@ class AddNewLot(ParentManage):
         record = model.record()
         record.setValue("id", self.max_id)
         model.insertRecord(model.rowCount(), record)
+        if populate:
+            self.put_combo_populate(qtable, populate)
+
+
+    def put_combo_populate(self, qtable, array_json):
+        for _json in array_json:
+            combo = QComboBox()
+            _json = json.loads(_json)
+            idx = qtable.model().index(qtable.model().rowCount()-1, _json['pos'])
+            qtable.setIndexWidget(idx, combo)
+            self.populate_combo_filters(combo, _json['table'])
 
 
     def get_max_id(self, table_name):
@@ -372,11 +387,12 @@ class AddNewLot(ParentManage):
         return 0
 
 
-    def save_basic_table(self, qtable, manage_type=None):
+    def save_table(self, dialog, qtable, manage_type=None):
 
         model = qtable.model()
+        print(str(model))
         if model.submitAll():
-            self.close_dialog(self.dlg_basic_table)
+            # self.close_dialog(dialog)
             if manage_type == 'team':
                 self.populate_cmb_team()
         else:
@@ -1043,11 +1059,14 @@ class AddNewLot(ParentManage):
         for x in range(0, len(rows)):
             combo = QComboBox()
             row = rows[x]
+
             # Populate QComboBox
             utils_giswater.set_item_data(combo, combo_values, 1)
+
             # Set QCombobox to wanted item
-            utils_giswater.set_combo_itemData(combo, str(row[field]), 1)
-            # Get index and put QComboBox into QTableView at index position
+            utils_giswater.set_combo_itemData(combo, str(row[field]), 0)
+
+            # Get index and put QComboBox into QTableView at inde   x position
             idx = qtable.model().index(x, widget_pos)
             qtable.setIndexWidget(idx, combo)
             combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x, widget_pos))
@@ -1435,12 +1454,9 @@ class AddNewLot(ParentManage):
     def open_vehicle_manage(self):
 
         self.max_id = self.get_max_id('om_team_x_vehicle')
-        self.dlg_basic_table = BasicTable()
-        self.load_settings(self.dlg_basic_table)
-        self.dlg_basic_table.setWindowTitle("Vehicle management")
-        table_name = 'v_om_team_x_vehicle'
-        # TODO:: Add trigger editable view into v_om_team_x_vehicle
-        # table_name = 'om_team_x_vehicle'
+        self.dlg_vehicle_manager = VehicleManagement()
+        self.load_settings(self.dlg_vehicle_manager)
+        self.dlg_vehicle_manager.setWindowTitle("Vehicle management")
 
         widget = QPushButton()
         widget.setText(str('Test'))
@@ -1449,19 +1465,32 @@ class AddNewLot(ParentManage):
         widget.setObjectName("test")
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
-        self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
-        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
-        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
-        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
-        self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
-        self.open_dialog(self.dlg_basic_table)
+        # self.fill_table(self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
+        # self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
+        self.fill_table(self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
+        self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
+        self.fill_table(self.dlg_vehicle_manager.tbl_loads, 'om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
+        self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_loads, 'om_vehicle_x_parameters')
+        self.dlg_vehicle_manager.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_vehicle_manager.tbl_vehicle))
+        self.dlg_vehicle_manager.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_vehicle_manager))
+        self.dlg_vehicle_manager.btn_accept.clicked.connect(partial(self.save_table, self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'vehicle'))
+        self.dlg_vehicle_manager.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_vehicle_manager.tbl_vehicle, ['{"pos":1,"table":"cat_team"}','{"pos":2,"table":"ext_cat_vehicle"}']))
+        self.dlg_vehicle_manager.rejected.connect(partial(self.save_settings, self.dlg_vehicle_manager))
+        self.dlg_vehicle_manager.cmb_filter_vehicle.currentIndexChanged.connect(partial(self.filter_loads))
+
+
+        self.populate_table_vehicle()
+
+        # Open dialog
+        self.open_dialog(self.dlg_vehicle_manager)
+
+
+    def populate_table_vehicle(self):
 
         # Populate model visit
-        sql = ("SELECT * FROM v_om_team_x_vehicle ORDER BY id")
+        sql = ("SELECT cat_team.id, v_om_team_x_vehicle.team FROM v_om_team_x_vehicle "
+               "JOIN cat_team ON cat_team.idval = v_om_team_x_vehicle.team ORDER BY v_om_team_x_vehicle.id")
         rows = self.controller.get_rows(sql, commit=True)
-
         if rows is None:
             return
 
@@ -1474,7 +1503,13 @@ class AddNewLot(ParentManage):
         if combo_values is None:
             return
 
-        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 1, 1, combo_values)
+        self.put_combobox(self.dlg_vehicle_manager.tbl_vehicle, rows, 0, 1, combo_values)
+
+        sql = ("SELECT ext_cat_vehicle.id, v_om_team_x_vehicle.vehicle FROM v_om_team_x_vehicle "
+               "JOIN ext_cat_vehicle ON ext_cat_vehicle.idval = v_om_team_x_vehicle.vehicle ORDER BY v_om_team_x_vehicle.id")
+        rows = self.controller.get_rows(sql, commit=True)
+        if rows is None:
+            return
 
         # Add combo into column vehicle_id
         sql = ("SELECT id, idval"
@@ -1482,10 +1517,14 @@ class AddNewLot(ParentManage):
                " ORDER BY id")
         combo_values = self.controller.get_rows(sql, commit=True)
 
+        # Populate cmb_vehicle on tab Loads
+        self.dlg_vehicle_manager.cmb_filter_vehicle.addItem('', '')
+        utils_giswater.set_item_data(self.dlg_vehicle_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
+
         if combo_values is None:
             return
 
-        self.put_combobox(self.dlg_basic_table.tbl_basic, rows, 2, 2, combo_values)
+        self.put_combobox(self.dlg_vehicle_manager.tbl_vehicle, rows, 0, 2, combo_values)
 
 
     def open_user_manage(self):
@@ -1580,6 +1619,22 @@ class AddNewLot(ParentManage):
 
         self.dlg_user_manage.tbl_user.model().setFilter(expr_filter)
         self.dlg_user_manage.tbl_user.model().select()
+
+
+    def filter_loads(self):
+
+        # Refresh model with selected filter
+        filter = utils_giswater.getWidgetText(self.dlg_vehicle_manager, self.dlg_vehicle_manager.cmb_filter_vehicle)
+
+        if filter == 'null':
+            expr_filter = ''
+        else:
+            sql = "SELECT id FROM ext_cat_vehicle WHERE idval = '"+str(filter)+"'"
+            row = self.controller.get_row(sql, commit=True)
+            expr_filter = " vehicle_id = '"+str(row[0])+"'"
+
+        self.dlg_vehicle_manager.tbl_loads.model().setFilter(expr_filter)
+        self.dlg_vehicle_manager.tbl_loads.model().select()
 
 
     def lot_selector(self):
