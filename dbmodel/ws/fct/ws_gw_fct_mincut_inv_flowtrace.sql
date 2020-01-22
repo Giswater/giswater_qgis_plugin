@@ -28,7 +28,9 @@ node_1_aux	varchar(16);
 node_2_aux	varchar(16);
 query_text	text;
 v_debug		Boolean;
+v_data		json;
 v_macroexpl integer;
+v_mincutversion integer;
 
 
 BEGIN
@@ -38,7 +40,8 @@ BEGIN
 
     -- Get debug variable
     SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
-
+    SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';
+	
     -- Starting process
     SELECT * INTO mincut_rec FROM anl_mincut_result_cat WHERE id=result_id_arg;
 	SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
@@ -143,25 +146,39 @@ BEGIN
 				END IF;
 				INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
 			
-				-- Run for extremes node
-				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+				-- call engine in function of mincut version used
+				IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
+						
+					-- call graf analytics function (MCEXTENDED)
+					v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "parameters":{"id":', result_id_arg ,', "process":"extended"}}}');
+
+					RAISE NOTICE 'v_data %', v_data;
+					PERFORM gw_fct_grafanalytics_mincut(v_data);
+			
+				ELSIF v_mincutversion =  3 THEN
+
+					-- Run for extremes node
+					SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+			
+					-- Check extreme being a closed valve
+					SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+					WHERE node_id = node_1_aux AND ((closed=TRUE) OR (proposed=TRUE)) AND result_id=result_id_arg;
+					IF controlValue = 0 THEN
+						-- Compute the tributary area using DFS
+						PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_1_aux, result_id_arg);
+					END IF;
+			
+					-- Check other extreme being a closed valve
+					SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+					WHERE node_id = node_2_aux AND ((closed=TRUE) OR (proposed=TRUE)) AND result_id=result_id_arg;
+					
+					IF controlValue = 0 THEN
+						-- Compute the tributary area using DFS
+						PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_2_aux, result_id_arg);
+					END IF;		
 		
-				-- Check extreme being a closed valve
-				SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-				WHERE node_id = node_1_aux AND ((closed=TRUE) OR (proposed=TRUE)) AND result_id=result_id_arg;
-				IF controlValue = 0 THEN
-					-- Compute the tributary area using DFS
-					PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_1_aux, result_id_arg);
 				END IF;
-		
-				-- Check other extreme being a closed valve
-				SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-				WHERE node_id = node_2_aux AND ((closed=TRUE) OR (proposed=TRUE)) AND result_id=result_id_arg;
-				
-				IF controlValue = 0 THEN
-					-- Compute the tributary area using DFS
-					PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_2_aux, result_id_arg);
-				END IF;
+	
 			ELSE 
 				IF v_debug THEN
 					RAISE NOTICE 'Valve: % has no more arc to affect',rec_valve.node_id;

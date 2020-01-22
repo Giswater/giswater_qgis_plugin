@@ -31,6 +31,9 @@ v_arc integer;
 v_querytext text;
 affected_rows numeric;
 cont1 integer default 0;
+v_arctwin integer;
+v_nodetwin integer;
+
 
 BEGIN
 
@@ -60,12 +63,12 @@ BEGIN
 	
 	
 	-- set boundary conditions of graf table	
-	IF v_mincutprocess = 'base' THEN
-		UPDATE temp_anlgraf SET flag=1
-		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))
-		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
-			
-	ELSIF v_mincutprocess = 'extended' THEN 
+	UPDATE temp_anlgraf SET flag=1
+	FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))
+	AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
+		
+	IF v_mincutprocess = 'extended' THEN 
+
 		UPDATE temp_anlgraf SET flag=1
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE 
 		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
@@ -76,23 +79,36 @@ BEGIN
 	
 	------------------
 	-- starting engine
-				
+
+	-- get node twin
+	v_nodetwin = (select node_id FROM (SELECT node_1 AS node_id FROM temp_anlgraf WHERE arc_id = v_arc UNION SELECT node_2 FROM temp_anlgraf WHERE arc_id = v_arc)a WHERE node_id::varchar IN 
+		     (SELECT node_id FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))));
+	
+	-- get arc_id twin in case of exists to remove results (arc twin is that arc closest choosed arc connected with valve)
+	SELECT arc_id INTO v_arctwin FROM temp_anlgraf WHERE (node_1 = v_nodetwin OR node_2 = v_nodetwin) AND arc_id <> v_arc;
+	
 	-- set the starting element
-	v_querytext = 'UPDATE temp_anlgraf SET water=1 WHERE arc_id='||quote_literal(v_arc)||' AND flag=0'; 
+	v_querytext = 'UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
 	EXECUTE v_querytext;
-			
+
+	--raise exception 'v_arctwin %', v_arctwin;
+		
 	EXECUTE v_querytext;-- inundation process
 	LOOP	
 		cont1 = cont1+1;
-		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id::integer = a.arc_id::integer;
+		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id::integer = a.arc_id::integer;
 		GET DIAGNOSTICS affected_rows =row_count;
 		EXIT WHEN affected_rows = 0;
 		EXIT WHEN cont1 = 100;
 	END LOOP;
+
+	IF v_arctwin IS NOT NULL THEN 
+		v_querytext = 'UPDATE temp_anlgraf SET water=0 WHERE arc_id IN (SELECT arc_id FROM temp_anlgraf WHERE arc_id='||quote_literal(v_arctwin)||' LIMIT 1)';
+		EXECUTE v_querytext;
+	END IF;
 	
 	-- finish engine
 	----------------
-	
 	-- insert arc results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_arc (result_id, arc_id)
 		SELECT '||v_mincutid||', a.arc_id FROM (SELECT arc_id FROM temp_anlgraf WHERE water=1)a';
@@ -105,17 +121,26 @@ BEGIN
 
 	-- insert delimiters into table
 	IF v_mincutprocess = 'base' THEN
-		EXECUTE 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE result_id = '||v_mincutid||' AND node_id IN 
-			(select node_1::varchar from (SELECT node_1, water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
-			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)';
-			
-	ELSIF v_mincutprocess = 'extended' THEN
-		EXECUTE 'INSERT INTO anl_mincut_result_node (result_id, node_id)
-			SELECT '||v_mincutid||', b.node_1 FROM (SELECT node_1::varchar FROM
-			(SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
-			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2) b';
-	END IF;
+		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE result_id = '||v_mincutid||' AND node_id IN 
+				(SELECT node_1::varchar(16) FROM (
+				select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+				)a group by node_1  having sum(flag) = 5)';
+		EXECUTE v_querytext;
 
+		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id = '||v_mincutid||' AND node_id IN 
+				(SELECT node_1::varchar(16) FROM (
+				select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+				)a group by node_1  having sum(flag) = 6)';
+		EXECUTE v_querytext;			
+
+	ELSIF v_mincutprocess = 'extended' THEN
+		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id = '||v_mincutid||' AND node_id IN 
+				(SELECT node_1::varchar(16) FROM (
+				select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+				)a group by node_1  having sum(water) = 2 and sum(flag) = 6)';
+		EXECUTE v_querytext;
+	END IF;
+	
 RETURN 1;
 END;
 $BODY$
