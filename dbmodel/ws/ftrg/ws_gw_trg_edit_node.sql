@@ -385,6 +385,12 @@ BEGIN
 	        END IF;
 	    END IF;
 
+	--insert tank into anl_mincut_inlet_x_exploitation
+		IF v_man_table='man_tank' THEN
+			INSERT INTO anl_mincut_inlet_x_exploitation(node_id, expl_id)
+			VALUES (NEW.node_id, NEW.expl_id);
+		END IF;
+
 	-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter 
@@ -583,6 +589,11 @@ BEGIN
 		ELSIF v_man_table ='man_tank' THEN
 			UPDATE man_tank SET pol_id=NEW.pol_id, vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name
 			WHERE node_id=OLD.node_id;
+			
+			--update anl_mincut_inlet_x_exploitation if exploitation changes
+			IF NEW.expl_id != OLD.expl_id THEN
+				UPDATE anl_mincut_inlet_x_exploitation SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
+			END IF;
 	
 		ELSIF v_man_table ='man_pump' THEN
 			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, 
@@ -696,8 +707,11 @@ BEGIN
 		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_tank WHERE node_id=OLD.node_id );
 		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id );
 
-		-- delete from note table
+		-- delete from node table
 		DELETE FROM node WHERE node_id = OLD.node_id;
+
+		--remove node from anl_mincut_inlet_x_exploitation
+		DELETE FROM anl_mincut_inlet_x_exploitation WHERE node_id=OLD.node_id;
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 
