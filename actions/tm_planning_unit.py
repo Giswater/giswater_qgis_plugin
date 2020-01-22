@@ -125,9 +125,10 @@ class TmPlanningUnit(TmParentAction):
         sql = (f"SELECT node_id FROM v_edit_node "
                f" WHERE node_id ILIKE '%{_filter}%'")
         rows = self.controller.get_rows(sql, log_sql=True)
-        list_items = [row[0] for row in rows]
-        model = QStringListModel()
-        self.set_completer_object(completer, model, widget, list_items)
+        if rows:
+            list_items = [row[0] for row in rows]
+            model = QStringListModel()
+            self.set_completer_object(completer, model, widget, list_items)
 
 
     def set_completer_object(self, completer, model, widget, list_items, max_visible=10):

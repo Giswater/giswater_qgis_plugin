@@ -721,9 +721,8 @@ class TmBasic(TmParentAction):
         self.calculate_total_price(month_selector, self.planned_camp_id)
 
         # Get data to fill combo from memory
-        if self.rows_cmb_builder is None:
-            self.update_cmb_builder()
-            utils_giswater.set_item_data(month_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
+        self.update_cmb_builder()
+        utils_giswater.set_item_data(month_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
 
         month_selector.btn_close.clicked.connect(partial(self.close_dialog, month_selector))
         month_selector.rejected.connect(partial(self.close_dialog, month_selector))
