@@ -1469,8 +1469,8 @@ class AddNewLot(ParentManage):
         # self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
         self.fill_table(self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
         self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
-        self.fill_table(self.dlg_vehicle_manager.tbl_loads, 'om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
-        self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_loads, 'om_vehicle_x_parameters')
+        self.fill_table(self.dlg_vehicle_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
+        self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters')
         self.dlg_vehicle_manager.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_vehicle_manager.tbl_vehicle))
         self.dlg_vehicle_manager.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_vehicle_manager))
         self.dlg_vehicle_manager.btn_accept.clicked.connect(partial(self.save_table, self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'vehicle'))
@@ -1629,9 +1629,7 @@ class AddNewLot(ParentManage):
         if filter == 'null':
             expr_filter = ''
         else:
-            sql = "SELECT id FROM ext_cat_vehicle WHERE idval = '"+str(filter)+"'"
-            row = self.controller.get_row(sql, commit=True)
-            expr_filter = " vehicle_id = '"+str(row[0])+"'"
+            expr_filter = " vehicle = '"+str(filter)+"'"
 
         self.dlg_vehicle_manager.tbl_loads.model().setFilter(expr_filter)
         self.dlg_vehicle_manager.tbl_loads.model().select()
@@ -2001,7 +1999,7 @@ class AddNewLot(ParentManage):
     """ FUNCTIONS RELATED WITH TAB LOAD"""
     def fill_tab_load(self):
         """ Fill tab 'Load' """
-        table_load = "om_vehicle_x_parameters"
+        table_load = "v_ui_om_vehicle_x_parameters"
         filter = "lot_id = '" + str(utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.lot_id)) + "'"
 
         self.fill_tbl_load_man(self.dlg_lot, self.tbl_load, table_load, filter)
@@ -2068,7 +2066,7 @@ class AddNewLot(ParentManage):
             return
 
         # Get path of selected image
-        sql = ("SELECT image FROM om_vehicle_x_parameters"
+        sql = ("SELECT image FROM v_ui_om_vehicle_x_parameters"
                " WHERE id = '" + str(selected_list[0].data()) + "'")
         row = self.controller.get_row(sql, commit=True)
         if not row:
