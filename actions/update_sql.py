@@ -1219,7 +1219,7 @@ class UpdateSQL(ApiParent):
         if new_project is True:
             if str(self.title) != 'null':
                 extras += ', ' + '"title":"' + str(self.title) + '"'
-            extras += ', ' + '"author":"' + str(self.controller.current_user) + '"'
+            extras += ', ' + '"author":"' + str(self.username) + '"'
             current_date = QDate.currentDate().toString('dd-MM-yyyy')
             extras += ', ' + '"date":"' + str(current_date) + '"'
 
