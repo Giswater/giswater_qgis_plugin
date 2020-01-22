@@ -264,6 +264,8 @@ class TmPlanningUnit(TmParentAction):
         record = model.record()
         campaign_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
         work_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
+        builder_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_builder, 0)
+        priority = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_priority, 0)
         times = utils_giswater.getWidgetText(self.dlg_unit, self.dlg_unit.txt_times, return_string_null=False)
         try:
             if times is None or int(times) < 1 or times == "":
@@ -274,6 +276,8 @@ class TmPlanningUnit(TmParentAction):
             record.setValue("node_id", selected_id)
             record.setValue("campaign_id", campaign_id)
             record.setValue("work_id", work_id)
+            record.setValue("builder_id", builder_id)
+            record.setValue("priority_id", priority)
             record.setValue("frequency", times)
             model.insertRecord(-1, record)
             model.select()
