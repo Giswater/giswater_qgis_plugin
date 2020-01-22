@@ -132,7 +132,7 @@ class TmPlanningUnit(TmParentAction):
     def set_completer_object(self, completer, model, widget, list_items, max_visible=10):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object.
-            WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
+            WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
         """
 
         # Set completer and model: add autocomplete in the widget
@@ -259,7 +259,7 @@ class TmPlanningUnit(TmParentAction):
 
     def insert_row(self, qtable, selected_id):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
-        self.controller.log_info(str("TEST 1"))
+
         model = qtable.model()
         record = model.record()
         campaign_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
@@ -269,16 +269,14 @@ class TmPlanningUnit(TmParentAction):
             if times is None or int(times) < 1 or times == "":
                 times = "1"
         except:
-            self.controller.log_info(str("TEST 10"))
             times = "1"
         finally:
             record.setValue("node_id", selected_id)
             record.setValue("campaign_id", campaign_id)
             record.setValue("work_id", work_id)
-            record.setValue("frequency", str(times))
+            record.setValue("frequency", times)
             model.insertRecord(-1, record)
             model.select()
-            self.controller.log_info(str("TEST 20"))
 
 
     def update_table(self, dialog, qtable, table_name):
@@ -294,17 +292,17 @@ class TmPlanningUnit(TmParentAction):
         else:
             self.dlg_unit.btn_insert.setEnabled(True)
             self.dlg_unit.btn_snapping.setEnabled(True)
-        expr_filter = "campaign_id =" + str(campaign_id)
+        expr_filter = f"campaign_id ='{campaign_id}'"
 
-        if work_id: expr_filter += " AND work_id =" + str(work_id)
-        if builder: expr_filter += " AND builder_id =" + str(builder)
-        # if priority: expr_filter += " AND priority_id =" + str(priority)
-        self.controller.log_info(f"expr_filter --> {expr_filter}")
+        if work_id: expr_filter += f" AND work_id ='{work_id}'"
+        if builder: expr_filter += f" AND builder_id ='{builder}'"
+        if priority: expr_filter += f" AND priority_id ='{priority}'"
         self.fill_table_unit(qtable, table_name, expr_filter=expr_filter)
 
-        self.manage_combos(qtable, table_name, expr_filter)
-        qtable.model().dataChanged.connect(partial(self.update_table, dialog, qtable, table_name))
+        # self.manage_combos(qtable, table_name, expr_filter)
+
         self.get_id_list()
+
 
     def manage_combos(self, qtable, table_name, expr_filter):
         sql = "SELECT id, name FROM cat_builder"
@@ -343,17 +341,17 @@ class TmPlanningUnit(TmParentAction):
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
+        model.select()
 
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
-
-        if expr:
-            model.setFilter(expr_filter)
-
-        model.select()
         # Attach model to table view
-        qtable.setModel(model)
+        if expr:
+            qtable.setModel(model)
+            qtable.model().setFilter(expr_filter)
+        else:
+            qtable.setModel(model)
 
         return expr
 
