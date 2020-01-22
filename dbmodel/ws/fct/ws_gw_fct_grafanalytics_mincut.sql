@@ -61,18 +61,14 @@ BEGIN
 	SELECT arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 	
-	
 	-- set boundary conditions of graf table	
 	UPDATE temp_anlgraf SET flag=1
-	FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))
+	FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE)) --OR (broken = TRUE))
 	AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
 		
-	IF v_mincutprocess = 'extended' THEN 
-
-		UPDATE temp_anlgraf SET flag=1
-		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE 
-		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
-	END IF;
+	UPDATE temp_anlgraf SET flag=1
+	FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE 
+	AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
 				
 	-- reset water flag
 	UPDATE temp_anlgraf SET water=0;
@@ -83,7 +79,7 @@ BEGIN
 	-- get arc_id twin in case of exists to remove results (arc twin is that arc closest choosed arc connected with valve)
 	-- 1) get node twin
 	v_nodetwin = (select node_id FROM (SELECT node_1 AS node_id FROM temp_anlgraf WHERE arc_id = v_arc UNION SELECT node_2 FROM temp_anlgraf WHERE arc_id = v_arc)a WHERE node_id::varchar IN 
-		     (SELECT node_id FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))));
+		     (SELECT node_id FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE)))); --OR (broken = TRUE))));
 	-- get arc_id twin
 	SELECT arc_id INTO v_arctwin FROM temp_anlgraf WHERE (node_1 = v_nodetwin OR node_2 = v_nodetwin) AND arc_id <> v_arc;
 	
@@ -119,27 +115,23 @@ BEGIN
 		(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
 		GROUP BY node_1, water HAVING water=1) b';
 
-	-- insert delimiters into table
-	IF v_mincutprocess = 'base' THEN
-		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE result_id = '||v_mincutid||' AND node_id IN 
-				(SELECT node_1::varchar(16) FROM (
-				select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
-				)a group by node_1  having sum(flag) = 5)';
-		EXECUTE v_querytext;
+	-- insert valve results into table
+	v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
+		(SELECT node_1::varchar(16) FROM (
+		select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+		)a group by node_1  having sum(flag) = 5)';
+	EXECUTE v_querytext;
 
-		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id = '||v_mincutid||' AND node_id IN 
-				(SELECT node_1::varchar(16) FROM (
-				select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
-				)a group by node_1  having sum(flag) = 6)';
-		EXECUTE v_querytext;			
+	v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
+			(SELECT node_1::varchar(16) FROM (
+			select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+			)a group by node_1  having sum(flag) = 6)';
+	EXECUTE v_querytext;			
 
-	ELSIF v_mincutprocess = 'extended' THEN
-		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id = '||v_mincutid||' AND node_id IN 
-				(SELECT node_1::varchar(16) FROM (
-				select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
-				)a group by node_1  having sum(water) = 2 and sum(flag) = 6)';
-		EXECUTE v_querytext;
-	END IF;
+	-- set proposed = false for broken valves
+	v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE broken = TRUE AND result_id = '||v_mincutid;
+	EXECUTE v_querytext;	
+
 	
 RETURN 1;
 END;

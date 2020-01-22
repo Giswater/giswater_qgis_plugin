@@ -44,7 +44,7 @@ BEGIN
 	
     -- Starting process
     SELECT * INTO mincut_rec FROM anl_mincut_result_cat WHERE id=result_id_arg;
-	SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
+    SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
 	
     -- Loop for all the proposed valves
     FOR rec_valve IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=result_id_arg AND proposed=TRUE
@@ -147,15 +147,8 @@ BEGIN
 				INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
 			
 				-- call engine in function of mincut version used
-				IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
-						
-					-- call graf analytics function (MCEXTENDED)
-					v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "parameters":{"id":', result_id_arg ,', "process":"extended"}}}');
-
-					RAISE NOTICE 'v_data %', v_data;
-					PERFORM gw_fct_grafanalytics_mincut(v_data);
-			
-				ELSIF v_mincutversion =  3 THEN
+					
+				IF v_mincutversion =  3 THEN
 
 					-- Run for extremes node
 					SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
@@ -175,23 +168,31 @@ BEGIN
 					IF controlValue = 0 THEN
 						-- Compute the tributary area using DFS
 						PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_2_aux, result_id_arg);
-					END IF;		
-		
+					END IF;	
+					
+				ELSIF v_mincutversion = 4 OR v_mincutversion =  5 THEN
+
+					-- call graf analytics function
+					v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":', element_id_arg ,', "parameters":{"id":', result_id_arg ,'}}}');
+
+					--RAISE exception 'v_data %', v_data;
+					PERFORM gw_fct_grafanalytics_mincut(v_data);		
 				END IF;
-	
 			ELSE 
 				IF v_debug THEN
 					RAISE NOTICE 'Valve: % has no more arc to affect',rec_valve.node_id;
 				END IF;
 			END IF;
-		
+
+			raise notice ' valve no intlet %', rec_valve.node_id;
 			--Valve has no exit. Update proposed value
-			UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id=rec_valve.node_id;			
+			UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id=rec_valve.node_id;
+
 		END IF;
 
-	IF v_debug THEN
-		RAISE NOTICE 'End flow analisys process for valve: %',rec_valve.node_id;
-	END IF;
+		IF v_debug THEN
+			RAISE NOTICE 'End flow analisys process for valve: %',rec_valve.node_id;
+		END IF;
 	
 	END LOOP;
 	

@@ -1,2 +1,3 @@
 3.3.026
 *************
+Bug fix on mincut 4G and enhance sample for ws using closed and broken valves

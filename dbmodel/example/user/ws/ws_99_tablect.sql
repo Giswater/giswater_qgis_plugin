@@ -158,6 +158,8 @@ UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113955';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='113994';
 UPDATE node SET nodecat_id='JUNCTION CHNGMAT' WHERE node_id='114016';
 
+UPDATE man_valve SET closed = TRUE WHERE node_id = '1115';
+UPDATE man_valve SET broken = TRUE WHERE node_id IN ('1112', '1093');
 
 UPDATE config_param_system SET value = '{"SECTOR":true, "DMA":true, "PRESSZONE":true, "DQA":true, "MINSECTOR":true}'
 WHERE parameter = 'om_dynamicmapzones_status';

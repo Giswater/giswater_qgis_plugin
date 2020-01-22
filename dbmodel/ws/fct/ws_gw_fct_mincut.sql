@@ -114,7 +114,7 @@ BEGIN
     IF v_debug THEN
 	RAISE NOTICE '6-Identify unaccess valves';
     END IF;
-    UPDATE anl_mincut_result_valve SET unaccess=true WHERE result_id=result_id_arg AND node_id IN 
+    UPDATE anl_mincut_result_valve SET unaccess=true, proposed = false WHERE result_id=result_id_arg AND node_id IN 
     (SELECT node_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_arg);
 
      -- The element to isolate could be an arc or a node
