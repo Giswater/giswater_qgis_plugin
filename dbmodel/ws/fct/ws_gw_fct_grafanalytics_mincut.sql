@@ -80,14 +80,14 @@ BEGIN
 	------------------
 	-- starting engine
 
-	-- get node twin
+	-- get arc_id twin in case of exists to remove results (arc twin is that arc closest choosed arc connected with valve)
+	-- 1) get node twin
 	v_nodetwin = (select node_id FROM (SELECT node_1 AS node_id FROM temp_anlgraf WHERE arc_id = v_arc UNION SELECT node_2 FROM temp_anlgraf WHERE arc_id = v_arc)a WHERE node_id::varchar IN 
 		     (SELECT node_id FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE) OR (broken = TRUE))));
-	
-	-- get arc_id twin in case of exists to remove results (arc twin is that arc closest choosed arc connected with valve)
+	-- get arc_id twin
 	SELECT arc_id INTO v_arctwin FROM temp_anlgraf WHERE (node_1 = v_nodetwin OR node_2 = v_nodetwin) AND arc_id <> v_arc;
 	
-	-- set the starting element
+	-- 2) set the starting element
 	v_querytext = 'UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
 	EXECUTE v_querytext;
 
