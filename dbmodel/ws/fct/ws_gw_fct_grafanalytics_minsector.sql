@@ -15,8 +15,8 @@ $BODY$
 /*
 delete from temp_anlgraf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85, "buffer":15}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "usePsectors":TRUE, "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "usePsectors":TRUE, "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85, "buffer":15}}}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
@@ -57,11 +57,13 @@ v_srid			integer;
 v_buffer		float;
 v_input			json;
 v_visible_layer		text;
+v_usepsectors		boolean;
 
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
+
 
 	-- get variables
 	v_arcid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'arc');
@@ -70,6 +72,7 @@ BEGIN
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_concavehull = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
 	v_buffer = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'buffer');
+	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 
 
 	-- select config values
@@ -102,7 +105,6 @@ BEGIN
 		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
 	END IF;
  
-
 	-- reset graf & audit_log tables
 	DELETE FROM temp_anlgraf;
 	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
@@ -110,15 +112,28 @@ BEGIN
 	DELETE FROM anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fprocesscat_id=34 AND user_name=current_user;
 
-	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MINSECTOR DYNAMIC SECTORITZATION'));
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('---------------------------------------------------'));
+	IF v_usepsectors THEN
+		SELECT count(*) INTO v_count FROM selector_psector WHERE cur_user = current_user;
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 
+		concat('INFO: Plan psector strategy is enabled. The number of psectors used on this analysis is ', v_count));
+	ELSE 
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 
+		concat('INFO: All psectors have been disabled to execute this analysis'));
+	END IF;
+
+	
 		
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	DELETE FROM selector_psector WHERE cur_user=current_user;
+
+	-- use masterplan
+	IF v_usepsectors IS NOT TRUE THEN
+		DELETE FROM selector_psector WHERE cur_user=current_user;
+	END IF;
 
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN

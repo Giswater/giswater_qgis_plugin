@@ -14,9 +14,7 @@ $BODY$
 /*
 TO EXECUTE
 INSERT INTO anl_mincut_result_cat values (-1);
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "parameters":{"id":-1, "process":"base"}}}')
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "parameters":{"id":-1, "process":"extended"}}}')
-
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "parameters":{"id":-1}}}')
 */
 
 
@@ -34,7 +32,6 @@ cont1 integer default 0;
 v_arctwin integer;
 v_nodetwin integer;
 
-
 BEGIN
 
     -- Search path
@@ -51,8 +48,7 @@ BEGIN
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	DELETE FROM selector_psector WHERE cur_user=current_user;
-	
+
 	-- create graf
 	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf )
 	SELECT arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
