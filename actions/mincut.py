@@ -315,6 +315,7 @@ class MincutParent(ParentAction):
         # Close dialog, save dialog position, and disconnect snapping
         self.close_dialog(self.dlg_mincut)
         self.disconnect_snapping()
+        self.remove_selection()
         self.refresh_map_canvas()
         
     
@@ -585,20 +586,18 @@ class MincutParent(ParentAction):
                             views = 'v_anl_arc, v_anl_node, v_anl_connec'
                             message = "To see the conflicts load the views"
                             self.controller.show_info_box(message, "See layers", parameter=views)
-                            self.dlg_mincut.close()
                     else:
                         self.dlg_mincut.closeMainWin = True
                         self.dlg_mincut.mincutCanceled = False
-                        self.dlg_mincut.close()
-
             else:
                 self.dlg_mincut.closeMainWin = True
                 self.dlg_mincut.mincutCanceled = False
-                self.dlg_mincut.close()
         else:
             self.dlg_mincut.closeMainWin = True
             self.dlg_mincut.mincutCanceled = False
-            self.dlg_mincut.close()
+
+        self.remove_selection()
+        self.dlg_mincut.close()
 
         self.iface.actionPan().trigger()
 

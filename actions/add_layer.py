@@ -88,7 +88,7 @@ class AddLayer(object):
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group='GW Layers'):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW TEMPORAL LAYERS"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (string)
         :param the_geom: Geometry field of the table (string)
@@ -128,7 +128,7 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW layers'):
+    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW TEMPORAL LAYERS'):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
@@ -260,7 +260,7 @@ class AddLayer(object):
 
 
 
-    def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW_layers'):
+    def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW TEMPORAL LAYERS'):
         """
         :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
         :param data: Json

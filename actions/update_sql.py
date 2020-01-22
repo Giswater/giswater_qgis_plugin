@@ -3253,10 +3253,10 @@ class UpdateSQL(ApiParent):
         if row:
             project_version = row[0]
 
-        message = ("Plugin version:     " + str(plugin_version) + "\n"
-                   "Project version:    " + str(project_version) + "\n"
-                   "PostgreSQL version: " + str(postgresql_version) + "\n"
-                   "Postgis version:    " + str(postgis_version))
+        message = ("Plugin version:          " + str(plugin_version) + "\n"
+                   "Project version:         " + str(project_version) + "\n"
+                   "PostgreSQL version:  " + str(postgresql_version) + "\n"
+                   "Postgis version:         " + str(postgis_version))
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, message)
 
         # Set signals
