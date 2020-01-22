@@ -76,7 +76,8 @@ class TmPlanningUnit(TmParentAction):
         validator = QIntValidator(1, 9999999)
         self.dlg_unit.txt_times.setValidator(validator)
 
-        utils_giswater.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.DoubleClicked)
+        # utils_giswater.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.DoubleClicked)
+        utils_giswater.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.NoEditTriggers)
 
         sql = "SELECT id, name FROM cat_campaign"
         rows = self.controller.get_rows(sql, log_sql=True)
@@ -266,6 +267,7 @@ class TmPlanningUnit(TmParentAction):
         work_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
         builder_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_builder, 0)
         priority = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_priority, 0)
+        comment = utils_giswater.getWidgetText(self.dlg_unit, self.dlg_unit.txt_comment, return_string_null=False)
         times = utils_giswater.getWidgetText(self.dlg_unit, self.dlg_unit.txt_times, return_string_null=False)
         try:
             if times is None or int(times) < 1 or times == "":
@@ -278,6 +280,7 @@ class TmPlanningUnit(TmParentAction):
             record.setValue("work_id", work_id)
             record.setValue("builder_id", builder_id)
             record.setValue("priority_id", priority)
+            record.setValue("comment", comment)
             record.setValue("frequency", times)
             model.insertRecord(-1, record)
             model.select()
