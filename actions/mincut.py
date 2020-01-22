@@ -205,12 +205,12 @@ class MincutParent(ParentAction, MultipleSelection):
                "FROM " + self.schema_name + ".anl_mincut_result_cat) , true)")
         row = self.controller.get_row(sql, log_sql=True)
 
-        if row:
-            if row[0] is not None:
-                if self.is_new:
-                    result_mincut_id = str(int(row[0])+1)
+        if not row or row[0] is None:
+            result_mincut_id = '1'
+        elif row[0]:
+            result_mincut_id = str(int(row[0]) + 1)
 
-        self.result_mincut_id.setText(str(result_mincut_id))
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
 
     def mg_mincut(self):
@@ -370,6 +370,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def accept_save_data(self):
         """ Slot function button 'Accept' """
 
+        self.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
 
         # Manage 'address'
@@ -606,6 +607,7 @@ class MincutParent(ParentAction, MultipleSelection):
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class) "
                    " VALUES ('" + str(result_mincut_id_text) + "', 2);")
             self.controller.execute_sql(sql)
+            self.is_new = False
 
         # Disable Auto, Custom, Hydrometer
         self.action_mincut.setDisabled(True)
@@ -767,6 +769,7 @@ class MincutParent(ParentAction, MultipleSelection):
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_class)"
                    " VALUES ('" + str(result_mincut_id_text) + "', 3);")
             self.controller.execute_sql(sql)
+            self.is_new = False
 
         # On inserting work order
         self.action_mincut.setDisabled(True)
