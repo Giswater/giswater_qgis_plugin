@@ -16,8 +16,8 @@ DECLARE
 v_incorrect_arc text[];
 v_count integer;
 v_errortext text;
-v_start_point geometry(Point,25831);
-v_end_point geometry(Point,25831);
+v_start_point geometry(Point,SRID_VALUE);
+v_end_point geometry(Point,SRID_VALUE);
 v_query text;
 v_result json;
 v_result_info json;

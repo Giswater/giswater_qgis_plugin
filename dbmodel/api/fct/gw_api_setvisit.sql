@@ -99,7 +99,7 @@ BEGIN
 	v_tablename = ((p_data ->>'feature')::json->>'tableName');
 	v_xcoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
 	v_ycoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
-	v_thegeom = st_setsrid(st_makepoint(v_xcoord, v_ycoord),25831);
+	v_thegeom = st_setsrid(st_makepoint(v_xcoord, v_ycoord),SRID_VALUE);
 	v_node_id = ((p_data ->>'data')::json->>'fields')::json->>'node_id';
 	v_addphotos = (p_data ->>'data')::json->>'photos';
 	v_parameter_id = ((p_data ->>'data')::json->>'fields')::json->>'parameter_id';

@@ -18,8 +18,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
     num_connec integer,
     num_hydro integer,
     sector_id integer,
-    the_geom geometry (linestring, 25831),
-    the_geom_p geometry (point, 25831),
+    the_geom geometry (linestring, SRID_VALUE),
+    the_geom_p geometry (point, SRID_VALUE),
     tstamp timestamp default now());
 
 	
@@ -32,5 +32,5 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
     num_connec integer,
     num_hydro integer,
     sector_id integer,
-    the_geom geometry (linestring, 25831),
-    the_geom_p geometry (point, 25831));
+    the_geom geometry (linestring, SRID_VALUE),
+    the_geom_p geometry (point, SRID_VALUE));

@@ -20,7 +20,7 @@ CREATE TABLE utils.address
   streetaxis_id character varying(16),
   postnumber character varying(16),
   plot_id character varying(16),
-  the_geom geometry(Point,25831),
+  the_geom geometry(Point,SRID_VALUE),
   ud_expl_id integer,
   ws_expl_id integer,
   CONSTRAINT address_pkey PRIMARY KEY (id))
@@ -43,7 +43,7 @@ CREATE TABLE utils.streetaxis
   type character varying(18),
   name character varying(100),
   text text,
-  the_geom geometry(MultiLineString,25831),
+  the_geom geometry(MultiLineString,SRID_VALUE),
   ud_expl_id integer,
   ws_expl_id integer,
   muni_id integer,
@@ -66,7 +66,7 @@ CREATE TABLE utils.municipality
   muni_id integer NOT NULL,
   name text,
   observ text,
-  the_geom geometry(MultiPolygon,25831),
+  the_geom geometry(MultiPolygon,SRID_VALUE),
   CONSTRAINT municipality_pkey PRIMARY KEY (muni_id)
 );
 
@@ -94,7 +94,7 @@ CREATE TABLE utils.plot
   square character varying(16),
   observ text,
   text text,
-  the_geom geometry(MultiPolygon,25831),
+  the_geom geometry(MultiPolygon,SRID_VALUE),
   ws_expl_id integer,
   ud_expl_id integer,
   CONSTRAINT plot_pkey PRIMARY KEY (id)
