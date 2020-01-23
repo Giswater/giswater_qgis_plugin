@@ -741,6 +741,18 @@ class Giswater(QObject):
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
+
+        # Check if table 'v_edit_node' is loaded
+        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        if not layer_node and show_warning:
+            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            if layer_arc or layer_connec:
+                title = "Giswater plugin cannot be loaded"
+                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
+                self.controller.show_warning(msg, 20, title=title)
+                return
+
         self.connection_status, not_version = self.controller.set_database_connection()
         if not self.connection_status or not_version:
             message = self.controller.last_error
@@ -753,21 +765,14 @@ class Giswater(QObject):
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
 
-        # Get schema name from table 'v_edit_node' and set it in controller and in config file
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
-        if not layer:
-            self.controller.show_warning("Layer not found", parameter="v_edit_node")
-            return
-
         self.controller.get_current_user()
-        layer_source = self.controller.get_layer_source(layer)
+        layer_source = self.controller.get_layer_source(layer_node)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
 
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
-        self.controller.log_info("Set search_path")
 
         self.set_info_button()
 
