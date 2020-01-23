@@ -76,6 +76,9 @@ class ManageDocument(ParentManage):
         # Fill combo boxes
         self.populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
 
+        # Set current date
+        utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', None)
+
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
         self.set_completer_object(self.dlg_add_doc, table_object)
@@ -127,6 +130,7 @@ class ManageDocument(ParentManage):
         # Get values from dialog
         doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id")
         doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=False)
+        date = utils_giswater.getCalendarDate(self.dlg_add_doc, "date")
         observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
         path = utils_giswater.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
         if doc_type == 'null':
@@ -143,14 +147,14 @@ class ManageDocument(ParentManage):
         # If document not exists perform an INSERT
         if row is None:
             if doc_id == 'null':
-                sql = (f"INSERT INTO doc (doc_type, path, observ)"
-                       f" VALUES ('{doc_type}', '{path}', '{observ}') RETURNING id;")
+                sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
+                       f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
                 new_doc_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
                 sql = ""
                 doc_id = str(new_doc_id[0])
             else:
-                sql = (f"INSERT INTO doc (id, doc_type, path, observ)"
-                       f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}');")
+                sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
+                       f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
 
         # If document exists perform an UPDATE
         else:
@@ -159,7 +163,7 @@ class ManageDocument(ParentManage):
             if not answer:
                 return
             sql = (f"UPDATE doc "
-                   f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}'"
+                   f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'"
                    f" WHERE id = '{doc_id}';")
 
         # Manage records in tables @table_object_x_@geom_type
