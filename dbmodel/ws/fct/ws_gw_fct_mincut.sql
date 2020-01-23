@@ -141,7 +141,7 @@ BEGIN
 			IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
  			
 				-- call graf analytics function (MCBASE)
-				v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "parameters":{"id":', result_id_arg ,', "process":"base"}}}');
+				v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg ,', "process":"base"}}}');
 				RAISE NOTICE 'v_data MINCUT %', v_data;
 				PERFORM gw_fct_grafanalytics_mincut(v_data);
 			

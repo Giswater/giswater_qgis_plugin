@@ -46,7 +46,7 @@ BEGIN
 		-- Modify result values
 		INSERT INTO anl_mincut_result_valve (result_id, node_id) VALUES (result_id_var, node_id_var);
         UPDATE anl_mincut_result_valve SET closed=TRUE, proposed=TRUE, broken=FALSE, unaccess=FALSE, 
-		the_geom=(SELECT the_geom FROM ws.node WHERE node_id=node_id_var) WHERE node_id=node_id_var;
+		the_geom=(SELECT the_geom FROM node WHERE node_id=node_id_var) WHERE node_id=node_id_var;
 		--restore man_valve original values
 		UPDATE man_valve SET closed=TRUE WHERE node_id=node_id_var;
 	END IF;

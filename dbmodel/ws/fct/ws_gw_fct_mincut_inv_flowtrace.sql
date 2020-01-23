@@ -173,7 +173,7 @@ BEGIN
 				ELSIF v_mincutversion = 4 OR v_mincutversion =  5 THEN
 
 					-- call graf analytics function
-					v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":', element_id_arg ,', "parameters":{"id":', result_id_arg ,'}}}');
+					v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":', element_id_arg ,', "step":2, "parameters":{"id":', result_id_arg ,'}}}');
 
 					--RAISE exception 'v_data %', v_data;
 					PERFORM gw_fct_grafanalytics_mincut(v_data);		

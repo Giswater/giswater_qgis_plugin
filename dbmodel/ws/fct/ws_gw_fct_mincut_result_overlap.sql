@@ -27,6 +27,7 @@ DECLARE
     count_int		integer;
     count_result_int	integer;
     conflict_text	text;
+    v_message		text;
 
 BEGIN
 
@@ -60,8 +61,9 @@ BEGIN
 			IF overlap_exists_bool IS FALSE THEN
 
 				-- create temp result for joined analysis
-				INSERT INTO anl_mincut_result_cat (work_order, mincut_state, mincut_class, expl_id, macroexpl_id) 
-				VALUES ('Conflict', 2, 1, mincut_rec.expl_id, mincut_rec.macroexpl_id) RETURNING id INTO id_last;
+				DELETE FROM anl_mincut_result_cat WHERE id=-2;
+				INSERT INTO anl_mincut_result_cat (id, work_order, mincut_state, mincut_class, expl_id, macroexpl_id) 
+				VALUES (-2, 'Conflict Mincut', 2, 1, mincut_rec.expl_id, mincut_rec.macroexpl_id) RETURNING id INTO id_last;
 
 				-- copying proposed valves and afected arcs from original mincut result to temp result  into anl_mincut_result_valve 
                                 query_text:='INSERT INTO anl_mincut_result_valve (result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
@@ -94,7 +96,7 @@ BEGIN
 
 			-- Storing id of possible conflict
 			IF conflict_id_text IS NULL THEN
-				conflict_id_text:=overlap_rec.id;
+				conflict_id_text:=concat(overlap_rec.id);
 			ELSE
 				conflict_id_text:=concat(conflict_id_text,',',overlap_rec.id);
 			END IF;
@@ -125,16 +127,25 @@ BEGIN
 
 			-- Insert the conflict results on the anl tables to enable the posibility to analyze it
 			DELETE FROM anl_arc WHERE fprocesscat_id=31 and cur_user=current_user;
-			DELETE FROM anl_node WHERE fprocesscat_id=31 and cur_user=current_user;
+			DELETE FROM selector_audit WHERE cur_user = current_user;			
 			
-			INSERT INTO anl_arc (arc_id, arccat_id, arc_id_aux, fprocesscat_id, cur_user, the_geom) SELECT arc_id, concat ('result_id:', result_id_arg), 
-						 concat ('{', conflict_id_text, '}'), 31, current_user, the_geom FROM anl_mincut_result_arc WHERE result_id=id_last;
-			INSERT INTO anl_node (node_id, nodecat_id, node_id_aux, nodecat_id_aux, fprocesscat_id, cur_user, the_geom) SELECT node_id, 
-						concat ('result_id:', result_id_arg), concat ('{', conflict_id_text, '}'), (CASE WHEN proposed=false THEN 'OPEN' ELSE 'CLOSED' END),
-						31, current_user, the_geom FROM anl_mincut_result_valve WHERE result_id=id_last;
-			INSERT INTO anl_connec (connec_id, connecat_id, connec_id_aux, connecat_id_aux, fprocesscat_id, cur_user, the_geom) SELECT connec_id, 
-						concat ('result_id:', result_id_arg), concat ('{', conflict_id_text, '}'), null,
-						31, current_user, the_geom FROM anl_mincut_result_connec WHERE result_id=id_last;
+			v_message = concat ('Mincut ', result_id_arg,' overlaps date-time with other mincuts (',conflict_id_text,') on same macroexploitation and has conflicts at least with one');
+
+			-- insert conflict mincuts
+			EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
+					SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, '||quote_literal(v_message)||' 
+					FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id IN ('||conflict_id_text||')';
+
+			-- insert current mincut
+			INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
+					SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, v_message 
+					FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id=result_id_arg;
+
+			-- insert additional affectations
+			EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
+					SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, '||quote_literal(v_message)||'
+					FROM anl_mincut_result_arc JOIN arc a USING (arc_id)  WHERE result_id = '||id_last||' AND a.arc_id NOT IN 
+					(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id IN ('||conflict_id_text||') UNION SELECT arc_id FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||')';
 
 			conflict_text:=conflict_id_text;
 		ELSE 

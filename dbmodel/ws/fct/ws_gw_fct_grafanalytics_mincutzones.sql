@@ -93,7 +93,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------------------'));
 
 	
-	INSERT INTO anl_mincut_result_cat VALUES (-1) ON CONFLICT (id) DO nothing;
+	INSERT INTO anl_mincut_result_cat VALUES (-1, 'Massive Mincut') ON CONFLICT (id) DO nothing;
 
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -114,13 +114,13 @@ BEGIN
 
 	IF v_count1 = 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES 
-		(v_fprocesscat_id, concat('WARNING: There are no arcs (state=1) with minsector_id informed. Please check your data before continue'));	
+		(v_fprocesscat_id, concat('WARNING: All arcs (state=1) on the selected exploitation(s) have not minsector_id informed. Please check your data before continue'));	
 	ELSIF v_count2 > 0 THEN 
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES 
-		(v_fprocesscat_id, concat('WARNING: There are ',v_count2, ' arcs (state=1) without minsector_id informed. Please check your data before continue'));	
+		(v_fprocesscat_id, concat('WARNING: There are ',v_count2, ' arcs (state=1) on the selected exploitation(s) without minsector_id informed. Please check your data before continue'));	
 	ELSE 
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (
-		v_fprocesscat_id, concat('There are ',v_count1, ' arcs (state=1) and all of them have minsector_id informed.'));
+		v_fprocesscat_id, concat('There are ',v_count1, ' arcs (state=1) on the selected exploitation(s) and all of them have minsector_id informed.'));
 
 		v_count1 = 0;
 	

@@ -24,3 +24,5 @@ To work with, be shure minsector data of the analysed network is well structured
 You can use minsector analysis function to update it before.  
 This analysis may take a lot of time. Be patient!!!'
 WHERE id=2712;
+
+UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'om_mincut_valvestat_using_valveunaccess';
