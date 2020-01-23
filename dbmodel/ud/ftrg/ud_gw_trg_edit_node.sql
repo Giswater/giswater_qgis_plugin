@@ -30,6 +30,7 @@ DECLARE
 	v_old_value_param text;
 	v_customfeature text;
 	v_featurecat text;
+	v_auto_pol_id text;
 
 BEGIN
 
@@ -45,7 +46,7 @@ BEGIN
 
 	--Get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
+	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	
     -- Control insertions ID
@@ -376,6 +377,19 @@ BEGIN
         	v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         	EXECUTE v_sql;
 
+        	--insert double geometry
+			IF (v_man_table IN ('man_chamber', 'man_storage', 'man_wwtp','man_netgully') 
+        		and (v_insert_double_geom IS TRUE)) THEN
+				
+				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
+
+				INSERT INTO polygon(pol_id,the_geom) 
+				VALUES (v_auto_pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
+				from node where node_id=NEW.node_id));
+				
+				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_auto_pol_id||''' WHERE node_id = '''||NEW.node_id||''';';
+
+			END IF;
 		END IF;
 
 	-- man addfields insert

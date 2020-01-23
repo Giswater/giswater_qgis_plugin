@@ -32,7 +32,8 @@ DECLARE
 	v_featurecat text;
 	v_psector_vdefault integer;
 	v_arc_id text;
-	
+	v_auto_pol_id text;
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -320,6 +321,19 @@ BEGIN
 	            v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
 	            EXECUTE v_sql;
 	        END IF;
+
+	        --insert double geometry
+			IF (v_man_table IN ('man_fountain') and (v_insert_double_geom IS TRUE)) THEN
+				
+				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
+
+				INSERT INTO polygon(pol_id,the_geom) 
+				VALUES (v_auto_pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) 
+				from connec where connec_id=NEW.connec_id));
+				
+				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_auto_pol_id||''' WHERE connec_id = '''||NEW.connec_id||''';';
+			END IF;
+
 	    END IF;
 
 		
