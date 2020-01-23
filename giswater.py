@@ -751,6 +751,7 @@ class Giswater(QObject):
                 title = "Giswater plugin cannot be loaded"
                 msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
                 self.controller.show_warning(msg, 20, title=title)
+                self.set_info_button()
                 return
 
         self.connection_status, not_version = self.controller.set_database_connection()
