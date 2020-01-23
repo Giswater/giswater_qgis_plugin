@@ -14,8 +14,8 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 
-changelog=Version 3.1.119 (17/05/2019)
-    - Bug fix and enhance arc-node control on forms for ud (depth and ymax)
+changelog=Version 3.1.131 (22/01/2020)
+    - Minor bugs fix
     
 
 # Tags are comma separated with spaces allowed
