@@ -319,7 +319,7 @@ class ApiCF(ApiParent, QObject):
                 value = utils_giswater.getCalendarDate(dialog, widget)
             else:
                 if widget is None:
-                    msg = "Widget {} is not configured or have a bad config".format(field['widgetname'])
+                    msg = f"Widget {field['column_id']} is not configured or have a bad config"
                     self.controller.show_message(msg)
 
             if str(value) != '' and value is not None and value is not -1:
