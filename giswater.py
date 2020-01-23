@@ -1242,6 +1242,8 @@ class Giswater(QObject):
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 widget.setObjectName(f"{item['layer']}")
                 widget.setProperty('field_id', item['id'])
+                widget.setProperty('field_the_geom', item['field_the_geom'])
+
                 if int(item['criticity']) == 3:
                     grl_critical.addWidget(label, pos, 0)
                     grl_critical.addWidget(widget, pos, 1)
@@ -1264,16 +1266,19 @@ class Giswater(QObject):
         schemaname = self.schema_name.replace('"','')
         for check in checks:
             if check.isChecked():
-                sql = (f"SELECT attname FROM pg_attribute a "
-                       f" JOIN pg_class t on a.attrelid = t.oid "
-                       f" JOIN pg_namespace s on t.relnamespace = s.oid "
-                       f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
-                       f" AND s.nspname = '{schemaname}' "
-                       f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
-                       f" ORDER BY a.attnum limit 1")
-                the_geom = self.controller.get_row(sql, commit=True)
-                if not the_geom: the_geom = [None]
-                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom[0], check.property('field_id'), None)
+                try:
+                    the_geom = check.property('field_the_geom')
+                except KeyError as e:
+                    sql = (f"SELECT attname FROM pg_attribute a "
+                           f" JOIN pg_class t on a.attrelid = t.oid "
+                           f" JOIN pg_namespace s on t.relnamespace = s.oid "
+                           f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
+                           f" AND s.nspname = '{schemaname}' "
+                           f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
+                           f" ORDER BY a.attnum limit 1")
+                    the_geom = self.controller.get_row(sql, commit=True)
+                if not the_geom: the_geom = None
+                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom, check.property('field_id'), None)
         self.parent.close_dialog(self.dlg_audit_project)
 
 
