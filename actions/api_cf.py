@@ -284,8 +284,7 @@ class ApiCF(ApiParent, QObject):
         if self.complet_result[0]['body']['form']['template'] == 'GENERIC':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
-            if feature_cat is not None:
-                self.manage_new_feature(self.complet_result, dialog)
+            self.manage_feature(self.complet_result, dialog)
             return result, dialog
 
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
@@ -297,13 +296,12 @@ class ApiCF(ApiParent, QObject):
                     sub_tag = 'node'
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag)
 
-            if feature_cat is not None:
-                self.manage_new_feature(self.complet_result, dialog)
+            self.manage_feature(self.complet_result, dialog)
 
             return result, dialog
 
 
-    def manage_new_feature(self, complet_result, dialog):
+    def manage_feature(self, complet_result, dialog):
 
         result = complet_result[0]['body']['data']
         for field in result['fields']:
