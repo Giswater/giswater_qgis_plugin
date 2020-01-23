@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2464
+--FUNCTION CODE: 2794
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_check_project(INTEGER);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(p_data json)
@@ -373,20 +373,27 @@ BEGIN
 
 		--list missing layers with criticity 3 and 2
 
-		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,column_name as id,'''||v_srid||''' as srid,
-		''3'' as criticity, qgis_message
-		FROM '||v_schema||'.audit_check_project JOIN information_schema.columns ON table_name = table_id 
+		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
+		'''||v_srid||''' as srid,b.column_name as field_the_geom,''3'' as criticity, qgis_message
+		FROM '||v_schema||'.audit_check_project 
+		JOIN information_schema.columns ON table_name = table_id 
 		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
 		LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
-		WHERE criticity=3 and enabled IS NOT TRUE) a'
+		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
+		WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
+   		WHERE criticity=3 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity3;
 
-		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,column_name as id,'''||v_srid||''' as srid,
-		''2'' as criticity, qgis_message
-		FROM '||v_schema||'.audit_check_project JOIN information_schema.columns ON table_name = table_id 
+
+		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
+		'''||v_srid||''' as srid,b.column_name as field_the_geom,''2'' as criticity, qgis_message
+		FROM '||v_schema||'.audit_check_project 
+		JOIN information_schema.columns ON table_name = table_id 
 		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
 		LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
-		WHERE criticity=2 and enabled IS NOT TRUE) a'
+		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
+		WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
+   		WHERE criticity=2 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity2;
 
 		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
