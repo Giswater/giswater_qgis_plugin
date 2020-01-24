@@ -316,6 +316,7 @@ class MincutParent(ParentAction):
         # Close dialog, save dialog position, and disconnect snapping
         self.close_dialog(self.dlg_mincut)
         self.disconnect_snapping()
+        self.remove_selection()
         self.refresh_map_canvas()
         
     
