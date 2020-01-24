@@ -862,28 +862,20 @@ class ApiCF(ApiParent, QObject):
             self.layer_new_feature.commitChanges()
 
             my_json = json.dumps(_json)
-
             if my_json == '' or str(my_json) == '{}':
                 self.close_dialog(dialog)
                 return
+            feature = f'"id":"{self.new_feature.attribute(id_name)}", '
 
-            feature = f'"featureType":"{self.feature_type}", '
-            feature += f'"tableName":"{p_table_id}", '
-            feature += f'"id":"{self.new_feature.attribute(id_name)}"'
-            extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
-
-            body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
         # If we make an info
         else:
             my_json = json.dumps(_json)
-            feature = f'"featureType":"{self.feature_type}", '
-            feature += f'"tableName":"{p_table_id}", '
-            feature += f'"id":"{feature_id}"'
-            extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
-            body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
-
+            feature = f'"id":"{feature_id}", '
+        feature += f'"featureType":"{self.feature_type}", '
+        feature += f'"tableName":"{p_table_id}"'
+        extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
+        body = self.create_body(feature=feature, extras=extras)
+        sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if not row:
