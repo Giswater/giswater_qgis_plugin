@@ -276,6 +276,7 @@ BEGIN
 		-- Enable topocontrol triggers
 		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
 		ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
+		ALTER TABLE node ENABLE TRIGGER gw_trg_node_statecontrol;
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
 		ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_update;
