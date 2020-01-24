@@ -255,7 +255,7 @@ class MincutParent(ParentAction):
         sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) "
                "FROM anl_mincut_result_cat), true)")
         row = self.controller.get_row(sql, commit=True, log_sql=True)
-        if not row or row[0] is None:
+        if not row or row[0] is None or row[0] < 1:
             result_mincut_id = '1'
         elif row[0]:
             result_mincut_id = str(int(row[0])+1)
@@ -1512,7 +1512,14 @@ class MincutParent(ParentAction):
             sql = ("INSERT INTO anl_mincut_result_cat (mincut_state)"
                    " VALUES (0) RETURNING id;")
             new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
-            real_mincut_id = new_mincut_id[0]
+            if new_mincut_id[0] < 1:
+                real_mincut_id = 1
+                sql = (f"UPDATE anl_mincut_result_cat SET(id) = (1) "
+                       f"WHERE id = {new_mincut_id[0]};")
+                self.controller.execute_sql(sql, log_sql=True)
+            else:
+                real_mincut_id = new_mincut_id[0]
+
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
         self.task1.setProgress(25)
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
@@ -1522,7 +1529,7 @@ class MincutParent(ParentAction):
         sql = (f"SELECT gw_fct_mincut('{elem_id}',"
                f" '{elem_type}', '{real_mincut_id}');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row[0]:
+        if not row or not row[0]:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
 
