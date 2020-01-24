@@ -572,35 +572,34 @@ class MincutParent(ParentAction):
                 result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
                 sql = f"SELECT gw_fct_mincut_result_overlap('{result_mincut_id_text}', '{cur_user}');"
                 row = self.controller.get_row(sql, commit=True, log_sql=True)
-                if row:
-                    if row[0]:
-                        self.dlg_binfo = BasicInfo()
-                        self.dlg_binfo.setWindowTitle('Mincut conflict')
-                        msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]}) on same macroexploitation \n"
-                               f" and has conflicts at least with one.  It's not possible to continue.  \n"
-                               f"For more information take a look on v_anl_arc or query: \n")
-                        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
-                        text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
-                                f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
-                        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_info, text)
-                        self.open_dialog(self.dlg_binfo)
-                        self.dlg_binfo.btn_accept.clicked.connect(self.accept_overlap)
-                        self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
-                        self.dlg_binfo.btn_close.clicked.connect(self.cancel_overlap)
-                        sql = ("SELECT * FROM selector_audit"
-                               " WHERE fprocesscat_id='31' AND cur_user=current_user")
-                        row = self.controller.get_row(sql, log_sql=False)
-                        if not row:
-                            sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
-                                   " VALUES('31', current_user)")
-                            self.controller.execute_sql(sql, log_sql=False)
-
+                if row and row[0]:
+                    self.dlg_binfo = BasicInfo()
+                    self.dlg_binfo.setWindowTitle('Mincut conflict')
+                    msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]}) on same macroexploitation \n"
+                           f" and has conflicts at least with one.  It's not possible to continue.  \n"
+                           f"For more information take a look on v_anl_arc or query: \n")
+                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
+                    text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
+                            f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
+                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_info, text)
+                    self.open_dialog(self.dlg_binfo)
+                    self.dlg_binfo.btn_accept.clicked.connect(self.accept_overlap)
+                    self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+                    self.dlg_binfo.btn_close.clicked.connect(self.cancel_overlap)
+                    sql = ("SELECT * FROM selector_audit"
+                           " WHERE fprocesscat_id='31' AND cur_user=current_user")
+                    row = self.controller.get_row(sql, log_sql=False)
+                    if not row:
+                        sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
+                               " VALUES('31', current_user)")
+                        self.controller.execute_sql(sql, log_sql=False)
                 else:
                     self.accept_overlap()
             else:
                 self.accept_overlap()
         else:
             self.accept_overlap()
+
         self.iface.actionPan().trigger()
 
     def accept_overlap(self):
