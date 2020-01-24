@@ -1024,6 +1024,8 @@ class ParentAction(object):
     def show_exceptions_msg(self, title, msg=""):
         cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
         self.dlg_info = BasicInfo()
+        self.dlg_info.btn_accept.setVisible(False)
+        self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
         self.open_dialog(self.dlg_info)
