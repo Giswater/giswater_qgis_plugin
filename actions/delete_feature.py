@@ -114,7 +114,7 @@ class DeleteFeature(ApiParent):
         for value in row[0]['body']['data']['info']['values']:
             result_msg += value['message'] + '\n\n'
 
-        utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.txt_infolog, result_msg)
+        utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.txt_feature_infolog, result_msg)
 
         # Enable button delete feature
         if result_msg != '':
