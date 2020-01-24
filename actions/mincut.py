@@ -27,6 +27,7 @@ from .parent import ParentAction
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from ..ui_manager import BasicInfo
 from ..ui_manager import Mincut
 from ..ui_manager import Mincut_fin
 from ..ui_manager import Mincut_add_hydrometer
@@ -564,44 +565,52 @@ class MincutParent(ParentAction):
 
         sql = (f"SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
                f" WHERE id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()
                 result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
                 sql = f"SELECT gw_fct_mincut_result_overlap('{result_mincut_id_text}', '{cur_user}');"
-                row = self.controller.get_row(sql, commit=True)
+                row = self.controller.get_row(sql, commit=True, log_sql=True)
                 if row:
                     if row[0]:
-                        message = "Mincut done, but has conflict and overlaps with "
-                        answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
-                        if answer:
-                            sql = ("SELECT * FROM selector_audit"
-                                   " WHERE fprocesscat_id='31' AND cur_user=current_user")
-                            row = self.controller.get_row(sql, log_sql=False)
-                            if not row:
-                                sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
-                                       " VALUES('31', current_user)")
-                                self.controller.execute_sql(sql, log_sql=False)
-                            views = 'v_anl_arc, v_anl_node, v_anl_connec'
-                            message = "To see the conflicts load the views"
-                            self.controller.show_info_box(message, "See layers", parameter=views)
-                    else:
-                        self.dlg_mincut.closeMainWin = True
-                        self.dlg_mincut.mincutCanceled = False
+                        self.dlg_binfo = BasicInfo()
+                        self.dlg_binfo.setWindowTitle('Mincut conflict')
+                        msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]}) on same macroexploitation \n"
+                               f" and has conflicts at least with one.  It's not possible to continue.  \n"
+                               f"For more information take a look on v_anl_arc or query: \n")
+                        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
+                        text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
+                                f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
+                        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_info, text)
+                        self.open_dialog(self.dlg_binfo)
+                        self.dlg_binfo.btn_accept.clicked.connect(self.accept_overlap)
+                        self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+                        self.dlg_binfo.btn_close.clicked.connect(self.cancel_overlap)
+                        sql = ("SELECT * FROM selector_audit"
+                               " WHERE fprocesscat_id='31' AND cur_user=current_user")
+                        row = self.controller.get_row(sql, log_sql=False)
+                        if not row:
+                            sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
+                                   " VALUES('31', current_user)")
+                            self.controller.execute_sql(sql, log_sql=False)
+
+                else:
+                    self.accept_overlap()
             else:
-                self.dlg_mincut.closeMainWin = True
-                self.dlg_mincut.mincutCanceled = False
+                self.accept_overlap()
         else:
-            self.dlg_mincut.closeMainWin = True
-            self.dlg_mincut.mincutCanceled = False
-
-        self.remove_selection()
-        self.dlg_mincut.close()
-
+            self.accept_overlap()
         self.iface.actionPan().trigger()
 
+    def accept_overlap(self):
+        self.dlg_mincut.closeMainWin = True
+        self.dlg_mincut.mincutCanceled = False
+        self.dlg_mincut.close()
+        self.remove_selection()
 
+    def cancel_overlap(self):
+        self.dlg_binfo.close()
     def update_result_selector(self, result_mincut_id, commit=True):    
         """ Update table 'anl_mincut_result_selector' """    
             
@@ -1694,7 +1703,10 @@ class MincutParent(ParentAction):
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()
         self.canvas.refresh()
-        
+        for a in self.iface.attributesToolBar().actions():
+            if a.objectName() == 'mActionDeselectAll':
+                a.trigger()
+                break
 
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
