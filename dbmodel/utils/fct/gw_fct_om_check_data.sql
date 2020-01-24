@@ -117,37 +117,37 @@ BEGIN
 		VALUES (25, 1, 'INFO: No arc''s without node_1 or node_2 nodes found.');
 	END IF;
 
-	-- Chec state 1 arcs with state 0 nodes
+	-- Chec state 1 arcs with state 0 nodes (96)
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=0 UNION
 			SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=0) a';
 			
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-		SELECT 96, node_id, nodecat_id, ''Nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) 
+		SELECT 96, arc_id, arccat_id, ''Arc with state=1 using nodes with state = 0'', the_geom FROM ', v_querytext);
 
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 0. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=96 AND cur_user=current_user'));
+		VALUES (25, 3, concat('SELECT * FROM anl_arc WHERE fprocesscat_id=96 AND cur_user=current_user'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
 	END IF;
 
-	-- Chec state 1 arcs with state 2 nodes
+	-- Chec state 1 arcs with state 2 nodes (97)
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=2 UNION
 			SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=2) a';
 			
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
-		SELECT 97, node_id, nodecat_id, ''Nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) 
+		SELECT 97, arc_id, arccat_id, ''Arcs with state=1 using nodes with state = 2'', the_geom FROM (', v_querytext,')a');
 
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 0. Please, check your data before continue'));
+		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 2. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=97 AND cur_user=current_user'));
+		VALUES (25, 3, concat('SELECT * FROM anl_arc WHERE fprocesscat_id=97 AND cur_user=current_user'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
