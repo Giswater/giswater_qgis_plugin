@@ -42,6 +42,9 @@ BEGIN
 		
 		v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 		v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
+		
+		-- profilactic issue to keep to keep stable edit_disable_statetopocontrol
+		UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;					
 
 		IF TG_OP = 'INSERT' THEN   
 			-- Arc ID

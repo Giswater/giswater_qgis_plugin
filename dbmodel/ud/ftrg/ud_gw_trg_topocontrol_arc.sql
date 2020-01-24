@@ -24,7 +24,7 @@ DECLARE
     value1 boolean;
     value2 boolean;
     featurecat_aux text;
-    state_topocontrol_bool boolean;
+    v_sys_statetopocontrol boolean;
     sys_y1_aux double precision;
     sys_y2_aux double precision;
 	sys_length_aux double precision;
@@ -41,6 +41,7 @@ DECLARE
 	v_node_proximity double precision;
 	v_arc_searchnodes_control boolean;
 	v_arc_searchnodes double precision;
+	v_user_dis_statetopocontrol boolean;
 
 BEGIN 
 
@@ -50,16 +51,16 @@ BEGIN
  -- Get data from config tables
     --SELECT * INTO optionsRecord FROM inp_options LIMIT 1;  
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
-	SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol' ;
+	SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='state_topocontrol' ;
 	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='geom_slp_direction' ;
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
    	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='samenode_init_end_control' ;
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint  FROM config_param_system WHERE parameter='nodeinsert_arcendpoint';
-
     SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='arc_searchnodes';
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
-
-	IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
+	SELECT value::boolean INTO v_user_dis_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol';
+	
+    IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
 
 		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
@@ -67,7 +68,7 @@ BEGIN
 		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
        
-    ELSIF state_topocontrol_bool IS TRUE THEN
+    ELSIF v_sys_statetopocontrol IS TRUE THEN
 	
 		-- Looking for state control
 		PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
@@ -320,7 +321,7 @@ BEGIN
 		IF v_dsbl_error IS NOT TRUE THEN
 			PERFORM audit_function (1042,1244,NEW.arc_id);
 		ELSE
-			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
 		
 	--Not existing nodes but accepted insertion
@@ -330,6 +331,8 @@ BEGIN
 	ELSE
 		IF v_dsbl_error IS NOT TRUE THEN
 			PERFORM audit_function (1042,1244,NEW.arc_id);
+		ELSE
+			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
 		
 	END IF;

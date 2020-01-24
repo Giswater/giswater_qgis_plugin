@@ -13,7 +13,7 @@ DECLARE
     vnoderec record;
     newPoint public.geometry;    
     connecPoint public.geometry;
-    state_topocontrol_bool boolean;
+    v_sys_statetopocontrol boolean;
     connec_id_aux varchar;
     array_agg varchar [];
 	v_dsbl_error boolean;
@@ -21,35 +21,35 @@ DECLARE
 	v_nodeinsert_arcendpoint boolean;
 	v_arc_searchnodes_control boolean;
 	v_arc_searchnodes double precision;
-
+	v_user_dis_statetopocontrol boolean;
+	
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
  -- Get data from config table 
-    SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol';
+    SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='state_topocontrol';
    	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
    	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='samenode_init_end_control' ;
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint  FROM config_param_system WHERE parameter='nodeinsert_arcendpoint';
-
-    SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='arc_searchnodes';
+	SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='arc_searchnodes';
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
+	SELECT value::boolean INTO v_user_dis_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol';
+
 
     -- disable trigger
     IF v_arc_searchnodes_control IS FALSE THEN
 	RETURN NEW;
     END IF;
 	
-    IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
+    IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
 
-	SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
-	ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
+		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
-	SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
-	ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
-   
-    
-    ELSIF state_topocontrol_bool IS TRUE THEN
+		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
+		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;      
+    ELSE
 
 	-- Looking for state control
 	PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
@@ -148,7 +148,7 @@ BEGIN
 
 	--  Control of start/end node
 	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
-    
+   
 		-- Control of same node initial and final
 		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
 			IF v_dsbl_error IS NOT TRUE THEN
@@ -193,7 +193,7 @@ BEGIN
 		IF v_dsbl_error IS NOT TRUE THEN
 			PERFORM audit_function (1042,1344, NEW.arc_id);	
 		ELSE
-			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
 		
 	--Not existing nodes but accepted insertion
@@ -204,7 +204,7 @@ BEGIN
 		IF v_dsbl_error IS NOT TRUE THEN
 			PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
 		ELSE
-			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
 	END IF;
 	

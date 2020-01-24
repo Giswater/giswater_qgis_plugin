@@ -330,7 +330,9 @@ BEGIN
 				rec_aux2.state=2;
 				rec_aux2.state_type=v_ficticius;
 				
-				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
+				-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres 
+				--it seems that does not recognize the new node inserted
+				UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
 
 				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
@@ -344,7 +346,8 @@ BEGIN
 				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 				
-				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
+				-- restore temporary value for edit_disable_statetopocontrol variable
+				UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
@@ -357,7 +360,6 @@ BEGIN
 				-- Insert existig arc (on service) to the current alternative
 				INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE);
 				
-	   
 				-- Insert data into traceability table
 				INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 				VALUES ('DIVIDE WITH PLANIFIED NODE',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
@@ -370,7 +372,9 @@ BEGIN
 					
 			ELSIF (v_state=2 AND v_state_node=2) THEN 
 			
-				UPDATE config_param_system SET value = replace (value, 'true', 'false') WHERE parameter='arc_searchnodes';
+				-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres
+				-- it seems that does not recognize the new node inserted
+				UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
 
 				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
@@ -384,7 +388,8 @@ BEGIN
 				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
-				UPDATE config_param_system SET value = replace (value, 'false', 'true') WHERE parameter='arc_searchnodes';
+				-- restore temporary value for edit_disable_statetopocontrol variable
+				UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;

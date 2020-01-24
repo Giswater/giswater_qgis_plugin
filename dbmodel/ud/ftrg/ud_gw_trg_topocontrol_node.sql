@@ -11,34 +11,43 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_topocontrol_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    numNodes numeric;
-    psector_vdefault_var integer;
-    replace_node_aux boolean;
-    node_id_var varchar;
-    node_rec record;
-    querystring Varchar; 
-    arcrec Record; 
-    nodeRecord1 Record; 
-    nodeRecord2 Record; 
-    optionsRecord Record;
-    z1 double precision;
-    z2 double precision;
-    xvar double precision;
-    yvar double precision;
-    pol_id_var varchar;
-    top_elev_aux double precision;
-    v_arc record;
-    v_arcrecord "SCHEMA_NAME".v_edit_arc;
-    v_arcrecordtb "SCHEMA_NAME".arc;
-    v_node_proximity_control boolean;
-    v_node_proximity double precision;
-    v_dsbl_error boolean;
-    v_psector_id integer;
-    v_tempvalue text;
+numNodes numeric;
+psector_vdefault_var integer;
+replace_node_aux boolean;
+node_id_var varchar;
+node_rec record;
+v_querytext Varchar; 
+arcrec Record; 
+nodeRecord1 Record; 
+nodeRecord2 Record; 
+optionsRecord Record;
+z1 double precision;
+z2 double precision;
+xvar double precision;
+yvar double precision;
+pol_id_var varchar;
+top_elev_aux double precision;
+v_arc record;
+v_arcrecord "SCHEMA_NAME".v_edit_arc;
+v_arcrecordtb "SCHEMA_NAME".arc;
+v_node_proximity_control boolean;
+v_node_proximity double precision;
+v_dsbl_error boolean;
+v_psector_id integer;
+v_tempvalue text;
+v_mantable text;
+v_epatable text;
+v_manquerytext1 text;
+v_manquerytext2 text;
+v_epaquerytext1 text;
+v_epaquerytext2 text;
+v_schemaname text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    v_schemaname = 'SCHEMA_NAME';
+
 
 	-- Get parameters
 	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
@@ -120,29 +129,60 @@ BEGIN
 						-- getting values to create new 'fictius' arc
 						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
 							
-						-- refactoring values fo new one
+						-- refactoring values for new one
 						PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 						v_arcrecordtb.arc_id:= (SELECT nextval('urn_id_seq'));
 						v_arcrecordtb.code = v_arcrecordtb.arc_id;
 						v_arcrecordtb.state=2;
 						v_arcrecordtb.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius' LIMIT 1);
-						IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
+
+						-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres it seems that does not recognize the new node inserted
+						UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
+
+						-- Insert new records into arc table
+						INSERT INTO arc SELECT v_arcrecordtb.*;
+
+						-- update real values of node_1 and node_2
+						IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=node_rec.node_id THEN
 							v_arcrecordtb.node_1 = NEW.node_id;
 						ELSE
 							v_arcrecordtb.node_2 = NEW.node_id;
 						END IF;
+					
+						UPDATE arc SET node_1=v_arcrecordtb.node_1, node_2=v_arcrecordtb.node_2 WHERE arc_id = v_arcrecordtb.arc_id;
+
+						-- restore temporary value for edit_disable_statetopocontrol variable
+						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
+
+						-- getting table child information (man_table)
+						v_mantable = (SELECT man_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
+						v_epatable = (SELECT epa_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
+
+						-- building querytext for man_table
+						v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') 
+						FROM information_schema.columns WHERE table_name=v_mantable AND table_schema=v_schemaname AND column_name !='arc_id');
+						IF  v_querytext IS NULL THEN 
+							v_querytext='';
+						END IF;
+						v_manquerytext1 =  'INSERT INTO '||v_mantable||' SELECT ';
+						v_manquerytext2 =  v_querytext||' FROM '||v_mantable||' WHERE arc_id= '||v_arc.arc_id||'::text';
+
+						-- building querytext for epa_table
+						v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') 
+						FROM information_schema.columns WHERE table_name=v_epatable AND table_schema=v_schemaname AND column_name !='arc_id');
+						IF  v_querytext IS NULL THEN 
+							v_querytext='';
+						END IF;
+						v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
+						v_epaquerytext2 =  v_querytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc.arc_id||'::text';
 						
-						-- set temporary values for config variables
-						SELECT value INTO v_tempvalue FROM config_param_system WHERE parameter='edit_enable_arc_nodes_update';
-						UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',false) where parameter='arc_searchnodes';
-						UPDATE config_param_system  SET value='TRUE' WHERE parameter='edit_enable_arc_nodes_update';
+						-- insert new records into man_table
+						EXECUTE v_manquerytext1||v_arcrecordtb.arc_id::text||v_manquerytext2;
+				
+						-- insert new records into epa_table
+						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id::text||v_epaquerytext2;	
+
 						
-						-- Insert new records into arc table
-						INSERT INTO arc SELECT v_arcrecordtb.*;
-						
-						-- restore temporary value for config variables
-						UPDATE config_param_system SET value=gw_fct_json_object_set_key(value::json,'activated',true) where parameter='arc_searchnodes';
-						UPDATE config_param_system SET value=v_tempvalue WHERE parameter='edit_enable_arc_nodes_update';
 
 						--Copy addfields from old arc to new arcs	
 						INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
@@ -164,14 +204,14 @@ BEGIN
 			
 		ELSIF TG_OP ='UPDATE' THEN			
 			
-		-- Updating expl / dma
+			-- Updating expl / dma
 			IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
 				NEW.expl_id:= (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);          
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
 				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          				
 			END IF;
 			
-		-- Updating polygon geometry in case of exists it
+			-- Updating polygon geometry in case of exists it
 			pol_id_var:= (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id 
 			UNION SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id);
 			IF (pol_id_var IS NOT NULL) THEN   
@@ -180,8 +220,8 @@ BEGIN
 				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;
 			END IF;  
 	   
-		-- Select arcs with start-end on the updated node to modify coordinates
-			querystring := 'SELECT * FROM "arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
+			-- Select arcs with start-end on the updated node to modify coordinates
+			v_querytext:= 'SELECT * FROM "arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
 
 			IF NEW.custom_top_elev IS NULL 
 				THEN top_elev_aux=NEW.top_elev;
@@ -190,7 +230,7 @@ BEGIN
 			END IF;
 
 			--updating arcs
-			FOR arcrec IN EXECUTE querystring
+			FOR arcrec IN EXECUTE v_querystring
 			LOOP
 
 				-- Initial and final node of the arc
@@ -245,9 +285,9 @@ BEGIN
 			END LOOP; 
 
 			--updating links
-			querystring := 'SELECT * FROM "link" WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
+			v_querytext:= 'SELECT * FROM "link" WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
 
-			FOR arcrec IN EXECUTE querystring
+			FOR arcrec IN EXECUTE v_querystring
 			LOOP
 				-- Coordinates
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(arcrec."link_id") USING arcrec.the_geom, NEW.the_geom; 					

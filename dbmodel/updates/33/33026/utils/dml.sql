@@ -40,3 +40,10 @@ ON conflict (id) DO NOTHING;
 
 UPDATE audit_cat_param_user set  layout_order=15  where id='audit_project_epa_result';
 UPDATE audit_cat_param_user set layout_order=16  where id='audit_project_plan_result';
+
+
+
+INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id, isenabled,
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, isdeprecated)
+VALUES ('edit_disable_statetopocontrol','dynamic_param','If true, topocontrol is executed without state definition. This parameter is used for trg_topocontrol_node when ficticius arcs are inserted due a misterious bug of postgres who does not recongize the new node over the old one',
+'role_edit', true, 'utils',false,false,'boolean',null,true,false,false);
