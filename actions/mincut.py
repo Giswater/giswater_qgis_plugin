@@ -100,12 +100,11 @@ class MincutParent(ParentAction):
 
         # Parametrize list of layers
         self.layers_connec = self.controller.get_group_layers('connec')                        
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")                
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
-            self.iface.setActiveLayer(self.layer_node)
+            self.iface.setActiveLayer(self.layer_arc)
 
         self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
@@ -575,17 +574,17 @@ class MincutParent(ParentAction):
                 if row and row[0]:
                     self.dlg_binfo = BasicInfo()
                     self.dlg_binfo.setWindowTitle('Mincut conflict')
-                    msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]}) on same macroexploitation <br>"
-                           f" and has conflicts at least with one. <br>"
-                           f"<b> It's not possible to continue.  </b><br>"
-                           f"<b>If you Accept you will lose proposed mincut. If you Close this dialog, you can return to mincut form.</b><br>"
-                           f"For more information take a look on v_anl_arc or query: <br>")
+                    msg = (
+                        f"Proposed mincut overlaps date-time with other mincuts ({row[0]}) on same macroexploitation "
+                        f" and has conflicts at least with one. <br>"
+                        f"<b>It's not possible to continue. You can try to modify start-end values .</b><br>"
+                        f"For more information take a look on v_anl_arc or query: <br>")
                     utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
                     text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
                             f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
                     utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_info, text)
                     self.open_dialog(self.dlg_binfo)
-                    self.dlg_binfo.btn_accept.clicked.connect(self.mincut_close)
+                    self.dlg_binfo.btn_accept.hide()
                     self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
                     self.dlg_binfo.btn_close.clicked.connect(self.cancel_overlap)
                     sql = ("SELECT * FROM selector_audit"
@@ -1395,7 +1394,7 @@ class MincutParent(ParentAction):
         # Set snapping to 'arc' and 'node'
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.snap_to_arc()
-        self.snapper_manager.snap_to_node()
+        #self.snapper_manager.snap_to_node()
 
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
@@ -1416,9 +1415,7 @@ class MincutParent(ParentAction):
         # Check feature
         elem_type = None
         layer = self.snapper_manager.get_snapped_layer(result)
-        if layer == self.layer_node:
-            elem_type = 'node'
-        elif layer == self.layer_arc:
+        if layer == self.layer_arc:
             elem_type = 'arc'
 
         if elem_type:
@@ -1485,19 +1482,14 @@ class MincutParent(ParentAction):
         node_exist = False
         layer = self.snapper_manager.get_snapped_layer(result)
         # Check feature
-        if layer == self.layer_node:
-            node_exist = True
+        layers_arc = self.controller.get_group_layers('arc')
+        self.layernames_arc = []
+        for layer in layers_arc:
+            self.layernames_arc.append(layer.name())
+
+        element_type = layer.name()
+        if element_type in self.layernames_arc:
             self.snapper_manager.get_snapped_feature(result, True)
-
-        if not node_exist:
-            layers_arc = self.controller.get_group_layers('arc')
-            self.layernames_arc = []
-            for layer in layers_arc:
-                self.layernames_arc.append(layer.name())
-
-            element_type = layer.name()
-            if element_type in self.layernames_arc:
-                self.snapper_manager.get_snapped_feature(result, True)
 
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
