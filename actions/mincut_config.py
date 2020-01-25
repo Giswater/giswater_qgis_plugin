@@ -47,7 +47,7 @@ class MincutConfig(ParentAction):
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         self.load_settings(self.dlg_min_edit)
-        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'v_ui_anl_mincut_result_cat', 'forecast_start, exec_start', 'forecast_end, exec_end')
+        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'anl_mincut_result_cat', 'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
@@ -61,7 +61,7 @@ class MincutConfig(ParentAction):
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM v_ui_anl_mincut_result_cat "
+        sql = "SELECT DISTINCT(id) FROM anl_mincut_result_cat WHERE id > 0 "
         rows = self.controller.get_rows(sql)
         values = []
         if rows:
@@ -81,7 +81,7 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
-        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
         self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector, self.tbl_mincut_edit, 'id'))
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
@@ -235,7 +235,7 @@ class MincutConfig(ParentAction):
             i = int(model.fieldIndex(field_id))
             value=model.data(model.index(x, i))
             selected_mincuts.append(value)
-        selector_values = f'{{"mincut": {{"ids":{selected_mincuts}, "table":"anl_mincut_result_selector", "view":"v_ui_anl_mincut_result_cat"}}}}'
+        selector_values = f'{{"mincut": {{"ids":{selected_mincuts}, "table":"anl_mincut_result_selector", "view":"anl_mincut_result_cat"}}}}'
         self.dlg_selector = ApiSelector()
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
@@ -249,13 +249,12 @@ class MincutConfig(ParentAction):
     def populate_combos(self):
 
         # Fill ComboBox state
-        sql = ("SELECT name"
-               " FROM anl_mincut_cat_state"
-               " ORDER BY name")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
+        sql = ("SELECT id, name FROM anl_mincut_cat_state ORDER BY name")
+        rows = self.controller.get_rows(sql, log_sql=True, add_empty_row=True)
+        utils_giswater.set_item_data(self.dlg_min_edit.state_edit, rows, 1)
 
-        sql = "SELECT expl_id, name FROM exploitation ORDER BY name"
+		# Fill ComboBox state
+        sql = "SELECT expl_id, name FROM exploitation WHERE expl_id > 0 ORDER BY name"
         rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
@@ -307,8 +306,8 @@ class MincutConfig(ParentAction):
 
         expr = ""
         id_ = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
-        state = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.state_edit, False, False)
-        expl = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 0)
+        state = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
+        expl = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
         dates_filter = ""
         if state == '':
             self.dlg_min_edit.date_from.setEnabled(False)
@@ -331,11 +330,11 @@ class MincutConfig(ParentAction):
             format_low = 'yyyy-MM-dd 00:00:00.000'
             format_high = 'yyyy-MM-dd 23:59:59.999'
             interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
-            if state in 'Planified':
+            if str(state) in ('0'):
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
                 dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
-            elif state in ('In Progress', 'Finished'):
+            elif str(state) in ('1', '2'):
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: exec_end')
                 dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
@@ -346,8 +345,8 @@ class MincutConfig(ParentAction):
         expr += f" OR work_order::text ILIKE '%{id_}%')"
         expr += f" {dates_filter}"
         if state != '':
-            expr += f" AND state::text ILIKE '%{state}%' OR state IS null"
-        expr += f" AND expl_id::text ILIKE '%{expl}%' OR expl_id IS null"
+            expr += f" AND state::text ILIKE '%{state}%' "
+        expr += f" AND (exploitation::text ILIKE '%{expl}%' OR exploitation IS null)"
         self.controller.log_info(str(expr))
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
@@ -394,8 +393,8 @@ class MincutConfig(ParentAction):
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        message = "Are you sure you want to delete these records?"
-        title = "Delete records"
+        message = "Are you sure you want to delete these mincuts?"
+        title = "Delete mincut"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = (f"DELETE FROM {table_name}"
