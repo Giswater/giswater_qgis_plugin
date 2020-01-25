@@ -203,7 +203,7 @@ class ManageVisit(ParentManage, QObject):
         # load feature if in tbl_relation
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = f'"{self.geom_type}_id"::text IN ({self.locked_feature_id})'
+        expr_filter = f'"{self.geom_type}_id" IN ({self.locked_feature_id})'
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
