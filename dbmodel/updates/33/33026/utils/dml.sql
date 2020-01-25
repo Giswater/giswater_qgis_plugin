@@ -42,8 +42,12 @@ UPDATE audit_cat_param_user set  layout_order=15  where id='audit_project_epa_re
 UPDATE audit_cat_param_user set layout_order=16  where id='audit_project_plan_result';
 
 
-
 INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id, isenabled,
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, vdefault, isdeprecated)
 VALUES ('edit_disable_statetopocontrol','dynamic_param','If true, topocontrol is executed without state definition. This parameter is used for trg_topocontrol_node when ficticius arcs are inserted due a misterious bug of postgres who does not recongize the new node over the old one',
 'role_edit', true, 'utils',false,false,'boolean',null,true,false,false);
+
+INSERT INTO audit_cat_function(id, function_name, function_type, project_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2796, 'gw_api_getselectors', 'utils', 'function', 'Function used for api to get values of user selectors from database', 
+'role_basic', false, false, false);
+
