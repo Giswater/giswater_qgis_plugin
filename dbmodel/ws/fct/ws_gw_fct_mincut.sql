@@ -44,6 +44,8 @@ DECLARE
     v_priority		json;
     v_count		int2;
     v_mincutversion 	integer;
+    v_mincutdetails	text;
+    v_outpùt		json;
 
 BEGIN
     -- Search path
@@ -263,14 +265,14 @@ BEGIN
 	WHERE result_id=result_id_arg;
 
 	-- Insert hazard values on audit_log_data table
-	-- arcs
+	-- count arcs
 	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length FROM anl_mincut_result_arc JOIN arc USING (arc_id) WHERE result_id=result_id_arg group by result_id;
 	SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume FROM anl_mincut_result_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id WHERE result_id=result_id_arg group by result_id, arccat_id;
 
-	--connec
+	-- count connec
 	SELECT count(connec_id) INTO v_numconnecs FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
 
-	-- total hydrometers
+	-- count hydrometers
 	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer FROM rtc_hydrometer_x_connec JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
 	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 	JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg;
@@ -279,20 +281,26 @@ BEGIN
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
 			JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
 			JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-			JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg GROUP BY category_id limit 1)a);
+			JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg GROUP BY category_id ORDER BY category_id)a);
 				
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
 	
-	v_return = concat('{"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
-	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"number":"',v_numhydrometer,'","priority":',v_priority,'}}}');
+	v_mincutdetails = (concat('"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
+	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}'));
+
+	v_outpùt = concat ('{', v_mincutdetails , '}');
 			
-	INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_return);
-		
+	INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_outpùt);
+
+	--update output results
+	UPDATE anl_mincut_result_cat SET output = v_outpùt WHERE id = result_id_arg;
 
 	-- calculate the boundary of mincut using arcs and valves
 	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
 		' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
 	        INTO v_geometry;
+
+	RAISE NOTICE 'v_outpùt %', v_outpùt;
 			
 	-- restore state selector
 	INSERT INTO selector_state (state_id, cur_user)
@@ -300,7 +308,7 @@ BEGIN
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
 
 	-- returning
-    v_return = concat('{"mincutOverlap":"',v_overlap,'", "geometry":"',v_geometry,'"}');
+	v_return = concat('{"mincutOverlap":"',v_overlap,'", "geometry":"',v_geometry,'",', v_mincutdetails, '}');
 
 	IF v_debug THEN RAISE NOTICE 'End of process ';	END IF;
 	
