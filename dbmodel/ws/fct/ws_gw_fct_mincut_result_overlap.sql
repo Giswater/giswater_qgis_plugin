@@ -12,16 +12,16 @@ RETURNS text AS
 $BODY$
 DECLARE
 v_mincutrec record;
-v_overlaprec record;
+v_rec record;
 id_last	integer;
 v_overlap_macroexpl integer;
 v_overlaps boolean;
 v_overlap_comp boolean;
-v_conflict text;
+v_conflictmsg text;
 v_count	integer;
 v_count2 integer;
 v_message text;
-v_mincutsarray integer[];
+v_conflictarray integer[];
 v_id integer;
 v_querytext text;
 
@@ -32,7 +32,7 @@ BEGIN
 
     -- init variables;
     v_overlaps:=FALSE;
-    v_conflict:=NULL;
+    v_conflictmsg:=NULL;
     
     SELECT count(*) INTO v_count FROM anl_mincut_result_arc WHERE result_id=result_id_arg;
     
@@ -40,14 +40,14 @@ BEGIN
     SELECT * INTO v_mincutrec FROM anl_mincut_result_cat WHERE id=result_id_arg;
 
     -- timedate overlap control
-    FOR v_overlaprec IN SELECT * FROM anl_mincut_result_cat 
+    FOR v_rec IN SELECT * FROM anl_mincut_result_cat 
     WHERE (forecast_start, forecast_end) OVERLAPS (v_mincutrec.forecast_start, v_mincutrec.forecast_end) AND id !=result_id_arg
     LOOP
 	-- if exist timedate overlap
-  	IF v_overlaprec.id IS NOT NULL THEN
+  	IF v_rec.id IS NOT NULL THEN
   	        
 		-- macroexploitation overlap control
-		SELECT macroexpl_id INTO v_overlap_macroexpl FROM exploitation WHERE expl_id=v_overlaprec.expl_id;
+		SELECT macroexpl_id INTO v_overlap_macroexpl FROM exploitation WHERE expl_id=v_rec.expl_id;
 
 		-- if exists macroexpl overlap		
 		IF v_overlap_macroexpl=v_mincutrec.macroexpl_id THEN
@@ -78,25 +78,24 @@ BEGIN
 			-- copying proposed valves and afected arcs from overlaped mincut result 
 			v_querytext:='INSERT INTO anl_mincut_result_valve ( result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
 				     SELECT '||id_last||', node_id,  closed,  broken, unaccess, proposed, the_geom 
-				     FROM anl_mincut_result_valve WHERE result_id='||v_overlaprec.id||' AND proposed=TRUE';     
+				     FROM anl_mincut_result_valve WHERE result_id='||v_rec.id||' AND proposed=TRUE';     
 			EXECUTE v_querytext;
 
 			v_querytext:='INSERT INTO anl_mincut_result_arc ( result_id, arc_id, the_geom)
 			             SELECT '||id_last||', arc_id, the_geom 
-			             FROM anl_mincut_result_arc WHERE result_id='||v_overlaprec.id;    
+			             FROM anl_mincut_result_arc WHERE result_id='||v_rec.id;    
 			EXECUTE v_querytext;	
 
 			-- count arc_id afected on the overlaped mincut result
-			v_count:=v_count+(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=v_overlaprec.id);
+			v_count:=v_count+(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=v_rec.id);
 
 			-- Storing id of possible conflict
-			IF v_conflict IS NULL THEN
-				v_mincutsarray = array_append(v_mincutsarray::integer[], v_overlaprec.id::integer);
-				v_conflict:=concat(v_overlaprec.id);
-				
+			IF v_conflictmsg IS NULL THEN
+				v_conflictarray = array_append(v_conflictarray::integer[], v_rec.id::integer);
+				v_conflictmsg:=concat('Id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H');			
 			ELSE
-				v_mincutsarray = array_append(v_mincutsarray, v_overlaprec.id);
-				v_conflict:=concat(v_conflict,',',v_overlaprec.id);
+				v_conflictarray = array_append(v_conflictarray, v_rec.id);
+				v_conflictmsg:=concat(v_conflictmsg,' , Id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H');
 			END IF;
 			
 		END IF;
@@ -112,7 +111,7 @@ BEGIN
 	v_count2:=(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=id_last) ;
 
 	-- write the possible message to show
-	v_message = concat ('Mincut ', result_id_arg,' overlaps date-time with other mincuts (',v_conflict,') on same macroexpl. and has conflicts at least with one');
+	v_message = concat ('Mincut ', result_id_arg,' overlaps date-time with other mincuts (',v_conflictmsg,') on same macroexpl. and has conflicts at least with one');
 
 	-- Insert the conflict results on the anl tables to enable the posibility to analyze it
 	DELETE FROM anl_arc WHERE fprocesscat_id=31 and cur_user=current_user;
@@ -133,7 +132,7 @@ BEGIN
 		-- insert conflict mincuts
 		EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 			SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, '||quote_literal(v_message)||' 
-			FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id IN ('||v_conflict||')';
+			FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id IN ('||v_conflictarray||')';
 
 		-- insert current mincut
 		INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
@@ -144,10 +143,10 @@ BEGIN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 			SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, '||quote_literal(v_message)||'
 			FROM anl_mincut_result_arc JOIN arc a USING (arc_id)  WHERE result_id = '||id_last||' AND a.arc_id NOT IN 
-			(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id IN ('||v_conflict||') UNION SELECT arc_id FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||')';
+			(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id IN ('||v_conflictarray||') UNION SELECT arc_id FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||')';
 	ELSE 
 		-- check for overlaps type 2
-		FOREACH v_id IN ARRAY v_mincutsarray
+		FOREACH v_id IN ARRAY v_conflictarray
 		LOOP
 			-- insert conflict arcs
 			v_querytext =  'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
@@ -160,7 +159,7 @@ BEGIN
 
 		SELECT count(*) INTO v_count FROM anl_arc WHERE fprocesscat_id=31 AND cur_user=current_user;
 		IF v_count = 0 THEN
-			v_conflict:=null;
+			v_conflictmsg:=null;
 		END IF;
 	END IF;
 
@@ -169,7 +168,7 @@ BEGIN
 	
    END IF;
    
-   RETURN v_conflict;
+   RETURN v_conflictmsg;
 
 END;
 $BODY$
