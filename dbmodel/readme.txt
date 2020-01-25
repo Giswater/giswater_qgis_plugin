@@ -129,4 +129,10 @@ subfolder structure of ud/ws/utils folder
 9) LAST PROCESS FUNCTION
 	- Grant permissions to all relations using audit_cat_* tables
 	- Enable foreing keys with utils schema if exists
-	- Drop deprecated table/views/functions/sequences ONLY for new projects
+	- Drop deprecated table/views/functions/sequences ONLY for new projects;
+	
+	
+-- List of ui views desacoplated from code (fields to filter must exists) but users can adapt by ownself this views
+-------------------------------------------------------------------------------------------------------------------
+v_ui_hydrometer
+v_ui_anl_mincut_result_cat
