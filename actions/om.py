@@ -175,7 +175,7 @@ class Om(ParentAction):
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + utils_giswater.getWidgetText(dialog, widget) + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + utils_giswater.getWidgetText(dialog, widget) + "' WHERE parameter='" + parameter + "' AND cur_user = current_user '"
                     else:
                         sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
                                 " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "')"
