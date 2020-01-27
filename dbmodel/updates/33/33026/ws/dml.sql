@@ -29,5 +29,5 @@ UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'om_mincut_valve
 
 
 UPDATE config_param_system SET value =
-'{"mincut": "id, '' ('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_start::time,''H''"}'
+'{"mincut": "id, '' ('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''"}'
 WHERE parameter = 'api_selector_label';
