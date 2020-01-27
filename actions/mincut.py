@@ -1738,6 +1738,7 @@ class MincutParent(ParentAction):
         utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
         utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, row['state_name'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "output_details", row['output'])
         
         # Manage location
         self.open_mincut_manage_location(row)
