@@ -179,7 +179,7 @@ class AddNewLot(ParentManage):
         self.set_active_layer()
 
         self.set_icon(self.dlg_lot.btn_open_image, "136b")
-        self.dlg_lot.btn_open_image.clicked.connect(self.open_load_image)
+        self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
         if lot_id is not None:
             self.set_values(lot_id)
@@ -1051,7 +1051,7 @@ class AddNewLot(ParentManage):
         combo_values = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if combo_values is None:
             return
-        self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 15, combo_values)
+        self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 16, combo_values)
 
 
     def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
@@ -1178,7 +1178,6 @@ class AddNewLot(ParentManage):
                    " SET "+str(update)+""
                    " WHERE id = '"+str(lot_id)+"'; \n")
             self.controller.execute_sql(sql)
-
         self.save_relations(lot, lot_id)
         status = self.save_visits()
         if status:
@@ -1236,7 +1235,9 @@ class AddNewLot(ParentManage):
                     visit_id = str(value)
                 if key == "status":
                     if value not in ('', None):
-                        status = "$$"+str(value)+"$$ "
+                        _sql = ("SELECT id FROM om_typevalue WHERE idval = '" + str(value) + "'")
+                        result = self.controller.get_row(_sql, commit=True)
+                        status = "$$" + str(result[0]) + "$$ "
 
             if visit_id and status:
                 sql += ("UPDATE "+str(table_name)+" "
@@ -1457,16 +1458,16 @@ class AddNewLot(ParentManage):
         self.dlg_vehicle_manager = VehicleManagement()
         self.load_settings(self.dlg_vehicle_manager)
         self.dlg_vehicle_manager.setWindowTitle("Vehicle management")
+        self.dlg_vehicle_manager.tbl_loads.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        widget = QPushButton()
-        widget.setText(str('Test'))
-        widget.setStyleSheet("Text-align:left")
-        widget.setFlat(True)
-        widget.setObjectName("test")
+        # Tab 'Loads'
+        self.tbl_load = self.dlg_vehicle_manager.findChild(QTableView, "tbl_loads")
+        utils_giswater.set_qtv_config(self.tbl_load)
+
+        self.set_icon(self.dlg_vehicle_manager.btn_open_image, "136b")
+        self.dlg_vehicle_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        # self.fill_table(self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
-        # self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
         self.fill_table(self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
         self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
         self.fill_table(self.dlg_vehicle_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
@@ -1480,6 +1481,9 @@ class AddNewLot(ParentManage):
 
 
         self.populate_table_vehicle()
+
+        # Hide columns tbl_loads on load tab
+        self.hide_colums(self.dlg_vehicle_manager.tbl_loads, [0])
 
         # Open dialog
         self.open_dialog(self.dlg_vehicle_manager)
@@ -1678,7 +1682,7 @@ class AddNewLot(ParentManage):
         query_left += "(SELECT "+tableleft+".id FROM "+tableleft+""
         query_left += " RIGHT JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_left += " WHERE cur_user = current_user)"
-        query_left += " AND  "+field_id_left+" > -1"
+        query_left += " AND  "+field_id_left+" > -1 ORDER BY id"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
@@ -1690,7 +1694,7 @@ class AddNewLot(ParentManage):
 
         query_right = "SELECT "+tableright+".lot_id, * FROM " + tableleft + ""
         query_right += " JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
-        query_right += " WHERE cur_user = current_user"
+        query_right += " WHERE cur_user = current_user ORDER BY " + tableleft +".id"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, hide_right)
@@ -2052,9 +2056,10 @@ class AddNewLot(ParentManage):
         # Set model of selected widget
         self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
 
-    def open_load_image(self):
+    def open_load_image(self, qtable, pg_table):
 
-        selected_list = self.tbl_load.selectionModel().selectedRows(0)
+        selected_list = qtable.selectionModel().selectedRows(0)
+
         if selected_list == 0 or str(selected_list) == '[]':
             message = "Any load selected"
             self.controller.show_info_box(message)
@@ -2066,8 +2071,8 @@ class AddNewLot(ParentManage):
             return
 
         # Get path of selected image
-        sql = ("SELECT image FROM v_ui_om_vehicle_x_parameters"
-               " WHERE id = '" + str(selected_list[0].data()) + "'")
+        sql = ("SELECT image FROM " + pg_table + ""
+               " WHERE rid = '" + str(selected_list[0].data()) + "'")
         row = self.controller.get_row(sql, commit=True)
         if not row:
             return
