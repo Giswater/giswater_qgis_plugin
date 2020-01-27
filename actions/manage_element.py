@@ -83,11 +83,11 @@ class ManageElement(ParentManage):
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
+            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.rejected.connect(
-            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
+            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
@@ -411,7 +411,7 @@ class ManageElement(ParentManage):
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
-            self.manage_close(self.dlg_add_element, table_object)
+            self.manage_close(self.dlg_add_element, table_object, excluded_layers=[])
             # TODO Reload table tbl_element
             # filter_ = "node_id = '" + str(feature_id) + "'"
             # table_element = "v_ui_element_x_node"

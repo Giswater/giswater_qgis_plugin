@@ -92,9 +92,9 @@ class ManageDocument(ParentManage):
         self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object, tablename, qtable, item_id))        
-        self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer))
-        self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer))
-        self.dlg_add_doc.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_doc,  table_object))
+        self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
+        self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
+        self.dlg_add_doc.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_doc,  table_object, excluded_layers=["v_edit_element"]))
         self.dlg_add_doc.doc_id.textChanged.connect(partial(self.exist_object, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_doc,  table_object))
@@ -105,7 +105,7 @@ class ManageDocument(ParentManage):
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_add_doc, table_object)
+        self.tab_feature_changed(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
 
         # Open the dialog
         self.open_dialog(self.dlg_add_doc, maximize_button=False)
@@ -130,7 +130,7 @@ class ManageDocument(ParentManage):
         # Get values from dialog
         doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id")
         doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=False)
-        date = utils_giswater.getCalendarDate(self.dlg_add_doc, "date")
+        date = utils_giswater.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
         observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
         path = utils_giswater.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
         if doc_type == 'null':
@@ -197,7 +197,7 @@ class ManageDocument(ParentManage):
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id            
-            self.manage_close(self.dlg_add_doc, table_object)  
+            self.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
 
         if tablename is None:
             return

@@ -383,7 +383,7 @@ class ParentManage(ParentAction, object):
         self.description = utils_giswater.getWidgetText(dialog, "descript")
 
 
-    def tab_feature_changed(self, dialog, table_object):
+    def tab_feature_changed(self, dialog, table_object, excluded_layers=[]):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
@@ -401,7 +401,7 @@ class ParentManage(ParentAction, object):
         elif tab_position == 4:
             self.geom_type = "gully"
 
-        self.hide_generic_layers()                  
+        self.hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         self.widget = utils_giswater.getWidget(dialog, widget_name)
@@ -727,7 +727,7 @@ class ParentManage(ParentAction, object):
         self.connect_signal_selection_changed(dialog, table_object)
 
 
-    def manage_close(self, dialog, table_object, cur_active_layer=None):
+    def manage_close(self, dialog, table_object, cur_active_layer=None, excluded_layers=[]):
         """ Close dialog and disconnect snapping """
 
         if cur_active_layer:
@@ -746,8 +746,8 @@ class ParentManage(ParentAction, object):
         if self.project_type == 'ud':
             self.reset_model(dialog, table_object, "gully")
         self.close_dialog(dialog)
-        self.hide_generic_layers()
-        self.disconnect_snapping()   
+        self.hide_generic_layers(excluded_layers=excluded_layers)
+        self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
 
 
@@ -1090,25 +1090,25 @@ class ParentManage(ParentAction, object):
             widget.setSelectionBehavior(QAbstractItemView.SelectRows) 
         
         
-    def hide_generic_layers(self, visible=False):       
+    def hide_generic_layers(self, excluded_layers=[]):
         """ Hide generic layers """
         
         layer = self.controller.get_layer_by_tablename("v_edit_arc")
-        if layer:
+        if layer and "v_edit_arc" not in excluded_layers:
             self.controller.set_layer_visible(layer)
         layer = self.controller.get_layer_by_tablename("v_edit_node")
-        if layer:
+        if layer and "v_edit_node" not in excluded_layers:
             self.controller.set_layer_visible(layer)
         layer = self.controller.get_layer_by_tablename("v_edit_connec")
-        if layer:
+        if layer and "v_edit_connec" not in excluded_layers:
             self.controller.set_layer_visible(layer)
         layer = self.controller.get_layer_by_tablename("v_edit_element")
-        if layer:
+        if layer and "v_edit_element" not in excluded_layers:
             self.controller.set_layer_visible(layer)
-            
+
         if self.project_type == 'ud':
             layer = self.controller.get_layer_by_tablename("v_edit_gully")
-            if layer:
+            if layer and "v_edit_gully" not in excluded_layers:
                 self.controller.set_layer_visible(layer)
         
     
