@@ -1011,7 +1011,7 @@ class ApiCF(ApiParent, QObject):
     def set_auto_update_lineedit(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate'] and self.new_feature_id is None:
+            if field['isautoupdate'] and self.new_feature_id is None and field['widgettype']!='typeahead':
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))

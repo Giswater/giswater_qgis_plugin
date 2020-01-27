@@ -142,6 +142,7 @@ class AddLayer(object):
         """
         colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
         text_result = None
+        temp_layers_added = []
         if del_old_layers:
             self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
@@ -163,8 +164,8 @@ class AddLayer(object):
                         cat_field = data[k]['category_field']
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                         self.categoryze_layer(v_layer, cat_field, size)
-
-        return {'text_result':text_result}
+                    temp_layers_added.append(v_layer)
+        return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
 
 
     def categoryze_layer(self, layer, cat_field, size):
