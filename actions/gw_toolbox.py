@@ -123,6 +123,7 @@ class GwToolBox(ApiParent):
                                                    self.dlg_functions.cmb_layers, complet_result[0]['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_functions))
         enable_btn_run = index.sibling(index.row(), 2).data()
         bool_dict = {"True": True, "true": True, "False": False, "false": False}
         self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
@@ -238,7 +239,7 @@ class GwToolBox(ApiParent):
 
 
     def execute_function(self, dialog, combo, result):
-
+        dialog.btn_cancel.setEnabled(False)
         dialog.progressBar.setMaximum(0)
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setVisible(True)
