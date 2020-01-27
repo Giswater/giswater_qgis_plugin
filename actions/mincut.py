@@ -574,8 +574,8 @@ class MincutParent(ParentAction):
                 if row and row[0]:
                     self.dlg_binfo = BasicInfo()
                     self.dlg_binfo.setWindowTitle('Mincut conflict')
-                    msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]}) on same macroexploitation "
-                           f" and has conflicts at least with one. <br>"
+                    msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]})<br>"
+                           f"on same macroexploitation and has conflicts at least with one. <br>"
                            f"<b>It's not possible to continue. You can try to modify start-end values .</b><br>"
                            f"For more information take a look on v_anl_arc or query: <br>")
                     utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
