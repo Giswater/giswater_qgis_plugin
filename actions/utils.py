@@ -112,8 +112,12 @@ class Utils(ParentAction):
         cur_user = self.controller.get_current_user()
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv,
             self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
-        utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list,
-            self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user))
+
+        unicode = self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user)
+        if not unicode:
+            unicode = 'latin1'
+        utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
+        
         if str(self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user)).upper() == 'TRUE':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
