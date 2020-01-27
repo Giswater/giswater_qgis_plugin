@@ -253,7 +253,7 @@ class MincutConfig(ParentAction):
         rows = self.controller.get_rows(sql, log_sql=True, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.state_edit, rows, 1)
 
-		# Fill ComboBox state
+        # Fill ComboBox state
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id > 0 ORDER BY name"
         rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
