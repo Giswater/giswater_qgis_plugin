@@ -58,9 +58,9 @@ BEGIN
 				-- create temp result for joined analysis
 				DELETE FROM anl_mincut_result_cat WHERE id=-2;
 				INSERT INTO anl_mincut_result_cat (id, work_order, mincut_state, mincut_class, expl_id, macroexpl_id) 
-				VALUES (-2, 'Conflict Mincut', 2, 1, v_mincutrec.expl_id, v_mincutrec.macroexpl_id) RETURNING id INTO id_last;
+				VALUES (-2, 'Conflict Mincut (system)', 2, 1, v_mincutrec.expl_id, v_mincutrec.macroexpl_id) RETURNING id INTO id_last;
 
-				-- copying proposed valves and afected arcs from original mincut result to temp result  into anl_mincut_result_valve 
+				-- copying proposed valves and afected arcs from original mincut result to temp result into anl_mincut_result_valve 
                                 v_querytext:='INSERT INTO anl_mincut_result_valve (result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
 				             SELECT '||id_last||', node_id,  closed,  broken, unaccess, proposed, the_geom 
 				             FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||' AND proposed=TRUE';

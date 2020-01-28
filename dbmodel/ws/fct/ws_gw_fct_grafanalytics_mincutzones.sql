@@ -93,7 +93,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------------------'));
 
 	
-	INSERT INTO anl_mincut_result_cat VALUES (-1, 'Massive Mincut') ON CONFLICT (id) DO nothing;
+	INSERT INTO anl_mincut_result_cat VALUES (-1, 'Massive Mincut (system)') ON CONFLICT (id) DO nothing;
 
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
