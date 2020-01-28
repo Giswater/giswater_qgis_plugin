@@ -32,7 +32,7 @@ BEGIN
     	INTO query_aux;
     END IF;
 
-	IF query_aux = 't' THEN
+	IF IF query_aux = 't' or query_aux = 'true' THEN THEN
 
 		--DROP FK
 
