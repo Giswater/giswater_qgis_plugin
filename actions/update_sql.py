@@ -2625,6 +2625,8 @@ class UpdateSQL(ApiParent):
                        " UNION SELECT id,active FROM " + schema_name + ".arc_type "
                        " UNION SELECT id,active FROM " + schema_name + ".connec_type "
                        " UNION SELECT id,active FROM " + schema_name + ".gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+            else:
+                return
 
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
@@ -2640,6 +2642,8 @@ class UpdateSQL(ApiParent):
                        " UNION SELECT id,active FROM " + schema_name + ".arc_type "
                        " UNION SELECT id,active FROM " + schema_name + ".connec_type "
                        " UNION SELECT id,active FROM " + schema_name + ".gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+            else:
+                return
 
             rows = self.controller.get_rows(sql, log_sql=True, commit=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
