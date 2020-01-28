@@ -68,7 +68,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.cmb_position = 15  # Variable used to set the position of the QCheckBox in the relations table
+        self.cmb_position = 16  # Variable used to set the position of the QCheckBox in the relations table
 
         self.srid = self.controller.plugin_settings_value('srid')
         # Get layers of every geom_type
