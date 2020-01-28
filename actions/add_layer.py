@@ -88,7 +88,7 @@ class AddLayer(object):
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW TEMPORAL LAYERS"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW Layers"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (string)
         :param the_geom: Geometry field of the table (string)
