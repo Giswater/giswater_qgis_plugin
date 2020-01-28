@@ -226,5 +226,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION gw_trg_notify()
-  OWNER TO postgres;
