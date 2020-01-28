@@ -1026,6 +1026,9 @@ class UpdateSQL(ApiParent):
             self.error_count = self.error_count + 1
             return
 
+        if project_type is False:
+            project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+
         folders = sorted(os.listdir(self.folderUpdatesApi + ''))
         self.controller.log_info(str(folders))
         for folder in folders:
@@ -1561,8 +1564,16 @@ class UpdateSQL(ApiParent):
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(50)
-        self.api(True)
+        status = self.api(True)
         self.task1.setProgress(100)
+        self.manage_result_message(status, parameter="Implement api")
+        if status:
+            self.controller.dao.commit()
+        else:
+            self.controller.dao.rollback()
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
 
     def load_custom_sql_files(self, dialog, widget):
