@@ -97,6 +97,7 @@ BEGIN
 	v_message:= ((p_data ->>'data')::json->>'parameters')::json->>'message'::text;
 	v_usenetworkgeom:= ((p_data ->>'data')::json->>'parameters')::json->>'useNetworkGeom';
 	v_usenetworkdemand:= ((p_data ->>'data')::json->>'parameters')::json->>'useNetworkDemand';
+	v_geometrylog:= ((p_data ->>'data')::json->>'parameters')::json->>'geometryLog';
 
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
@@ -1471,19 +1472,23 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
 
-	--lines
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (3, 14, 39)) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, '}');
+	IF 	v_geometrylog THEN 
+	
+		--lines
+		v_result = null;
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (3, 14, 39)) row; 
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, '}');
 
-	--polygons
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=14) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon","qmlPath":"',v_qmlpolpath,'", "values":',v_result, '}');
+		--polygons
+		v_result = null;
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=14) row; 
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_polygon = concat ('{"geometryType":"Polygon","qmlPath":"',v_qmlpolpath,'", "values":',v_result, '}');
+	
+	END IF;
 		
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

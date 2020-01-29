@@ -147,7 +147,7 @@ BEGIN
 	IF v_skipcheckdata IS NOT TRUE THEN
 	
 		RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
-		v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'", "useNetworkGeom":"',
+		v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"',v_result,'", "useNetworkGeom":"',
 		v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
 	
 		SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;

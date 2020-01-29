@@ -85,7 +85,7 @@ BEGIN
 	PERFORM gw_fct_utils_csv2pg_export_swmm_inp(v_result, null);
 	
 	-- manage return message
-	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',v_result,'","saveOnDatabase":true}}}')::json;
+	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"',v_result,'","saveOnDatabase":true}}}')::json;
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
