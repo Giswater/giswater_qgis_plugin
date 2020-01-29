@@ -28,6 +28,38 @@
         <translation>Giswater - Urban drainage</translation>
     </message>    
     
+    <message>
+        <source>toolbar_basic_name</source>
+        <translation>Giswater Basic Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_om_ud_name</source>
+        <translation>Giswater Om_ud Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_om_ws_name</source>
+        <translation>Giswater Om_ws Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_edit_name</source>
+        <translation>Giswater Edit Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_cad_name</source>
+        <translation>Giswater Cad Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_epa_name</source>
+        <translation>Giswater Epa Toolbar</translation>
+    </message>
+        <message>
+        <source>toolbar_master_name</source>
+        <translation>Giswater Master Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_utils_name</source>
+        <translation>Giswater Utils Toolbar</translation>
+    </message>
 
     <!-- BUTTONS -->
     <message>
