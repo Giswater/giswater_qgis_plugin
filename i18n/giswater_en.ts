@@ -10,7 +10,7 @@
     <message>
         <source>menu_name</source>
         <translation>Giswater</translation>
-    </message>   
+    </message>
     <message>
         <source>toolbar_ed_name</source>
         <translation>Giswater - Edit</translation>
@@ -26,8 +26,41 @@
     <message>
         <source>toolbar_ud_name</source>
         <translation>Giswater - Urban drainage</translation>
-    </message>    
-	
+    </message>
+
+    <message>
+        <source>toolbar_basic_name</source>
+        <translation>Giswater Basic Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_om_ud_name</source>
+        <translation>Giswater Om_ud Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_om_ws_name</source>
+        <translation>Giswater Om_ws Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_edit_name</source>
+        <translation>Giswater Edit Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_cad_name</source>
+        <translation>Giswater Cad Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_epa_name</source>
+        <translation>Giswater Epa Toolbar</translation>
+    </message>
+        <message>
+        <source>toolbar_master_name</source>
+        <translation>Giswater Master Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_utils_name</source>
+        <translation>Giswater Utils Toolbar</translation>
+    </message>
+
     <!-- BUTTONS -->
     <message>
         <source>41_text</source>
@@ -1025,6 +1058,30 @@
     <message>
         <source>Zoom unavailable. Doesn't exist the geometry for the street</source>
         <translation>Zoom unavailable. Doesn't exist the geometry for the street</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel these mincuts?</source>
+        <translation>Are you sure you want to cancel these mincuts?</translation>
+    </message>
+    <message>
+        <source>No function associated to</source>
+        <translation>No function associated to</translation>
+    </message>
+    <message>
+        <source>Parameter widgetfunction is null for widget</source>
+        <translation>Parameter widgetfunction is null for widget</translation>
+    </message>
+    <message>
+        <source>Parameter button_function is null for button</source>
+        <translation>Parameter button_function is null for button</translation>
+    </message>
+    <message>
+        <source>Function not found</source>
+        <translation>Function not found</translation>
+    </message>
+    <message>
+        <source>Select a valid path.</source>
+        <translation>Select a valid path.</translation>
     </message>
 
 </context>

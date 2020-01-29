@@ -28,6 +28,38 @@
         <translation>Giswater - Urban drainage</translation>
     </message>    
     
+    <message>
+        <source>toolbar_basic_name</source>
+        <translation>Giswater Basic Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_om_ud_name</source>
+        <translation>Giswater Om_ud Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_om_ws_name</source>
+        <translation>Giswater Om_ws Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_edit_name</source>
+        <translation>Giswater Edit Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_cad_name</source>
+        <translation>Giswater Cad Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_epa_name</source>
+        <translation>Giswater Epa Toolbar</translation>
+    </message>
+        <message>
+        <source>toolbar_master_name</source>
+        <translation>Giswater Master Toolbar</translation>
+    </message>
+    <message>
+        <source>toolbar_utils_name</source>
+        <translation>Giswater Utils Toolbar</translation>
+    </message>
 
     <!-- BUTTONS -->
     <message>
@@ -1026,6 +1058,30 @@
     <message>
         <source>Zoom unavailable. Doesn't exist the geometry for the street</source>
         <translation>Zoom no disponible. No existe la geometría de la calle</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to cancel these mincuts?</source>
+        <translation>¿Está seguro que desea cancelar estos mincuts?</translation>
+    </message>
+    <message>
+        <source>No function associated to</source>
+        <translation>No hay funcion asociada a</translation>
+    </message>
+    <message>
+        <source>Parameter widgetfunction is null for widget</source>
+        <translation>El parametro widgetfunction es nulo para el widget</translation>
+    </message>
+    <message>
+        <source>Parameter button_function is null for button</source>
+        <translation>El parametro button_function es nulo para el boton</translation>
+    </message>
+    <message>
+        <source>Function not found</source>
+        <translation>Funcion no encontrada</translation>
+    </message>
+    <message>
+        <source>Select a valid path.</source>
+        <translation>Seleccione una ruta válida.</translation>
     </message>
 </context>
 
