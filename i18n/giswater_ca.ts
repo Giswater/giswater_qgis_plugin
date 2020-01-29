@@ -1028,6 +1028,30 @@
         <source>Zoom unavailable. Doesn't exist the geometry for the street</source>
         <translation>Zoom no disponible. No existeix la geometria del carrer</translation>
     </message>
+    <message>
+        <source>Are you sure you want to cancel these mincuts?</source>
+        <translation>Está segur que vol cancel.lar aquests mincuts?</translation>
+    </message>
+    <message>
+        <source>No function associated to</source>
+        <translation>No hi ha cap funcio asociada a</translation>
+    </message>
+    <message>
+        <source>Parameter widgetfunction is null for widget</source>
+        <translation>El parametre widgetfunction es nul per el widget</translation>
+    </message>
+    <message>
+        <source>Parameter button_function is null for button</source>
+        <translation>El parametre button_function es nul per el buto</translation>
+    </message>
+    <message>
+        <source>Function not found</source>
+        <translation>Funcio no trobada</translation>
+    </message>
+    <message>
+        <source>Select a valid path.</source>
+        <translation>Seleccioneu una ruta vàlida.</translation>
+    </message>
 
 </context>
 

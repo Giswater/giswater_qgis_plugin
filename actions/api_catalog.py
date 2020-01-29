@@ -246,8 +246,8 @@ class ApiCatalog(ApiParent):
             utils_giswater.setWidgetText(previous_dialog, widget, catalog_id)
             widget.setFocus()
         else:
-            msg = ("Widget not found: " + str(widget_name))
-            self.controller.show_message(msg, 2)
+            message = "Widget not found"
+            self.controller.show_message(message, 2, parameter=str(widget_name))
 
         self.close_dialog(self.dlg_catalog)
 

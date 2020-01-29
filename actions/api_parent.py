@@ -592,8 +592,8 @@ class ApiParent(ParentAction):
                     self.controller.show_message(msg, 2)
                     return widget
             else:
-                msg = ("parameter button_function is null for button " + widget.objectName())
-                self.controller.show_message(msg, 2)
+                message = "Parameter button_function is null for button "
+                self.controller.show_message(message, 2, parameter=widget.objectName())
         # Call def gw_api_open_node(self, dialog, widget) of the class ApiCf
         # or def no_function_associated(self, widget=None, message_level=1)
         """
@@ -713,8 +713,8 @@ class ApiParent(ParentAction):
     def no_function_associated(self, **kwargs):
         widget = kwargs['widget']
         message_level = kwargs['message_level']
-        msg = f"No function associated to {type(widget)} {widget.objectName()}: "
-        self.controller.show_message(msg, message_level)
+        message = f"No function associated to"
+        self.controller.show_message(message, message_level, parameter=f"{type(widget)} {widget.objectName()}")
 
 
     def set_headers(self, widget, field):
@@ -911,11 +911,11 @@ class ApiParent(ParentAction):
                     self.controller.show_message(msg, 2)
                     return widget
             else:
-                msg = ("parameter widgetfunction is null for widget " + real_name)
-                self.controller.show_message(msg, 2)
+                message = "Parameter widgetfunction is null for widget"
+                self.controller.show_message(message, 2, parameter=real_name)
         else:
-            msg = "parameter widgetfunction not found"
-            self.controller.show_message(msg, 2)
+            message = "parameter not found"
+            self.controller.show_message(message, 2, parameter='widgetfunction')
         # Call def gw_api_open_url(self, widget) or def no_function_associated(self, widget=None, message_level=1)
         widget.clicked.connect(partial(getattr(self, func_name), widget))
         return widget
@@ -1454,8 +1454,8 @@ class ApiParent(ParentAction):
                 if not exist:
                     return widget
         else:
-            msg = "parameter button_function not found"
-            self.controller.show_message(msg, 2)
+            message = "parameter not found"
+            self.controller.show_message(message, 2, parameter='button_function')
 
         if type(widget) == QLineEdit:
             # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer

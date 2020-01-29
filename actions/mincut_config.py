@@ -217,9 +217,9 @@ class MincutConfig(ParentAction):
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        msg = "Are you sure you want to cancel these mincuts?"
+        message = "Are you sure you want to cancel these mincuts?"
         title = "Cancel mincuts"
-        answer = self.controller.ask_question(msg, title, inf_text)
+        answer = self.controller.ask_question(message, title, inf_text)
         if answer:
             sql = (f"UPDATE anl_mincut_result_cat SET mincut_state = 3 "
                    f" WHERE id::text IN ({list_id})")

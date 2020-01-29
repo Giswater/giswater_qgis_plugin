@@ -115,8 +115,8 @@ class GwToolBox(ApiParent):
 
         if not status:
             self.alias_function = index.sibling(index.row(), 1).data()
-            msg = "Function not found"
-            self.controller.show_message(msg, parameter=self.alias_function)
+            message = "Function not found"
+            self.controller.show_message(message, parameter=self.alias_function)
             return
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,

@@ -1614,8 +1614,8 @@ class AddNewLot(ParentManage):
         widget = utils_giswater.getWidget(dialog, str(widget_name))
         csv_path = utils_giswater.getWidgetText(dialog, widget)
         if str(csv_path) == 'null':
-            msg = "Select a valid path."
-            self.controller.show_info_box(msg, "Info")
+            message = "Select a valid path."
+            self.controller.show_info_box(message, "Info")
             return
         all_rows = []
         row = []

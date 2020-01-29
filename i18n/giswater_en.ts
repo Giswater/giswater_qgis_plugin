@@ -1026,6 +1026,30 @@
         <source>Zoom unavailable. Doesn't exist the geometry for the street</source>
         <translation>Zoom unavailable. Doesn't exist the geometry for the street</translation>
     </message>
+    <message>
+        <source>Are you sure you want to cancel these mincuts?</source>
+        <translation>Are you sure you want to cancel these mincuts?</translation>
+    </message>
+    <message>
+        <source>No function associated to</source>
+        <translation>No function associated to</translation>
+    </message>
+    <message>
+        <source>Parameter widgetfunction is null for widget</source>
+        <translation>Parameter widgetfunction is null for widget</translation>
+    </message>
+    <message>
+        <source>Parameter button_function is null for button</source>
+        <translation>Parameter button_function is null for button</translation>
+    </message>
+    <message>
+        <source>Function not found</source>
+        <translation>Function not found</translation>
+    </message>
+    <message>
+        <source>Select a valid path.</source>
+        <translation>Select a valid path.</translation>
+    </message>
 
 </context>
 
