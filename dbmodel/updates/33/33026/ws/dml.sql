@@ -26,3 +26,6 @@ This analysis may take a lot of time. Be patient!!!'
 WHERE id=2712;
 
 UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'om_mincut_valvestat_using_valveunaccess';
+
+-- 2020/01/29
+UPDATE audit_cat_param_user SET formname = 'hidden_value' WHERE id='inp_options_buildup_mode';
