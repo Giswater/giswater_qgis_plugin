@@ -1019,6 +1019,7 @@ class ManageNewPsector(ParentManage):
 
                 sql = sql[:len(sql) - 2]
                 sql += f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.psector_id)}'"
+                sql += f" AND cur_user=current_user "
 
         else:
             values = "VALUES("
@@ -1058,7 +1059,9 @@ class ManageNewPsector(ParentManage):
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = '{new_psector_id[0]}' "
-                           f" WHERE parameter = 'psector_vdefault';")
+                           f" WHERE parameter = 'psector_vdefault'"
+                           f" AND cur_user=current_user; "
+                    )
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user);")
