@@ -98,6 +98,7 @@ BEGIN
 	v_usenetworkgeom:= ((p_data ->>'data')::json->>'parameters')::json->>'useNetworkGeom';
 	v_usenetworkdemand:= ((p_data ->>'data')::json->>'parameters')::json->>'useNetworkDemand';
 	v_geometrylog:= ((p_data ->>'data')::json->>'parameters')::json->>'geometryLog';
+	IF v_geometrylog IS NULL THEN v_geometrylog = TRUE; END IF;
 
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
@@ -1472,8 +1473,18 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
 
-	IF 	v_geometrylog THEN 
+	--    Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+
+	IF v_geometrylog THEN
 	
+		--points
+		v_result = null;
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (7, 14, 64, 66, 70, 71, 98)) row; 
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
+
 		--lines
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -1487,25 +1498,33 @@ BEGIN
 		FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=14) row; 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_polygon = concat ('{"geometryType":"Polygon","qmlPath":"',v_qmlpolpath,'", "values":',v_result, '}');
-	
+
+		--    Control nulls
+		v_result_point := COALESCE(v_result_point, '{}'); 
+		v_result_line := COALESCE(v_result_line, '{}'); 
+		v_result_polygon := COALESCE(v_result_polygon, '{}'); 
+
+		--  Return
+		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+			',"body":{"form":{}'||
+				',"data":{ "info":'||v_result_info||','||
+					'"point":'||v_result_point||','||
+					'"line":'||v_result_line||','||
+					'"polygon":'||v_result_polygon||','||
+					'"setVisibleLayers":[] }'||
+				'}'||
+			'}')::json;
+
+	ELSE 
+		--  Return
+		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+			',"body":{"form":{}'||
+				',"data":{ "info":'||v_result_info||','||
+					'"setVisibleLayers":[] }'||
+				'}'||
+			'}')::json;
+
 	END IF;
-		
-	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
-	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
-	
---  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||','||
-				'"setVisibleLayers":[] }'||
-		       '}'||
-	    '}')::json;
 	
 END;
 $BODY$
