@@ -66,7 +66,7 @@ BEGIN
 	IF rec_tab.id IS NOT NULL THEN
 
 		-- get selector parameters
-		v_concat_label = (SELECT value::json->>'mincut' FROM config_param_system WHERE parameter = 'api_selector_label');
+		v_concat_label = (SELECT value::json->>'label' FROM config_param_system WHERE parameter = 'api_selector_mincut');
 		--raise exception 'v_concat_label %', v_concat_label;
 
 		-- Get exploitations, selected and unselected
