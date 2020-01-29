@@ -306,10 +306,11 @@ class MincutConfig(ParentAction):
 
         expr = ""
         id_ = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
-        state = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
+        state_id = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 0)
+        state_text = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
         expl = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
         dates_filter = ""
-        if state == '':
+        if state_id == '':
             self.dlg_min_edit.date_from.setEnabled(False)
             self.dlg_min_edit.date_to.setEnabled(False)
         else:
@@ -330,22 +331,23 @@ class MincutConfig(ParentAction):
             format_low = 'yyyy-MM-dd 00:00:00.000'
             format_high = 'yyyy-MM-dd 23:59:59.999'
             interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
-            if str(state) in ('0'):
+            if str(state_id) in ('0'):
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
                 dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
-            elif str(state) in ('1', '2'):
+            elif str(state_id) in ('1', '2'):
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: exec_end')
                 dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
             else:
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from:')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to:')
+
         expr += f" (id::text ILIKE '%{id_}%'"
         expr += f" OR work_order::text ILIKE '%{id_}%')"
         expr += f" {dates_filter}"
-        if state != '':
-            expr += f" AND state::text ILIKE '%{state}%' "
+        if state_text != '':
+            expr += f" AND state::text ILIKE '%{state_text}%' "
         expr += f" AND (exploitation::text ILIKE '%{expl}%' OR exploitation IS null)"
         self.controller.log_info(str(expr))
         # Refresh model with selected filter
