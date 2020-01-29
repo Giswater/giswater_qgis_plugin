@@ -128,7 +128,7 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW TEMPORAL LAYERS'):
+    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
