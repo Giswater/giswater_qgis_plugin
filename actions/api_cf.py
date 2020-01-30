@@ -1158,6 +1158,7 @@ class ApiCF(ApiParent, QObject):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         self.show_actions(tab_name)
+
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             self.fill_tab_element()
@@ -2653,6 +2654,9 @@ class ApiCF(ApiParent, QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
     def gw_api_open_node(self, **kwargs):
+        """ Function called in class ApiParent.add_button(...) -->
+                widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
+
         dialog = kwargs['dialog']
         widget = kwargs['widget']
 
