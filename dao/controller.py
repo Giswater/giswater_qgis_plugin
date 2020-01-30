@@ -69,6 +69,7 @@ class DaoController(object):
 
     def set_plugin_dir(self, plugin_dir):
         self.plugin_dir = plugin_dir
+        self.log_info(f"Plugin folder: {self.plugin_dir}")
         
         
     def set_logger(self, logger_name=None):
@@ -210,7 +211,9 @@ class DaoController(object):
                 self.log_warning("Error getting default connection (settings)")
                 self.last_error = self.tr("Error getting default connection")
                 return None, not_version
+
         self.credentials = credentials
+
         return credentials, not_version
 
 
@@ -915,7 +918,6 @@ class DaoController(object):
             tab_name = self.plugin_name
 
         if message_level >= self.min_message_level:
-            msg = "QGIS: " + str(msg)
             QgsMessageLog.logMessage(msg, tab_name, message_level)
 
         return msg
@@ -1030,7 +1032,6 @@ class DaoController(object):
                 return None
 
         schemaname = schemaname.replace('"', '')
-
         project_type = None
         tablename = "version"
         exists = self.check_table(tablename)

@@ -74,13 +74,15 @@ class Logger(object):
         
         try:
             module_path = inspect.stack()[stack_level][1]  
+            file_name = os.path.basename(module_path)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
-            header = "{" + module_path + " | Line " + str(function_line) + " (" + str(function_name) + ")}"        
+            header = "{" + file_name + " | Line " + str(function_line) + " (" + str(function_name) + ")}"
             text = header
             if msg:
                 text+= "\n" + str(msg)    
             self.logger_file.log(log_level, text)
+
         except Exception as e:
             self.controller.log_warning("Error logging: " + str(e), logger_file=False)
         
