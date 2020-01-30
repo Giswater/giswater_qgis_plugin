@@ -230,7 +230,7 @@ BEGIN
 			END IF;
 
 			--updating arcs
-			FOR arcrec IN EXECUTE v_querystring
+			FOR arcrec IN EXECUTE v_querytext
 			LOOP
 
 				-- Initial and final node of the arc
@@ -287,7 +287,7 @@ BEGIN
 			--updating links
 			v_querytext:= 'SELECT * FROM "link" WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
 
-			FOR arcrec IN EXECUTE v_querystring
+			FOR arcrec IN EXECUTE v_querytext
 			LOOP
 				-- Coordinates
 				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(arcrec."link_id") USING arcrec.the_geom, NEW.the_geom; 					

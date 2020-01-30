@@ -85,6 +85,7 @@ v_qmlpointpath		text = '';
 v_qmllinepath		text = '';
 v_qmlpolpath		text = '';
 v_doublen2a		integer;
+v_geometrylog boolean;
 
 BEGIN
 
