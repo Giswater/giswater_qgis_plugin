@@ -107,14 +107,22 @@ class DaoController(object):
         
         if context_name is None:
             context_name = self.plugin_name
+
+        value = None
+        try:
         value = QCoreApplication.translate(context_name, message)
+        except TypeError:
+            value = QCoreApplication.translate(context_name, str(message))
+        finally:
         # If not translation has been found, check into 'ui_message' context
         if value == message:
             value = QCoreApplication.translate('ui_message', message)
+
         return value                            
     
         
     def plugin_settings_value(self, key, default_value=""):
+
         key = self.plugin_name + "/" + key
         value = self.qgis_settings.value(key, default_value)
         return value    
