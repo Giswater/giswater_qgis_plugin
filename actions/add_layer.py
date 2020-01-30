@@ -270,7 +270,7 @@ class AddLayer(object):
 
 
 
-    def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW TEMPORAL LAYERS'):
+    def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
         """
         :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
         :param data: Json
