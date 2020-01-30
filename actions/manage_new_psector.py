@@ -1019,7 +1019,6 @@ class ManageNewPsector(ParentManage):
 
                 sql = sql[:len(sql) - 2]
                 sql += f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.psector_id)}'"
-                sql += f" AND cur_user=current_user "
 
         else:
             values = "VALUES("
