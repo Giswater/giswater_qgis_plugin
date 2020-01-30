@@ -3225,7 +3225,7 @@ class UpdateSQL(ApiParent):
 
         for k, v in list(data.items()):
             if str(k) == "info":
-                self.populate_info_text(dialog, data)
+                self.add_layer.populate_info_text(dialog, data)
 
 
     def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):

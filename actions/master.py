@@ -325,7 +325,7 @@ class Master(ParentAction):
         else:
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             if complet_result[0]['status'] == "Accepted":
-                self.populate_info_text(dialog, complet_result[0]['body']['data'])
+                self.add_layer.populate_info_text(dialog, complet_result[0]['body']['data'])
             message = complet_result[0]['message']['text']
             if message is not None:
                 self.controller.show_info_box(message)

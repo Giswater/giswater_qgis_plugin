@@ -68,7 +68,7 @@ class DuplicatePsector(ParentManage, QObject):
         data = complet_result[0]['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.populate_info_text(self.dlg_duplicate_psector, data)
+                change_tab = self.add_layer.populate_info_text(self.dlg_duplicate_psector, data)
         # Close dialog
         if not change_tab:
             self.close_dialog(self.dlg_duplicate_psector)

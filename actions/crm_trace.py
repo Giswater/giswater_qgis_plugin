@@ -209,7 +209,7 @@ class CrmTrace(ApiParent):
         for k, v in list(data.items()):
             if str(k) == "info":
                 self.controller.log_info("populate_info_text")
-                self.populate_info_text(dialog, tab_main, txt_infolog, data)
+                self.add_layer.populate_info_text(dialog, tab_main, txt_infolog, data)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:

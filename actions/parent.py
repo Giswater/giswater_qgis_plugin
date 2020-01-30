@@ -793,95 +793,6 @@ class ParentAction(object):
 
         return body
 
-    def set_layers_visible(self, layers):
-        for layer in layers:
-            lyr = self.controller.get_layer_by_tablename(layer)
-            if lyr:
-                self.controller.set_layer_visible(lyr)
-
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True):
-        if del_old_layers:
-            self.delete_layer_from_toc(function_name)
-        srid = self.controller.plugin_settings_value('srid')
-        for k, v in list(data.items()):
-            if str(k) == 'setVisibleLayers':
-                self.set_layers_visible(v)
-            elif str(k) == "info":
-                self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
-            else:
-                counter = len(data[k]['values'])
-                if counter > 0:
-                    counter = len(data[k]['values'])
-                    geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
-                    self.populate_vlayer(v_layer, data, k, counter)
-                    if 'qmlPath' in data[k]:
-                        qml_path = data[k]['qmlPath']
-                        self.load_qml(v_layer, qml_path)
-
-
-    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
-
-        change_tab = False
-        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
-
-        if reset_text:
-            text = ""
-        for item in data['info']['values']:
-            if 'message' in item:
-                if item['message'] is not None:
-                    text += str(item['message']) + "\n"
-                    if force_tab:
-                        change_tab = True
-                else:
-                    text += "\n"
-
-        utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
-        qtabwidget = dialog.findChild(QTabWidget,'mainTab')
-        if change_tab and qtabwidget is not None:
-            qtabwidget.setCurrentIndex(tab_idx)
-
-        return change_tab
-
-
-    def populate_vlayer(self, virtual_layer, data, layer_type, counter):
-
-        prov = virtual_layer.dataProvider()
-
-        # Enter editing mode
-        virtual_layer.startEditing()
-        if counter > 0:
-            for key, value in list(data[layer_type]['values'][0].items()):
-                # add columns
-                if str(key) != 'the_geom':
-                    prov.addAttributes([QgsField(str(key), QVariant.String)])
-
-        # Add features
-        for item in data[layer_type]['values']:
-            attributes = []
-            fet = QgsFeature()
-
-            for k, v in list(item.items()):
-                if str(k) != 'the_geom':
-                    attributes.append(v)
-                if str(k) in 'the_geom':
-                    sql = f"SELECT St_AsText('{v}')"
-                    row = self.controller.get_row(sql, log_sql=False)
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
-            fet.setAttributes(attributes)
-            prov.addFeatures([fet])
-
-        # Commit changes
-        virtual_layer.commitChanges()
-        QgsProject.instance().addMapLayer(virtual_layer, False)
-        root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup('GW Functions results')
-        if my_group is None:
-            my_group = root.insertGroup(0, 'GW Functions results')
-
-        my_group.insertLayer(0, virtual_layer)
-
 
     def get_composers_list(self):
 
@@ -901,19 +812,6 @@ class ParentAction(object):
             index += 1
 
         return index
-
-
-    def get_all_actions(self):
-
-        self.controller.log_info(str("TEST"))
-        actions_list = self.iface.mainWindow().findChildren(QAction)
-        for action in actions_list:
-           self.controller.log_info(str(action.objectName()))
-           action.triggered.connect(partial(self.show_action_name, action))
-
-
-    def show_action_name(self, action):
-        self.controller.log_info(str(action.objectName()))
 
 
     def set_restriction(self, dialog, widget_to_ignore, restriction):
@@ -1031,6 +929,7 @@ class ParentAction(object):
         self.open_dialog(self.dlg_info)
 
 
+
     def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
         """ Set one column of a QtableView as QComboBox with values from database.
         :param qtable: QTableView to fill
@@ -1068,3 +967,18 @@ class ParentAction(object):
         qtable.model().setData(i, elem[0])
         i = qtable.model().index(pos_x, widget_pos+1)
         qtable.model().setData(i, elem[1])
+
+
+
+    def get_all_actions(self):
+
+        self.controller.log_info(str("TEST"))
+        actions_list = self.iface.mainWindow().findChildren(QAction)
+        for action in actions_list:
+           self.controller.log_info(str(action.objectName()))
+           action.triggered.connect(partial(self.show_action_name, action))
+
+
+    def show_action_name(self, action):
+        self.controller.log_info(str(action.objectName()))
+

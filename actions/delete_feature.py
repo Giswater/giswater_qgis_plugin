@@ -142,7 +142,7 @@ class DeleteFeature(ApiParent):
         data = complet_result[0]['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.populate_info_text(self.dlg_delete_feature, data)
+                change_tab = self.add_layer.populate_info_text(self.dlg_delete_feature, data)
 
         self.dlg_delete_feature.btn_cancel.setText('Accept')
         # Close dialog
