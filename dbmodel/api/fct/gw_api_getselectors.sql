@@ -37,8 +37,11 @@ DECLARE
 	v_aux_json json;
 	fields_array json[];
 	v_result_list text[];
-	v_concat_label text;
 	v_filter_name text;
+	v_parameter_selector json;
+	v_label text;
+	v_table text;
+	v_selector text;
 
 BEGIN
 
@@ -66,16 +69,18 @@ BEGIN
 	IF rec_tab.id IS NOT NULL THEN
 
 		-- get selector parameters
-		v_concat_label = (SELECT value::json->>'label' FROM config_param_system WHERE parameter = 'api_selector_mincut');
-		--raise exception 'v_concat_label %', v_concat_label;
+		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = 'api_selector_mincut');
+		v_label = v_parameter_selector->>'label';
+		v_table = v_parameter_selector->>'table';
+		v_selector = v_parameter_selector->>'selector';
 
 		-- Get exploitations, selected and unselected
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT concat(' || v_concat_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-		FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'view') ||' WHERE id IN (SELECT result_id FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'table') ||' WHERE cur_user=' || quote_literal(current_user) || ')
+		SELECT concat(' || v_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+		FROM '|| v_table ||' WHERE id IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ')
 		UNION
-		SELECT concat(' || v_concat_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-		FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'view') ||' WHERE id NOT IN (SELECT result_id FROM '|| ((v_selectors_list->>rec_tab.formname)::json->>'table') ||' WHERE cur_user=' || quote_literal(current_user) || ') 
+		SELECT concat(' || v_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+		FROM '|| v_table ||' WHERE id NOT IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') 
 		ORDER BY label) a'
 		INTO v_formTabs_minuct; 
 		
@@ -88,7 +93,7 @@ BEGIN
 		END IF;
 
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabName', rec_tab.tabname::TEXT);
-		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tableName', ((v_selectors_list->>rec_tab.formname)::json->>'table'));
+		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tableName', v_table);
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabLabel', rec_tab.tablabel::TEXT);
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'selectorType', rec_tab.formname::TEXT);
 
