@@ -41,8 +41,10 @@ class ManageNewPsector(ParentManage):
 
     def new_psector(self, psector_id=None, plan_om=None, is_api=False):
         """ Buttons 45 and 81: New psector """
+
         row = self.controller.get_config(parameter='sys_currency', columns='value::text', table='config_param_system')
-        self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
+        if row:
+            self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
         self.dlg_plan_psector = Plan_psector()

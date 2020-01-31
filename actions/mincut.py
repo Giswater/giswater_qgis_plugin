@@ -183,8 +183,9 @@ class MincutParent(ParentAction):
 
         try:
             row = self.controller.get_config('sys_mincutalerts_enable', 'value', 'config_param_system')
-            custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
-            self.show_notified.setVisible(custom_action_sms['show_sms_info'])
+            if row:
+                custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
+                self.show_notified.setVisible(custom_action_sms['show_sms_info'])
         except KeyError as e:
             self.show_notified.setVisible(False)
 
