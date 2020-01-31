@@ -88,6 +88,9 @@ BEGIN
 		--EXECUTE 'INSERT INTO ' || quote_ident(v_tablename) ||' (id, idval, descript, status) VALUES (' || quote_literal(v_id) ||', ' || quote_literal(v_lot_id) ||', ' || quote_literal(v_descript) ||', ' || quote_literal(v_status) ||')';
 		EXECUTE 'INSERT INTO ' || quote_ident(v_tablename) ||' (id, descript, status, visitclass_id, team_id) VALUES (' || quote_literal(v_id) ||', ' || quote_literal(v_descript) ||', ' || quote_literal(v_status) ||', ' || quote_literal(v_visitclass_id) ||', ' || quote_literal(v_team) ||')';
 
+		-- Update selector_lot for qgisserver user
+		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_id ||', ''qgisserver'')';
+		
 		-- message
 		SELECT gw_api_getmessage(null, 40) INTO v_message;
 		v_data = p_data->>'data';

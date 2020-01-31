@@ -66,12 +66,16 @@ BEGIN
  	
 
     -- Check if exist some other workday opened, and close
-	EXECUTE 'SELECT team_id, lot_id, endtime, user_id FROM (SELECT * FROM ud.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_record;
+	EXECUTE 'SELECT team_id, lot_id, endtime, user_id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_record;
 	
 	IF v_record.user_id IS NULL OR v_record.endtime IS NOT NULL THEN
 	
 		-- Insert start work day
 		INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
+
+		-- Update selector_lot
+		EXECUTE 'DELETE FROM selector_lot WHERE cur_user='''|| v_user ||'''';
+		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_lot ||', '''|| v_user ||''')';
 		
 		-- message
 		SELECT gw_api_getmessage(null, 70) INTO v_message;
@@ -89,6 +93,10 @@ BEGIN
 
 			-- Insert start work day
 			INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
+
+			-- Update selector_lot
+			EXECUTE 'DELETE FROM selector_lot WHERE cur_user='''|| v_user ||'''';
+			EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_lot ||', '''|| v_user ||''')';
 			
 			-- message
 			SELECT gw_api_getmessage(null, 70) INTO v_message;
@@ -98,6 +106,10 @@ BEGIN
 		ELSE
 			UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone 
 			WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=v_user ORDER BY id DESC) a LIMIT 1); 
+
+			-- Update selector_lot
+			EXECUTE 'DELETE FROM selector_lot WHERE cur_user='''|| v_user ||'''';
+			
 			-- message
 			SELECT gw_api_getmessage(null, 80) INTO v_message;
 			v_data = p_data->>'data';
