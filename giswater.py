@@ -1251,17 +1251,14 @@ class Giswater(QObject):
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
             except KeyError as e:
-                if type(e).__name__ not in exceptions:
-                    exceptions.append(type(e).__name__)
-                    msg += f"<b>Key: </b>{e}<br>"
-                    msg += f"<b>Python file: </b>{__name__} <br>"
-                    msg += f"<b>Python function: </b>{self.get_missing_layers.__name__} <br>"
-        if "KeyError" in exceptions:
-            self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+                description = "Key on returned json from ddbb is missed"
+                self.controller.manage_exception(description)
+
         return critical_level
 
 
     def add_selected_layers(self):
+
         checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
         schemaname = self.schema_name.replace('"','')
         for check in checks:
