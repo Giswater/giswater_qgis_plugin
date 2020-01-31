@@ -1254,7 +1254,7 @@ class Giswater(QObject):
                     grl_others.addWidget(widget, pos, 1)
             except KeyError as e:
                 description = "Key on returned json from ddbb is missed"
-                self.controller.manage_exception(description)
+                self.controller.manage_exception(None, description)
 
         return critical_level
 

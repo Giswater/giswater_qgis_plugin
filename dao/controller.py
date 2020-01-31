@@ -1418,7 +1418,7 @@ class DaoController(object):
             layer.dataProvider().forceReload()
 
 
-    def manage_exception(self, description=None):
+    def manage_exception(self, title=None, description=None):
         """ Manage exception and show information to the user """
 
         # Get traceback
@@ -1427,7 +1427,6 @@ class DaoController(object):
         file_name = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
         # Set exception message details
-        title = "Information about exception"
         msg = ""
         msg += f"Error type: {exc_type}\n"
         msg += f"File name: {file_name}\n"
@@ -1441,12 +1440,13 @@ class DaoController(object):
         self.log_warning(msg)
 
 
-    def show_exceptions_msg(self, title, msg=""):
+    def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
         """ Show exception message in dialog """
 
         self.dlg_info = BasicInfo()
-        self.dlg_info.setWindowTitle(title)
-        self.dlg_info.lbl_title.setText(title)
+        self.dlg_info.setWindowTitle(window_title)
+        if title:
+            self.dlg_info.lbl_title.setText(title)
         self.dlg_info.txt_info.setText(msg)
         self.dlg_info.show()
 
