@@ -87,6 +87,10 @@
         <translation>Gestor de lots</translation>
     </message>
     <message>
+        <source>76_text</source>
+        <translation>Selector de lots</translation>
+    </message>
+    <message>
         <source>81_text</source>
         <translation>Nou sector de planificació OM</translation>
     </message>
