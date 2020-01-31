@@ -5,20 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
-
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
 
-
 import os.path
 from functools import partial
+import traceback
+import sys
 
 from .pg_dao import PgDao
 from .logger import Logger
 from .. import sys_manager
+from ..ui_manager import BasicInfo
 
 
 class DaoController(object):
@@ -110,13 +110,13 @@ class DaoController(object):
 
         value = None
         try:
-        value = QCoreApplication.translate(context_name, message)
+            value = QCoreApplication.translate(context_name, message)
         except TypeError:
             value = QCoreApplication.translate(context_name, str(message))
         finally:
-        # If not translation has been found, check into 'ui_message' context
-        if value == message:
-            value = QCoreApplication.translate('ui_message', message)
+            # If not translation has been found, check into 'ui_message' context
+            if value == message:
+                value = QCoreApplication.translate('ui_message', message)
 
         return value                            
     
@@ -1416,3 +1416,37 @@ class DaoController(object):
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()
+
+
+    def manage_exception(self, description=None):
+        """ Manage exception and show information to the user """
+
+        # Get traceback
+        trace = traceback.format_exc()
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        file_name = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+
+        # Set exception message details
+        title = "Information about exception"
+        msg = ""
+        msg += f"Error type: {exc_type}\n"
+        msg += f"File name: {file_name}\n"
+        msg += f"Line number: {exc_tb.tb_lineno}\n"
+        if description:
+            msg += f"Description: {description}\n"
+        msg += f"{trace}"
+
+        # Show exception message in dialog and log it
+        self.show_exceptions_msg(title, msg)
+        self.log_warning(msg)
+
+
+    def show_exceptions_msg(self, title, msg=""):
+        """ Show exception message in dialog """
+
+        self.dlg_info = BasicInfo()
+        self.dlg_info.setWindowTitle(title)
+        self.dlg_info.lbl_title.setText(title)
+        self.dlg_info.txt_info.setText(msg)
+        self.dlg_info.show()
+
