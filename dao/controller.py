@@ -1448,5 +1448,15 @@ class DaoController(object):
         if title:
             self.dlg_info.lbl_title.setText(title)
         self.dlg_info.txt_info.setText(msg)
+        self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_info.show()
+
+
+    def test_exception(self):
+        """ Function to test exception manager """
+
+        try:
+            print(4 / 0)
+        except Exception:
+            self.manage_exception()
 
