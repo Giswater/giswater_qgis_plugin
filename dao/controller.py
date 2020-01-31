@@ -1418,22 +1418,26 @@ class DaoController(object):
             layer.dataProvider().forceReload()
 
 
-    def manage_exception(self, title=None, description=None):
+    def manage_exception(self, title=None, description=None, sql=None):
         """ Manage exception and show information to the user """
 
         # Get traceback
         trace = traceback.format_exc()
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        file_name = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        path = exc_tb.tb_frame.f_code.co_filename
+        file_name = os.path.split(path)[1]
+        #folder_name = os.path.dirname(path)
 
         # Set exception message details
         msg = ""
         msg += f"Error type: {exc_type}\n"
         msg += f"File name: {file_name}\n"
         msg += f"Line number: {exc_tb.tb_lineno}\n"
+        msg += f"{trace}"
         if description:
             msg += f"Description: {description}\n"
-        msg += f"{trace}"
+        if sql:
+            msg += f"SQL:\n {sql}\n"
 
         # Show exception message in dialog and log it
         self.show_exceptions_msg(title, msg)
