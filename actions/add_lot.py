@@ -1233,12 +1233,12 @@ class AddNewLot(ParentManage):
             for key, value in list(item.items()):
                 if key == "visit_id":
                     visit_id = str(value)
-                if key == "status":
+                if key == "status_name":
                     if value not in ('', None):
                         _sql = ("SELECT id FROM om_typevalue WHERE idval = '" + str(value) + "'")
                         result = self.controller.get_row(_sql, commit=True)
-                        status = "$$" + str(result[0]) + "$$ "
-
+                        if result not in ('', None):
+                            status = "$$" + str(result[0]) + "$$ "
             if visit_id and status:
                 sql += ("UPDATE "+str(table_name)+" "
                         "SET (status) = ("+str(status)+") "
@@ -1682,7 +1682,7 @@ class AddNewLot(ParentManage):
         query_left += "(SELECT "+tableleft+".id FROM "+tableleft+""
         query_left += " RIGHT JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_left += " WHERE cur_user = current_user)"
-        query_left += " AND  "+field_id_left+" > -1 ORDER BY id"
+        query_left += " AND  "+field_id_left+" > -1 ORDER BY id desc"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
@@ -1694,7 +1694,7 @@ class AddNewLot(ParentManage):
 
         query_right = "SELECT "+tableright+".lot_id, * FROM " + tableleft + ""
         query_right += " JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
-        query_right += " WHERE cur_user = current_user ORDER BY " + tableleft +".id"
+        query_right += " WHERE cur_user = current_user ORDER BY " + tableleft +".id desc"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, hide_right)
