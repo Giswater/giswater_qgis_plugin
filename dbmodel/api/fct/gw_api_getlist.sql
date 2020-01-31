@@ -258,14 +258,14 @@ BEGIN
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 AND device = $2'
-			INTO v_query_result
+		EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 AND device = $2'
+			INTO v_query_result, v_default
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_api_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 LIMIT 1'
-				INTO v_query_result
+			EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 LIMIT 1'
+				INTO v_query_result, v_default
 				USING v_tablename;
 		END IF;	
 
