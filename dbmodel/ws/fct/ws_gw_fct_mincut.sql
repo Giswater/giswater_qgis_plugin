@@ -229,12 +229,6 @@ BEGIN
 					
 	UPDATE anl_mincut_result_valve SET proposed = FALSE WHERE closed = TRUE AND result_id=result_id_arg ;
 
-	IF (select value::boolean from config_param_system where parameter='om_mincut_disable_check_temporary_overlap')  IS NOT TRUE THEN 
-		IF v_debug THEN
-			RAISE NOTICE '9-Check temporary overlap control against other planified mincuts';
-		END IF;
-		SELECT gw_fct_mincut_result_overlap(result_id_arg, current_user) INTO v_overlap;	
-	END IF;
 
 	IF v_debug THEN	RAISE NOTICE '10-Update mincut selector'; END IF;
 	

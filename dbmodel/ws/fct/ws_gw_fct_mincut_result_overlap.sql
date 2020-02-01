@@ -9,11 +9,16 @@ This version of Giswater is provided by Giswater Association
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_result_overlap(integer, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_overlap(result_id_arg integer, cur_user_var text)
 RETURNS text AS
+
+/*
+SELECT SCHEMA_NAME.gw_fct_mincut('2100', 'arc', 21)
+*/
+
 $BODY$
 DECLARE
 v_mincutrec record;
 v_rec record;
-id_last	integer;
+v_conflict_id	integer;
 v_overlap_macroexpl integer;
 v_overlaps boolean;
 v_overlap_comp boolean;
@@ -58,16 +63,16 @@ BEGIN
 				-- create temp result for joined analysis
 				DELETE FROM anl_mincut_result_cat WHERE id=-2;
 				INSERT INTO anl_mincut_result_cat (id, work_order, mincut_state, mincut_class, expl_id, macroexpl_id) 
-				VALUES (-2, 'Conflict Mincut (system)', 2, 1, v_mincutrec.expl_id, v_mincutrec.macroexpl_id) RETURNING id INTO id_last;
+				VALUES (-2, 'Conflict Mincut (system)', 2, 1, v_mincutrec.expl_id, v_mincutrec.macroexpl_id) RETURNING id INTO v_conflict_id;
 
 				-- copying proposed valves and afected arcs from original mincut result to temp result into anl_mincut_result_valve 
                                 v_querytext:='INSERT INTO anl_mincut_result_valve (result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
-				             SELECT '||id_last||', node_id,  closed,  broken, unaccess, proposed, the_geom 
+				             SELECT '||v_conflict_id||', node_id,  closed,  broken, unaccess, proposed, the_geom 
 				             FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||' AND proposed=TRUE';
 				EXECUTE v_querytext;
 
 				v_querytext:='INSERT INTO anl_mincut_result_arc ( result_id, arc_id, the_geom)
-				             SELECT '||id_last||', arc_id, the_geom 
+				             SELECT '||v_conflict_id||', arc_id, the_geom 
 				             FROM anl_mincut_result_arc WHERE result_id='||result_id_arg;
 				EXECUTE v_querytext;	
 
@@ -77,12 +82,12 @@ BEGIN
 
 			-- copying proposed valves and afected arcs from overlaped mincut result 
 			v_querytext:='INSERT INTO anl_mincut_result_valve ( result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
-				     SELECT '||id_last||', node_id,  closed,  broken, unaccess, proposed, the_geom 
+				     SELECT '||v_conflict_id||', node_id,  closed,  broken, unaccess, proposed, the_geom 
 				     FROM anl_mincut_result_valve WHERE result_id='||v_rec.id||' AND proposed=TRUE';     
 			EXECUTE v_querytext;
 
 			v_querytext:='INSERT INTO anl_mincut_result_arc ( result_id, arc_id, the_geom)
-			             SELECT '||id_last||', arc_id, the_geom 
+			             SELECT '||v_conflict_id||', arc_id, the_geom 
 			             FROM anl_mincut_result_arc WHERE result_id='||v_rec.id;    
 			EXECUTE v_querytext;	
 
@@ -106,9 +111,9 @@ BEGIN
 
 	-- call mincut_flowtrace function
 	raise notice 'Execute mincut again mixing overlaped valves';
-	PERFORM gw_fct_mincut_inverted_flowtrace (id_last);
+	PERFORM gw_fct_mincut_inverted_flowtrace (v_conflict_id);
 
-	v_count2:=(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=id_last) ;
+	v_count2:=(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=v_conflict_id) ;
 
 	-- write the possible message to show
 	v_message = concat ('Mincut ', result_id_arg,' overlaps date-time with other mincuts (',v_conflictmsg,') on same macroexpl. and has conflicts at least with one');
@@ -119,20 +124,12 @@ BEGIN
 	
 	IF v_count != v_count2 THEN
 
-		-- Update result valves with two dry sides to proposed=false
-		UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id IN
-		(
-			SELECT node_1 FROM anl_mincut_result_arc JOIN arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-			JOIN anl_mincut_result_valve ON node_id=node_1 WHERE anl_mincut_result_arc.result_id=id_last AND proposed IS TRUE
-				INTERSECT
-			SELECT node_2 FROM anl_mincut_result_arc JOIN arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-			JOIN anl_mincut_result_valve ON node_id=node_2 WHERE anl_mincut_result_arc.result_id=id_last AND proposed IS TRUE
-		);		
+		v_querytext = replace(replace(v_conflictarray::text,'{',''),'}','');
 		
 		-- insert conflict mincuts
 		EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 			SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, '||quote_literal(v_message)||' 
-			FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id IN ('||v_conflictarray||')';
+			FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id IN ('||v_querytext||')';
 
 		-- insert current mincut
 		INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
@@ -142,8 +139,8 @@ BEGIN
 		-- insert additional affectations
 		EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 			SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, '||quote_literal(v_message)||'
-			FROM anl_mincut_result_arc JOIN arc a USING (arc_id)  WHERE result_id = '||id_last||' AND a.arc_id NOT IN 
-			(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id IN ('||v_conflictarray||') UNION SELECT arc_id FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||')';
+			FROM anl_mincut_result_arc JOIN arc a USING (arc_id)  WHERE result_id = '||v_conflict_id||' AND a.arc_id NOT IN 
+			(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id IN ('||v_querytext||') UNION SELECT arc_id FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||')';
 	ELSE 
 		-- check for overlaps type 2
 		FOREACH v_id IN ARRAY v_conflictarray
@@ -163,7 +160,9 @@ BEGIN
 		END IF;
 	END IF;
 
-	DELETE FROM  anl_mincut_result_cat WHERE id=id_last;
+	
+
+	DELETE FROM  anl_mincut_result_cat WHERE id=v_conflict_id;
 	PERFORM setval('SCHEMA_NAME.anl_mincut_result_cat_seq', (select max(id) from anl_mincut_result_cat) , true);   
 	
    END IF;
