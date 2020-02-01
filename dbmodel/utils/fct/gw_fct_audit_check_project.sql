@@ -55,7 +55,7 @@ v_qmllinepath text = '';
 v_qmlpolpath text = '';
 v_user_control boolean = false;
 v_layer_log boolean = false;
-v_context text;
+v_errcontext text;
 
 BEGIN 
 
@@ -466,8 +466,8 @@ BEGIN
 
 --  Exception handling
     EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_context = pg_exception_context;  
-		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+		GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	  
 END;
 
