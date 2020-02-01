@@ -16,13 +16,13 @@ SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":9, "infoType
 */
 
 DECLARE 
-v_querytext 	text;
-v_sys_rows 	text;
-v_parameter   text;
-v_audit_rows 	integer;
+v_querytext text;
+v_sys_rows text;
+v_parameter text;
+v_audit_rows integer;
 v_compare_sign text;
-v_isenabled 	boolean;
-v_diference 	integer;
+v_isenabled boolean;
+v_diference integer;
 v_error integer;
 v_count integer;
 v_table_host text;
@@ -50,12 +50,12 @@ v_result json;
 v_result_info json;
 v_fprocesscat_id_aux integer;
 v_qgis_version text;
-v_qmlpointpath	text = '';
-v_qmllinepath	text = '';
-v_qmlpolpath	text = '';
+v_qmlpointpath text = '';
+v_qmllinepath text = '';
+v_qmlpolpath text = '';
 v_user_control boolean = false;
 v_layer_log boolean = false;
-
+v_context text;
 
 BEGIN 
 
@@ -464,10 +464,11 @@ BEGIN
 	--  Return	   
 	RETURN v_return;
 
---    Exception handling
-  --  EXCEPTION WHEN OTHERS THEN 
-    --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-    
+--  Exception handling
+    EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_context = pg_exception_context;  
+		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	  
 END;
 
 $BODY$
