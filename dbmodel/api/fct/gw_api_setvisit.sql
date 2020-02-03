@@ -88,7 +88,7 @@ BEGIN
 	
 --  get input values
 	v_client = (p_data ->>'client')::json;
-	--v_id = ((p_data ->>'feature')::json->>'id');
+	v_id = ((p_data ->>'feature')::json->>'id');
 	v_feature = p_data ->>'feature';
 	v_class = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
 	v_visitextcode = ((p_data ->>'data')::json->>'fields')::json->>'ext_code';
@@ -105,9 +105,11 @@ BEGIN
 	v_parameter_id = ((p_data ->>'data')::json->>'fields')::json->>'parameter_id';
 
 	
-	-- Get new visit id
-	v_id := (SELECT max(id)+1 FROM om_visit);
-
+	-- Get new visit id if not exist
+	IF v_id IS NULL THEN
+		v_id := (SELECT max(id)+1 FROM om_visit);
+	END IF;
+	
 	IF v_id IS NULL AND (SELECT count(id) FROM om_visit) = 0 THEN
 		v_id=1;
 	END IF;
