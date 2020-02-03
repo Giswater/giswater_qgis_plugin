@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Audit check project result</string>
+   <string>Check project</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
@@ -51,8 +51,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>626</width>
-            <height>465</height>
+            <width>98</width>
+            <height>100</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
