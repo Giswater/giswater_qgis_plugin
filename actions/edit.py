@@ -13,7 +13,7 @@ from .manage_document import ManageDocument
 from .manage_workcat_end import ManageWorkcatEnd
 from .delete_feature import DeleteFeature
 from .parent import ParentAction
-
+from ..ui_manager import ApiDocker
 
 class Edit(ParentAction):
 
@@ -71,10 +71,11 @@ class Edit(ParentAction):
         else:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
+        dlg_docker = self.manage_docker_options(ApiDocker())
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
                                                new_feature_id=feature_id, layer_new_feature=self.layer,
-                                               tab_type='data', new_feature=feature)
+                                               tab_type='data', new_feature=feature, docker=dlg_docker)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)

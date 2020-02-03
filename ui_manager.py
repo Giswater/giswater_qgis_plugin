@@ -10,11 +10,12 @@ from functools import partial
 class GwDockWidget(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
     
-    def __init__(self, subtag=None):
+    def __init__(self, subtag=None, position=None):
         super().__init__()
         self.setupUi(self)
         
         self.subtag = subtag
+        self.position = position
         
         print(f'{type(self)}: {self.objectName()}')
     
@@ -171,6 +172,9 @@ FORM_CLASS = get_ui_class('api_dimensioning.ui')
 class ApiDimensioningUi(GwMainWindow, FORM_CLASS):
     pass
 
+FORM_CLASS = get_ui_class('api_docker.ui')
+class ApiDocker(GwDockWidget, FORM_CLASS):
+    pass
 
 FORM_CLASS = get_ui_class('api_epa_options.ui')
 class ApiEpaOptions(GwDialog, FORM_CLASS):

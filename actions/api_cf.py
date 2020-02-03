@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit,QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QDockWidget
 
 import json, os, re, subprocess, urllib.parse as parse, sys, webbrowser
 from collections import OrderedDict
@@ -28,7 +28,7 @@ from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiBasicInfo, ApiCfUi, EventFull, LoadDocuments, Sections
+from ..ui_manager import ApiBasicInfo, ApiCfUi, EventFull, GwMainWindow, LoadDocuments, Sections
 
 
 class ApiCF(ApiParent, QObject):
@@ -50,7 +50,7 @@ class ApiCF(ApiParent, QObject):
         self.tab_type = tab_type
 
 
-    def hilight_feature(self, point, rb_list, tab_type=None):
+    def hilight_feature(self, point, rb_list, tab_type=None, docker=None):
 
         cursor = QCursor()
         x = cursor.pos().x()
@@ -97,7 +97,7 @@ class ApiCF(ApiParent, QObject):
             for feature in layer['ids']:
                 action = QAction(str(feature['id']), None)
                 sub_menu.addAction(action)
-                action.triggered.connect(partial(self.set_active_layer, action, tab_type))
+                action.triggered.connect(partial(self.set_active_layer, action, tab_type, docker))
                 action.hovered.connect(partial(self.draw_by_action, feature, rb_list))
 
         main_menu.addSeparator()
@@ -156,7 +156,7 @@ class ApiCF(ApiParent, QObject):
             self.draw_polyline(points)
 
 
-    def set_active_layer(self, action, tab_type):
+    def set_active_layer(self, action, tab_type, docker=None):
         """ Set active selected layer """
 
         parent_menu = action.associatedWidgets()[0]
@@ -164,13 +164,12 @@ class ApiCF(ApiParent, QObject):
         if layer:
             table_name = self.controller.get_layer_source(layer)
             self.iface.setActiveLayer(layer)
-            complet_result, dialog = self.open_form(
-                table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type)
+            complet_result, dialog = self.open_form(table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type, docker=docker)
             self.draw(complet_result)
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
-                  layer_new_feature=None, tab_type=None, new_feature=None):
+                  layer_new_feature=None, tab_type=None, new_feature=None, docker=None):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -295,7 +294,9 @@ class ApiCF(ApiParent, QObject):
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag)
+
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, docker=docker)
+
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
 
@@ -345,8 +346,7 @@ class ApiCF(ApiParent, QObject):
         
         return result, self.hydro_info_dlg
 
-
-    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None):
+    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, docker=None):
 
         # Dialog
         self.dlg_cf = ApiCfUi(sub_tag)
@@ -560,11 +560,37 @@ class ApiCF(ApiParent, QObject):
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
+        self.dlg_cf.dlg_closed.connect(partial(self.close_docker, docker))
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+        if docker:
+            # Delete las form from memory
+            last_info = docker.findChild(GwMainWindow, 'api_cf')
+            if last_info:
+                last_info.setParent(None)
+                del last_info
+            # Remove las docker from iface and put the new docker
+            self.iface.removeDockWidget(docker)
+            self.dock_dialog(docker, self.dlg_cf)
+            # self.load_settings(docker)
+            docker.dlg_closed.connect(self.roll_back)
+            docker.dlg_closed.connect(partial(self.resetRubberbands))
+            docker.dlg_closed.connect(partial(self.set_vdefault_edition))
+            docker.dlg_closed.connect(partial(self.close_docker, docker))
+            #docker.dlg_closed.connect(partial(self.save_settings, docker))
+
 
         # Open dialog
         self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
+
+
+    def close_docker(self, docker):
+        """1=Left,  2=right, 8=bottom, 4= top"""
+        if docker:
+            cur_user = self.controller.get_current_user()
+            x = self.iface.mainWindow().dockWidgetArea(docker)
+            self.controller.plugin_settings_set_value("docker_info_" + cur_user, x)
+            self.iface.removeDockWidget(docker)
 
 
     def roll_back(self):
@@ -954,8 +980,11 @@ class ApiCF(ApiParent, QObject):
                           'actionSection')
         for action in actions_list:
             if action.objectName() not in static_actions:
-                action.setEnabled(enabled)
+                self.enable_action(action, enabled)
 
+
+    def enable_action(self, action, enabled):
+        action.setEnabled(enabled)
 
 
     def check_datatype_validator(self, dialog, widget, btn):

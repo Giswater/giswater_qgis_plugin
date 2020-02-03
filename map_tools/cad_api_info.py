@@ -5,6 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+from collections import OrderedDict
+from functools import partial
+
 from qgis.core import QgsMapToPixel
 
 from qgis.PyQt.QtCore import Qt
@@ -13,6 +17,7 @@ from qgis.PyQt.QtWidgets import QAction
 
 from .parent import ParentMapTool
 from ..actions.api_cf import ApiCF
+from ..ui_manager import ApiDocker
 
 
 class CadApiInfo(ParentMapTool):
@@ -28,6 +33,8 @@ class CadApiInfo(ParentMapTool):
         # :var self.block_signal: used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
 
+        self.dlg_docker = ApiDocker()
+
 
     def create_point(self, event):
 
@@ -40,6 +47,40 @@ class CadApiInfo(ParentMapTool):
             return False
 
         return point
+
+
+
+
+    def manage_docker_options(self, docker):
+        """ Check if user want dock the dialog or not """
+        row = self.controller.get_config('dock_dialogs')
+        row = 1
+        if not row:
+            docker = None
+        else:
+            # Load last docker position
+            cur_user = self.controller.get_current_user()
+            pos = self.controller.plugin_settings_value(f"docker_info_{cur_user}")
+            print(f"POS -> {pos} --> {type(pos)}")
+            docker.position = pos if type(pos) is int else 2
+
+            # If user want to dock the dialog, we reset rubberbands for each info
+            # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
+            try:
+                self.info_cf.resetRubberbands()
+            except AttributeError as e:
+                pass
+        return docker
+
+
+    def close_docker(self, docker):
+        """1=Left,  2=right, 8=bottom, 4= top"""
+
+        if docker:
+            x = self.iface.mainWindow().dockWidgetArea(docker)
+            print(x)
+            del self.dlg_docker
+
 
 
     """ QgsMapTools inherited event functions """
@@ -66,6 +107,7 @@ class CadApiInfo(ParentMapTool):
             self.block_signal = False
             return
 
+        self.dlg_docker = self.manage_docker_options(self.dlg_docker)
         self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
         self.info_cf.signal_activate.connect(self.reactivate_map_tool)
         complet_result = None
@@ -74,7 +116,7 @@ class CadApiInfo(ParentMapTool):
             point = self.create_point(event)
             if point is False:
                 return
-            complet_result, dialog = self.info_cf.open_form(point, tab_type=self.tab_type)
+            complet_result, dialog = self.info_cf.open_form(point, tab_type=self.tab_type, docker=self.dlg_docker)
 
         if complet_result is False:
             print("No point under mouse(LeftButton)")
@@ -85,7 +127,7 @@ class CadApiInfo(ParentMapTool):
                 print("No point under mouse(RightButton)")
                 return
 
-            self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type=self.tab_type)
+            self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type=self.tab_type, docker=self.dlg_docker)
 
 
     def reactivate_map_tool(self):
