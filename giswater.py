@@ -1181,10 +1181,17 @@ class Giswater(QObject):
 
         result = json.loads(row[0], object_pairs_hook=OrderedDict)
         if 'status' in result and result['status'] == 'Failed':
-            msg = f"<b>Error: </b>{result['SQLERR']}<br>"
-            msg += f"<b>Context: </b>{result['SQLCONTEXT']} <br>"
-            self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
-            return True
+            try:
+                msg = f"<b>Error: </b>{result['SQLERR']}<br>"
+                msg += f"<b>Context: </b>{result['SQLCONTEXT']} <br>"
+                self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            except KeyError as e:
+                msg = f"<b>Key: </b>{e}<br>"
+                msg += f"<b>Python file: </b>{__name__} <br>"
+                msg += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br>"
+                self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            finally:
+                return True
 
         self.dlg_audit_project = AuditCheckProjectResult()
         self.parent.load_settings(self.dlg_audit_project)
