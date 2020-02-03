@@ -236,7 +236,7 @@ class ParentAction(object):
         query_left += f" AND  {field_id_left} > -1"
         query_left += aql
 
-        self.fill_table_by_query(tbl_all_rows, query_left)
+        self.fill_table_by_query(tbl_all_rows, query_left + f" ORDER BY {name};")
         self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
 
@@ -250,7 +250,7 @@ class ParentAction(object):
 
         query_right += " WHERE cur_user = current_user"
 
-        self.fill_table_by_query(tbl_selected_rows, query_right)
+        self.fill_table_by_query(tbl_selected_rows, query_right + f" ORDER BY {name};")
         self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
