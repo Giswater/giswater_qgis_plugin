@@ -128,6 +128,7 @@ class GwToolBox(ApiParent):
         enable_btn_run = index.sibling(index.row(), 2).data()
         bool_dict = {"True": True, "true": True, "False": False, "false": False}
         self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
+        self.dlg_functions.btn_cancel.setEnabled(bool_dict[enable_btn_run])
         self.open_dialog(self.dlg_functions)
 
 
