@@ -14,8 +14,8 @@ DECLARE
 v_incorrect_arc text[];
 v_count integer;
 v_errortext text;
-v_start_point geometry(Point,SRID_VALUE);
-v_end_point geometry(Point,SRID_VALUE);
+v_start_point public.geometry(Point,SRID_VALUE);
+v_end_point public.geometry(Point,SRID_VALUE);
 v_query text;
 rec record;
 v_result json;
@@ -29,7 +29,7 @@ v_missing_cat_node text;
 v_missing_cat_arc text;
 v_incorrect_start text[];
 v_incorrect_end text[];
-
+v_error_context text;
  
 BEGIN 
 
@@ -57,15 +57,49 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 1, '-------');
 
+	
+	IF 'DXF_JUN' NOT IN (SELECT id FROM cat_feature) OR 'DXF_JUN_CAT' NOT IN (SELECT id FROM cat_node) THEN
+		INSERT INTO cat_feature(id, system_id, feature_type, parent_layer)
+		VALUES ('DXF_JUN', 'JUNCTION', 'NODE','v_edit_node') ON CONFLICT DO NOTHING;
+		--create child view
+		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+		"feature":{"catFeature":"DXF_JUN"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}$$);
+
+		IF v_project_type = 'WS' THEN
+			INSERT INTO node_type(id, type, epa_default, man_table, epa_table, active, code_autofill, 
+		            isarcdivide, graf_delimiter)
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, true,true ,'NONE') 
+			ON CONFLICT DO NOTHING;
+
+			INSERT INTO cat_node(id, nodetype_id, active)
+			VALUES ('DXF_JUN_CAT', 'DXF_JUN', true) ON CONFLICT DO NOTHING;
+		ELSIF v_project_type = 'UD' THEN
+			INSERT INTO node_type(id, type, epa_default, man_table, epa_table, active, code_autofill, 
+		            isarcdivide)
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, true,true) 
+			ON CONFLICT DO NOTHING;
+
+			INSERT INTO cat_node(id, active)
+			VALUES ('DXF_JUN_CAT', true) ON CONFLICT DO NOTHING;
+		END IF;
+
+		v_errortext=concat('INFO: Insert DXF_JUN into cat_feature, node_type and DXF_JUN_CAT into cat_node.');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (106, 1, v_errortext);
+
+		v_errortext=concat('INFO: Create view for cat_feature DXF_JUN.');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (106, 1, v_errortext);
+	END IF;
 
 	--check if there are nodes coming from dxf that overlap nodes existing in the network
 	v_count=0;
-	FOR rec IN SELECT * FROM temp_table WHERE temp_table.geom_point IS NOT NULL LOOP
+	FOR rec IN SELECT * FROM temp_table WHERE temp_table.geom_point IS NOT NULL AND fprocesscat_id = 106 LOOP
 		IF (SELECT node_id FROM node WHERE ST_DWithin(rec.geom_point,node.the_geom,0.01)) IS NOT NULL THEN
 			v_count=+1;
 			
 			INSERT INTO anl_node(nodecat_id, fprocesscat_id, the_geom, descript)
-			VALUES ('JUNCTION'::text, 106,rec.geom_point,'DUPLICATED');
+			VALUES ('DXF_JUN_CAT'::text, 106,rec.geom_point,'DUPLICATED');
 		END IF;
 	END LOOP;
 
@@ -114,7 +148,7 @@ BEGIN
 				IF NOT EXISTS (SELECT * FROM anl_node WHERE fprocesscat_id=106 AND the_geom=v_start_point) THEN
 							
 					INSERT INTO anl_node(nodecat_id, fprocesscat_id, the_geom, descript)
-					VALUES ('JUNCTION'::text, 106,v_start_point,'NEW');
+					VALUES ('DXF_JUN_CAT'::text, 106,v_start_point,'NEW');
 				END IF;
 			END IF;
 		ELSE
@@ -130,7 +164,7 @@ BEGIN
 					raise notice 'insert end';
 
 					INSERT INTO anl_node(nodecat_id, fprocesscat_id, the_geom, descript)
-					VALUES ('JUNCTION'::text, 106,v_end_point,'NEW');
+					VALUES ('DXF_JUN_CAT'::text, 106,v_end_point,'NEW');
 				END IF;
 			END IF;
 		ELSE
@@ -164,6 +198,8 @@ BEGIN
 		VALUES (106, 2, v_errortext);
 	END IF;
 
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 1, null);
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 1, 'PRESS RUN TO EXECUTE INSERT');
 	-- get results
 	-- info
 
@@ -194,7 +230,7 @@ BEGIN
 	v_result_polygon = '{"geometryType":"", "values":[],"category_field":""}';
 
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Check import dxf done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
@@ -202,6 +238,11 @@ BEGIN
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
 	    '}')::json;
+
+	EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+		RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 
 END;
 
