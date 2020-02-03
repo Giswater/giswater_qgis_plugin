@@ -31,7 +31,7 @@ v_project_type text;
 v_version text;
 v_cat_feature text;
 rec text;
-v_error_line text;
+v_error_context text;
 
 v_topocontrol boolean;
 v_workcat text;
@@ -219,8 +219,8 @@ BEGIN
 
 
 	EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_error_line = PG_EXCEPTION_CONTEXT;
-		RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_line) || '}')::json;
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+		RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 
 END;
