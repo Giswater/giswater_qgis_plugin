@@ -369,7 +369,7 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(self.tab_feature_changed,
-            self.dlg_plan_psector, table_object))
+            self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"]))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, self.plan_om + '_psector'))
         viewname = 'v_edit_' + self.plan_om + '_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_plan_psector,
@@ -427,7 +427,7 @@ class ManageNewPsector(ParentManage):
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_plan_psector, table_object)
+        self.tab_feature_changed(self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"])
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
@@ -935,7 +935,7 @@ class ManageNewPsector(ParentManage):
             self.reset_model_psector("gully")
         self.reset_model_psector("other")
         self.close_dialog(self.dlg_plan_psector)
-        self.hide_generic_layers()
+        self.hide_generic_layers(excluded_layers=["v_edit_element"])
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
 

@@ -75,7 +75,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg_work_end.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_work_end, self.table_object))
         self.dlg_work_end.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_work_end, self.table_object))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
-        self.dlg_work_end.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_work_end, self.table_object))
+        self.dlg_work_end.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Set values
         self.fill_fields()
@@ -88,7 +88,7 @@ class ManageWorkcatEnd(ParentManage):
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_work_end, self.table_object)
+        self.tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
 
         # Open dialog
         self.open_dialog(self.dlg_work_end, maximize_button=False)
@@ -427,7 +427,7 @@ class ManageWorkcatEnd(ParentManage):
         """ Close dialog and disconnect snapping """
 
         self.close_dialog(dialog)
-        self.hide_generic_layers()
+        self.hide_generic_layers(excluded_layers=["v_edit_element"])
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
         if force_downgrade:
