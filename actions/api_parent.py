@@ -49,6 +49,7 @@ class ApiParent(ParentAction):
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
         self.list_update = []
+        self.temp_layers_added = []
 
 
     def get_editable_project(self):
@@ -1530,12 +1531,18 @@ class ApiParent(ParentAction):
         widget = kwargs['widget']
         function_name = kwargs['function_name']
         complet_result = self.manage_dxf(path, False, True)
+
+        for layer in complet_result['temp_layers_added']:
+            self.temp_layers_added.append(layer)
         if complet_result is not False:
             widget.setText(complet_result['path'])
         if complet_result['result']:
             data = complet_result['result']['body']['data']
-            self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
+            result = self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
+            for layer in result['temp_layers_added']:
+                self.temp_layers_added.append(layer)
         dialog.btn_run.setEnabled(True)
+        dialog.btn_cancel.setEnabled(True)
 
 
     def manage_dxf(self, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
@@ -1552,6 +1559,7 @@ class ApiParent(ParentAction):
 
         sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
         self.controller.execute_sql(sql, commit=True)
+        temp_layers_added = []
         for type_ in ['LineString', 'Point', 'Polygon']:
             sql = ""
             # Get file name without extension
@@ -1601,6 +1609,7 @@ class ApiParent(ParentAction):
             if toc:
                 if dxf_layer.isValid():
                     self.add_layer.from_dxf_to_toc(dxf_layer, dxf_output_filename)
+                    temp_layers_added.append(dxf_layer)
 
         # Unlock signals
         self.iface.mainWindow().blockSignals(False)
@@ -1612,7 +1621,7 @@ class ApiParent(ParentAction):
         else:
             result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
-        return {"path": dxf_path, "result":result}
+        return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
 
 
 

@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
+from qgis.core import QgsProject
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
@@ -121,12 +122,33 @@ class GwToolBox(ApiParent):
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
                                                    self.dlg_functions.cmb_layers, complet_result[0]['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_functions))
 
         enable_btn_run = index.sibling(index.row(), 2).data()
         bool_dict = {"True": True, "true": True, "False": False, "false": False}
         self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
         self.open_dialog(self.dlg_functions)
 
+
+    def remove_layers(self):
+        root = QgsProject.instance().layerTreeRoot()
+        layers_to_remove = []
+        for layer in self.temp_layers_added:
+            layers_to_remove.append(layer)
+            demRaster = root.findLayer(layer.id())
+            parentGroup = demRaster.parent()
+            try:
+                QgsProject.instance().removeMapLayer(layer.id())
+            except Exception as e:
+                pass
+
+            if len(parentGroup.findLayers())== 0:
+                root.removeChildNode(parentGroup)
+
+        for layer in layers_to_remove:
+            if layer in self.temp_layers_added: self.temp_layers_added.remove(layer)
+        layers_to_remove.clear()
 
     def set_selected_layer(self, dialog, combo):
 

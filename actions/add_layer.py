@@ -142,11 +142,14 @@ class AddLayer(object):
         """
         colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
         text_result = None
+        temp_layers_added = []
         if del_old_layers:
             self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
-            if str(k) == "info":
+            if str(k) == 'setVisibleLayers':
+                self.set_layers_visible(v)
+            elif str(k) == "info":
                 text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
             elif k in ('point', 'line', 'polygon'):
                 if not 'values' in data[k]: continue
@@ -163,8 +166,15 @@ class AddLayer(object):
                         cat_field = data[k]['category_field']
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                         self.categoryze_layer(v_layer, cat_field, size)
+                    temp_layers_added.append(v_layer)
+        return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
 
-        return {'text_result':text_result}
+
+    def set_layers_visible(self, layers):
+        for layer in layers:
+            lyr = self.controller.get_layer_by_tablename(layer)
+            if lyr:
+                self.controller.set_layer_visible(lyr)
 
 
     def categoryze_layer(self, layer, cat_field, size):

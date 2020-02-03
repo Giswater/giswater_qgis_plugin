@@ -178,6 +178,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_close">
        <property name="text">
         <string>Close</string>
