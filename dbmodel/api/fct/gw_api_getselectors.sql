@@ -33,7 +33,8 @@ DECLARE
 	rec_tab record;
 	v_active boolean=true;
 	v_firsttab boolean=false;
-	v_selectors_list json;
+	v_selectors_list text;
+	v_selector_type json;
 	v_aux_json json;
 	fields_array json[];
 	v_result_list text[];
@@ -54,14 +55,18 @@ BEGIN
 		INTO api_version;
 
 -- Get input parameters:
-	v_selectors_list := (p_data ->> 'data')::json->> 'selector_type';
+	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
+	v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>'mincut')::json->>'ids';
 
+-- Manage list ids
+	v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
+	
 -- Start the construction of the tabs array
 	v_formTabs := '[';
 	
-	SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM json_object_keys(v_selectors_list))a into fields_array;
+	SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM json_object_keys(v_selector_type))a into fields_array;
 	
-
+	
 	FOREACH v_aux_json IN ARRAY fields_array
 	LOOP		
 
@@ -74,16 +79,21 @@ BEGIN
 		v_table = v_parameter_selector->>'table';
 		v_selector = v_parameter_selector->>'selector';
 
-		-- Get exploitations, selected and unselected
+		-- Manage selectors list
+		IF v_selectors_list = '()' THEN
+			v_selectors_list = '(-1)';
+		END IF;
+		
+		-- Get exploitations, selected and unselected with selectors list
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		SELECT concat(' || v_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-		FROM '|| v_table ||' WHERE id IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ')
+		FROM '|| v_table ||' WHERE id IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') AND id IN '|| v_selectors_list ||'
 		UNION
 		SELECT concat(' || v_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-		FROM '|| v_table ||' WHERE id NOT IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') 
+		FROM '|| v_table ||' WHERE id NOT IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') AND id IN '|| v_selectors_list ||'
 		ORDER BY label) a'
-		INTO v_formTabs_minuct; 
-		
+		INTO v_formTabs_minuct;
+
 		
 		-- Add tab name to json
 		IF v_formTabs_minuct IS NULL THEN
