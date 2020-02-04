@@ -144,6 +144,7 @@ class ManageVisit(ParentManage, QObject):
         # Set signals
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(self.close_dialog, self.dlg_add_visit))
+        self.dlg_add_visit.accepted.connect(partial(self.update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(self.manage_accepted)
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
