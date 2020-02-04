@@ -299,8 +299,9 @@ class AddLayer(object):
                 if str(k) in 'the_geom':
                     sql = f"SELECT St_AsText('{v}')"
                     row = self.controller.get_row(sql, log_sql=False)
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
+                    if row and row[0]:
+                        geometry = QgsGeometry.fromWkt(str(row[0]))
+                        fet.setGeometry(geometry)
             fet.setAttributes(attributes)
             prov.addFeatures([fet])
 
