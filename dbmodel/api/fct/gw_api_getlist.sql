@@ -328,12 +328,12 @@ BEGIN
 				
 				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterlot) ||'::text';
 			ELSIF v_field='team_id' THEN
-			
 				IF v_filterteam IS NULL THEN
 					v_filterteam := v_value;
 				END IF;
-				
-				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterteam) ||'::text';
+				IF v_filterteam IS NOT NULL THEN
+					v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterteam) ||'::text';
+				END IF;
 			ELSIF v_value IS NOT NULL  THEN
 				IF v_startdate IS NULL THEN
 					v_startdate := v_value;			
@@ -343,7 +343,6 @@ BEGIN
 		END LOOP;
 		
 	END IF;
-	raise notice 'V_QUERY_RESULT -> %',v_query_result;
 	
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
@@ -360,7 +359,7 @@ BEGIN
 			v_query_result := v_query_result || ' AND '||v_field||'::text = '||quote_literal(v_value) ||'::text';
 		END LOOP;
 	END IF;
-
+	
 	-- add extend filter
 	IF v_the_geom IS NOT NULL AND v_canvasextend IS NOT NULL THEN
 		
@@ -374,9 +373,10 @@ BEGIN
 		v_query_result := v_query_result || ' AND ST_dwithin ( '|| v_tablename || '.' || v_the_geom || ',' || 
 		'ST_MakePolygon(ST_GeomFromText(''LINESTRING ('||v_x1||' '||v_y1||', '||v_x1||' '||v_y2||', '||v_x2||' '||v_y2||', '||v_x2||' '||v_y1||', '||v_x1||' '||v_y1||')'','||v_srid||')),1)';
 	END IF;
-
+	
 	-- add orderby
 	IF v_orderby IS NULL THEN
+
 		v_orderby = v_default->>'orderBy';
 		v_ordertype = v_default->>'orderType';
 	END IF;
@@ -394,10 +394,11 @@ BEGIN
 
 
 	-- add limit
+	
 	IF v_limit IS NULL THEN
 		v_limit = 15;
 	END IF;
-
+	
 	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
         INTO v_lastpage;
     
@@ -432,6 +433,7 @@ BEGIN
 		INTO v_filter_fields;
 
 		--  setting values of filter fields
+		
 		SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 		i=1;
 		IF v_text IS NOT NULL THEN
@@ -450,18 +452,21 @@ BEGIN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', COALESCE(v_startdate));
 					ELSIF (v_filter_fields[i]->>'column_id')='lot_id' AND v_filterlot IS NOT NULL THEN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_filterlot::text);
+					ELSIF (v_filter_fields[i]->>'column_id')='team_id' AND v_filterteam IS NOT NULL THEN
+						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_filterteam::text);	
 					ELSIF (v_filter_fields[i]->>'widgettype')='combo' THEN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
 					ELSE
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
 					END IF;
 				END IF;
-
+				
 				--raise notice 'v_value % v_filter_fields %', v_value, v_filter_fields[i];
-
+				
 				i=i+1;			
-		
+			
 			END LOOP;
+			
 		END IF;
 
 	-- adding the widget of list
@@ -516,6 +521,7 @@ BEGIN
 -- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
 	v_fields_json_ = array_to_json (v_filter_fields_);
+
 --    Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_featuretype := COALESCE(v_featuretype, '');
@@ -542,6 +548,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-

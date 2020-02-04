@@ -117,6 +117,7 @@ DECLARE
 	combo_json json;
 	v_childs_result json;
 	v_current_user text;
+	v_text text[];
 
 
 BEGIN
@@ -187,7 +188,7 @@ BEGIN
 
 	-- forcing usermanager
 	v_isusermanager = TRUE;
-
+	
 	-- setting tabs in is firstcall
 	IF v_currentactivetab IS NULL THEN 
 		v_firstcall := TRUE;
@@ -204,6 +205,7 @@ BEGIN
 			v_activedonetab := FALSE;
 			v_activeteamtab := FALSE;
 		END IF;
+		
 	END IF;
 
 
@@ -443,7 +445,7 @@ BEGIN
 		-- Team tab
 		------------------
 		IF v_activeteamtab THEN
-		
+			
 			IF v_isfeaturemanager THEN
 				v_featuretype = NULL;
 			END IF; 
@@ -455,7 +457,9 @@ BEGIN
 			END IF;
 			
 			-- setting feature
+			v_filterfields := (((p_data->>'data')::json->>'fields')::json)->>'team_id';
 			p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
+			
 
 			-- refactor fields by filterFields
 			v_filterfields := ((p_data->>'data')::json->>'fields')::json;
@@ -474,27 +478,29 @@ BEGIN
 
 			--refactor tabNames
 			p_data := replace (p_data::text, 'tabFeature', 'feature');
-		
+			
 			RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
 			SELECT gw_api_getlist (p_data) INTO v_fields_json;
-
+			array_index = 0;
+			
 			-- getting pageinfo and list values
 			v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
 			v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
-		
+			
 			v_fields_json := COALESCE(v_fields_json, '{}');
 			
 		END IF;
-
+		
 		-- building
 		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabTeam' and device = v_device LIMIT 1;
-
+		
 		IF v_tab IS NULL THEN 
 			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabTeam' LIMIT 1;			
 		END IF;
 
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
 		'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activeteamtab);
+		
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		
 		IF v_isusermanager THEN
@@ -543,6 +549,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-
