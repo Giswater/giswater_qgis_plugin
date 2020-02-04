@@ -2563,13 +2563,13 @@ class ApiCF(ApiParent, QObject):
             self.snapper_manager.snap_to_node()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(partial(self.mouse_move, layer))
+        self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
 
 
-    def mouse_move(self, layer, point):
+    def mouse_moved(self, layer, point):
         """ Mouse motion detection """
 
         # Set active layer
