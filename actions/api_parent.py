@@ -1175,13 +1175,40 @@ class ApiParent(ParentAction):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
+
+        # Store user snapping configuration
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        if self.snapper_manager.controller is None:
+            self.snapper_manager.set_controller(self.controller)
+        self.snapper_manager.store_snapping_options()
         self.snapper = self.snapper_manager.get_snapper()
-        self.layer_node = self.controller.get_layer_by_tablename("ve_node")
+
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
 
-        self.canvas.xyCoordinates.connect(self.mouse_move)
+        self.canvas.xyCoordinates.connect(partial(self.mouse_move))
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
+
+    def dlg_destroyed(self, layer=None, vertex=None):
+        self.dlg_is_destroyed = True
+
+        if layer is not None:
+            self.iface.setActiveLayer(layer)
+        else:
+            if self.layer is not None:
+                self.iface.setActiveLayer(self.layer)
+
+        if vertex is not None:
+            self.iface.mapCanvas().scene().removeItem(vertex)
+        else:
+            if hasattr(self, 'vertex_marker'):
+                if self.vertex_marker is not None:
+                    self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+        try:
+            self.canvas.xyCoordinates.disconnect()
+        except:
+            pass
 
     def snapping_node(self, point, button):
         """ Get id of selected nodes (node1 and node2) """
@@ -1192,9 +1219,9 @@ class ApiParent(ParentAction):
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
-
+        if not event_point: return
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if self.snapper_manager.result_is_valid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
@@ -1204,10 +1231,12 @@ class ApiParent(ParentAction):
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
                 if self.node1 is None:
-                    self.node1 = str(element_id)
+                    self.node1 = str(element_id)                    
+                    self.draw_point(QgsPointXY(result.point()))
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
+                    self.draw_point(QgsPointXY(result.point()))
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
 
         if self.node1 and self.node2:
@@ -1220,9 +1249,9 @@ class ApiParent(ParentAction):
             row = self.controller.get_row(sql, log_sql=True)
             if row:
                 if 'elev' in row[0]:
-                    utils_giswater.setWidgetText(self.dialog, 'elev', row[0]['elev'])
+                    utils_giswater.setWidgetText(self.dlg_cf, 'elev', row[0]['elev'])
                 if 'top_elev' in row[0]:
-                    utils_giswater.setWidgetText(self.dialog, 'top_elev', row[0]['top_elev'])
+                    utils_giswater.setWidgetText(self.dlg_cf, 'top_elev', row[0]['top_elev'])
 
 
     def mouse_move(self, point):
