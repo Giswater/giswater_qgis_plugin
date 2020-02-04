@@ -499,7 +499,7 @@ class ManageVisit(ParentManage, QObject):
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
-        fake_filter = f'{self.geom_type}_id::integer IN ("-1")'
+        fake_filter = f'{self.geom_type}_id IN (-1)'
         self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
         # set the callback to setup all events later
@@ -517,11 +517,11 @@ class ManageVisit(ParentManage, QObject):
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
-        ids = [x[0] for x in rows]
+        ids = [f"'{x[0]}'" for x in rows]
 
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = f'"{self.geom_type}_id"::integer IN ({",".join(ids)})'
+        expr_filter = f"{self.geom_type}_id IN ({','.join(ids)})"
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
