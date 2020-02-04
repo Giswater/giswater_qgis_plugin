@@ -959,7 +959,13 @@ class Giswater(QObject):
 
 
     def get_new_layers_name(self, layers_list):
-        layers_name = [layer.name() for layer in layers_list]
+        layers_name = []
+        for layer in layers_list:
+            layer_source = self.controller.get_layer_source(layer)
+            # Collect only the layers of the work scheme
+            if 'schema' in layer_source and layer_source['schema'] == self.schema_name:
+                layers_name.append(layer.name())
+
         self.set_layer_config(layers_name)
 
 
