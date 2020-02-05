@@ -150,6 +150,8 @@ class GwToolBox(ApiParent):
         for layer in layers_to_remove:
             if layer in self.temp_layers_added: self.temp_layers_added.remove(layer)
         layers_to_remove.clear()
+        self.iface.mapCanvas().refresh()
+
 
     def set_selected_layer(self, dialog, combo):
 
