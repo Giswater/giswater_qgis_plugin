@@ -60,16 +60,14 @@ class ApiSearch(ApiParent):
 
         body = self.create_body()
         function_name = "gw_api_getsearch"
-        row = self.controller.execute_api_function(function_name, body)
-        if not row:
+        complet_list = self.controller.execute_api_function(function_name, body)
+        if not complet_list:
             return False
-
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
         self.lineedit_list = []
-        for tab in complet_list[0]["form"]:
+        for tab in complet_list["form"]:
             if first_tab is None:
                 first_tab = tab['tabName']
             tab_widget = QWidget(main_tab)

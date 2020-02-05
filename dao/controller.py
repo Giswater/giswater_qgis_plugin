@@ -13,7 +13,9 @@ from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTa
 from qgis.PyQt.QtSql import QSqlDatabase
 
 
-import os.path
+import json, os.path
+
+from collections import OrderedDict
 from functools import partial
 
 from .pg_dao import PgDao
@@ -649,7 +651,7 @@ class DaoController(object):
         return True
 
 
-    def execute_api_function(self, function_name, body, format_return='::text'):
+    def execute_api_function(self, function_name, body):
         """ Manage execution API function """
 
         # Check if function exists
@@ -658,17 +660,20 @@ class DaoController(object):
             self.show_warning("Function not found in database", parameter=function_name)
             return None
 
-        sql = "SELECT " + function_name + "($${" + body + "}$$)"
-        if format_return:
-            sql += format_return
+        sql = f"SELECT {function_name} ($${{{body}}}$$)::text;"
         row = self.get_row(sql, log_sql=True)
         if not row:
             self.show_critical("NOT ROW FOR", parameter=sql)
             return None
 
-        return row
+        json_result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
-    
+        if json_result['status'] == 'Failed':
+            pass
+
+        return json_result
+
+
     def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """
         
