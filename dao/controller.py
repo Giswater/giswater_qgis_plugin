@@ -654,7 +654,11 @@ class DaoController(object):
 
 
     def execute_api_function(self, function_name, body):
-        """ Manage execution API function """
+        """ Manage execution API function
+        :param function_name: Name of function to call (text)
+        :param body: Parameter for function (json::text)
+        :return: Response of the function executed (json)
+        """
 
         # Check if function exists
         row = self.check_function(function_name)
@@ -681,9 +685,10 @@ class DaoController(object):
                 msg += f"<b>Python function: </b>{self.execute_api_function.__name__} <br>"
                 self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
             finally:
-                return True
+                return False
 
         return json_result
+
 
     def show_exceptions_msg(self, title, msg=""):
         cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
@@ -693,6 +698,7 @@ class DaoController(object):
         self.dlg_info.setWindowTitle(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
         self.dlg_info.exec()
+
 
     def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """
