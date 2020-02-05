@@ -163,3 +163,5 @@ UPDATE man_valve SET broken = TRUE WHERE node_id IN ('1112', '1093');
 
 UPDATE config_param_system SET value = '{"SECTOR":true, "DMA":true, "PRESSZONE":true, "DQA":true, "MINSECTOR":true}'
 WHERE parameter = 'om_dynamicmapzones_status';
+
+UPDATE element SET code = concat ('E',element_id);
