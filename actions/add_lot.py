@@ -1178,8 +1178,12 @@ class AddNewLot(ParentManage):
                    " SET "+str(update)+""
                    " WHERE id = '"+str(lot_id)+"'; \n")
             self.controller.execute_sql(sql)
+
         self.save_relations(lot, lot_id)
+        sql = ("SELECT gw_fct_lot_psector_geom(" + str(lot_id) + ")")
+        self.controller.execute_sql(sql)
         status = self.save_visits()
+
         if status:
             self.manage_rejected()
 
