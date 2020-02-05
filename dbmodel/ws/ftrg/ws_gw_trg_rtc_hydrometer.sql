@@ -19,11 +19,11 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
         
-        IF NEW.hydrometer_id IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
+        --IF NEW.hydrometer_id IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
-        ELSE
-            PERFORM audit_function(1102,1342);
-        END IF;
+        --ELSE
+            --PERFORM audit_function(1102,1342);
+        --END IF;
 
     ELSIF TG_OP = 'UPDATE' THEN
             RETURN NEW;
@@ -31,11 +31,11 @@ BEGIN
         
     ELSIF TG_OP = 'DELETE' THEN
         
-        IF OLD.hydrometer_id NOT IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
-            RETURN NEW;
-        ELSE
-            PERFORM audit_function(1106,1342);
-        END IF;
+        --IF OLD.hydrometer_id NOT IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
+            RETURN OLD;
+        --ELSE
+            --PERFORM audit_function(1106,1342);
+        --END IF;
     
     END IF;
 
