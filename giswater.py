@@ -1453,7 +1453,7 @@ class Giswater(QObject):
                 except KeyError as e:
                     msg_key += f"<b>Key: </b>{e}<br>"
                     msg_key += f"<b>Python file: </b>{__name__} <br>"
-                    msg_key += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br><br>"
+                    msg_key += f"<b>Python function: </b>{self.set_layer_config.__name__} <br><br>"
                 continue
 
             for field in complet_result['body']['data']['fields']:
