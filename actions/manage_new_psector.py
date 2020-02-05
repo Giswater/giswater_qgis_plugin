@@ -1017,7 +1017,7 @@ class ManageNewPsector(ParentManage):
                         else:
                             if type(value) is not bool:
                                 value = value.replace(",", ".")
-                            sql += f"{column_name} = '{value}', "
+                            sql += f"{column_name} = $${value}$$, "
 
                 sql = sql[:len(sql) - 2]
                 sql += f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.psector_id)}'"
@@ -1044,7 +1044,7 @@ class ManageNewPsector(ParentManage):
                                 sql += column_name + ", "
                                 values += "null, "
                             else:
-                                values += f"'{value}', "
+                                values += f"$${value}$$, "
                                 sql += column_name + ", "
 
                 sql = sql[:len(sql) - 2] + ") "
@@ -1059,7 +1059,7 @@ class ManageNewPsector(ParentManage):
                 row = self.controller.get_config('psector_vdefault')
                 if row:
                     sql = (f"UPDATE config_param_user "
-                           f" SET value = '{new_psector_id[0]}' "
+                           f" SET value = $${new_psector_id[0]}$$ "
                            f" WHERE parameter = 'psector_vdefault'"
                            f" AND cur_user=current_user; "
                     )
