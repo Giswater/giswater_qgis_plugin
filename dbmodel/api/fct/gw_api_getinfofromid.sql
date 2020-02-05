@@ -124,6 +124,7 @@ DECLARE
 	v_parentfields text;
 	v_status text ='Accepted';
 	v_childtype text;
+	v_errcontext text;
 
 
 BEGIN
@@ -589,9 +590,10 @@ BEGIN
 			'}'||
 		'}')::json;
 
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   --  Exception handling
+    EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
