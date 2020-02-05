@@ -1162,10 +1162,11 @@ class Giswater(QObject):
         for layer in layers:
             if layer is None: continue
             if layer.providerType() in ('memory', 'ogr'): continue
+            layer_source = self.controller.get_layer_source(layer)
+            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
             uri = layer.dataProvider().dataSourceUri()
             if 'SELECT row_number() over ()' in str(uri): continue
-            layer_source = self.controller.get_layer_source(layer)
             schema_name = layer_source['schema']
             if schema_name is not None:
                 schema_name = schema_name.replace('"', '')
@@ -1396,6 +1397,9 @@ class Giswater(QObject):
         self.set_form_suppress(self.available_layers)
         all_layers_toc = self.controller.get_layers()
         for layer in all_layers_toc:
+            layer_source = self.controller.get_layer_source(layer)
+            # Filter to take only the layers of the current schema
+            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
             table_name = f"{self.controller.get_layer_source_table_name(layer)}"
             self.available_layers.append(table_name)
 
