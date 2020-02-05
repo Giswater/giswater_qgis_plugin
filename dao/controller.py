@@ -1172,7 +1172,10 @@ class DaoController(object):
         """ Get layers of the group @geom_type """
         
         list_items = []        
-        sql = ("SELECT parent_layer "
+        sql = ("SELECT child_layer "
+               "FROM cat_feature "
+               "WHERE upper(feature_type) = '" + geom_type.upper() + "'"
+			   "UNION SELECT DISTINCT parent_layer "
                "FROM cat_feature "
                "WHERE upper(feature_type) = '" + geom_type.upper() + "'")
         rows = self.get_rows(sql, log_sql=True)
