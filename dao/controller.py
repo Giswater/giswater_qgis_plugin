@@ -20,7 +20,9 @@ from functools import partial
 
 from .pg_dao import PgDao
 from .logger import Logger
+from .. import utils_giswater
 from .. import sys_manager
+from ..ui_manager import BasicInfo
 
 
 class DaoController(object):
@@ -668,11 +670,29 @@ class DaoController(object):
 
         json_result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
-        if json_result['status'] == 'Failed':
-            pass
+        if 'status' in json_result and json_result['status'] == 'Failed':
+            try:
+                msg = f"<b>Error: </b>{json_result['SQLERR']}<br>"
+                msg += f"<b>Context: </b>{json_result['SQLCONTEXT']} <br>"
+                self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            except KeyError as e:
+                msg = f"<b>Key: </b>{e}<br>"
+                msg += f"<b>Python file: </b>{__name__} <br>"
+                msg += f"<b>Python function: </b>{self.execute_api_function.__name__} <br>"
+                self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            finally:
+                return True
 
         return json_result
 
+    def show_exceptions_msg(self, title, msg=""):
+        cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
+        self.dlg_info = BasicInfo()
+        self.dlg_info.btn_accept.setVisible(False)
+        self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
+        self.dlg_info.setWindowTitle(title)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
+        self.dlg_info.exec()
 
     def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """

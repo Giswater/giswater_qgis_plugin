@@ -1195,16 +1195,16 @@ class Giswater(QObject):
         result = json.loads(row[0], object_pairs_hook=OrderedDict)
         if 'status' in result and result['status'] == 'Failed':
             try:
+                title = "Execute failed."
                 msg = f"<b>Error: </b>{result['SQLERR']}<br>"
-                msg += f"<b>Context: </b>{result['SQLCONTEXT']} <br>"
-                self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+                msg += f"<b>Context: </b>{result['SQLCONTEXT']} <br><br>"
             except KeyError as e:
+                title = "Key on returned json from ddbb is missed."
                 msg = f"<b>Key: </b>{e}<br>"
                 msg += f"<b>Python file: </b>{__name__} <br>"
-                msg += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br>"
-                self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
-            finally:
-                return True
+                msg += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br><br>"
+            self.controller.show_exceptions_msg(title, msg)
+            return True
 
         self.dlg_audit_project = AuditCheckProjectResult()
         self.parent.load_settings(self.dlg_audit_project)
@@ -1276,7 +1276,7 @@ class Giswater(QObject):
                     msg += f"<b>Python file: </b>{__name__} <br>"
                     msg += f"<b>Python function: </b>{self.get_missing_layers.__name__} <br>"
         if "KeyError" in exceptions:
-            self.parent.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
         return critical_level
 
 
@@ -1433,7 +1433,8 @@ class Giswater(QObject):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 Column names as alias, combos and typeahead as ValueMap"""
-
+        msg_failed = ""
+        msg_key = ""
         for layer_name in layers:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
@@ -1444,19 +1445,27 @@ class Giswater(QObject):
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
             sql = (f"SELECT gw_api_getinfofromid($${{{body}}}$$)")
-            row = self.controller.get_row(sql, commit=True)
+            row = self.controller.get_row(sql, commit=True, log_sql=True)
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 continue
-
+            complet_result = row[0]
             # When info is nothing
-            if 'results' in row[0]:
-                if row[0]['results'] == 0:
-                    self.controller.show_message(row[0]['message']['text'], 1)
+            if 'results' in complet_result:
+                if complet_result['results'] == 0:
+                    self.controller.show_message(complet_result['message']['text'], 1)
                     continue
 
-            complet_result = row[0]
-
+            if 'status' in complet_result and complet_result['status'] == 'Failed':
+                print(sql)
+                try:
+                    msg_failed += f"<b>Error: </b>{complet_result['SQLERR']}<br>"
+                    msg_failed += f"<b>Context: </b>{complet_result['SQLCONTEXT']} <br><br>"
+                except KeyError as e:
+                    msg_key += f"<b>Key: </b>{e}<br>"
+                    msg_key += f"<b>Python file: </b>{__name__} <br>"
+                    msg_key += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br><br>"
+                continue
 
             for field in complet_result['body']['data']['fields']:
                 _values = {}
@@ -1497,6 +1506,12 @@ class Giswater(QObject):
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+        if msg_failed != "":
+            self.controller.show_exceptions_msg("Execute failed.", msg_failed)
+
+        if msg_key != "":
+            self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
 
 
     def set_column_visibility(self, layer, col_name, hidden):
