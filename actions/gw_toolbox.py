@@ -132,9 +132,8 @@ class GwToolBox(ApiParent):
 
     def remove_layers(self):
         root = QgsProject.instance().layerTreeRoot()
-        layers_to_remove = []
-        for layer in self.temp_layers_added:
-            layers_to_remove.append(layer)
+        for layer in reversed(self.temp_layers_added):
+            self.temp_layers_added.remove(layer)
             # Possible QGIS bug: Instead of returning None because it is not found in the TOC, it breaks
             try:
                 demRaster = root.findLayer(layer.id())
@@ -150,9 +149,6 @@ class GwToolBox(ApiParent):
             if len(parentGroup.findLayers())== 0:
                 root.removeChildNode(parentGroup)
 
-        for layer in layers_to_remove:
-            if layer in self.temp_layers_added: self.temp_layers_added.remove(layer)
-        layers_to_remove.clear()
         self.iface.mapCanvas().refresh()
 
 
