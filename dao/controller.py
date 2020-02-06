@@ -676,16 +676,16 @@ class DaoController(object):
 
         if 'status' in json_result and json_result['status'] == 'Failed':
             try:
+                title = "Execute failed."
                 msg = f"<b>Error: </b>{json_result['SQLERR']}<br>"
                 msg += f"<b>Context: </b>{json_result['SQLCONTEXT']} <br>"
-                self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
             except KeyError as e:
+                title = "Key on returned json from ddbb is missed."
                 msg = f"<b>Key: </b>{e}<br>"
                 msg += f"<b>Python file: </b>{__name__} <br>"
                 msg += f"<b>Python function: </b>{self.execute_api_function.__name__} <br>"
-                self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
-            finally:
-                return False
+            self.show_exceptions_msg(title, msg)
+            return False
 
         return json_result
 
