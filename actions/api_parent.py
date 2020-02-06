@@ -1530,8 +1530,10 @@ class ApiParent(ParentAction):
         dialog = kwargs['dialog']
         widget = kwargs['widget']
         function_name = kwargs['function_name']
-        complet_result = self.manage_dxf(path, False, True)
 
+        complet_result = self.manage_dxf(dialog, path, False, True)
+        gruop_name = os.path.splitext(os.path.basename(path))[0]
+        self.add_layer.zoom_to_group(gruop_name)
         for layer in complet_result['temp_layers_added']:
             self.temp_layers_added.append(layer)
         if complet_result is not False:
@@ -1545,7 +1547,7 @@ class ApiParent(ParentAction):
         dialog.btn_cancel.setEnabled(True)
 
 
-    def manage_dxf(self, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
+    def manage_dxf(self, dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
         """ Select a dxf file and add layers into toc
         :param dxf_path: path of dxf file
         :param export_to_db: Export layers to database

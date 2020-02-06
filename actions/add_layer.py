@@ -9,7 +9,8 @@ import json
 from collections import OrderedDict
 
 from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
-    QgsLineSymbol, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
+    QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
+    QgsVectorLayer, QgsVectorLayerExporter
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
@@ -352,3 +353,24 @@ class AddLayer(object):
         layer.triggerRepaint()
 
         return True
+
+
+    def zoom_to_group(self, group_name, buffer=10):
+        extent = QgsRectangle()
+        extent.setMinimal()
+
+        # Iterate through layers from certain group and combine their extent
+        root = QgsProject.instance().layerTreeRoot()
+        group = root.findGroup(group_name)  # Adjust this to fit your group's name
+        if not group: return False
+        for child in group.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                extent.combineExtentWith(child.layer().extent())
+
+        xmax = extent.xMaximum() + buffer
+        xmin = extent.xMinimum() - buffer
+        ymax = extent.yMaximum() + buffer
+        ymin = extent.yMinimum() - buffer
+        extent.set(xmin, ymin, xmax, ymax)
+        self.iface.mapCanvas().setExtent(extent)
+        self.iface.mapCanvas().refresh()
