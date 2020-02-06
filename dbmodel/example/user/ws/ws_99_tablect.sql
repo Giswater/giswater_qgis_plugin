@@ -165,3 +165,5 @@ UPDATE config_param_system SET value = '{"SECTOR":true, "DMA":true, "PRESSZONE":
 WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
+
+ALTER TABLE element ADD CONSTRAINT element_unique_code UNIQUE(code);

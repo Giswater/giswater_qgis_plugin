@@ -1004,6 +1004,8 @@ INSERT INTO connec (connec_id, code, elevation, depth, connecat_id, sector_id, c
 
 UPDATE connec SET tstamp = now();
 
+ALTER TABLE element DROP CONSTRAINT element_unique_code;
+
 INSERT INTO element VALUES ('473', 'N1051', 'COVER40X40', NULL, 1, 1, 2, NULL, NULL, NULL, NULL, NULL, 'Standard Location', 'work1', NULL, 'builder1', '1900-01-01', NULL, 'owner1', NULL, NULL, 'TO REVIEW', NULL, NULL, NULL, NULL, NULL, NULL, true, 1, 'ELEMENT', NULL);
 INSERT INTO element VALUES ('474', 'N1003', 'COVER40X40', NULL, 1, 1, 2, NULL, NULL, NULL, NULL, NULL, 'Standard Location', 'work1', NULL, 'builder1', '1900-01-01', NULL, 'owner1', NULL, NULL, 'TO REVIEW', NULL, NULL, NULL, NULL, NULL, NULL, true, 1, 'ELEMENT', NULL);
 INSERT INTO element VALUES ('475', 'N134', 'COVER40X40', NULL, 1, 1, 2, NULL, NULL, NULL, NULL, NULL, 'Standard Location', 'work1', NULL, 'builder1', '1900-01-01', NULL, 'owner1', NULL, NULL, 'TO REVIEW', NULL, NULL, NULL, NULL, NULL, NULL, true, 1, 'ELEMENT', NULL);
