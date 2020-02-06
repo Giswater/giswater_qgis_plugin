@@ -189,17 +189,17 @@ BEGIN
 	-- CATALOGS
 	--cat_feature
 	--node
-	INSERT INTO cat_feature VALUES ('EPAMANH','JUNCTION','NODE');
-	INSERT INTO cat_feature VALUES ('EPAOUTF','OUTFALL','NODE');
-	INSERT INTO cat_feature VALUES ('EPASTOR','STORAGE','NODE');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAMANH','JUNCTION','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAOUTF','OUTFALL','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPASTOR','STORAGE','NODE', 'v_edit_node');
 	
 	--arc
-	INSERT INTO cat_feature VALUES ('EPACOND','CONDUIT','ARC');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPACOND','CONDUIT','ARC', 'v_edit_arc');
 	--nodarc
-	INSERT INTO cat_feature VALUES ('EPAWEIR','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAPUMP','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAORIF','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAOUTL','VARC','ARC');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAWEIR','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPUMP','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAORIF','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAOUTL','VARC','ARC', 'v_edit_arc');
 
 	INSERT INTO cat_dwf_scenario VALUES (1, 'test');
 	
@@ -221,16 +221,20 @@ BEGIN
 	INSERT INTO cat_mat_arc VALUES ('EPAMAT');
 	
 	--cat_node
-	INSERT INTO cat_node VALUES ('EPAMANH-CAT', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPAOUTF-CAT', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPASTOR-CAT', 'EPAMAT');
+	INSERT INTO cat_node (id, matcat_id, active) VALUES ('EPAMANH-CAT', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, matcat_id, active) VALUES ('EPAOUTF-CAT', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, matcat_id, active) VALUES ('EPASTOR-CAT', 'EPAMAT', TRUE);
 
 	-- cat_arc
-	INSERT INTO cat_arc VALUES ('EPAWEIR-CAT', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAORIF-CAT', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAPUMP-CAT', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAOUTL-CAT', 'EPAMAT');
+	INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAWEIR-CAT', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAORIF-CAT', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAPUMP-CAT', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, matcat_id, active) VALUES ('EPAOUTL-CAT', 'EPAMAT', TRUE);
 
+
+	--create child views 
+	PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+ 	"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
 
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
