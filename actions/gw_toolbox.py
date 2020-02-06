@@ -310,7 +310,7 @@ class GwToolBox(ApiParent):
                     for field in function[0]['return_type']:
                         widget = dialog.findChild(QWidget, field['widgetname'])
                         param_name = widget.objectName()
-                        if type(widget) in ('', QLineEdit, QPushButton):
+                        if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet("border: 1px solid gray")
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""','null')
