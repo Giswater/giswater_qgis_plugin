@@ -128,11 +128,11 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
+    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
-        :param function_name:
+        :param layer_name:
         :param force_tab:
         :param reset_text:
         :param tab_idx:
@@ -144,7 +144,7 @@ class AddLayer(object):
         text_result = None
         temp_layers_added = []
         if del_old_layers:
-            self.delete_layer_from_toc(function_name)
+            self.delete_layer_from_toc(layer_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == 'setVisibleLayers':
@@ -157,7 +157,7 @@ class AddLayer(object):
                 if counter > 0:
                     counter = len(data[k]['values'])
                     geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                     self.populate_vlayer(v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']

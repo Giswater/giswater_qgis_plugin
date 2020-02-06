@@ -1604,7 +1604,7 @@ class ApiParent(ParentAction):
                 self.add_layer.export_layer_to_db(dxf_layer, crs)
 
             if del_old_layers:
-                self.delete_layer_from_toc(dxf_layer.name())
+                self.add_layer.delete_layer_from_toc(dxf_layer.name())
 
             if toc:
                 if dxf_layer.isValid():
