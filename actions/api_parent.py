@@ -1556,6 +1556,7 @@ class ApiParent(ParentAction):
         srid = self.controller.plugin_settings_value('srid')
         # Block the signals so that the window does not appear asking for crs / srid and / or alert message
         self.iface.mainWindow().blockSignals(True)
+        dialog.txt_infolog.clear()
 
         sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
         self.controller.execute_sql(sql, commit=True)
