@@ -59,8 +59,8 @@ BEGIN
 
 	-- Get user_id and team_id
 	EXECUTE 'SELECT user_id, team_id, lot_id, endtime FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_record;
-	
-	IF v_record.endtime IS NULL THEN
+
+	IF v_record.endtime IS NOT NULL THEN
 		-- Inserting data (With started lot)
 		EXECUTE 'INSERT INTO om_vehicle_x_parameters (vehicle_id, team_id, image, load, cur_user, tstamp) VALUES('''||v_vehicle_name||''','||v_record.team_id::integer||', '''|| COALESCE(v_photo_url, '') ||COALESCE(v_hash, '') ||''','''||COALESCE(v_load, '0')||''', current_user,'''||NOW()||''')';
 	ELSE
