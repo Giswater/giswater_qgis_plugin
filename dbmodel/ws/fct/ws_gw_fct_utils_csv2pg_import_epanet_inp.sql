@@ -234,32 +234,32 @@ BEGIN
 	-- CATALOGS
 	--cat_feature
 	--node
-	INSERT INTO cat_feature VALUES ('EPAJUN','JUNCTION','NODE');
-	INSERT INTO cat_feature VALUES ('EPATAN','TANK','NODE');
-	INSERT INTO cat_feature VALUES ('EPARES','SOURCE','NODE');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAJUN','JUNCTION','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPATAN','TANK','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPARES','SOURCE','NODE', 'v_edit_node');
 	--arc
-	INSERT INTO cat_feature VALUES ('EPAPIPE','PIPE','ARC');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPIPE','PIPE','ARC', 'v_edit_arc');
 	
 	--nodarc (AS arc)
-	INSERT INTO cat_feature VALUES ('EPACHV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAFCV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAGPV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAPBV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAPSV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAPRV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPATCV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAPUMP','VARC','ARC');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPACHV','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAFCV','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAGPV','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPBV','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPSV','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPRV','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPATCV','VARC','ARC', 'v_edit_arc');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPUMP','VARC','ARC', 'v_edit_arc');
 	
 	--nodarc (AS node)
-	INSERT INTO cat_feature VALUES ('EPACHVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPAFCVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPAGPVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPAPBVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPAPSVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPAPRVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPATCVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPAPUMPA2N','PUMP','NODE');
-	
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPACHVA2N','VALVE','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAFCVA2N','VALVE','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAGPVA2N','VALVE','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPBVA2N','VALVE','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPSVA2N','VALVE','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPRVA2N','VALVE','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPATCVA2N','VALVE','NODE', 'v_edit_node');
+	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAPUMPA2N','PUMP','NODE', 'v_edit_node');
+
 	--arc_type
 	--arc
 	INSERT INTO arc_type VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe',TRUE);
@@ -302,27 +302,31 @@ BEGIN
 	INSERT INTO cat_arc( id, arctype_id, matcat_id,  dint)
 	SELECT DISTINCT ON (csv6, csv5) concat(csv6::numeric(10,3),'-',csv5::numeric(10,3))::text, 'EPAPIPE', csv6, csv5::float FROM temp_csv2pg WHERE source='[PIPES]' AND csv1 not like ';%' AND csv5 IS NOT NULL;
 	
-	INSERT INTO cat_arc VALUES ('EPAPUMP-CAT', 'EPAPUMP', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPACHV-CAT', 'EPACHV', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAFCV-CAT', 'EPAFCV', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAGPV-CAT', 'EPAGPV', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAPBV-CAT', 'EPAPBV', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAPSV-CAT', 'EPAPSV', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPATCV-CAT', 'EPATCV', 'EPAMAT');
-	INSERT INTO cat_arc VALUES ('EPAPRV-CAT', 'EPAPRV', 'EPAMAT');
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPUMP-CAT', 'EPAPUMP', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPACHV-CAT', 'EPACHV', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAFCV-CAT', 'EPAFCV', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAGPV-CAT', 'EPAGPV', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPBV-CAT', 'EPAPBV', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPSV-CAT', 'EPAPSV', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPATCV-CAT', 'EPATCV', 'EPAMAT', TRUE);
+	INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('EPAPRV-CAT', 'EPAPRV', 'EPAMAT', TRUE);
 
 	--cat_node
-	INSERT INTO cat_node VALUES ('EPAJUN-CAT', 'EPAJUN', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPATAN-CAT', 'EPATAN', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPARES-CAT', 'EPARES', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPACHV-CATA2N', 'EPACHVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPAFCV-CATA2N', 'EPAFCVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPAGPV-CATA2N', 'EPAGPVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPAPBV-CATA2N', 'EPAPBVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPAPSV-CATA2N', 'EPAPSVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPATCV-CATA2N', 'EPATCVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPAPRV-CATA2N', 'EPAPRVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPAPUMP-CATA2N', 'EPAPUMPA2N', 'EPAMAT');
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAJUN-CAT', 'EPAJUN', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPATAN-CAT', 'EPATAN', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPARES-CAT', 'EPARES', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPACHV-CATA2N', 'EPACHVA2N', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAFCV-CATA2N', 'EPAFCVA2N', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAGPV-CATA2N', 'EPAGPVA2N', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPBV-CATA2N', 'EPAPBVA2N', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPSV-CATA2N', 'EPAPSVA2N', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPATCV-CATA2N', 'EPATCVA2N', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPRV-CATA2N', 'EPAPRVA2N', 'EPAMAT', TRUE);
+	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPUMP-CATA2N', 'EPAPUMPA2N', 'EPAMAT', TRUE);
+	
+	--create child views 
+	PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+ 	"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
 
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
