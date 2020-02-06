@@ -383,7 +383,7 @@ class GwToolBox(ApiParent):
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
             msg += f"<b>DB call: </b>{sql}<br>"
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
-
+        self.remove_layers()
 
     def execute_no_parametric(self, dialog, function_name):
 
