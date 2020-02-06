@@ -8,5 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2020/01/25
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_mincut_result_cat", "column":"output", "dataType":"json"}}$$);
+-- 2020/02/06
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_table", "column":"isaudit", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_table", "column":"keepauditdays", "dataType":"integer"}}$$);
