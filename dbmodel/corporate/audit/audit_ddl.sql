@@ -20,9 +20,3 @@ newdata json,
 query text,
 tstamp timestamp default now()
 );
-
-
-
-ALTER TABLE SCHEMA_NAME.audit_cat_table add column isaudit boolean;
-ALTER TABLE SCHEMA_NAME.audit_cat_table add column keepauditdays integer;
-
