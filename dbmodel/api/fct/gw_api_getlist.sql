@@ -325,9 +325,8 @@ BEGIN
 				IF v_filterlot IS NULL THEN
 					v_filterlot := v_value;
 				END IF;
-				
 				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterlot) ||'::text';
-			ELSIF v_field='team_id' THEN
+			ELSIF v_field='team_id' and ((p_data ->>'feature')::json->>'tableName')::text != 'om_visit' THEN
 				IF v_filterteam IS NULL THEN
 					v_filterteam := v_value;
 				END IF;
@@ -390,8 +389,8 @@ BEGIN
 	IF v_ordertype IS NOT NULL THEN
 		v_query_result := v_query_result ||' '||v_ordertype;
 	END IF;
-		raise notice '%', v_query_result;
 
+	raise notice 'query - %', v_query_result;
 
 	-- add limit
 	
