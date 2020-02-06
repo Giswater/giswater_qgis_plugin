@@ -82,7 +82,6 @@ class GwToolBox(ApiParent):
 
 
     def open_function(self, index):
-
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
         self.alias_function = index.sibling(index.row(), 0).data()
@@ -136,7 +135,12 @@ class GwToolBox(ApiParent):
         layers_to_remove = []
         for layer in self.temp_layers_added:
             layers_to_remove.append(layer)
-            demRaster = root.findLayer(layer.id())
+            # Possible QGIS bug: Instead of returning None because it is not found in the TOC, it breaks
+            try:
+                demRaster = root.findLayer(layer.id())
+            except RuntimeError:
+                continue
+
             parentGroup = demRaster.parent()
             try:
                 QgsProject.instance().removeMapLayer(layer.id())
