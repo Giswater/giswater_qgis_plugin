@@ -19,12 +19,9 @@ class Basic(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
 
-
         self.minor_version = "3.0"
-        self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')        
-
+        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')
         self.logged = False
 
 
@@ -110,17 +107,10 @@ class Basic(ParentAction):
         self.open_dialog(self.dlg_hydro_state, maximize_button=False)
 
 
-
     def basic_api_search(self):
         """ Button 32: SearchPlus """
         self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_search.api_search()
      
-    def close_dialog(self, dlg):
 
-        ParentAction.close_dialog(self, dlg)
-        try:
-            self.search_plus.refresh_data()
-        except:
-            pass
 
