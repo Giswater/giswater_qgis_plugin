@@ -60,7 +60,7 @@ class ApiSearch(ApiParent):
 
         body = self.create_body()
         function_name = "gw_api_getsearch"
-        complet_list = self.controller.execute_api_function(function_name, body)
+        complet_list = self.controller.get_json(function_name, body)
         if not complet_list:
             return False
 

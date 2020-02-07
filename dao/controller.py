@@ -653,10 +653,11 @@ class DaoController(object):
         return True
 
 
-    def execute_api_function(self, function_name, body):
+    def get_json(self, function_name, body, commit=True):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
-        :param body: Parameter for function (json::text)
+        :param body: Parameter for function (json)
+        :param commit: Commit sql (bool)
         :return: Response of the function executed (json)
         """
 
@@ -666,14 +667,12 @@ class DaoController(object):
             self.show_warning("Function not found in database", parameter=function_name)
             return None
 
-        sql = f"SELECT {function_name} ($${{{body}}}$$)::text;"
-        row = self.get_row(sql, log_sql=True)
-        if not row:
+        sql = f"SELECT {function_name} ($${{{body}}}$$);"
+        row = self.get_row(sql, commit=commit, log_sql=True)
+        if not row or not row[0]:
             self.show_critical("NOT ROW FOR", parameter=sql)
             return None
-
-        json_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-
+        json_result = row[0]
         if 'status' in json_result and json_result['status'] == 'Failed':
             try:
                 title = "Execute failed."
@@ -683,7 +682,7 @@ class DaoController(object):
                 title = "Key on returned json from ddbb is missed."
                 msg = f"<b>Key: </b>{e}<br>"
                 msg += f"<b>Python file: </b>{__name__} <br>"
-                msg += f"<b>Python function: </b>{self.execute_api_function.__name__} <br>"
+                msg += f"<b>Python function: </b>{self.get_json.__name__} <br>"
             self.show_exceptions_msg(title, msg)
             return False
 
