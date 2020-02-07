@@ -44,7 +44,7 @@ DECLARE
     v_sensibility float;
     v_sensibility_f float;
     v_id varchar;
-    v_layer text;
+    v_layer record;
     v_sql text;
     v_sql2 text;
     v_iseditable text;
@@ -115,21 +115,24 @@ BEGIN
 --   Make point
      SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
 
-     raise notice 'v_visiblelayer %', v_visiblelayer;
 
 --  Get element
-     v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '||quote_literal(v_activelayer)||' UNION
-              SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) UNION 
-              SELECT DISTINCT ON (layer_id) layer_id, orderby+100 FROM  '||quote_ident(v_config_layer)||' JOIN cat_feature ON parent_layer=layer_id 
+     v_sql := 'SELECT layer_id, 0 as orderby, add_param->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '||quote_literal(v_activelayer)||' UNION
+              SELECT layer_id, orderby , add_param->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) UNION 
+              SELECT DISTINCT ON (layer_id) layer_id, orderby+100, add_param->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' JOIN cat_feature ON parent_layer=layer_id 
               WHERE child_layer = any('||quote_literal(v_visiblelayer)||'::text[]) ORDER BY orderby';
 
-    FOR v_layer IN EXECUTE v_sql 
+    FOR v_layer IN EXECUTE v_sql     
     LOOP
+
+	--  Indentify geometry type   
+    
         v_count=v_count+1;
             --    Get id column
         EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
             INTO v_idname
-            USING v_layer;
+            USING v_layer.layer_id;
+            
         --    For views it suposse pk is the first column
         IF v_idname IS NULL THEN
             EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
@@ -137,7 +140,7 @@ BEGIN
 		    AND s.nspname = $2
 		    ORDER BY a.attnum LIMIT 1'
 		    INTO v_idname
-		    USING v_layer, schemas_array[1];
+		    USING v_layer.layer_id, schemas_array[1];
 
         END IF;
 
@@ -152,37 +155,35 @@ BEGIN
                 AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
                 ORDER BY a.attnum' 
 	        INTO v_the_geom
-	        USING v_layer, schemas_array[1];
-	
+	        USING v_layer.layer_id, schemas_array[1];
+	        
 
-        --  Indentify geometry type
-        EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
-        INTO v_geometrytype;
-
-        IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
+        IF v_layer.geomtype = 'polygon' THEN
 
             --  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
-            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
-		    ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc LIMIT 1'
+            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer.layer_id)||' WHERE st_dwithin ($1, '||quote_ident(v_layer.layer_id)||'.'||quote_ident(v_the_geom)||', $2) 
+		    ORDER BY  ST_area('||v_layer.layer_id||'.'||v_the_geom||') asc LIMIT 1'
                     INTO v_id
                     USING v_point, v_sensibility;
         ELSE
             --  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
-		    ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc LIMIT 1'
+            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer.layer_id)||' WHERE st_dwithin ($1, '||quote_ident(v_layer.layer_id)||'.'||quote_ident(v_the_geom)||', $2) 
+		    ORDER BY  ST_Distance('||v_layer.layer_id||'.'||v_the_geom||', $1) asc LIMIT 1'
                     INTO v_id
                     USING v_point, v_sensibility;
         END IF;
 
+        
+
         IF v_id IS NOT NULL THEN 
             exit;
         ELSE 
-            RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
+           -- RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
         END IF;
 
     END LOOP;
 
-    RAISE NOTICE 'Found (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
+  --  RAISE NOTICE 'Found (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
     
 --    Control NULL's
     IF v_id IS NULL THEN
@@ -195,12 +196,12 @@ BEGIN
     
 --   Get editability of layer
     EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) THEN ''True'' ELSE ''False'' END) 
-            FROM  '||quote_ident(v_config_layer)||' WHERE layer_id='||quote_literal(v_layer)||';'
+            FROM  '||quote_ident(v_config_layer)||' WHERE layer_id='||quote_literal(v_layer.layer_id)||';'
             INTO v_iseditable;
 	RAISE NOTICE '----------------%',v_toolbar;
 --   Call and return gw_api_getinfofromid
-	RETURN SCHEMA_NAME.gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
-	'"},"feature":{"tableName":"',v_layer,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json);
+	RETURN gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
+	'"},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json);
 
 --    Exception handling
  --     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
