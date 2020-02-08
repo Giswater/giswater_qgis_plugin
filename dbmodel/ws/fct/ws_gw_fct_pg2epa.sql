@@ -15,29 +15,27 @@ $BODY$
 
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"resultId":"t3", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"resultId":"t1", "useNetworkGeom":"false"}}$$)
 
 */
 
 DECLARE
-	v_networkmode integer = 1;
-	v_return json;
-	v_input json;
-	v_result text;
-	v_onlymandatory_nodarc boolean = false;
-	v_vnode_trimarcs boolean = false;
-	v_response integer;
-	v_message text;
-	v_usenetworkdemand boolean;
-	v_buildupmode integer;
-	v_usenetworkgeom boolean;
-	v_skipcheckdata boolean;
-	v_inpoptions json;
+v_networkmode integer = 1;
+v_return json;
+v_input json;
+v_result text;
+v_onlymandatory_nodarc boolean = false;
+v_vnode_trimarcs boolean = false;
+v_response integer;
+v_message text;
+v_usenetworkdemand boolean;
+v_buildupmode integer;
+v_usenetworkgeom boolean;
+v_skipcheckdata boolean;
+v_inpoptions json;
+v_advancedsettings boolean;
 	
 BEGIN
-
 
 	--  Get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
@@ -50,16 +48,10 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- reset networkparameters i case of v_buildupmode = 1 (fast epanet)
-	IF v_buildupmode =  1 THEN
-		UPDATE config_param_user SET value = '1' WHERE parameter='inp_options_networkmode' AND cur_user=current_user;
-		UPDATE config_param_user SET value = '2' WHERE parameter='inp_options_valve_mode' AND cur_user=current_user;
-		UPDATE config_param_user SET value = 'NONE' WHERE parameter='inp_options_quality_mode' AND cur_user=current_user;
-	END IF;
-
 	-- Getting user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
+	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	
 	-- only mandatory nodarc
 	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
@@ -147,18 +139,27 @@ BEGIN
 	IF v_skipcheckdata IS NOT TRUE THEN
 	
 		RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
-		v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"',v_result,'", "useNetworkGeom":"',
-		v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
+		v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
+		"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
 	
 		SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 	END IF;
 
 	IF v_buildupmode = 1 THEN
-		RAISE NOTICE '9 - Use fast epanet models (modifying values in order to force builtupmode 1';
-		PERFORM gw_fct_pg2epa_fast_buildup(v_result);
+		RAISE NOTICE '9 - Use supply buildup model (modifying values in order to force builtupmode 1';
+		PERFORM gw_fct_pg2epa_buildup_supply(v_result);
+	ELSIF v_buildupmode = 2 THEN
+		RAISE NOTICE '9 - Use transport buildup model (modifying values in order to force builtupmode 2';
+		PERFORM gw_fct_pg2epa_buildup_transport(v_result);
+
 	END IF;
 
-	RAISE NOTICE '10 - Calling for the export function';
+	IF v_advancedsettings THEN
+		RAISE NOTICE '10- Fixing advanced settings';
+		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+	END IF;
+
+	RAISE NOTICE '11 - Calling for the export function';
 	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(v_result, null);
 
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;

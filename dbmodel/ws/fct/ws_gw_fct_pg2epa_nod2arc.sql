@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2316
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
+CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
 AS $BODY$
 
 /*example
@@ -43,9 +43,7 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
-
 
 	--  Looking for nodarc values
 	SELECT min(st_length(the_geom)) FROM rpt_inp_arc JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_arc.sector_id WHERE result_id=result_id_var
@@ -242,7 +240,8 @@ BEGIN
 
 		-- control pipes
                 IF ST_Length(record_arc2.the_geom)/2 < v_nod2arc OR ST_Length(record_arc1.the_geom)/2 <  v_nod2arc THEN
-			RAISE EXCEPTION 'It''s impossible to continue. Nodarc % has close pipes with length:( %, % ) versus nodarc length ( % )', node_id_aux, ST_Length(record_arc2.the_geom), ST_Length(record_arc1.the_geom),v_nod2arc ;
+			--RAISE EXCEPTION 'It''s impossible to continue. Nodarc % has close pipes with length:( %, % ) versus nodarc length ( % )', node_id_aux, ST_Length(record_arc2.the_geom), ST_Length(record_arc1.the_geom),v_nod2arc ;
+			v_nod2arc = 0.001;
                 END IF;
     
                 valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom) / 2);

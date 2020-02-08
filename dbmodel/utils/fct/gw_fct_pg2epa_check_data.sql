@@ -14,78 +14,76 @@ $BODY$
 /*EXAMPLE
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"resultId":"testbgeo","saveOnDatabase":true, "useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)
+"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"testbgeo","saveOnDatabase":true, "useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)
 
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"resultId":"testbgeo7","saveOnDatabase":true, "useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)
+"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"testbgeo7","saveOnDatabase":true, "useNetworkGeom":"FALSE", "useNetworkDemand":"FALSE"}}}$$)
 */
 
 DECLARE
-v_data 				json;
-valve_rec			record;
-v_countglobal		integer;
-v_record			record;
-setvalue_int		int8;
-v_project_type 		text;
-v_count				integer;
-v_count_2			integer;
-infiltration_aux	text;
-rgage_rec			record;
-scenario_aux		text;
-v_min_node2arc		float;
-v_saveondatabase 	boolean;
-v_result			text;
-v_version			text;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
-v_result_polygon	json;
-v_querytext			text;
-v_nodearc_real 		float;
-v_nodearc_user 		float;
-v_result_id 		text;
-v_min 				numeric (12,4);
-v_max				numeric (12,4);
-v_headloss			text;
-v_message			text;
-v_demandtype 		integer;
-v_patternmethod		integer;
-v_period			text;
-v_networkmode		integer;
-v_valvemode			integer;
-v_demandtypeval 	text;
-v_patternmethodval 	text;
-v_periodval 		text;
-v_valvemodeval 		text;
-v_networkmodeval	text;
-v_dwfscenario		text;
-v_allowponding		text;
-v_florouting		text;
-v_flowunits		text;
-v_hydrologyscenario	text;
-v_qualitymode		text;
-v_qualmodeval		text;
-v_buildupmode		int2;
-v_buildmodeval		text;
-v_usenetworkgeom	boolean;
-v_usenetworkdemand	boolean;
-v_buffer		float;
-v_n2nlength		float;
-v_statuspg		text;
-v_forcestatuspg		text;
-v_statusps		text;
-v_forcestatusps		text;
-v_statusprv		text;
-v_forcestatusprv	text;
-v_diameter		float;
-v_roughness 		float;
-v_defaultdemand 	float;
-v_qmlpointpath		text = '';
-v_qmllinepath		text = '';
-v_qmlpolpath		text = '';
-v_doublen2a		integer;
+v_data json;
+v_countglobal integer;
+v_record record;
+v_project_type text;
+v_count	integer;
+v_count_2 integer;
+v_infiltration text;
+v_scenario text;
+v_min_node2arc float;
+v_saveondatabase boolean;
+v_result text;
+v_version text;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_querytext text;
+v_nodearc_real float;
+v_nodearc_user float;
+v_result_id text;
+v_min numeric (12,4);
+v_max numeric (12,4);
+v_headloss text;
+v_message text;
+v_demandtype integer;
+v_patternmethod integer;
+v_period text;
+v_networkmode integer;
+v_valvemode integer;
+v_demandtypeval text;
+v_patternmethodval text;
+v_periodval text;
+v_valvemodeval text;
+v_networkmodeval text;
+v_dwfscenario text;
+v_allowponding text;
+v_florouting text;
+v_flowunits text;
+v_hydrologyscenario text;
+v_qualitymode text;
+v_qualmodeval text;
+v_buildupmode int2;
+v_buildmodeval text;
+v_usenetworkgeom boolean;
+v_usenetworkdemand boolean;
+v_buffer float;
+v_n2nlength float;
+v_statuspg text;
+v_forcestatuspg text;
+v_statusps text;
+v_forcestatusps text;
+v_statusprv text;
+v_forcestatusprv text;
+v_diameter float;
+v_roughness float;
+v_defaultdemand	float;
+v_qmlpointpath text = '';
+v_qmllinepath text = '';
+v_qmlpolpath text = '';
+v_doublen2a integer;
 v_geometrylog boolean;
+v_advancedsettingsval text;
 
 BEGIN
 
@@ -99,8 +97,10 @@ BEGIN
 	v_usenetworkgeom:= ((p_data ->>'data')::json->>'parameters')::json->>'useNetworkGeom';
 	v_usenetworkdemand:= ((p_data ->>'data')::json->>'parameters')::json->>'useNetworkDemand';
 	v_geometrylog:= ((p_data ->>'data')::json->>'parameters')::json->>'geometryLog';
+
 	IF v_geometrylog IS NULL THEN v_geometrylog = TRUE; END IF;
 
+	
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
@@ -148,13 +148,13 @@ BEGIN
 
 
 	IF v_project_type = 'UD' THEN
-		SELECT hydrology_id INTO scenario_aux FROM inp_selector_hydrology WHERE cur_user=current_user;
+		SELECT hydrology_id INTO v_scenario FROM inp_selector_hydrology WHERE cur_user=current_user;
 		SELECT value INTO v_dwfscenario FROM config_param_user WHERE parameter = 'inp_options_dwfscenario' AND cur_user=current_user;
 		SELECT value INTO v_allowponding FROM config_param_user WHERE parameter = 'inp_options_allow_ponding' AND cur_user=current_user;
 		SELECT value INTO v_florouting FROM config_param_user WHERE parameter = 'inp_options_flow_routing' AND cur_user=current_user;
 		SELECT value INTO v_flowunits FROM config_param_user WHERE parameter = 'inp_options_flow_units' AND cur_user=current_user;
 
-		SELECT upper(name) INTO v_hydrologyscenario FROM cat_hydrology WHERE hydrology_id=scenario_aux::integer;
+		SELECT upper(name) INTO v_hydrologyscenario FROM cat_hydrology WHERE hydrology_id=v_scenario::integer;
 
 		IF v_dwfscenario IS NULL THEN v_dwfscenario='NONE'; END IF;
 
@@ -176,6 +176,7 @@ BEGIN
 		SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 		SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 		SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
+		SELECT value INTO v_advancedsettings FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
 					
 		SELECT idval INTO v_demandtypeval FROM inp_typevalue WHERE id=v_demandtype::text AND typevalue ='inp_value_demandtype';
 		SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
@@ -183,7 +184,7 @@ BEGIN
 		SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
 		SELECT idval INTO v_qualmodeval FROM inp_typevalue WHERE id=v_qualitymode::text AND typevalue ='inp_value_opti_qual';
 		SELECT idval INTO v_buildmodeval FROM inp_typevalue WHERE id=v_buildupmode::text AND typevalue ='inp_options_buildup_mode';
-			
+		
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Result id: ', v_result_id));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
@@ -193,63 +194,68 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Number of pumps as Double-n2a: ', v_doublen2a));		
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval));
-
+		
 		IF v_buildupmode = 1 THEN
 
-			-- fast buildup default values
-			SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_buffer FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-			SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_system WHERE parameter = 'inp_fast_buildup';
+			-- supply buildup default values
+			SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_buffer FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
+			SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
 
 		
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, null);
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			'FAST BUILDUP RESET FOR USER VALUES: Network Mode: BASIC, Valve mode: INVENTORY VALUES, Quality mode: NONE');
+			'SUPPLY RESET FOR USER VALUES: Network Mode: BASIC, Valve mode: INVENTORY VALUES, Quality mode: NONE');
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('FAST BUILDUP VDEF: Null elevations have been setted using a buffer to closest node (',v_buffer,' mts.) acording variable of config_param_system.'));
+			concat('SUPPLY VDEF: Null elevations have been setted using a buffer to closest node (',v_buffer,' mts.) acording user variable.'));
 	
 			IF v_defaultdemand IS NOT NULL AND v_demandtype = 1 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('FAST BUILDUP VDEF: Acording with demand method choosed (ESTIMATED) null demands have been setted to ',
-				v_defaultdemand,' acording variable of config_param_system.'));
+				concat('SUPPLY VDEF: Acording with demand method choosed (ESTIMATED) null demands have been setted to ',
+				v_defaultdemand,' acording user variable.'));
 			END IF;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('FAST BUILDUP VDEF: Virtual reservoirs have been created over each tank with a virtual pipe of length: ',v_n2nlength,' mts. acording variable of config_param_system.'));
+			concat('SUPPLY VDEF: Virtual reservoirs have been created over each tank with a virtual pipe of length: ',v_n2nlength,' mts. acording user variable.'));
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('FAST BUILDUP VDEF: The status of pressure groups with null values have been updated to ',v_statuspg,' acording variable of config_param_system.'));
+			concat('SUPPLY VDEF: The status of pressure groups with null values have been updated to ',v_statuspg,' acording user variable.'));
 
 			IF v_forcestatusps IS NOT NULL THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('FAST BUILDUP VDEF: The status of all pressure groups have been updated to ',v_forcestatuspg,' acording variable of config_param_system.'));
+				concat('SUPPLY VDEF: The status of all pressure groups have been updated to ',v_forcestatuspg,' acording user variable.'));
 			END IF;
 	
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('FAST BUILDUP VDEF: The status of pumping stations with null values have been updated to ',v_statusps,' acording variable of config_param_system.'));
+			concat('SUPPLY VDEF: The status of pumping stations with null values have been updated to ',v_statusps,' acording user variable.'));
 			
 			IF v_forcestatusps IS NOT NULL THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('FAST BUILDUP VDEF: The status of all pumping stations have been updated to ',v_forcestatusps,' acording variable of config_param_system.'));
+				concat('SUPPLY VDEF: The status of all pumping stations have been updated to ',v_forcestatusps,' acording user variable.'));
 			END IF;
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('FAST BUILDUP VDEF: The status of PRV with null values have been updated to ',v_statusprv,' acording variable of config_param_system.'));
+			concat('SUPPLY VDEF: The status of PRV with null values have been updated to ',v_statusprv,' acording user variable.'));
 
 			IF v_forcestatusprv IS NOT NULL THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('FAST BUILDUP VDEF: The status of PRV have been updated to ',v_forcestatusprv,' acording variable of config_param_system.'));
+				concat('SUPPLY VDEF: The status of PRV have been updated to ',v_forcestatusprv,' acording user variable.'));
 			END IF;
 		END IF;
+		
+		IF v_advancedsettingsval IS NOT NULL THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, concat('Advanced settings: ', v_advancedsettings));
+		END IF;
+		
 	END IF;
 
 
@@ -273,7 +279,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 AND v_buildupmode =  1 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 4, concat('FAST BUILDUP MODE: There is/are ',v_count,' orphan(s) nodes that not have been exported to EPA. Take a look on temporal for details.'));
+			VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' orphan(s) nodes that not have been exported to EPA. Take a look on temporal for details.'));
 		ELSIF v_count > 0 AND v_buildupmode > 1 THEN
 			DELETE FROM anl_node WHERE fprocesscat_id=7 and cur_user=current_user;
 			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 7, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
@@ -300,7 +306,7 @@ BEGIN
 
 		IF v_count > 0 AND v_buildupmode =  1 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 4, concat('FAST BUILDUP MODE: There is/are ',v_count,' arc(s) without start/end nodes that not have been exported to EPA. Take a look on temporal for details.'));
+			VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' arc(s) without start/end nodes that not have been exported to EPA. Take a look on temporal for details.'));
 		ELSIF v_count > 0 AND v_buildupmode > 1 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) without start/end nodes. Take a look on temporal for details.'));
@@ -554,10 +560,10 @@ BEGIN
 				VALUES (14, v_result_id, 1, concat('INFO: Column rted on subcatchment table have been checked without any values missed.'));
 			END IF;
 
-			SELECT infiltration INTO infiltration_aux FROM cat_hydrology JOIN inp_selector_hydrology
+			SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN inp_selector_hydrology
 			ON inp_selector_hydrology.hydrology_id=cat_hydrology.hydrology_id WHERE cur_user=current_user;
 			
-			IF infiltration_aux='CURVE_NUMBER' THEN
+			IF v_infiltration='CURVE_NUMBER' THEN
 			
 				SELECT count(*) INTO v_count FROM v_edit_subcatchment where (curveno is null) 
 				OR (conduct_2 is null) OR (drytime_2 is null);
@@ -575,7 +581,7 @@ BEGIN
 					VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''CURVE_NUMBER'' infiltration method on subcatchment table (curveno, conduct_2, drytime_2) have been checked without any values missed.'));
 				END IF;
 			
-			ELSIF infiltration_aux='GREEN_AMPT' THEN
+			ELSIF v_infiltration='GREEN_AMPT' THEN
 			
 				SELECT count(*) INTO v_count FROM v_edit_subcatchment where (suction is null) 
 				OR (conduct_¡ is null) OR (initdef is null);
@@ -592,7 +598,7 @@ BEGIN
 				END IF;
 			
 			
-			ELSIF infiltration_aux='HORTON' OR infiltration_aux='MODIFIED_HORTON' THEN
+			ELSIF v_infiltration='HORTON' OR v_infiltration='MODIFIED_HORTON' THEN
 			
 				SELECT count(*) INTO v_count FROM v_edit_subcatchment where (maxrate is null) 
 				OR (minrate is null) OR (decay is null) OR (drytime is null) OR (maxinfil is null);
@@ -664,7 +670,7 @@ BEGIN
 			END IF;
 
 			
-			SELECT dscenario_id INTO scenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
+			SELECT dscenario_id INTO v_scenario FROM inp_selector_dscenario WHERE cur_user=current_user;
 
 			RAISE NOTICE '8 - nod2arc length control';
 			
@@ -688,7 +694,7 @@ BEGIN
 				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript) 
 				SELECT 64, node_id, nodecat_id, the_geom , 'Null elevation' FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 4, concat('FAST BUILDUP MODE: There is/are ',v_count,
+				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,
 				' node(s) without elevation. Values have been updated using the elevation from closest''s nodes. Take a look on temporal table for details.'));
 			ELSIF v_count > 0 AND v_buildupmode > 1 THEN
 				DELETE FROM anl_node WHERE fprocesscat_id=64 and cur_user=current_user;
@@ -727,7 +733,7 @@ BEGIN
 
 			IF v_count > 0 AND v_buildupmode = 1 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 4, concat('FAST BUILDUP MODE: There is/are ',v_count,' arc(s) and associated nodes totally disconnected fron any reservoir and not have been exported. Take a look on temporal table for details'));
+				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' arc(s) and associated nodes totally disconnected from any reservoir or tank and not have been exported. Take a look on temporal table for details'));
 			ELSIF v_count > 0 AND v_buildupmode > 1 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) totally disconnected fron any reservoir, according with the gw_fct_pg2epa_inlet_flowtrace function.Take a look on temporal table for details'));
@@ -754,7 +760,7 @@ BEGIN
 
 			IF v_count > 0 AND v_buildupmode = 1 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 4, concat('FAST BUILDUP MODE: There is/are ',v_count,' node2arc(s) with more than two arcs that have been transformed into junctions. Take a look on temporal table to know details.'));
+				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' node2arc(s) with more than two arcs that have been transformed into junctions. Take a look on temporal table to know details.'));
 			
 			ELSIF v_count > 0 AND v_buildupmode > 1 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
@@ -870,7 +876,7 @@ BEGIN
 				SELECT avg(roughness) INTO v_roughness FROM rpt_inp_arc WHERE result_id=p_result;
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 4, concat('FAST BUILDUP MODE: There is/are ',v_count,
+				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,
 				' pipe(s) with null values for roughness. Due the builup mode choosed all values will be setted using the avegare of the rest of the values', v_roughness));
 				v_countglobal=v_countglobal+v_count; 
 				v_count=0;
@@ -933,13 +939,13 @@ BEGIN
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 						VALUES (14, v_result_id, 4, concat(
-						'FAST BUILDUP MODE: There is/are ',v_count,
-						' tank(s) with null values on mandatory columns, but according with the fast buildup rules thet have been replaced by a junction linked with a reservoir.'));
+						'SUPPLY MODE: There is/are ',v_count,
+						' tank(s) with null values on mandatory columns, but according with the SUPPLY rules these tanks have been replaced by a junction linked with a reservoir.'));
 						v_countglobal=v_countglobal+v_count;
 						v_count=0;
 					ELSE
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-						VALUES (14, v_result_id, 2, 'FAST BUILDUP MODE: All tanks have values on mandatory fields but they have been replaced by a junction linked with a ficticious reservoir.');
+						VALUES (14, v_result_id, 2, 'SUPPLY MODE: All tanks have values on mandatory fields but they have been replaced by a junction linked with a ficticious reservoir.');
 					END IF;	
 			
 				ELSIF v_buildupmode > 1 THEN
@@ -1104,11 +1110,11 @@ BEGIN
 
 				IF v_count > 0 AND v_buildupmode = 1 THEN
 
-					SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_fast_buildup';
+					SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
 				
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 					VALUES (14, v_result_id, 4, concat(
-					'FAST BUILDUP MODE: There is/are ',v_count,' pipes without diameter have been setted with diameter = ',v_diameter,' according system variable defined for fast buildup mode.'));
+					'SUPPLY MODE: There is/are ',v_count,' pipes without diameter have been setted with diameter = ',v_diameter,' according system variable defined for SUPPLY mode.'));
 					v_countglobal=v_countglobal+v_count; 
 					v_count=0;
 				
@@ -1466,13 +1472,6 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=14 order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
-	--points
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (7, 14, 64, 66, 70, 71, 98)) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
@@ -1526,7 +1525,6 @@ BEGIN
 			'}')::json;
 
 	END IF;
-	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

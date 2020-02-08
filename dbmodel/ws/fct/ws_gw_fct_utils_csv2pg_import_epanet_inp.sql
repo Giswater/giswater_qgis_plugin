@@ -368,6 +368,21 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Rules will be stored on inp_rules_importinp table. This is a temporary table. Data need to be moved to inp_rules_x_arc, inp_rules_x_node and inp_rules_x_sector tables to be used later');
 	
 
+	-- to_arc on pumps
+	UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
+	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
+		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2	
+		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
+	WHERE b.node_id = inp_pump.node_id;
+
+	-- to_arc on valves
+	UPDATE inp_valve_importinp SET to_arc = b.to_arc FROM
+	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from epa.arc 
+		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2
+		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
+	WHERE b.node_id = inp_valve.node_id;
+			
+			
 	IF v_arc2node_reverse THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 	
 		FOR v_data IN SELECT * FROM arc WHERE epa_type IN ('VALVE','PUMP')
@@ -404,13 +419,13 @@ BEGIN
 			EXECUTE 'INSERT INTO '||v_mantablename||' VALUES ('||quote_literal(v_node_id)||')';
 
 			IF v_epatablename = 'inp_pump' THEN
-				INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status,energyparam, energyvalue)
-				SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
+				INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status,energyparam, energyvalue, to_arc)
+				SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue, to_arc FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 				DELETE FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 			ELSIF v_epatablename = 'inp_valve' THEN
-				INSERT INTO inp_valve (node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status)
-				SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status FROM inp_valve_importinp WHERE arc_id=v_data.arc_id;
+				INSERT INTO inp_valve (node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc)
+				SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM inp_valve_importinp WHERE arc_id=v_data.arc_id;
 			END IF;
 				
 			-- get old nodes
@@ -448,7 +463,7 @@ BEGIN
 				EXIT WHEN i = v_data.count;
 			END LOOP;
 		END LOOP;
-
+		
 		DELETE FROM inp_valve_importinp;
 		DELETE FROM inp_pump_importinp;
 

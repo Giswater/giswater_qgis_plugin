@@ -23,12 +23,17 @@ SELECT * FROM anl_mincut_arc_x_node  where user_name=current_user;
 
 
 DECLARE
-affected_rows numeric;
-cont1 integer default 0;
+v_affectedrows numeric;
+v_cont integer default 0;
+v_buildupmode int2;
+
 BEGIN
 
-    -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+	-- Search path
+	SET search_path = "SCHEMA_NAME", public;
+
+	-- get user values
+	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 
 	delete FROM anl_mincut_arc_x_node where user_name=current_user;
 	delete FROM anl_arc where cur_user=current_user AND fprocesscat_id=39;
@@ -50,14 +55,22 @@ BEGIN
 	(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM anl_mincut_arc_x_node GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 
 	-- init inlets
-	UPDATE anl_mincut_arc_x_node
-		SET flag1=1, water=1 
-		WHERE node_id IN (SELECT node_id FROM rpt_inp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET') and result_id=p_result_id)
-		AND anl_mincut_arc_x_node.user_name=current_user; 
+	IF v_buildupmode = 1 THEN
+		UPDATE anl_mincut_arc_x_node
+			SET flag1=1, water=1 
+			WHERE node_id IN (SELECT node_id FROM rpt_inp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK') and result_id=p_result_id)
+			AND anl_mincut_arc_x_node.user_name=current_user; 
 
+	ELSIF v_buildupmode = 2 THEN 
+		UPDATE anl_mincut_arc_x_node
+			SET flag1=1, water=1 
+			WHERE node_id IN (SELECT node_id FROM rpt_inp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET') and result_id=p_result_id)
+			AND anl_mincut_arc_x_node.user_name=current_user; 
+	END IF;
+		
 	-- inundation process
 	LOOP
-	cont1 = cont1+1;
+	v_cont = v_cont+1;
 
 		update anl_mincut_arc_x_node n
 		set water= 1, flag1=n.flag1+1
@@ -65,10 +78,10 @@ BEGIN
 		where n.node_id = a.node_id and
 		n.arc_id = a.arc_id;
 
-		GET DIAGNOSTICS affected_rows =row_count;
+		GET DIAGNOSTICS v_affectedrows =row_count;
 
-		exit when affected_rows = 0;
-		EXIT when cont1 = 200;
+		exit when v_affectedrows = 0;
+		EXIT when v_cont = 200;
 
 	END LOOP;
 
@@ -80,7 +93,6 @@ BEGIN
 		GROUP BY a.arc_id, user_name, the_geom
 		having max(water) = 0 and user_name=current_user;
 		
-
 	-- insert into result table the dry arcs (water=0)
 	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
 	SELECT 39, p_result_id, node_1, n.the_geom, 'Node disconnected from any reservoir' FROM arc JOIN anl_arc USING (arc_id) 
@@ -88,7 +100,7 @@ BEGIN
 	SELECT 39, p_result_id, node_2, n.the_geom, 'Node disconnected from any reservoir' FROM arc JOIN anl_arc USING (arc_id) 
 	JOIN node n ON node_2=node_id WHERE fprocesscat_id=39 AND result_id = p_result_id AND cur_user=current_user;
 
-RETURN cont1;
+RETURN v_cont;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

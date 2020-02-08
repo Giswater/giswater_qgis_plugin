@@ -35,7 +35,7 @@ BEGIN
 	-- insert data on temp_table
 	INSERT INTO temp_table (fprocesscat_id, text_column)
 	SELECT  50, concat('{"arc_id":"',arc_id,'", "vnode_id":"' ,vnode_id, '", "locate":', locate,', "elevation":',
-	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
+	(CASE WHEN (elevation1 - locate*(elevation1-elevation2)) IS NULL THEN 0 ELSE (elevation1 - locate*(elevation1-elevation2))::numeric(12,3) END),
 	', "depth":',(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3), '}')::json
 	FROM (
 		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, arc_id, 
@@ -95,7 +95,7 @@ BEGIN
 		rpt_inp_arc.sector_id,
 		rpt_inp_arc.state,
 		rpt_inp_arc.state_type,
-		concat ('{"parentArc":"', a.arc_id, '", "annotation":"',rpt_inp_arc.annotation,'"}'),
+		concat ('{"parentArc":"', a.arc_id, '", "annotation":"',(CASE WHEN rpt_inp_arc.annotation IS NULL THEN '' ELSE replace (rpt_inp_arc.annotation,'"','') END),'"}'),
 		rpt_inp_arc.diameter,
 		rpt_inp_arc.roughness,
 		st_length(ST_LineSubstring(the_geom, locate_1, locate_2)),
@@ -131,7 +131,8 @@ BEGIN
 		ORDER BY arc_id, a.id;
 	
 	--delete only trimmed arc on rpt_inp_arc table
-	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT annotation::json->>'parentArc' FROM rpt_inp_arc WHERE result_id=result_id_var) AND result_id=result_id_var;
+	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT annotation::json->>'parentArc' FROM rpt_inp_arc WHERE result_id=result_id_var 
+	AND left (annotation,1)= '{') AND result_id=result_id_var;
 
 	-- set minimum value of arcs
 	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id=result_id_var;

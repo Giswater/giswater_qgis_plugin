@@ -6,14 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2774
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fast_buildup(p_result text)
+DROP FUNCTION IF EXISTS ws.gw_fct_pg2epa_fast_buildup(p_result text);
+CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_buildup_supply(p_result text)
 RETURNS integer 
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"resultId":"t12", "useNetworkGeom":"false"}}$$)
+SELECT ws.gw_fct_pg2epa_buildup_supply($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"resultId":"t12", "useNetworkGeom":"false"}}$$)
 */
 
 DECLARE
@@ -30,50 +29,49 @@ v_statusprv text;
 v_forcestatuspg text;
 v_forcestatusps text;
 v_forcestatusprv text;
-v_buffer float;
+v_nullbuffer float;
+v_cerobuffer float;
 v_n2nlength float;
 v_querytext text;
 v_diameter float;
 v_defaultdemand float;
 v_demandtype int2;
+v_switch2junction text;
 
 BEGIN
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws", public;
 
 	-- get values
 	SELECT epsg INTO v_srid FROM version LIMIT 1;
 
-	-- system variables
-	SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_buffer FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-	
 	-- get user variables
+	SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_nullbuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'node')::json->>'ceroElevBuffer' INTO v_cerobuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'reservoir')::json->>'switch2Junction' INTO v_switch2junction FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 
-
+	
+	-- switch to junction an specific list of RESERVOIRS
+	UPDATE rpt_inp_node SET epa_type = 'JUNCTION' WHERE node_id IN (select node_id FROM v_edit_node
+	JOIN (select unnest((replace (replace((v_switch2junction::text),'[','{'),']','}'))::text[]) as type)a ON a.type = node_type) AND result_id = p_result;
+	
 	-- delete orphan nodes
 	DELETE FROM rpt_inp_node WHERE result_id = p_result AND node_id NOT IN 
 	(SELECT node_1 FROM rpt_inp_arc WHERE result_id = p_result UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id = p_result) ;
 	
-
 	-- deleting arcs without extremal nodes
 	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=p_result;	
-
-	-- deleting arcs and nodes disconnected from any reservoir
-	DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_1 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user 
-						   UNION SELECT node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
-	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
-
 
 	-- setting roughness for null values
 	SELECT avg(roughness) INTO v_roughness FROM rpt_inp_arc WHERE result_id=p_result;
@@ -90,14 +88,20 @@ BEGIN
 	-- setting null elevation values using closest points values
 	UPDATE rpt_inp_node SET elevation = d.elevation FROM
 		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
-		WHERE st_dwithin (a.the_geom, b.the_geom, v_buffer) AND a.node_id != b.node_id AND a.elevation IS NULL AND b.elevation IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
-	WHERE rpt_inp_node.elevation IS NULL AND d.node_id=rpt_inp_node.node_id AND result_id=p_result;
-	v_querytext = 'SELECT * FROM rpt_inp_node WHERE (epa_type = ''TANK'' OR epa_type = ''INLET'') AND result_id = '||quote_literal(p_result);
+		WHERE st_dwithin (a.the_geom, b.the_geom, v_nullbuffer) AND a.node_id != b.node_id AND a.elevation IS NULL AND b.elevation IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
+		WHERE rpt_inp_node.elevation IS NULL AND d.node_id=rpt_inp_node.node_id AND result_id=p_result;
 
-	-- setting cero on elevation those have null values in spite of previous process
+	-- setting cero elevation values using closest points values
+	UPDATE rpt_inp_node SET elevation = d.elevation FROM
+		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
+		WHERE st_dwithin (a.the_geom, b.the_geom, v_cerobuffer) AND a.node_id != b.node_id AND a.elevation = 0 AND b.elevation > 0) c order by st_distance (n1_geom, n2_geom))d
+		WHERE rpt_inp_node.elevation IS NULL AND d.node_id=rpt_inp_node.node_id AND result_id=p_result;
+	
+	-- setting cero on elevation those have null values in spite of previous processes (profilactic issue in order to don't crash the epanet file)
 	UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=p_result;
 
 	-- transform all tanks by reservoirs with link and junction
+	v_querytext = 'SELECT * FROM rpt_inp_node WHERE (epa_type = ''TANK'' OR epa_type = ''INLET'') AND result_id = '||quote_literal(p_result);
 	FOR v_record IN EXECUTE v_querytext
 	LOOP
 		raise notice '  %', v_record;
@@ -124,6 +128,12 @@ BEGIN
 		FROM rpt_inp_node WHERE id = v_record.id AND result_id = p_result;
 
 	END LOOP;
+
+	-- deleting arcs and nodes disconnected from any reservoir
+	DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_1 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user 
+						   UNION SELECT node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+
 	
 	-- set pressure groups
 	UPDATE rpt_inp_arc SET status= v_statuspg WHERE status IS NULL AND result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '1'); 
@@ -145,6 +155,10 @@ BEGIN
 	IF v_forcestatusprv IS NOT NULL THEN
 		UPDATE rpt_inp_arc SET status= v_forcestatusprv WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve); 
 	END IF;
+
+	-- switch reservoirs to junction
+	
+	
 
     RETURN 1;
 
