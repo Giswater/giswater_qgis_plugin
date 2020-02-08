@@ -15,8 +15,8 @@ $BODY$
 /*
 delete from temp_anlgraf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "usePsectors":TRUE, "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "usePsectors":TRUE, "updateFeature":"TRUE", "updateMinsectorGeom":"TRUE","concaveHullParam":0.85, "buffer":15}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2, "geomParamUpdate":10}}}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
@@ -29,35 +29,34 @@ SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=c
 */
 
 DECLARE
-affected_rows 		numeric;
-cont1 			integer default 0;
-v_class 		text = 'MINSECTOR';
-v_feature 		record;
-v_expl 			json;
-v_data 			json;
-v_fprocesscat_id 	integer;
-v_addparam 		record;
-v_attribute 		text;
-v_arcid 		text;
-v_featuretype		text;
-v_featureid 		integer;
-v_querytext 		text;
-v_updatefeature 	boolean;
-v_arc			text;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
-v_result_polygon	json;
-v_result 		text;
-v_count			integer;
-v_version		text;
-v_updatemapzgeom 	boolean;
-v_concavehull		float;
-v_srid			integer;
-v_buffer		float;
-v_input			json;
-v_visible_layer		text;
-v_usepsectors		boolean;
+v_affectedrows numeric;
+v_cont1 integer default 0;
+v_class text = 'MINSECTOR';
+v_feature record;
+v_expl json;
+v_data json;
+v_fprocesscat_id integer;
+v_addparam record;
+v_attribute	text;
+v_arcid text;
+v_featuretype text;
+v_featureid	integer;
+v_querytext	text;
+v_updatefeature boolean;
+v_arc text;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_result text;
+v_count	integer;
+v_version text;
+v_updatemapzgeom integer;
+v_geomparamupdate float;
+v_srid integer;
+v_input json;
+v_visible_layer text;
+v_usepsectors boolean;
 
 BEGIN
 
@@ -70,8 +69,7 @@ BEGIN
 	v_updatefeature = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_concavehull = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
-	v_buffer = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'buffer');
+	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 
 
@@ -156,8 +154,8 @@ BEGIN
 			
 	-- starting process
 	LOOP
-		EXIT WHEN cont1 = -1;
-		cont1 = 0;
+		EXIT WHEN v_cont1 = -1;
+		v_cont1 = 0;
 
 		-- reset water flag
 		UPDATE temp_anlgraf SET water=0;
@@ -178,11 +176,11 @@ BEGIN
 
 		-- inundation process
 		LOOP	
-			cont1 = cont1+1;
+			v_cont1 = v_cont1+1;
 			UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
-			GET DIAGNOSTICS affected_rows =row_count;
-			EXIT WHEN affected_rows = 0;
-			EXIT WHEN cont1 = 200;
+			GET DIAGNOSTICS v_affectedrows =row_count;
+			EXIT WHEN v_affectedrows = 0;
+			EXIT WHEN v_cont1 = 200;
 		END LOOP;
 		
 		-- finish engine
@@ -253,29 +251,52 @@ BEGIN
 	END IF;
 
 	-- update geometry of mapzones
-	IF v_updatemapzgeom THEN
-
-			IF v_buffer IS NOT NULL THEN
-
-				v_querytext = '	UPDATE minsector set the_geom = geom FROM
-					(SELECT minsector_id, (st_buffer(st_collect(the_geom),'||v_buffer||')) as geom from arc where minsector_id > 0 group by minsector_id)a 
-					WHERE a.minsector_id = minsector.minsector_id';
-
-			ELSIF v_concavehull IS NOT NULL THEN 
-
-				v_querytext = 'UPDATE minsector set the_geom = (a.the_geom) 
-					FROM (with polygon AS (SELECT st_collect (the_geom) as g, minsector_id FROM arc group by minsector_id)
-					SELECT minsector_id, CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||v_concavehull||'), 3)::geometry(Polygon,'||v_srid||')
-					ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon, '||v_srid||') END AS the_geom FROM polygon
-					)a WHERE a.minsector_id = minsector.minsector_id';
-			END IF;
+	IF v_updatemapzgeom = 0 THEN
+		-- do nothing
+	ELSIF  v_updatemapzgeom = 1 THEN
+		
+		-- concave polygon
+		v_querytext = 'UPDATE minsector set the_geom = st_multi(a.the_geom) 
+				FROM (with polygon AS (SELECT st_collect (the_geom) as g, minsector_id FROM arc group by minsector_id)
+				SELECT minsector_id, CASE WHEN st_geometrytype(st_concavehull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
+				v_concavehull||'), 3)::geometry(Polygon,'||v_srid||')
+				ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon, '||v_srid||') END AS the_geom FROM polygon
+				)a WHERE a.minsector_id = minsector.minsector_id';
+		EXECUTE v_querytext;
+				
+	ELSIF  v_updatemapzgeom = 2 THEN
 			
-			EXECUTE v_querytext;	
+		-- pipe buffer
+		v_querytext = '	UPDATE minsector set the_geom = st_multi(geom) FROM
+				(SELECT minsector_id, (st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where minsector_id > 0 group by minsector_id)a 
+				WHERE a.minsector_id = minsector.minsector_id';			
+		EXECUTE v_querytext;
 
-			-- message
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of minsector ',v_class ,' have been modified by this process'));
-		END IF;
+	ELSIF  v_updatemapzgeom = 3 THEN
+
+		-- use plot and pipe buffer		
+		-- buffer pipe
+		v_querytext = '	UPDATE minsector set the_geom = geom FROM
+				(SELECT minsector_id, st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where minsector_id::integer > 0 
+				AND arc_id NOT IN (SELECT DISTINCT arc_id FROM v_edit_connec,ext_plot WHERE st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001))
+				group by minsector_id)a 
+				WHERE a.minsector_id = minsector.minsector_id';			
+		EXECUTE v_querytext;
+
+		-- plot
+		v_querytext = '	UPDATE minsector set the_geom = geom FROM
+				(SELECT minsector_id, st_multi(st_buffer(st_collect(ext_plot.the_geom),0.01)) as geom FROM v_edit_connec, ext_plot
+				WHERE minsector_id::integer > 0 AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
+				group by minsector_id)a 
+				WHERE a.minsector_id = minsector.minsector_id';	
+		EXECUTE v_querytext;
+	END IF;
+				
+	IF v_updatemapzgeom > 0 THEN
+		-- message
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
+	END IF;
 	
 	
 	-- set selector
@@ -323,7 +344,7 @@ BEGIN
 		       '}'||
 	    '}')::json;
 	
-RETURN cont1;
+RETURN v_cont1;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

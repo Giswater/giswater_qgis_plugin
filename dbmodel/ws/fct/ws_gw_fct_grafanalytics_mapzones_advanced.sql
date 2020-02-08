@@ -13,17 +13,17 @@ $BODY$
 
 /*
 SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[15]", 
-"updateFeature":"TRUE", "updateMapZone":"FALSE","concaveHullParam":0.85, "debug":"FALSE"}}}');
+"updateFeature":"TRUE", "updateMapZone":1,"geomParamUpdate":0.85, "debug":"FALSE"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+"updateFeature":"TRUE", "updateMapZone":3,"geomParamUpdate":10}}}');
 ELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 
 SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+"updateFeature":"TRUE", "updateMapZone":0}}}');
 
 SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
-"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85}}}');
+"updateFeature":"TRUE","updateMapZone":2","geomParamUpdate":10}}}');
 */
 
 DECLARE

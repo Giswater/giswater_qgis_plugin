@@ -40,7 +40,7 @@ TO EXECUTE
 
 -- SECTOR
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"FALSE", "concaveHullParam":0.85, "buffer":15, "debug":"false"}}}');
+"updateFeature":"TRUE", "updateMapZone":2, ""geomParamUpdate":15, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -51,10 +51,10 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 -- DMA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE", "concaveHullParam":0.85, "buffer":15, "debug":"false"}}}');
+"updateFeature":"TRUE", "updateMapZone":"TRUE", ""geomParamUpdate":15,"debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85,"debug":"false"}}}');
+"updateFeature":"TRUE", "updateMapZone":2,"concaveHullParam":0.85,"debug":"false"}}}');
 
 SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user group by log_message order by 2 --DMA
 
@@ -65,7 +65,7 @@ UPDATE arc SET dma_id=0
 
 -- DQA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85, "buffer":15, "debug":"false"}}}');
+"updateFeature":"TRUE", "updateMapZone":2,""geomParamUpdate":15,"debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -76,7 +76,7 @@ SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
 -- PRESZZONE
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
-"updateFeature":"TRUE","updateMapZone":"TRUE","concaveHullParam":0.85, "buffer":15, "debug":"false"}}}');
+"updateFeature":"TRUE","updateMapZone":2,""geomParamUpdate":15,"debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -96,10 +96,10 @@ UPDATE arc SET dma_id=0 where expl_id IN (1,2)
 
 2) RUN
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85, "buffer":15, "debug":"true"}}}');
+"updateFeature":"TRUE", "updateMapZone":2,""geomParamUpdate":15,"debug":"true"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE","concaveHullParam":0.85, "buffer":15, "debug":"true"}}}');
+"updateFeature":"TRUE", "updateMapZone":2,""geomParamUpdate":15,"debug":"true"}}}');
 
 INSTRUCTIONS
 flag: 0 open, 1 closed
@@ -135,7 +135,7 @@ v_featureid 		integer;
 v_text 			text;
 v_querytext 		text;
 v_updatetattributes 	boolean;
-v_updatemapzgeom	boolean;
+v_updatemapzgeom	integer;
 v_result_info 		json;
 v_result_point		json;
 v_result_line 		json;
@@ -153,7 +153,7 @@ v_input 		json;
 v_count1		integer;
 v_count2		integer;
 v_count3		integer;
-v_buffer		float;
+v_geomparamupdate	float;
 v_visible_layer		text;
 
 BEGIN
@@ -165,8 +165,7 @@ BEGIN
 	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'node');
 	v_updatetattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
-	v_concavehull = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'concaveHullParam');
-	v_buffer = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'buffer');
+	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 
@@ -478,27 +477,51 @@ BEGIN
 			END IF;
 
 			-- update geometry of mapzones
-			IF v_updatemapzgeom THEN
-
-				IF v_buffer IS NOT NULL THEN
-
-					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
-						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_buffer||')) as geom from arc where '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||')a 
-						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
-
-				ELSIF v_concavehull IS NOT NULL THEN 
-
-					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
+			IF v_updatemapzgeom = 0 THEN
+				-- do nothing
+			ELSIF  v_updatemapzgeom = 1 THEN
+			
+				-- concave polygon
+				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
 						FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM arc group by '||quote_ident(v_field)||') 
 						SELECT '||quote_ident(v_field)||
-						', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
-						v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
+						', CASE WHEN st_geometrytype(st_concavehull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
+						v_geomparamupdate||'), 3)::geometry(Polygon,'||(v_srid)||')
 						ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 						)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||'::text != 0::text';
-				END IF;
+				EXECUTE v_querytext;
 				
-				EXECUTE v_querytext;	
+			ELSIF  v_updatemapzgeom = 2 THEN
+			
+				-- pipe buffer
+				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
+						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where '||quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||')a 
+						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);			
+				EXECUTE v_querytext;
 
+			ELSIF  v_updatemapzgeom = 3 THEN
+				-- use plot and pipe buffer
+			
+				-- buffer pipe
+				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
+						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where '||quote_ident(v_field)||'::integer > 0 
+						AND arc_id NOT IN (SELECT arc_id FROM v_edit_connec,ext_plot WHERE st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001))
+						group by '||quote_ident(v_field)||')a 
+						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);	
+				EXECUTE v_querytext;
+
+				-- plot
+				v_querytext = 'UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
+						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(ext_plot.the_geom),0.01)) as geom FROM v_edit_connec, ext_plot
+						WHERE '||quote_ident(v_field)||'::integer > 0 AND WHERE st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
+						group by '||quote_ident(v_field)||')a 
+						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);	
+
+				EXECUTE v_querytext;
+			END IF;
+				
+					
+			IF v_updatemapzgeom > 0 THEN
 				-- message
 				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 				VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
