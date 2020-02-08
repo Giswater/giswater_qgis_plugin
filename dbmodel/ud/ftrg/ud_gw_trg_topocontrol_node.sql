@@ -11,25 +11,19 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_topocontrol_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-numNodes numeric;
-psector_vdefault_var integer;
-replace_node_aux boolean;
-node_id_var varchar;
-node_rec record;
+v_node record;
 v_querytext Varchar; 
-arcrec Record; 
-nodeRecord1 Record; 
-nodeRecord2 Record; 
-optionsRecord Record;
-z1 double precision;
-z2 double precision;
-xvar double precision;
-yvar double precision;
-pol_id_var varchar;
-top_elev_aux double precision;
+v_arcrec Record; 
+v_noderecord1 Record; 
+v_noderecord2 Record; 
+v_z1 double precision;
+v_z2 double precision;
+v_x double precision;
+v_y double precision;
+v_pol varchar;
+v_topelev double precision;
 v_arc record;
-v_arcrecord "SCHEMA_NAME".v_edit_arc;
-v_arcrecordtb "SCHEMA_NAME".arc;
+v_arcrecordtb record;
 v_node_proximity_control boolean;
 v_node_proximity double precision;
 v_dsbl_error boolean;
@@ -73,8 +67,8 @@ BEGIN
 			IF (NEW.state=1) AND (v_node_proximity_control IS TRUE) THEN
 
 				-- check existing state=1 nodes
-				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
-				IF node_rec.node_id IS NOT NULL THEN
+				SELECT * INTO v_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
+				IF v_node.node_id IS NOT NULL THEN
 		
 					IF v_dsbl_error IS NOT TRUE THEN
 						PERFORM audit_function (1097,1334, NEW.node_id);	
@@ -88,10 +82,10 @@ BEGIN
 			ELSIF (NEW.state=2) AND (v_node_proximity_control IS TRUE) THEN
 
 				-- check existing state=2 nodes on same alternative
-				SELECT * INTO node_rec FROM node JOIN plan_psector_x_node USING (node_id) WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) 
+				SELECT * INTO v_node FROM node JOIN plan_psector_x_node USING (node_id) WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) 
 				AND node.node_id != NEW.node_id AND node.state=2 AND psector_id=v_psector_id;
 			
-				IF node_rec.node_id IS NOT NULL THEN
+				IF v_node.node_id IS NOT NULL THEN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
 						PERFORM audit_function (1096,1334, NEW.node_id);	
@@ -104,16 +98,16 @@ BEGIN
 
 
 			-- check for existing node (1)
-			SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
+			SELECT * INTO v_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
 
-			IF (NEW.state=2 AND node_rec.node_id IS NOT NULL) THEN
+			IF (NEW.state=2 AND v_node.node_id IS NOT NULL) THEN
 				
 				-- inserting on plan_psector_x_node the existing node as state=0
-				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
+				INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, v_node.node_id, 0);
 
 				-- looking for all the arcs (1 and 2) using existing node
-				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM v_edit_arc WHERE node_1=node_rec.node_id 
-				AND state >0 UNION SELECT arc_id, node_2 FROM v_edit_arc WHERE node_2=node_rec.node_id AND state >0)
+				FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM v_edit_arc WHERE node_1=v_node.node_id 
+				AND state >0 UNION SELECT arc_id, node_2 FROM v_edit_arc WHERE node_2=v_node.node_id AND state >0)
 				LOOP
 
 					-- if exists some arc planified on same alternative attached to that existing node
@@ -121,9 +115,9 @@ BEGIN
 							
 						-- reconnect the planified arc to the new planified node in spite of connected to the node state=1
 						IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
-							UPDATE arc SET node_1=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_1=node_rec.node_id;							
+							UPDATE arc SET node_1=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_1=v_node.node_id;							
 						ELSE
-							UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=node_rec.node_id;
+							UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=v_node.node_id;
 						END IF;
 					ELSE
 						-- getting values to create new 'fictius' arc
@@ -143,7 +137,7 @@ BEGIN
 						INSERT INTO arc SELECT v_arcrecordtb.*;
 
 						-- update real values of node_1 and node_2
-						IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=node_rec.node_id THEN
+						IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_node.node_id THEN
 							v_arcrecordtb.node_1 = NEW.node_id;
 						ELSE
 							v_arcrecordtb.node_2 = NEW.node_id;
@@ -212,85 +206,85 @@ BEGIN
 			END IF;
 			
 			-- Updating polygon geometry in case of exists it
-			pol_id_var:= (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id 
+			v_pol:= (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id 
 			UNION SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id);
-			IF (pol_id_var IS NOT NULL) THEN   
-				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
-				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
-				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;
+			IF (v_pol IS NOT NULL) THEN   
+				v_x= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+				v_y= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
+				UPDATE polygon SET the_geom=ST_translate(the_geom, v_x, v_y) WHERE pol_id=v_pol;
 			END IF;  
 	   
 			-- Select arcs with start-end on the updated node to modify coordinates
 			v_querytext:= 'SELECT * FROM "arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
 
 			IF NEW.custom_top_elev IS NULL 
-				THEN top_elev_aux=NEW.top_elev;
+				THEN v_topelev=NEW.top_elev;
 			ELSE 
-				top_elev_aux=NEW.custom_top_elev;
+				v_topelev=NEW.custom_top_elev;
 			END IF;
 
 			--updating arcs
-			FOR arcrec IN EXECUTE v_querytext
+			FOR v_arcrec IN EXECUTE v_querytext
 			LOOP
 
 				-- Initial and final node of the arc
-				SELECT * INTO nodeRecord1 FROM node WHERE node.node_id = arcrec.node_1;
-				SELECT * INTO nodeRecord2 FROM node WHERE node.node_id = arcrec.node_2;
+				SELECT * INTO v_noderecord1 FROM node WHERE node.node_id = v_arcrec.node_1;
+				SELECT * INTO v_noderecord2 FROM node WHERE node.node_id = v_arcrec.node_2;
 		
 				-- Control de lineas de longitud 0
-				IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) AND st_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
+				IF (v_noderecord1.node_id IS NOT NULL) AND (v_noderecord2.node_id IS NOT NULL) AND st_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
 		
 					-- Update arc node coordinates, node_id and direction
-					IF (nodeRecord1.node_id = NEW.node_id) THEN
+					IF (v_noderecord1.node_id = NEW.node_id) THEN
 					
 						-- Coordinates
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
+						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(v_arcrec."arc_id") USING v_arcrec.the_geom, NEW.the_geom; 
 						
-						-- Calculating new values of z1 and z2
-						IF arcrec.custom_elev1 IS NULL AND arcrec.elev1 IS NULL THEN
-							z1 = (top_elev_aux - arcrec.y1);
+						-- Calculating new values of v_z1 and v_z2
+						IF v_arcrec.custom_elev1 IS NULL AND v_arcrec.elev1 IS NULL THEN
+							v_z1 = (v_topelev - v_arcrec.y1);
 						END IF;
 
-						IF arcrec.custom_elev2 IS NULL AND arcrec.elev2 IS NULL THEN				
-							IF nodeRecord2.custom_top_elev IS NULL THEN
-								z2 = (nodeRecord2.top_elev - arcrec.y2);
+						IF v_arcrec.custom_elev2 IS NULL AND v_arcrec.elev2 IS NULL THEN				
+							IF v_noderecord2.custom_top_elev IS NULL THEN
+								v_z2 = (v_noderecord2.top_elev - v_arcrec.y2);
 							ELSE
-								z2 = (nodeRecord2.custom_top_elev - arcrec.y2);
+								v_z2 = (v_noderecord2.custom_top_elev - v_arcrec.y2);
 							END IF;
 						END IF;
 							
 	
-					ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
+					ELSIF (v_noderecord2.node_id = NEW.node_id) THEN
 						-- Coordinates
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
+						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(v_arcrec."arc_id") USING v_arcrec.the_geom, NEW.the_geom; 
 		
-						-- Calculating new values of z1 and z2
-						IF arcrec.custom_elev2 IS NULL AND arcrec.elev2 IS NULL THEN
-							z2 = (top_elev_aux - arcrec.y2);
+						-- Calculating new values of v_z1 and v_z2
+						IF v_arcrec.custom_elev2 IS NULL AND v_arcrec.elev2 IS NULL THEN
+							v_z2 = (v_topelev - v_arcrec.y2);
 						END IF; 
 
-						IF arcrec.custom_elev1 IS NULL AND arcrec.elev1 IS NULL THEN						
-							IF nodeRecord1.custom_top_elev IS NULL THEN	
-								z1 = (nodeRecord1.top_elev - arcrec.y1);
+						IF v_arcrec.custom_elev1 IS NULL AND v_arcrec.elev1 IS NULL THEN						
+							IF v_noderecord1.custom_top_elev IS NULL THEN	
+								v_z1 = (v_noderecord1.top_elev - v_arcrec.y1);
 							ELSE
-								z1 = (nodeRecord1.custom_top_elev - arcrec.y1);
+								v_z1 = (v_noderecord1.custom_top_elev - v_arcrec.y1);
 							END IF;
 						END IF;
 					END IF;				
 				END IF;
 
 				-- Force a simple update on arc in order to update direction
-				EXECUTE 'UPDATE arc SET the_geom = the_geom WHERE arc_id = ' || quote_literal(arcrec."arc_id");	
+				EXECUTE 'UPDATE arc SET the_geom = the_geom WHERE arc_id = ' || quote_literal(v_arcrec."arc_id");	
 				
 			END LOOP; 
 
 			--updating links
 			v_querytext:= 'SELECT * FROM "link" WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
 
-			FOR arcrec IN EXECUTE v_querytext
+			FOR v_arcrec IN EXECUTE v_querytext
 			LOOP
 				-- Coordinates
-				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(arcrec."link_id") USING arcrec.the_geom, NEW.the_geom; 					
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_arcrec."link_id") USING v_arcrec.the_geom, NEW.the_geom; 					
 			END LOOP; 
 			
 		END IF;
