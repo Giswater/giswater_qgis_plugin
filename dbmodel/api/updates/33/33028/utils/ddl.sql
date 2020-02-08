@@ -8,6 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2020/02/06
-DROP VIEW v_minsector;
-ALTER TABLE minsector ALTER COLUMN the_geom TYPE geometry (multipolygon, SRID_VALUE) USING ST_Multi(the_geom);
+-- 2020/02/07
+ ALTER TABLE config_api_layer ADD COLUMN add_param json;
