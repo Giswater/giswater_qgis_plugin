@@ -142,7 +142,7 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) 
-		SELECT 97, arc_id, arccat_id, ''Arcs with state=1 using nodes with state = 2'', the_geom FROM (', v_querytext,')a');
+		SELECT 97, arc_id, arccat_id, ''Arcs with state=1 using nodes with state = 2'', the_geom FROM ', v_querytext);
 
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 2. Please, check your data before continue'));
