@@ -125,6 +125,7 @@ DECLARE
 	v_status text ='Accepted';
 	v_childtype text;
 	v_errcontext text;
+	v_toggledition boolean;
 
 
 BEGIN
@@ -552,6 +553,9 @@ BEGIN
         END IF;
     END IF;
 
+    -- Get toggledition parameter
+    EXECUTE 'SELECT value::boolean FROM config_param_user WHERE parameter = ''qgis_toggledition_forceopen''' INTO v_toggledition;
+
     v_tablename:= (to_json(v_tablename));
     v_table_parent:= (to_json(v_table_parent));
 
@@ -577,11 +581,13 @@ BEGIN
     v_parentfields := COALESCE(v_parentfields, '{}');
     v_fields := COALESCE(v_fields, '{}');
     v_message := COALESCE(v_message, '{}');
+    v_toggledition := COALESCE(v_toggledition, FALSE);
 
 --    Return
 -----------------------
      RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_apiversion ||
 	      ',"body":{"form":' || v_forminfo ||
+		     ', "toggledition":'|| v_toggledition ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
 			      ',"parentFields":' || v_parentfields ||
