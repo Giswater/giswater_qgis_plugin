@@ -47,10 +47,14 @@ v_element text;
 v_visit text;
 v_doc text;
 v_connect_arc text;
-api_version json;
+v_api_version json;
 v_result_id text= 'feature relations';
 v_result_info text;
 v_result text;
+v_man_table text;
+v_featurecat text;
+v_connect_pol text;
+v_error_context text;
 
 BEGIN
 
@@ -64,36 +68,99 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO api_version;
-        
+        INTO v_api_version;
+    --get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
+
+	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
+	INTO v_featurecat;
+
+	EXECUTE 'SELECT man_table FROM '||v_feature_type||'_type WHERE id = '''||v_featurecat||''';'
+	INTO v_man_table;
 
 	IF v_feature_type='arc' THEN
 	--check connec& gully related to arc
 		SELECT string_agg(feature_id,',') INTO v_connect_connec FROM v_ui_arc_x_relations 
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
 
+		IF v_connect_connec IS NOT NULL THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the feature :',v_connect_connec ));
+		END IF;
+
 		SELECT string_agg(feature_id,',') INTO v_connect_gully FROM v_ui_arc_x_relations 
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='GULLY' AND  arc_id = v_feature_id;
-	
+		
+		IF v_connect_gully IS NOT NULL THEN
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
+
+		END IF;
+		
+
 	--check final nodes related to arc
 		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_ui_arc_x_node WHERE arc_id = v_feature_id;
 		
+		IF v_connect_node IS NOT NULL THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
+			END IF;
+
 	ELSIF v_feature_type='node' THEN
 	--check nodes childs related to node
 
 		IF v_project_type = 'WS' THEN
-		 		SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
+		 	SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
+
+			IF v_connect_node IS NOT NULL THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
+			END IF;
 		END IF;
 	--check arcs related to node
 		SELECT string_agg(arc_id,',') INTO v_connect_arc FROM v_ui_arc_x_node WHERE (node_1 = v_feature_id OR node_2 = v_feature_id);
 		
+		IF v_connect_arc IS NOT NULL THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the feature: ',v_connect_arc ));
+		END IF;
+		--check related polygon
+		IF v_man_table IN ('man_tank', 'man_register', 'man_wwtp', 'man_storage','man_netgully','man_chamber') THEN
+		 	EXECUTE 'SELECT pol_id FROM '||v_man_table||' where node_id= '''||v_feature_id||''';'
+		 	INTO v_connect_pol;
+
+		 	IF v_connect_pol IS NOT NULL THEN
+		 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
+		 	END IF;
+		END IF;
+
 	ELSIF v_feature_type='connec' OR v_feature_type='gully' THEN
-		EXECUTE 'SELECT string_agg(feature_id,'','') FROM link where exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text'
+		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text)
+		OR  (feature_type=''CONNEC''  AND  feature_id = '''||v_feature_id||'''::text)'
 		INTO v_connect_connec;
-		EXECUTE 'SELECT string_agg(feature_id,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '''||v_feature_id||'''::text'
+
+		IF v_connect_connec IS NOT NULL THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Links connected with the feature :',v_connect_connec ));
+		END IF;
+
+		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '''||v_feature_id||'''::text
+		OR  (feature_type=''GULLY''  AND  feature_id = '''||v_feature_id||'''::text)'
 		INTO v_connect_gully;
+
+		IF v_connect_gully IS NOT NULL THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
+		END IF;
+		
+		--check related polygon
+		IF v_man_table = 'man_fountain' THEN
+		 	EXECUTE 'SELECT pol_id FROM '||v_man_table||' where connec_id= '''||v_feature_id||''';'
+		 	INTO v_connect_pol;
+		ELSIF v_feature_type = 'gully' THEN
+			EXECUTE 'SELECT pol_id FROM gully WHERE gully_id = '''||v_feature_id||''';'
+		 	INTO v_connect_pol;
+		END IF;
+
+		IF v_connect_pol IS NOT NULL THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
+		END IF;
+
 	END IF;
 	
 	
@@ -101,29 +168,26 @@ BEGIN
 	EXECUTE 'SELECT string_agg(element_id,'','') FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_element;
 
+	IF v_element IS NOT NULL THEN
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the feature: ',v_element ));
+	END IF;
 	--check visits related to feature
 	EXECUTE 'SELECT string_agg(visit_id::text,'','') FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_visit;
+
+	IF v_visit IS NOT NULL THEN
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the feature: ',v_visit ));
+	END IF;
 
 	--check visits related to feature
 	EXECUTE 'SELECT string_agg(doc_id,'','') FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_doc;
 
+	IF v_doc IS NOT NULL THEN
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the feature: ',v_doc ));
+	END IF;
 
 
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the feature -> ',v_connect_arc ));
-
-IF v_project_type = 'WS' THEN
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature -> ',v_connect_node ));
-END IF;
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the feature -> ',v_connect_connec ));
-
-IF v_project_type = 'UD' THEN 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature -> ',v_connect_gully ));
-END IF;
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the feature -> ',v_element ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the feature -> ',v_doc ));
-INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the feature -> ',v_visit ));
 
 SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=51) row; 
@@ -139,8 +203,13 @@ v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 raise notice 'v_result,%',v_result;
 raise notice 'v_result_info,%',v_result_info;
 
-RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
+RETURN ('{"status":"Accepted", "apiVersion":'||v_api_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
+
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
