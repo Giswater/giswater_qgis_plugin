@@ -204,6 +204,21 @@ class ApiParent(ParentAction):
         return False
 
 
+    def get_feature_by_expr(self, layer, expr_filter):
+        # Check filter and existence of fields
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = f"{expr.parserErrorString()}: {expr_filter}"
+            self.controller.show_warning(message)
+            return
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        # Iterate over features
+        for feature in it:
+            return feature
+        return False
+
+
     def check_actions(self, action, enabled):
 
         action.setChecked(enabled)

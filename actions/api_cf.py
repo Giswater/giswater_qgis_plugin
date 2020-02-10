@@ -645,8 +645,10 @@ class ApiCF(ApiParent, QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
             if widget.property('column_id') == self.field_id:
                 self.feature_id = widget.text()
+                # Set filter expression
+                expr_filter = f"{self.field_id} = '{self.feature_id}'"
                 # Get selected feature
-                self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+                self.feature = self.get_feature_by_expr(self.layer, expr_filter)
         except AttributeError as e:
             message = "The field widgettype is not configured for"
             self.controller.show_message(message, 2, parameter=field['column_id'])
