@@ -480,7 +480,7 @@ class ApiSearch(ApiParent):
                        f" VALUES('{row[0]}', current_user)")
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
-            self.controller.show_warning(msg)
+            self.controller.show_info(msg)
 
 
     def update_selector_workcat(self, workcat_id):
