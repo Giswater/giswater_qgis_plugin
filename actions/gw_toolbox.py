@@ -54,15 +54,12 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        if not complet_result:
+            self.controller.show_message(f"No results for: SELECT {function_name} ($${{{body}}}$$);", 2)
             return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
-        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'])
+        self.populate_trv(self.dlg_toolbox.trv, complet_result['body']['data'])
         self.dlg_toolbox.txt_filter.textChanged.connect(partial(self.filter_functions))
         self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
 
@@ -72,13 +69,11 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        if not complet_result :
             return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'], expand=True)
+        self.populate_trv(self.dlg_toolbox.trv, complet_result['body']['data'], expand=True)
 
 
     def open_function(self, index):
