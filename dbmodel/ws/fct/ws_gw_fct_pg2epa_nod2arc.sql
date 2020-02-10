@@ -6,42 +6,45 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2316
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
+DROP FUNCTION IF EXISTS "ws".gw_fct_pg2epa_nod2arc(varchar);
 CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
 AS $BODY$
 
 /*example
-select SCHEMA_NAME.gw_fct_pg2epa_nod2arc ('testbgeo3', true)
+select ws.gw_fct_pg2epa_nod2arc ('testbgeo3', true)
 */
 
 DECLARE
-	record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
-	record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-	record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-	record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-	node_diameter double precision;
-	valve_arc_geometry geometry;
-	valve_arc_node_1_geom geometry;
-	valve_arc_node_2_geom geometry;
-	arc_reduced_geometry geometry;
-	node_id_aux text;
-	num_arcs integer;
-	shortpipe_record record;
-	to_arc_aux text;
-	arc_id_aux text;
-	error_var text;
-	v_nod2arc float;
-	v_query_text text;
-	v_arcsearchnodes float;
-	v_status text;
-	v_nodarc_min float;
-	v_count integer = 1;
-	v_buildupmode int2 = 2;
+v_node record;
+v_arc record;
+v_arc1 record;
+v_arc2 record;
+v_newarc record;
+v_nodediam double precision;
+v_arc_geom geometry;
+v_node1_geom geometry;
+v_node2_geom geometry;
+v_arcreduced_geom geometry;
+v_node_id text;
+v_numarcs integer;
+v_shortpipe record;
+v_toarc text;
+v_arc_id text;
+v_error text;
+v_nod2arc float;
+v_querytext text;
+v_arcsearchnodes float;
+v_status text;
+v_nodarc_min float;
+v_count integer = 1;
+v_buildupmode int2 = 2;
+v_angle1 float;
+v_angle2 float;
 
 BEGIN
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws", public;
 
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
 
@@ -90,7 +93,7 @@ BEGIN
 		GROUP by node_id, nodecat_id, the_geom
 		HAVING count(*) > 2;
 	
-		v_query_text = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||'
+		v_querytext = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||'
 				AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (66,67) and cur_user=current_user) UNION 
 				SELECT a.node_id FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var)||'
 				AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (66,67) and cur_user=current_user) UNION 
@@ -98,7 +101,7 @@ BEGIN
 				' AND to_arc IS NOT NULL AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (66,67) and cur_user=current_user)';
 
 	ELSIF v_buildupmode > 1 AND p_only_mandatory_nodarc THEN
-		v_query_text = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
+		v_querytext = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
 				AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION  
 				SELECT a.node_id FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var)||' 
 				AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION 
@@ -106,7 +109,7 @@ BEGIN
 				' AND to_arc IS NOT NULL AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user)';
 			
 	ELSIF v_buildupmode > 1 AND p_only_mandatory_nodarc IS FALSE THEN
-		v_query_text = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id ='||quote_literal(result_id_var)||' 
+		v_querytext = 'SELECT a.node_id FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id ='||quote_literal(result_id_var)||' 
 				 AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION 
 				SELECT a.node_id FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id ='||quote_literal(result_id_var)||' 
 				 AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user) UNION 
@@ -114,226 +117,269 @@ BEGIN
 				 AND a.node_id NOT IN (SELECT node_id FROM anl_node WHERE fprocesscat_id IN (67) and cur_user=current_user)';
 	END IF;
 
-    FOR node_id_aux IN EXECUTE v_query_text
+    FOR v_node_id IN EXECUTE v_querytext
     LOOP
     
 	v_count = v_count + 1;
 	
         -- Get node data
-	SELECT * INTO record_node FROM rpt_inp_node WHERE node_id = node_id_aux AND result_id=result_id_var;
+	SELECT * INTO v_node FROM rpt_inp_node WHERE node_id = v_node_id AND result_id=result_id_var;
 
         -- Get arc data
-        SELECT COUNT(*) INTO num_arcs FROM rpt_inp_arc WHERE (node_1 = node_id_aux OR node_2 = node_id_aux) AND result_id=result_id_var;
+        SELECT COUNT(*) INTO v_numarcs FROM rpt_inp_arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND result_id=result_id_var;
 
         -- Get arcs
-        SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var;
-        SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var;
+        SELECT * INTO v_arc1 FROM rpt_inp_arc WHERE node_1 = v_node_id AND result_id=result_id_var;
+        SELECT * INTO v_arc2 FROM rpt_inp_arc WHERE node_2 = v_node_id AND result_id=result_id_var;
 
-
-        -- Just 1 arcs
-        IF num_arcs = 1 THEN
+        IF v_numarcs = 0 THEN
+            CONTINUE;      
+        
+        ELSIF v_numarcs = 1 THEN
 
             -- Compute valve geometry
-            IF record_arc2 ISNULL THEN
+            IF v_arc2 ISNULL THEN
 
                 -- Use arc 1 as reference
-                record_new_arc = record_arc1;
-    
-                -- TODO: Control pipe shorter than 0.5 m!
-                valve_arc_node_1_geom := ST_StartPoint(record_arc1.the_geom);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, v_nod2arc / ST_Length(record_arc1.the_geom));
+                v_newarc = v_arc1;
+                v_node1_geom := ST_StartPoint(v_arc1.the_geom);
+                v_node2_geom := ST_LineInterpolatePoint(v_arc1.the_geom, v_nod2arc / ST_Length(v_arc1.the_geom));
 
                 -- Correct arc geometry
-                arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-       		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc1.the_geom,ST_LineLocatePoint(v_arc1.the_geom,v_node2_geom),1);
+       		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;    
-		UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id AND result_id=result_id_var; 
+		UPDATE rpt_inp_arc SET the_geom = v_arcreduced_geom, node_1 = (SELECT concat(v_node_id, '_n2a_2')) WHERE arc_id = v_arc1.arc_id AND result_id=result_id_var; 
  	    
-            ELSIF record_arc1 ISNULL THEN
+            ELSIF v_arc1 ISNULL THEN
  
                 -- Use arc 2 as reference
-                record_new_arc = record_arc2;
-
-                valve_arc_node_2_geom := ST_EndPoint(record_arc2.the_geom);
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom));
+                v_newarc = v_arc2;
+                v_node2_geom := ST_EndPoint(v_arc2.the_geom);
+                v_node1_geom := ST_LineInterpolatePoint(v_arc2.the_geom, 1 - v_nod2arc / ST_Length(v_arc2.the_geom));
 
                 -- Correct arc geometry
-                arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc2.the_geom,0,ST_LineLocatePoint(v_arc2.the_geom,v_node1_geom));
+		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE arc_id = record_arc2.arc_id AND result_id=result_id_var;
+                UPDATE rpt_inp_arc SET the_geom = v_arcreduced_geom, node_2 = (SELECT concat(v_node_id, '_n2a_1')) WHERE arc_id = v_arc2.arc_id AND result_id=result_id_var;
 
             END IF;
 
-        -- Two arcs
-        ELSIF num_arcs = 2 THEN
+        ELSIF v_numarcs = 2 THEN
 
             -- Two 'node_2' arcs
-            IF record_arc1 ISNULL THEN
+            IF v_arc1 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO v_arc2 FROM rpt_inp_arc WHERE node_2 = v_node_id AND result_id=result_id_var ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO v_arc1 FROM rpt_inp_arc WHERE node_2 = v_node_id AND result_id=result_id_var ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
-                record_new_arc = record_arc1;
+                v_newarc = v_arc1;
     
                 -- TODO: Control pipe shorter than 0.5 m!
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom) / 2);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, 1 - v_nod2arc / ST_Length(record_arc1.the_geom) / 2);
+                v_node1_geom := ST_LineInterpolatePoint(v_arc2.the_geom, 1 - v_nod2arc / ST_Length(v_arc2.the_geom) / 2);
+                v_node2_geom := ST_LineInterpolatePoint(v_arc1.the_geom, 1 - v_nod2arc / ST_Length(v_arc1.the_geom) / 2);
 
                 -- Correct arc geometry
-                arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,0,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom));
-		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc1.the_geom,0,ST_LineLocatePoint(v_arc1.the_geom,v_node2_geom));
+		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id AND result_id=result_id_var; 
+                UPDATE rpt_inp_arc AS a SET the_geom = v_arcreduced_geom, node_2 = (SELECT concat(v_node_id, '_n2a_2')) WHERE a.arc_id = v_arc1.arc_id AND result_id=result_id_var; 
 
-                arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc2.the_geom,0,ST_LineLocatePoint(v_arc2.the_geom,v_node1_geom));
+		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id AND result_id=result_id_var;
+                UPDATE rpt_inp_arc SET the_geom = v_arcreduced_geom, node_2 = (SELECT concat(v_node_id, '_n2a_1')) WHERE a.arc_id = v_arc2.arc_id AND result_id=result_id_var;
 
 
             -- Two 'node_1' arcs
-            ELSIF record_arc2 ISNULL THEN
+            ELSIF v_arc2 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO v_arc1 FROM rpt_inp_arc WHERE node_1 = v_node_id AND result_id=result_id_var ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO v_arc2 FROM rpt_inp_arc WHERE node_1 = v_node_id AND result_id=result_id_var ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
-                record_new_arc = record_arc1;
+                v_newarc = v_arc1;
     
                 -- TODO: Control arc shorter than 0.5 m!
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, v_nod2arc / ST_Length(record_arc2.the_geom) / 2);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, v_nod2arc / ST_Length(record_arc1.the_geom) / 2);
+                v_node1_geom := ST_LineInterpolatePoint(v_arc2.the_geom, v_nod2arc / ST_Length(v_arc2.the_geom) / 2);
+                v_node2_geom := ST_LineInterpolatePoint(v_arc1.the_geom, v_nod2arc / ST_Length(v_arc1.the_geom) / 2);
 
                 -- Correct arc geometry
-                arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc1.the_geom,ST_LineLocatePoint(v_arc1.the_geom,v_node2_geom),1);
+		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id AND result_id=result_id_var; 
+                UPDATE rpt_inp_arc AS a SET the_geom = v_arcreduced_geom, node_1 = (SELECT concat(v_node_id, '_n2a_2')) WHERE a.arc_id = v_arc1.arc_id AND result_id=result_id_var; 
 
-                arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom),1);
-		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc2.the_geom,ST_LineLocatePoint(v_arc2.the_geom,v_node1_geom),1);
+		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id AND result_id=result_id_var;
+                UPDATE rpt_inp_arc SET the_geom = v_arcreduced_geom, node_1 = (SELECT concat(v_node_id, '_n2a_1')) WHERE a.arc_id = v_arc2.arc_id AND result_id=result_id_var;
                         
 
             -- One 'node_1' and one 'node_2'
             ELSE
 
                 -- Use arc 1 as reference (TODO: Why?)
-                record_new_arc = record_arc1;
+                v_newarc = v_arc1;
 
 		-- control pipes
-                IF ST_Length(record_arc2.the_geom)/2 < v_nod2arc OR ST_Length(record_arc1.the_geom)/2 <  v_nod2arc THEN
-			--RAISE EXCEPTION 'It''s impossible to continue. Nodarc % has close pipes with length:( %, % ) versus nodarc length ( % )', node_id_aux, ST_Length(record_arc2.the_geom), ST_Length(record_arc1.the_geom),v_nod2arc ;
+                IF ST_Length(v_arc2.the_geom)/2 < v_nod2arc OR ST_Length(v_arc1.the_geom)/2 <  v_nod2arc THEN
+			--RAISE EXCEPTION 'It''s impossible to continue. Nodarc % has close pipes with length:( %, % ) versus nodarc length ( % )', v_node_id, ST_Length(v_arc2.the_geom), ST_Length(v_arc1.the_geom),v_nod2arc ;
 			v_nod2arc = 0.001;
                 END IF;
     
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom) / 2);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, v_nod2arc / ST_Length(record_arc1.the_geom) / 2);
+                v_node1_geom := ST_LineInterpolatePoint(v_arc2.the_geom, 1 - v_nod2arc / ST_Length(v_arc2.the_geom) / 2);
+                v_node2_geom := ST_LineInterpolatePoint(v_arc1.the_geom, v_nod2arc / ST_Length(v_arc1.the_geom) / 2);
 
                 -- Correct arc geometry
-                arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc1.the_geom,ST_LineLocatePoint(v_arc1.the_geom,v_node2_geom),1);
+		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id AND result_id=result_id_var; 
+                UPDATE rpt_inp_arc AS a SET the_geom = v_arcreduced_geom, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = v_arc1.arc_id AND result_id=result_id_var; 
 
-                arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-		IF ST_GeometryType(arc_reduced_geometry) != 'ST_LineString' THEN
-			error_var = concat(record_arc1.arc_id,',',ST_GeometryType(arc_reduced_geometry));
-			PERFORM audit_function(2022,2316,error_var);
+                v_arcreduced_geom := ST_LineSubstring(v_arc2.the_geom,0,ST_LineLocatePoint(v_arc2.the_geom,v_node1_geom));
+		IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+			v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+			PERFORM audit_function(2022,2316,v_error);
 		END IF;
-                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id AND result_id=result_id_var;
+                UPDATE rpt_inp_arc SET the_geom = v_arcreduced_geom, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = v_arc2.arc_id AND result_id=result_id_var;
                         
             END IF;
 
-        -- num_arcs 0 or > 2
-        ELSE
+        ELSIF v_numarcs > 2 THEN
 
-            CONTINUE;
-                        
+		-- get arc with maximun radial separation againts others
+		v_angle1 = 0;
+		v_angle2 = 0;
+		
+		FOR v_arc1 IN (SELECT *, case when ST_Azimuth (st_startpoint(the_geom), st_endpoint(the_geom)) > 3.14 then abs(ST_Azimuth (st_startpoint(the_geom), st_endpoint(the_geom))-6.28) 
+		else ST_Azimuth (st_startpoint(the_geom), st_endpoint(the_geom)) end as angle FROM 
+		(SELECT * FROM rpt_inp_arc WHERE node_1 = v_node_id AND result_id=result_id_var UNION SELECT * FROM rpt_inp_arc WHERE node_2 = v_node_id AND result_id=result_id_var)a)
+		LOOP		
+			FOR v_arc2 IN (SELECT *,case when ST_Azimuth (st_startpoint(the_geom), st_endpoint(the_geom)) > 3.14 then abs(ST_Azimuth (st_startpoint(the_geom), st_endpoint(the_geom))-6.28) 
+			else ST_Azimuth (st_startpoint(the_geom), st_endpoint(the_geom)) end as angle FROM
+			(SELECT * FROM rpt_inp_arc WHERE node_1 = v_node_id AND result_id=result_id_var UNION SELECT * FROM rpt_inp_arc WHERE node_2 = v_node_id AND result_id=result_id_var)a)
+			LOOP 
+				v_angle2 = v_angle2 + abs(v_arc1.angle - v_arc2.angle);
+			END LOOP;
+
+			-- setting new value of arc
+			IF  v_angle2 > v_angle1 THEN
+				v_arc = v_arc2;
+				v_angle1 = v_angle2;
+			END IF;
+			v_angle2 = 0;
+			
+		END LOOP;
+
+                -- Use arc as reference
+                v_newarc = v_arc;
+
+		IF v_arc.node_1 = v_node.node_id THEN
+			v_node1_geom := ST_StartPoint(v_arc1.the_geom);
+			v_node2_geom := ST_LineInterpolatePoint(v_arc1.the_geom, v_nod2arc / ST_Length(v_arc1.the_geom));
+
+			-- Correct arc geometry
+			v_arcreduced_geom := ST_LineSubstring(v_arc1.the_geom,ST_LineLocatePoint(v_arc1.the_geom,v_node2_geom),1);
+			IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+				v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+				PERFORM audit_function(2022,2316,v_error);
+			END IF;    
+			UPDATE rpt_inp_arc SET the_geom = v_arcreduced_geom, node_1 = (SELECT concat(v_node_id, '_n2a_2')) WHERE arc_id = v_arc1.arc_id AND result_id=result_id_var; 
+ 	    
+		ELSIF v_arc.node_2 = v_node.node_id THEN
+			v_node2_geom := ST_EndPoint(v_arc2.the_geom);
+			v_node1_geom := ST_LineInterpolatePoint(v_arc2.the_geom, 1 - v_nod2arc / ST_Length(v_arc2.the_geom));
+
+			-- Correct arc geometry
+			v_arcreduced_geom := ST_LineSubstring(v_arc2.the_geom,0,ST_LineLocatePoint(v_arc2.the_geom,v_node1_geom));
+			IF ST_GeometryType(v_arcreduced_geom) != 'ST_LineString' THEN
+				v_error = concat(v_arc1.arc_id,',',ST_GeometryType(v_arcreduced_geom));
+				PERFORM audit_function(2022,2316,v_error);
+			END IF;
+			UPDATE rpt_inp_arc SET the_geom = v_arcreduced_geom, node_2 = (SELECT concat(v_node_id, '_n2a_1')) WHERE arc_id = v_arc2.arc_id AND result_id=result_id_var;
+		END IF; 
         END IF;
 
         -- Create new arc geometry
-        valve_arc_geometry := ST_MakeLine(valve_arc_node_1_geom, valve_arc_node_2_geom);
+        v_arc_geom := ST_MakeLine(v_node1_geom, v_node2_geom);
 
         -- Values to insert into arc table
-        record_new_arc.arc_id := concat(node_id_aux, '_n2a');   
-	record_new_arc.arccat_id := record_node.nodecat_id;
-	record_new_arc.epa_type := record_node.epa_type;
-        record_new_arc.sector_id := record_node.sector_id;
-        record_new_arc.state := record_node.state;
-        record_new_arc.state_type := record_node.state_type;
-        record_new_arc.annotation := record_node.annotation;
-        record_new_arc.length := ST_length2d(valve_arc_geometry);
-        record_new_arc.the_geom := valve_arc_geometry;
-        
-
+        v_newarc.arc_id := concat(v_node_id, '_n2a');   
+	v_newarc.arccat_id := v_node.nodecat_id;
+	v_newarc.epa_type := v_node.epa_type;
+        v_newarc.sector_id := v_node.sector_id;
+        v_newarc.state := v_node.state;
+        v_newarc.state_type := v_node.state_type;
+        v_newarc.annotation := v_node.annotation;
+        v_newarc.length := ST_length2d(v_arc_geom);
+        v_newarc.the_geom := v_arc_geom;
+        v_newarc.minorloss := v_node.childparam->>'minorloss';
+        v_newarc.diameter := v_node.childparam->>'diameter';
+        v_newarc.status := v_node.childparam->>'status';
+        v_newarc.childparam := gw_fct_json_object_delete_keys(v_node.childparam, 'minorloss', 'diameter', 'status');
+       
         -- Identifing and updating (if it's needed) the right direction
-	SELECT to_arc,status INTO to_arc_aux, v_status FROM (SELECT node_id,to_arc,status FROM inp_valve UNION SELECT node_id,to_arc,status FROM inp_shortpipe UNION 
-								SELECT node_id,to_arc,status FROM inp_pump) a WHERE node_id=node_id_aux;
+	SELECT to_arc,status INTO v_toarc, v_status FROM (SELECT node_id,to_arc,status FROM inp_valve UNION SELECT node_id,to_arc,status FROM inp_shortpipe UNION 
+								SELECT node_id,to_arc,status FROM inp_pump) a WHERE node_id=v_node_id;
 
-	SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
-			ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
+	SELECT arc_id INTO v_arc_id FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(v_newarc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
+			ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(v_newarc.the_geom)) LIMIT 1;
 
-	IF arc_id_aux=to_arc_aux THEN
-		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
-		record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+	IF v_arc_id=v_toarc THEN
+		v_newarc.node_1 := concat(v_node_id, '_n2a_1');
+		v_newarc.node_2 := concat(v_node_id, '_n2a_2');
 	ELSE
-		record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
-		record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
-		record_new_arc.the_geom := st_reverse(record_new_arc.the_geom);
+		v_newarc.node_2 := concat(v_node_id, '_n2a_1');
+		v_newarc.node_1 := concat(v_node_id, '_n2a_2');
+		v_newarc.the_geom := st_reverse(v_newarc.the_geom);
 	END IF; 
 
-
         -- Inserting new arc into arc table
-        INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, status, the_geom)
-	VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.arccat_id, record_new_arc.epa_type, record_new_arc.sector_id, 
-	record_new_arc.state, record_new_arc.state_type, record_new_arc.diameter, record_new_arc.roughness, record_new_arc.annotation, record_new_arc.length, v_status, record_new_arc.the_geom);
+        INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, status, the_geom, minorloss, chidparam)
+	VALUES(result_id_var, v_newarc.arc_id, v_newarc.node_1, v_newarc.node_2, 'NODE2ARC', v_newarc.arccat_id, v_newarc.epa_type, v_newarc.sector_id, 
+	v_newarc.state, v_newarc.state_type, v_newarc.diameter, v_newarc.roughness, v_newarc.annotation, v_newarc.length, v_status, v_newarc.the_geom, v_newarc.minorloss, v_newarc.childparam);
 
-        -- Inserting new nodes into node table
-        record_node.epa_type := 'JUNCTION';
-        record_node.the_geom := valve_arc_node_1_geom;
-        record_node.node_id := concat(node_id_aux, '_n2a_1');
-		
+        -- Inserting new node1 into node table
+        v_node.epa_type := 'JUNCTION';
+        v_node.the_geom := v_node1_geom;
+        v_node.node_id := concat(v_node_id, '_n2a_1');
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
-	VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
-	record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
+	VALUES(result_id_var, v_node.node_id, v_node.elevation, v_node.elev, 'NODE2ARC', v_node.nodecat_id, v_node.epa_type, 
+	v_node.sector_id, v_node.state, v_node.state_type, v_node.annotation, 0, v_node.the_geom);
 
-        record_node.the_geom := valve_arc_node_2_geom;
-        record_node.node_id := concat(node_id_aux, '_n2a_2');
+        -- Inserting new node2 into node table
+        v_node.epa_type := 'JUNCTION';
+        v_node.the_geom := v_node2_geom;
+        v_node.node_id := concat(v_node_id, '_n2a_2');
         INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom) 
-	VALUES(result_id_var, record_node.node_id, record_node.elevation, record_node.elev, 'NODE2ARC', record_node.nodecat_id, record_node.epa_type, 
-	record_node.sector_id, record_node.state, record_node.state_type, record_node.annotation, 0, record_node.the_geom);
-
+	VALUES(result_id_var, v_node.node_id, v_node.elevation, v_node.elev, 'NODE2ARC', v_node.nodecat_id, v_node.epa_type, 
+	v_node.sector_id, v_node.state, v_node.state_type, v_node.annotation, 0, v_node.the_geom);
 
         -- Deleting old node from node table
-        DELETE FROM rpt_inp_node WHERE node_id =  node_id_aux AND result_id=result_id_var;
-
+        DELETE FROM rpt_inp_node WHERE node_id =  v_node_id AND result_id=result_id_var;
 
     END LOOP;
 
-
     RETURN 1;
-
-
 		
 END;
 $BODY$

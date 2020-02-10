@@ -37,6 +37,7 @@ v_diameter float;
 v_defaultdemand float;
 v_demandtype int2;
 v_switch2junction text;
+v_defaultcurve text;
 
 BEGIN
 
@@ -47,25 +48,28 @@ BEGIN
 	SELECT epsg INTO v_srid FROM version LIMIT 1;
 
 	-- get user variables
-	SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_nullbuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'node')::json->>'ceroElevBuffer' INTO v_cerobuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
-	SELECT (value::json->>'reservoir')::json->>'switch2Junction' INTO v_switch2junction FROM config_param_user WHERE parameter = 'inp_options_buildup_distribution' AND cur_user=current_user;
+	SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_nullbuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'node')::json->>'ceroElevBuffer' INTO v_cerobuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'reservoir')::json->>'switch2Junction' INTO v_switch2junction FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pressGroup')::json->>'defaultCurve' INTO v_defaultcurve FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
-
 	
 	-- switch to junction an specific list of RESERVOIRS
 	UPDATE rpt_inp_node SET epa_type = 'JUNCTION' WHERE node_id IN (select node_id FROM v_edit_node
 	JOIN (select unnest((replace (replace((v_switch2junction::text),'[','{'),']','}'))::text[]) as type)a ON a.type = node_type) AND result_id = p_result;
-	
+
+	-- setting pump curves where curve_id is null
+	UPDATE rpt_inp_arc SET childparam = gw_fct_json_object_set_key(childparam, 'curve_id', v_defaultcurve) WHERE childparam->>'curve_id' IS NULL AND childparam->>'pump_type'='1' AND result_id = p_result ;
+
 	-- delete orphan nodes
 	DELETE FROM rpt_inp_node WHERE result_id = p_result AND node_id NOT IN 
 	(SELECT node_1 FROM rpt_inp_arc WHERE result_id = p_result UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id = p_result) ;
@@ -156,8 +160,7 @@ BEGIN
 		UPDATE rpt_inp_arc SET status= v_forcestatusprv WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve); 
 	END IF;
 
-	-- switch reservoirs to junction
-	
+
 	
 
     RETURN 1;

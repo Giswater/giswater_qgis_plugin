@@ -9,4 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/01/30
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"inp_","table":"inp_pump_additional", "column":"to_arc", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"childparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"childparam", "dataType":"json", "isUtils":"False"}}$$);

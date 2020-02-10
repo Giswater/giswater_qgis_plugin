@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2430
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_check_data(text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
+DROP FUNCTION IF EXISTS ws.gw_fct_pg2epa_check_data(text);
+CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -83,12 +83,13 @@ v_qmllinepath text = '';
 v_qmlpolpath text = '';
 v_doublen2a integer;
 v_geometrylog boolean;
+v_advancedsettings text;
 v_advancedsettingsval text;
 
 BEGIN
 
 	--  Search path	
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws", public;
 
 	-- getting input data 	
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;  -- deprecated parameter (not used after 3.3.019)
@@ -1168,23 +1169,6 @@ BEGIN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 					VALUES (14, v_result_id, 3, ' Change the pattern method using some of the CONNEC method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
 				END IF;		
-			END IF;
-
-			-- Check for missed features on inp tables
-			v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) 
-				AND state > 0 AND epa_type !=''NOT DEFINED'' UNION SELECT node_id FROM node WHERE node_id 
-				NOT IN (select node_id from inp_shortpipe UNION select node_id from inp_valve UNION select node_id from inp_tank 
-				UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump UNION SELECT node_id from inp_inlet 
-				UNION SELECT node_id from inp_junction) AND state >0 AND epa_type !=''NOT DEFINED'') a';
-		
-			EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (14, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
-			ELSE
-				INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-				VALUES (14, 1, 'INFO: No features missed on inp_tables found.');
 			END IF;
 			
 		END IF;
