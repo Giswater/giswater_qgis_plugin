@@ -175,7 +175,7 @@ BEGIN
 	END IF;
 
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (106, 2, 'Topoccontrol is deactivated.');
+		VALUES (106, 2, 'Topocontrol is deactivated.');
 	
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (106, 1, concat('INFO: Features inserted with state: ',v_state,' and state type: ',v_state_type,'.'));	
