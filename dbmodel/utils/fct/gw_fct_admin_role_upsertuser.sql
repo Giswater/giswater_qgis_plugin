@@ -15,43 +15,42 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
-"data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":"123", "role":"role_basic", "action":"insert", 
-"manager_id":["1","2"], "gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "user_id": "john", "user_name":"John Smith", "password":"123", "role":"role_basic", "action":"insert", 
+"manager_x_schema":{"ws_sample":["1","3"],"ud_sample":["2"],"ws_sample_dev":[]}}}$$);
+
+ 
+SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
+"client":{"device":9, "infoType":100, "lang":"ES"}, 
+"form":{}, 
+"data":{"filterFields":{}, "pageInfo":{}, "user_id": "john", "user_name":"John Smith", "password":"32", 
+"role":"role_edit", "action":"update","manager_x_schema":{"ws_sample":["2"],"ud_sample":["3","1"],"ws_sample_dev":[]}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
-"data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":"32", "role":"role_edit", "action":"update","manager_id":["1"],
-"gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "user_id": "john", "user_name":"John Smith", "password":"32", 
+"role":"role_edit", "action":"delete","manager_x_schema":{"ws_sample":["2"],"ud_sample":["3","1"],"ws_sample_dev":[]}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
-"client":{"device":9, "infoType":100, "lang":"ES"}, 
-"form":{}, 
-"data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":"456", "role":null, "action":"update",
-"gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_admin_role_upsertuser($${
-"client":{"device":9, "infoType":100, "lang":"ES"}, 
-"form":{}, "data":{"filterFields":{}, "pageInfo":{}, "user_name":"john", "password":null, "role":null, "action":"delete","manager_id":null,
-"gw_schema":["SCHEMA_NAME","SCHEMA_NAME"]}}$$);
 */
-
 
 DECLARE
 	v_user_name text;
+	v_user_id text;
 	v_password text;
 	v_role text;
 	v_action text;
 	v_current_role text;
+	v_current_name text;
 	v_version text;
 	v_manager json;
 	v_manager_array text[];
 	v_expl_array integer[];
 	v_current_manager text[];
 	v_sys_expl_x_user boolean;
-	v_gw_schema json;
 	v_gw_schema_array text[];
-
+	v_manager_x_schema json;
+	v_manager_x_schema_array text[];
+	
 	v_result_point json;
 	v_result_line json;
 	v_result_polygon json;
@@ -71,15 +70,15 @@ BEGIN
 	SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
 
 	v_user_name = lower(((p_data ->>'data')::json->>'user_name')::text);
+	v_user_id = lower(((p_data ->>'data')::json->>'user_id')::text);
 	v_password = ((p_data ->>'data')::json->>'password')::text;
 	v_role = ((p_data ->>'data')::json->>'role')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_manager = ((p_data->>'data')::json->>'manager_id')::text;
-	v_gw_schema = ((p_data->>'data')::json->>'gw_schema')::text;
+	v_manager_x_schema = ((p_data->>'data')::json->>'manager_x_schema')::text;
 	
-	--change managers and schema list into array
-	v_manager_array=(SELECT array_agg(value) AS list FROM json_array_elements_text(v_manager) );
-	v_gw_schema_array=(SELECT array_agg(value) AS list FROM json_array_elements_text(v_gw_schema) );
+	--change schema list into array
+	v_gw_schema_array = (SELECT array_agg(a.key) result FROM json_each(v_manager_x_schema) a);
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=107 AND user_name=current_user;
@@ -91,140 +90,163 @@ BEGIN
 
 	IF v_action = 'insert' THEN
 
-
 		--create user in  a database, encrypt password and assign a role	
-		IF (SELECT 1 FROM pg_roles WHERE rolname=v_user_name) is null THEN
+		IF (SELECT 1 FROM pg_roles WHERE rolname=v_user_id) is null THEN
 		
-			EXECUTE 'CREATE USER '||v_user_name||' WITH ENCRYPTED PASSWORD '''||v_password||''';';
+			EXECUTE 'CREATE USER '||v_user_id||' WITH ENCRYPTED PASSWORD '''||v_password||''';';
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (107, null, 1, concat('INFO: User ',v_user_name,' created in a database'));
+			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' created in a database'));
 	
 		ELSE
 			RETURN audit_function(3040,2780);
 		END IF;
 
-		EXECUTE 'GRANT '||v_role||' TO '||v_user_name||';';
+		EXECUTE 'GRANT '||v_role||' TO '||v_user_id||';';
 		
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (107, null, 1, concat('INFO: Role ',v_role,' granted.'));
-		
+	
 		FOREACH rec_schema IN ARRAY v_gw_schema_array LOOP
 			--insert user into user catalog
 			EXECUTE 'INSERT INTO '||rec_schema||'.cat_users (id,name,sys_role) 
-			VALUES ('''||v_user_name||''','''||v_user_name||''','''||v_role||''') ON CONFLICT (id) DO NOTHING;';
+			VALUES ('''||v_user_id||''','''||v_user_name||''','''||v_role||''') ON CONFLICT (id) DO NOTHING;';
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (107, null, 1, concat('INFO: User ',v_user_name,' inserted into cat_users of schema ',rec_schema,'.'));
+			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into cat_users of schema ',rec_schema,'.'));
 
 			EXECUTE 'SELECT value::boolean  
 			FROM '||rec_schema||'.config_param_system WHERE parameter = ''sys_exploitation_x_user'''
 			INTO v_sys_expl_x_user;
 
 			IF v_sys_expl_x_user THEN
+				--get the defined manager for the schema
+				v_manager=(v_manager_x_schema::json->>rec_schema)::text;
+				--change manager list into array
+				v_manager_array=(SELECT array_agg(value) AS list FROM json_array_elements_text(v_manager) );
+				
 				--insert user into related cat_manager and exploitation if managing exploitation for user is used (true)
 				FOREACH rec_manager IN ARRAY v_manager_array LOOP
 					EXECUTE 'UPDATE '||rec_schema||'.cat_manager 
-					SET username = array_append(username,'''||v_user_name||''') WHERE id = '||rec_manager::integer||';';
+					SET username = array_append(username,'''||v_user_id||''') WHERE id = '||rec_manager::integer||';';
 				END LOOP;
 				
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (107, null, 1, concat('INFO: User ',v_user_name,' inserted into cat_manager of schema ',rec_schema,'.'));
+				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into cat_manager of schema ',rec_schema,'.'));
 
 				--insert values for the new user into basic selectors
 				EXECUTE 'INSERT INTO '||rec_schema||'.selector_state (state_id, cur_user) 
-				VALUES (1,'''||v_user_name||''') ON CONFLICT (state_id,cur_user) DO NOTHING';
+				VALUES (1,'''||v_user_id||''') ON CONFLICT (state_id,cur_user) DO NOTHING';
 
 				EXECUTE 'INSERT INTO '||rec_schema||'.selector_expl (expl_id, cur_user) 
-				SELECT expl_id, '''||v_user_name||''' FROM '||rec_schema||'.exploitation_x_user 
-				WHERE username= '''||v_user_name||''' ON CONFLICT (expl_id,cur_user) DO NOTHING';
+				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.exploitation_x_user 
+				WHERE username= '''||v_user_id||''' ON CONFLICT (expl_id,cur_user) DO NOTHING';
 	
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (107, null, 1, concat('INFO: User ',v_user_name,' inserted into expl and state selectors of schema ',rec_schema,'.'));
+				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into expl and state selectors of schema ',rec_schema,'.'));
 
 			ELSE
 				--insert values for the new user into basic selectors
 				EXECUTE 'INSERT INTO '||rec_schema||'.selector_state (state_id, cur_user) 
-				VALUES (1,'''||v_user_name||''') ON CONFLICT (state_id,cur_user) DO NOTHING';
+				VALUES (1,'''||v_user_id||''') ON CONFLICT (state_id,cur_user) DO NOTHING';
 	
 				EXECUTE 'INSERT INTO '||rec_schema||'.selector_expl (expl_id, cur_user) 
-				SELECT expl_id, '''||v_user_name||''' FROM '||rec_schema||'.exploitation 
+				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.exploitation 
 				ON CONFLICT (expl_id,cur_user) DO NOTHING';
 	
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (107, null, 1, concat('INFO: User ',v_user_name,' inserted into expl and state selectors of schema ',rec_schema,'.'));
+				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into expl and state selectors of schema ',rec_schema,'.'));
 
 			END IF;
 
-
 		END LOOP;
-
 	ElSIF v_action = 'update' THEN
 
 		--assign a new password if its not null
 		IF v_password IS NOT NULL THEN
 
-			EXECUTE 'ALTER USER '||v_user_name||' WITH ENCRYPTED PASSWORD '''||v_password||''';';
+			EXECUTE 'ALTER USER '||v_user_id||' WITH ENCRYPTED PASSWORD '''||v_password||''';';
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (107, null, 1, concat('INFO: Password changed for user ',v_user_name,'.'));
+			VALUES (107, null, 1, concat('INFO: Password changed for user ',v_user_id,'.'));
 		END IF;
 
 		--check users current role
 		EXECUTE 'SELECT rolname FROM pg_user u JOIN pg_auth_members m ON (m.member = u.usesysid) JOIN pg_roles r ON (r.oid = m.roleid)
-		WHERE  u.usename = '''||v_user_name||''';'
+		WHERE  u.usename = '''||v_user_id||''';'
 		INTO v_current_role;
 
 		--assign a new role if its different than the current one and change values in users catalog
 		IF v_role != v_current_role AND v_role IS NOT NULL THEN
 
-			EXECUTE ' REVOKE '||v_current_role||' FROM '||v_user_name||';';
+			EXECUTE ' REVOKE '||v_current_role||' FROM '||v_user_id||';';
 
-			EXECUTE ' GRANT '||v_role||' TO '||v_user_name||';';
+			EXECUTE ' GRANT '||v_role||' TO '||v_user_id||';';
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (107, null, 1, concat('INFO: Role changed to ',v_role,'.'));
 
+
+			FOREACH rec_schema IN ARRAY v_gw_schema_array LOOP
+
+				--update cat_users with new role
+				IF v_role != v_current_role AND v_role IS NOT NULL THEN
+
+					EXECUTE 'UPDATE '||rec_schema||'.cat_users SET sys_role = '''||v_role||''' WHERE id = '''||v_user_id||''';';
+
+				END IF;
+				
+			END LOOP;
+		END IF;
+		
+		--check users current name and update it if it changed
+		SELECT name INTO v_current_name FROM cat_users WHERE id = v_user_id;
+
+		IF v_user_name != v_current_name THEN
+			UPDATE cat_users SET name = v_user_name WHERE id=v_user_id;
+		END IF;
+
 		FOREACH rec_schema IN ARRAY v_gw_schema_array LOOP
 
-			--update cat_users with new role
-			IF v_role != v_current_role AND v_role IS NOT NULL THEN
-
-				EXECUTE 'UPDATE '||rec_schema||'.cat_users SET sys_role = '''||v_role||''' WHERE id = '''||v_user_name||''';';
-
-			END IF;
-			
 			EXECUTE 'SELECT value::boolean 
 			FROM '||rec_schema||'.config_param_system WHERE parameter = ''sys_exploitation_x_user'''
 			INTO v_sys_expl_x_user;
-
 			--if managing exploitation for user is used (true)
 			IF v_sys_expl_x_user THEN
 
+				--get the defined manager for the schema
+				v_manager=(v_manager_x_schema::json->>rec_schema)::text;
+				--change manager list into array
+				v_manager_array=(SELECT array_agg(value) AS list FROM json_array_elements_text(v_manager) );
+				
 				--check to which manager user is assigned
 				EXECUTE 'select array_agg(id) 
-				from (select id, username as users from '||rec_schema||'.cat_manager) a where '''||v_user_name||''' =any(users)'
+				from (select id, username as users from '||rec_schema||'.cat_manager) a where '''||v_user_id||''' =any(users)'
 				INTO v_current_manager ;
 
 				--change assignation to managers if it changed
-				IF (v_current_manager <> v_manager_array) OR (v_current_manager is null and v_manager_array iS NOT NULL) THEN
+				IF v_manager_array IS NULL OR (v_current_manager <> v_manager_array) 
+				OR (v_current_manager is null and v_manager_array iS NOT NULL) THEN
 					--remove user from current managers
 					EXECUTE 'UPDATE '||rec_schema||'.cat_manager 
-					SET username = array_remove(username,'''||v_user_name||''') WHERE '''||v_user_name||''' = any(username);';
+					SET username = array_remove(username,'''||v_user_id||''') WHERE '''||v_user_id||''' = any(username);';
 
-					--add user to new managers
-					FOREACH rec_manager IN ARRAY v_manager_array LOOP
-						EXECUTE 'UPDATE '||rec_schema||'.cat_manager 
-						SET username = array_append(username,'''||v_user_name||''') WHERE id = '||rec_manager::integer||';';
+					--insert user into manager if there are elements in manager array
+					IF array_length(v_manager_array,1) > 0 THEN
+						--add user to new managers
+						FOREACH rec_manager IN ARRAY v_manager_array LOOP
+							EXECUTE 'UPDATE '||rec_schema||'.cat_manager 
+							SET username = array_append(username,'''||v_user_id||''') WHERE id = '||rec_manager::integer||';';
 
-						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-						VALUES (107, null, 1, concat('INFO: User ',v_user_name,' assigned to new managers.'));
-					END LOOP;
+							INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+							VALUES (107, null, 1, concat('INFO: User ',v_user_id,' assigned to new managers.'));
+						END LOOP;
+					END IF;
 				END IF;
 
 			END IF;
 		END LOOP;
-		END IF;
+		
 
 	ElSIF v_action = 'delete' THEN
 
@@ -234,11 +256,11 @@ BEGIN
 			WHERE table_name ilike ''%selector%'' AND table_name!=''anl_mincut_selector_valve'' 
 			AND table_schema= '''||rec_schema||'''' LOOP
 
-				EXECUTE 'DELETE FROM '||rec_schema||'.'||rec.table_name||' WHERE cur_user = '''||v_user_name||''';';
+				EXECUTE 'DELETE FROM '||rec_schema||'.'||rec.table_name||' WHERE cur_user = '''||v_user_id||''';';
 			END LOOP;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (107, null, 1, concat('INFO: User ',v_user_name,' deleted from selectors.'));
+			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from selectors.'));
 
 			EXECUTE 'SELECT value::boolean  
 			FROM '||rec_schema||'.config_param_system WHERE parameter = ''sys_exploitation_x_user'''			
@@ -248,26 +270,24 @@ BEGIN
 			IF v_sys_expl_x_user THEN
 				--remove user from cat_manager
 				EXECUTE 'UPDATE '||rec_schema||'.cat_manager 
-				SET username = array_remove(username,'''||v_user_name||''') WHERE '''||v_user_name||''' = any(username);';
+				SET username = array_remove(username,'''||v_user_id||''') WHERE '''||v_user_id||''' = any(username);';
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (107, null, 1, concat('INFO: User ',v_user_name,' deleted from cat_manager.'));
+				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from cat_manager.'));
 			END IF;
 
 			--remove user from users catalog
-			EXECUTE 'DELETE FROM '||rec_schema||'.cat_users WHERE id = '''||v_user_name||''';';
+			EXECUTE 'DELETE FROM '||rec_schema||'.cat_users WHERE id = '''||v_user_id||''';';
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (107, null, 1, concat('INFO: User ',v_user_name,' deleted from cat_users.'));
+			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from cat_users.'));
 
 		END LOOP;
-
-		
-
-		EXECUTE 'DROP USER '||v_user_name||';';
+		--drop user from the database
+		EXECUTE 'DROP USER '||v_user_id||';';
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (107, null, 1, concat('INFO: User ',v_user_name,' deleted from database.'));
+		VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from database.'));
 
 	END IF;
 	
@@ -283,7 +303,7 @@ BEGIN
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');
 
 		--return definition for v_audit_check_result
-	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"User management done succesfully"}, "version":"'||v_version||'"'||
 		     ',"body":{"form":{}'||
 			     ',"data":{ "info":'||v_result_info||','||
 					'"point":'||v_result_point||','||
