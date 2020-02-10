@@ -572,15 +572,10 @@ class ApiCF(ApiParent, QObject):
 
 
     def set_vdefault_edition(self):
-        try:
-
-            row = self.controller.get_config('qgis_toggledition_forceopen')
-            if (not row or row[0].upper() != "TRUE") and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+        if 'toggledition' in self.complet_result[0]['body']:
+            force_open = self.complet_result[0]['body']['toggledition']
+            if not force_open and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
                 self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-        except  KeyError as e:
-            pass
-        except Exception as e:
-            print(f"{type(e).__name__} --> {e}")
 
 
     def get_last_value(self):
