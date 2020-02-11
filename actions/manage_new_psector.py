@@ -328,7 +328,7 @@ class ManageNewPsector(ParentManage):
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
-            self.tbl_document.doubleClicked.connect(partial(self.document_open))
+            self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
 
         else:
 
@@ -383,14 +383,15 @@ class ManageNewPsector(ParentManage):
             self.plan_om + '_psector', psector_id, 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_plan_psector.btn_doc_delete.clicked.connect(self.document_delete)
+        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(self.document_delete, self.tbl_document, 'doc_x_psector'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
-        self.dlg_plan_psector.btn_open_doc.clicked.connect(self.document_open)
+        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
+        self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
 
-        self.cmb_status.currentIndexChanged.connect(
-            partial(self.show_status_warning))
-
-        self.set_completer()
+        # Create list for completer QLineEdit
+        sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
+        list_items = self.make_list_for_completer(sql)
+        self.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
 
         sql = (f"SELECT other, gexpenses, vat "
                f"FROM {self.plan_om}_psector "
@@ -1279,7 +1280,7 @@ class ManageNewPsector(ParentManage):
 
 
     def document_insert(self):
-        """ Insert a docmet related to the current visit """
+        """ Insert a document related to the current visit """
         doc_id = self.doc_id.text()
         psector_id = self.psector_id.text()
         if not doc_id:
@@ -1297,8 +1298,8 @@ class ManageNewPsector(ParentManage):
                f" WHERE doc_id = '{doc_id}' AND psector_id = '{psector_id}'")
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
-            message = "Document already exist"
-            self.controller.show_warning(message)
+            msg = "Document already exist"
+            self.controller.show_warning(msg)
             return
 
         # Insert into new table
@@ -1312,37 +1313,6 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.tbl_document.model().select()
 
 
-    def document_delete(self):
-        """ Delete record from selected rows in tbl_document """
-
-        # Get selected rows. 0 is the column of the pk 0 'id'
-        selected_list = self.tbl_document.selectionModel().selectedRows(0)
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_info_box(message)
-            return
-
-        selected_id = []
-        for index in selected_list:
-            doc_id = index.data()
-            selected_id.append(str(doc_id))
-        message = "Are you sure you want to delete these records?"
-        title = "Delete records"
-        answer = self.controller.ask_question(message, title, ','.join(selected_id))
-        if answer:
-            sql = (f"DELETE FROM doc_x_psector"
-                   f" WHERE id IN ({','.join(selected_id)})")
-            status = self.controller.execute_sql(sql)
-            if not status:
-                message = "Error deleting data"
-                self.controller.show_warning(message)
-                return
-            else:
-                message = "Event deleted"
-                self.controller.show_info(message)
-                self.dlg_plan_psector.tbl_document.model().select()
-
-
     def manage_document(self, qtable):
         """ Access GUI to manage documents e.g Execute action of button 34 """
         
@@ -1352,53 +1322,6 @@ class ManageNewPsector(ParentManage):
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
         utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
-
-
-    def document_open(self):
-        """ Open selected document """
-
-        # Get selected rows
-        field_index = self.tbl_document.model().fieldIndex('path')
-        selected_list = self.dlg_plan_psector.tbl_document.selectionModel().selectedRows(field_index)
-        if not selected_list:
-            message = "Any record selected"
-            self.controller.show_info_box(message)
-            return
-        elif len(selected_list) > 1:
-            message = "More then one document selected. Select just one document."
-            self.controller.show_warning(message)
-            return
-
-        path = selected_list[0].data()
-        # Check if file exist
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
-
-
-    def set_completer(self):
-        """ Set autocompleter """
-
-        # Adding auto-completion to a QLineEdit - document_id
-        self.completer = QCompleter()
-        self.dlg_plan_psector.doc_id.setCompleter(self.completer)
-        model = QStringListModel()
-
-        sql = "SELECT DISTINCT(id) FROM v_ui_document"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
-        values = []
-        if rows:
-            for row in rows:
-                values.append(str(row[0]))
-
-        model.setStringList(values)
-        self.completer.setModel(model)
 
 
     def show_status_warning(self):

@@ -62,7 +62,7 @@ class MincutConfig(ParentAction):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM anl_mincut_result_cat WHERE id > 0 "
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         values = []
         if rows:
             for row in rows:

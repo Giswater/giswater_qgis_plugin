@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileD
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
-import configparser, json, os, re, sys, webbrowser
+import configparser, json, os, re, subprocess, sys, webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -677,34 +677,35 @@ class ParentAction(object):
             self.iface.mapCanvas().zoomScale(float(scale))
 
 
-    def set_completer(self, tablename, widget, field_search, color='black'):
-        """ Set autocomplete of widget @table_object + "_id"
-            getting id's from selected @table_object
+    def make_list_for_completer(self, sql):
+        """ Prepare a list with the necessary items for the completer
+        :param sql: Query to be executed, where will we get the list of items (string)
+        :return list_items: List with the result of the query executed (List) ["item1","item2","..."]
         """
+        rows = self.controller.get_rows(sql, commit=True)
+        list_items = []
+        if rows:
+            for row in rows:
+                list_items.append(str(row[0]))
+        return list_items
 
-        if not widget:
-            return
 
-        # Set SQL
-        sql = (f"SELECT DISTINCT({field_search})"
-               f" FROM {tablename}"
-               f" ORDER BY {field_search}")
-        row = self.controller.get_rows(sql, commit=True)
-
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
-
-        # Set completer and model: add autocomplete in the widget
-        self.completer = QCompleter()
-        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.completer.setCompletionMode(0)
-        self.completer.popup().setStyleSheet("color: "+color+";")
-        widget.setCompleter(self.completer)
-
+    def set_completer_lineedit(self, qlineedit, list_items):
+        """ Set a completer into a QLineEdit
+        :param qlineedit: Object where to set the completer (QLineEdit)
+        :param list_items: List of items to set into the completer (List)["item1","item2","..."]
+        """
+        completer = QCompleter()
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setMaxVisibleItems(10)
+        completer.setCompletionMode(0)
+        completer.setFilterMode(Qt.MatchContains)
+        completer.popup().setStyleSheet("color: black;")
+        qlineedit.setCompleter(completer)
         model = QStringListModel()
-        model.setStringList(row)
-        self.completer.setModel(model)
+        model.setStringList(list_items)
+        completer.setModel(model)
+
 
     def get_max_rectangle_from_coords(self, list_coord):
         """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
@@ -968,6 +969,98 @@ class ParentAction(object):
         i = qtable.model().index(pos_x, widget_pos+1)
         qtable.model().setData(i, elem[1])
 
+
+    def document_insert(self, dialog, tablename, field, field_value):
+        """ Insert a document related to the current visit
+        :param dialog: (QDialog )
+        :param tablename: Name of the table to make the queries (string)
+        :param field: Field of the table to make the where clause (string)
+        :param field_value: Value to compare in the clause where (string)
+        """
+        doc_id = dialog.doc_id.text()
+        if not doc_id:
+            message = "You need to insert doc_id"
+            self.controller.show_warning(message)
+            return
+
+        # Check if document already exist
+        sql = (f"SELECT doc_id"
+               f" FROM {tablename}"
+               f" WHERE doc_id = '{doc_id}' AND {field} = '{field_value}'")
+        row = self.controller.get_row(sql, commit=True)
+        if row:
+            msg = "Document already exist"
+            self.controller.show_warning(msg)
+            return
+
+        # Insert into new table
+        sql = (f"INSERT INTO {tablename} (doc_id, {field})"
+               f" VALUES ('{doc_id}', '{field_value}')")
+        status = self.controller.execute_sql(sql, commit=True)
+        if status:
+            message = "Document inserted successfully"
+            self.controller.show_info(message)
+
+        dialog.tbl_document.model().select()
+
+
+    def document_open(self, qtable):
+        """ Open selected document """
+
+        # Get selected rows
+        field_index = qtable.model().fieldIndex('path')
+        selected_list = qtable.selectionModel().selectedRows(field_index)
+        if not selected_list:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More then one document selected. Select just one document."
+            self.controller.show_warning(message)
+            return
+
+        path = selected_list[0].data()
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
+
+
+    def document_delete(self, qtable, tablename):
+        """ Delete record from selected rows in tbl_document """
+
+        # Get selected rows. 0 is the column of the pk 0 'id'
+        selected_list = qtable.selectionModel().selectedRows(0)
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+
+        selected_id = []
+        for index in selected_list:
+            doc_id = index.data()
+            selected_id.append(str(doc_id))
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, ','.join(selected_id))
+        if answer:
+            sql = (f"DELETE FROM {tablename}"
+                   f" WHERE id IN ({','.join(selected_id)})")
+            status = self.controller.execute_sql(sql)
+            if not status:
+                message = "Error deleting data"
+                self.controller.show_warning(message)
+                return
+            else:
+                message = "Document deleted"
+                self.controller.show_info(message)
+                qtable.model().select()
 
 
     def get_all_actions(self):
