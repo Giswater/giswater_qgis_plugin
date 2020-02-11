@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2798
 
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_advancedsettings(p_result text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_advancedsettings(p_result text)
 RETURNS integer 
 AS $BODY$
 
 /*example
-SELECT ws.gw_fct_pg2epa_advancedsettings($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"resultId":"t12", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_advancedsettings($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"resultId":"t12", "useNetworkGeom":"false"}}$$)
 */
 
 DECLARE
@@ -29,7 +29,7 @@ v_pumproughness float;
 BEGIN
 
 	--  Search path
-	SET search_path = "ws", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get user variables
 	SELECT ((value::json->>'parameters')::json->>'valve')::json INTO v_valve FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
