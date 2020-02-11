@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2114
 
 
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
-  RETURNS smallint AS
+  RETURNS json AS
 
 $BODY$
 /*
@@ -50,6 +50,12 @@ v_epaquerytext2	text;
 v_mantable 	text;
 v_epatable 	text;
 v_schemaname 	text;
+v_node_type text;
+v_version text;
+v_arc_code text;
+v_count integer;
+v_count_connec integer=0;
+v_count_gully integer=0;
 
 rec_visit 	record;
 rec_node	record;
@@ -58,6 +64,13 @@ rec_aux		record;
 rec_aux1	"SCHEMA_NAME".arc;
 rec_aux2	"SCHEMA_NAME".arc;
 
+v_result text;
+v_result_info text;
+v_result_point text;
+v_result_line text;
+v_result_polygon text;
+v_error_context text;
+
 BEGIN
 
 -- Search path
@@ -65,16 +78,19 @@ BEGIN
     v_schemaname = 'SCHEMA_NAME';
 
 	-- Get project type
-	SELECT wsoftware, epsg INTO v_project_type, v_srid FROM version LIMIT 1;
+	SELECT wsoftware, epsg, giswater INTO v_project_type, v_srid,v_version FROM version LIMIT 1;
     
     -- Get node values
     SELECT the_geom INTO v_node_geom FROM node WHERE node_id = node_id_arg;
 	SELECT state INTO v_state_node FROM node WHERE node_id=node_id_arg;
 	
 	IF v_project_type = 'WS' THEN
-		SELECT isarcdivide INTO v_isarcdivide FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=node_id_arg;
+		SELECT isarcdivide, node_type.id INTO v_isarcdivide, v_node_type 
+		FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id 
+		JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=node_id_arg;
 	ELSE
-		SELECT isarcdivide INTO v_isarcdivide FROM node_type JOIN node ON node.node_type = node_type.id WHERE node.node_id=node_id_arg;
+		SELECT isarcdivide, node_type.id INTO v_isarcdivide, v_node_type 
+		FROM node_type JOIN node ON node.node_type = node_type.id WHERE node.node_id=node_id_arg;
 	END IF;
 
     -- Get parameters from configs table
@@ -82,6 +98,21 @@ BEGIN
 	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user;
 	SELECT value::smallint INTO v_ficticius FROM config_param_system WHERE parameter='plan_statetype_ficticius';
 
+	-- delete old values on result table
+	DELETE FROM audit_check_data WHERE fprocesscat_id=112 AND user_name=current_user;
+	
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 4, 'ARC DIVIDE');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 4, '-------------------------------------------------------------');
+
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 3, 'CRITICAL ERRORS');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 3, '----------------------');	
+
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 2, 'WARNINGS');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 2, '--------------');	
+
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 1, '-------');
 	
 	-- State control
 	IF v_state=0 THEN
@@ -111,6 +142,9 @@ BEGIN
 
 		IF v_arc_id IS NOT NULL THEN 
 
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (112, 1, concat('Divide arc ', v_arc_id,'.'));
+
 			--  Locate position of the nearest point
 			v_intersect_loc := ST_LineLocatePoint(v_arc_geom, v_node_geom);
 			
@@ -120,7 +154,9 @@ BEGIN
 		
 			-- Check if any of the 'lines' are in fact a point
 			IF (ST_GeometryType(v_line1) = 'ST_Point') OR (ST_GeometryType(v_line2) = 'ST_Point') THEN
-				RETURN 1;
+				--RETURN 1;
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 3, concat('One of the new arcs has no length. The selected node may be its final.'));
 			END IF;
 		
 			-- Get arc data
@@ -166,6 +202,17 @@ BEGIN
 				INSERT INTO arc SELECT rec_aux1.*;
 				INSERT INTO arc SELECT rec_aux2.*;
 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Insert new arcs into arc table.');
+
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
+				round(st_length(rec_aux1.the_geom)::numeric,2),'.'));
+				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, concat('Arc1: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
+				round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
+
 				-- insert new records into man_table
 				EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
 				EXECUTE v_manquerytext1||rec_aux2.arc_id::text||v_manquerytext2;
@@ -174,10 +221,16 @@ BEGIN
 				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, 'Insert new arcs into man and epa table.');
+
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 				UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
 				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Update values of arcs node_1 and node_2.');
+
 				--Copy addfields from old arc to new arcs	
 				INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 				SELECT 
@@ -193,12 +246,18 @@ BEGIN
 				value_param
 				FROM man_addfields_value WHERE feature_id=v_arc_id;
 				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Copy addfields from old to new arcs.');
+
 				-- update arc_id of disconnected nodes linked to old arc
 				FOR rec_node IN SELECT node_id, the_geom FROM node WHERE arc_id=v_arc_id
 				LOOP
 					UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
 					v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1) 
 					WHERE node_id=rec_node.node_id;
+					
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
 				END LOOP;
 
 				-- Capture linked feature information to redraw (later on this function)
@@ -207,6 +266,9 @@ BEGIN
 				LOOP
 					v_array_connec:= array_append(v_array_connec, v_connec_id);
 				END LOOP;
+
+				SELECT count(connec_id) INTO v_count_connec FROM connec WHERE arc_id=v_arc_id;
+
 				UPDATE connec SET arc_id=NULL WHERE arc_id=v_arc_id;
 
 				-- gully
@@ -216,6 +278,9 @@ BEGIN
 					LOOP
 						v_array_gully:= array_append(v_array_gully, v_gully_id);
 					END LOOP;
+
+					SELECT count(gully_id) INTO v_count_gully FROM gully WHERE arc_id=v_arc_id;
+
 					UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id;
 				END IF;
 						
@@ -224,84 +289,103 @@ BEGIN
 				VALUES ('DIVIDE ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 			
 				-- Update elements from old arc to new arcs
-				FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=v_arc_id  LOOP
-					DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
-					INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
-					INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
-				END LOOP;
+				SELECT count(id) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;
+
+				IF v_count > 0 THEN
+					FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=v_arc_id  LOOP
+						INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
+						INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
+						DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
+					END LOOP;
+
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Copy ',v_count,' elements from old to new arcs.'));
+				END IF;
 			
 				-- Update documents from old arc to the new arcs
-				FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=v_arc_id  LOOP
-					DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
-					INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
-					INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
-
-				END LOOP;
+				SELECT count(id) into v_count FROM doc_x_arc WHERE arc_id=v_arc_id;
+				IF v_count > 0 THEN
+					FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=v_arc_id  LOOP
+						INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
+						INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
+						DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
+					END LOOP;
+				
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Copy ',v_count,' documents from old to new arcs.'));
+				END IF;
 
 				-- Update visits from old arc to the new arcs (only for state=1, state=1)
-				FOR rec_visit IN SELECT om_visit.* FROM om_visit_x_arc JOIN om_visit ON om_visit.id=visit_id WHERE arc_id=v_arc_id LOOP
+				SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_arc_id;
 
-					IF rec_visit.the_geom IS NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
+				IF v_count > 0 THEN
+					FOR rec_visit IN SELECT om_visit.* FROM om_visit_x_arc JOIN om_visit ON om_visit.id=visit_id WHERE arc_id=v_arc_id LOOP
 
-						-- Get visit data into two new visits
-						INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
-						SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
-						FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit1;
+						IF rec_visit.the_geom IS NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
 
-						INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
-						SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
-						FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit2;
-						
-						FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=rec_visit.id LOOP
-		
-							IF rec_event.xcoord IS NOT NULL AND rec_event.ycoord IS NOT NULL THEN -- event must be related to one of the two new visits
+							-- Get visit data into two new visits
+							INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
+							SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+							FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit1;
+
+							INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
+							SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+							FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit2;
+							
+							FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=rec_visit.id LOOP
+			
+								IF rec_event.xcoord IS NOT NULL AND rec_event.ycoord IS NOT NULL THEN -- event must be related to one of the two new visits
+									
+									--  Locate position of the nearest point
+									v_eventlocation := ST_LineLocatePoint(v_arc_geom, ST_ClosestPoint(v_arc_geom, ST_setSrid(ST_MakePoint(rec_event.xcoord, rec_event.ycoord), v_srid)));
+									
+									IF v_eventlocation < v_intersect_loc THEN
+										UPDATE om_visit_event SET visit_id=v_newvisit1 WHERE id=rec_event.id;
+									ELSE
+										UPDATE om_visit_event SET visit_id=v_newvisit2 WHERE id=rec_event.id;
+									END IF;
+								ELSE 	-- event must be related on both new visits. As a result, new event must be created
 								
-								--  Locate position of the nearest point
-								v_eventlocation := ST_LineLocatePoint(v_arc_geom, ST_ClosestPoint(v_arc_geom, ST_setSrid(ST_MakePoint(rec_event.xcoord, rec_event.ycoord), v_srid)));
-								
-								IF v_eventlocation < v_intersect_loc THEN
+									-- upate event to visit1
 									UPDATE om_visit_event SET visit_id=v_newvisit1 WHERE id=rec_event.id;
-								ELSE
-									UPDATE om_visit_event SET visit_id=v_newvisit2 WHERE id=rec_event.id;
-								END IF;
-							ELSE 	-- event must be related on both new visits. As a result, new event must be created
-							
-								-- upate event to visit1
-								UPDATE om_visit_event SET visit_id=v_newvisit1 WHERE id=rec_event.id;
+									
+									-- insert new event related to new visit2
+									INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
+									geom3,xcoord,ycoord,compass,text, index_val,is_last) 
+									SELECT event_code, v_newvisit2, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
+									geom3,xcoord,ycoord,compass,text, index_val,is_last FROM om_visit_event WHERE id=rec_event.id;
 								
-								-- insert new event related to new visit2
-								INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
-								geom3,xcoord,ycoord,compass,text, index_val,is_last) 
-								SELECT event_code, v_newvisit2, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
-								geom3,xcoord,ycoord,compass,text, index_val,is_last FROM om_visit_event WHERE id=rec_event.id;
+								END IF;
+			
+							END LOOP;
+														
+							INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit1, rec_aux1.arc_id);
+							INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit2, rec_aux2.arc_id);
+						
+							-- delete old visit
+							DELETE FROM om_visit WHERE id=rec_visit.id;
 							
+						ELSIF rec_visit.the_geom IS NOT NULL THEN -- if visit has geometry, events does not have geometry
+
+							--  Locate position of the nearest point
+							v_visitlocation := ST_LineLocatePoint(v_arc_geom, ST_ClosestPoint(v_arc_geom, rec_visit.the_geom));
+							
+							IF v_visitlocation < v_intersect_loc THEN
+								v_newarc = rec_aux1.arc_id;
+							ELSE
+								v_newarc = rec_aux2.arc_id;
 							END IF;
-		
-						END LOOP;
-													
-						INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit1, rec_aux1.arc_id);
-						INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit2, rec_aux2.arc_id);
-					
-						-- delete old visit
-						DELETE FROM om_visit WHERE id=rec_visit.id;
 						
-					ELSIF rec_visit.the_geom IS NOT NULL THEN -- if visit has geometry, events does not have geometry
-
-						--  Locate position of the nearest point
-						v_visitlocation := ST_LineLocatePoint(v_arc_geom, ST_ClosestPoint(v_arc_geom, rec_visit.the_geom));
-						
-						IF v_visitlocation < v_intersect_loc THEN
-							v_newarc = rec_aux1.arc_id;
-						ELSE
-							v_newarc = rec_aux2.arc_id;
+							-- distribute visit to new arc
+							INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_visit.id, v_newarc);
+							DELETE FROM om_visit_x_arc WHERE arc_id=v_arc_id;
 						END IF;
-					
-						-- distribute visit to new arc
-						INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_visit.id, v_newarc);
-						DELETE FROM om_visit_x_arc WHERE arc_id=v_arc_id;
-					END IF;
-				END LOOP;
+					END LOOP;
 
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Copy ',v_count,' visits from old to new arcs.'));
+
+				END IF;
 				-- Update arc_id on node
 				FOR rec_aux IN SELECT * FROM node WHERE arc_id=v_arc_id  LOOP
 
@@ -313,15 +397,31 @@ BEGIN
 					UPDATE node SET arc_id=v_newarc WHERE node_id=rec_aux.node_id;
 						
 				END LOOP;
-				
+
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, 'Update arc_id on node.');
+	
 				-- reconnect links
 				UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
-				PERFORM gw_fct_connect_to_network(v_array_connec, 'CONNEC');
-				PERFORM gw_fct_connect_to_network(v_array_gully, 'GULLY');
+
+				IF v_count_connec > 0 THEN
+					PERFORM gw_fct_connect_to_network(v_array_connec, 'CONNEC');
+
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs.'));
+				END IF;
+				IF v_count_gully > 0 THEN
+					PERFORM gw_fct_connect_to_network(v_array_gully, 'GULLY');
+
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies.'));
+				END IF;
 
 				-- delete old arc
 				DELETE FROM arc WHERE arc_id=v_arc_id;
-						
+				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, concat('Delete old arc: ',v_arc_id,'.'));	
 		
 			ELSIF (v_state=1 AND v_state_node=2) THEN
 				rec_aux1.state=2;
@@ -334,9 +434,23 @@ BEGIN
 				--it seems that does not recognize the new node inserted
 				UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, 'Arc with state =1, node with state = 2.');
+
 				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
 				INSERT INTO arc SELECT rec_aux2.*;
+
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Insert new arcs into arc table.');
+
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
+				round(st_length(rec_aux1.the_geom)::numeric,2),'.'));
+				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, concat('Arc1: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
+				round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
 
 				-- Insert new records into man table		
 				EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
@@ -345,7 +459,10 @@ BEGIN
 				-- Insert new records into epa table
 				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
-				
+	
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Insert new arcs into man and epa table.');
+
 				-- restore temporary value for edit_disable_statetopocontrol variable
 				UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
@@ -353,12 +470,18 @@ BEGIN
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 				UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Update values of arcs node_1 and node_2.');
+
 				-- Update doability for the new arcs
 				UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 				UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
 			
 				-- Insert existig arc (on service) to the current alternative
 				INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE);
+
+	   			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,concat('Insert arcs into current psector: ',v_psector,'.'));
 				
 				-- Insert data into traceability table
 				INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
@@ -369,9 +492,14 @@ BEGIN
 				UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux1.arc_id;
 				UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux2.arc_id;
 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Set values on plan_psector_x_arc addparam.');
 					
 			ELSIF (v_state=2 AND v_state_node=2) THEN 
-			
+				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, 'Arc and node have both state = 2.');
+
 				-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres
 				-- it seems that does not recognize the new node inserted
 				UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
@@ -379,6 +507,17 @@ BEGIN
 				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
 				INSERT INTO arc SELECT rec_aux2.*;
+
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Insert new arcs into arc table.');
+
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
+				round(st_length(rec_aux1.the_geom)::numeric,2),'.'));
+				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, concat('Arc1: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
+				round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
 
 				-- Insert new records into man table		
 				EXECUTE v_manquerytext1||rec_aux1.arc_id::text||v_manquerytext2;
@@ -388,13 +527,19 @@ BEGIN
 				EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 				EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Insert new arcs into man and epa table.');
+
 				-- restore temporary value for edit_disable_statetopocontrol variable
 				UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 				-- update node_1 and node_2 because it's not possible to pass using parameters
 				UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 				UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
-				
+
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Update values of arcs node_1 and node_2.');
+			
 				--Copy addfields from old arc to new arcs	
 				INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 				SELECT 
@@ -410,12 +555,18 @@ BEGIN
 				value_param
 				FROM man_addfields_value WHERE feature_id=v_arc_id;
 				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1,'Copy addfields from old to new arcs.');
+
 				-- update arc_id of disconnected nodes linked to old arc
 				FOR rec_node IN SELECT node_id, the_geom FROM node WHERE arc_id=v_arc_id
 				LOOP
 					UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
 					v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1) 
 					WHERE node_id=rec_node.node_id;
+
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
 				END LOOP;
 
 				-- Capture linked feature information to redraw (later on this function)
@@ -424,6 +575,9 @@ BEGIN
 				LOOP
 					v_array_connec:= array_append(v_array_connec, v_connec_id);
 				END LOOP;
+
+				SELECT count(connec_id) INTO v_count_connec FROM connec WHERE arc_id=v_arc_id;
+
 				UPDATE connec SET arc_id=NULL WHERE arc_id=v_arc_id;
 
 				-- gully
@@ -433,6 +587,9 @@ BEGIN
 					LOOP
 						v_array_gully:= array_append(v_array_gully, v_gully_id);
 					END LOOP;
+
+					SELECT count(gully_id) INTO v_count_gully FROM gully WHERE arc_id=v_arc_id;
+
 					UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id;
 				END IF;
 							
@@ -441,20 +598,31 @@ BEGIN
 				VALUES ('DIVIDE PLANIFIED ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 			
 				-- Update elements from old arc to new arcs
-				FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=v_arc_id  LOOP
-					INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
-					INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
-					DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
-				END LOOP;
-			
-				-- Update documents from old arc to the new arcs
-				FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=v_arc_id  LOOP
-					INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
-					INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
-					DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
+				SELECT count(id) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;
 
-				END LOOP;
-			
+				IF v_count > 0 THEN
+					FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=v_arc_id  LOOP
+						INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
+						INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
+						DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
+					END LOOP;
+
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Copy ',v_count,' elements from old to new arcs.'));
+				END IF;
+
+				-- Update documents from old arc to the new arcs
+				SELECT count(id) into v_count FROM doc_x_arc WHERE arc_id=v_arc_id;
+				IF v_count > 0 THEN
+					FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=v_arc_id  LOOP
+						INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
+						INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
+						DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
+					END LOOP;
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Copy ',v_count,' documents from old to new arcs.'));
+				END IF;
+
 				-- Visits are not updatable because it's impossible to have visits on arc with state=2
 				
 				-- Update arc_id on node
@@ -469,16 +637,34 @@ BEGIN
 						
 				END LOOP;
 				
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, 'Update arc_id on node.');
+
 				-- in case of divide ficitius arc, new arcs will be ficticius, but we need to set doable false because they are inserted by default as true
 				IF (SELECT state_type FROM arc WHERE arc_id=v_arc_id) = v_ficticius THEN
 					UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 					UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
+					
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, 'Update psector_x_arc as doable for fictitious arcs.');
+			
 				END IF;
 
 				-- reconnect links
 				UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
-				PERFORM gw_fct_connect_to_network(v_array_connec, 'CONNEC');
-				PERFORM gw_fct_connect_to_network(v_array_gully, 'GULLY');
+				
+				IF v_count_connec > 0 THEN
+					PERFORM gw_fct_connect_to_network(v_array_connec, 'CONNEC');
+
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs.'));
+				END IF;
+				IF v_count_gully > 0 THEN
+					PERFORM gw_fct_connect_to_network(v_array_gully, 'GULLY');
+
+					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies.'));
+				END IF;
                 
                 -- update arc_id for linked features in psector after reconnect
 				UPDATE plan_psector_x_connec a SET arc_id=c.arc_id FROM connec c WHERE c.connec_id=a.connec_id;
@@ -490,21 +676,58 @@ BEGIN
 				-- delete old arc
 				DELETE FROM arc WHERE arc_id=v_arc_id;		
 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 1, 'Delete old arc.');	
+
 			ELSIF (v_state=2 AND v_state_node=1) THEN
-				RETURN v_return;		
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 3, 'Arc with state 2 cant be divide by node with state 1.');	
+	
 			ELSE  
 				PERFORM audit_function(2120,2114); 
 				
 			END IF;
 		ELSE
-			RETURN 0;
+			--RETURN 0;
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (112, 3, 'Cant detect any arc to divide.');
 		END IF;
 	ELSE
-		RETURN 0;
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (112, 3, concat('Node type ', v_node_type,' doesnt divide arcs.'));
+		--RETURN 0;
 	END IF;
 
 	
-RETURN v_return;
+-- get results
+	-- info
+
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data 
+	WHERE user_name="current_user"() AND fprocesscat_id=112 ORDER BY criticity desc, id asc) row; 
+	
+	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+
+	v_result_point = '{"geometryType":"", "values":[]}';
+	v_result_line = '{"geometryType":"", "values":[]}';
+	v_result_polygon = '{"geometryType":"", "values":[]}';
+
+--  Return
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Arc divide done successfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+		     	'"setVisibleLayers":[]'||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||'}'||
+		       '}'||
+	    '}')::json;
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
  
 
   END;
