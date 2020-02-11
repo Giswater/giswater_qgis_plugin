@@ -53,7 +53,7 @@ BEGIN
 		*/
 			
 		INSERT INTO dma (dma_id, name, descript,  the_geom, undelete,  expl_id, pattern_id, link, minc, maxc, effc, grafconfig)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int, NEW.pattern_id, NEW.link, NEW.minc, NEW.maxc, NEW.effc, NEW.grafconfig);
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int, NEW.pattern_id, NEW.link, NEW.minc, NEW.maxc, NEW.effc, NEW.grafconfig::json);
 
 		RETURN NEW;
 		
@@ -61,7 +61,7 @@ BEGIN
    	
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
-		pattern_id=NEW.pattern_id, link=NEW.link, minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, grafconfig=NEW.grafconfig
+		pattern_id=NEW.pattern_id, link=NEW.link, minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc, grafconfig=NEW.grafconfig::json
 		WHERE dma_id=NEW.dma_id;
 		
 		RETURN NEW;
