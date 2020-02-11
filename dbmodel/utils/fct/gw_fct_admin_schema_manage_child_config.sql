@@ -171,12 +171,12 @@ BEGIN
 			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
 				label, ismandatory,isparent,iseditable,isautoupdate,field_length,num_decimals) 
 			VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,
-				rec.form_label, rec.is_mandatory, false,rec.iseditable,false,rec.field_length, rec.num_decimals);
+				rec.param_name, rec.is_mandatory, false,rec.iseditable,false,rec.field_length, rec.num_decimals);
 		ELSE
 			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
 				label, ismandatory,isparent,iseditable,isautoupdate) 
 			VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,
-				rec.form_label, rec.is_mandatory, false,rec.iseditable,false);
+				rec.param_name, rec.is_mandatory, false,rec.iseditable,false);
 		END IF;
 		
 	END LOOP;
