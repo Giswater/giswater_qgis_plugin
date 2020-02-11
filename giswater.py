@@ -75,7 +75,8 @@ class Giswater(QObject):
         self.btn_add_layers = None
         self.update_sql = None
         self.action = None
-            
+        self.action_info = None
+
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         self.plugin_name = self.get_value_from_metadata('name', 'giswater')
@@ -653,8 +654,10 @@ class Giswater(QObject):
                         del sys.modules[mod_name]
 
             # Remove icon of action 'Info'
-            self.action.triggered.disconnect()
-            self.iface.removeToolBarIcon(self.action_info)
+            if self.action:
+                self.action.triggered.disconnect()
+            if self.action_info:
+                self.iface.removeToolBarIcon(self.action_info)
 
         except Exception as e:
             self.controller.log_warning(str(e))
