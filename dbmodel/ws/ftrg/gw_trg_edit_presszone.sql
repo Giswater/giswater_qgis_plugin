@@ -30,15 +30,15 @@ BEGIN
             END IF;
 			
 			
-		INSERT INTO cat_presszone (id, descript, expl_id, nodeparent, the_geom, grafconfig)
-		VALUES (NEW.id, NEW.descript, expl_id_int, NEW.the_geom, NEW.grafconfig);
+		INSERT INTO cat_presszone (id, descript, expl_id, the_geom, grafconfig)
+		VALUES (NEW.id, NEW.descript, expl_id_int, NEW.the_geom, NEW.grafconfig::json);
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE cat_presszone 
-		SET id=NEW.id, descript=NEW.descript, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig
+		SET id=NEW.id, descript=NEW.descript, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json
 		WHERE id=NEW.id;
 		
 		RETURN NEW;
