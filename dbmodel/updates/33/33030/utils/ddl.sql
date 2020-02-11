@@ -11,3 +11,18 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/01/30
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"childparam", "dataType":"json", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"childparam", "dataType":"json", "isUtils":"False"}}$$);
+
+
+CREATE TABLE doc_x_workcat
+(
+  id serial NOT NULL,
+  doc_id character varying(30),
+  workcat_id character varying (30),
+  CONSTRAINT doc_x_workcat_pkey PRIMARY KEY (id),
+  CONSTRAINT doc_x_workcat_doc_id_fkey FOREIGN KEY (doc_id)
+      REFERENCES doc (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT doc_x_workcat_workcat_id_fkey FOREIGN KEY (workcat_id)
+      REFERENCES cat_work (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);

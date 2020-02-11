@@ -737,7 +737,7 @@ BEGIN
 				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' arc(s) and associated nodes totally disconnected from any reservoir or tank and not have been exported. Take a look on temporal table for details'));
 			ELSIF v_count > 0 AND v_buildupmode > 1 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) totally disconnected fron any reservoir, according with the gw_fct_pg2epa_inlet_flowtrace function.Take a look on temporal table for details'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) totally disconnected from any reservoir, according with the gw_fct_pg2epa_inlet_flowtrace function.Take a look on temporal table for details'));
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 1, 'INFO: gw_fct_pg2epa_inlet_flowtrace have been triggered. No results founded for pipes and nodes disconected from inlets.');

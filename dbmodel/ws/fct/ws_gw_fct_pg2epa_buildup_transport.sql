@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2800
 
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_buildup_transport(p_result text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_buildup_transport(p_result text)
 RETURNS integer 
 AS $BODY$
 
 /*example
-SELECT ws.gw_fct_pg2epa($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"resultId":"t12", "useNetworkGeom":"false"}}$$)
 */
@@ -22,7 +22,7 @@ DECLARE
 BEGIN
 
 	--  Search path
-	SET search_path = "ws", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	
     RETURN 1;
