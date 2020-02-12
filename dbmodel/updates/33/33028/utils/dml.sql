@@ -13,3 +13,11 @@ UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='municipality_vdefault'
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='sector_vdefault';
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='exploitation_vdefault';
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='dma_vdefault';
+
+
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (112, 'Arc divide', 'edit', 'utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (113, 'Node interpolate', 'edit', 'ud') ON CONFLICT (id) DO NOTHING;
