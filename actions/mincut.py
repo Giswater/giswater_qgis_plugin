@@ -582,7 +582,7 @@ class MincutParent(ParentAction):
                     utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
                     text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
                             f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
-                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_info, text)
+                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, text)
                     self.open_dialog(self.dlg_binfo)
                     self.dlg_binfo.btn_accept.hide()
                     self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))

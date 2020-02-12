@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
-    <widget class="QTextEdit" name="txt_info">
+    <widget class="QTextEdit" name="txt_infolog">
      <property name="documentTitle">
       <string/>
      </property>
