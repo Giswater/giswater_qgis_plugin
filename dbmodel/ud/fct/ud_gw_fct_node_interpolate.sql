@@ -37,17 +37,24 @@ DECLARE
 	v_ang210 float;
 	v_ang120 float;
 	v_ymax float;
-	v_error_context text;
+	v_version text;
+
+	p_x float;
+	p_y float;
+	p_node1 text;
+	p_node2 text;
+
 	v_result text;
 	v_result_info json;
 	v_result_point json;
 	v_result_polygon json;
 	v_result_line json;
-	v_version text;
-	p_x float;
-	p_y float;
-	p_node1 text;
-	p_node2 text;
+	v_result_fields text;
+	v_result_ymax text;
+	v_result_top text;
+	v_result_elev text;
+	v_error_context text;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -55,10 +62,10 @@ BEGIN
 
 	SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
 
-	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'p_x')::float;
-	p_y = (((p_data ->>'data')::json->>'parameters')::json->>'p_y')::float;
-	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'p_node1')::text;
-	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'p_node2')::text;
+	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'x')::float;
+	p_y = (((p_data ->>'data')::json->>'parameters')::json->>'y')::float;
+	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'node1')::text;
+	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::text;
 
 	-- manage log (fprocesscat = 113)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=113 AND user_name=current_user;
@@ -133,8 +140,14 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=113 order by 
 	criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result_info = concat ('{"geometryType":"", "values":',v_result,'}');
 
+	
+	v_result_top= COALESCE(v_top::text,'""');
+	v_result_ymax = COALESCE(v_ymax::text,'""');
+	v_result_elev = COALESCE(v_elev::text,'""');
+	
+	v_result_fields = concat('[{"data_top_elev":',v_result_top, ',"data_ymax":',v_result_ymax, ',"data_elev":',v_result_elev,'}]');
 
 --      Control NULL's
 	v_version:=COALESCE(v_version,'{}');
@@ -142,6 +155,7 @@ BEGIN
 	v_result_point:=COALESCE(v_result_point,'{}');
 	v_result_line:=COALESCE(v_result_line,'{}');
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');
+	v_result_fields:=COALESCE(v_result_fields,'{}');
 
 
 	--return definition for v_audit_check_result
@@ -150,10 +164,9 @@ BEGIN
 			     ',"data":{ "info":'||v_result_info||','||
 					'"point":'||v_result_point||','||
 					'"line":'||v_result_line||','||
-					'"polygon":'||v_result_polygon||'}'||
-			      '}}')::json;
-	--  Return	   
-	--RETURN v_return;
+					'"polygon":'||v_result_polygon||','||
+					'"fields":'||v_result_fields||'}'||
+			      '}}');
 
 --  Exception handling
     EXCEPTION WHEN OTHERS THEN
