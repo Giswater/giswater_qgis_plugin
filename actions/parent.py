@@ -1028,6 +1028,6 @@ class ParentAction(object):
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.open_dialog(self.dlg_info)
 
