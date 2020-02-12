@@ -40,8 +40,6 @@ DECLARE
 	v_vdefault text;
 	v_id int8;
 	v_numnodes integer;
-	v_node1 varchar;
-	v_node2 varchar;
 	v_idname text;
 	v_feature_type text;
 	count_aux integer;
@@ -96,6 +94,7 @@ DECLARE
 	v_noderecord1 record;
 	v_noderecord2 record;
         v_input json;
+        v_presszone_id text;
 
 BEGIN
 
@@ -215,27 +214,47 @@ BEGIN
 				END IF;
 			ELSIF upper(v_catfeature.feature_type) ='ARC' THEN
 			
-				SELECT node_id INTO v_node1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
+				SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
 				ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(p_reduced_geometry)) LIMIT 1;
 	
-				SELECT node_id INTO v_node2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
+				SELECT * INTO v_noderecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
 				ORDER BY ST_Distance(v_edit_node.the_geom, ST_endpoint(p_reduced_geometry)) LIMIT 1;
 	
-				IF (v_node1 IS NOT NULL) AND (v_node2 IS NOT NULL) THEN
+				IF (v_noderecord1.node_id IS NOT NULL) AND (v_noderecord2.node_id IS NOT NULL) THEN
 
 					-- Control of same node initial and final
-					IF (v_node1 = v_node2) AND (v_samenode_init_end_control IS TRUE) THEN
-						v_message = (SELECT concat('Error[1040]:',error_message, v_node1,'. ',hint_message) FROM audit_cat_error WHERE id=1040);
+					IF (v_noderecord1.node_id = v_noderecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
+						v_message = (SELECT concat('Error[1040]:',error_message, v_noderecord1.node_id,'. ',hint_message) FROM audit_cat_error WHERE id=1040);
 						v_status = false;
 					END IF;
+
+					-- getting mapzone by heritage from nodes
+					IF v_project_type = 'WS' THEN
+						IF v_noderecord1.presszonecat_id = v_noderecord2.presszonecat_id THEN
+							v_presszone_id = v_noderecord1.presszonecat_id;
+						END IF;
+					END IF;
+
+					IF v_noderecord1.sector_id = v_noderecord2.sector_id THEN
+						v_sector_id = v_noderecord1.sector_id;
+					END IF;
+
+					IF v_noderecord1.dma_id = v_noderecord2.dma_id THEN
+						v_dma_id = v_noderecord1.dma_id;
+					END IF;
+
+					IF v_noderecord1.expl_id = v_noderecord2.expl_id THEN
+						v_expl_id = v_noderecord1.expl_id;
+					END IF;
+					
 				--Error, no existing nodes
-				ELSIF ((v_node1 IS NULL) OR (v_node2 IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_node1,'[node_2]:',v_node2,'. ',hint_message) FROM audit_cat_error WHERE id=1042);
+				ELSIF ((v_noderecord1.node_id IS NULL) OR (v_noderecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
+					v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_noderecord1.node_id,'[node_2]:',v_noderecord2.node_id,'. ',hint_message) FROM audit_cat_error WHERE id=1042);
 					v_status = false;
 				END IF;
 	
 				--getting 1st approach of gis length
-				v_gislength = (SELECT st_length(p_reduced_geometry))::float;
+				v_gislength = (SELECT st_length(p_reduced_geometry))::float;		
 				
 			ELSIF upper(v_catfeature.feature_type) ='CONNEC' THEN 
 				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(p_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != p_id AND connec.state!=0);		
@@ -252,34 +271,70 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+
+		-- get vdefaults user's mapzones (for vdefault is disabled because values are taken using heritage from nodes)
+		IF upper(v_catfeature.feature_type) != 'ARC' THEN
+			SELECT value INTO v_sector_id FROM config_param_user WHERE parameter = 'sector_vdefault' and cur_user = current_user;
+			SELECT value INTO v_dma_id FROM config_param_user WHERE parameter = 'dma_vdefault' and cur_user = current_user;
+			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'expl_vdefault' and cur_user = current_user;
+			SELECT value INTO v_muni_id FROM config_param_user WHERE parameter = 'muni_vdefault' and cur_user = current_user;
+			SELECT value INTO v_presszone_id FROM config_param_user WHERE parameter = 'presszone_vdefault' and cur_user = current_user;
+		END IF;
+				
+		-- map zones controls setting values
+		IF v_project_type = 'WS' THEN
+
+			-- presszone	 
+			IF v_presszone_id IS NULL THEN
+				SELECT count(*) into count_aux FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001);
+				IF count_aux = 1 THEN
+					v_presszone_id := (SELECT id FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001) LIMIT 1);
+				ELSIF count_aux > 1 THEN
+					v_presszone_id =(SELECT presszonecat_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
+					order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+				END IF;	
+			END IF;
+
+		END IF;
 			
-		-- map zones controls
 		-- Sector ID
-		SELECT count(*) into count_aux FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001);
-		IF count_aux = 1 THEN
-			v_sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001) LIMIT 1);
-		ELSIF count_aux > 1 THEN
-			v_sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
-			order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
-		END IF;	
-	
-		-- Macrosector
-		v_macrosector_id := (SELECT macrosector_id FROM sector WHERE sector_id=v_sector_id);
+		IF v_presszone_id IS NULL THEN
+			SELECT count(*) into count_aux FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001);
+			IF count_aux = 1 THEN
+				v_sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001) LIMIT 1);
+			ELSIF count_aux > 1 THEN
+				v_sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
+				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+			END IF;	
+		END IF;
 	
 		-- Dma ID
-		SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001);
-		IF count_aux = 1 THEN
-			v_dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) LIMIT 1);
-		ELSIF count_aux > 1 THEN
-			v_dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
-			order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+		IF v_dma_id IS NULL THEN
+			SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001);
+			IF count_aux = 1 THEN
+				v_dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) LIMIT 1);
+			ELSIF count_aux > 1 THEN
+				v_dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
+				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+			END IF;	
+		END IF;
+
+		-- Expl ID
+		IF v_expl_id IS NULL THEN
+			SELECT count(*) into count_aux FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001);
+			IF count_aux = 1 THEN
+				v_expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001) LIMIT 1);
+			ELSIF count_aux > 1 THEN
+				v_expl_id =(SELECT expl_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
+				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+			END IF;
 		END IF;
 	
 		-- Macrodma
 		v_macrodma_id := (SELECT macrodma_id FROM dma WHERE dma_id=v_dma_id);
 					
-		-- Exploitation
-		v_expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001) LIMIT 1);
+		-- Macrosector
+		v_macrosector_id := (SELECT macrosector_id FROM sector WHERE sector_id=v_sector_id);
 	
 		-- Municipality 
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) LIMIT 1); 
@@ -326,7 +381,7 @@ BEGIN
 	
 		-- getting vdefault values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT feature_field_id as param, value::text AS vdef FROM audit_cat_param_user 
-			JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL)a'
+			JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL and config_param_user.parameter NOT IN (''enddate_vdefault'', ''statetype_plan_vdefault''))a'
 			INTO v_values_array;
 
 		-- getting propierties from feature catalog value
@@ -350,7 +405,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		
 	-- getting values on insert from feature
 	ELSIF p_tg_op ='UPDATE' THEN	
 		EXECUTE 'SELECT (row_to_json(a)) FROM 
@@ -358,16 +412,11 @@ BEGIN
 			INTO v_values_array
 			USING p_id;
 	END IF;
-
-	-- get full values of nodes from arc
-	SELECT * INTO v_noderecord1 FROM v_edit_node WHERE node_id = v_node1;
-	SELECT * INTO v_noderecord2 FROM v_edit_node WHERE node_id = v_node2;
 	
 	-- looping the array setting values and widgetcontrols
 	FOREACH aux_json IN ARRAY v_fields_array 
         LOOP          
 		array_index := array_index + 1;
-
 
 		IF p_tg_op='INSERT' THEN 
 
@@ -389,10 +438,10 @@ BEGIN
 				field_value = v_code;
 				
 			ELSIF (aux_json->>'column_id') = 'node_1' THEN
-				field_value = v_node1;
+				field_value = v_noderecord1.node_id;
 				
 			ELSIF (aux_json->>'column_id') = 'node_2' THEN
-				field_value = v_node2;
+				field_value = v_noderecord2.node_id;
 				
 			ELSIF (aux_json->>'column_id') = 'gis_length' THEN
 				field_value = v_gislength;
@@ -401,8 +450,10 @@ BEGIN
 				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'
 					INTO field_value
 					USING v_catfeature.id;
-					
+
 			-- mapzones values
+			ELSIF (aux_json->>'column_id') = 'presszonecat_id' THEN
+				field_value = v_presszone_id;
 			ELSIF (aux_json->>'column_id') = 'sector_id' THEN
 				field_value = v_sector_id;
 			ELSIF (aux_json->>'column_id') = 'macrosector_id' THEN
@@ -433,7 +484,7 @@ BEGIN
 				field_value = v_shape;
 			ELSIF (aux_json->>'column_id')='matcat_id' THEN	
 				field_value = v_matcat_id;
-			
+
 			-- catalog
 			ELSIF (aux_json->>'column_id') = 'arccat_id' OR (aux_json->>'column_id') = 'nodecat_id' OR  (aux_json->>'column_id') = 'connecat_id'  THEN	
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
@@ -443,7 +494,7 @@ BEGIN
 			ELSIF (aux_json->>'column_id') =  'fluid_type' OR  (aux_json->>'column_id') =  'function_type' OR (aux_json->>'column_id') =  'location_type' OR (aux_json->>'column_id') =  'category_type' THEN
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
 					WHERE ((a->>'param') = (aux_json->>'column_id') AND left ((a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
-		
+
 			-- rest (including addfields)
 			ELSE 
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id');
@@ -468,14 +519,20 @@ BEGIN
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
 					WHERE (a->>'param') = 'gratecat_id';
 				END IF;
+				
 			END IF;
 
 			-- setting widgetcontrols when null (user has not configurated form fields table).
 			IF (aux_json->>'widgetcontrols') IS NULL THEN
 				v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||v_tablename||'", "idName":"'||v_idname||'", "id":"'||p_id||
-					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';
+					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'"}}';
 				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetcontrols;
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
+			END IF;
+
+			-- refactor possible incorrect date values because python doesnot manage
+			IF (aux_json->>'widgettype') = 'datepickertime' THEN 
+				field_value = replace(field_value,'/','-');
 			END IF;
 			
 			
