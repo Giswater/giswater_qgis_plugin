@@ -139,8 +139,9 @@ class TmBasic(TmParentAction):
         self.manage_prices(id_new_camp)
 
 
-    def manage_prices(self, id_camp):
+    def manage_prices(self, id_camp, dialog=None):
         # Set dialog and signals
+        if id_camp is None: id_camp = self.get_campaing_id(dialog)
         dlg_prices_management = PriceManagement()
         self.load_settings(dlg_prices_management)
         dlg_prices_management.btn_close.clicked.connect(partial(self.close_dialog, dlg_prices_management))
@@ -218,7 +219,7 @@ class TmBasic(TmParentAction):
         dlg_tree_manage.btn_cancel.clicked.connect(partial(self.close_dialog, dlg_tree_manage))
         dlg_tree_manage.btn_accept.clicked.connect(partial(self.get_year, dlg_tree_manage))
         dlg_tree_manage.btn_update_price.clicked.connect(partial(self.get_campaing_id, dlg_tree_manage))
-        dlg_tree_manage.btn_update_price.clicked.connect(partial(self.manage_prices, self.campaign_id))
+        dlg_tree_manage.btn_update_price.clicked.connect(partial(self.manage_prices, None, dlg_tree_manage))
 
         self.set_completer_object(table_name, dlg_tree_manage.txt_campaign, field_name)
         self.open_dialog(dlg_tree_manage)
@@ -245,7 +246,7 @@ class TmBasic(TmParentAction):
             self.controller.show_warning(message)
             return None
         self.campaign_id = row[0]
-        return True
+        return row[0]
 
     
     def get_year(self, dialog):
