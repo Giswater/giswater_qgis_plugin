@@ -1950,11 +1950,10 @@ class UpdateSQL(ApiParent):
             sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables "
                    "WHERE table_schema = '" + str(row[0]) + "' "
                    "AND table_name = 'version')")
-            exists = self.controller.get_row(sql)
-
+            exists = self.controller.get_row(sql, show_warning=False)
             if exists and str(exists[0]) == 'True':
                 sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
-                result = self.controller.get_row(sql)
+                result = self.controller.get_row(sql, show_warning=False)
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
@@ -1967,7 +1966,7 @@ class UpdateSQL(ApiParent):
 
 
     def filter_srid_changed(self):
-        # return
+
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''

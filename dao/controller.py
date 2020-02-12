@@ -454,7 +454,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None, show_warning_detail=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -463,10 +463,12 @@ class DaoController(object):
         if not row:
             # Check if any error has been raised
             if self.last_error:
-                text = "Undefined error" 
-                if '-1' in self.log_codes:   
+                text = "Undefined error"
+                if '-1' in self.log_codes:
                     text = self.log_codes[-1]
-                self.show_warning_detail(text, str(self.last_error))
+                if show_warning_detail:
+                    self.show_warning_detail(text, str(self.last_error))
+                self.log_info(sql)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
