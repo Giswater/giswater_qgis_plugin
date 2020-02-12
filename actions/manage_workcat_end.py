@@ -182,8 +182,11 @@ class ManageWorkcatEnd(ParentManage):
 
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
+        # Setting values
+        self.workcat_id_end = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
+        self.enddate = utils_giswater.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
 
-        if self.workcat_id_end == 'null' or self.workcat_id_end is None:
+        if self.workcat_id_end in ('null', None):
             message = "Please select a workcat id end"
             self.controller.show_warning(message)
             return
@@ -243,8 +246,8 @@ class ManageWorkcatEnd(ParentManage):
 
     def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
-
         tablename = "v_edit_" + geom_type
+
         if self.selected_list is None:
             return
 
