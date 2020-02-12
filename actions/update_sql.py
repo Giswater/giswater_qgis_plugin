@@ -50,6 +50,8 @@ class UpdateSQL(ApiParent):
         self.plugin_dir = plugin_dir
         self.schema_name = self.controller.schema_name
         self.project_type = None
+        self.dlg_readsql = None
+        self.dlg_info = None
 
 
     def init_sql(self, set_database_connection=False):
@@ -87,9 +89,10 @@ class UpdateSQL(ApiParent):
         self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
 
         # Create the dialog and signals
-        self.dlg_readsql = Readsql()
-        self.load_settings(self.dlg_readsql)
-        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
+        if self.dlg_readsql is None:
+            self.dlg_readsql = Readsql()
+            self.load_settings(self.dlg_readsql)
+            self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
 
         # Check if we have any layer loaded
         self.project_type = self.controller.get_project_type()
@@ -1950,10 +1953,10 @@ class UpdateSQL(ApiParent):
             sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables "
                    "WHERE table_schema = '" + str(row[0]) + "' "
                    "AND table_name = 'version')")
-            exists = self.controller.get_row(sql, show_warning=False)
+            exists = self.controller.get_row(sql, show_warning_detail=False)
             if exists and str(exists[0]) == 'True':
                 sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
-                result = self.controller.get_row(sql, show_warning=False)
+                result = self.controller.get_row(sql, show_warning_detail=False)
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
@@ -3262,9 +3265,10 @@ class UpdateSQL(ApiParent):
     def info_show_info(self):
         """ Button 36: Info show info, open giswater and visit web page """
 
-        # Create form
-        self.dlg_info = InfoShowInfo()
-        self.load_settings(self.dlg_info)
+        if self.dlg_info is None:
+            # Create form
+            self.dlg_info = InfoShowInfo()
+            self.load_settings(self.dlg_info)
 
         # Get Plugin, Giswater, PostgreSQL and Postgis version
         postgresql_version = self.controller.get_postgresql_version()
