@@ -80,7 +80,8 @@ UNION
           GROUP BY a.node_id) b USING (node_id)
   WHERE b.ct > 1 AND rpt_inp_node.epa_type::text = 'INLET'::text;
 
-  
+
+drop VIEW vi_pumps;
 CREATE OR REPLACE VIEW vi_pumps AS 
  SELECT arc_id,
     rpt_inp_arc.node_1,
@@ -91,7 +92,7 @@ CREATE OR REPLACE VIEW vi_pumps AS
     ('PATTERN'::text || ' '::text) || (rpt_inp_arc.childparam->>'pattern')::text AS pattern
    FROM inp_selector_result, rpt_inp_arc
      WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-      AND epa_type = 'PUMP'::text;
+      AND epa_type = 'PUMP'::text
 UNION
  SELECT rpt_inp_arc.arc_id::text AS arc_id,
     rpt_inp_arc.node_1,

@@ -39,8 +39,7 @@ TO EXECUTE
 ----------
 
 -- SECTOR
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":2, ""geomParamUpdate":15, "debug":"false"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -50,8 +49,7 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 
 -- DMA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":"TRUE", ""geomParamUpdate":15,"debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]","updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", 
 "updateFeature":"TRUE", "updateMapZone":2,"concaveHullParam":0.85,"debug":"false"}}}');
@@ -64,8 +62,7 @@ UPDATE arc SET dma_id=0
 
 
 -- DQA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", 
-"updateFeature":"TRUE", "updateMapZone":2,""geomParamUpdate":15,"debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]","updateFeature":"TRUE", "updateMapZone":2 , "geomParamUpdate":15, "debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "updateFeature":TRUE}}}');
 
@@ -75,8 +72,7 @@ SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
 
 -- PRESZZONE
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]",
-"updateFeature":"TRUE","updateMapZone":2,""geomParamUpdate":15,"debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]", "updateFeature":"TRUE","updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
 

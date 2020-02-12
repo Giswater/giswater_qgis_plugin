@@ -529,12 +529,6 @@ BEGIN
 				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetcontrols;
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 			END IF;
-
-			-- refactor possible incorrect date values because python doesnot manage
-			IF (aux_json->>'widgettype') = 'datepickertime' THEN 
-				field_value = replace(field_value,'/','-');
-			END IF;
-			
 			
 		ELSIF  p_tg_op ='UPDATE' THEN 
 				
