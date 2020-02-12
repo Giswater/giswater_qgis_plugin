@@ -73,7 +73,10 @@ class Giswater(QObject):
         self.plugin_toolbars = {}
         self.available_layers = []
         self.btn_add_layers = None
-            
+        self.update_sql = None
+        self.action = None
+        self.action_info = None
+
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         self.plugin_name = self.get_value_from_metadata('name', 'giswater')
@@ -108,10 +111,6 @@ class Giswater(QObject):
         # Define signals
         self.set_signals()
 
-        if sys.version[0] == '2':
-            reload(sys)
-            sys.setdefaultencoding("utf-8")
-
 
     def set_signals(self): 
         """ Define widget and event signals """
@@ -122,20 +121,19 @@ class Giswater(QObject):
 
     def set_info_button(self):
 
-        self.toolButton = QToolButton()
-        self.action_info = self.iface.addToolBarWidget(self.toolButton)
+        toolButton = QToolButton()
+        self.action_info = self.iface.addToolBarWidget(toolButton)
 
         icon_path = self.icon_folder + '36.png'
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
-            action = QAction(icon, "Show info", self.iface.mainWindow())
+            self.action = QAction(icon, "Show info", self.iface.mainWindow())
         else:
-            action = QAction("Show info", self.iface.mainWindow())
+            self.action = QAction("Show info", self.iface.mainWindow())
 
-        self.toolButton.setDefaultAction(action)
-
+        toolButton.setDefaultAction(self.action)
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
-        action.triggered.connect(self.update_sql.init_sql)
+        self.action.triggered.connect(self.update_sql.init_sql)
 
     
     def enable_python_console(self):
@@ -632,16 +630,13 @@ class Giswater(QObject):
         try:
             self.save_toolbars_position()
         except Exception as e:
-            pass
+            self.controller.log_warning(str(e))
 
         try:
             # Unlisten notify channel and stop thread
             if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
                 list_channels = ['desktop', self.controller.current_user]
                 self.notify.stop_listening(list_channels)
-
-            # Remove icon of action 'Info'
-            self.iface.removeToolBarIcon(self.action_info)
 
             for action in list(self.actions.values()):
                 self.iface.removePluginMenu(self.plugin_name, action)
@@ -658,20 +653,21 @@ class Giswater(QObject):
                     if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
                         del sys.modules[mod_name]
 
-            # Reset instance attributes
-            self.actions = {}
-            self.map_tools = {}
-            self.srid = None
-            self.plugin_toolbars = {}
+            # Remove icon of action 'Info'
+            if self.action:
+                self.action.triggered.disconnect()
+            if self.action_info:
+                self.iface.removeToolBarIcon(self.action_info)
 
         except Exception as e:
-            pass
+            self.controller.log_warning(str(e))
         finally:
             # Reset instance attributes
             self.actions = {}
             self.map_tools = {}
             self.srid = None
             self.plugin_toolbars = {}
+            self.action = None
 
     
     """ Slots """             
