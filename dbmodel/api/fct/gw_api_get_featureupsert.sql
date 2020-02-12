@@ -381,7 +381,8 @@ BEGIN
 	
 		-- getting vdefault values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT feature_field_id as param, value::text AS vdef FROM audit_cat_param_user 
-			JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL and config_param_user.parameter NOT IN (''enddate_vdefault'', ''statetype_plan_vdefault''))a'
+			JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL AND 
+			config_param_user.parameter NOT IN (''enddate_vdefault'', ''statetype_plan_vdefault'', ''statetype_end_vdefault''))a'
 			INTO v_values_array;
 
 		-- getting propierties from feature catalog value
