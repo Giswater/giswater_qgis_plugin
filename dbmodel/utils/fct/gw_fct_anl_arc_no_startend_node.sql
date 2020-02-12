@@ -102,7 +102,7 @@ BEGIN
 	--points
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, arccat_id, state, expl_id, descript, the_geom_p, fprocesscat_id FROM anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=3) row; 
+	FROM (SELECT id, node_id, arccat_id, state, expl_id, descript, the_geom_p as the_geom, fprocesscat_id FROM anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=3) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
 	
