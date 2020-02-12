@@ -1158,9 +1158,10 @@ class ApiParent(ParentAction):
             widget.setProperty('column_id', field['column_id'])
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
-        widget.setDisplayFormat('yyyy/MM/dd')
+        widget.setDisplayFormat('dd/MM/yyyy')
         if 'value' in field and field['value'] not in ('', None, 'null'):
-            date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+            field['value'] = "2020/10/10"
+            date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
             utils_giswater.setCalendarDate(dialog, widget, date)
         else:
             widget.clear()
@@ -1338,7 +1339,7 @@ class ApiParent(ParentAction):
                     widget.setDisplayFormat('yyyy/MM/dd')
                     date = QDate.currentDate()
                     if 'value' in field and field['value'] not in ('', None, 'null'):
-                        date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+                        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

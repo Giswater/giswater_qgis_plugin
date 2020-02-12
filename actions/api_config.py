@@ -262,7 +262,7 @@ class ApiConfig(ApiParent):
                 elif field['widgettype'] == 'datepickertime':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
-                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                    date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -365,7 +365,7 @@ class ApiConfig(ApiParent):
                 elif field['widgettype'] == 'datepickertime':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
-                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                    date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

@@ -53,9 +53,9 @@ class TmBasic(TmParentAction):
 
         # Set default dates
         current_year = QDate.currentDate().year()
-        start_date = QDate.fromString(str(int(current_year)) + '/11/01', 'yyyy/MM/dd')
+        start_date = QDate.fromString(str(int(current_year)) + '-11-01', 'yyyy-MM-dd')
         self.dlg_new_campaign.start_date.setDate(start_date)
-        end_date = QDate.fromString(str(int(current_year)+1) + '/10/31', 'yyyy/MM/dd')
+        end_date = QDate.fromString(str(int(current_year)+1) + '-10-31', 'yyyy-MM-dd')
         self.dlg_new_campaign.end_date.setDate(end_date)
 
         table_name = 'cat_campaign'
