@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2328
 
-DROP FUNCTION IF EXISTS "ws".gw_fct_pg2epa_fill_data(varchar);
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fill_data(varchar);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS 
 $BODY$
 
 DECLARE     
@@ -17,7 +17,7 @@ v_usedmapattern boolean;
 BEGIN
 
 --  Search path
-    SET search_path = "ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  Get variables
     v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);

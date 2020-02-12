@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varch
 AS $BODY$
 
 /*example
-select ws.gw_fct_pg2epa_nod2arc ('testbgeo3', true)
+select SCHEMA_NAME.gw_fct_pg2epa_nod2arc ('testbgeo3', true)
 */
 
 DECLARE
