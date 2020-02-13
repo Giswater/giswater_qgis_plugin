@@ -496,22 +496,18 @@ BEGIN
 				EXECUTE v_querytext;
 
 			ELSIF  v_updatemapzgeom = 3 THEN
-				-- use plot and pipe buffer
 			
-				-- buffer pipe
+				-- use plot and pipe buffer
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
-						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where '||quote_ident(v_field)||'::integer > 0 
-						AND arc_id NOT IN (SELECT arc_id FROM v_edit_connec,ext_plot WHERE st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001))
-						group by '||quote_ident(v_field)||')a 
-						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);	
-				EXECUTE v_querytext;
-
-				-- plot
-				v_querytext = 'UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
-						(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(ext_plot.the_geom),0.01)) as geom FROM v_edit_connec, ext_plot
-						WHERE '||quote_ident(v_field)||'::integer > 0 AND WHERE st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
-						group by '||quote_ident(v_field)||')a 
-						WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);	
+							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
+							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc 
+							where '||quote_ident(v_field)||'::integer > 0  group by '||quote_ident(v_field)||'
+							UNION
+							SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
+							WHERE '||quote_ident(v_field)||'::integer > 0 AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
+							group by '||quote_ident(v_field)||'	
+							)a group by '||quote_ident(v_field)||')b 
+						WHERE b.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
 
 				EXECUTE v_querytext;
 			END IF;

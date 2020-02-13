@@ -275,6 +275,8 @@ BEGIN
 	ELSIF  v_updatemapzgeom = 3 THEN
 
 		-- use plot and pipe buffer		
+
+/*
 		-- buffer pipe
 		v_querytext = '	UPDATE minsector set the_geom = geom FROM
 				(SELECT minsector_id, st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where minsector_id::integer > 0 
@@ -282,13 +284,24 @@ BEGIN
 				group by minsector_id)a 
 				WHERE a.minsector_id = minsector.minsector_id';			
 		EXECUTE v_querytext;
-
 		-- plot
 		v_querytext = '	UPDATE minsector set the_geom = geom FROM
 				(SELECT minsector_id, st_multi(st_buffer(st_collect(ext_plot.the_geom),0.01)) as geom FROM v_edit_connec, ext_plot
 				WHERE minsector_id::integer > 0 AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
 				group by minsector_id)a 
 				WHERE a.minsector_id = minsector.minsector_id';	
+*/
+		v_querytext = ' UPDATE minsector set the_geom = geom FROM
+					(SELECT minsector_id, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
+					(SELECT minsector_id, st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc 
+					where minsector_id::integer > 0  group by minsector_id
+					UNION
+					SELECT minsector_id, st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
+					WHERE minsector_id::integer > 0 AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
+					group by minsector_id
+					)a group by minsector_id)b 
+				WHERE b.minsector_id=minsector.minsector_id';
+
 		EXECUTE v_querytext;
 	END IF;
 				

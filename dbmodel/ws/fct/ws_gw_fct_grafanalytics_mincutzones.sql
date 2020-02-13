@@ -168,6 +168,14 @@ BEGIN
 		VALUES (v_fprocesscat_id, concat('DETAIL (fprocesscat_id : 49)')); 
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 		VALUES (v_fprocesscat_id, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=49 AND user_name=current_user'));	
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, '');
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 'RESUME');
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, '-------------------------------------------------');
+		INSERT INTO audit_check_data (fprocesscat_id, error_message)
+		SELECT 29, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data 
+		WHERE fprocesscat_id=29 AND user_name=current_user ORDER BY (((log_message::json->>'connecs')::json->>'hydrometers')::json->>'total')::integer desc;
+
+		
 	END IF;
 	
 	-- get results
