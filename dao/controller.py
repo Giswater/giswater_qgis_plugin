@@ -12,6 +12,7 @@ from qgis.PyQt.QtSql import QSqlDatabase
 
 import os.path
 from functools import partial
+import inspect
 import traceback
 import sys
 
@@ -470,10 +471,7 @@ class DaoController(object):
         if not row:
             # Check if any error has been raised
             if self.last_error:
-                text = "Undefined error" 
-                if '-1' in self.log_codes:   
-                    text = self.log_codes[-1]
-                self.show_warning_detail(text, str(self.last_error))
+                self.manage_exception_db(self.last_error, sql)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
@@ -490,10 +488,7 @@ class DaoController(object):
         if not rows2:
             # Check if any error has been raised
             if self.last_error:
-                text = "Undefined error"
-                if '-1' in self.log_codes:
-                    text = self.log_codes[-1]
-                self.show_warning_detail(text, str(self.dao.last_error))
+                self.manage_exception_db(self.last_error, sql)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
@@ -516,10 +511,7 @@ class DaoController(object):
         if not result:
             if log_error:
                 self.log_info(sql, stack_level_increase=1)
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
+            self.manage_exception_db(self.last_error, sql)
             return False
         else:
             if search_audit:
@@ -539,10 +531,7 @@ class DaoController(object):
         if not value:
             if log_error:
                 self.log_info(sql, stack_level_increase=1)
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
+            self.manage_exception_db(self.last_error, sql)
             return False
         else:
             if search_audit:
@@ -599,13 +588,11 @@ class DaoController(object):
         result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
-            return False
+            # Check if any error has been raised
+            if self.last_error:
+                self.manage_exception_db(self.last_error, sql)
 
-        return True
+        return result
                
             
     def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
@@ -651,13 +638,11 @@ class DaoController(object):
         result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
-            return False
+            # Check if any error has been raised
+            if self.last_error:
+                self.manage_exception_db(self.last_error, sql)
 
-        return True
+        return result
 
 
     def execute_api_function(self, function_name, body, format_return='::text'):
@@ -674,7 +659,9 @@ class DaoController(object):
             sql += format_return
         row = self.get_row(sql, log_sql=True)
         if not row:
-            self.show_critical("NOT ROW FOR", parameter=sql)
+            # Check if any error has been raised
+            if self.last_error:
+                self.manage_exception_db(self.last_error, sql)
             return None
 
         return row
@@ -1433,7 +1420,7 @@ class DaoController(object):
         msg += f"Error type: {exc_type}\n"
         msg += f"File name: {file_name}\n"
         msg += f"Line number: {exc_tb.tb_lineno}\n"
-        msg += f"{trace}"
+        msg += f"{trace}\n"
         if description:
             msg += f"Description: {description}\n"
         if sql:
@@ -1442,6 +1429,34 @@ class DaoController(object):
         # Show exception message in dialog and log it
         self.show_exceptions_msg(title, msg)
         self.log_warning(msg)
+
+
+    def manage_exception_db(self, description=None, sql=None, stack_level=2):
+        """ Manage exception in database queries and show information to the user """
+
+        try:
+            module_path = inspect.stack()[stack_level][1]
+            file_name = os.path.basename(module_path)
+            function_line = inspect.stack()[stack_level][2]
+            function_name = inspect.stack()[stack_level][3]
+
+            # Set exception message details
+            msg = ""
+            msg += f"File name: {file_name}\n"
+            msg += f"Function name: {function_name}\n"
+            msg += f"Line number: {function_line}\n"
+            if description:
+                msg += f"Description:\n {description}\n"
+            if sql:
+                msg += f"SQL:\n {sql}\n"
+
+            # Show exception message in dialog and log it
+            title = "Database error"
+            self.show_exceptions_msg(title, msg)
+            self.log_warning(msg, stack_level_increase=2)
+
+        except Exception as e:
+            self.log_warning(f"Error logging: {e}", logger_file=False)
 
 
     def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
