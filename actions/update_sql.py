@@ -3275,6 +3275,11 @@ class UpdateSQL(ApiParent):
         postgis_version = self.controller.get_postgis_version()
         plugin_version = self.get_plugin_version()
         project_version = 0
+
+        # Make sure we have schema name
+        if self.schema_name is None:
+            self.schema_name = self.controller.schema_name
+
         sql = f"SELECT giswater FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1"
         row = self.controller.get_row(sql)
         if row:
@@ -3293,13 +3298,14 @@ class UpdateSQL(ApiParent):
         self.version_metadata = self.get_plugin_version()
 
         # Check if exist column sample in table version
-        sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + self.schema_name + "';"
-        result = self.controller.get_row(sql, commit=True)
+        sql = (f"SELECT column_name FROM information_schema.columns "
+               f"WHERE table_name = 'version' and column_name='sample' and table_schema = '{self.schema_name}';")
+        result = self.controller.get_row(sql, commit=True, log_sql=True)
         if result is None:
-            sql = "SELECT giswater, language FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
+            sql = f"SELECT giswater, language FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1;"
             result = self.controller.get_row(sql, commit=True)
         else:
-            sql = "SELECT giswater, language, sample FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1;"
+            sql = f"SELECT giswater, language, sample FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1;"
             result = self.controller.get_row(sql, commit=True)
             self.is_sample = result[2]
 
