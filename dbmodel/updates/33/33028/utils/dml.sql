@@ -33,3 +33,5 @@ UPDATE audit_cat_param_user SET layout_order = 6 WHERE id = 'builtdate_vdefault'
 UPDATE audit_cat_param_user SET layout_order = 7 WHERE id = 'enddate_vdefault';
 UPDATE audit_cat_param_user SET layout_order = 8 WHERE id = 'workcat_id_end_vdefault';
 UPDATE audit_cat_param_user SET label = 'Enddate' WHERE label = 'End date:';
+
+UPDATE config_api_layer SET is_editable = TRUE WHERE layer_id = ANY(ARRAY['v_edit_arc', 'v_edit_node','v_edit_connec']);
