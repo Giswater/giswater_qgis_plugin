@@ -50,7 +50,7 @@ BEGIN
 	
 	PERFORM gw_fct_admin_role_permissions();
 
-	DELETE FROM audit_check_data where fprocesscat_id = 114;
+	DELETE FROM audit_check_data where fprocesscat_id = 115;
 	
 	GRANT ALL ON TABLE node_type TO role_basic;
 	
@@ -161,7 +161,7 @@ BEGIN
 
 								raise notice 'v_query_result,%',v_query_result;
 								INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, error_message) 
-								VALUES (114, rec_fct.function_name,rec_role.id,v_query_result);
+								VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 							END IF;
 						
 								--fusion arcs or delete node if it's not connected to arcs
@@ -173,7 +173,7 @@ BEGIN
 									RAISE NOTICE 'FUSION,%',v_feature_id;
 									
 									INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, error_message) 
-									VALUES (114, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
+									VALUES (115, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
 									
 								ELSE
 									RAISE NOTICE 'DELETE,%',v_feature_id;
@@ -200,7 +200,7 @@ BEGIN
 				END IF;
 			
 			INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, error_message) 
-			VALUES (114, rec_fct.function_name,rec_role.id,v_query_result);
+			VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 			
 			END IF;
 
@@ -216,7 +216,7 @@ GRANT SELECT ON TABLE node_type TO role_basic;
 raise notice 'return';
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE user_name="current_user"() AND fprocesscat_id=114 ORDER BY criticity desc, id asc) row; 
+	WHERE user_name="current_user"() AND fprocesscat_id=115 ORDER BY criticity desc, id asc) row; 
 	
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
