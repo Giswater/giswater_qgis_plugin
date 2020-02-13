@@ -26,3 +26,5 @@ CREATE TABLE doc_x_workcat
       REFERENCES cat_work (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_function", "column":"sample_query", "dataType":"text", "isUtils":"False"}}$$);
