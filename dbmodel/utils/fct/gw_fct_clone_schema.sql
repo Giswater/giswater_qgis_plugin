@@ -186,7 +186,7 @@ $$;
        action_condition as condition,
        action_statement as definition
 from information_schema.triggers
-where event_object_schema = 'ws_sample'
+where event_object_schema = 'SCHEMA_NAME'
 group by 1,2,3,4,6,7,8
 order by table_schema,
          table_name;
