@@ -444,8 +444,10 @@ class AddNewLot(ParentManage):
             return
 
         # Transform text dates as QDate
-        startdate = QDate.fromString(startdate.replace('/', '-'), self.lot_date_format)
-        enddate = QDate.fromString(enddate.replace('/', '-'), self.lot_date_format)
+        if startdate: startdate = startdate.replace('/', '-')
+        startdate = QDate.fromString(startdate, self.lot_date_format)
+        if enddate: enddate = enddate.replace('/', '-')
+        enddate = QDate.fromString(enddate, self.lot_date_format)
 
         if startdate <= enddate:
             self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
