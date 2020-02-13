@@ -243,6 +243,12 @@ class ManageWorkcatEnd(ParentManage):
 
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True)
 
+            # Remove selection for all layers in TOC
+            for layer in self.iface.mapCanvas().layers():
+                if layer.type() == layer.VectorLayer:
+                    layer.removeSelection()
+            self.iface.mapCanvas().refresh()
+
 
     def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
