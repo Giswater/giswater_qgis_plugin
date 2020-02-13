@@ -684,8 +684,9 @@ BEGIN
 				VALUES (112, 3, 'Arc with state 2 cant be divide by node with state 1.');	
 	
 			ELSE  
-				PERFORM audit_function(2120,2114); 
-				
+				--PERFORM audit_function(2120,2114); 
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (112, 3, 'There is an inconsistency between node and arc state.');
 			END IF;
 		ELSE
 			--RETURN 0;

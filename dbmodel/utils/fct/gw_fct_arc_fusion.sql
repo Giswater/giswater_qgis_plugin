@@ -7,10 +7,11 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2112
 
 
+DROP FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(character varying, character varying, date);
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(node_id_arg character varying, workcat_id_end_aux character varying, enddate_aux date)
 
-
-  RETURNS integer AS
+  RETURNS json AS
 $BODY$
 DECLARE
 
@@ -28,13 +29,37 @@ DECLARE
     rec_param integer;
     v_vnode integer;
     v_node_geom public.geometry;
+    v_version  text;
+
+    v_result text;
+    v_result_info text;
+    v_result_point text;
+    v_result_line text;
+    v_result_polygon text;
+    v_error_context text;
 
 BEGIN
 
     -- Search path
     SET search_path = SCHEMA_NAME, public;
 
-    SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+    SELECT wsoftware, giswater INTO v_project_type, v_version FROM version LIMIT 1;
+
+        -- delete old values on result table
+    DELETE FROM audit_check_data WHERE fprocesscat_id=114 AND user_name=current_user;
+    
+    -- Starting process
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 4, 'ARC FUSION');
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 4, '-------------------------------------------------------------');
+
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 3, 'CRITICAL ERRORS');    
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 3, '----------------------'); 
+
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 2, 'WARNINGS');   
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 2, '--------------'); 
+
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 1, 'INFO');
+    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 1, '-------');
 
     -- Check if the node is exists
     SELECT node_id INTO v_exists_node_id FROM v_edit_node WHERE node_id = node_id_arg;
@@ -100,7 +125,7 @@ BEGIN
             SELECT * INTO rec_addfield2 FROM man_addfields_value WHERE feature_id=v_my_record2.arc_id and parameter_id=rec_param;
 
                 IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
-                    RETURN audit_function(3008,2112);
+                    RETURN audit_function(3008,2114);
                 ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
                     UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param;
                 ELSIF rec_addfield1.value_param IS NULL and rec_addfield2.value_param IS NOT NULL THEN
@@ -157,21 +182,57 @@ BEGIN
             -- Arcs has different types
             ELSE
                 --INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (1, node_id_arg);
-                RETURN audit_function(2004,2112);
+                --RETURN audit_function(2004,2114);
+                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                VALUES (114, 3, 'It is impossible to use the node to fusion two arcs. HINT: Pipes have different types');
             END IF;
          
         -- Node has not 2 arcs
         ELSE
-            RETURN audit_function(2006,2112);
+            RETURN audit_function(2006,2114);
+            INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+            VALUES (114, 3, 'It is impossible to use the node to fusion two arcs. HINT: Node doesnt have 2 arcs');
+            
         END IF;
 
     -- Node not found
     ELSE 
-        RETURN audit_function(2002,2112);
+        RETURN audit_function(2002,2114);
+        INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+        VALUES (114, 3, 'Node not found . HINT: Please check table node');
     END IF;
 
-    RETURN audit_function(0,2112);
+   -- RETURN audit_function(0,2114);
+-- get results
+    -- info
 
+    SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+    FROM (SELECT id, error_message as message FROM audit_check_data 
+    WHERE user_name="current_user"() AND fprocesscat_id=114 ORDER BY criticity desc, id asc) row; 
+    
+    v_result_info := COALESCE(v_result, '{}'); 
+    v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+
+    v_result_point = '{"geometryType":"", "values":[]}';
+    v_result_line = '{"geometryType":"", "values":[]}';
+    v_result_polygon = '{"geometryType":"", "values":[]}';
+
+--  Return
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Arc fusion done successfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+             ',"data":{ "info":'||v_result_info||','||
+                '"setVisibleLayers":[]'||','||
+                '"point":'||v_result_point||','||
+                '"line":'||v_result_line||','||
+                '"polygon":'||v_result_polygon||'}'||
+               '}'
+        '}')::json;
+
+    EXCEPTION WHEN OTHERS THEN
+     GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+ 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
