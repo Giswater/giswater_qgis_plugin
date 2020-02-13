@@ -1160,7 +1160,6 @@ class ApiParent(ParentAction):
         widget.setCalendarPopup(True)
         widget.setDisplayFormat('dd/MM/yyyy')
         if 'value' in field and field['value'] not in ('', None, 'null'):
-            field['value'] = "2020/10/10"
             date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
             utils_giswater.setCalendarDate(dialog, widget, date)
         else:

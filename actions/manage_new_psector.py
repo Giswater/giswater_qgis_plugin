@@ -1062,8 +1062,7 @@ class ManageNewPsector(ParentManage):
                     sql = (f"UPDATE config_param_user "
                            f" SET value = $${new_psector_id[0]}$$ "
                            f" WHERE parameter = 'psector_vdefault'"
-                           f" AND cur_user=current_user; "
-                    )
+                           f" AND cur_user=current_user; ")
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user);")

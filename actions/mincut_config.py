@@ -350,7 +350,7 @@ class MincutConfig(ParentAction):
         if state_text != '':
             expr += f" AND state::text ILIKE '%{state_text}%' "
         expr += f" AND (exploitation::text ILIKE '%{expl}%' OR exploitation IS null)"
-        self.controller.log_info(str(expr))
+
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
         qtable.model().select()

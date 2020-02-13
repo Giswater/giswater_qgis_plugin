@@ -108,7 +108,7 @@ class Basic(ParentAction):
 
 
     def basic_api_search(self):
-        """ Button 32: SearchPlus """
+        """ Button 32: ApiSearch """
         self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_search.api_search()
      
