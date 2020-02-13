@@ -485,7 +485,8 @@ BEGIN
 				field_value = v_shape;
 			ELSIF (aux_json->>'column_id')='matcat_id' THEN	
 				field_value = v_matcat_id;
-
+			ELSIF (aux_json->>'column_id')='state_type' THEN	
+				field_value = (aux_json->>'selectedId'); -- using value defined on get_formfields function. This operation should be done for the rest of the combochilds
 			-- catalog
 			ELSIF (aux_json->>'column_id') = 'arccat_id' OR (aux_json->>'column_id') = 'nodecat_id' OR  (aux_json->>'column_id') = 'connecat_id'  THEN	
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
