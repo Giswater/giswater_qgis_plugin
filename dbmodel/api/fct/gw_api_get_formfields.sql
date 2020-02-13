@@ -221,14 +221,16 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
 				-- Get selected value
-				IF p_tgop ='INSERT' THEN
-					v_vdefault:=quote_ident(aux_json->>'column_id');
-					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
-						INTO field_value_parent;
-				ELSIF p_tgop ='UPDATE' OR p_tgop = 'SELECT' THEN
+				IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') AND aux_json->>'column_id' IS NOT NULL AND p_tablename IS NOT NULL 
+									   AND p_idname IS NOT NULL AND p_id IS NOT NULL AND p_columntype IS NOT NULL THEN
 					EXECUTE 'SELECT ' || quote_ident(aux_json->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) ||
 					 ' = CAST(' || quote_literal(p_id) || ' AS ' || COALESCE(p_columntype, 'character varying') || ')' 
 						INTO field_value_parent; 
+				ELSIF p_tgop ='INSERT' OR p_tgop = 'SELECT' THEN
+					v_vdefault:=quote_ident(aux_json->>'column_id');
+					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
+						INTO field_value_parent;
+				
 				END IF;
 
 				IF v_vdefault IS NULL THEN
@@ -311,8 +313,12 @@ BEGIN
 						combo_json_child := COALESCE(combo_json_child, '[]');
 						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);								
 						-- Get selected value
-						IF p_tgop ='INSERT' THEN
-							
+						IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') AND aux_json->>'column_id' IS NOT NULL AND p_tablename IS NOT NULL 
+									   AND p_idname IS NOT NULL AND p_id IS NOT NULL AND p_columntype IS NOT NULL THEN
+							EXECUTE 'SELECT ' || quote_ident(aux_json_child->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' ||
+							 quote_literal(p_id) || ' AS ' || p_columntype || ')' 
+							INTO v_vdefault; 
+						ELSIF p_tgop ='INSERT' OR p_tgop = 'SELECT' THEN
 							IF quote_ident(aux_json_child->>'column_id') = 'state_type' AND field_value_parent  = '0' THEN
 								EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_end_vdefault'''
 								INTO v_vdefault;													
@@ -332,11 +338,6 @@ BEGIN
 								INTO v_vdefault;													
 							END IF;
 
-							
-						ELSIF p_tgop ='UPDATE' THEN
-							EXECUTE 'SELECT ' || quote_ident(aux_json_child->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' ||
-							 quote_literal(p_id) || ' AS ' || p_columntype || ')' 
-							INTO v_vdefault; 
 						END IF;
 
 						IF v_vdefault IS NULL THEN
