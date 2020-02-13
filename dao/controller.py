@@ -655,11 +655,12 @@ class DaoController(object):
         return True
 
 
-    def get_json(self, function_name, body, commit=True):
+    def get_json(self, function_name, body, commit=True, log_sql=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param body: Parameter for function (json)
         :param commit: Commit sql (bool)
+        :param log_sql: Show query in qgis log (bool)
         :return: Response of the function executed (json)
         """
 
@@ -670,7 +671,7 @@ class DaoController(object):
             return None
 
         sql = f"SELECT {function_name} ($${{{body}}}$$);"
-        row = self.get_row(sql, commit=commit, log_sql=True)
+        row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
             self.show_critical("NOT ROW FOR", parameter=sql)
             return None
