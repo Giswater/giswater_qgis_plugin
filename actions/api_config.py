@@ -76,8 +76,8 @@ class ApiConfig(ApiParent):
         addfields_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'addfields_layout1')
 
         groupBox_1 = QGroupBox("Basic")
-        groupBox_2 = QGroupBox("Om")
-        groupBox_3 = QGroupBox("Workcat")
+        groupBox_2 = QGroupBox("O&&M")
+        groupBox_3 = QGroupBox("Inventory")
         groupBox_4 = QGroupBox("Mapzones")
         groupBox_5 = QGroupBox("Edit")
         groupBox_6 = QGroupBox("Epa")
@@ -87,7 +87,7 @@ class ApiConfig(ApiParent):
         groupBox_9 = QGroupBox("Node")
         groupBox_10 = QGroupBox("Arc")
         groupBox_11 = QGroupBox("Utils")
-        groupBox_12 = QGroupBox("Connec&Gully")
+        groupBox_12 = QGroupBox(f"Connec&&Gully")
 
         groupBox_13 = QGroupBox("Topology")
         groupBox_14 = QGroupBox("Builder")
@@ -105,7 +105,7 @@ class ApiConfig(ApiParent):
 
         self.basic_form = QGridLayout()
         self.om_form = QGridLayout()
-        self.workcat_form = QGridLayout()
+        self.inventory_form = QGridLayout()
         self.mapzones_form = QGridLayout()
         self.cad_form = QGridLayout()
         self.epa_form = QGridLayout()
@@ -136,7 +136,7 @@ class ApiConfig(ApiParent):
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
-        groupBox_3.setLayout(self.workcat_form)
+        groupBox_3.setLayout(self.inventory_form)
         groupBox_4.setLayout(self.mapzones_form)
         groupBox_5.setLayout(self.cad_form)
         groupBox_6.setLayout(self.epa_form)
@@ -287,7 +287,7 @@ class ApiConfig(ApiParent):
                 elif field['layout_id'] == 2:
                     self.order_widgets(field, self.om_form, lbl, chk, widget)
                 elif field['layout_id'] == 3:
-                    self.order_widgets(field, self.workcat_form, lbl, chk, widget)
+                    self.order_widgets(field, self.inventory_form, lbl, chk, widget)
                 elif field['layout_id'] == 4:
                     self.order_widgets(field, self.mapzones_form, lbl, chk, widget)
                 elif field['layout_id'] == 5:
@@ -392,7 +392,7 @@ class ApiConfig(ApiParent):
                 elif field['layout_id'] == 2:
                     self.order_widgets_system(field, self.om_form, lbl,  widget)
                 elif field['layout_id'] == 3:
-                    self.order_widgets_system(field, self.workcat_form, lbl,  widget)
+                    self.order_widgets_system(field, self.inventory_form, lbl,  widget)
                 elif field['layout_id'] == 4:
                     self.order_widgets_system(field, self.mapzones_form, lbl,  widget)
                 elif field['layout_id'] == 5:
