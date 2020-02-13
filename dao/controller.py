@@ -5,13 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
-
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
-
 
 import json, os.path
 
@@ -214,6 +211,7 @@ class DaoController(object):
                 self.log_warning("Error getting default connection (settings)")
                 self.last_error = self.tr("Error getting default connection")
                 return None, not_version
+
         self.credentials = credentials
         return credentials, not_version
 
@@ -1060,10 +1058,12 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
             if schemaname is None:
-                return None
+                self.get_layer_source_from_credentials()
+                schemaname = self.schema_name
+                if schemaname is None:
+                    return None
 
         schemaname = schemaname.replace('"', '')
-
         project_type = None
         tablename = "version"
         exists = self.check_table(tablename)
@@ -1428,6 +1428,7 @@ class DaoController(object):
 
 
     def get_config(self, parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+
         sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
         if sql_added:
             sql += sql_added
@@ -1440,6 +1441,7 @@ class DaoController(object):
 
     def indexing_spatial_layer(self, layer_name):
         """ Force reload dataProvider of layer """
+
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()

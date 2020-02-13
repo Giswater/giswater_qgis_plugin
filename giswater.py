@@ -54,8 +54,8 @@ from .ui_manager import AuditCheckProjectResult
 
 
 
-class Giswater(QObject):  
-    
+class Giswater(QObject):
+
     def __init__(self, iface):
         """ Constructor 
         :param iface: An interface instance that will be passed to this class
@@ -69,13 +69,14 @@ class Giswater(QObject):
         self.iface = iface
         self.actions = {}
         self.map_tools = {}
-        self.srid = None  
+        self.srid = None
         self.plugin_toolbars = {}
         self.available_layers = []
         self.btn_add_layers = None
         self.update_sql = None
         self.action = None
         self.action_info = None
+        self.toolButton = None
 
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -85,15 +86,15 @@ class Giswater(QObject):
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
         QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
-            
+
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
             message = "Config file not found at: " + setting_file
-            self.iface.messageBar().pushMessage("", message, 1, 20) 
-            return  
-          
-        # Set plugin settings
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            return
+
+            # Set plugin settings
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())
 
@@ -112,7 +113,7 @@ class Giswater(QObject):
         self.set_signals()
 
 
-    def set_signals(self): 
+    def set_signals(self):
         """ Define widget and event signals """
 
         self.iface.projectRead.connect(self.project_read)
@@ -120,9 +121,10 @@ class Giswater(QObject):
 
 
     def set_info_button(self):
+        """ Set main information button (always visible) """
 
-        toolButton = QToolButton()
-        self.action_info = self.iface.addToolBarWidget(toolButton)
+        self.toolButton = QToolButton()
+        self.action_info = self.iface.addToolBarWidget(self.toolButton)
 
         icon_path = self.icon_folder + '36.png'
         if os.path.exists(icon_path):
@@ -131,11 +133,22 @@ class Giswater(QObject):
         else:
             self.action = QAction("Show info", self.iface.mainWindow())
 
-        toolButton.setDefaultAction(self.action)
+        self.toolButton.setDefaultAction(self.action)
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
         self.action.triggered.connect(self.update_sql.init_sql)
 
-    
+
+    def unset_info_button(self):
+        """ Unset main information button (when plugin is disabled or reloaded) """
+
+        if self.action:
+            self.action.triggered.disconnect()
+        if self.action_info:
+            self.iface.removeToolBarIcon(self.action_info)
+        self.action = None
+        self.action_info = None
+
+
     def enable_python_console(self):
         """ Enable Python console and Log Messages panel if parameter 'enable_python_console' = True """
 
@@ -146,38 +159,38 @@ class Giswater(QObject):
         else:
             import console
             console.show_console()
-            
+
         # Manage Log Messages panel
         message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
         if message_log:
             message_log.setVisible(True)
-        
+
 
     def tr(self, message):
         if self.controller:
             return self.controller.tr(message)
-        
-    
-    def manage_action(self, index_action, function_name):  
+
+
+    def manage_action(self, index_action, function_name):
         """ Associate the action with @index_action the execution
             of the callback function @function_name when the action is triggered
         """
-        
+
         if function_name is None:
-            return 
-        
+            return
+
         try:
-            action = self.actions[index_action]                
+            action = self.actions[index_action]
 
             # Basic toolbar actions
             if int(index_action) in (32, 41, 48, 86):
-                callback_function = getattr(self.basic, function_name)  
+                callback_function = getattr(self.basic, function_name)
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
             elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
                 callback_function = getattr(self.mincut, function_name)
-                action.triggered.connect(callback_function)            
-            # OM toolbar actions
+                action.triggered.connect(callback_function)
+                # OM toolbar actions
             elif int(index_action) in (18, 64, 65, 74, 75, 76, 81, 82, 84):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
@@ -202,8 +215,8 @@ class Giswater(QObject):
                 callback_function = getattr(self.tm_basic, function_name)
                 action.triggered.connect(callback_function)
             # Generic function
-            else:        
-                callback_function = getattr(self, 'action_triggered')  
+            else:
+                callback_function = getattr(self, 'action_triggered')
                 action.triggered.connect(partial(callback_function, function_name))
 
             # Hide actions according parameter action_to_hide from config file
@@ -213,19 +226,19 @@ class Giswater(QObject):
                         action.setVisible(False)
 
         except AttributeError:
-            action.setEnabled(False)                
+            action.setEnabled(False)
 
-     
+
     def create_action(self, index_action, text, toolbar, is_checkable, function_name, action_group):
         """ Creates a new action with selected parameters """
-        
+
         icon = None
         icon_path = self.icon_folder + index_action + '.png'
-        if os.path.exists(icon_path):        
+        if os.path.exists(icon_path):
             icon = QIcon(icon_path)
-                
+
         if icon is None:
-            action = QAction(text, action_group) 
+            action = QAction(text, action_group)
         else:
             action = QAction(icon, text, action_group)
         action.setObjectName(function_name)
@@ -235,18 +248,18 @@ class Giswater(QObject):
         if self.schema_exists and (index_action == '01' or index_action == '02'):
             action = self.manage_dropdown_menu(action, index_action)
 
-        toolbar.addAction(action)  
-        action.setCheckable(is_checkable)    
-        self.actions[index_action] = action                                     
-        
+        toolbar.addAction(action)
+        action.setCheckable(is_checkable)
+        self.actions[index_action] = action
+
         # Management of the action                     
         self.manage_action(index_action, function_name)
-        
+
         # Management of the map_tool associated to this action (if it has one)
-        self.manage_map_tool(index_action, function_name)        
-            
+        self.manage_map_tool(index_action, function_name)
+
         return action
-      
+
     def manage_dropdown_menu(self, action, index_action):
         """ Create dropdown menu for insert management of nodes and arcs """
 
@@ -256,7 +269,7 @@ class Giswater(QObject):
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
-                    index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
+                index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
@@ -302,12 +315,12 @@ class Giswater(QObject):
             It has to be defined in the configuration file.
             Associate it to corresponding @action_group
         """
-        
+
         text_action = self.tr(index_action + '_text')
         function_name = self.settings.value('actions/' + str(index_action) + '_function')
         if not function_name:
             return None
-            
+
         # Buttons NOT checkable (normally because they open a form)
         list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 86, 64, 65, 66, 67, 68, 69,
                         74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305)
@@ -318,8 +331,8 @@ class Giswater(QObject):
         # Buttons checkable (normally related with 'map_tools')                
         else:
             action = self.create_action(index_action, text_action, toolbar, True, function_name, action_group)
-        
-        return action         
+
+        return action
 
 
     def open_browser(self, web_tag):
@@ -331,10 +344,10 @@ class Giswater(QObject):
         """ Get the action with @index_action and check if has an associated map_tool.
             If so, add it to dictionary of available map_tools 
         """
-        
+
         map_tool = None
-        action = self.actions[index_action]          
-        
+        action = self.actions[index_action]
+
         # Check if the @action has an associated map_tool         
         if int(index_action) == 16:
             map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)
@@ -347,7 +360,7 @@ class Giswater(QObject):
         elif int(index_action) in (37, 199):
             map_tool = CadApiInfo(self.iface, self.settings, action, index_action)
         elif int(index_action) == 39:
-            map_tool = Dimensioning(self.iface, self.settings, action, index_action)                     
+            map_tool = Dimensioning(self.iface, self.settings, action, index_action)
         elif int(index_action) == 43:
             map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
         elif int(index_action) == 44:
@@ -372,6 +385,7 @@ class Giswater(QObject):
         """ Manage actions of the common plugin toolbars """
         self.toolbar_basic()
         self.toolbar_utils()
+
 
     def toolbar_basic(self, x=None, y=None):
         """ Function called in def manage_toolbars(...)
@@ -525,7 +539,7 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
 
         # Manage action group of every toolbar
-        parent = self.iface.mainWindow()           
+        parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name','gw_QActionGroup')
@@ -533,14 +547,14 @@ class Giswater(QObject):
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)
 
         # Disable and hide all plugin_toolbars and actions
-        self.enable_toolbars(False) 
+        self.enable_toolbars(False)
 
-        self.edit.set_controller(self.controller)            
-        self.go2epa.set_controller(self.controller)            
+        self.edit.set_controller(self.controller)
+        self.go2epa.set_controller(self.controller)
         self.master.set_controller(self.controller)
         if self.wsoftware == 'ws':
             self.mincut.set_controller(self.controller)
-        self.om.set_controller(self.controller)  
+        self.om.set_controller(self.controller)
 
         self.edit.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
@@ -551,31 +565,33 @@ class Giswater(QObject):
         self.enable_toolbar("basic")
         self.enable_toolbar("utils")
 
-           
-    def manage_toolbar(self, toolbar_id, list_actions): 
+
+    def manage_toolbar(self, toolbar_id, list_actions):
         """ Manage action of selected plugin toolbar """
-                
+
         if list_actions is None:
             return
 
-        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')        
+        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
 
         plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
         plugin_toolbar.toolbar.setObjectName(toolbar_name)
         plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
-        plugin_toolbar.list_actions = list_actions           
+        plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
 
-           
+
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
         # Delete python compiled files
-        self.delete_pyc_files()  
-        
+        self.delete_pyc_files()
+
         # Force project read (to work with PluginReloader)
         self.project_read(False)
+
+        self.set_info_button()
 
 
     def manage_feature_cat(self):
@@ -588,8 +604,8 @@ class Giswater(QObject):
         self.feature_cat = {}
 
         if self.wsoftware.upper() == 'WS':
-            sql = ("SELECT cat_feature.* FROM cat_feature JOIN " 
-                  "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
+                   "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
         elif self.wsoftware.upper() == 'UD':
             sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
                    "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
@@ -617,7 +633,9 @@ class Giswater(QObject):
 
 
     def unload(self, remove_modules=True):
-        """ Removes plugin menu items and icons from QGIS GUI """
+        """ Removes plugin menu items and icons from QGIS GUI
+            :param @remove_modules is True when plugin is disabled or reloaded
+        """
 
         if self.btn_add_layers:
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
@@ -644,39 +662,36 @@ class Giswater(QObject):
 
             for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:
-                    plugin_toolbar.toolbar.setVisible(False)                
+                    plugin_toolbar.toolbar.setVisible(False)
                     del plugin_toolbar.toolbar
 
             if remove_modules:
+                # Unset main information button (when plugin is disabled or reloaded)
+                self.unset_info_button()
+
                 # unload all loaded giswater related modules
                 for mod_name, mod in list(sys.modules.items()):
-                    if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
-                        del sys.modules[mod_name]
-
-            # Remove icon of action 'Info'
-            if self.action:
-                self.action.triggered.disconnect()
-            if self.action_info:
-                self.iface.removeToolBarIcon(self.action_info)
+                    if mod and hasattr(mod, '__file__') and mod.__file__:
+                        if self.plugin_dir in mod.__file__:
+                            del sys.modules[mod_name]
 
         except Exception as e:
-            self.controller.log_warning(str(e))
+            print(str(e))
         finally:
             # Reset instance attributes
             self.actions = {}
             self.map_tools = {}
             self.srid = None
             self.plugin_toolbars = {}
-            self.action = None
 
-    
-    """ Slots """             
+
+    """ Slots """
 
     def enable_actions(self, enable=True, start=1, stop=100):
         """ Utility to enable/disable all actions """
 
         for i in range(start, stop+1):
-            self.enable_action(enable, i)              
+            self.enable_action(enable, i)
 
 
     def enable_action(self, enable=True, index=1):
@@ -685,7 +700,7 @@ class Giswater(QObject):
         key = str(index).zfill(2)
         if key in self.actions:
             action = self.actions[key]
-            action.setEnabled(enable)                   
+            action.setEnabled(enable)
 
 
     def hide_action(self, visible=True, index=1):
@@ -699,17 +714,17 @@ class Giswater(QObject):
 
     def enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
-        
+
         # Enable/Disable actions
         self.enable_actions(visible)
         try:
             for plugin_toolbar in list(self.plugin_toolbars.values()):
-                if plugin_toolbar.enabled:                
+                if plugin_toolbar.enabled:
                     plugin_toolbar.toolbar.setVisible(visible)
         except:
-            pass                      
-                                  
-        
+            pass
+
+
     def enable_toolbar(self, toolbar_id, enable=True):
         """ Enable/Disable toolbar. Normally because user has no permission """
 
@@ -724,10 +739,9 @@ class Giswater(QObject):
         """ Function executed when a user creates a new QGIS project """
 
         self.unload(False)
-        self.set_info_button()
 
-                          
-    def project_read(self, show_warning=True): 
+
+    def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         # Unload plugin before reading opened project
@@ -747,7 +761,6 @@ class Giswater(QObject):
                 title = "Giswater plugin cannot be loaded"
                 msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
                 self.controller.show_warning(msg, 20, title=title)
-                self.set_info_button()
                 return
 
         self.connection_status, not_version = self.controller.set_database_connection()
@@ -770,8 +783,6 @@ class Giswater(QObject):
 
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
-
-        self.set_info_button()
 
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)
@@ -836,27 +847,27 @@ class Giswater(QObject):
             # Control if json have a correct format
             pass
         finally:
-             # TODO remove this line when do you want enabled api info for epa
-             self.list_to_hide.append('199')
+            # TODO remove this line when do you want enabled api info for epa
+            self.list_to_hide.append('199')
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
 
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
-            
+
         # Set objects for map tools classes
         self.manage_map_tools()
 
         # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
         self.manage_custom_forms()
-        
+
         # Initialize parameter 'node2arc'
-        self.controller.plugin_settings_set_value("node2arc", "0")        
-        
+        self.controller.plugin_settings_set_value("node2arc", "0")
+
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
-        
+
         # Manage project variable 'expl_id'
         self.manage_expl_id()
 
@@ -1041,24 +1052,24 @@ class Giswater(QObject):
         """ Set layer custom UI form and init function """
 
         # Set custom for layer dimensions
-        self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
+        self.set_layer_custom_form_dimensions(self.layer_dimensions)
 
-        
+
     def set_layer_custom_form_dimensions(self, layer):
- 
+
         if layer is None:
             return
-        
+
         name_ui = 'dimensions.ui'
         name_init = 'dimensions.py'
         name_function = 'formOpen'
         file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, 'init', name_init)                     
-        layer.editFormConfig().setUiForm(file_ui) 
+        file_init = os.path.join(self.plugin_dir, 'init', name_init)
+        layer.editFormConfig().setUiForm(file_ui)
         layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(file_init)           
+        layer.editFormConfig().setInitFilePath(file_init)
         layer.editFormConfig().setInitFunction(name_function)
-        
+
         if self.wsoftware == 'ws':
             fieldname_node = "depth"
             fieldname_connec = "depth"
@@ -1076,7 +1087,7 @@ class Giswater(QObject):
             self.layer_connec.setMapTipTemplate(display_field)
             self.layer_connec.setDisplayExpression(display_field)
 
-    
+
     def manage_map_tools(self):
         """ Manage map tools """
 
@@ -1098,33 +1109,33 @@ class Giswater(QObject):
 
 
     def set_map_tool(self, map_tool_name):
-        """ Set objects for map tools classes """  
+        """ Set objects for map tools classes """
 
         if map_tool_name in self.map_tools:
             map_tool = self.map_tools[map_tool_name]
             map_tool.set_controller(self.controller)
 
 
-    def action_triggered(self, function_name):   
+    def action_triggered(self, function_name):
         """ Action with corresponding funcion name has been triggered """
-        
-        try:   
-            if function_name in self.map_tools:          
-                self.controller.check_actions(False)                        
+
+        try:
+            if function_name in self.map_tools:
+                self.controller.check_actions(False)
                 map_tool = self.map_tools[function_name]
                 if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)
                 else:
                     self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
-            self.controller.show_warning("AttributeError: "+str(e))            
+            self.controller.show_warning("AttributeError: "+str(e))
         except KeyError as e:
-            self.controller.show_warning("KeyError: "+str(e))              
-       
-        
+            self.controller.show_warning("KeyError: "+str(e))
+
+
     def delete_pyc_files(self):
         """ Delete python compiled files """
-        
+
         filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
         for f in filelist:
             os.remove(f)
@@ -1132,21 +1143,21 @@ class Giswater(QObject):
 
     def manage_expl_id(self):
         """ Manage project variable 'expl_id' """
-        
+
         # Get project variable 'expl_id'
         try:
             expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
         except:
             pass
-        
+
         if expl_id is None:
             return
-                    
+
         # Update table 'selector_expl' of current user (delete and insert)
         sql = ("DELETE FROM selector_expl WHERE current_user = cur_user;"
                "\nINSERT INTO selector_expl (expl_id, cur_user)"
                " VALUES(" + expl_id + ", current_user);")
-        self.controller.execute_sql(sql)        
+        self.controller.execute_sql(sql)
 
 
     def populate_audit_check_project(self, layers):
@@ -1173,7 +1184,7 @@ class Giswater(QObject):
                 sql += ("\nINSERT INTO audit_check_project"
                         " (table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user)"
                         " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1, '"+str(table_user)+"');")
-                
+
         status = self.controller.execute_sql(sql)
         if not status:
             return False
@@ -1184,7 +1195,7 @@ class Giswater(QObject):
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_audit_check_project($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
-        
+
         if not row:
             return False
 
@@ -1233,7 +1244,7 @@ class Giswater(QObject):
                f" ON CONFLICT  (parameter, cur_user) "
                f" DO UPDATE SET value='{value[state]}'")
         self.controller.execute_sql(sql, log_sql=True)
-        
+
 
     def get_missing_layers(self, dialog, m_layers, critical_level):
 
@@ -1381,8 +1392,8 @@ class Giswater(QObject):
 
         """ Get available layers to be configured """
         schema_name = self.schema_name.replace('"','')
-        sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature " 
-              f"UNION " 
+        sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+              f"UNION "
               f"SELECT DISTINCT(child_layer) FROM cat_feature "
               f"WHERE child_layer IN ("
               f"     SELECT table_name FROM information_schema.tables"
@@ -1429,6 +1440,7 @@ class Giswater(QObject):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 Column names as alias, combos and typeahead as ValueMap"""
+
         msg_failed = ""
         msg_key = ""
         for layer_name in layers:
@@ -1437,11 +1449,11 @@ class Giswater(QObject):
                 # msg = f"Layer {layer_name} does not found, therefore, not configured."
                 # self.controller.show_warning(msg)
                 continue
-                
+
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            sql = (f"SELECT gw_api_getinfofromid($${{{body}}}$$)")
-            row = self.controller.get_row(sql, commit=True, log_sql=True)
+            sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
+            row = self.controller.get_row(sql, commit=True)
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 continue
@@ -1453,7 +1465,6 @@ class Giswater(QObject):
                     continue
 
             if 'status' in complet_result and complet_result['status'] == 'Failed':
-                print(sql)
                 try:
                     msg_failed += f"<b>Error: </b>{complet_result['SQLERR']}<br>"
                     msg_failed += f"<b>Context: </b>{complet_result['SQLCONTEXT']} <br><br>"
@@ -1486,9 +1497,9 @@ class Giswater(QObject):
                     if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
                         if field['widgetcontrols']['setQgisConstraints'] is True:
                             layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
-                                                 QgsFieldConstraints.ConstraintStrengthSoft)
+                                                     QgsFieldConstraints.ConstraintStrengthSoft)
                             layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
-                                                 QgsFieldConstraints.ConstraintStrengthHard)
+                                                     QgsFieldConstraints.ConstraintStrengthHard)
 
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
@@ -1512,6 +1523,7 @@ class Giswater(QObject):
 
     def set_column_visibility(self, layer, col_name, hidden):
         """ Hide selected fields according table config_api_form_fields.hidden """
+
         config = layer.attributeTableConfig()
         columns = config.columns()
         for column in columns:
@@ -1521,9 +1533,10 @@ class Giswater(QObject):
         config.setColumns(columns)
         layer.setAttributeTableConfig(config)
 
-        
+
     def set_column_multiline(self, layer, field, fieldIndex):
         """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+
         if field['widgettype'] == 'text':
             if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
@@ -1545,3 +1558,4 @@ class Giswater(QObject):
         body = "" + client + form + feature + data
 
         return body
+
