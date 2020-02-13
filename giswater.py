@@ -629,6 +629,7 @@ class Giswater(QObject):
 
         if msg != "Field child_layer of id: ":
             self.controller.show_warning(msg + "is not defined in table cat_feature")
+
         return True
 
 
@@ -806,6 +807,8 @@ class Giswater(QObject):
 
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
+        if self.wsoftware is None:
+            return
 
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
