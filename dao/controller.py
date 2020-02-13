@@ -11,6 +11,9 @@ from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTa
 from qgis.PyQt.QtSql import QSqlDatabase
 
 import os.path
+import json
+
+from collections import OrderedDict
 from functools import partial
 import inspect
 import traceback
@@ -18,6 +21,7 @@ import sys
 
 from .pg_dao import PgDao
 from .logger import Logger
+from .. import utils_giswater
 from .. import sys_manager
 from ..ui_manager import BasicInfo
 
@@ -462,7 +466,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None, show_warning_detail=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -645,8 +649,14 @@ class DaoController(object):
         return result
 
 
-    def execute_api_function(self, function_name, body, format_return='::text'):
-        """ Manage execution API function """
+    def get_json(self, function_name, body, commit=True, log_sql=False):
+        """ Manage execution API function
+        :param function_name: Name of function to call (text)
+        :param body: Parameter for function (json)
+        :param commit: Commit sql (bool)
+        :param log_sql: Show query in qgis log (bool)
+        :return: Response of the function executed (json)
+        """
 
         # Check if function exists
         row = self.check_function(function_name)
@@ -654,19 +664,40 @@ class DaoController(object):
             self.show_warning("Function not found in database", parameter=function_name)
             return None
 
-        sql = "SELECT " + function_name + "($${" + body + "}$$)"
-        if format_return:
-            sql += format_return
-        row = self.get_row(sql, log_sql=True)
-        if not row:
+        sql = f"SELECT {function_name} ($${{{body}}}$$);"
+        row = self.get_row(sql, commit=commit, log_sql=log_sql)
+        if not row or not row[0]:
             # Check if any error has been raised
             if self.last_error:
                 self.manage_exception_db(self.last_error, sql)
             return None
+        json_result = row[0]
+        if 'status' in json_result and json_result['status'] == 'Failed':
+            try:
+                title = "Execute failed."
+                msg = f"<b>Error: </b>{json_result['SQLERR']}<br>"
+                msg += f"<b>Context: </b>{json_result['SQLCONTEXT']} <br>"
+            except KeyError as e:
+                title = "Key on returned json from ddbb is missed."
+                msg = f"<b>Key: </b>{e}<br>"
+                msg += f"<b>Python file: </b>{__name__} <br>"
+                msg += f"<b>Python function: </b>{self.get_json.__name__} <br>"
+            self.show_exceptions_msg(title, msg)
+            return False
 
-        return row
+        return json_result
 
-    
+
+    def show_exceptions_msg(self, title, msg=""):
+        cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
+        self.dlg_info = BasicInfo()
+        self.dlg_info.btn_accept.setVisible(False)
+        self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
+        self.dlg_info.setWindowTitle(title)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        self.dlg_info.exec()
+
+
     def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """
         
@@ -1024,7 +1055,10 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
             if schemaname is None:
-                return None
+                self.get_layer_source_from_credentials()
+                schemaname = self.schema_name
+                if schemaname is None:
+                    return None
 
         schemaname = schemaname.replace('"', '')
         project_type = None
@@ -1137,7 +1171,10 @@ class DaoController(object):
         """ Get layers of the group @geom_type """
         
         list_items = []        
-        sql = ("SELECT parent_layer "
+        sql = ("SELECT child_layer "
+               "FROM cat_feature "
+               "WHERE upper(feature_type) = '" + geom_type.upper() + "'"
+			   "UNION SELECT DISTINCT parent_layer "
                "FROM cat_feature "
                "WHERE upper(feature_type) = '" + geom_type.upper() + "'")
         rows = self.get_rows(sql, log_sql=True)
@@ -1388,6 +1425,7 @@ class DaoController(object):
 
 
     def get_config(self, parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+
         sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
         if sql_added:
             sql += sql_added
@@ -1400,6 +1438,7 @@ class DaoController(object):
 
     def indexing_spatial_layer(self, layer_name):
         """ Force reload dataProvider of layer """
+
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()

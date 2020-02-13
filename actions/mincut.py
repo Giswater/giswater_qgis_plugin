@@ -183,8 +183,9 @@ class MincutParent(ParentAction):
 
         try:
             row = self.controller.get_config('sys_mincutalerts_enable', 'value', 'config_param_system')
-            custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
-            self.show_notified.setVisible(custom_action_sms['show_sms_info'])
+            if row:
+                custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
+                self.show_notified.setVisible(custom_action_sms['show_sms_info'])
         except KeyError as e:
             self.show_notified.setVisible(False)
 
@@ -581,7 +582,7 @@ class MincutParent(ParentAction):
                     utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
                     text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
                             f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
-                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_info, text)
+                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, text)
                     self.open_dialog(self.dlg_binfo)
                     self.dlg_binfo.btn_accept.hide()
                     self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
@@ -1937,6 +1938,7 @@ class MincutParent(ParentAction):
             date_time = (str(date_value))
             date = str(date_time.split()[0])
             time = str(date_time.split()[1])
+            if date: date = date.replace('/', '-')
             qt_date = QDate.fromString(date, 'yyyy-MM-dd')
             qt_time = QTime.fromString(time, 'h:mm:ss')
             utils_giswater.setCalendarDate(self.dlg_mincut, widget_date, qt_date)

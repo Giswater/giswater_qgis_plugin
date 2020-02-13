@@ -53,9 +53,9 @@ class TmBasic(TmParentAction):
 
         # Set default dates
         current_year = QDate.currentDate().year()
-        start_date = QDate.fromString(str(int(current_year)) + '/11/01', 'yyyy/MM/dd')
+        start_date = QDate.fromString(str(int(current_year)) + '-11-01', 'yyyy-MM-dd')
         self.dlg_new_campaign.start_date.setDate(start_date)
-        end_date = QDate.fromString(str(int(current_year)+1) + '/10/31', 'yyyy/MM/dd')
+        end_date = QDate.fromString(str(int(current_year)+1) + '-10-31', 'yyyy-MM-dd')
         self.dlg_new_campaign.end_date.setDate(end_date)
 
         table_name = 'cat_campaign'
@@ -139,10 +139,15 @@ class TmBasic(TmParentAction):
         self.manage_prices(id_new_camp)
 
 
-    def manage_prices(self, id_camp):
-        # Set dialog and signals
+    def manage_prices(self, id_camp, dialog=None):
+
         dlg_prices_management = PriceManagement()
         self.load_settings(dlg_prices_management)
+        if id_camp is None:
+            id_camp = self.get_campaing_id(dialog)
+            dlg_prices_management.rejected.connect(partial(self.check_prices, dialog))
+
+        # Set dialog and signals
         dlg_prices_management.btn_close.clicked.connect(partial(self.close_dialog, dlg_prices_management))
         dlg_prices_management.rejected.connect(partial(self.close_dialog, dlg_prices_management))
         
@@ -207,7 +212,7 @@ class TmBasic(TmParentAction):
 
         dlg_tree_manage = TreeManage()
         self.load_settings(dlg_tree_manage)
-
+        dlg_tree_manage.btn_accept.setEnabled(False)
         table_name = 'cat_campaign'
         field_id = 'id'
         field_name = 'name'
@@ -218,10 +223,22 @@ class TmBasic(TmParentAction):
         dlg_tree_manage.btn_cancel.clicked.connect(partial(self.close_dialog, dlg_tree_manage))
         dlg_tree_manage.btn_accept.clicked.connect(partial(self.get_year, dlg_tree_manage))
         dlg_tree_manage.btn_update_price.clicked.connect(partial(self.get_campaing_id, dlg_tree_manage))
-        dlg_tree_manage.btn_update_price.clicked.connect(partial(self.manage_prices, self.campaign_id))
+        dlg_tree_manage.btn_update_price.clicked.connect(partial(self.manage_prices, None, dlg_tree_manage))
+        dlg_tree_manage.txt_campaign.textChanged.connect(partial(self.check_prices, dlg_tree_manage))
 
         self.set_completer_object(table_name, dlg_tree_manage.txt_campaign, field_name)
         self.open_dialog(dlg_tree_manage)
+
+
+    def check_prices(self, dialog):
+        sql = (f"SELECT * FROM v_edit_price " 
+              f"WHERE name = '{dialog.txt_campaign.text()}'"
+               f" AND price is null")
+        rows = self.controller.get_rows(sql, commit=True)
+        if not rows:
+            dialog.btn_accept.setEnabled(True)
+        else:
+            dialog.btn_accept.setEnabled(False)
 
 
     def populate_cmb_years(self, table_name, field_id, field_name, combo, reverse=False):
@@ -245,7 +262,7 @@ class TmBasic(TmParentAction):
             self.controller.show_warning(message)
             return None
         self.campaign_id = row[0]
-        return True
+        return row[0]
 
     
     def get_year(self, dialog):

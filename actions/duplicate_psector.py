@@ -55,17 +55,13 @@ class DuplicatePsector(ParentManage, QObject):
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
-
-        # Execute manage add fields function
-        sql = f"SELECT gw_fct_duplicate_psector($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
+        complet_result = self.controller.get_json('gw_fct_duplicate_psector', body)
+        if not complet_result:
             self.controller.show_message("Function gw_fct_duplicate_psector executed with no result ", 3)
             return
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         # Populate tab info
-        data = complet_result[0]['body']['data']
+        data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
                 change_tab = self.add_layer.populate_info_text(self.dlg_duplicate_psector, data)

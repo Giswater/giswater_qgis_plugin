@@ -54,15 +54,12 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        if not complet_result:
+            self.controller.show_message(f"No results for: SELECT {function_name} ($${{{body}}}$$);", 2)
             return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
-        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'])
+        self.populate_trv(self.dlg_toolbox.trv, complet_result['body']['data'])
         self.dlg_toolbox.txt_filter.textChanged.connect(partial(self.filter_functions))
         self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
 
@@ -72,17 +69,14 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        if not complet_result :
             return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'], expand=True)
+        self.populate_trv(self.dlg_toolbox.trv, complet_result['body']['data'], expand=True)
 
 
     def open_function(self, index):
-
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
         self.alias_function = index.sibling(index.row(), 0).data()
@@ -133,10 +127,14 @@ class GwToolBox(ApiParent):
 
     def remove_layers(self):
         root = QgsProject.instance().layerTreeRoot()
-        layers_to_remove = []
-        for layer in self.temp_layers_added:
-            layers_to_remove.append(layer)
-            demRaster = root.findLayer(layer.id())
+        for layer in reversed(self.temp_layers_added):
+            self.temp_layers_added.remove(layer)
+            # Possible QGIS bug: Instead of returning None because it is not found in the TOC, it breaks
+            try:
+                demRaster = root.findLayer(layer.id())
+            except RuntimeError:
+                continue
+
             parentGroup = demRaster.parent()
             try:
                 QgsProject.instance().removeMapLayer(layer.id())
@@ -146,9 +144,8 @@ class GwToolBox(ApiParent):
             if len(parentGroup.findLayers())== 0:
                 root.removeChildNode(parentGroup)
 
-        for layer in layers_to_remove:
-            if layer in self.temp_layers_added: self.temp_layers_added.remove(layer)
-        layers_to_remove.clear()
+        self.iface.mapCanvas().refresh()
+
 
 
     def set_selected_layer(self, dialog, combo):
@@ -308,7 +305,7 @@ class GwToolBox(ApiParent):
                     for field in function[0]['return_type']:
                         widget = dialog.findChild(QWidget, field['widgetname'])
                         param_name = widget.objectName()
-                        if type(widget) in ('', QLineEdit, QPushButton):
+                        if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet("border: 1px solid gray")
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""','null')
@@ -381,7 +378,7 @@ class GwToolBox(ApiParent):
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
             msg += f"<b>DB call: </b>{sql}<br>"
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
-
+        self.remove_layers()
 
     def execute_no_parametric(self, dialog, function_name):
 

@@ -47,78 +47,116 @@
      </layout>
     </item>
     <item row="0" column="0">
-     <widget class="QScrollArea" name="scrollArea">
-      <property name="widgetResizable">
+     <widget class="QTabWidget" name="tab_main">
+      <property name="enabled">
        <bool>true</bool>
       </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>672</width>
-         <height>494</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QTabWidget" name="tab_main">
-          <property name="enabled">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_basic">
+       <attribute name="title">
+        <string>Basic</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QScrollArea" name="scrollArea_2">
+          <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="tabShape">
-           <enum>QTabWidget::Rounded</enum>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="tab_basic">
-           <attribute name="title">
-            <string>Basic</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <item>
+          <widget class="QWidget" name="scrollAreaWidgetContents_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>648</width>
+             <height>450</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
              <layout class="QGridLayout" name="page1_layout1"/>
             </item>
-            <item>
+            <item row="0" column="1">
              <layout class="QGridLayout" name="page1_layout2"/>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_featurecat">
-           <attribute name="title">
-            <string>Featurecat</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_featurecat">
+       <attribute name="title">
+        <string>Featurecat</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>648</width>
+             <height>450</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
              <layout class="QGridLayout" name="page2_layout1"/>
             </item>
-            <item>
+            <item row="0" column="1">
              <layout class="QGridLayout" name="page2_layout2"/>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_mantype">
-           <attribute name="title">
-            <string>Man type</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_5">
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_mantype">
+       <attribute name="title">
+        <string>Man type</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QScrollArea" name="scrollArea_3">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_3">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>648</width>
+             <height>450</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
              <layout class="QGridLayout" name="man_layout1"/>
             </item>
@@ -127,25 +165,63 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_addfields">
-           <attribute name="title">
-            <string>Addfields</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_6">
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_addfields">
+       <attribute name="title">
+        <string>Addfields</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QScrollArea" name="scrollArea_4">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>648</width>
+             <height>450</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
             <item row="0" column="0">
              <layout class="QGridLayout" name="addfields_layout1"/>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_admin">
-           <attribute name="title">
-            <string>Admin</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_admin">
+       <attribute name="title">
+        <string>Admin</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QScrollArea" name="scrollArea_5">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_5">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>648</width>
+             <height>450</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0">
              <layout class="QGridLayout" name="admin_layout1"/>
             </item>
-            <item>
+            <item row="0" column="1">
              <layout class="QGridLayout" name="admin_layout2"/>
             </item>
            </layout>

@@ -13,7 +13,7 @@ from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QLabel, QLineEdit
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, QLabel, QLineEdit
 from qgis.PyQt.QtWidgets import QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 
 import csv
@@ -27,6 +27,7 @@ from collections import OrderedDict
 
 from .. import utils_giswater
 from .api_cf import ApiCF
+from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
@@ -60,16 +61,14 @@ class ApiSearch(ApiParent):
 
         body = self.create_body()
         function_name = "gw_api_getsearch"
-        row = self.controller.execute_api_function(function_name, body)
-        if not row:
+        complet_list = self.controller.get_json(function_name, body)
+        if not complet_list:
             return False
-
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
         self.lineedit_list = []
-        for tab in complet_list[0]["form"]:
+        for tab in complet_list["form"]:
             if first_tab is None:
                 first_tab = tab['tabName']
             tab_widget = QWidget(main_tab)
@@ -86,7 +85,7 @@ class ApiSearch(ApiParent):
                 if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
                     widget = self.add_lineedit(field)
-                    widget = self.set_completer(widget, completer)
+                    widget = self.set_typeahead_completer(widget, completer)
                     self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
@@ -101,7 +100,7 @@ class ApiSearch(ApiParent):
         self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
 
 
-    def set_completer(self, widget, completer=None):
+    def set_typeahead_completer(self, widget, completer=None):
         """ Set completer and add listeners """
 
         if completer:
@@ -398,8 +397,8 @@ class ApiSearch(ApiParent):
         """ Create the view and open the dialog with his content """
 
         workcat_id = item['sys_id']
-        layer_name = item['sys_table_id']
         field_id = item['filter_text']
+        display_name = item ['display_name']
 
         if workcat_id is None:
             return False
@@ -410,6 +409,13 @@ class ApiSearch(ApiParent):
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = ListItems()
+
+        self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
+        self.set_icon(self.items_dialog.btn_doc_insert, "111")
+        self.set_icon(self.items_dialog.btn_doc_delete, "112")
+        self.set_icon(self.items_dialog.btn_doc_new, "34")
+        self.set_icon(self.items_dialog.btn_open_doc, "170")
+
         self.load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
@@ -417,14 +423,32 @@ class ApiSearch(ApiParent):
 
         utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, "Filter by: "+str(field_id))
         utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, "Filter by: "+str(field_id))
+
         #
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_psm_end.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.items_dialog.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_document.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
         self.disable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
         self.disable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
 
+        # Create list for completer QLineEdit
+        sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
+        list_items = self.make_list_for_completer(sql)
+        self.set_completer_lineedit(self.items_dialog.doc_id, list_items)
+
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
+        table_doc = "v_ui_doc_x_workcat"
+        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item ['sys_id']))
+        self.items_dialog.btn_doc_delete.clicked.connect(partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
+        self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item ['sys_id']))
+        self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
+        self.items_dialog.tbl_document.doubleClicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
+
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
@@ -448,6 +472,10 @@ class ApiSearch(ApiParent):
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_document, table_doc)
+
         #
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
@@ -457,6 +485,15 @@ class ApiSearch(ApiParent):
         self.fill_label_data(workcat_id, table_name_end, extension)
 
         self.open_dialog(self.items_dialog)
+
+
+    def manage_document(self, qtable, item_id):
+        """ Access GUI to manage documents e.g Execute action of button 34 """
+
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
+        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
+        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
     def force_expl(self,  workcat_id):
@@ -482,7 +519,7 @@ class ApiSearch(ApiParent):
                        f" VALUES('{row[0]}', current_user)")
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
-            self.controller.show_warning(msg)
+            self.controller.show_info(msg)
 
 
     def update_selector_workcat(self, workcat_id):

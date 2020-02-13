@@ -143,7 +143,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
             if default_current_date:
                 date = QDate.currentDate()
             else:
-                date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
+                date = QDate.fromString('01-01-2000', 'dd-MM-yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit \
             or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss')):

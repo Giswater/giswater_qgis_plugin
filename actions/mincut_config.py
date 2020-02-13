@@ -62,7 +62,7 @@ class MincutConfig(ParentAction):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM anl_mincut_result_cat WHERE id > 0 "
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         values = []
         if rows:
             for row in rows:
@@ -88,8 +88,9 @@ class MincutConfig(ParentAction):
         self.set_icon(self.btn_notify, "307")
         try:
             row = self.controller.get_config('sys_mincutalerts_enable', 'value', 'config_param_system')
-            self.custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
-            self.btn_notify.setVisible(self.custom_action_sms['show_mincut_sms'])
+            if row:
+                self.custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
+                self.btn_notify.setVisible(self.custom_action_sms['show_mincut_sms'])
         except KeyError as e:
             self.btn_notify.setVisible(False)
 
@@ -349,7 +350,7 @@ class MincutConfig(ParentAction):
         if state_text != '':
             expr += f" AND state::text ILIKE '%{state_text}%' "
         expr += f" AND (exploitation::text ILIKE '%{expl}%' OR exploitation IS null)"
-        self.controller.log_info(str(expr))
+
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
         qtable.model().select()

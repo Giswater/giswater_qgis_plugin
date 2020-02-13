@@ -204,6 +204,21 @@ class ApiParent(ParentAction):
         return False
 
 
+    def get_feature_by_expr(self, layer, expr_filter):
+        # Check filter and existence of fields
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = f"{expr.parserErrorString()}: {expr_filter}"
+            self.controller.show_warning(message)
+            return
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        # Iterate over features
+        for feature in it:
+            return feature
+        return False
+
+
     def check_actions(self, action, enabled):
 
         action.setChecked(enabled)
@@ -1143,9 +1158,9 @@ class ApiParent(ParentAction):
             widget.setProperty('column_id', field['column_id'])
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
-        widget.setDisplayFormat('yyyy/MM/dd')
+        widget.setDisplayFormat('dd/MM/yyyy')
         if 'value' in field and field['value'] not in ('', None, 'null'):
-            date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+            date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
             utils_giswater.setCalendarDate(dialog, widget, date)
         else:
             widget.clear()
@@ -1175,13 +1190,40 @@ class ApiParent(ParentAction):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
+
+        # Store user snapping configuration
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        if self.snapper_manager.controller is None:
+            self.snapper_manager.set_controller(self.controller)
+        self.snapper_manager.store_snapping_options()
         self.snapper = self.snapper_manager.get_snapper()
-        self.layer_node = self.controller.get_layer_by_tablename("ve_node")
+
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
 
-        self.canvas.xyCoordinates.connect(self.mouse_move)
+        self.canvas.xyCoordinates.connect(partial(self.mouse_move))
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
+
+    def dlg_destroyed(self, layer=None, vertex=None):
+        self.dlg_is_destroyed = True
+
+        if layer is not None:
+            self.iface.setActiveLayer(layer)
+        else:
+            if self.layer is not None:
+                self.iface.setActiveLayer(self.layer)
+
+        if vertex is not None:
+            self.iface.mapCanvas().scene().removeItem(vertex)
+        else:
+            if hasattr(self, 'vertex_marker'):
+                if self.vertex_marker is not None:
+                    self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+        try:
+            self.canvas.xyCoordinates.disconnect()
+        except:
+            pass
 
     def snapping_node(self, point, button):
         """ Get id of selected nodes (node1 and node2) """
@@ -1192,9 +1234,9 @@ class ApiParent(ParentAction):
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
-
+        if not event_point: return
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if self.snapper_manager.result_is_valid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
@@ -1204,10 +1246,12 @@ class ApiParent(ParentAction):
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
                 if self.node1 is None:
-                    self.node1 = str(element_id)
+                    self.node1 = str(element_id)                    
+                    self.draw_point(QgsPointXY(result.point()))
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
+                    self.draw_point(QgsPointXY(result.point()))
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
 
         if self.node1 and self.node2:
@@ -1220,9 +1264,9 @@ class ApiParent(ParentAction):
             row = self.controller.get_row(sql, log_sql=True)
             if row:
                 if 'elev' in row[0]:
-                    utils_giswater.setWidgetText(self.dialog, 'elev', row[0]['elev'])
+                    utils_giswater.setWidgetText(self.dlg_cf, 'elev', row[0]['elev'])
                 if 'top_elev' in row[0]:
-                    utils_giswater.setWidgetText(self.dialog, 'top_elev', row[0]['top_elev'])
+                    utils_giswater.setWidgetText(self.dlg_cf, 'top_elev', row[0]['top_elev'])
 
 
     def mouse_move(self, point):
@@ -1294,7 +1338,7 @@ class ApiParent(ParentAction):
                     widget.setDisplayFormat('yyyy/MM/dd')
                     date = QDate.currentDate()
                     if 'value' in field and field['value'] not in ('', None, 'null'):
-                        date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+                        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -1531,7 +1575,8 @@ class ApiParent(ParentAction):
         widget = kwargs['widget']
         function_name = kwargs['function_name']
         complet_result = self.manage_dxf(dialog, path, False, True)
-
+        gruop_name = os.path.splitext(os.path.basename(path))[0]
+        self.add_layer.zoom_to_group(gruop_name)
         for layer in complet_result['temp_layers_added']:
             self.temp_layers_added.append(layer)
         if complet_result is not False:
@@ -1556,6 +1601,7 @@ class ApiParent(ParentAction):
         srid = self.controller.plugin_settings_value('srid')
         # Block the signals so that the window does not appear asking for crs / srid and / or alert message
         self.iface.mainWindow().blockSignals(True)
+        dialog.txt_infolog.clear()
 
         sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
         self.controller.execute_sql(sql, commit=True)
@@ -1604,7 +1650,7 @@ class ApiParent(ParentAction):
                 self.add_layer.export_layer_to_db(dxf_layer, crs)
 
             if del_old_layers:
-                self.delete_layer_from_toc(dxf_layer.name())
+                self.add_layer.delete_layer_from_toc(dxf_layer.name())
 
             if toc:
                 if dxf_layer.isValid():

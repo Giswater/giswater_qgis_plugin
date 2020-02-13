@@ -306,6 +306,7 @@ class ParentManage(ParentAction, object):
                f" WHERE parameter = '{parameter}' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
+            if row[0]: row[0] = row[0].replace('/', '-')
             date = QDate.fromString(row[0], 'yyyy-MM-dd')
         else:
             date = QDate.currentDate()

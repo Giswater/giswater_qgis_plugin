@@ -572,15 +572,10 @@ class ApiCF(ApiParent, QObject):
 
 
     def set_vdefault_edition(self):
-        try:
-
-            row = self.controller.get_config('qgis_toggledition_forceopen')
-            if (not row or row[0].upper() != "TRUE") and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+        if 'toggledition' in self.complet_result[0]['body']:
+            force_open = self.complet_result[0]['body']['toggledition']
+            if not force_open and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
                 self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-        except  KeyError as e:
-            pass
-        except Exception as e:
-            print(f"{type(e).__name__} --> {e}")
 
 
     def get_last_value(self):
@@ -645,8 +640,10 @@ class ApiCF(ApiParent, QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
             if widget.property('column_id') == self.field_id:
                 self.feature_id = widget.text()
-                # Get selected feature
-                self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+                # Set filter expression
+                expr_filter = f"{self.field_id} = '{self.feature_id}'"
+                self.feature = self.get_feature_by_expr(self.layer, expr_filter)
+
         except AttributeError as e:
             message = "The field widgettype is not configured for"
             self.controller.show_message(message, 2, parameter=field['column_id'])
@@ -1158,6 +1155,7 @@ class ApiCF(ApiParent, QObject):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         self.show_actions(tab_name)
+
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             self.fill_tab_element()
@@ -2562,13 +2560,13 @@ class ApiCF(ApiParent, QObject):
             self.snapper_manager.snap_to_node()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(partial(self.mouse_move, layer))
+        self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
 
 
-    def mouse_move(self, layer, point):
+    def mouse_moved(self, layer, point):
         """ Mouse motion detection """
 
         # Set active layer
@@ -2653,6 +2651,9 @@ class ApiCF(ApiParent, QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
     def gw_api_open_node(self, **kwargs):
+        """ Function called in class ApiParent.add_button(...) -->
+                widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
+
         dialog = kwargs['dialog']
         widget = kwargs['widget']
 

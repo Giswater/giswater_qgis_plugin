@@ -9,7 +9,8 @@ import json
 from collections import OrderedDict
 
 from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
-    QgsLineSymbol, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
+    QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
+    QgsVectorLayer, QgsVectorLayerExporter
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
@@ -128,11 +129,11 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
+    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
-        :param function_name:
+        :param layer_name:
         :param force_tab:
         :param reset_text:
         :param tab_idx:
@@ -144,7 +145,7 @@ class AddLayer(object):
         text_result = None
         temp_layers_added = []
         if del_old_layers:
-            self.delete_layer_from_toc(function_name)
+            self.delete_layer_from_toc(layer_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == 'setVisibleLayers':
@@ -157,7 +158,7 @@ class AddLayer(object):
                 if counter > 0:
                     counter = len(data[k]['values'])
                     geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                     self.populate_vlayer(v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']
@@ -300,8 +301,9 @@ class AddLayer(object):
                 if str(k) in 'the_geom':
                     sql = f"SELECT St_AsText('{v}')"
                     row = self.controller.get_row(sql, log_sql=False)
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
+                    if row and row[0]:
+                        geometry = QgsGeometry.fromWkt(str(row[0]))
+                        fet.setGeometry(geometry)
             fet.setAttributes(attributes)
             prov.addFeatures([fet])
 
@@ -352,3 +354,24 @@ class AddLayer(object):
         layer.triggerRepaint()
 
         return True
+
+
+    def zoom_to_group(self, group_name, buffer=10):
+        extent = QgsRectangle()
+        extent.setMinimal()
+
+        # Iterate through layers from certain group and combine their extent
+        root = QgsProject.instance().layerTreeRoot()
+        group = root.findGroup(group_name)  # Adjust this to fit your group's name
+        if not group: return False
+        for child in group.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                extent.combineExtentWith(child.layer().extent())
+
+        xmax = extent.xMaximum() + buffer
+        xmin = extent.xMinimum() - buffer
+        ymax = extent.yMaximum() + buffer
+        ymin = extent.yMinimum() - buffer
+        extent.set(xmin, ymin, xmax, ymax)
+        self.iface.mapCanvas().setExtent(extent)
+        self.iface.mapCanvas().refresh()
