@@ -60,6 +60,8 @@ class ManageWorkcatEnd(ParentManage):
         self.set_icon(self.dlg_work_end.btn_insert, "111")
         self.set_icon(self.dlg_work_end.btn_delete, "112")
         self.set_icon(self.dlg_work_end.btn_snapping, "137")
+        self.set_icon(self.dlg_work_end.btn_new_workcat, "193")
+
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "cat_work"
@@ -110,9 +112,17 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def fill_fields(self):
-        """ Fill dates and combo cat_work """
+        """ Fill dates and combos cat_work/state type end """
 
+        sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
+        row = self.controller.get_config('statetype_end_vdefault')
+
+        if row:
+            utils_giswater.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
         row = self.controller.get_config('enddate_vdefault')
+
         if row:
             enddate = self.manage_dates(row[0]).date()
             self.dlg_work_end.enddate.setDate(enddate)
@@ -185,6 +195,7 @@ class ManageWorkcatEnd(ParentManage):
         # Setting values
         self.workcat_id_end = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         self.enddate = utils_giswater.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
+        self.statetype_id_end = utils_giswater.get_item_data(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
 
         if self.workcat_id_end in ('null', None):
             message = "Please select a workcat id end"
@@ -260,7 +271,7 @@ class ManageWorkcatEnd(ParentManage):
         sql = ""
         for id_ in self.selected_list:
             sql += (f"UPDATE {tablename} "
-                    f"SET state = '0', workcat_id_end = '{self.workcat_id_end}', "
+                    f"SET state = '0', state_type = '{self.statetype_id_end}', workcat_id_end = '{self.workcat_id_end}', "
                     f"enddate = '{self.enddate}' "
                     f"WHERE {geom_type}_id = '{id_}';\n")
         if sql != "":
