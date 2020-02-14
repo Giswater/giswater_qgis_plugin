@@ -322,7 +322,7 @@ class ApiCF(ApiParent, QObject):
                     msg = f"Widget {field['column_id']} is not configured or have a bad config"
                     self.controller.show_message(msg)
 
-            if str(value) != '' and value is not None and value is not -1:
+            if str(value) not in ('', None, -1, "None") and widget.property('column_id'):
                 self.my_json[str(widget.property('column_id'))] = str(value)
 
         self.controller.log_info(str(self.my_json))
@@ -583,7 +583,8 @@ class ApiCF(ApiParent, QObject):
         for widget in widgets:
             if widget.hasFocus():
                 value = utils_giswater.getWidgetText(self.dlg_cf, widget)
-                self.my_json[str(widget.property('column_id'))] = str(value)
+                if str(value) not in ('', None, -1, "None") and widget.property('column_id'):
+                    self.my_json[str(widget.property('column_id'))] = str(value)
 
 
     def start_editing(self, layer):
