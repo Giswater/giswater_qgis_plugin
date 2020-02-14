@@ -27,7 +27,7 @@ VALUES (113, 'Node interpolate', 'edit', 'ud') ON CONFLICT (id) DO NOTHING;
 UPDATE audit_cat_param_user SET isparent = False WHERE id = 'state_vdefault';
 UPDATE audit_cat_param_user SET label = 'State type (On service):', dv_querytext = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 1 ', dv_parent_id = NULL, dv_querytext_filterc = NULL WHERE id = 'statetype_vdefault';
 UPDATE audit_cat_param_user SET label = 'State type (Obsolete):' WHERE id = 'statetype_end_vdefault';
-UPDATE audit_cat_param_user SET sys_role_id = 'role_edit', label = 'State type (Planified):', layout_id = 3, layout_order = 4 WHERE id = 'statetype_plan_vdefault';
+UPDATE audit_cat_param_user SET sys_role_id = 'role_edit', label = 'State type (Planified):', layout_id = 3, layout_order = 4, dv_parent_id = NULL WHERE id = 'statetype_plan_vdefault';
 UPDATE audit_cat_param_user SET layout_order = 5 WHERE id = 'workcat_vdefault';
 UPDATE audit_cat_param_user SET layout_order = 6 WHERE id = 'builtdate_vdefault';
 UPDATE audit_cat_param_user SET layout_order = 7 WHERE id = 'enddate_vdefault';
