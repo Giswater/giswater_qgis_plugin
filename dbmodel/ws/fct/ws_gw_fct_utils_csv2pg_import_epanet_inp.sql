@@ -373,14 +373,14 @@ BEGIN
 	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
 		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2	
 		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
-	WHERE b.node_id = inp_pump.node_id;
+	WHERE b.node_id = inp_pump_importinp.node_id;
 
 	-- to_arc on valves
 	UPDATE inp_valve_importinp SET to_arc = b.to_arc FROM
 	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from epa.arc 
 		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2
 		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
-	WHERE b.node_id = inp_valve.node_id;
+	WHERE b.node_id = inp_valve_importinp.node_id;
 			
 			
 	IF v_arc2node_reverse THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
