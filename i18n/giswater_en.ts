@@ -311,7 +311,27 @@
         <source>has been unchecked (mg_generic)</source>
         <translation>has been unchecked (mg_generic)</translation>
     </message>      
-    
+    <message>
+        <source>301_text</source>
+        <translation>Annual planner</translation>
+    </message>
+    <message>
+        <source>302_text</source>
+        <translation>Monthly planner</translation>
+    </message>
+    <message>
+        <source>303_text</source>
+        <translation>Prices generator</translation>
+    </message>
+        <message>
+        <source>304_text</source>
+        <translation>Add visit</translation>
+    </message>
+    </message>
+        <message>
+        <source>305_text</source>
+        <translation>Unit Planner</translation>
+    </message>
   
 </context>
 
