@@ -6,18 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2122
 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".clone_schema(text, text);
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_clone_schema(p_data json)
+RETURNS json AS
+$BODY$
+
 /*
 SELECT SCHEMA_NAME.gw_fct_clone_schema($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
-"data":{"parameters":{"source_schema":"SCHEMA_NAME","dest_schema":"SCHEMA_NAME_copy6"}}}$$);
+"data":{"parameters":{"source_schema":"SCHEMA_NAME","dest_schema":"SCHEMA_NAME_2"}}}$$);
 */
-
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".clone_schema(text, text);
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_clone_schema(p_data json)
-RETURNS json LANGUAGE plpgsql AS $$
-
 
 DECLARE
     rec_view record;
@@ -35,13 +35,15 @@ DECLARE
     v_query_text text;
     v_id_field text;
     rec_seq  record;
-
+    rec_trg record;
+    v_trg_fields text;
+    v_replace_query text;
     v_result json;
     v_result_info json;
     v_result_point json;
     v_result_polygon json;
     v_result_line json;
-
+    
 BEGIN
 
     -- Search path
@@ -98,7 +100,7 @@ BEGIN
     FOR rec_fct IN 
         SELECT routine_name,concat(routine_name,'(',string_agg(parameters.data_type,', '),')') FROM information_schema.routines
        LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
-        WHERE routines.specific_schema='SCHEMA_NAME' and routine_name!='audit_function'
+        WHERE routines.specific_schema='SCHEMA_NAME' and routine_name!='audit_function' and routine_name!='gw_fct_repair_arc'
         group by routine_name
     LOOP
         EXECUTE 'select * from pg_get_functiondef('''|| rec_fct.routine_name||'''::regproc)'
@@ -106,7 +108,41 @@ BEGIN
         v_fct_definition = REPLACE (v_fct_definition,v_source_schema, v_dest_schema);
         EXECUTE v_fct_definition;
 
-        RAISE NOTICE 'rec_fct,%',rec_fct;
+ 
+    END LOOP;
+
+    --trg
+    FOR rec_trg IN 
+        select event_object_schema as table_schema, event_object_table as table_name, trigger_schema, trigger_name,
+        string_agg(event_manipulation, ',') as event, action_timing as activation, action_condition as condition, action_statement as definition
+        from information_schema.triggers where event_object_schema = v_source_schema group by 1,2,3,4,6,7,8 order by table_schema, table_name
+    LOOP
+
+        raise notice 'rec_trg,%',rec_trg;
+        SELECT string_agg(event_object_column, ',') INTO v_trg_fields FROM information_schema.triggered_update_columns 
+        WHERE event_object_schema = v_source_schema and event_object_table=rec_trg.table_name AND trigger_name = rec_trg.trigger_name;
+
+        raise notice 'v_trg_fields,%',v_trg_fields;
+
+    EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
+        into v_replace_query;
+        
+        IF v_trg_fields IS NULL THEN 
+
+            EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||'
+            ON '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
+          
+        ELSE   
+
+        EXECUTE 'select replace('''||v_replace_query||''', ''UPDATE'', '' UPDATE  OF '||v_trg_fields||''')'
+        into v_replace_query; 
+       
+
+            EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 
+            '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
+
+        END IF;
+
     END LOOP;
 
     -- fk,check
@@ -174,20 +210,6 @@ BEGIN
 
  
 END;
-$$;   
-
-
-/*select event_object_schema as table_schema,
-       event_object_table as table_name,
-       trigger_schema,
-       trigger_name,
-       string_agg(event_manipulation, ',') as event,
-       action_timing as activation,
-       action_condition as condition,
-       action_statement as definition
-from information_schema.triggers
-where event_object_schema = 'SCHEMA_NAME'
-group by 1,2,3,4,6,7,8
-order by table_schema,
-         table_name;
-*/
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
