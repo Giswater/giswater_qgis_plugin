@@ -472,7 +472,8 @@ BEGIN
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP					
 					-- setting feature id value
-					IF (aux_json->>'column_id') = 'arc_id' OR (aux_json->>'column_id')='node_id' OR (aux_json->>'column_id')='connec_id' OR (aux_json->>'column_id') ='gully_id' THEN
+					IF (aux_json->>'column_id') = 'arc_id' OR (aux_json->>'column_id')='node_id' OR (aux_json->>'column_id')='connec_id' 
+					OR (aux_json->>'column_id') ='gully_id' OR (aux_json->>'column_id') ='pol_id'  THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_featureid);
 						RAISE NOTICE ' --- SETTING feature id VALUE % ---',v_featureid ;
 
