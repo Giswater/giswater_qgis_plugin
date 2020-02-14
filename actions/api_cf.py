@@ -322,7 +322,7 @@ class ApiCF(ApiParent, QObject):
                     msg = f"Widget {field['column_id']} is not configured or have a bad config"
                     self.controller.show_message(msg)
 
-                if str(value) not in ('', None, -1, "None") and widget.property('column_id'):
+            if str(value) not in ('', None, -1, "None") and widget.property('column_id'):
                 self.my_json[str(widget.property('column_id'))] = str(value)
 
         self.controller.log_info(str(self.my_json))
