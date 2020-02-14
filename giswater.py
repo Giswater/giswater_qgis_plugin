@@ -532,11 +532,24 @@ class Giswater(QObject):
         config_folder = main_folder + os.sep + "config" + os.sep
         path = config_folder + 'ui_config.config'
         if not os.path.exists(path):
-            self.controller.log_warning("File not found", parameter=path)
-            return
+            # Create file and configure section 'toolbars_position'
+            parser = configparser.RawConfigParser()
+            parser.add_section('toolbars_position')
+            parser.set('toolbars_position', 'pos_0', 'basic', '0','98')
+            parser.set('toolbars_position', 'pos_1', 'om_ud', '10', '98')
+            parser.set('toolbars_position', 'pos_2', 'om_ws', '20', '98')
+            parser.set('toolbars_position', 'pos_3', 'edit', '30', '98')
+            parser.set('toolbars_position', 'pos_4', 'cad', '40', '98')
+            parser.set('toolbars_position', 'pos_5', 'epa', '50', '98')
+            parser.set('toolbars_position', 'pos_6', 'master', '60', '98')
+            parser.set('toolbars_position', 'pos_7', 'utils', '70', '98')
+
+            # Writing our configuration file to 'ui_config.config'
+            with open(path, 'w') as configfile:
+                parser.write(configfile)
+                configfile.close()
 
         parser.read(path)
-
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, x=0, y=0):'
         for x in range(0,8):
             toolbar_id = parser.get("toolbars_position", 'pos_'+str(x)).split(',')
