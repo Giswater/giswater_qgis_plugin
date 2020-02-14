@@ -12,6 +12,10 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node_interpolate(p_data json)
 RETURNS json AS
 
 $BODY$
+/*
+SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
+*/
 
 DECLARE
 
@@ -36,7 +40,7 @@ DECLARE
 	v_elev json;
 	v_ang210 float;
 	v_ang120 float;
-	v_ymax float;
+	v_ymax json;
 	v_version text;
 
 	p_x float;
@@ -60,7 +64,7 @@ BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
+	SELECT  giswater INTO v_version FROM version order by id desc limit 1;
 
 	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'x')::float;
 	p_y = (((p_data ->>'data')::json->>'parameters')::json->>'y')::float;
@@ -78,21 +82,21 @@ BEGIN
 	-- Make geom point
 	v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));
 
-	-- Get node1 values
+	-- Get node1 system values
 	v_geom1:= (SELECT the_geom FROM node WHERE node_id=p_node1);
-	v_top1:= (SELECT top_elev FROM node WHERE node_id=p_node1);
-	v_elev1:= (SELECT elev FROM node WHERE node_id=p_node1);
+	v_top1:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node1);
+	v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
 	
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Capture values of selected node 1 - top elev:',v_top1 , ', elev:', v_elev1));
+    VALUES (113, 4, concat('Capture system values of selected node 1 - top elev:',v_top1 , ', elev:', v_elev1));
 
-	-- Get node2 values
+	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
-	v_top2:= (SELECT top_elev FROM node WHERE node_id=p_node2);
-	v_elev2:= (SELECT elev FROM node WHERE node_id=p_node2);
+	v_top2:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node2);
+	v_elev2:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node2);
 
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Capture values of selected node 2 - top elev:',v_top2 , ', elev:', v_elev2));
+    VALUES (113, 4, concat('Capture system values of selected node 2 - top elev:',v_top2 , ', elev:', v_elev2));
 
 	-- Calculate distances
 	v_distance10 = (SELECT ST_distance (v_geom0 , v_geom1));
@@ -127,12 +131,23 @@ BEGIN
 		
 		
 	v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
-	v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3))::text);		
+	v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));		
 	v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
 
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Final results for a selected node- top elev:',v_top2 , ', v_ymax', v_ymax, ', elev:', v_elev2));
+    INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+    VALUES (113, 4, concat('------------------------------'));
 
+	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+    VALUES (113, 4, concat('Final custom results for a selected node'));
+
+    INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+    VALUES (113, 4, concat('Top elev:',v_top));
+
+    INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+    VALUES (113, 4, concat('Ymax:',v_ymax));
+
+    INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+    VALUES (113, 4, concat('Elev:',v_elev));
 
 	-- get results
 	-- info
@@ -147,7 +162,7 @@ BEGIN
 	v_result_ymax = COALESCE(v_ymax::text,'""');
 	v_result_elev = COALESCE(v_elev::text,'""');
 	
-	v_result_fields = concat('[{"data_top_elev":',v_result_top, ',"data_ymax":',v_result_ymax, ',"data_elev":',v_result_elev,'}]');
+	v_result_fields = concat('[{"data_custom_top_elev":',v_result_top, ',"data_custom_ymax":',v_result_ymax, ',"data_custom_elev":',v_result_elev,'}]');
 
 --      Control NULL's
 	v_version:=COALESCE(v_version,'{}');
