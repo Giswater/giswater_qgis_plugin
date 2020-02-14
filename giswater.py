@@ -535,14 +535,14 @@ class Giswater(QObject):
             # Create file and configure section 'toolbars_position'
             parser = configparser.RawConfigParser()
             parser.add_section('toolbars_position')
-            parser.set('toolbars_position', 'pos_0', 'basic', '0','98')
-            parser.set('toolbars_position', 'pos_1', 'om_ud', '10', '98')
-            parser.set('toolbars_position', 'pos_2', 'om_ws', '20', '98')
-            parser.set('toolbars_position', 'pos_3', 'edit', '30', '98')
-            parser.set('toolbars_position', 'pos_4', 'cad', '40', '98')
-            parser.set('toolbars_position', 'pos_5', 'epa', '50', '98')
-            parser.set('toolbars_position', 'pos_6', 'master', '60', '98')
-            parser.set('toolbars_position', 'pos_7', 'utils', '70', '98')
+            parser.set('toolbars_position', 'pos_0', 'basic, 0, 98')
+            parser.set('toolbars_position', 'pos_1', 'om_ud, 10, 98')
+            parser.set('toolbars_position', 'pos_2', 'om_ws, 20, 98')
+            parser.set('toolbars_position', 'pos_3', 'edit, 30, 98')
+            parser.set('toolbars_position', 'pos_4', 'cad, 40, 98')
+            parser.set('toolbars_position', 'pos_5', 'epa, 50, 98')
+            parser.set('toolbars_position', 'pos_6', 'master, 60, 98')
+            parser.set('toolbars_position', 'pos_7', 'utils, 70, 98')
 
             # Writing our configuration file to 'ui_config.config'
             with open(path, 'w') as configfile:
