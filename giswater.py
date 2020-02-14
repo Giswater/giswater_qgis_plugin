@@ -483,13 +483,12 @@ class Giswater(QObject):
 
 
     def save_toolbars_position(self):
-
-        parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        path = os.path.dirname(__file__) + '/config/ui_config.config'
-        if not os.path.exists(path):
-            self.controller.log_warning("File not found", parameter=path)
-            return
-
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path = config_folder + 'ui_config.config'
         parser.read(path)
 
         # Get all QToolBar
@@ -504,6 +503,11 @@ class Giswater(QObject):
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
+
+        # Check if section toolbars_position exists in file
+        if 'toolbars_position' not in parser:
+            parser = configparser.RawConfigParser()
+            parser.add_section('toolbars_position')
 
         if len(own_toolbars)==8:
             for w in own_toolbars:
@@ -523,9 +527,10 @@ class Giswater(QObject):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
         """
-
-        parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        path = os.path.dirname(__file__) + '/config/ui_config.config'
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        path = config_folder + 'ui_config.config'
         if not os.path.exists(path):
             self.controller.log_warning("File not found", parameter=path)
             return
