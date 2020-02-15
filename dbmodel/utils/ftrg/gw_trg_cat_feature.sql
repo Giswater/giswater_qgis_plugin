@@ -58,7 +58,7 @@ BEGIN
 
 
 	-- manage audit_cat_param_user parameters
-	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') AND v_projecttype='WS' THEN
+	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
 
 		-- get layout_id
 		IF NEW.feature_type='NODE' THEN
@@ -71,9 +71,15 @@ BEGIN
 
 		-- get layout_order
 		SELECT max(layout_order)+1 INTO v_layout_order FROM audit_cat_param_user WHERE formname='config' and layout_id=v_layout;
-	
-		v_partialquerytext =  concat('JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
-		lower(NEW.feature_type),'type_id WHERE ',lower(NEW.feature_type),'_type.id = ',quote_literal(NEW.id));
+
+		IF v_projecttype = 'WS' THEN
+			v_partialquerytext =  concat('JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
+			lower(NEW.feature_type),'type_id WHERE ',lower(NEW.feature_type),'_type.id = ',quote_literal(NEW.id));
+			
+		ELSIF  v_projecttype = 'UD' THEN
+			v_partialquerytext =  concat('LEFT JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
+			lower(NEW.feature_type),'_type WHERE ',lower(NEW.feature_type),'_type.id = ',quote_literal(NEW.id),' OR ',lower(NEW.feature_type),'_type.id IS NULL');
+		END IF;
 				
 		v_table = concat ('cat_',lower(NEW.feature_type));
 		
@@ -94,7 +100,7 @@ BEGIN
 		-- insert parameter
 		INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id, label, isenabled, layout_id, layout_order, 
 		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated)
-		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default for ',v_id,' cat_feature'), 'role_edit', concat ('Default value for ', v_id), true, v_layout ,v_layout_order,
+		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layout_order,
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo',true,false)
 		ON CONFLICT (id) DO NOTHING;
 
@@ -165,7 +171,7 @@ BEGIN
 			--create the trigger
 			IF v_viewname IS NOT NULL THEN
 				EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
-				INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_node('''||NEW.id||''');';
+				INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('''||NEW.id||''');';
 			END IF;
 		END IF;
 		
@@ -179,9 +185,7 @@ BEGIN
 		DELETE FROM config_api_tableinfo_x_infotype where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
 		-- delete audit_cat_param_user parameters
-		IF v_projecttype='WS' THEN
-			DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
-		END IF;
+		DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
 
 		RETURN NULL;
 
