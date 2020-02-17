@@ -13,9 +13,10 @@ version=3.3.028
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.3.028 (xx/xx/2020)
-    -
-    -
+changelog=Version 3.3.028 (17/02/2020)
+    - Update QGIS templates
+    - Set workcat_id_end and enddate with 'End feature' tool
+    - Improve speed info
 
 
 # Tags are comma separated with spaces allowed
