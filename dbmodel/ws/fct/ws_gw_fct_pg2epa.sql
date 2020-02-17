@@ -40,6 +40,7 @@ v_skipcheckdata boolean;
 v_inpoptions json;
 v_advancedsettings boolean;
 v_file json;
+v_body json;
 	
 BEGIN
 
@@ -186,11 +187,11 @@ BEGIN
 		"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
 	
 		SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
-		
-		v_return = gw_fct_json_object_set_key(v_return, 'file', v_file);
-
 	END IF;
-
+	
+	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+	
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 
 
