@@ -26,6 +26,8 @@ DECLARE
 	v_querytext text;
 	v_table text;
 	v_feature_field_id text;
+	v_feature record;
+	v_query text;
 
 BEGIN	
 
@@ -98,18 +100,40 @@ BEGIN
 		v_querytext = concat('SELECT ',v_table,'.id, ', v_table,'.id AS idval FROM ', v_table,' ', v_partialquerytext);
 
 		-- insert parameter
+        IF TG_OP = 'UPDATE' THEN
+            DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
+        END IF;
+
 		INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id, label, isenabled, layout_id, layout_order, 
 		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated)
 		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layout_order,
-		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo',true,false)
-		ON CONFLICT (id) DO NOTHING;
+		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo',true,false);
 
-		IF TG_OP = 'UPDATE' AND OLD.id != NEW.id THEN
-			DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
-		END IF;
+
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
+	
+		-- insert into *_type tables new register from cat_feature
+		EXECUTE 'SELECT * FROM '||concat(lower(NEW.feature_type),'_type')||' WHERE type = '''||NEW.system_id||''' LIMIT 1'
+		INTO v_feature;
+	
+		IF lower(NEW.feature_type)='arc' THEN
+			EXECUTE 'INSERT INTO arc_type (id, type, epa_default, man_table, epa_table, active, code_autofill) 
+			VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', '''||v_feature.epa_table||''', TRUE, '''||v_feature.code_autofill||''')';
+		ELSIF lower(NEW.feature_type)='node' THEN
+			EXECUTE 'INSERT INTO node_type (id, type, epa_default, man_table, epa_table, active, code_autofill, choose_hemisphere, isarcdivide) 
+			VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', '''||v_feature.epa_table||''', TRUE, '''||v_feature.code_autofill||''', '''||v_feature.choose_hemisphere||''', '''||v_feature.isarcdivide||''')';
+		ELSE
+			EXECUTE 'INSERT INTO ' || concat(lower(NEW.feature_type),'_type')||' (id, type, man_table, active, code_autofill) VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.man_table||''', TRUE, '''||v_feature.code_autofill||''')';
+		END IF;
+
+		--create child view
+		v_query='{"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
+		PERFORM gw_fct_admin_manage_child_views(v_query::json);
+		
+
+		
 		--insert definition into config_api_tableinfo_x_infotype if its not present already
 		IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_api_tableinfo_x_infotype)
 		and NEW.child_layer IS NOT NULL THEN
