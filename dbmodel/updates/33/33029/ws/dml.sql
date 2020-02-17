@@ -16,13 +16,10 @@ UPDATE audit_cat_function SET return_type =
 {"widgetname":"updateFeature", "label":"Update feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":7, "value":"FALSE"},
 {"widgetname":"updateMapZone", "label":"Update mapzone geometry method","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layout_order":8,
 "comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":"2"}, 
-{"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":10, "isMandatory":false, "placeholder":"CONCAVE POLYGON: 0.85, PIPE BUFFER: 10", "value":""}]',
+{"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":10, "isMandatory":false, "placeholder":"5-30", "value":""}]',
 descript = 'Function to analyze graf of network. Multiple analysis is avaliable.  On advanced mode multi exploitation is avaliable and update mapzones geometry is enabled. Dynamic analisys to sectorize network using the flow traceability function. 
 Before work with this funcion it is mandatory to configurate field graf_delimiter on node_type and field grafconfig on [dma, sector, cat_presszone and dqa] tables.
-Standard values for parameter are:
-- Concave hull on  CONCAVE POLYGON method: 0.85 (0.5-0.99)
-- Buffer for pipes PIPE BUFFER method (mts): 5-50
-- Buffer for pipes ON PLOT & PIPE BUFFER method when there is not any plot associated to mapzone (mts): 5-50'
+A standard value for PIPE BUFFER maybe: 5-30 (mts)'
 WHERE function_name ='gw_fct_grafanalytics_mapzones_advanced';
 
 
@@ -32,10 +29,27 @@ UPDATE audit_cat_function SET return_type =
 {"widgetname":"updateFeature", "label":"Update feature attributes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":7, "value":"FALSE"},
 {"widgetname":"updateMapZone", "label":"Update mapzone geometry method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layout_order":8,
 "comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":"2"}, 
-{"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":10, "isMandatory":false, "placeholder":"CONCAVE POLYGON: 0.85, PIPE BUFFER: 10", "value":""}]',
+{"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layout_order":10, "isMandatory":false, "placeholder":"5-30", "value":""}]',
 descript = 'Dynamic analisys to sectorize network using the flow traceability function. Before work with this funcion it is mandatory to configurate field graf_delimiter on node_type and field grafconfig on [dma, sector, cat_presszone and dqa] tables.
-Standard values for parameter are:
-- Concave hull on  CONCAVE POLYGON method: 0.85 (0.5-0.99)
-- Buffer for pipes PIPE BUFFER method (mts): 5-50
-- Buffer for pipes ON PLOT & PIPE BUFFER method when there is not any plot associated to mapzone (mts): 5-50'
+A standard value for PIPE BUFFER maybe: 5-30 (mts)'
 WHERE id=2706;
+
+
+UPDATE audit_cat_function SET return_type = 
+'[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
+"comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"DMA"}, 
+{"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":2, 
+"dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"1"}]'
+WHERE id=2766;
+
+
+UPDATE audit_cat_param_user SET vdefault = '{"dma":"c:\users\user\dmaline.qml", "dqa":"c:\users\user\dqaline.qml", "sector":"c:\users\user\sectorline.qml", "cat_presszone":"c:\users\user\presszoneline.qml", "minsector":"c:\users\user\minsectorline.qml"}'
+WHERE id = 'qgis_qml_linelayer_path';
+
+UPDATE audit_cat_param_user SET vdefault = '{"dma":"c:\users\user\dmapoint.qml", "dqa":"c:\users\user\dqapoint.qml", "sector":"c:\users\user\sectorpoint.qml", "cat_presszone":"c:\users\user\presszonepoint.qml","minsector":"c:\users\user\minsectorpoint.qml"}'
+WHERE id = 'qgis_qml_pointlayer_path';
+
+UPDATE audit_cat_param_user SET vdefault = '{"dma":"c:\users\user\dmapol.qml", "dqa":"c:\users\user\dqapol.qml", "sector":"c:\users\user\sectorpol.qml", "cat_presszone":"c:\users\user\presszonepol.qml","minsector":"c:\users\user\minsectorpol.qml"}'
+WHERE id = 'qgis_qml_polygonlayer_path';
+
+

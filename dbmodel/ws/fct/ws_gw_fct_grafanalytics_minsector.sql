@@ -37,11 +37,11 @@ v_expl json;
 v_data json;
 v_fprocesscat_id integer;
 v_addparam record;
-v_attribute	text;
+v_attribute text;
 v_arcid text;
 v_featuretype text;
-v_featureid	integer;
-v_querytext	text;
+v_featureid integer;
+v_querytext text;
 v_updatefeature boolean;
 v_arc text;
 v_result_info json;
@@ -57,6 +57,8 @@ v_srid integer;
 v_input json;
 v_visible_layer text;
 v_usepsectors boolean;
+v_concavehull float = 0.85;
+
 
 BEGIN
 

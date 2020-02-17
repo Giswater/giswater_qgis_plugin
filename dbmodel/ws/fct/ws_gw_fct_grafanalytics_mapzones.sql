@@ -118,39 +118,40 @@ SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
 
 DECLARE
 
-affected_rows 		numeric;
-cont1 			integer default 0;
-v_cont1 		integer default 0;
-v_class 		text;
-v_feature 		record;
-v_expl 			json;
-v_data 			json;
-v_fprocesscat_id 	integer;
-v_nodeid 		text;
-v_featureid 		integer;
-v_text 			text;
-v_querytext 		text;
-v_updatetattributes 	boolean;
-v_updatemapzgeom	integer;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
-v_result_polygon	json;
-v_result 		text;
-v_count			integer;
-v_version		text;
-v_table			text;
-v_field 		text;
-v_fieldmp 		text;
-v_srid 			integer;
-v_concavehull		float;
-v_debug			boolean;
-v_input 		json;
-v_count1		integer;
-v_count2		integer;
-v_count3		integer;
-v_geomparamupdate	float;
-v_visible_layer		text;
+v_affectrows numeric;
+v_cont1 integer default 0;
+v_class text;
+v_feature record;
+v_expl json;
+v_data json;
+v_fprocesscat_id integer;
+v_nodeid text;
+v_featureid integer;
+v_text text;
+v_querytext text;
+v_updatetattributes boolean default false;
+v_updatemapzgeom integer default 0;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_result text;
+v_count integer;
+v_version text;
+v_table text;
+v_field text;
+v_fieldmp text;
+v_srid integer;
+v_debug boolean;
+v_input json;
+v_count1 integer;
+v_count2 integer;
+v_count3 integer;
+v_geomparamupdate float;
+v_visible_layer text;
+v_concavehull float = 0.85;
+v_pointqmlpath text;
+v_lineqmlpath text;
 
 BEGIN
 	-- Search path
@@ -164,6 +165,7 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
+	v_concavehull = 0.85;
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
@@ -199,7 +201,17 @@ BEGIN
 	ELSE
 		RAISE EXCEPTION 'Please enter a valid grafClass';
 	END IF;
-		
+
+	-- select user values
+	EXECUTE 'SELECT value::json->>'''||v_table||''' FROM config_param_user WHERE parameter = ''qgis_qml_pointlayer_path'' and cur_user = current_user'
+	INTO v_pointqmlpath;
+	EXECUTE 'SELECT value::json->>'''||v_table||''' FROM config_param_user WHERE parameter = ''qgis_qml_linelayer_path'' and cur_user = current_user'
+	INTO v_lineqmlpath;
+
+	-- Adding quotes to control nulls
+	v_pointqmlpath := COALESCE(v_pointqmlpath, '""'); 
+	v_lineqmlpath := COALESCE(v_lineqmlpath, '""'); 
+	
 	-- reset graf & audit_log tables
 	DELETE FROM anl_arc where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
 	DELETE FROM anl_node where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
@@ -362,22 +374,21 @@ BEGIN
 				
 				EXECUTE v_querytext;
 
-				cont1 = 0;
 				v_count = 0;
 
 				-- inundation process
 				LOOP	
-					cont1 = cont1+1;
+					v_count = v_count+1;
 					
 					UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 					
-					GET DIAGNOSTICS affected_rows =row_count;
-					EXIT WHEN affected_rows = 0;
-					EXIT WHEN cont1 = 150;
+					GET DIAGNOSTICS v_affectrows = row_count;
+					EXIT WHEN v_affectrows = 0;
+					EXIT WHEN v_count = 150;
 					
-					v_count = v_count + affected_rows;
+					v_count = v_count + v_affectrows;
 
-					raise notice 'Counter % Feature_id % Affected rows % ', cont1, v_featureid, affected_rows;
+					raise notice 'Counter % Feature_id % Affected rows % ', v_count, v_featureid, v_affectrows;
 					
 				END LOOP;
 				
@@ -481,8 +492,8 @@ BEGIN
 				v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
 						FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM arc group by '||quote_ident(v_field)||') 
 						SELECT '||quote_ident(v_field)||
-						', CASE WHEN st_geometrytype(st_concavehull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
-						v_geomparamupdate||'), 3)::geometry(Polygon,'||(v_srid)||')
+						', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
+						v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
 						ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 						)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||'::text != 0::text';
 				EXECUTE v_querytext;
@@ -539,21 +550,42 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-	-- disconnected arcs
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT arc_id, arccat_id, state, expl_id, 'Disconnected arc'::text as descript, the_geom FROM v_edit_arc WHERE arc_id NOT IN 
-	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "values":',v_result, '}');
+	IF v_updatetattributes THEN -- only disconnected features to make a simple log
+		v_result = null;
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT arc_id, arccat_id, state, expl_id, 'Disconnected arc'::text as descript, the_geom FROM v_edit_arc WHERE arc_id NOT IN 
+		(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "values":',v_result, '}');
 
-	-- disconnected connecs
-	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT connec_id, connecat_id, c.state, c.expl_id, 'Disconnected connec'::text as descript, c.the_geom FROM v_edit_connec c WHERE arc_id NOT IN 
-	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"", "values":',v_result, '}');
+		-- disconnected connecs
+		v_result = null;
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+		FROM (SELECT connec_id, connecat_id, c.state, c.expl_id, 'Disconnected connec'::text as descript, c.the_geom FROM v_edit_connec c WHERE arc_id NOT IN 
+		(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"", "values":',v_result, '}');
+
+	ELSE -- all features in order to make a more complex log
+
+		-- arc elements
+		v_result = null;
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT a.arc_id, b.'||quote_ident(v_field)||', a.the_geom FROM anl_arc a 
+			JOIN (SELECT '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||quote_ident(v_table)||') b ON  nodeparent = descript 
+			WHERE fprocesscat_id='||v_fprocesscat_id||' AND cur_user=current_user) row'
+		INTO v_result;
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":'||v_lineqmlpath||', "values":',v_result, '}');
+
+		-- connec elements
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT c.connec_id, b.'||quote_ident(v_field)||', c.the_geom FROM anl_arc a 
+			JOIN (SELECT  '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as nodeparent from '||quote_ident(v_table)||') b ON  nodeparent = descript 
+			JOIN connec c ON c.arc_id = a.arc_id
+			WHERE fprocesscat_id='||v_fprocesscat_id||' AND cur_user=current_user) row'
+		INTO v_result;
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_point = concat ('{"geometryType":"Point", "qmlPath":'||v_pointqmlpath||', "values":',v_result, '}');
+	END IF;
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
