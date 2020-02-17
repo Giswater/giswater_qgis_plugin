@@ -18,15 +18,16 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang"
 */
 
 DECLARE
-	v_return json;
-	v_input json;
-	v_result text;
-	v_usenetworkgeom boolean;
-	v_dumpsubcatch boolean;
-	v_inpoptions json;
-	
-BEGIN
+v_return json;
+v_input json;
+v_result text;
+v_usenetworkgeom boolean;
+v_dumpsubcatch boolean;
+v_inpoptions json;
+v_file json;
+v_body json;
 
+BEGIN
 
 --  Get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
@@ -81,12 +82,17 @@ BEGIN
 		PERFORM gw_fct_pg2epa_dump_subcatch ();
 	END IF;
 		
-	-- Calling for the export function
-	PERFORM gw_fct_utils_csv2pg_export_swmm_inp(v_result, null);
-	
-	-- manage return message
+	-- Calling for the quality data function
 	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"',v_result,'","saveOnDatabase":true}}}')::json;
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+		
+	-- Calling for the export function
+	SELECT gw_fct_utils_csv2pg_export_epanet_inp(v_result, null) INTO v_file;
+	
+	-- manage return message
+	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+
 
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 	
