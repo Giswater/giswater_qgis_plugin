@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2020/02/12
+--12/02/2020
 
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='municipality_vdefault';
 UPDATE audit_cat_param_user SET isenabled=FALSE WHERE id='sector_vdefault';
@@ -22,7 +22,7 @@ VALUES (112, 'Arc divide', 'edit', 'utils') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (113, 'Node interpolate', 'edit', 'ud') ON CONFLICT (id) DO NOTHING;
 
--- 13/02/2020
+--13/02/2020
 
 UPDATE audit_cat_param_user SET isparent = False WHERE id = 'state_vdefault';
 UPDATE audit_cat_param_user SET label = 'State type (On service):', dv_querytext = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 1 ', dv_parent_id = NULL, dv_querytext_filterc = NULL WHERE id = 'statetype_vdefault';
@@ -33,3 +33,17 @@ UPDATE audit_cat_param_user SET layout_order = 6 WHERE id = 'builtdate_vdefault'
 UPDATE audit_cat_param_user SET layout_order = 7 WHERE id = 'enddate_vdefault';
 UPDATE audit_cat_param_user SET layout_order = 8 WHERE id = 'workcat_id_end_vdefault';
 UPDATE audit_cat_param_user SET label = 'Enddate' WHERE label = 'End date:';
+
+--17/02/2020
+
+UPDATE arc_type SET active=TRUE WHERE active IS NULL;
+UPDATE arc_type SET code_autofill=TRUE WHERE code_autofill IS NULL;
+
+
+UPDATE connec_type SET active=TRUE WHERE active IS NULL;
+UPDATE connec_type SET code_autofill=TRUE WHERE code_autofill IS NULL;
+
+UPDATE node_type SET active=TRUE WHERE active IS NULL;
+UPDATE node_type SET code_autofill=TRUE WHERE code_autofill IS NULL;
+UPDATE node_type SET choose_hemisphere=TRUE WHERE choose_hemisphere IS NULL;
+UPDATE node_type SET isarcdivide=TRUE WHERE isarcdivide IS NULL;

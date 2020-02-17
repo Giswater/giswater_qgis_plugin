@@ -283,3 +283,5 @@ UPDATE cat_grate SET cost_ut = 'N_BGRT1' WHERE id='N/I';
 UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_cost = 'VIRTUAL_M3' WHERE id = 'VIRTUAL';
 
 UPDATE element SET code = concat ('E',element_id);
+
+UPDATE cat_feature SET id=id;

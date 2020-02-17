@@ -21,3 +21,7 @@ UPDATE audit_cat_param_user SET label = 'Default type for node (parent layer)', 
 UPDATE audit_cat_param_user SET label = 'Default type for arc (parent layer)', description='Default type for arc when parent layer (v_edit_arc) is used' WHERE id='arctype_vdefault';
 UPDATE audit_cat_param_user SET label = 'Default type for connec (parent layer)', description='Default type for connec when parent layer (v_edit_connec) is used' WHERE id='connectype_vdefault';
 UPDATE audit_cat_param_user SET label = 'Default type for gully (parent layer)', description='Default type for gully when parent layer (v_edit_gully) is used' WHERE id='gullytype_vdefault';
+
+--17/02/2020
+UPDATE gully_type SET active=TRUE WHERE active IS NULL;
+UPDATE gully_type SET code_autofill=TRUE WHERE code_autofill IS NULL;
