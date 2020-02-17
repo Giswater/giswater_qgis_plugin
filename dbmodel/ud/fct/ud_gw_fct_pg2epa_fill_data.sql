@@ -14,14 +14,14 @@ v_rainfall text;
 
 BEGIN
 
---  Search path
+    --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
--- Delete previous results on rpt_inp_node & arc tables
+   -- Delete previous results on rpt_inp_node & arc tables
    DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
    DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
    
--- set all timeseries of raingage using user's value
+   -- set all timeseries of raingage using user's value
    v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
 	
 	IF v_rainfall IS NOT NULL THEN
@@ -29,8 +29,8 @@ BEGIN
 	END IF;
 
    
--- Insert on node rpt_inp table
--- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
+	-- Insert on node rpt_inp table
+	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
@@ -76,7 +76,9 @@ BEGIN
 	WHERE outfallparam IS NOT NULL AND fprocesscat_id=13 AND cur_user=current_user
 	AND rpt_inp_node.node_id=a.node_id AND rpt_inp_node.result_id=result_id_var;
 
--- Insert on arc rpt_inp table
+	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider, inp_junction
+
+         -- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom)
 	SELECT
 	result_id_var,
@@ -97,8 +99,10 @@ BEGIN
 		LEFT JOIN cat_arc ON v_arc_x_node.arccat_id = cat_arc.id
 		LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
 		LEFT JOIN inp_conduit ON v_arc_x_node.arc_id = inp_conduit.arc_id
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
+		WHERE (is_operative IS TRUE)
 		AND v_arc_x_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
+
+	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump, inp_conduit
 
     RETURN 1;
 		

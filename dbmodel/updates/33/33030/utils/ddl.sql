@@ -9,10 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/01/30
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"childparam", "dataType":"json", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"childparam", "dataType":"json", "isUtils":"False"}}$$);
-
-
 CREATE TABLE doc_x_workcat
 (
   id serial NOT NULL,
@@ -28,3 +24,5 @@ CREATE TABLE doc_x_workcat
 );
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_function", "column":"sample_query", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"addparam", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"addparam", "dataType":"text", "isUtils":"False"}}$$);

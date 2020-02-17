@@ -43,28 +43,29 @@ UNION
     rpt_inp_node
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND rpt_inp_node.node_type::text = 'VIRT-RESERVOIR'::text;
 
+
 drop VIEW IF EXISTS vi_curves;
 drop view IF EXISTS vi_tanks;
 CREATE OR REPLACE VIEW vi_tanks AS 
  SELECT node_id,
     elevation,
-    (childparam->>'initlevel')::numeric(12,4) as initlevel,
-    (childparam->>'minlevel')::numeric(12,4) as minlevel,
-    (childparam->>'maxlevel')::numeric(12,4) as maxlevel,
-    (childparam->>'diameter')::numeric(12,4) as diameter,
-    (childparam->>'minvol')::numeric(12,4) as minvol,
-    (childparam->>'curve_id') as curve_id
+    (addparam::json->>'initlevel') as initlevel,
+    (addparam::json->>'minlevel') as minlevel,
+    (addparam::json->>'maxlevel') as maxlevel,
+    (addparam::json->>'diameter') as diameter,
+    (addparam::json->>'minvol') as minvol,
+    (addparam::json->>'curve_id') as curve_id
     FROM inp_selector_result,rpt_inp_node
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND rpt_inp_node.epa_type::text = 'TANK'::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT node_id,
     rpt_inp_node.elevation,
-    (childparam->>'initlevel')::numeric(12,4) as initlevel,
-    (childparam->>'minlevel')::numeric(12,4) as minlevel,
-    (childparam->>'maxlevel')::numeric(12,4) as maxlevel,
-    (childparam->>'diameter')::numeric(12,4) as diameter,
-    (childparam->>'minvol')::numeric(12,4) as minvol,
-    (childparam->>'curve_id') as curve_id
+    (addparam::json->>'initlevel') as initlevel,
+    (addparam::json->>'minlevel') as minlevel,
+    (addparam::json->>'maxlevel') as maxlevel,
+    (addparam::json->>'diameter') as diameter,
+    (addparam::json->>'minvol') as minvol,
+    (addparam::json->>'curve_id') as curve_id
    FROM inp_selector_result, rpt_inp_node
      LEFT JOIN ( SELECT a.node_id,
             count(*) AS ct
@@ -81,15 +82,15 @@ UNION
   WHERE b.ct > 1 AND rpt_inp_node.epa_type::text = 'INLET'::text;
 
 
-drop VIEW vi_pumps;
+  drop view vi_pumps;
 CREATE OR REPLACE VIEW vi_pumps AS 
  SELECT arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
-    ('POWER'::text || ' '::text) || (rpt_inp_arc.childparam->>'power')::text AS power,
-    ('HEAD'::text || ' '::text) || (rpt_inp_arc.childparam->>'curve_id')::text AS head,
-    ('SPEED'::text || ' '::text) || (rpt_inp_arc.childparam->>'speed')::text AS speed,
-    ('PATTERN'::text || ' '::text) || (rpt_inp_arc.childparam->>'pattern')::text AS pattern
+    ('POWER'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'power')::text AS power,
+    ('HEAD'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'curve_id')::text AS head,
+    ('SPEED'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'speed')::text AS speed,
+    ('PATTERN'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'pattern')::text AS pattern
    FROM inp_selector_result, rpt_inp_arc
      WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
       AND epa_type = 'PUMP'::text
@@ -112,46 +113,46 @@ CREATE OR REPLACE VIEW vi_valves AS
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    (childparam->>'valv_type')::character varying(18) as valv_type,
-    childparam->>'pressure' AS setting,
+    (addparam::json->>'valv_type')::character varying(18) as valv_type,
+    addparam::json->>'pressure' AS setting,
     rpt_inp_arc.minorloss
    FROM inp_selector_result,rpt_inp_arc
-  WHERE (childparam->>'valv_type' = 'PRV' OR childparam->>'valv_type' = 'PSV' OR childparam->>'valv_type' = 'PBV') 
+  WHERE (addparam::json->>'valv_type' = 'PRV' OR addparam::json->>'valv_type' = 'PSV' OR addparam::json->>'valv_type' = 'PBV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    childparam->>'valv_type',
-    childparam->>'flow',
+    addparam::json->>'valv_type',
+    addparam::json->>'flow',
     rpt_inp_arc.minorloss
    FROM inp_selector_result, rpt_inp_arc
-  WHERE (childparam->>'valv_type' = 'FCV') 
+  WHERE (addparam::json->>'valv_type' = 'FCV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    childparam->>'valv_type',
-    childparam->>'coefloss',
+    addparam::json->>'valv_type',
+    addparam::json->>'coefloss',
     rpt_inp_arc.minorloss
    FROM inp_selector_result,
     rpt_inp_arc
-WHERE (childparam->>'valv_type' = 'TCV') 
+WHERE (addparam::json->>'valv_type' = 'TCV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    childparam->>'valv_type',
-    childparam->>'curve_id',
+    addparam::json->>'valv_type',
+    addparam::json->>'curve_id',
     rpt_inp_arc.minorloss
    FROM inp_selector_result,
     rpt_inp_arc
-WHERE (childparam->>'valv_type' = 'GPV') 
+WHERE (addparam::json->>'valv_type' = 'GPV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
 
@@ -173,7 +174,7 @@ UNION
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
     'GPV'::character varying(18) AS valv_type,
-    childparam->>'curve_id' AS setting,
+    addparam::json->>'curve_id' AS setting,
     0::numeric(12,4) AS minorloss
    FROM inp_selector_result,
     rpt_inp_arc
@@ -186,44 +187,44 @@ UNION
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    childparam->>'valv_type',
-    childparam->>'pressure',
+    addparam::json->>'valv_type',
+    addparam::json->>'pressure',
     rpt_inp_arc.minorloss
    FROM inp_selector_result, rpt_inp_arc
-  WHERE (childparam->>'valv_type' = 'PRV' OR childparam->>'valv_type' = 'PSV' OR childparam->>'valv_type' = 'PBV') 
+  WHERE (addparam::json->>'valv_type' = 'PRV' OR addparam::json->>'valv_type' = 'PSV' OR addparam::json->>'valv_type' = 'PBV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    childparam->>'valv_type',
-    childparam->>'flow',
+    addparam::json->>'valv_type',
+    addparam::json->>'flow',
     rpt_inp_arc.minorloss
    FROM inp_selector_result, rpt_inp_arc
-  WHERE (childparam->>'valv_type' = 'FCV') 
+  WHERE (addparam::json->>'valv_type' = 'FCV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    childparam->>'valv_type',
-    childparam->>'coef_loss',
+    addparam::json->>'valv_type',
+    addparam::json->>'coef_loss',
     rpt_inp_arc.minorloss
    FROM inp_selector_result, rpt_inp_arc
-  WHERE (childparam->>'valv_type' = 'TCV') 
+  WHERE (addparam::json->>'valv_type' = 'TCV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
     rpt_inp_arc.diameter,
-    childparam->>'valv_type',
-    childparam->>'curve_id',
+    addparam::json->>'valv_type',
+    addparam::json->>'curve_id',
     rpt_inp_arc.minorloss
    FROM inp_selector_result, rpt_inp_arc
-   WHERE (childparam->>'valv_type' = 'GPV') 
+   WHERE (addparam::json->>'valv_type' = 'GPV') 
   AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
 
   

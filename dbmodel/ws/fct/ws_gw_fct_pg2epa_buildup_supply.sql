@@ -63,52 +63,44 @@ BEGIN
 	SELECT (value::json->>'pressGroup')::json->>'defaultCurve' INTO v_defaultcurve FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	
-	-- switch to junction an specific list of RESERVOIRS
+	RAISE NOTICE 'switch to junction an specific list of RESERVOIRS';
 	UPDATE rpt_inp_node SET epa_type = 'JUNCTION' WHERE node_id IN (select node_id FROM v_edit_node
 	JOIN (select unnest((replace (replace((v_switch2junction::text),'[','{'),']','}'))::text[]) as type)a ON a.type = node_type) AND result_id = p_result;
 
-	-- setting pump curves where curve_id is null
-	UPDATE rpt_inp_arc SET childparam = gw_fct_json_object_set_key(childparam, 'curve_id', v_defaultcurve) WHERE childparam->>'curve_id' IS NULL AND childparam->>'pump_type'='1' AND result_id = p_result ;
+	RAISE NOTICE 'setting pump curves where curve_id is null';
+	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve) WHERE addparam::json->>'curve_id' IS NULL AND addparam::json->>'pump_type'='1' AND result_id = p_result ;
 
-	-- delete orphan nodes
-	DELETE FROM rpt_inp_node WHERE result_id = p_result AND node_id NOT IN 
-	(SELECT node_1 FROM rpt_inp_arc WHERE result_id = p_result UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id = p_result) ;
-	
-	-- deleting arcs without extremal nodes
-	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=p_result;	
-
-	-- setting roughness for null values
+	RAISE NOTICE 'setting roughness for null values';
 	SELECT avg(roughness) INTO v_roughness FROM rpt_inp_arc WHERE result_id=p_result;
 	UPDATE rpt_inp_arc SET roughness = v_roughness WHERE roughness IS NULL AND result_id= p_result;
 
-	-- setting demands for null values
+	RAISE NOTICE 'setting demands for null values';
 	IF v_defaultdemand IS NOT NULL AND v_demandtype = 1 THEN
 		UPDATE rpt_inp_node SET demand = v_defaultdemand WHERE demand IS NULL AND result_id= p_result;
 	END IF;
 	
-	-- setting diameter for null values
+	RAISE NOTICE 'setting diameter for null values';
 	UPDATE rpt_inp_arc SET diameter = v_diameter WHERE diameter IS NULL AND result_id= p_result;
 
-	-- setting null elevation values using closest points values
+	RAISE NOTICE 'setting null elevation values using closest points values';
 	UPDATE rpt_inp_node SET elevation = d.elevation FROM
 		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
 		WHERE st_dwithin (a.the_geom, b.the_geom, v_nullbuffer) AND a.node_id != b.node_id AND a.elevation IS NULL AND b.elevation IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
 		WHERE rpt_inp_node.elevation IS NULL AND d.node_id=rpt_inp_node.node_id AND result_id=p_result;
 
-	-- setting cero elevation values using closest points values
+	RAISE NOTICE 'setting cero elevation values using closest points values';
 	UPDATE rpt_inp_node SET elevation = d.elevation FROM
 		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
 		WHERE st_dwithin (a.the_geom, b.the_geom, v_cerobuffer) AND a.node_id != b.node_id AND a.elevation = 0 AND b.elevation > 0) c order by st_distance (n1_geom, n2_geom))d
 		WHERE rpt_inp_node.elevation IS NULL AND d.node_id=rpt_inp_node.node_id AND result_id=p_result;
 	
-	-- setting cero on elevation those have null values in spite of previous processes (profilactic issue in order to don't crash the epanet file)
+	RAISE NOTICE 'setting cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
 	UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=p_result;
 
-	-- transform all tanks by reservoirs with link and junction
+	RAISE NOTICE 'transform all tanks by reservoirs with link and junction';
 	v_querytext = 'SELECT * FROM rpt_inp_node WHERE (epa_type = ''TANK'' OR epa_type = ''INLET'') AND result_id = '||quote_literal(p_result);
 	FOR v_record IN EXECUTE v_querytext
 	LOOP
-		raise notice '  %', v_record;
 
 		-- new point
 		v_x=st_x(v_record.the_geom);
@@ -133,35 +125,41 @@ BEGIN
 
 	END LOOP;
 
-	-- deleting arcs and nodes disconnected from any reservoir
+
+	RAISE NOTICE 'deleting nodes disconnected from any reservoir';
 	DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_1 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user 
 						   UNION SELECT node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+
+	RAISE NOTICE 'deleting arcs disconnected from any reservoir';
 	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
 
+	RAISE NOTICE 'delete orphan nodes';	
+	DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=p_result;
+
+	RAISE NOTICE 'deleting arcs without extremal nodes';
+	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=p_result;	
+
 	
-	-- set pressure groups
+	RAISE NOTICE 'set pressure groups';
 	UPDATE rpt_inp_arc SET status= v_statuspg WHERE status IS NULL AND result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '1'); 
 	
 	IF v_forcestatuspg IS NOT NULL THEN
 		UPDATE rpt_inp_arc SET status=v_forcestatuspg WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '1') AND result_id=p_result;
 	END IF;
 	
-	-- set pump stations
+	RAISE NOTICE 'set pump stations';
 	UPDATE rpt_inp_arc SET status= v_statusps WHERE status IS NULL AND result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '2'); 
 
 	IF v_forcestatusps IS NOT NULL THEN
 		UPDATE rpt_inp_arc SET status= v_forcestatusps WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '2'); 
 	END IF;
 		
-	-- set valves
+	RAISE NOTICE 'set valves';
 	UPDATE rpt_inp_arc SET status=v_statusprv WHERE status IS NULL AND result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve);
 	
 	IF v_forcestatusprv IS NOT NULL THEN
 		UPDATE rpt_inp_arc SET status= v_forcestatusprv WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve); 
 	END IF;
-
-
-	
 
     RETURN 1;
 

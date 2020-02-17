@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"testbgeo","saveOnDatabase":true, "useNetworkGeom":"TRUE", "useNetworkDemand":"TRUE"}}}$$)
+"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
 
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -85,6 +85,7 @@ v_doublen2a integer;
 v_geometrylog boolean;
 v_advancedsettings text;
 v_advancedsettingsval text;
+v_curvedefault text;
 
 BEGIN
 
@@ -124,11 +125,11 @@ BEGIN
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND user_name=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id IN (3, 14, 39) AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fprocesscat_id IN (7, 14, 64, 66, 70, 71, 98) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fprocesscat_id IN (7, 14, 64, 65, 66, 67, 70, 71, 98) AND cur_user=current_user;
 
 
 	-----------------------------------
-	RAISE NOTICE '001 -Starting process';
+	RAISE NOTICE '001 - STARTING PROCESS';
 	-----------------------------------
 	
 	-- Header
@@ -199,57 +200,53 @@ BEGIN
 		IF v_buildupmode = 1 THEN
 
 			-- supply buildup default values
-			SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_buffer FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-			SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_system WHERE parameter = 'inp_options_buildup_supply';
-
+			SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_buffer FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'pressGroup')::json->>'defaultCurve' INTO v_curvedefault FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'pumpStation')::json->>'status' INTO v_statusps FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+			SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 		
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, null);
-
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			'SUPPLY RESET FOR USER VALUES: Network Mode: BASIC, Valve mode: INVENTORY VALUES, Quality mode: NONE');
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
 			concat('SUPPLY VDEF: Null elevations have been setted using a buffer to closest node (',v_buffer,' mts.) acording user variable.'));
 	
 			IF v_defaultdemand IS NOT NULL AND v_demandtype = 1 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('SUPPLY VDEF: Acording with demand method choosed (ESTIMATED) null demands have been setted to ',
-				v_defaultdemand,' acording user variable.'));
+				concat('SUPPLY VDEF: Null demands have been setted to ( ',v_defaultdemand,' ) acording user variable.'));
 			END IF;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('SUPPLY VDEF: Virtual reservoirs have been created over each tank with a virtual pipe of length: ',v_n2nlength,' mts. acording user variable.'));
+			concat('SUPPLY VDEF: Virtual reservoirs have been created over each tank with a virtual pipe of length: ( ',v_n2nlength,' ) mts. acording user variable.'));
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('SUPPLY VDEF: The status of pressure groups with null values have been updated to ',v_statuspg,' acording user variable.'));
+			concat('SUPPLY VDEF: The status of pressure groups with null values have been updated to ( ',v_statuspg,' ) acording user variable.'));
 
 			IF v_forcestatusps IS NOT NULL THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('SUPPLY VDEF: The status of all pressure groups have been updated to ',v_forcestatuspg,' acording user variable.'));
+				concat('SUPPLY VDEF: The status of all pressure groups have been updated to ( ',v_forcestatuspg,' ) acording user variable.'));
 			END IF;
 	
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('SUPPLY VDEF: The status of pumping stations with null values have been updated to ',v_statusps,' acording user variable.'));
+			concat('SUPPLY VDEF: The status of pumping stations with null values have been updated to ( ',v_statusps,' ) acording user variable.'));
 			
 			IF v_forcestatusps IS NOT NULL THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('SUPPLY VDEF: The status of all pumping stations have been updated to ',v_forcestatusps,' acording user variable.'));
+				concat('SUPPLY VDEF: The status of all pumping stations have been updated to ( ',v_forcestatusps,' ) acording user variable.'));
 			END IF;
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-			concat('SUPPLY VDEF: The status of PRV with null values have been updated to ',v_statusprv,' acording user variable.'));
+			concat('SUPPLY VDEF: The status of PRV with null values have been updated to ( ',v_statusprv,' ) acording user variable.'));
 
 			IF v_forcestatusprv IS NOT NULL THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, 
-				concat('SUPPLY VDEF: The status of PRV have been updated to ',v_forcestatusprv,' acording user variable.'));
+				concat('SUPPLY VDEF: The status of PRV have been updated to ( ',v_forcestatusprv,' ) acording user variable.'));
 			END IF;
 		END IF;
 		
@@ -268,21 +265,20 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (14, v_result_id, 2, concat('WARNING: Use result network geometry have been checked. Network geometry defined on the same result done before have been used. This method is faster but be shure existing geometry is well-built.'));
 	ELSE
-
-
-	
 		-- UTILS
 		RAISE NOTICE '1 - Check orphan nodes (7)';
 
-		v_querytext = '(SELECT * FROM rpt_inp_node WHERE result_id='||quote_literal(v_result_id)||' AND node_id NOT IN (SELECT node_1 FROM rpt_inp_arc 
-		WHERE result_id='||quote_literal(v_result_id)||' UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id='||quote_literal(v_result_id)|| ')) a';
+		v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (
+				SELECT node_id FROM rpt_inp_node WHERE result_id='||quote_literal(v_result_id)||' EXCEPT 
+				(SELECT node_1 as node_id FROM rpt_inp_arc WHERE result_id='||quote_literal(v_result_id)||' UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id='||quote_literal(v_result_id)||'))a
+				JOIN rpt_inp_node USING (node_id)
+				) b';
 		
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 AND v_buildupmode =  1 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' orphan(s) nodes that not have been exported to EPA. Take a look on temporal for details.'));
 		ELSIF v_count > 0 AND v_buildupmode > 1 THEN
-			DELETE FROM anl_node WHERE fprocesscat_id=7 and cur_user=current_user;
 			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 7, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (14, 3, concat('ERROR: There is/are ',v_count,' arc''s without node_1 or node_2. Take a look on temporal for details.'));
@@ -290,16 +286,19 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (14, 1, 'INFO: No node(s) orphan found.');
 		END IF;
-	
 
 		RAISE NOTICE '2 - Check arcs without start/end node (3)';
 		
-		v_querytext = '	SELECT 3, arc_id, arccat_id,  state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arc with node_1 not present in the exportation'' 
-				FROM rpt_inp_arc where result_id = '||quote_literal(v_result_id)||' AND node_1 NOT IN (SELECT node_id FROM rpt_inp_node where result_id='||quote_literal(v_result_id)||')
+		v_querytext = '	SELECT 3, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without nodes extremals'' FROM rpt_inp_arc 
+				WHERE result_id='||quote_literal(v_result_id)||' 
+				EXCEPT ( 
+				SELECT 3, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without nodes extremals'' FROM rpt_inp_arc JOIN 
+				(SELECT node_id FROM rpt_inp_node WHERE result_id='||quote_literal(v_result_id)||') a ON node_1=node_id 
 				UNION 
-				SELECT 3, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arc with node_2 not present in the exportation'' 
-				FROM rpt_inp_arc where result_id = '||quote_literal(v_result_id)||' AND node_2 NOT IN (SELECT node_id FROM rpt_inp_node where result_id='||quote_literal(v_result_id)||')';
-
+				SELECT 3, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without nodes extremals'' FROM rpt_inp_arc JOIN 
+				(SELECT node_id FROM rpt_inp_node WHERE result_id='||quote_literal(v_result_id)||') b ON node_2=node_id
+				WHERE result_id='||quote_literal(v_result_id)||')';
+	
 		EXECUTE 'SELECT count(*) FROM ('||v_querytext ||')a'
 			INTO v_count;
 
@@ -691,14 +690,12 @@ BEGIN
 			
 			SELECT count(*) INTO v_count FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
 			IF v_count > 0 AND v_buildupmode = 1 THEN
-				DELETE FROM anl_node WHERE fprocesscat_id=64 and cur_user=current_user;
 				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript) 
 				SELECT 64, node_id, nodecat_id, the_geom , 'Null elevation' FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,
 				' node(s) without elevation. Values have been updated using the elevation from closest''s nodes. Take a look on temporal table for details.'));
 			ELSIF v_count > 0 AND v_buildupmode > 1 THEN
-				DELETE FROM anl_node WHERE fprocesscat_id=64 and cur_user=current_user;
 				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
 				SELECT 64, node_id, nodecat_id, the_geom FROM rpt_inp_node WHERE result_id=v_result_id AND elevation IS NULL;
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
@@ -711,13 +708,19 @@ BEGIN
 			RAISE NOTICE '10 - Elevation control with cero values (65)';
 			
 			SELECT count(*) INTO v_count FROM rpt_inp_node WHERE result_id=v_result_id AND elevation=0;
+
+			IF v_count > 0 AND v_buildupmode = 1 THEN
+				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript) 
+				SELECT 65, node_id, nodecat_id, the_geom , 'Cero elevation' FROM rpt_inp_node WHERE result_id=v_result_id AND elevation = 0;
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,
+				' node(s) with elevation  = 0. Values have been updated using the elevation from closest''s nodes. Take a look on temporal table for details.'));
 			
-			IF v_count > 0 THEN
-				DELETE FROM anl_node WHERE fprocesscat_id=65 and cur_user=current_user;
+			ELSIF v_count > 0 AND v_buildupmode > 1 THEN
 				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript) 
 				SELECT 65, node_id, nodecat_id, the_geom, 'Elevation with cero' FROM rpt_inp_node WHERE result_id=v_result_id AND elevation=0;
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',v_count,' node(s) with elevation=0.'));
+				VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',v_count,' node(s) with elevation=0. For more info you can type:'));
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=65 AND cur_user=current_user'));
 			ELSE
@@ -746,7 +749,6 @@ BEGIN
 
 			RAISE NOTICE '12 - Node2arcs with more than two arcs (66)';
 			
-			DELETE FROM anl_node WHERE fprocesscat_id=66 and cur_user=current_user;
 			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
 			SELECT 66, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs' FROM (
 				SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
@@ -759,22 +761,17 @@ BEGIN
 
 			SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=66 AND cur_user=current_user;
 
-			IF v_count > 0 AND v_buildupmode = 1 THEN
+			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' node2arc(s) with more than two arcs that have been transformed into junctions. Take a look on temporal table to know details.'));
-			
-			ELSIF v_count > 0 AND v_buildupmode > 1 THEN
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arc(s) with more than two arcs. Take a look on temporal table to know details.'));
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node2arcs with more than two arcs. It''s impossible to continue. For more info you can type:'));
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc(s) with more than mandatory two arcs.');
+				VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc(s) with more than two arcs.');
 			END IF;
 			
 
 			RAISE NOTICE '13 - Node2arcs with less than two arcs (67)';
 			
-			DELETE FROM anl_node WHERE fprocesscat_id=67 and cur_user=current_user;
 			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
 			SELECT 67, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs' FROM (
 				SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
@@ -789,12 +786,12 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',
-				v_count,' node2arc(s) with less than mandatory two arcs. All of them have been transformed to junction. Please review your data.'));
+				v_count,' node2arc(s) with less than two arcs. All of them have been transformed to nodarc using only arc joined. For more info you can type: '));
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user'));
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc(s) with less than mandatory two arcs.');
+				VALUES (14, v_result_id, 1, 'INFO: No results founded looking for node2arc(s) with less than two arcs.');
 			END IF;
 
 
@@ -827,11 +824,11 @@ BEGIN
 			SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=70 AND cur_user=current_user;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'));
+				VALUES (14, v_result_id, 2, concat('WARNING: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'));
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 1, 
-				'INFO: to_arc values checked for valves. It exists and it''s one of two closest arcs. Any way There are two possibilities to define sense, and must be defined by hand, BE SHURE IT IS OK.');
+				'INFO: to_arc values checked for valves. It exists and it''s one of  closest arcs.');
 			END IF;
 
 
@@ -839,7 +836,7 @@ BEGIN
 			
 			DELETE FROM anl_node WHERE fprocesscat_id=71 and cur_user=current_user;
 			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
-			select 71, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for pump' FROM v_edit_inp_pump WHERE node_id NOT IN(
+			select 71, node_id, nodecat_id , the_geom,  'To arc is null or does not exists as closest arc for pump' FROM v_edit_inp_pump WHERE node_id NOT IN(
 				select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
 				union
 				select node_id FROM v_edit_inp_pump JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_2);
@@ -847,11 +844,11 @@ BEGIN
 			SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=71 AND cur_user=current_user;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ', v_count,' pump(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'));
+				VALUES (14, v_result_id, 2, concat('WARNING: There is/are ', v_count,' pump(s) without to_arc value according with closest arcs. Take a look on temporal table to know details.'));
 			ELSE 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (14, v_result_id, 1, 
-				'INFO: to_arc values checked for pumps. It exists and it''s one of two closest arcs. Any way There are two possibilities to define sense, and must be defined by hand, BE SHURE IT IS OK.');
+				'INFO: to_arc values checked for pumps. It exists and it''s one of the closest arcs.');
 			END IF;
 			
 
@@ -941,7 +938,7 @@ BEGIN
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 						VALUES (14, v_result_id, 4, concat(
 						'SUPPLY MODE: There is/are ',v_count,
-						' tank(s) with null values on mandatory columns, but according with the SUPPLY rules these tanks have been replaced by a junction linked with a reservoir.'));
+						' tank(s) with null values on mandatory columns, but according with the SUPPLY MODE rules these tanks have been replaced by a junction linked with a reservoir.'));
 						v_countglobal=v_countglobal+v_count;
 						v_count=0;
 					ELSE
@@ -1051,62 +1048,66 @@ BEGIN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 					VALUES (14, v_result_id, 1, 'INFO: FCV valves checked. No mandatory values missed.');
 				END IF;		
-
+				
 						
 			RAISE NOTICE '23 - pumps';		
-			
-			IF v_buildupmode = 1 THEN		
-			
-				-- curves
-				SELECT count(*) INTO v_count FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
-				WHERE (curve_id IS NULL OR pump_type IS NULL) AND result_id=v_result_id;
-		
+
+			-- pump_type
+			SELECT count(*) INTO v_count FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
+			WHERE (pump_type IS NULL) AND result_id=v_result_id;
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values on pump_type column).'));					
+				v_countglobal=v_countglobal+v_count; 
+				v_count=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 1, 'INFO: Pumps checked. No mandatory values for pump_type missed.');
+			END IF;
+
+			-- curve_id
+			IF v_buildupmode = 1 THEN
+
+				SELECT count(*) INTO v_count FROM rpt_inp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '' AND addparam::json->>'pump_type' = '1' AND result_id=v_result_id;
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-					VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values on (curve_id, pump_type) columns).'));
+					VALUES (14, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' pump_type = 1 with null values on curve_id column. Default user value for curve of pumptype = 1 ( ',v_curvedefault,' ) have been chosen.'));					
 					v_countglobal=v_countglobal+v_count; 
 					v_count=0;
-				ELSE
-					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-					VALUES (14, v_result_id, 1, 'INFO: Pumps checked. No mandatory values for curve_id missed.');
+				END IF;				
 			
-				END IF;
-						
 			ELSIF v_buildupmode > 1 THEN
 			
-				--pumps
-				SELECT count(*) INTO v_count FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
-				WHERE (curve_id IS NULL OR inp_pump.status IS NULL) AND result_id=v_result_id;
+				SELECT count(*) INTO v_count FROM rpt_inp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '' AND result_id=v_result_id;
 		
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-					VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values at least on columns for pump (curve_id, status).'));
+					VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values at least on curve_id.'));
 					v_countglobal=v_countglobal+v_count; 
 					v_count=0;
 				ELSE
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-					VALUES (14, v_result_id, 1, 'INFO: Pumps checked. No mandatory values missed.');
+					VALUES (14, v_result_id, 1, 'INFO: Pumps checked. No curve_id mandatory values missed.');
 			
 				END IF;
 				
 				--pump additional
 				SELECT count(*) INTO v_count FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
-				WHERE ((curve_id IS NULL) OR (inp_pump_additional.status IS NULL)) AND result_id=v_result_id;
+				WHERE curve_id IS NULL AND result_id=v_result_id;
 					IF v_count > 0 THEN
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 						VALUES (14, v_result_id, 3, concat(
-						'ERROR: There is/are ',v_count,' additional pump(s) with null values at least on mandatory columns for additional pump (curve_id, status).'));
+						'ERROR: There is/are ',v_count,' additional pump(s) with null values at least on mandatory column curve_id for additional pump.'));
 						v_countglobal=v_countglobal+v_count; 
 						v_count=0;
 					ELSE
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-						VALUES (14, v_result_id, 1, 'INFO: Additional pumps checked. No mandatory values missed.');
+						VALUES (14, v_result_id, 1, 'INFO: Additional pumps checked. No mandatory values for curve_id missed.');
 					END IF;	
 			END IF;
 			
 
 			RAISE NOTICE '24 -  diameter';
-			
 			SELECT count(*) INTO v_count FROM rpt_inp_arc WHERE diameter IS NULL AND epa_type='PIPE' AND result_id=v_result_id;
 
 				IF v_count > 0 AND v_buildupmode = 1 THEN
@@ -1144,7 +1145,7 @@ BEGIN
 
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 					VALUES (14, v_result_id, 2, concat('WARNING: There is/are ',v_count,
-					' vnode(s) over node2arc features. This is an important inconsistency with vnode and treamed arcs. Reduce the nodarc length or check the vnodes affected in order to redraw it.'));
+					' vnode(s) over node2arc. This is an important inconsistency. You need to reduce the nodarc length or check affected vnodes. For more info you can type'));
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 					VALUES (14, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=59 AND cur_user=current_user'));		
 

@@ -43,36 +43,36 @@ BEGIN
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 
 	-- update child param for inp_tank
-	UPDATE rpt_inp_node SET childparam=concat('{"initlevel":"',initlevel,'", "minlevel"::"',minlevel,'", "maxlevel"::"',maxlevel
-	,'", "diameter":"',diameter,'", "minvol"::"',minvol,'", "curve_id"::"',curve_id,'"}')
+	UPDATE rpt_inp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
 	FROM inp_tank WHERE rpt_inp_node.node_id=inp_tank.node_id AND result_id=result_id_var;
 
 	-- update child param for inp_inlet
-	UPDATE rpt_inp_node SET childparam=concat('{"pattern_id":"',pattern_id,'", "initlevel":"',initlevel,'", "minlevel"::"',minlevel,'", "maxlevel"::"',maxlevel
-	,'", "diameter":"',diameter,'", "minvol"::"',minvol,'", "curve_id"::"',curve_id,'"}')
+	UPDATE rpt_inp_node SET addparam=concat('{"pattern_id":"',inp_inlet.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
+	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
 	FROM inp_inlet WHERE rpt_inp_node.node_id=inp_inlet.node_id AND result_id=result_id_var;
 	
 	-- update child param for inp_valve
-	UPDATE rpt_inp_node SET childparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',diameter,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',
-	curve_id,'", "minorloss":"',minorloss,'", "status":"',status,'", "to_arc":"',to_arc,'"}')
+	UPDATE rpt_inp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',diameter,'", "flow":"',
+	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
+	'", "to_arc":"',to_arc,'"}')
 	FROM inp_valve WHERE rpt_inp_node.node_id=inp_valve.node_id AND result_id=result_id_var;
 
-	-- update childparam for inp_pump
-	UPDATE rpt_inp_node SET childparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'" "status":"',status,'", "to_arc":"',to_arc,'", "energyparam":"',
-	energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
+	-- update addparam for inp_pump
+	UPDATE rpt_inp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
+	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE rpt_inp_node.node_id=inp_pump.node_id AND result_id=result_id_var;
 
-
--- Insert on arc rpt_inp table
+	-- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
-	length, the_geom, expl_id)
+	length, diameter, the_geom, expl_id)
 	SELECT
 	result_id_var,
 	v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
 	CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
 	length,
+	(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
 	v_arc.the_geom,
-	inp_pipe.minorloss,
 	v_arc.expl_id
 	FROM inp_selector_sector, v_arc
 		LEFT JOIN value_state_type ON id=state_type
@@ -82,23 +82,22 @@ BEGIN
 		LEFT JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
 		WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN '1900-01-01'::date ELSE builtdate END))/365 >= inp_cat_mat_roughness.init_age 
 		AND (now()::date - (CASE WHEN builtdate IS NULL THEN '1900-01-01'::date ELSE builtdate END))/365 < inp_cat_mat_roughness.end_age
-		AND ((is_operative IS TRUE) OR (is_operative IS NULL))
+		AND (is_operative IS TRUE)
 		AND v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
 	-- update child param for inp_pipe
 	UPDATE rpt_inp_arc SET 
-	minorloss = minorloss,
-	diameter = (CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END), 
+	minorloss = inp_pipe.minorloss,
 	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),	
-	childparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reaction_value,'"}')
+	addparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reactionvalue,'"}')
 	FROM inp_pipe WHERE rpt_inp_arc.arc_id=inp_pipe.arc_id AND result_id=result_id_var;
 
 	-- update child param for inp_virtualvalve
 	UPDATE rpt_inp_arc SET 
-	minorloss = minorloss, 
-	diameter = diameter, 
-	status = status, 
-	childparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "to_arc":"',to_arc,'"}')
+	minorloss = inp_virtualvalve.minorloss, 
+	diameter = inp_virtualvalve.diameter, 
+	status = inp_virtualvalve.status, 
+	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "to_arc":"',to_arc,'"}')
 	FROM inp_virtualvalve WHERE rpt_inp_arc.arc_id=inp_virtualvalve.arc_id AND result_id=result_id_var;
 
     RETURN 1;

@@ -14,9 +14,10 @@ DELETE FROM config_param_system WHERE parameter = 'inp_fast_buildup';
 INSERT INTO audit_cat_param_user VALUES 
 ('inp_options_buildup_supply', 'hidden_value', 'Parameters for supply buildup epanets models', 'role_epa', NULL, NULL, 'supply options for buildup model', NULL, NULL, true, NULL, NULL, 'SCHEMA_NAME', false, NULL, NULL, NULL, 
 false, 'text', 'linetext', true, null,
-'{"node":{"nullElevBuffer":100, "ceroElevBuffer":100}, "pipe":{"diameter":"160"}, "junction":{"defaultDemand":"0.001"}, "tank":{"distVirtualReservoir":0.01}, "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"IM20"},pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"}, "PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]}}',
+'{"node":{"nullElevBuffer":100, "ceroElevBuffer":100}, "pipe":{"diameter":"160"}, "junction":{"defaultDemand":"0.001"}, "tank":{"distVirtualReservoir":0.01}, "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"IM20"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED"}, "PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE"}, "reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]}}',
 NULL, NULL, TRUE, NULL, NULL, NULL, NULL, FALSE)
 ON conflict (id) DO NOTHING;
+
 
 INSERT INTO audit_cat_param_user VALUES 
 ('inp_options_buildup_transport', 'hidden_value', 'Parameters for transport buildup epanets models', 'role_epa', NULL, NULL, 'Tansport options for buildup model', NULL, NULL, true, NULL, NULL, 'SCHEMA_NAME', false, NULL, NULL, NULL, 
