@@ -383,15 +383,14 @@ class Giswater(QObject):
 
     def manage_toolbars_common(self):
         """ Manage actions of the common plugin toolbars """
-        self.toolbar_basic()
-        self.toolbar_utils()
+        self.toolbar_basic("basic")
+        self.toolbar_utils("utils")
 
 
-    def toolbar_basic(self, x=None, y=None):
+    def toolbar_basic(self, toolbar_id, x=None, y=None):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
             list_actions = ['37', '41', '48', '86', '32']
         elif self.controller.get_project_type() == 'ud':
@@ -403,11 +402,10 @@ class Giswater(QObject):
             self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_utils(self, x=None, y=None):
+    def toolbar_utils(self, toolbar_id, x=None, y=None):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "utils"
         if self.controller.get_project_type() in ('ws', 'ud'):
             list_actions = ['206', '99', '83', '58']
         elif self.controller.get_project_type() in ('tm', 'pl'):
@@ -422,61 +420,56 @@ class Giswater(QObject):
         self.utils.set_project_type(self.wsoftware)
 
 
-    def toolbar_om_ws(self, x=0, y=0):
+    def toolbar_om_ws(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "om_ws"
         list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_om_ud(self, x=0, y=0):
+    def toolbar_om_ud(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "om_ud"
         list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_edit(self, x=0, y=0):
+    def toolbar_edit(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "edit"
+
         list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '69', '39', '34', '66', '33', '67']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_cad(self, x=0, y=0):
+    def toolbar_cad(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "cad"
         list_actions = ['71', '72']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_epa(self, x=0, y=0):
+    def toolbar_epa(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "epa"
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_master(self, x=0, y=0):
+    def toolbar_master(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "master"
         list_actions = ['45', '46', '47', '38', '49', '50']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -531,30 +524,27 @@ class Giswater(QObject):
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
         path = config_folder + 'ui_config.config'
+
+        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils')
         if not os.path.exists(path):
             # Create file and configure section 'toolbars_position'
             parser = configparser.RawConfigParser()
             parser.add_section('toolbars_position')
-            parser.set('toolbars_position', 'pos_0', 'basic, 0, 98')
-            parser.set('toolbars_position', 'pos_1', 'om_ud, 10, 98')
-            parser.set('toolbars_position', 'pos_2', 'om_ws, 20, 98')
-            parser.set('toolbars_position', 'pos_3', 'edit, 30, 98')
-            parser.set('toolbars_position', 'pos_4', 'cad, 40, 98')
-            parser.set('toolbars_position', 'pos_5', 'epa, 50, 98')
-            parser.set('toolbars_position', 'pos_6', 'master, 60, 98')
-            parser.set('toolbars_position', 'pos_7', 'utils, 70, 98')
+            for pos, tb in enumerate(toolbar_names):
+                parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos *10}, 98')
 
             # Writing our configuration file to 'ui_config.config'
             with open(path, 'w') as configfile:
                 parser.write(configfile)
                 configfile.close()
+                del configfile
 
         parser.read(path)
-        # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, x=0, y=0):'
-        for x in range(0,8):
-            toolbar_id = parser.get("toolbars_position", 'pos_'+str(x)).split(',')
+        # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
+        for pos, tb in enumerate(toolbar_names):
+            toolbar_id = parser.get("toolbars_position", 'pos_'+str(pos)).split(',')
             if toolbar_id:
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[0], toolbar_id[1], toolbar_id[2])
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
