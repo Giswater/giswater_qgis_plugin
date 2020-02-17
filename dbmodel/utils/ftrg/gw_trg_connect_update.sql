@@ -41,49 +41,43 @@ BEGIN
 		-- updating links geom
 		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE THEN
 
-			--  Select conneclinks with start-end on the updated connec
-			querystring := 'SELECT * FROM link WHERE (link.feature_id = ' || quote_literal(NEW.connec_id) || ' 
-			AND feature_type=''CONNEC'') OR (link.exit_id = ' || quote_literal(NEW.connec_id)|| ' AND feature_type=''CONNEC'');'; 
+			--Select links with start on the updated connec
+			querystring := 'SELECT * FROM link WHERE (link.feature_id = ' || quote_literal(NEW.connec_id) || ' AND feature_type=''CONNEC'')';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
-				-- Initial and final connec of the LINK
-				SELECT * INTO connecRecord1 FROM v_edit_connec WHERE v_edit_connec.connec_id = linkrec.feature_id AND linkrec.feature_type='CONNEC';
-				SELECT * INTO connecRecord2 FROM v_edit_connec WHERE v_edit_connec.connec_id = linkrec.exit_id AND linkrec.exit_type='CONNEC'; 
-				
-				-- Update link from connec
-				IF (connecRecord1.connec_id) IS NOT NULL THEN
-					EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
-				ELSIF (connecRecord2.connec_id) IS NOT NULL THEN
-					EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
-				END IF;
-			
-				-- Update link from gully
-				IF v_projectype ='UD' THEN
-					SELECT * INTO connecRecord3 FROM v_edit_gully WHERE v_edit_gully.gully_id = linkrec.exit_id AND linkrec.exit_type='CONNEC'; 
-					
-					IF (connecRecord3.gully_id IS NOT NULL) THEN
-						EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
-					END IF;
-				END IF;
-					
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
 			END LOOP;
-			
+
+			--Select links with end on the updated connec
+			querystring := 'SELECT * FROM link WHERE (link.exit_id = ' || quote_literal(NEW.connec_id) || ' AND exit_type=''CONNEC'')';
+			FOR linkrec IN EXECUTE querystring
+			LOOP
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
+			END LOOP;		
 		END IF;
 		
 		-- update the rest of the feature parameters
 		FOR v_link IN SELECT * FROM link WHERE (exit_type='CONNEC' AND exit_id=OLD.connec_id)
 		LOOP
+
 			IF v_link.feature_type='CONNEC' THEN
-			
-				UPDATE connec SET arc_id=NEW.arc_id, pjoint_type = NEW.pjoint_type , pjoint_id = NEW.pjoint_id
-				WHERE connec_id=v_link.feature_id;
+
+				-- update connec, mandatory to use v_edit_connec because it's identified and managed when arc_id comes from plan psector tables
+				UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
+							
+				IF v_projectype = 'WS' THEN
+
+					-- update presszone
+					UPDATE v_edit_connec SET presszonecat_id=NEW.presszonecat_id, dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id WHERE connec_id=v_link.feature_id;
+				END IF;
 			
 			ELSIF v_link.feature_type='GULLY' THEN
  		
-				UPDATE gully SET arc_id=NEW.arc_id, pjoint_type = NEW.pjoint_type , pjoint_id = NEW.pjoint_id
-				WHERE gully_id=v_link.feature_id;
+				-- update gully, mandatory to use v_edit_gully because it's identified and managed when arc_id comes from plan psector tables
+				UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
 				
 			END IF;
+			
 		END LOOP;
 	
 	ELSIF v_featuretype='gully' THEN
@@ -100,22 +94,18 @@ BEGIN
 		-- updating links geom
 		IF st_equals (NEW.the_geom, OLD.the_geom) IS FALSE THEN
 	
-			--Select links with start-end on the updated node
-			querystring := 'SELECT * FROM link WHERE (link.feature_id = ' || quote_literal(NEW.gully_id) || ' 
-			AND feature_type=''GULLY'') OR (link.exit_id = ' || quote_literal(NEW.gully_id)|| ' AND feature_type=''GULLY'');'; 
+			--Select links with start on the updated gully
+			querystring := 'SELECT * FROM link WHERE (link.feature_id = ' || quote_literal(NEW.gully_id) || ' AND feature_type=''GULLY'')';
 			FOR linkrec IN EXECUTE querystring
 			LOOP
-				-- Initial and final gully of the LINK
-				SELECT * INTO gullyRecord1 FROM v_edit_gully WHERE v_edit_gully.gully_id = linkrec.feature_id;
-				SELECT * INTO gullyRecord2 FROM v_edit_gully WHERE v_edit_gully.gully_id = linkrec.exit_id;
-				SELECT * INTO gullyRecord3 FROM v_edit_connec WHERE v_edit_connec.connec_id = linkrec.exit_id;
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
+			END LOOP;
 
-				-- Update link
-				IF (gullyRecord1.gully_id) IS NOT NULL THEN
-					EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
-				ELSIF (gullyRecord2.gully_id IS NOT NULL) OR (gullyRecord3.connec_id IS NOT NULL) THEN
-					EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
-				END IF;
+			--Select links with end on the updated gully
+			querystring := 'SELECT * FROM link WHERE (link.exit_id = ' || quote_literal(NEW.gully_id) || ' AND exit_type=''GULLY'')';
+			FOR linkrec IN EXECUTE querystring
+			LOOP
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
 			END LOOP;
 		END IF;
 		
@@ -124,14 +114,13 @@ BEGIN
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 			
-				UPDATE v_edit_connec SET arc_id=NEW.arc_id, pjoint_type = NEW.pjoint_type , pjoint_id = NEW.pjoint_id
-				WHERE connec_id=v_link.feature_id;
+				UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
 			
 			ELSIF v_link.feature_type='GULLY' THEN
 		
-				UPDATE v_edit_gully SET arc_id=NEW.arc_id, pjoint_type = NEW.pjoint_type , pjoint_id = NEW.pjoint_id
-				WHERE gully_id=v_link.feature_id;
+				UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
 			END IF;
+
 		END LOOP;
 		
 	END IF;

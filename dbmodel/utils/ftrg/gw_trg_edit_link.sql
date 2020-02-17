@@ -188,7 +188,7 @@ BEGIN
 				
 			IF v_vnode.vnode_id IS NULL THEN -- there is no vnode on the new position
 
-				v_node_id = (select vnode_id FROM vnode WHERE vnode_id::text = OLD.exit_id AND OLD.exit_type='VNODE');
+				v_node_id = (select vnode_id FROM vnode WHERE vnode_id::text = NEW.exit_id AND NEW.exit_type='VNODE');
 
 				IF v_node_id IS NULL THEN -- there is no vnode existing linked				
 					INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
