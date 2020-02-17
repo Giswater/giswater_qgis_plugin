@@ -547,8 +547,8 @@ class ApiCF(ApiParent, QObject):
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(self.api_action_help, self.geom_type))
-        ep = QgsMapToolEmitPoint(self.canvas)
-        action_interpolate.triggered.connect(partial(self.activate_snapping, ep))
+        self.ep = QgsMapToolEmitPoint(self.canvas)
+        action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
 
         # Buttons
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
