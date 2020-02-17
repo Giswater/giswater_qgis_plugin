@@ -187,7 +187,7 @@ BEGIN
 	
 		SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 		
-		v_return = gw_fct_json_object_set_key(vreturn, 'file', v_file);
+		v_return = gw_fct_json_object_set_key(v_return, 'file', v_file);
 
 	END IF;
 
