@@ -12,8 +12,8 @@ DROP TRIGGER gw_trg_topocontrol_arc ON arc;
 CREATE TRIGGER gw_trg_topocontrol_arc  BEFORE INSERT OR UPDATE OF the_geom, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, state, inverted_slope
 ON arc  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_topocontrol_arc();
 
-DROP TRIGGER gw_trg_gully_update ON gully;
-DROP TRIGGER gw_trg_update_link_arc_id ON gully;
+DROP TRIGGER IF EXISTS gw_trg_gully_update ON gully;
+DROP TRIGGER IF EXISTS gw_trg_update_link_arc_id ON gully;
 
 CREATE TRIGGER gw_trg_connect_update AFTER UPDATE OF arc_id, pjoint_id, pjoint_type, the_geom
 ON SCHEMA_NAME.gully FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_connect_update('gully');

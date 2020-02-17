@@ -238,8 +238,8 @@ CREATE TRIGGER gw_trg_edit_visitman_x_gully INSTEAD OF DELETE ON "SCHEMA_NAME".v
 "SCHEMA_NAME".gw_trg_ui_visitman();
 
 DROP TRIGGER IF EXISTS gw_trg_update_link_arc_id ON "SCHEMA_NAME".gully;
-CREATE TRIGGER gw_trg_update_link_arc_id AFTER UPDATE OF arc_id ON "SCHEMA_NAME".gully
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_update_link_arc_id(gully);
+--CREATE TRIGGER gw_trg_update_link_arc_id AFTER UPDATE OF arc_id ON "SCHEMA_NAME".gully
+--FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_update_link_arc_id(gully);
 
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_gully_control ON "SCHEMA_NAME".gully;
 CREATE TRIGGER gw_trg_man_addfields_value_gully_control AFTER UPDATE OF gully_id OR DELETE ON SCHEMA_NAME.gully

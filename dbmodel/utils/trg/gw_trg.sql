@@ -24,7 +24,7 @@ FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_connec_proximity();
 
 DROP TRIGGER IF EXISTS gw_trg_connec_update ON "SCHEMA_NAME".connec;
 CREATE TRIGGER gw_trg_connec_update AFTER UPDATE OF the_geom ON "SCHEMA_NAME".connec
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_connec_update();
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_connect_update();
 
 DROP TRIGGER IF EXISTS gw_trg_edit_cad_aux ON "SCHEMA_NAME".v_edit_cad_auxcircle;
 CREATE TRIGGER gw_trg_edit_cad_aux INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".v_edit_cad_auxcircle  
@@ -189,9 +189,9 @@ DROP TRIGGER IF EXISTS gw_trg_ui_visitman_x_connec ON "SCHEMA_NAME".v_ui_om_visi
 CREATE TRIGGER gw_trg_ui_visitman_x_connec INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visitman_x_connec FOR EACH ROW EXECUTE PROCEDURE 
 "SCHEMA_NAME".gw_trg_ui_visitman();
 
-DROP TRIGGER IF EXISTS gw_trg_update_link_arc_id ON "SCHEMA_NAME".connec;
-CREATE TRIGGER gw_trg_update_link_arc_id AFTER UPDATE OF arc_id ON "SCHEMA_NAME".connec
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_update_link_arc_id(connec);
+--DROP TRIGGER IF EXISTS gw_trg_update_link_arc_id ON "SCHEMA_NAME".connec;
+--CREATE TRIGGER gw_trg_update_link_arc_id AFTER UPDATE OF arc_id ON "SCHEMA_NAME".connec
+--FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_update_link_arc_id(connec);
 
 
 
