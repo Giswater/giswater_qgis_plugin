@@ -727,8 +727,29 @@ class DaoController(object):
                 pass
             
         return True
-        
-        
+
+
+    def translate_tooltip(self, context_name, widget, idx=None):
+        """ Translate tooltips widgets of the form to current language
+            If we find a translation, it will be put
+            If the object does not have a tooltip we will put the object text itself as a tooltip
+        """
+        if type(widget) is QTabWidget:
+            widget_name = widget.widget(idx).objectName()
+            tooltip = self.tr(f'tooltip_{widget_name}', context_name)
+            if tooltip != f'tooltip_{widget_name}':
+                widget.setTabToolTip(idx, tooltip)
+            elif widget.toolTip() == "":
+                widget.setTabToolTip(idx, widget.tabText(idx))
+        else:
+            widget_name = widget.objectName()
+            tooltip = self.tr(f'tooltip_{widget_name}', context_name)
+            if tooltip != f'tooltip_{widget_name}':
+                widget.setToolTip(tooltip)
+            elif widget.toolTip() == "":
+                widget.setToolTip(widget.text())
+
+
     def translate_form(self, dialog, context_name):
         """ Translate widgets of the form to current language """
         
@@ -746,7 +767,7 @@ class DaoController(object):
         widget_list = dialog.findChildren(QTabWidget)
         for widget in widget_list:
             self.translate_widget(context_name, widget)
-         
+
         # Translate title of the form   
         text = self.tr('title', context_name)
         dialog.setWindowTitle(text)
@@ -771,7 +792,7 @@ class DaoController(object):
                         text = self.tr(widget_text, context_name)
                         if text != widget_text:
                             widget.setTabText(i, text)
-
+                    self.translate_tooltip(context_name, widget, i)
             elif type(widget) is QToolBox:
                 num_tabs = widget.count()
                 for i in range(0, num_tabs):
@@ -784,6 +805,7 @@ class DaoController(object):
                         text = self.tr(widget_text, context_name)
                         if text != widget_text:
                             widget.setItemText(i, text)
+                    self.translate_tooltip(context_name, widget.widget(i))
             else:
                 widget_name = widget.objectName()
                 text = self.tr(widget_name, context_name)
@@ -794,7 +816,11 @@ class DaoController(object):
                     text = self.tr(widget_text, context_name)
                     if text != widget_text:
                         widget.setText(text)
-        except:
+                self.translate_tooltip(context_name, widget)
+
+
+        except Exception as e:
+            print(f"{widget_name} --> {type(e).__name__} --> {e}")
             pass
         
         
