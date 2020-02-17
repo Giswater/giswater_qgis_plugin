@@ -6,8 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
+DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(p_result_id character varying,  p_path text)
-RETURNS void AS
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -23,6 +24,8 @@ DECLARE
 	result_id_aux varchar;
 	title_aux varchar;
 	v_pg2csvcat_id integer = 10;
+	v_return json;
+
 
 BEGIN
 
@@ -94,8 +97,15 @@ BEGIN
 		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
-
-RETURN;
+	-- build return
+	select (array_to_json(array_agg(row_to_json(a))))::json 
+	into v_return from
+	(select concat(rpad(csv1,20),' ',rpad(csv2,20),' ', rpad(csv3,20),' ',rpad(csv4,20),' ',rpad(csv5,20),' ',rpad(csv6,20),' ',rpad(csv7,20),' ',
+	rpad(csv8,20),' ',rpad(csv9,20),' ',rpad(csv10,20),' ',rpad(csv11,20),' ',rpad(csv12,20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20)) as text
+	from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user
+	order by id)a;
+	
+RETURN v_return;
         
 END;$BODY$
 LANGUAGE plpgsql VOLATILE

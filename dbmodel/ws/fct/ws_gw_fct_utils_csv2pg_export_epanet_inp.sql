@@ -133,7 +133,7 @@ BEGIN
 	into v_return from
 	(select concat(rpad(csv1,20),' ',rpad(csv2,20),' ', rpad(csv3,20),' ',rpad(csv4,20),' ',rpad(csv5,20),' ',rpad(csv6,20),' ',rpad(csv7,20),' ',
 	rpad(csv8,20),' ',rpad(csv9,20),' ',rpad(csv10,20),' ',rpad(csv11,20),' ',rpad(csv12,20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20)) as text
-	from SCHEMA_NAME.temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user
+	from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user
 	order by id)a;
 	
 RETURN v_return;
