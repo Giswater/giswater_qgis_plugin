@@ -660,23 +660,20 @@ class Go2Epa(ApiParent):
             if self.imports_canceled:
                 break
 
-            sql = f"SELECT gw_fct_pg2epa_main($${{{body}}}$$)::text"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if not row or row[0] is None:
+            complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
+            if not complet_result:
                 self.controller.show_warning("NOT ROW FOR: " + sql)
                 message = "Export failed"
                 self.controller.show_info_box(message)
                 return
-
-            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            steps = f"{counter}/{complet_result[0]['steps']}"
+            steps = f"{counter}/{complet_result['steps']}"
             utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, steps)
             counter += 1
-            print(f"{counter}:{complet_result[0]['steps']}:{complet_result[0]['continue']}")
+            print(f"{counter}:{complet_result['steps']}:{complet_result['continue']}")
             _continue = False
             common_msg = ""
             message = None
-            if str(complet_result[0]['continue']).lower() == 'true':
+            if str(complet_result['continue']).lower() == 'true':
                 _continue = True
 
             if not _continue:
@@ -684,22 +681,15 @@ class Go2Epa(ApiParent):
 
             # Export to inp file
             if export_inp is True:
-                if complet_result[0]['status'] == "Accepted":
-                    self.add_layer.add_temp_layer(self.dlg_go2epa, complet_result[0]['body']['data'], 'INP results', True, True, 1, False)
-                message = complet_result[0]['message']['text']
-
-                # Get values from temp_csv2pg and insert into INP file
-                sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, "
-                       "csv14, csv15, csv16, csv17, csv18, csv19, csv20, csv21, csv22, csv23, csv24, csv25 "
-                       "FROM temp_csv2pg "
-                       "WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
-                rows = self.controller.get_rows(sql, commit=True)
-
-                if rows is None:
-                    self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                if complet_result['status'] == "Accepted":
+                    self.add_layer.add_temp_layer(self.dlg_go2epa, complet_result['body']['data'], 'INP results', True, True, 1, False)
+                message = complet_result['message']['text']
+                
+                # Get values from complet_result['body']['file'] and insert into INP file
+                if 'file' not in complet_result['body']:
                     self.show_widgets(False)
                     return
-                self.insert_into_inp(self.file_inp, rows)
+                self.insert_into_inp(self.file_inp, complet_result['body']['file'])
                 common_msg += "Export INP finished. "
 
             # Execute epa
