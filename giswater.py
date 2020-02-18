@@ -986,35 +986,11 @@ class Giswater(QObject):
     def manage_layers(self):
         """ Get references to project main layers """
 
-        # Initialize variables
-        self.layer_arc = None
-        self.layer_connec = None
-        self.layer_gully = None
-        self.layer_node = None
-
         # Check if we have any layer loaded
         layers = self.controller.get_layers()
 
         if len(layers) == 0:
             return False
-
-        # Iterate over all layers
-        for cur_layer in layers:
-
-            uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
-            if uri_table:
-
-                if 'v_edit_arc' == uri_table:
-                    self.layer_arc = cur_layer
-
-                elif 'v_edit_connec' == uri_table:
-                    self.layer_connec = cur_layer
-
-                elif 'v_edit_gully' == uri_table:
-                    self.layer_gully = cur_layer
-
-                elif 'v_edit_node' == uri_table:
-                    self.layer_node = cur_layer
 
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
