@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>resource_management</class>
+ <widget class="QDialog" name="resource_management">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>543</width>
+    <height>486</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Administrador de Recursos</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="team">
+        <attribute name="title">
+         <string>Equips</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="3" column="0">
+          <widget class="QPushButton" name="btn_team_delete">
+           <property name="text">
+            <string>Borrar</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="btn_team_selector">
+           <property name="text">
+            <string>Selector</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="btn_team_create">
+           <property name="text">
+            <string>Crear</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QComboBox" name="cmb_team"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QTableView" name="tableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="Vehicle">
+        <attribute name="title">
+         <string>Vehicles</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QComboBox" name="cmb_vehicle"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="btn_vehicle_create">
+           <property name="text">
+            <string>Crear</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="btn_vehicle_update">
+           <property name="text">
+            <string>Modificar</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="btn_vehicle_delete">
+           <property name="text">
+            <string>Borrar</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QTableView" name="tableView_2"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_accept">
+       <property name="text">
+        <string>Acceptar</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Cancel·lar</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+  <action name="actionT">
+   <property name="text">
+    <string>t</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>cmb_team</tabstop>
+  <tabstop>btn_team_create</tabstop>
+  <tabstop>btn_team_selector</tabstop>
+  <tabstop>btn_team_delete</tabstop>
+  <tabstop>tableView</tabstop>
+  <tabstop>cmb_vehicle</tabstop>
+  <tabstop>btn_vehicle_create</tabstop>
+  <tabstop>btn_vehicle_update</tabstop>
+  <tabstop>btn_vehicle_delete</tabstop>
+  <tabstop>tableView_2</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -6,6 +6,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
+
+
 try:
     from qgis.core import Qgis
 except ImportError:
@@ -25,7 +27,6 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox
 from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget, QDateEdit, QPushButton
 from qgis.core import QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsRubberBand
-from collections import OrderedDict
 
 import csv
 import os
@@ -42,9 +43,11 @@ from .parent_manage import ParentManage
 from ..ui_manager import AddLot
 from ..ui_manager import Lot_selector
 from ..ui_manager import BasicTable
-from ..ui_manager import VehicleManagement
+from ..ui_manager import LoadManagement
 from ..ui_manager import LotManagement
-from ..ui_manager import UserManagement
+from ..ui_manager import WorkManagement
+from ..ui_manager import ResourcesManagement
+from ..ui_manager import TeamManagement
 
 
 class AddNewLot(ParentManage):
@@ -174,7 +177,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
-        self.dlg_lot.cmb_man_team.clicked.connect(self.manage_team)
+        self.dlg_lot.btn_man_team.clicked.connect(self.manage_team, 'team')
         self.set_lot_headers()
         self.set_active_layer()
 
@@ -289,7 +292,6 @@ class AddNewLot(ParentManage):
     def open_photo(self, qtable):
 
         selected_list = qtable.selectionModel().selectedRows()
-        print(str(selected_list))
 
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -318,7 +320,7 @@ class AddNewLot(ParentManage):
             utils_giswater.set_combo_itemData(cmb, '5', 0)
 
 
-    def manage_team(self):
+    def manage_team(self, manage_type=None):
         """ Open dialog of teams """
 
         self.max_id = self.get_max_id('cat_team')
@@ -332,7 +334,8 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type=manage_type))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table)
@@ -390,11 +393,20 @@ class AddNewLot(ParentManage):
     def save_table(self, dialog, qtable, manage_type=None):
 
         model = qtable.model()
-        print(str(model))
         if model.submitAll():
             # self.close_dialog(dialog)
             if manage_type == 'team':
                 self.populate_cmb_team()
+            elif manage_type == 'team_selector':
+                sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
+                rows = self.controller.get_rows(sql, commit=True)
+                if rows:
+                    utils_giswater.set_item_data(self.dlg_resources_man.cmb_team, rows, 1)
+            elif manage_type == 'vehicle':
+                sql = ("SELECT id, idval FROM ext_cat_vehicle ORDER BY idval")
+                rows = self.controller.get_rows(sql, commit=True)
+                if rows:
+                    utils_giswater.set_item_data(self.dlg_resources_man.cmb_vehicle, rows, 1)
         else:
             print(str(model.lastError().text()))
 
@@ -578,13 +590,14 @@ class AddNewLot(ParentManage):
         headers = self.get_headers(qtable)
         rows = []
         model = qtable.model()
-        for x in range(0, model.rowCount()):
-            row = {}
-            for c in range(0, model.columnCount()):
-                index = model.index(x, c)
-                value = model.data(index)
-                row[headers[c]] = value
-            rows.append(row)
+        if model is not None:
+            for x in range(0, model.rowCount()):
+                row = {}
+                for c in range(0, model.columnCount()):
+                    index = model.index(x, c)
+                    value = model.data(index)
+                    row[headers[c]] = value
+                rows.append(row)
         return rows
 
 
@@ -1085,23 +1098,23 @@ class AddNewLot(ParentManage):
 
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
-
-        sql = ("SELECT * FROM ve_lot_x_"+str(feature_type)+" "
-               "WHERE lot_id ='"+str(lot_id)+"'")
-        rows = self.controller.get_rows(sql, commit=True)
-        self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
-                               isQStandardItemModel=True)
-        if rows is None:
-            return
-        for row in rows:
-            item = []
-            for value in row:
-                if value is not None:
-                    item.append(QStandardItem(str(value)))
-                else:
-                    item.append(QStandardItem(None))
-            if len(row) > 0:
-                standard_model.appendRow(item)
+        if feature_type:
+            sql = ("SELECT * FROM ve_lot_x_"+str(feature_type)+" "
+                   "WHERE lot_id ='"+str(lot_id)+"'")
+            rows = self.controller.get_rows(sql, commit=True)
+            self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
+                                   isQStandardItemModel=True)
+            if rows is None:
+                return
+            for row in rows:
+                item = []
+                for value in row:
+                    if value is not None:
+                        item.append(QStandardItem(str(value)))
+                    else:
+                        item.append(QStandardItem(None))
+                if len(row) > 0:
+                    standard_model.appendRow(item)
 
 
     def set_lot_headers(self):
@@ -1132,6 +1145,7 @@ class AddNewLot(ParentManage):
         index = self.dlg_lot.cmb_ot.currentIndex()
         item = self.list_to_work[index]
 
+        lot['id'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.lot_id, False, False)
         lot['startdate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate, False, False)
         lot['enddate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
         lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0, True)
@@ -1185,12 +1199,16 @@ class AddNewLot(ParentManage):
         status = self.save_visits()
 
         if status:
+            self.iface.mapCanvas().refreshAllLayers()
             self.manage_rejected()
 
 
     def save_relations(self, lot, lot_id):
 
         # Manage relations
+        if not lot['feature_type']:
+            return
+
         sql = ("DELETE FROM om_visit_lot_x_"+str(lot['feature_type'])+" "
                "WHERE lot_id = '"+str(lot_id)+"'; \n")
 
@@ -1388,8 +1406,9 @@ class AddNewLot(ParentManage):
     def get_headers(self, qtable):
 
         headers = []
-        for x in range(0, qtable.model().columnCount()):
-            headers.append(qtable.model().headerData(x, Qt.Horizontal))
+        if qtable.model() is not None:
+            for x in range(0, qtable.model().columnCount()):
+                headers.append(qtable.model().headerData(x, Qt.Horizontal))
         return headers
 
 
@@ -1440,8 +1459,9 @@ class AddNewLot(ParentManage):
             partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
-        self.dlg_lot_man.btn_manage_user.clicked.connect(partial(self.open_user_manage))
-        self.dlg_lot_man.btn_manage_vehicle.clicked.connect(partial(self.open_vehicle_manage))
+        self.dlg_lot_man.btn_work_register.clicked.connect(partial(self.open_work_register))
+        self.dlg_lot_man.btn_manage_load.clicked.connect(partial(self.open_load_manage))
+        self.dlg_lot_man.btn_lot_selector.clicked.connect(partial(self.lot_selector))
 
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
@@ -1456,68 +1476,15 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
 
-    def open_vehicle_manage(self):
+    def open_load_manage(self):
 
-        self.max_id = self.get_max_id('om_team_x_vehicle')
-        self.dlg_vehicle_manager = VehicleManagement()
-        self.load_settings(self.dlg_vehicle_manager)
-        self.dlg_vehicle_manager.setWindowTitle("Vehicle management")
-        self.dlg_vehicle_manager.tbl_loads.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_load_manager = LoadManagement()
+        self.load_settings(self.dlg_load_manager)
+        self.dlg_load_manager.tbl_loads.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Tab 'Loads'
-        self.tbl_load = self.dlg_vehicle_manager.findChild(QTableView, "tbl_loads")
+        self.tbl_load = self.dlg_load_manager.findChild(QTableView, "tbl_loads")
         utils_giswater.set_qtv_config(self.tbl_load)
-
-        self.set_icon(self.dlg_vehicle_manager.btn_open_image, "136b")
-        self.dlg_vehicle_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
-
-        # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        self.fill_table(self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
-        self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'v_om_team_x_vehicle')
-        self.fill_table(self.dlg_vehicle_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
-        self.set_table_columns(self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters')
-        self.dlg_vehicle_manager.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_vehicle_manager.tbl_vehicle))
-        self.dlg_vehicle_manager.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_vehicle_manager))
-        self.dlg_vehicle_manager.btn_accept.clicked.connect(partial(self.save_table, self.dlg_vehicle_manager, self.dlg_vehicle_manager.tbl_vehicle, 'vehicle'))
-        self.dlg_vehicle_manager.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_vehicle_manager.tbl_vehicle, ['{"pos":1,"table":"cat_team"}','{"pos":2,"table":"ext_cat_vehicle"}']))
-        self.dlg_vehicle_manager.rejected.connect(partial(self.save_settings, self.dlg_vehicle_manager))
-        self.dlg_vehicle_manager.cmb_filter_vehicle.currentIndexChanged.connect(partial(self.filter_loads))
-
-
-        self.populate_table_vehicle()
-
-        # Hide columns tbl_loads on load tab
-        self.hide_colums(self.dlg_vehicle_manager.tbl_loads, [0])
-
-        # Open dialog
-        self.open_dialog(self.dlg_vehicle_manager)
-
-
-    def populate_table_vehicle(self):
-
-        # Populate model visit
-        sql = ("SELECT cat_team.id, v_om_team_x_vehicle.team FROM v_om_team_x_vehicle "
-               "JOIN cat_team ON cat_team.idval = v_om_team_x_vehicle.team ORDER BY v_om_team_x_vehicle.id")
-        rows = self.controller.get_rows(sql, commit=True)
-        if rows is None:
-            return
-
-        # Add combo into column team_id
-        sql = ("SELECT id, idval"
-               " FROM cat_team"
-               " ORDER BY id")
-        combo_values = self.controller.get_rows(sql, commit=True)
-
-        if combo_values is None:
-            return
-
-        self.put_combobox(self.dlg_vehicle_manager.tbl_vehicle, rows, 0, 1, combo_values)
-
-        sql = ("SELECT ext_cat_vehicle.id, v_om_team_x_vehicle.vehicle FROM v_om_team_x_vehicle "
-               "JOIN ext_cat_vehicle ON ext_cat_vehicle.idval = v_om_team_x_vehicle.vehicle ORDER BY v_om_team_x_vehicle.id")
-        rows = self.controller.get_rows(sql, commit=True)
-        if rows is None:
-            return
 
         # Add combo into column vehicle_id
         sql = ("SELECT id, idval"
@@ -1526,35 +1493,49 @@ class AddNewLot(ParentManage):
         combo_values = self.controller.get_rows(sql, commit=True)
 
         # Populate cmb_vehicle on tab Loads
-        self.dlg_vehicle_manager.cmb_filter_vehicle.addItem('', '')
-        utils_giswater.set_item_data(self.dlg_vehicle_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
+        self.dlg_load_manager.cmb_filter_vehicle.addItem('', '')
+        utils_giswater.set_item_data(self.dlg_load_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
 
-        if combo_values is None:
-            return
+        self.set_icon(self.dlg_load_manager.btn_open_image, "136b")
+        self.dlg_load_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
-        self.put_combobox(self.dlg_vehicle_manager.tbl_vehicle, rows, 0, 2, combo_values)
+        # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        self.fill_table(self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
+        self.set_table_columns(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters')
+        self.dlg_load_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_load_manager))
+        self.dlg_load_manager.rejected.connect(partial(self.save_settings, self.dlg_load_manager))
+        self.dlg_load_manager.cmb_filter_vehicle.currentIndexChanged.connect(partial(self.filter_loads))
+        self.dlg_load_manager.btn_path.clicked.connect(partial(self.select_path, self.dlg_load_manager, 'txt_path'))
+
+        self.dlg_load_manager.btn_export_load.clicked.connect(partial(self.export_model_to_csv, self.dlg_load_manager, self.tbl_load, 'txt_path', '', 'yyyy-MM-dd hh:mm:ss'))
+
+        # Hide columns tbl_loads on load tab
+        self.hide_colums(self.dlg_load_manager.tbl_loads, [0])
+
+        # Open dialog
+        self.open_dialog(self.dlg_load_manager)
 
 
-    def open_user_manage(self):
+    def open_work_register(self):
 
-        self.dlg_user_manage = UserManagement()
-        self.load_settings(self.dlg_user_manage)
+        self.dlg_work_register = WorkManagement()
+        self.load_settings(self.dlg_work_register)
 
         table_object = 'om_visit_lot_x_user'
-        self.dlg_user_manage.tbl_user.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_work_register.tbl_work.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_object(self.dlg_user_manage.tbl_user, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_user_manage, self.dlg_user_manage.tbl_user, table_object)
+        self.fill_table_object(self.dlg_work_register.tbl_work, self.schema_name + "." + table_object)
+        self.set_table_columns(self.dlg_work_register, self.dlg_work_register.tbl_work, table_object)
 
         # Set filter events
-        self.dlg_user_manage.txt_user_filter.textChanged.connect(self.filter_user)
+        self.dlg_work_register.txt_team_filter.textChanged.connect(self.filter_team)
 
         # Set listeners
-        self.dlg_user_manage.btn_path.clicked.connect(partial(self.select_path, self.dlg_user_manage, 'txt_path'))
-        self.dlg_user_manage.btn_accept.clicked.connect(partial(self.manage_accept, self.dlg_user_manage.tbl_user))
-        self.dlg_user_manage.date_event_from.dateChanged.connect(partial(self.filter_user))
-        self.dlg_user_manage.date_event_to.dateChanged.connect(partial(self.filter_user))
+        self.dlg_work_register.btn_path.clicked.connect(partial(self.select_path, self.dlg_work_register, 'txt_path'))
+        self.dlg_work_register.btn_accept.clicked.connect(partial(self.manage_accept, self.dlg_work_register.tbl_work))
+        self.dlg_work_register.date_event_from.dateChanged.connect(partial(self.filter_team))
+        self.dlg_work_register.date_event_to.dateChanged.connect(partial(self.filter_team))
 
         # Get columns to ignore for tab_relations when export csv
         sql = "SELECT column_id FROM config_client_forms WHERE location_type = 'tbl_user' AND status IS NOT TRUE AND table_id = 'om_visit_lot_x_user'"
@@ -1573,19 +1554,21 @@ class AddNewLot(ParentManage):
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             if row[0]:
-                self.dlg_user_manage.date_event_from.setDate(row[0])
+                self.dlg_work_register.date_event_from.setDate(row[0])
             if row[1]:
-                self.dlg_user_manage.date_event_to.setDate(row[1])
+                self.dlg_work_register.date_event_to.setDate(row[1])
             else:
-                self.dlg_user_manage.date_event_to.setDate(current_date)
+                self.dlg_work_register.date_event_to.setDate(current_date)
 
         # TODO: Disable columns user_id + team_id
 
-        self.dlg_user_manage.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, 'txt_path', result_relation, 'yyyy-MM-dd hh:mm:ss'))
+        self.dlg_work_register.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_work_register,
+                                                                       self.dlg_work_register.tbl_work, 'txt_path',
+                                                                       result_relation, 'dd-MM-yyyy hh:mm:ss'))
 
         # Open form
-        self.dlg_user_manage.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_user_manage.show()
+        self.dlg_work_register.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_work_register.show()
 
 
     def manage_accept(self, widget):
@@ -1596,19 +1579,19 @@ class AddNewLot(ParentManage):
             return
 
         # Close dialog
-        self.close_dialog(self.dlg_user_manage)
+        self.close_dialog(self.dlg_work_register)
 
 
-    def filter_user(self):
+    def filter_team(self):
 
         # Refresh model with selected filter
-        filter = utils_giswater.getWidgetText(self.dlg_user_manage, self.dlg_user_manage.txt_user_filter)
+        filter = utils_giswater.getWidgetText(self.dlg_work_register, self.dlg_work_register.txt_team_filter)
 
         if filter == 'null':
             filter = ''
 
-        visit_start = self.dlg_user_manage.date_event_from.date()
-        visit_end = self.dlg_user_manage.date_event_to.date()
+        visit_start = self.dlg_work_register.date_event_from.date()
+        visit_end = self.dlg_work_register.date_event_to.date()
 
         if visit_start > visit_end:
             message = "Selected date interval is not valid"
@@ -1623,24 +1606,24 @@ class AddNewLot(ParentManage):
         expr_filter = ("(starttime BETWEEN "+str(interval)+" OR starttime IS NULL) "
                        "AND (endtime BETWEEN "+str(interval)+" OR endtime IS NULL)")
 
-        expr_filter += " AND user_id LIKE '%"+str(filter)+"%'"
+        expr_filter += " AND team_id::text LIKE '%"+str(filter)+"%'"
 
-        self.dlg_user_manage.tbl_user.model().setFilter(expr_filter)
-        self.dlg_user_manage.tbl_user.model().select()
+        self.dlg_work_register.tbl_work.model().setFilter(expr_filter)
+        self.dlg_work_register.tbl_work.model().select()
 
 
     def filter_loads(self):
 
         # Refresh model with selected filter
-        filter = utils_giswater.getWidgetText(self.dlg_vehicle_manager, self.dlg_vehicle_manager.cmb_filter_vehicle)
+        filter = utils_giswater.getWidgetText(self.dlg_load_manager, self.dlg_load_manager.cmb_filter_vehicle)
 
         if filter == 'null':
             expr_filter = ''
         else:
             expr_filter = " vehicle = '"+str(filter)+"'"
 
-        self.dlg_vehicle_manager.tbl_loads.model().setFilter(expr_filter)
-        self.dlg_vehicle_manager.tbl_loads.model().select()
+        self.dlg_load_manager.tbl_loads.model().setFilter(expr_filter)
+        self.dlg_load_manager.tbl_loads.model().select()
 
 
     def lot_selector(self):
@@ -1678,6 +1661,13 @@ class AddNewLot(ParentManage):
 
     def populate_lot_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, hide_left, hide_right):
 
+        # Get rows id on table lot manager
+        model = self.dlg_lot_man.tbl_lots.model()
+        data = ['']
+        for row in range(model.rowCount()):
+            index = model.index(row, 0)
+            data.append(str(model.data(index)))
+
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -1686,7 +1676,8 @@ class AddNewLot(ParentManage):
         query_left += "(SELECT "+tableleft+".id FROM "+tableleft+""
         query_left += " RIGHT JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_left += " WHERE cur_user = current_user)"
-        query_left += " AND  "+field_id_left+" > -1 ORDER BY id desc"
+        query_left += " AND id::text = ANY(ARRAY" + str(data) + ")"
+        query_left += " AND "+field_id_left+" > -1 ORDER BY id desc"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
@@ -1698,7 +1689,7 @@ class AddNewLot(ParentManage):
 
         query_right = "SELECT "+tableright+".lot_id, * FROM " + tableleft + ""
         query_right += " JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
-        query_right += " WHERE cur_user = current_user ORDER BY " + tableleft +".id desc"
+        query_right += " WHERE cur_user = current_user AND lot_id::text = ANY(ARRAY" + str(data) + ") ORDER BY " + tableleft +".id desc"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, hide_right)
@@ -2099,3 +2090,241 @@ class AddNewLot(ParentManage):
             else:
                 # Open the image
                 os.startfile(path)
+
+
+    def resources_management(self):
+
+        # Create the dialog
+        self.dlg_resources_man = ResourcesManagement()
+        self.load_settings(self.dlg_resources_man)
+
+        # Populate combos
+        sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
+        rows = self.controller.get_rows(sql, commit=True)
+        if rows:
+            utils_giswater.set_item_data(self.dlg_resources_man.cmb_team, rows, 1)
+
+        sql = ("SELECT id, idval FROM ext_cat_vehicle ORDER BY idval")
+        rows = self.controller.get_rows(sql, commit=True)
+        if rows:
+            utils_giswater.set_item_data(self.dlg_resources_man.cmb_vehicle, rows, 1)
+
+        # Set signals
+        self.dlg_resources_man.btn_team_create.clicked.connect(partial(self.manage_team, 'team_selector'))
+        self.dlg_resources_man.btn_team_selector.clicked.connect(partial(self.open_team_selector))
+        self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_team))
+
+        self.dlg_resources_man.btn_vehicle_create.clicked.connect(partial(self.manage_vehicle, 'vehicle', True))
+        self.dlg_resources_man.btn_vehicle_update.clicked.connect(partial(self.manage_vehicle, 'vehicle', False))
+        self.dlg_resources_man.btn_vehicle_delete.clicked.connect(partial(self.delete_vehicle))
+
+        self.dlg_resources_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_resources_man))
+
+
+        # Open form
+        self.open_dialog(self.dlg_resources_man)
+
+
+    def open_team_selector(self):
+
+        # Create the dialog
+        self.dlg_team_man = TeamManagement()
+        self.load_settings(self.dlg_team_man)
+
+        # Set signals
+        self.dlg_resources_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_team_man))
+
+
+        # Tab Users
+        self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id", [], [],
+                                     "all_user_rows", "selected_user_rows", "btn_user_select", "btn_user_unselect")
+        # Tab Vehciles
+        self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle", [], [],
+                                    "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select", "btn_vehicle_unselect")
+        # Tab Visitclass
+        self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "id", "id", [], [],
+                                    "all_visitclass_rows", "selected_visitclass_rows", "btn_visitclass_select",
+                                    "btn_visitclass_unselect")
+        # Open form
+        self.open_dialog(self.dlg_team_man)
+
+
+    def populate_team_selectors(self, dialog, tableleft, tableright, field_id_left, field_id_right,
+                                hide_left, hide_right, table_all, table_selected, button_select, button_unselect):
+
+        # Get team selected
+        filter_team = utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team")
+
+        # Get widgets
+        btn_select = dialog.findChild(QPushButton, button_select)
+        btn_unselect = dialog.findChild(QPushButton, button_unselect)
+
+        # fill QTableView all_rows
+        tbl_all_rows = dialog.findChild(QTableView, table_all)
+        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        query_left = "SELECT * FROM " + tableleft + " WHERE id NOT IN "
+        query_left += "(SELECT " + tableleft + ".id FROM " + tableleft + ""
+        query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
+        ## TODO:: Enhance this:
+        if tableleft in ("ext_cat_vehicle"):
+            query_left += " WHERE team = '" + str(filter_team) + "')"
+        else:
+            query_left += ")"
+
+        self.fill_table_by_query(tbl_all_rows, query_left)
+        self.hide_colums(tbl_all_rows, hide_left)
+        tbl_all_rows.setColumnWidth(1, 200)
+
+        # fill QTableView selected_rows
+        tbl_selected_rows = dialog.findChild(QTableView, table_selected)
+        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        query_right = "SELECT * FROM " + tableleft + ""
+        query_right += " JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
+        query_right += " WHERE team = '" + str(filter_team) + "'"
+
+        self.fill_table_by_query(tbl_selected_rows, query_right)
+        self.hide_colums(tbl_selected_rows, hide_right)
+        tbl_selected_rows.setColumnWidth(0, 200)
+        # Button select
+        btn_select.clicked.connect(
+            partial(self.multi_rows_team_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright,
+                    field_id_right, query_left, query_right, field_id_right, filter_team))
+
+        # Button unselect
+        btn_unselect.clicked.connect(
+            partial(self.team_unselector, tbl_all_rows, tbl_selected_rows, query_left, query_right,
+                    field_id_right, tableright, tableleft, filter_team))
+
+
+    def multi_rows_team_selector(self, qtable_left, qtable_right, id_ori,
+                            tablename_des, id_des, query_left, query_right, field_id, filter_team):
+        """
+            :param qtable_left: QTableView origin
+            :param qtable_right: QTableView destini
+            :param id_ori: Refers to the id of the source table
+            :param tablename_des: table destini
+            :param id_des: Refers to the id of the target table, on which the query will be made
+            :param query_right:
+            :param query_left:
+            :param field_id:
+        """
+
+        selected_list = qtable_left.selectionModel().selectedRows()
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        id_list = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable_left.model().record(row).value(id_ori)
+            id_list.append(id_)
+        for i in range(0, len(id_list)):
+            # Check if id_list already exists in id_selector
+            sql = ("SELECT DISTINCT(" + id_des + ")"
+                   " FROM " + self.schema_name + "." + tablename_des + ""
+                   " WHERE " + id_des + " = '" + str(id_list[i]) + "' AND team = '" + filter_team + "'")
+            row = self.controller.get_row(sql)
+
+            if row:
+                # if exist - show warning
+                message = "Id already selected"
+                self.controller.show_info_box(message, "Info", parameter=str(id_list[i]))
+            else:
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (" + field_id + ", team) "
+                       " VALUES ('" + str(id_list[i]) + "', '" + filter_team + "')")
+                self.controller.execute_sql(sql)
+
+        # Refresh
+        self.fill_table_by_query(qtable_right, query_right)
+        self.fill_table_by_query(qtable_left, query_left)
+        self.refresh_map_canvas()
+
+
+    def team_unselector(self, qtable_left, qtable_right, query_left, query_right, field_id_right, tableright, tableleft, filter_team):
+
+        selected_list = qtable_right.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        expl_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = str(qtable_right.model().record(row).value(field_id_right))
+            expl_id.append(id_)
+        for i in range(0, len(expl_id)):
+            query_delete = "DELETE FROM " + tableright + ""
+            query_delete += " WHERE " + tableright + "." + field_id_right + "= '" + str(expl_id[i]) + "' "
+            query_delete += " AND team = '" + str(filter_team) + "'"
+
+            self.controller.execute_sql(query_delete)
+
+        # Refresh
+        self.fill_table_by_query(qtable_left, query_left)
+        self.fill_table_by_query(qtable_right, query_right)
+        self.refresh_map_canvas()
+
+
+    def delete_team(self):
+
+        # Get team selected
+        filter_team = utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team")
+        message = "You are trying delete team '" + str(filter_team) + "'. Do you want continue?"
+        answer = self.controller.ask_question(message, "Delete team")
+        if answer:
+            sql = ("DELETE FROM cat_team WHERE idval = '" + str(filter_team) + "'")
+            status = self.controller.execute_sql(sql)
+            if status:
+                msg = "Successful removal."
+                self.controller.show_info_box(msg, "Info")
+                sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
+                rows = self.controller.get_rows(sql, commit=True)
+                if rows:
+                    utils_giswater.set_item_data(self.dlg_resources_man.cmb_team, rows, 1)
+
+
+    def delete_vehicle(self):
+
+        # Get vehicle selected
+        filter_vehicle = utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_vehicle")
+        message = "You are trying delete vehicle '" + str(filter_vehicle) + "'. Do you want continue?"
+        answer = self.controller.ask_question(message, "Delete vehicle")
+        if answer:
+            sql = ("DELETE FROM ext_cat_vehicle WHERE idval = '" + str(filter_vehicle) + "'")
+            status = self.controller.execute_sql(sql)
+            if status:
+                msg = "Successful removal."
+                self.controller.show_info_box(msg, "Info")
+                sql = ("SELECT id, idval FROM ext_cat_vehicle ORDER BY idval")
+                rows = self.controller.get_rows(sql, commit=True)
+                if rows:
+                    utils_giswater.set_item_data(self.dlg_resources_man.cmb_vehicle, rows, 1)
+
+
+    def manage_vehicle(self, manage_type=None, add_vehicle=False):
+        """ Open dialog of teams """
+
+        self.max_id = self.get_max_id('ext_cat_vehicle')
+        self.dlg_basic_table = BasicTable()
+        self.load_settings(self.dlg_basic_table)
+        self.dlg_basic_table.setWindowTitle("Vehicle management")
+        table_name = 'ext_cat_vehicle'
+
+        # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
+        self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_accept.clicked.connect(
+            partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type=manage_type))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
+        self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
+
+        if not add_vehicle:
+            self.dlg_basic_table.btn_add_row.setVisible(False)
+        self.open_dialog(self.dlg_basic_table)

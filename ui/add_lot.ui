@@ -518,7 +518,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="cmb_man_team">
+                <widget class="QPushButton" name="btn_man_team">
                  <property name="text">
                   <string>Gestionar equips</string>
                  </property>
@@ -920,15 +920,15 @@
               </item>
               <item>
                <widget class="QDateEdit" name="date_event_to">
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
                 <property name="date">
                  <date>
                   <year>3000</year>
                   <month>1</month>
                   <day>1</day>
                  </date>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

@@ -22,48 +22,39 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="1" column="6">
-         <widget class="QPushButton" name="btn_manage_user">
+        <item row="2" column="6">
+         <widget class="QPushButton" name="btn_manage_load">
           <property name="text">
-           <string>Gestor d'usuaris</string>
+           <string>Registre de residus</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLineEdit" name="txt_codi_ot">
-          <property name="maximumSize">
-           <size>
-            <width>100</width>
-            <height>16777215</height>
-           </size>
+        <item row="1" column="6">
+         <widget class="QPushButton" name="btn_work_register">
+          <property name="text">
+           <string>Registre de treballs</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="txt_address"/>
+        <item row="1" column="4">
+         <widget class="QCheckBox" name="chk_assignacio">
+          <property name="text">
+           <string>Feines pendents d'assignació a OT</string>
+          </property>
+         </widget>
         </item>
-        <item row="1" column="5">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Adreça:</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QComboBox" name="cmb_estat"/>
         </item>
         <item row="1" column="1">
          <widget class="QComboBox" name="cmb_actuacio"/>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tipus d'actuació:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-         </widget>
         </item>
         <item row="0" column="3">
          <widget class="QLabel" name="label_3">
@@ -79,27 +70,43 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4">
-         <widget class="QCheckBox" name="chk_assignacio">
-          <property name="text">
-           <string>Feines pendents d'assignació a OT</string>
+        <item row="1" column="5">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLineEdit" name="txt_codi_ot">
+          <property name="maximumSize">
+           <size>
+            <width>100</width>
+            <height>16777215</height>
+           </size>
           </property>
          </widget>
         </item>
-        <item row="1" column="3">
-         <widget class="QComboBox" name="cmb_estat"/>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="txt_address"/>
         </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_2">
+        <item row="0" column="1">
+         <widget class="QLabel" name="label">
           <property name="text">
-           <string>Adreça:</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tipus d'actuació:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="6">
-         <widget class="QPushButton" name="btn_manage_vehicle">
+        <item row="3" column="6">
+         <widget class="QPushButton" name="btn_lot_selector">
           <property name="text">
-           <string>Gestor de vehicles</string>
+           <string>Selector de lots</string>
           </property>
          </widget>
         </item>
@@ -141,15 +148,15 @@
           </item>
           <item row="1" column="0">
            <widget class="QDateEdit" name="date_event_from">
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2016</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -186,15 +193,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2017</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

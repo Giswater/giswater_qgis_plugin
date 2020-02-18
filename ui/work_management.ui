@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>user_manager</class>
- <widget class="QMainWindow" name="user_manager">
+ <class>work_manager</class>
+ <widget class="QMainWindow" name="work_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
+    <width>578</width>
     <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>User Management</string>
+   <string>Work Management</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
@@ -36,7 +36,7 @@
      </spacer>
     </item>
     <item row="2" column="0" colspan="2">
-     <widget class="QTableView" name="tbl_user">
+     <widget class="QTableView" name="tbl_work">
       <property name="sortingEnabled">
        <bool>true</bool>
       </property>
@@ -45,7 +45,11 @@
     <item row="1" column="0" colspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout_24">
       <item>
-       <widget class="QLineEdit" name="txt_path"/>
+       <widget class="QLineEdit" name="txt_path">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btn_path">
@@ -70,12 +74,12 @@
         <item>
          <widget class="QLabel" name="lbl_user_filter">
           <property name="text">
-           <string>Usuari:</string>
+           <string>Equip:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="txt_user_filter">
+         <widget class="QLineEdit" name="txt_team_filter">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -115,15 +119,15 @@
         </item>
         <item>
          <widget class="QDateEdit" name="date_event_to">
-          <property name="calendarPopup">
-           <bool>true</bool>
-          </property>
           <property name="date">
            <date>
             <year>3000</year>
             <month>1</month>
             <day>1</day>
            </date>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
