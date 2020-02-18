@@ -2142,7 +2142,7 @@ class AddNewLot(ParentManage):
         self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle", [], [],
                                     "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select", "btn_vehicle_unselect")
         # Tab Visitclass
-        self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "id", "id", [], [],
+        self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "idval", "visitclass", [], [],
                                     "all_visitclass_rows", "selected_visitclass_rows", "btn_visitclass_select",
                                     "btn_visitclass_unselect")
         # Open form
