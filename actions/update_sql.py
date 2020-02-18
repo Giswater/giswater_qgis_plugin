@@ -106,7 +106,7 @@ class UpdateSQL(ApiParent):
 
 
     def init_show_database(self):
-        """ Inizialitation code of the form (to be executed only once) """
+        """ Initialization code of the form (to be executed only once) """
 
         # Get SQL folder and check if exists
         folder_name = os.path.dirname(os.path.abspath(__file__))
@@ -205,7 +205,7 @@ class UpdateSQL(ApiParent):
 
 
     def set_signals(self):
-        """ Set signals. Function has to be executed only once (during form inizialitation) """
+        """ Set signals. Function has to be executed only once (during form initialization) """
 
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
         self.dlg_readsql.btn_task_example.clicked.connect(partial(self.task_example))

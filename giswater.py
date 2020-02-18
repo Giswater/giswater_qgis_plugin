@@ -870,9 +870,6 @@ class Giswater(QObject):
         # Set objects for map tools classes
         self.manage_map_tools()
 
-        # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
-        self.manage_custom_forms()
-
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")
 
@@ -897,7 +894,6 @@ class Giswater(QObject):
 
         # Set config layer fields when user add new layer into the TOC
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
-        # QgsProject.instance().legendLayersAdded.connect(self.add_layers_button)
 
         # Put add layers button into toc
         self.add_layers_button()
@@ -951,7 +947,6 @@ class Giswater(QObject):
                    f"   WHERE table_schema = '{schema_name}')"
                    f" ORDER BY child_layer")
 
-
             child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
             child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
@@ -977,6 +972,7 @@ class Giswater(QObject):
 
 
     def get_new_layers_name(self, layers_list):
+
         layers_name = []
         for layer in layers_list:
             layer_source = self.controller.get_layer_source(layer)
@@ -993,7 +989,6 @@ class Giswater(QObject):
         # Initialize variables
         self.layer_arc = None
         self.layer_connec = None
-        self.layer_dimensions = None
         self.layer_gully = None
         self.layer_node = None
 
@@ -1014,9 +1009,6 @@ class Giswater(QObject):
 
                 elif 'v_edit_connec' == uri_table:
                     self.layer_connec = cur_layer
-
-                elif 'v_edit_dimensions' == uri_table:
-                    self.layer_dimensions = cur_layer
 
                 elif 'v_edit_gully' == uri_table:
                     self.layer_gully = cur_layer
@@ -1057,46 +1049,6 @@ class Giswater(QObject):
         elif snapping_type == 2:
             snapping_type = QgsPointLocator.All
         QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
-
-
-    def manage_custom_forms(self):
-        """ Set layer custom UI form and init function """
-
-        # Set custom for layer dimensions
-        self.set_layer_custom_form_dimensions(self.layer_dimensions)
-
-
-    def set_layer_custom_form_dimensions(self, layer):
-
-        if layer is None:
-            return
-
-        name_ui = 'dimensions.ui'
-        name_init = 'dimensions.py'
-        name_function = 'formOpen'
-        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, 'init', name_init)
-        layer.editFormConfig().setUiForm(file_ui)
-        layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(file_init)
-        layer.editFormConfig().setInitFunction(name_function)
-
-        if self.wsoftware == 'ws':
-            fieldname_node = "depth"
-            fieldname_connec = "depth"
-        elif self.wsoftware == 'ud':
-            fieldname_node = "ymax"
-            fieldname_connec = "connec_depth"
-
-        if self.layer_node:
-            display_field = 'depth : [% "' + fieldname_node + '" %]'
-            self.layer_node.setMapTipTemplate(display_field)
-            self.layer_node.setDisplayExpression(display_field)
-
-        if self.layer_connec:
-            display_field = 'depth : [% "' + fieldname_connec + '" %]'
-            self.layer_connec.setMapTipTemplate(display_field)
-            self.layer_connec.setDisplayExpression(display_field)
 
 
     def manage_map_tools(self):
