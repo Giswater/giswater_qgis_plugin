@@ -107,5 +107,12 @@ class Logger(object):
         self.log(msg, logging.ERROR, stack_level + stack_level_increase + 1)
         if sum_error:
             self.num_errors += 1
+
+
+    def critical(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
+        """ Logger message into logger file with level CRITICAL (50) """
+        self.log(msg, logging.CRITICAL, stack_level + stack_level_increase + 1)
+        if sum_error:
+            self.num_errors+= 1
         
                 
