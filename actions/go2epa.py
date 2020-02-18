@@ -459,23 +459,9 @@ class Go2Epa(ApiParent):
         for row in all_rows:
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
-            line = ""
-            for x in range(0, len(row)):
-                if row[x] is not None:
-                    line += str(row[x])
-                    if len(row[x]) < 4:
-                        line += "\t\t\t\t\t"
-                    elif len(row[x]) < 8:
-                        line += "\t\t\t\t"
-                    elif len(row[x]) < 12:
-                        line += "\t\t\t"
-                    elif len(row[x]) < 16:
-                        line += "\t\t"
-                    elif len(row[x]) < 20:
-                        line += "\t"
-
-            line = line.rstrip() + "\n"
-            file1.write(line)
+            if 'text' in row and row['text'] is not None:
+                line = row['text'].rstrip() + "\n"
+                file1.write(line)
 
         file1.close()
         del file1
