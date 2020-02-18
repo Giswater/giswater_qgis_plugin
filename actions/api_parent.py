@@ -1732,12 +1732,10 @@ class ApiParent(ParentAction):
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
         extras = f'"selector_type":{selector_type}'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_getselectors($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
-        if not row:
-            return
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        for form_tab in complet_result[0]['body']['form']['formTabs']:
+        complet_result = self.controller.get_json('gw_api_getselectors', body, commit=True, log_sql=True)
+        if not complet_result: return False
+
+        for form_tab in complet_result['body']['form']['formTabs']:
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(form_tab['tabName'])
@@ -1776,8 +1774,7 @@ class ApiParent(ParentAction):
         extras += f'"result_name":"{widget.objectName()}", '
         extras += f'"result_value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_setselectors($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        complet_result = self.controller.get_json('gw_api_setselectors', body, log_sql=True, commit=True)
+        if not complet_result: return False
         for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
             self.controller.indexing_spatial_layer(layer_name)
