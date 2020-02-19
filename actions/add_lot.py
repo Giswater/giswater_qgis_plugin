@@ -177,7 +177,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
-        self.dlg_lot.btn_man_team.clicked.connect(self.manage_team, 'team')
+        self.dlg_lot.btn_man_team.clicked.connect(partial(self.manage_team, 'team'))
         self.set_lot_headers()
         self.set_active_layer()
 
