@@ -88,11 +88,9 @@ BEGIN
 	
 						OR (node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
 						
-						OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
-						
+						OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))	
 					UNION
-					
-					SELECT json_array_elements_text((config->>''inletArc'')::json) as arc_id, true as closed FROM ws.anl_mincut_inlet_x_exploitation	
+					SELECT json_array_elements_text((config->>''''inletArc'''')::json) as arc_id, true as closed FROM ws.anl_mincut_inlet_x_exploitation	
 					)a ON a.arc_id=v_edit_arc.arc_id
 				WHERE node_1 is not null and node_2 is not null'','||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
 

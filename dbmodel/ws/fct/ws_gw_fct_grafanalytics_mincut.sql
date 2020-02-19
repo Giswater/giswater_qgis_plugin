@@ -71,11 +71,16 @@ BEGIN
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND proposed = TRUE
 		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
 	END IF;
-	-- setting on the graf matrix closed valves
+	-- setting the graf matrix with closed valves
 	UPDATE temp_anlgraf SET flag=1 
 	FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE 
 	AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
-				
+	
+	-- setting the graf matrix with tanks
+	UPDATE temp_anlgraf SET flag=1 
+	FROM anl_mincut_inlet_x_exploitation 
+	WHERE (temp_anlgraf.node_1 = anl_mincut_inlet_x_exploitation.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_inlet_x_exploitation.node_id::integer);
+
 	-- reset water flag
 	UPDATE temp_anlgraf SET water=0;
 	
