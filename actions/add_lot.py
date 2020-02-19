@@ -1453,7 +1453,7 @@ class AddNewLot(ParentManage):
         # Set signals
         self.dlg_lot_man.btn_path.clicked.connect(partial(self.select_path, self.dlg_lot_man, 'txt_path'))
         self.dlg_lot_man.btn_export.clicked.connect(
-            partial(self.export_model_to_csv, self.dlg_lot_man, 'txt_path', self.dlg_lot_man.tbl_lots, '',
+            partial(self.export_model_to_csv, self.dlg_lot_man, self.dlg_lot_man.tbl_lots, 'txt_path', '',
                     self.lot_date_format))
         self.dlg_lot_man.tbl_lots.doubleClicked.connect(
             partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
