@@ -2169,11 +2169,7 @@ class AddNewLot(ParentManage):
         query_left = "SELECT * FROM " + tableleft + " WHERE id NOT IN "
         query_left += "(SELECT " + tableleft + ".id FROM " + tableleft + ""
         query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
-        ## TODO:: Enhance this:
-        if tableleft in ("ext_cat_vehicle"):
-            query_left += " WHERE team = '" + str(filter_team) + "')"
-        else:
-            query_left += ")"
+        query_left += " WHERE team = '" + str(filter_team) + "')"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
