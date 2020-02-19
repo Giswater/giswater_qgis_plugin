@@ -1973,7 +1973,7 @@ class AddNewLot(ParentManage):
         if actuacio != '' and actuacio != -1:
             expr_filter += " AND \"Tipus actuacio\" ILIKE '%"+str(actuacio)+"%' "
         if adreca != '':
-            expr_filter += " AND adreca ILIKE '%"+str(adreca)+"%' "
+            expr_filter += " AND \"Carrer\" ILIKE '%"+str(adreca)+"%' "
         if status != '':
             expr_filter += " AND \"Estat\"::TEXT ILIKE '%"+str(status)+"%'"
         if assignat:
