@@ -1392,6 +1392,8 @@ class Giswater(QObject):
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
             complet_result = self.controller.get_json('gw_api_getinfofromid', body)
+            if not complet_result: continue
+            
             for field in complet_result['body']['data']['fields']:
                 _values = {}
 
