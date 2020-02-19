@@ -273,7 +273,9 @@ class TmBasic(TmParentAction):
         if dialog.txt_campaign.text() != '':
             status = self.get_campaing_id(dialog)
             if not status: return None
-
+            sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
+            sql += f"INSERT INTO selector_planning VALUES ('{status}', current_user);"
+            self.controller.execute_sql(sql, commit=True, log_sql=True)
             if utils_giswater.isChecked(dialog, dialog.chk_campaign) and utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
                 self.selected_camp = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0)
                 sql = (f"SELECT DISTINCT(campaign_id) FROM planning"
@@ -679,6 +681,10 @@ class TmBasic(TmParentAction):
             message = "No hi ha cap any planificat"
             self.controller.show_warning(message)
             return
+        
+        sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
+        sql += f"INSERT INTO selector_planning VALUES ('{self.planned_camp_id}', current_user);"
+        self.controller.execute_sql(sql, commit=True, log_sql=True)
 
         self.controller.log_info(str(self.planned_camp_id))
         self.close_dialog(dialog)
