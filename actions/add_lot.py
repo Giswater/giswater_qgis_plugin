@@ -2118,7 +2118,7 @@ class AddNewLot(ParentManage):
         self.dlg_resources_man.btn_vehicle_update.clicked.connect(partial(self.manage_vehicle, 'vehicle', False))
         self.dlg_resources_man.btn_vehicle_delete.clicked.connect(partial(self.delete_vehicle))
 
-        self.dlg_resources_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_resources_man))
+        self.dlg_resources_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_resources_man))
 
 
         # Open form
@@ -2132,7 +2132,7 @@ class AddNewLot(ParentManage):
         self.load_settings(self.dlg_team_man)
 
         # Set signals
-        self.dlg_resources_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_team_man))
+        self.dlg_team_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_team_man))
 
 
         # Tab Users

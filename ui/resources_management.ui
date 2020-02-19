@@ -51,7 +51,7 @@
           <widget class="QComboBox" name="cmb_team"/>
          </item>
          <item row="4" column="0">
-          <widget class="QTableView" name="tableView"/>
+          <widget class="QTableView" name="tbl_view_team"/>
          </item>
         </layout>
        </widget>
@@ -85,7 +85,7 @@
           </widget>
          </item>
          <item row="4" column="0">
-          <widget class="QTableView" name="tableView_2"/>
+          <widget class="QTableView" name="tbl_view_vehicle"/>
          </item>
         </layout>
        </widget>
@@ -109,16 +109,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_accept">
+      <widget class="QPushButton" name="btn_close">
        <property name="text">
-        <string>Acceptar</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_cancel">
-       <property name="text">
-        <string>Cancel·lar</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>
@@ -137,14 +130,13 @@
   <tabstop>btn_team_create</tabstop>
   <tabstop>btn_team_selector</tabstop>
   <tabstop>btn_team_delete</tabstop>
-  <tabstop>tableView</tabstop>
+  <tabstop>tbl_view_team</tabstop>
   <tabstop>cmb_vehicle</tabstop>
   <tabstop>btn_vehicle_create</tabstop>
   <tabstop>btn_vehicle_update</tabstop>
   <tabstop>btn_vehicle_delete</tabstop>
-  <tabstop>tableView_2</tabstop>
-  <tabstop>btn_accept</tabstop>
-  <tabstop>btn_cancel</tabstop>
+  <tabstop>tbl_view_vehicle</tabstop>
+  <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
  <connections/>
