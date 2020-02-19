@@ -2155,6 +2155,9 @@ class AddNewLot(ParentManage):
         # Get team selected
         filter_team = utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team")
 
+        # Set window title
+        dialog.setWindowTitle("Administrador d'equips - " + str(filter_team))
+
         # Get widgets
         btn_select = dialog.findChild(QPushButton, button_select)
         btn_unselect = dialog.findChild(QPushButton, button_unselect)
