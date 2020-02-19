@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --17/02/2020
-CREATE INDEX IF NOT EXISTS link_feature_id ON ws_sample.link  USING btree (feature_id COLLATE pg_catalog."default");
+CREATE INDEX IF NOT EXISTS link_feature_id ON link  USING btree (feature_id COLLATE pg_catalog."default");
