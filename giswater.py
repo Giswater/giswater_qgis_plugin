@@ -1391,28 +1391,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
-            row = self.controller.get_row(sql, commit=True)
-            if not row:
-                self.controller.show_message("NOT ROW FOR: " + sql, 2)
-                continue
-            complet_result = row[0]
-            # When info is nothing
-            if 'results' in complet_result:
-                if complet_result['results'] == 0:
-                    self.controller.show_message(complet_result['message']['text'], 1)
-                    continue
-
-            if 'status' in complet_result and complet_result['status'] == 'Failed':
-                try:
-                    msg_failed += f"<b>Error: </b>{complet_result['SQLERR']}<br>"
-                    msg_failed += f"<b>Context: </b>{complet_result['SQLCONTEXT']} <br><br>"
-                except KeyError as e:
-                    msg_key += f"<b>Key: </b>{e}<br>"
-                    msg_key += f"<b>Python file: </b>{__name__} <br>"
-                    msg_key += f"<b>Python function: </b>{self.set_layer_config.__name__} <br><br>"
-                continue
-
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body)
             for field in complet_result['body']['data']['fields']:
                 _values = {}
 
