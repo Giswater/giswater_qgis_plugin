@@ -95,7 +95,7 @@ BEGIN
 		-- drop deprecated tables
 		FOR v_tablename IN SELECT table_name FROM information_schema.tables WHERE table_schema=v_schemaname and substring(table_name,1 , 1) = '_' 
 		LOOP
-			EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name;
+			EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
 		END LOOP;
 		
 		-- drop deprecated columns
