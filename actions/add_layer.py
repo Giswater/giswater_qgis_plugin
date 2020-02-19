@@ -162,7 +162,6 @@ class AddLayer(object):
                 if counter > 0:
                     counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
-                    geometry_type = "MultiLineString"
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                     # TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
