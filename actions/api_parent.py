@@ -1025,7 +1025,7 @@ class ApiParent(ParentAction):
         # wait to simulate a flashing effect
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
-
+        return rb
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points
@@ -1182,8 +1182,12 @@ class ApiParent(ParentAction):
 
         return widget
 
+    def manage_close_interpolate(self):
+        self.save_settings(self.dlg_binfo)
+        self.remove_interpolate_rb()
 
     def activate_snapping(self, complet_result, ep):
+        self.rb_interpolate = []
         self.interpolate_result = None
         self.resetRubberbands()
         self.dlg_binfo = BasicInfo()
@@ -1269,12 +1273,14 @@ class ApiParent(ParentAction):
                 message = "Selected node"
                 if self.node1 is None:
                     self.node1 = str(element_id)                    
-                    self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    self.rb_interpolate.append(rb)
                     self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    self.rb_interpolate.append(rb)
                     self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
 
@@ -1323,11 +1329,8 @@ class ApiParent(ParentAction):
 
     def remove_interpolate_rb(self):
         # Remove the circumferences made by the interpolate
-        rubber_bands = [i for i in self.iface.mapCanvas().scene().items() if issubclass(type(i), QgsRubberBand)]
-        for rb in rubber_bands:
-            if rb in self.iface.mapCanvas().scene().items() and rb != self.rubber_point:
-                self.iface.mapCanvas().scene().removeItem(rb)
-
+        for rb in self.rb_interpolate:
+            self.iface.mapCanvas().scene().removeItem(rb)
 
 
     def mouse_move(self, point):
