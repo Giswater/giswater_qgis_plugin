@@ -86,6 +86,7 @@ v_geometrylog boolean;
 v_advancedsettings text;
 v_advancedsettingsval text;
 v_curvedefault text;
+v_options json;
 
 BEGIN
 
@@ -127,6 +128,14 @@ BEGIN
 	DELETE FROM anl_arc WHERE fprocesscat_id IN (3, 14, 39) AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id IN (7, 14, 64, 65, 66, 67, 70, 71, 98) AND cur_user=current_user;
 
+
+	-- adding parameters to the answer
+	SELECT row_to_json(row) FROM (SELECT inp_options_interval_from, inp_options_interval_to
+			FROM crosstab('SELECT cur_user, parameter, value
+			FROM config_param_user WHERE parameter IN (''inp_options_interval_from'',''inp_options_interval_to'') 
+			AND cur_user = current_user'::text) as ct(cur_user varchar(50), inp_options_interval_from text, inp_options_interval_to text))row
+	INTO v_options;		
+			
 
 	-----------------------------------
 	RAISE NOTICE '001 - STARTING PROCESS';
@@ -1459,6 +1468,7 @@ BEGIN
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--    Control nulls
+	v_options := COALESCE(v_options, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
 	IF v_geometrylog THEN
@@ -1492,7 +1502,8 @@ BEGIN
 		--  Return
 		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}'||
-				',"data":{ "info":'||v_result_info||','||
+				',"data":{"options":'||v_options||','||
+					'"info":'||v_result_info||','||
 					'"point":'||v_result_point||','||
 					'"line":'||v_result_line||','||
 					'"polygon":'||v_result_polygon||','||
@@ -1504,7 +1515,8 @@ BEGIN
 		--  Return
 		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}'||
-				',"data":{ "info":'||v_result_info||','||
+				',"data":{"options":'||v_options||','||
+					'"info":'||v_result_info||','||
 					'"setVisibleLayers":[] }'||
 				'}'||
 			'}')::json;
