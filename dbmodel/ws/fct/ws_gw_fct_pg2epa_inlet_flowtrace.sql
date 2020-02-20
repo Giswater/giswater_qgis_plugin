@@ -48,9 +48,9 @@ BEGIN
 	select  arc.arc_id, case when node_2 is null then '00000' else node_2 end, current_user, null, case when node_1 is null then '00000' else node_1 end, null, 0, 0
 	from rpt_inp_arc arc
 	WHERE arc.result_id=p_result_id
-	);
+	) ON CONFLICT (arc_id, node_id, user_name) DO NOTHING;
 	
-	-- Delete from the graf table all that roSCHEMA_NAME that only exists one time (it means that arc don't have the correct topology)
+	-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
 	DELETE FROM anl_mincut_arc_x_node WHERE user_name=current_user AND arc_id IN 
 	(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM anl_mincut_arc_x_node GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 

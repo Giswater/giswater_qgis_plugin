@@ -87,7 +87,7 @@ BEGIN
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 		
 	-- Calling for the export function
-	SELECT gw_fct_utils_csv2pg_export_epanet_inp(v_result, null) INTO v_file;
+	SELECT gw_fct_utils_csv2pg_export_swmm_inp(v_result, null) INTO v_file;
 	
 	-- manage return message
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
