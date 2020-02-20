@@ -26,32 +26,46 @@
          <string>Equips</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="3" column="0">
-          <widget class="QPushButton" name="btn_team_delete">
-           <property name="text">
-            <string>Borrar</string>
-           </property>
-          </widget>
+         <item row="5" column="0">
+          <widget class="QTableView" name="tbl_view_team"/>
          </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="btn_team_selector">
-           <property name="text">
-            <string>Selector</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
+         <item row="0" column="0">
           <widget class="QPushButton" name="btn_team_create">
            <property name="text">
             <string>Crear</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QComboBox" name="cmb_team"/>
-         </item>
-         <item row="4" column="0">
-          <widget class="QTableView" name="tbl_view_team"/>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Gestió:</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btn_team_selector">
+              <property name="text">
+               <string>Selector</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QComboBox" name="cmb_team"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QPushButton" name="btn_team_delete">
+              <property name="text">
+               <string>Borrar</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+           <zorder>cmb_team</zorder>
+           <zorder>cmb_team</zorder>
+           <zorder>cmb_team</zorder>
+           <zorder>btn_team_selector</zorder>
+           <zorder>btn_team_delete</zorder>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -60,10 +74,10 @@
          <string>Vehicles</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <widget class="QComboBox" name="cmb_vehicle"/>
+         <item row="5" column="0">
+          <widget class="QTableView" name="tbl_view_vehicle"/>
          </item>
-         <item row="1" column="0">
+         <item row="0" column="0">
           <widget class="QPushButton" name="btn_vehicle_create">
            <property name="text">
             <string>Crear</string>
@@ -71,21 +85,30 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QPushButton" name="btn_vehicle_update">
-           <property name="text">
-            <string>Modificar</string>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>Gestió:</string>
            </property>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="1" column="0">
+             <widget class="QPushButton" name="btn_vehicle_update">
+              <property name="text">
+               <string>Modificar</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QComboBox" name="cmb_vehicle"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QPushButton" name="btn_vehicle_delete">
+              <property name="text">
+               <string>Borrar</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QPushButton" name="btn_vehicle_delete">
-           <property name="text">
-            <string>Borrar</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QTableView" name="tbl_view_vehicle"/>
          </item>
         </layout>
        </widget>
@@ -126,15 +149,7 @@
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>cmb_team</tabstop>
-  <tabstop>btn_team_create</tabstop>
-  <tabstop>btn_team_selector</tabstop>
-  <tabstop>btn_team_delete</tabstop>
   <tabstop>tbl_view_team</tabstop>
-  <tabstop>cmb_vehicle</tabstop>
-  <tabstop>btn_vehicle_create</tabstop>
-  <tabstop>btn_vehicle_update</tabstop>
-  <tabstop>btn_vehicle_delete</tabstop>
   <tabstop>tbl_view_vehicle</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>

@@ -177,7 +177,6 @@ class AddNewLot(ParentManage):
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
-        self.dlg_lot.btn_man_team.clicked.connect(partial(self.manage_team, 'team'))
         self.set_lot_headers()
         self.set_active_layer()
 
@@ -320,7 +319,7 @@ class AddNewLot(ParentManage):
             utils_giswater.set_combo_itemData(cmb, '5', 0)
 
 
-    def manage_team(self, manage_type=None):
+    def manage_team(self):
         """ Open dialog of teams """
 
         self.max_id = self.get_max_id('cat_team')
@@ -334,7 +333,7 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type=manage_type))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type='team_selector'))
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
@@ -394,10 +393,7 @@ class AddNewLot(ParentManage):
 
         model = qtable.model()
         if model.submitAll():
-            # self.close_dialog(dialog)
-            if manage_type == 'team':
-                self.populate_cmb_team()
-            elif manage_type == 'team_selector':
+            if manage_type == 'team_selector':
                 sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
                 rows = self.controller.get_rows(sql, commit=True)
                 if rows:
@@ -1426,6 +1422,10 @@ class AddNewLot(ParentManage):
             rows.insert(0, ['', ''])
             utils_giswater.set_item_data(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
 
+        # Populate combo date type
+        rows = [['Real', 'Real'],['Planificada', 'Planificada']]
+        utils_giswater.set_item_data(self.dlg_lot_man.cmb_date_filter_type, rows, 1, sort_combo=False)
+
         table_object = "v_ui_om_visit_lot"
 
         # set timeStart and timeEnd as the min/max dave values get from model
@@ -1471,8 +1471,10 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.chk_assignacio.stateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_to.dateChanged.connect(self.filter_lot)
+        self.dlg_lot_man.cmb_date_filter_type.currentIndexChanged.connect(self.filter_lot)
 
         # Open form
+        self.filter_lot()
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
 
@@ -1736,9 +1738,9 @@ class AddNewLot(ParentManage):
                 " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
                 " WHERE cur_user = current_user) AND LOWER(id::text) LIKE '%" + str(filter_id) + "%'"
                 " AND LOWER("+'"Estat"'+"::text) LIKE '%" + str(filter_status) + "%'"
-                " AND (LOWER("+'"Nom actuacio"'+"::text) LIKE '%" + str(filter_wotype) + "%'")
+                " AND (LOWER("+'"Tipus actuacio"'+"::text) LIKE '%" + str(filter_wotype) + "%'")
         if filter_wotype in (None, ''):
-            sql += " OR LOWER("+'"Nom actuacio"'+"::text) IS NULL)"
+            sql += " OR LOWER("+'"Tipus actuacio"'+"::text) IS NULL)"
         else:
             sql += ")"
         self.fill_table_by_query(qtable, sql)
@@ -1953,6 +1955,16 @@ class AddNewLot(ParentManage):
         status = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_estat, 1, add_quote=True)
         assignat = utils_giswater.isChecked(self.dlg_lot_man, self.dlg_lot_man.chk_assignacio)
 
+        # Get date type
+        date_type = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type)
+        if date_type == 'Real':
+            start_filter_name = 'Data inici'
+            end_filter_name = 'Data fi'
+        else:
+            start_filter_name = 'Data inici planificada'
+            end_filter_name = 'Data final planificada'
+
+
         visit_start = self.dlg_lot_man.date_event_from.date()
         visit_end = self.dlg_lot_man.date_event_to.date()
 
@@ -1966,8 +1978,10 @@ class AddNewLot(ParentManage):
         format_high = self.lot_date_format + ' 23:59:59.999'
         interval = "'"+str(visit_start.toString(format_low))+"'::timestamp AND '"+str(visit_end.toString(format_high))+"'::timestamp"
 
-        expr_filter = ("(\"Data inici planificada\" BETWEEN "+str(interval)+" OR \"Data inici planificada\" IS NULL) "
-                       "AND (\"Data final planificada\" BETWEEN "+str(interval)+" OR \"Data final planificada\" IS NULL)")
+        # expr_filter = ("(\"Data inici planificada\" BETWEEN "+str(interval)+" OR \"Data inici planificada\" IS NULL) "
+        #                "AND (\"Data final planificada\" BETWEEN "+str(interval)+" OR \"Data final planificada\" IS NULL)")
+        expr_filter = ("(\"" + str(start_filter_name) + "\" BETWEEN " + str(interval) + ") "
+                       "AND (\"" + str(end_filter_name) + "\" BETWEEN " + str(interval) + ")")
         if serie != 'null':
             expr_filter += " AND \"Serie\" ILIKE '%"+str(serie)+"%'"
         if actuacio != '' and actuacio != -1:
@@ -2110,16 +2124,35 @@ class AddNewLot(ParentManage):
             utils_giswater.set_item_data(self.dlg_resources_man.cmb_vehicle, rows, 1)
 
         # Set signals
-        self.dlg_resources_man.btn_team_create.clicked.connect(partial(self.manage_team, 'team_selector'))
+        self.dlg_resources_man.btn_team_create.clicked.connect(partial(self.manage_team))
         self.dlg_resources_man.btn_team_selector.clicked.connect(partial(self.open_team_selector))
         self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_team))
 
-        self.dlg_resources_man.btn_vehicle_create.clicked.connect(partial(self.manage_vehicle, 'vehicle', True))
-        self.dlg_resources_man.btn_vehicle_update.clicked.connect(partial(self.manage_vehicle, 'vehicle', False))
+        self.dlg_resources_man.btn_vehicle_create.clicked.connect(partial(self.manage_vehicle, True))
+        self.dlg_resources_man.btn_vehicle_update.clicked.connect(partial(self.manage_vehicle, False))
         self.dlg_resources_man.btn_vehicle_delete.clicked.connect(partial(self.delete_vehicle))
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_resources_man))
 
+        # # Populate table view team
+        # self.dlg_resources_man.tbl_view_team.setSelectionBehavior(QAbstractItemView.SelectRows)
+        #
+        # self.qtable_team_query = ("SELECT team, user_name, vehicle, visitclass FROM v_om_user_x_team"
+        #                           " JOIN v_om_team_x_vehicle USING (team)"
+        #                           " JOIN v_om_team_x_visitclass USING (team) WHERE team = "
+        #                           "'" + utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team") + "'")
+        #
+        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_team, self.qtable_team_query)
+        # self.dlg_resources_man.tbl_view_team.setColumnWidth(1, 200)
+        #
+        # # Populate table view vehicle
+        # self.dlg_resources_man.tbl_view_vehicle.setSelectionBehavior(QAbstractItemView.SelectRows)
+        #
+        # self.qtable_vehicle_query = ("SELECT * FROM ext_cat_vehicle "
+        #                     " WHERE idval = '" + utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team") + "'")
+        #
+        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_vehicle, self.qtable_vehicle_query)
+        # self.dlg_resources_man.tbl_view_vehicle.setColumnWidth(1, 200)
 
         # Open form
         self.open_dialog(self.dlg_resources_man)
@@ -2240,7 +2273,8 @@ class AddNewLot(ParentManage):
         # Refresh
         self.fill_table_by_query(qtable_right, query_right)
         self.fill_table_by_query(qtable_left, query_left)
-        self.refresh_map_canvas()
+        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_team, self.qtable_team_query)
+
 
 
     def team_unselector(self, qtable_left, qtable_right, query_left, query_right, field_id_right, tableright, tableleft, filter_team):
@@ -2265,7 +2299,7 @@ class AddNewLot(ParentManage):
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
         self.fill_table_by_query(qtable_right, query_right)
-        self.refresh_map_canvas()
+        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_team, self.qtable_team_query)
 
 
     def delete_team(self):
@@ -2275,6 +2309,12 @@ class AddNewLot(ParentManage):
         message = "You are trying delete team '" + str(filter_team) + "'. Do you want continue?"
         answer = self.controller.ask_question(message, "Delete team")
         if answer:
+            sql = ("SELECT * FROM om_vehicle_x_parameters JOIN cat_team ON cat_team.id = om_vehicle_x_parameters.team_id WHERE cat_team.idval = '" + str(filter_team) + "'")
+            rows = self.controller.get_rows(sql, log_sql=True)
+            if rows:
+                msg = "This team have some relations on om_vehicle_x_parameters table. Abort delete transaction."
+                self.controller.show_info_box(msg, "Info")
+                return
             sql = ("DELETE FROM cat_team WHERE idval = '" + str(filter_team) + "'")
             status = self.controller.execute_sql(sql)
             if status:
@@ -2304,7 +2344,7 @@ class AddNewLot(ParentManage):
                     utils_giswater.set_item_data(self.dlg_resources_man.cmb_vehicle, rows, 1)
 
 
-    def manage_vehicle(self, manage_type=None, add_vehicle=False):
+    def manage_vehicle(self, add_vehicle=False):
         """ Open dialog of teams """
 
         self.max_id = self.get_max_id('ext_cat_vehicle')
@@ -2319,7 +2359,7 @@ class AddNewLot(ParentManage):
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_accept.clicked.connect(
-            partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type=manage_type))
+            partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type='vehicle'))
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))

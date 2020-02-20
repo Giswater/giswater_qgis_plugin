@@ -474,7 +474,7 @@
               </layout>
              </item>
              <item row="7" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0,1,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0,1">
                <item>
                 <widget class="QLabel" name="label">
                  <property name="maximumSize">
@@ -514,13 +514,6 @@
                  </property>
                  <property name="sizeAdjustPolicy">
                   <enum>QComboBox::AdjustToContents</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="btn_man_team">
-                 <property name="text">
-                  <string>Gestionar equips</string>
                  </property>
                 </widget>
                </item>
