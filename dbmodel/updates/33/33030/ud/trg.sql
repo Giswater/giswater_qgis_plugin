@@ -8,3 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP TRIGGER IF EXISTS gw_trg_update_workcat_geom ON gully;
+DROP TRIGGER IF EXISTS gw_trg_update_workcat_geom ON connec;
+DROP TRIGGER IF EXISTS gw_trg_update_workcat_geom ON node;
+DROP TRIGGER IF EXISTS gw_trg_update_workcat_geom ON arc;
+
+DROP FUNCTION IF EXISTS gw_fct_update_workcat_geom (text);
