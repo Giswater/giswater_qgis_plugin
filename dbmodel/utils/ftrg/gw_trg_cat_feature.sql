@@ -28,6 +28,7 @@ DECLARE
 	v_feature_field_id text;
 	v_feature record;
 	v_query text;
+	v_arc_epa text;
 
 BEGIN	
 
@@ -117,15 +118,37 @@ BEGIN
 		-- insert into *_type tables new register from cat_feature
 		EXECUTE 'SELECT * FROM '||concat(lower(NEW.feature_type),'_type')||' WHERE type = '''||NEW.system_id||''' LIMIT 1'
 		INTO v_feature;
-	
-		IF lower(NEW.feature_type)='arc' THEN
-			EXECUTE 'INSERT INTO arc_type (id, type, epa_default, man_table, epa_table, active, code_autofill) 
-			VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', '''||v_feature.epa_table||''', TRUE, '''||v_feature.code_autofill||''')';
-		ELSIF lower(NEW.feature_type)='node' THEN
-			EXECUTE 'INSERT INTO node_type (id, type, epa_default, man_table, epa_table, active, code_autofill, choose_hemisphere, isarcdivide) 
-			VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', '''||v_feature.epa_table||''', TRUE, '''||v_feature.code_autofill||''', '''||v_feature.choose_hemisphere||''', '''||v_feature.isarcdivide||''')';
+		
+		IF v_feature IS NOT NULL THEN
+			IF lower(NEW.feature_type)='arc' THEN
+				EXECUTE 'INSERT INTO arc_type (id, type, epa_default, man_table, epa_table, active, code_autofill) 
+				VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', '''||v_feature.epa_table||''', TRUE, '''||v_feature.code_autofill||''')';
+			ELSIF lower(NEW.feature_type)='node' THEN
+				EXECUTE 'INSERT INTO node_type (id, type, epa_default, man_table, epa_table, active, code_autofill, choose_hemisphere, isarcdivide) 
+				VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', '''||v_feature.epa_table||''', TRUE, '''||v_feature.code_autofill||''', '''||v_feature.choose_hemisphere||''', '''||v_feature.isarcdivide||''')';
+			ELSE
+				EXECUTE 'INSERT INTO ' || concat(lower(NEW.feature_type),'_type')||' (id, type, man_table, active, code_autofill) VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.man_table||''', TRUE, '''||v_feature.code_autofill||''')';
+			END IF;
 		ELSE
-			EXECUTE 'INSERT INTO ' || concat(lower(NEW.feature_type),'_type')||' (id, type, man_table, active, code_autofill) VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.man_table||''', TRUE, '''||v_feature.code_autofill||''')';
+			IF lower(NEW.feature_type)='arc' THEN
+
+				IF lower(v_projecttype) = 'ws' THEN
+					v_arc_epa = 'PIPE';
+				ELSIF lower(v_projecttype) = 'ud' THEN
+					v_arc_epa = 'CONDUIT';
+				END IF;
+				raise notice 'v_arc_epa,%',v_arc_epa;
+				EXECUTE 'INSERT INTO arc_type (id, type, epa_default, man_table, epa_table, active, code_autofill) 
+				VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_arc_epa||''', concat(''man_'','''||lower(NEW.system_id)||'''), concat(''inp_'','''||lower(v_arc_epa)||'''), TRUE, TRUE)';
+
+			ELSIF lower(NEW.feature_type)='node' THEN
+				EXECUTE 'INSERT INTO node_type (id, type, epa_default, man_table, epa_table, active, code_autofill, choose_hemisphere, isarcdivide) 
+				VALUES ('''||NEW.id||''', '''||NEW.system_id||''', ''JUNCTION'',concat(''man_'','''||lower(NEW.system_id)||'''), ''inp_junction'', TRUE, TRUE, FALSE, TRUE)';
+
+			ELSE
+				EXECUTE 'INSERT INTO ' || concat(lower(NEW.feature_type),'_type')||' (id, type, man_table, active, code_autofill) 
+				VALUES ('''||NEW.id||''', '''||NEW.system_id||''', concat(''man_'','''||lower(NEW.system_id)||'''), TRUE, TRUE)';
+			END IF;
 		END IF;
 
 		--create child view
