@@ -1307,7 +1307,7 @@ class ApiParent(ParentAction):
             if widget:
                 text = utils_giswater.getWidgetText(self.dlg_cf, widget, False, False)
                 if text:
-                    msg = "Do you want to overwrite values?"
+                    msg = "Do you want to overwrite custom values?"
                     answer = self.controller.ask_question(msg, "Overwrite values")
                     if answer:
                         self.set_values()
