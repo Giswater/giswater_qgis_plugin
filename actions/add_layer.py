@@ -163,7 +163,7 @@ class AddLayer(object):
                     counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-                    # TODO This if controls if the function already works with GeoJson or is still to be refactored
+                    #TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
                     if key=='values':
                         self.populate_vlayer_old(v_layer, data, k, counter, group)

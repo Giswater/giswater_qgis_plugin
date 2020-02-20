@@ -1195,7 +1195,7 @@ class ApiParent(ParentAction):
         self.dlg_binfo.btn_accept.clicked.connect(partial(self.set_values))
         self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
         self.dlg_binfo.rejected.connect(partial(self.save_settings, self.dlg_binfo))
-        self.dlg_binfo.rejected.clicked.connect(partial(self.remove_interpolate_rb, complet_result))
+        self.dlg_binfo.rejected.connect(partial(self.remove_interpolate_rb))
 
         self.open_dialog(self.dlg_binfo)
 
@@ -1304,13 +1304,13 @@ class ApiParent(ParentAction):
         self.close_dialog(self.dlg_binfo)
 
 
-    def remove_interpolate_rb(self, complet_result):
+    def remove_interpolate_rb(self):
         # Remove the circumferences made by the interpolate
         vertex_items = [i for i in self.iface.mapCanvas().scene().items() if issubclass(type(i), QgsRubberBand)]
         for ver in vertex_items:
-            if ver in self.iface.mapCanvas().scene().items():
+            if ver in self.iface.mapCanvas().scene().items() and ver != self.rubber_point:
                 self.iface.mapCanvas().scene().removeItem(ver)
-        self.draw(complet_result, False, False)
+
 
 
     def mouse_move(self, point):
