@@ -818,6 +818,8 @@ class Giswater(QObject):
         if self.wsoftware is None:
             return
 
+        self.get_buttons_to_hide()
+
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
             self.project_read_tm(show_warning)
@@ -845,21 +847,6 @@ class Giswater(QObject):
 
         # Manage snapping layers
         self.manage_snapping_layers()
-
-        self.list_to_hide = []
-        try:
-            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
-            row = self.controller.get_config('qgis_toolbar_hidebuttons')
-            json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
-            self.list_to_hide = [str(x) for x in json_list['action_index']]
-        except  KeyError as e:
-            pass
-        except JSONDecodeError as e:
-            # Control if json have a correct format
-            pass
-        finally:
-            # TODO remove this line when do you want enabled api info for epa
-            self.list_to_hide.append('199')
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
@@ -901,6 +888,23 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
+
+
+    def get_buttons_to_hide(self):
+        self.list_to_hide = []
+        try:
+            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
+            row = self.controller.get_config('qgis_toolbar_hidebuttons')
+            json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
+            self.list_to_hide = [str(x) for x in json_list['action_index']]
+        except  KeyError as e:
+            pass
+        except JSONDecodeError as e:
+            # Control if json have a correct format
+            pass
+        finally:
+            # TODO remove this line when do you want enabled api info for epa
+            self.list_to_hide.append('199')
 
 
     def add_layers_button(self):
