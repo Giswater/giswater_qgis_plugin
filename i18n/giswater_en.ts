@@ -87,7 +87,7 @@
     </message>
     <message>
         <source>76_text</source>
-        <translation>Lot Selector</translation>
+        <translation>Resources manager</translation>
     </message>
     <message>
         <source>81_text</source>

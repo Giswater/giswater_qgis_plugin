@@ -1228,10 +1228,6 @@ class AddNewLot(ParentManage):
                 if key in (lot['feature_type'] + '_id', 'code', 'status', 'observ', 'validate'):
                     if value not in ('', None):
                         keys += key + ", "
-                        # if type(value) in (int, bool):
-                        #     values += f"$$"+str(value)+"$$, "
-                        # else:
-                        #     values += "$$" + value + "$$, "
                         values += "$$"+str(value)+"$$, "
             keys = keys[:-2]
             values = values[:-2]
@@ -1333,13 +1329,12 @@ class AddNewLot(ParentManage):
         row = index.row()
         column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
         feature_id = index.sibling(row, column_index).data()
-        # expr_filter = '"{}_id" IN ({})'.format(feature_type, "'"+str(feature_id)+"'")
         expr_filter = "\""+str(feature_type)+"_id\" IN ('"+str(feature_id)+"')"
+
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
 
         self.select_features_by_ids(feature_type, expr)
-        # self.iface.actionZoomToSelected().trigger()
         self.iface.actionZoomActualSize().trigger()
 
         layer = self.iface.activeLayer()
@@ -1664,7 +1659,7 @@ class AddNewLot(ParentManage):
         tableright = "selector_lot"
         field_id_left = "id"
         field_id_right = "lot_id"
-        #
+
         hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16]
         hide_right = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
 
@@ -1729,10 +1724,6 @@ class AddNewLot(ParentManage):
         dialog.txt_wotype_filter.textChanged.connect(
             partial(self.filter_lot_selector, dialog, dialog.txt_wotype_filter, tbl_all_rows, tableleft, tableright,
                     field_id_right, field_id_left))
-
-        # Order control
-        # tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
-        # tbl_selected_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_selected_rows, query_right))
 
 
     def filter_lot_selector(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l):
@@ -1958,7 +1949,6 @@ class AddNewLot(ParentManage):
                " ON CONFLICT DO NOTHING;")
         self.controller.execute_sql(sql)
         # set previous dialog
-        # if hasattr(self, 'previous_dialog'):
         self.manage_lot(selected_object_id, is_new=False, visitclass_id=visitclass_id)
 
 
@@ -1976,17 +1966,16 @@ class AddNewLot(ParentManage):
 
         # Get date type
         date_type = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type)
-        if date_type == 'Real inici':
+        if date_type == 'Data inici':
             filter_name = 'Data inici'
-        elif date_type == 'Real fi':
+        elif date_type == 'Data fi':
             filter_name = 'Data fi'
-        elif date_type == 'Planificada inici':
+        elif date_type == 'Data inici planificada':
             filter_name = 'Data inici planificada'
-        elif date_type == 'Planificada fi':
+        elif date_type == 'Data final planificada':
             filter_name = 'Data final planificada'
         else:
             return
-
 
         visit_start = self.dlg_lot_man.date_event_from.date()
         visit_end = self.dlg_lot_man.date_event_to.date()
@@ -2000,10 +1989,6 @@ class AddNewLot(ParentManage):
         format_low = self.lot_date_format + ' 00:00:00.000'
         format_high = self.lot_date_format + ' 23:59:59.999'
         interval = "'"+str(visit_start.toString(format_low))+"'::timestamp AND '"+str(visit_end.toString(format_high))+"'::timestamp"
-
-        # expr_filter = ("(\"Data inici planificada\" BETWEEN "+str(interval)+" OR \"Data inici planificada\" IS NULL) "
-        #                "AND (\"Data final planificada\" BETWEEN "+str(interval)+" OR \"Data final planificada\" IS NULL)")
-        # expr_filter = ("(\"" + str(filter_name) + "\" BETWEEN " + str(interval) + " OR \"" + str(filter_name) + "\" IS NULL) ")
 
         expr_filter = ("(\"" + str(filter_name) + "\" BETWEEN " + str(interval) + " ")
         if show_nulls:
@@ -2161,26 +2146,7 @@ class AddNewLot(ParentManage):
         self.dlg_resources_man.btn_vehicle_delete.clicked.connect(partial(self.delete_vehicle))
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_resources_man))
-
-        # # Populate table view team
-        # self.dlg_resources_man.tbl_view_team.setSelectionBehavior(QAbstractItemView.SelectRows)
-        #
-        # self.qtable_team_query = ("SELECT team, user_name, vehicle, visitclass FROM v_om_user_x_team"
-        #                           " JOIN v_om_team_x_vehicle USING (team)"
-        #                           " JOIN v_om_team_x_visitclass USING (team) WHERE team = "
-        #                           "'" + utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team") + "'")
-        #
-        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_team, self.qtable_team_query)
-        # self.dlg_resources_man.tbl_view_team.setColumnWidth(1, 200)
-        #
-        # # Populate table view vehicle
-        # self.dlg_resources_man.tbl_view_vehicle.setSelectionBehavior(QAbstractItemView.SelectRows)
-        #
-        # self.qtable_vehicle_query = ("SELECT * FROM ext_cat_vehicle "
-        #                     " WHERE idval = '" + utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team") + "'")
-        #
-        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_vehicle, self.qtable_vehicle_query)
-        # self.dlg_resources_man.tbl_view_vehicle.setColumnWidth(1, 200)
+        self.dlg_resources_man.rejected.connect(partial(self.save_settings, self.dlg_resources_man))
 
         # Open form
         self.open_dialog(self.dlg_resources_man)
@@ -2194,16 +2160,19 @@ class AddNewLot(ParentManage):
 
         # Set signals
         self.dlg_team_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_team_man))
-
+        self.dlg_team_man.rejected.connect(partial(self.save_settings, self.dlg_team_man))
 
         # Tab Users
-        self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id", [], [],
+        self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id",
+                                     [0,2], [0,2,3,4,5,6],
                                      "all_user_rows", "selected_user_rows", "btn_user_select", "btn_user_unselect")
         # Tab Vehciles
-        self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle", [], [],
-                                    "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select", "btn_vehicle_unselect")
+        self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle",
+                                     [0], [0, 5, 6, 7],
+                                     "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select", "btn_vehicle_unselect")
         # Tab Visitclass
-        self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "idval", "visitclass", [], [],
+        self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "idval", "visitclass",
+                                     [0, 3, 4, 5, 6, 7, 8, 9], [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                                     "all_visitclass_rows", "selected_visitclass_rows", "btn_visitclass_select",
                                     "btn_visitclass_unselect")
         # Open form
@@ -2301,8 +2270,6 @@ class AddNewLot(ParentManage):
         # Refresh
         self.fill_table_by_query(qtable_right, query_right)
         self.fill_table_by_query(qtable_left, query_left)
-        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_team, self.qtable_team_query)
-
 
 
     def team_unselector(self, qtable_left, qtable_right, query_left, query_right, field_id_right, tableright, tableleft, filter_team):
@@ -2327,8 +2294,6 @@ class AddNewLot(ParentManage):
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
         self.fill_table_by_query(qtable_right, query_right)
-        # self.fill_table_by_query(self.dlg_resources_man.tbl_view_team, self.qtable_team_query)
-
 
     def delete_team(self):
 
