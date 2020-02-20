@@ -1980,12 +1980,12 @@ class AddNewLot(ParentManage):
 
         # expr_filter = ("(\"Data inici planificada\" BETWEEN "+str(interval)+" OR \"Data inici planificada\" IS NULL) "
         #                "AND (\"Data final planificada\" BETWEEN "+str(interval)+" OR \"Data final planificada\" IS NULL)")
-        expr_filter = ("(\"" + str(start_filter_name) + "\" BETWEEN " + str(interval) + ") "
-                       "AND (\"" + str(end_filter_name) + "\" BETWEEN " + str(interval) + ")")
+        expr_filter = ("(\"" + str(start_filter_name) + "\" BETWEEN " + str(interval) + " OR \"" + str(start_filter_name) + "\" IS NULL) "
+                       "AND (\"" + str(end_filter_name) + "\" BETWEEN " + str(interval) + " OR \"" + str(end_filter_name) + "\" IS NULL)")
         if serie != 'null':
             expr_filter += " AND \"Serie\" ILIKE '%"+str(serie)+"%'"
         if actuacio != '' and actuacio != -1:
-            expr_filter += " AND \"Tipus actuacio\" ILIKE '%"+str(actuacio)+"%' "
+            expr_filter += " AND wotype_id ILIKE '%"+str(actuacio)+"%' "
         if adreca != '':
             expr_filter += " AND \"Carrer\" ILIKE '%"+str(adreca)+"%' "
         if status != '':
