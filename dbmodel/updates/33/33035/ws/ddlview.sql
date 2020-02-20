@@ -47,26 +47,28 @@ UNION
 drop VIEW IF EXISTS vi_curves;
 drop view IF EXISTS vi_tanks;
 CREATE OR REPLACE VIEW vi_tanks AS 
- SELECT node_id,
-    elevation,
-    (addparam::json->>'initlevel') as initlevel,
-    (addparam::json->>'minlevel') as minlevel,
-    (addparam::json->>'maxlevel') as maxlevel,
-    (addparam::json->>'diameter') as diameter,
-    (addparam::json->>'minvol') as minvol,
-    (addparam::json->>'curve_id') as curve_id
-    FROM inp_selector_result,rpt_inp_node
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elevation,
+    (rpt_inp_node.addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
+    (rpt_inp_node.addparam::json ->> 'minlevel'::text)::numeric AS minlevel,
+    (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
+    (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
+    (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
+    (rpt_inp_node.addparam::json ->> 'curve_id'::text)::numeric AS curve_id
+   FROM inp_selector_result,
+    rpt_inp_node
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND rpt_inp_node.epa_type::text = 'TANK'::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
- SELECT node_id,
+ SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
-    (addparam::json->>'initlevel') as initlevel,
-    (addparam::json->>'minlevel') as minlevel,
-    (addparam::json->>'maxlevel') as maxlevel,
-    (addparam::json->>'diameter') as diameter,
-    (addparam::json->>'minvol') as minvol,
-    (addparam::json->>'curve_id') as curve_id
-   FROM inp_selector_result, rpt_inp_node
+    (rpt_inp_node.addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
+    (rpt_inp_node.addparam::json ->> 'minlevel'::text)::numeric AS minlevel,
+    (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
+    (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
+    (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
+    (rpt_inp_node.addparam::json ->> 'curve_id'::text)::numeric AS curve_id
+   FROM inp_selector_result,
+    rpt_inp_node
      LEFT JOIN ( SELECT a.node_id,
             count(*) AS ct
            FROM ( SELECT rpt_inp_arc.node_1 AS node_id
@@ -100,7 +102,7 @@ UNION
     rpt_inp_arc.node_2,
     ('POWER'::text || ' '::text) || inp_pump_additional.power::text AS power,
     ('HEAD'::text || ' '::text) || inp_pump_additional.curve_id::text AS head,
-    ('SPEED'::text || ' '::text) || inp_pump_additional.speed AS speed,
+    ('SPEED'::text || ' '::text) || inp_pump_additional.speed::text AS speed,
     ('PATTERN'::text || ' '::text) || inp_pump_additional.pattern::text AS pattern
    FROM inp_selector_result,  inp_pump_additional
      JOIN rpt_inp_arc ON rpt_inp_arc.flw_code::text = concat(inp_pump_additional.node_id, '_n2a')
@@ -255,7 +257,7 @@ CREATE OR REPLACE VIEW vi_curves AS
            FROM inp_curve
              JOIN inp_curve_id ON inp_curve.curve_id::text = inp_curve_id.id::text
   ORDER BY 1, 4 DESC) a
-  WHERE 	((a.curve_id::text IN (SELECT vi_tanks.curve_id FROM vi_tanks)) 
+  WHERE 	((a.curve_id::text IN (SELECT vi_tanks.curve_id::text FROM vi_tanks)) 
 		OR (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head FROM vi_pumps)) 
 		OR (concat('GPV ', a.curve_id) IN ( SELECT vi_valves.setting FROM vi_valves)) 
 		OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue FROM vi_energy WHERE vi_energy.idval::text = 'EFFIC'::text)))

@@ -72,7 +72,8 @@ SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
 	v_result_line 	json;
 	v_version	json;
 	v_path 		text;
-	
+	v_error_context text;
+
 BEGIN
 
 	-- Search path
@@ -233,6 +234,7 @@ BEGIN
 	
 	-- CATALOGS
 	--cat_feature
+	ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
 	--node
 	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAJUN','JUNCTION','NODE', 'v_edit_node');
 	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPATAN','TANK','NODE', 'v_edit_node');
@@ -262,30 +264,31 @@ BEGIN
 
 	--arc_type
 	--arc
-	INSERT INTO arc_type VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe',TRUE);
+	INSERT INTO arc_type VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe',TRUE, TRUE);
 	--nodarc
-	INSERT INTO arc_type VALUES ('EPACHV', 'VARC', 'PIPE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPAFCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPAGPV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPAPBV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPAPSV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPAPRV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPATCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPAPUMP', 'VARC', 'PIPE', 'man_varc', 'inp_pump_importinp',TRUE);
+	INSERT INTO arc_type VALUES ('EPACHV', 'VARC', 'PIPE', 'man_varc', 'inp_valve_importinp',TRUE, TRUE);
+	INSERT INTO arc_type VALUES ('EPAFCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE, TRUE);
+	INSERT INTO arc_type VALUES ('EPAGPV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE, TRUE);
+	INSERT INTO arc_type VALUES ('EPAPBV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE, TRUE);
+	INSERT INTO arc_type VALUES ('EPAPSV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE, TRUE);
+	INSERT INTO arc_type VALUES ('EPAPRV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE, TRUE);
+	INSERT INTO arc_type VALUES ('EPATCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE, TRUE);
+	INSERT INTO arc_type VALUES ('EPAPUMP', 'VARC', 'PIPE', 'man_varc', 'inp_pump_importinp',TRUE, TRUE);
 	--node_type
 	--node
-	INSERT INTO node_type VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',TRUE);
-	INSERT INTO node_type VALUES ('EPATAN', 'TANK', 'TANK', 'man_tank', 'inp_tank',TRUE);
-	INSERT INTO node_type VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_reservoir',TRUE);
-	INSERT INTO node_type VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe',TRUE);
-	INSERT INTO node_type VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
-	INSERT INTO node_type VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
-	INSERT INTO node_type VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
-	INSERT INTO node_type VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
-	INSERT INTO node_type VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
-	INSERT INTO node_type VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
-	INSERT INTO node_type VALUES ('EPAPUMPA2N', 'PUMP', 'PUMP', 'man_pump', 'inp_pump',TRUE);
+	INSERT INTO node_type VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPATAN', 'TANK', 'TANK', 'man_tank', 'inp_tank',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_reservoir',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE, TRUE, 2, FALSE);
+	INSERT INTO node_type VALUES ('EPAPUMPA2N', 'PUMP', 'PUMP', 'man_pump', 'inp_pump',TRUE, TRUE, 2, FALSE);
 
+	ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 	--Materials
 	INSERT INTO cat_mat_arc 
 	SELECT DISTINCT csv6 FROM temp_csv2pg WHERE source='[PIPES]' AND csv6 IS NOT NULL;
@@ -330,7 +333,7 @@ BEGIN
 
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
-		
+
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
 	LOOP
@@ -346,6 +349,7 @@ BEGIN
 				v_query_fields = concat (v_query_fields,' , csv',v_rec_view.rid,'::',v_rec_view.data_type);
 				
 			END IF;
+
 		END LOOP;
 		
 		--inserting values on editable view
@@ -369,7 +373,7 @@ BEGIN
 	
 
 	-- to_arc on pumps
-	UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
+	/*UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
 	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
 		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2	
 		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
@@ -381,7 +385,7 @@ BEGIN
 		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2
 		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
 	WHERE b.node_id = inp_valve_importinp.node_id;
-			
+	*/
 			
 	IF v_arc2node_reverse THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 	
@@ -561,17 +565,34 @@ BEGIN
 	
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=41) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
+  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=41) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 	--lines
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=41)) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fprocesscat_id
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=41) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+	v_result_line = concat ('{"geometryType":"LineString",  "features":',v_result,'}'); 
+
 
 	--Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
@@ -580,13 +601,18 @@ BEGIN
 	v_version := COALESCE(v_version, '{}'); 	
 
 --  	Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 	    '}}')::json;
 	
+	--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
