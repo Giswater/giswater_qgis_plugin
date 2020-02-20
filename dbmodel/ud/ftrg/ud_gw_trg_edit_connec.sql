@@ -354,16 +354,26 @@ BEGIN
 			IF NEW.state = 1 AND OLD.state=2 THEN
 				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;					
 			END IF;
+			UPDATE connec SET state=NEW.state WHERE connec_id = OLD.connec_id;
 		END IF;
 
 		--check relation state - state_type
-	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	RETURN audit_function(3036,1212,NEW.state::text);
-	   	END IF;		
+		IF (NEW.state_type != OLD.state_type) THEN
+			IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+				RETURN audit_function(3036,1212,NEW.state::text);
+			ELSE
+				UPDATE connec SET state_type=NEW.state_type WHERE connec_id = OLD.connec_id;
+			END IF;
+		END IF;		
 
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN
 			UPDATE connec SET rotation=NEW.rotation WHERE connec_id = OLD.connec_id;
+		END IF;
+
+		-- customer_code
+		IF NEW.customer_code != OLD.customer_code THEN
+			UPDATE connec SET customer_code=NEW.customer_code WHERE connec_id = OLD.connec_id;
 		END IF;
 		
 		--link_path
@@ -372,19 +382,19 @@ BEGIN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
-        UPDATE connec 
-        SET  code=NEW.code, customer_code=NEW.customer_code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,
-			"state"=NEW."state", state_type=NEW.state_type, connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, annotation=NEW.annotation, "observ"=NEW."observ", 
+		UPDATE connec 
+		SET  code=NEW.code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,
+			connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, annotation=NEW.annotation, "observ"=NEW."observ", 
 			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-            ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, 
-			postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript, arc_id=NEW.arc_id,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, featurecat_id=NEW.featurecat_id,feature_id=NEW.feature_id, 
+			ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, 
+			postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript, 
+			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, featurecat_id=NEW.featurecat_id,feature_id=NEW.feature_id, 
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, private_connecat_id=NEW.private_connecat_id, lastupdate=now(), lastupdate_user=current_user
-        WHERE connec_id = OLD.connec_id;
+			WHERE connec_id = OLD.connec_id;
 
-			-- man addfields update
+		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter 
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE

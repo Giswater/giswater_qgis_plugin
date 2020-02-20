@@ -421,6 +421,8 @@ BEGIN
 			IF NEW.state = 1 AND OLD.state=2 THEN
 				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;					
 			END IF;
+			UPDATE connec SET state=NEW.state WHERE connec_id = OLD.connec_id;
+			
 		END IF;
 		
 		-- State_type
@@ -444,9 +446,13 @@ BEGIN
 		END IF;
 		
 		--check relation state - state_type
-	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	RETURN audit_function(3036,1318,NEW.state::text);
-       	END IF;			
+		IF (NEW.state_type != OLD.state_type) THEN
+			IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+				RETURN audit_function(3036,1318,NEW.state::text);
+			ELSE
+				UPDATE connec SET state_type=NEW.state_type WHERE connec_id = OLD.connec_id;
+			END IF;
+		END IF;			
        	
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN
@@ -473,22 +479,27 @@ BEGIN
 			END IF;
 		END IF;
 
+		-- customer_code
+		IF NEW.customer_code != OLD.customer_code THEN
+			UPDATE connec SET customer_code=NEW.customer_code WHERE connec_id = OLD.connec_id;
+		END IF;
+
 		UPDATE connec 
-			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.customer_code,
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
+			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, 
+			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=NEW.streetaxis2_id, 
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, descript=NEW.descript, verified=NEW.verified, 
 			postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
-			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, arc_id=NEW.arc_id, lastupdate=now(), lastupdate_user=current_user,
+			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure
 			WHERE connec_id=OLD.connec_id;
 			
-        IF v_man_table ='man_greentap' THEN
+		IF v_man_table ='man_greentap' THEN
 		    UPDATE man_greentap SET linked_connec=NEW.linked_connec
 			WHERE connec_id=OLD.connec_id;
 			
-        ELSIF v_man_table ='man_wjoin' THEN
+		ELSIF v_man_table ='man_wjoin' THEN
 			UPDATE man_wjoin SET top_floor=NEW.top_floor,cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
@@ -497,7 +508,7 @@ BEGIN
 			drain_distance=NEW.drain_distance, arq_patrimony=NEW.arq_patrimony, com_state=NEW.com_state, cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
-        ELSIF v_man_table ='man_fountain' THEN 			
+		ELSIF v_man_table ='man_fountain' THEN 			
 			UPDATE man_fountain SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
 			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
 			pol_id=NEW.pol_id

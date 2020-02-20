@@ -92,70 +92,70 @@ BEGIN
 			NEW.epa_type:= (SELECT epa_default FROM cat_node JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
 		END IF;
 		
-        -- Sector ID
-        IF (NEW.sector_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1320);  
-			END IF;
-				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF v_count = 1 THEN
-				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF v_count > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
-				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
-			END IF;	
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-			IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1320,NEW.node_id);          
-            END IF;            
-        END IF;
-        
-	-- Dma ID
-        IF (NEW.dma_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1320);  
-            END IF;
-				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF v_count = 1 THEN
-				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF v_count > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
-				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
-			END IF;
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF; 
-            IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1320,NEW.node_id);  
-            END IF;            
-        END IF;
+		-- Sector ID
+		IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+			RETURN audit_function(1008,1320);  
+				END IF;
+					SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+				IF v_count = 1 THEN
+					NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+				ELSIF v_count > 1 THEN
+					NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
+					order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+				END IF;	
+				IF (NEW.sector_id IS NULL) THEN
+					NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
+				IF (NEW.sector_id IS NULL) THEN
+			RETURN audit_function(1010,1320,NEW.node_id);          
+		    END IF;            
+		END IF;
 		
-		-- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
-		
-		-- Presszone
-        IF (NEW.presszonecat_id IS NULL) THEN
-            NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
-		
-		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
-		
-		-- State_type
-		IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		-- Dma ID
+		IF (NEW.dma_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+			RETURN audit_function(1012,1320);  
+		    END IF;
+					SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+				IF v_count = 1 THEN
+					NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+				ELSIF v_count > 1 THEN
+					NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
+					order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+				END IF;
+				IF (NEW.dma_id IS NULL) THEN
+					NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF; 
+		    IF (NEW.dma_id IS NULL) THEN
+			RETURN audit_function(1014,1320,NEW.node_id);  
+		    END IF;            
+		END IF;
+			
+			-- Verified
+		IF (NEW.verified IS NULL) THEN
+		    NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+			
+			-- Presszone
+		IF (NEW.presszonecat_id IS NULL) THEN
+		    NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+			
+			-- State
+		IF (NEW.state IS NULL) THEN
+		    NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+			
+			-- State_type
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
-        --check relation state - state_type
-        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	RETURN audit_function(3036,1320,NEW.state::text);
-       	END IF;
+		--check relation state - state_type
+		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			RETURN audit_function(3036,1320,NEW.state::text);
+		END IF;
 
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -198,14 +198,14 @@ BEGIN
 		END IF;
 		
 		-- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.ownercat_id IS NULL) THEN
+			NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- Soilcat_id
-        IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.soilcat_id IS NULL) THEN
+			NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -224,15 +224,11 @@ BEGIN
 			NEW.parent_id=v_node_id;
 		END IF;
 
-		--Arc id ,for those nodes that are not connected (node_type.isarcdivide = FALSE)
-		IF (SELECT isarcdivide FROM cat_node JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::boolean IS FALSE THEN 
-			NEW.arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom,0.001) LIMIT 1);
-		END IF;
 		
-	    -- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
-	       NEW.link=NEW.node_id;
-	    END IF;
+		-- LINK
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+			NEW.link=NEW.node_id;
+		END IF;
 
 		v_featurecat = (SELECT nodetype_id FROM cat_node WHERE id = NEW.nodecat_id);
 
@@ -280,9 +276,9 @@ BEGIN
 		END IF;   	
 
 		-- FEATURE INSERT      
-		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
-		buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, rotation,verified,
-        undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, the_geom, hemisphere, num_value) 
+		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, 
+		category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, 
+		postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, the_geom, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment,NEW.dma_id, NEW.presszonecat_id,
 		NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, 
 		NEW.streetaxis_id, NEW.streetaxis2_id, NEW.postcode,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
@@ -326,9 +322,10 @@ BEGIN
 			INSERT INTO man_reduction (node_id,diam1,diam2) VALUES(NEW.node_id,NEW.diam1, NEW.diam2);
 			
 		ELSIF v_man_table='man_valve' THEN	
-			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,lin_meters, exit_type,exit_code,drive_type, cat_valve2) 
-			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation, NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, 
-			NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2);
+			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
+			lin_meters, exit_type,exit_code,drive_type, cat_valve2) 
+			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation, 
+			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2);
 		
 		ELSIF v_man_table='man_manhole' THEN	
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -380,36 +377,36 @@ BEGIN
 		IF v_man_table='parent' THEN
 		    v_man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE node_type.id = cat_node.nodetype_id LIMIT 1)::text;
 	         
-	        IF v_man_table IS NOT NULL THEN
-	            v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-	            EXECUTE v_sql;
-	        END IF;
+			IF v_man_table IS NOT NULL THEN
+			    v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+			    EXECUTE v_sql;
+			END IF;
 
-	        --insert double geometry
+			--insert double geometry
 			IF (v_man_table IN ('man_register', 'man_tank') and (v_insert_double_geom IS TRUE)) THEN
-				
+					
 				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				INSERT INTO polygon(pol_id,the_geom) 
 				VALUES (v_auto_pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
 				from node where node_id=NEW.node_id));
-				
+					
 				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_auto_pol_id||''' WHERE node_id = '''||NEW.node_id||''';';
 			END IF;
-	    END IF;
+		END IF;
 
-	--insert tank into anl_mincut_inlet_x_exploitation
+		--insert tank into anl_mincut_inlet_x_exploitation
 		IF v_man_table='man_tank' THEN
 			INSERT INTO anl_mincut_inlet_x_exploitation(node_id, expl_id)
 			VALUES (NEW.node_id, NEW.expl_id);
 		END IF;
 
-	-- man addfields insert
+		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter 
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
 			LOOP
-				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+				EXECUTE 'SELECT $1."' ||v_addfields.param_name||'"'
 					USING NEW
 					INTO v_new_value_param;
 
@@ -420,79 +417,79 @@ BEGIN
 			END LOOP;
 		END IF;				
 
-	-- EPA insert
-        IF (NEW.epa_type = 'JUNCTION') THEN 
-			INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
+		-- EPA insert
+		IF (NEW.epa_type = 'JUNCTION') THEN 
+				INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
 
-        ELSIF (NEW.epa_type = 'TANK') THEN 
-			INSERT INTO inp_tank (node_id) VALUES (NEW.node_id);
+		ELSIF (NEW.epa_type = 'TANK') THEN 
+				INSERT INTO inp_tank (node_id) VALUES (NEW.node_id);
 
-        ELSIF (NEW.epa_type = 'RESERVOIR') THEN
-			INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
-			
-        ELSIF (NEW.epa_type = 'PUMP') THEN
-			INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN');
+		ELSIF (NEW.epa_type = 'RESERVOIR') THEN
+				INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
+				
+		ELSIF (NEW.epa_type = 'PUMP') THEN
+				INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN');
 
-        ELSIF (NEW.epa_type = 'VALVE') THEN
-			INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE');
+		ELSIF (NEW.epa_type = 'VALVE') THEN
+				INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE');
 
-        ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
-			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
-			
-        ELSIF (NEW.epa_type = 'INLET') THEN
-			INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);
-			
-        END IF;
+		ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
+				INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
+				
+		ELSIF (NEW.epa_type = 'INLET') THEN
+				INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);
+				
+		END IF;
 
-        RETURN NEW;
+		RETURN NEW;
 
-	-- UPDATE
+    -- UPDATE
     ELSIF TG_OP = 'UPDATE' THEN
 
 		-- EPA update
-        IF (NEW.epa_type != OLD.epa_type) THEN    
-         
-            IF (OLD.epa_type = 'JUNCTION') THEN
-                v_inp_table:= 'inp_junction';            
-            ELSIF (OLD.epa_type = 'TANK') THEN
-                v_inp_table:= 'inp_tank';                
-            ELSIF (OLD.epa_type = 'RESERVOIR') THEN
-                v_inp_table:= 'inp_reservoir';    
-            ELSIF (OLD.epa_type = 'SHORTPIPE') THEN
-                v_inp_table:= 'inp_shortpipe';    
-            ELSIF (OLD.epa_type = 'VALVE') THEN
-                v_inp_table:= 'inp_valve';    
-            ELSIF (OLD.epa_type = 'PUMP') THEN
-                v_inp_table:= 'inp_pump';  
-            ELSIF (OLD.epa_type = 'INLET') THEN
-                v_inp_table:= 'inp_inlet';
-            END IF;
-            IF v_inp_table IS NOT NULL THEN
-                v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
-                EXECUTE v_sql;
-            END IF;
-			v_inp_table := NULL;
+		IF (NEW.epa_type != OLD.epa_type) THEN    
+		 
+		    IF (OLD.epa_type = 'JUNCTION') THEN
+			v_inp_table:= 'inp_junction';            
+		    ELSIF (OLD.epa_type = 'TANK') THEN
+			v_inp_table:= 'inp_tank';                
+		    ELSIF (OLD.epa_type = 'RESERVOIR') THEN
+			v_inp_table:= 'inp_reservoir';    
+		    ELSIF (OLD.epa_type = 'SHORTPIPE') THEN
+			v_inp_table:= 'inp_shortpipe';    
+		    ELSIF (OLD.epa_type = 'VALVE') THEN
+			v_inp_table:= 'inp_valve';    
+		    ELSIF (OLD.epa_type = 'PUMP') THEN
+			v_inp_table:= 'inp_pump';  
+		    ELSIF (OLD.epa_type = 'INLET') THEN
+			v_inp_table:= 'inp_inlet';
+		    END IF;
+		    IF v_inp_table IS NOT NULL THEN
+			v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
+			EXECUTE v_sql;
+		    END IF;
+				v_inp_table := NULL;
 
-            IF (NEW.epa_type = 'JUNCTION') THEN
-                v_inp_table:= 'inp_junction';   
-            ELSIF (NEW.epa_type = 'TANK') THEN
-                v_inp_table:= 'inp_tank';     
-            ELSIF (NEW.epa_type = 'RESERVOIR') THEN
-                v_inp_table:= 'inp_reservoir';  
-            ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
-                v_inp_table:= 'inp_shortpipe';    
-            ELSIF (NEW.epa_type = 'VALVE') THEN
-                v_inp_table:= 'inp_valve';    
-            ELSIF (NEW.epa_type = 'PUMP') THEN
-                v_inp_table:= 'inp_pump';  
-            ELSIF (NEW.epa_type = 'INLET') THEN
-                v_inp_table:= 'inp_inlet';  
-            END IF;
-            IF v_inp_table IS NOT NULL THEN
-                v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-                EXECUTE v_sql;
-            END IF;
-        END IF;
+		    IF (NEW.epa_type = 'JUNCTION') THEN
+			v_inp_table:= 'inp_junction';   
+		    ELSIF (NEW.epa_type = 'TANK') THEN
+			v_inp_table:= 'inp_tank';     
+		    ELSIF (NEW.epa_type = 'RESERVOIR') THEN
+			v_inp_table:= 'inp_reservoir';  
+		    ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
+			v_inp_table:= 'inp_shortpipe';    
+		    ELSIF (NEW.epa_type = 'VALVE') THEN
+			v_inp_table:= 'inp_valve';    
+		    ELSIF (NEW.epa_type = 'PUMP') THEN
+			v_inp_table:= 'inp_pump';  
+		    ELSIF (NEW.epa_type = 'INLET') THEN
+			v_inp_table:= 'inp_inlet';  
+		    END IF;
+		    IF v_inp_table IS NOT NULL THEN
+			v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+			EXECUTE v_sql;
+		    END IF;
+		END IF;
 
 		-- State
 		IF (NEW.state != OLD.state) THEN
@@ -521,9 +518,9 @@ BEGIN
 		END IF;
 		
 		--check relation state - state_type
-	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	RETURN audit_function(3036,1320,NEW.state::text);
-       	END IF;
+		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			RETURN audit_function(3036,1320,NEW.state::text);
+		END IF;
 
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN
@@ -559,11 +556,6 @@ BEGIN
 			   UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
 		END IF;	
 		
-		--Arc id
-		IF (SELECT node_1 FROM arc WHERE node_1=NEW.node_id UNION SELECT node_2 FROM arc WHERE node_2=NEW.node_id) IS NULL THEN
-			NEW.arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom,0.001) LIMIT 1);
-		END IF;
-
 		--link_path
 		SELECT link_path INTO v_link_path FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id WHERE cat_node.id=NEW.nodecat_id;
 		IF v_link_path IS NOT NULL THEN
@@ -707,12 +699,12 @@ BEGIN
 				END IF;
 			
 			END LOOP;
-	    END IF;       
+		END IF;       
 
 		RETURN NEW;
 
-	-- DELETE
-    ELSIF TG_OP = 'DELETE' THEN
+   -- DELETE
+   ELSIF TG_OP = 'DELETE' THEN
 
 		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
 
@@ -730,7 +722,7 @@ BEGIN
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 
 		(SELECT id FROM man_addfields_parameter WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.node_type);
 
-        RETURN NULL;
+		RETURN NULL;
    
     END IF;
     
