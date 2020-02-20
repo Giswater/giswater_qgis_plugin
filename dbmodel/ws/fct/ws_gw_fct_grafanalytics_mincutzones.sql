@@ -50,6 +50,7 @@ v_version		text;
 v_fprocesscat_id	integer = 29;
 v_input			json;
 v_count2		integer;
+v_error_context text;
 
 
 BEGIN
@@ -204,6 +205,12 @@ BEGIN
 	    '}')::json;
 	
 RETURN v_count1;
+
+--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

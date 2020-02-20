@@ -41,7 +41,7 @@ DECLARE
 	v_version		text;
 	v_projectype		varchar(2);
 	v_srid			int4;
-	
+	v_error_context text;
 	
 BEGIN
 
@@ -166,10 +166,18 @@ BEGIN
 
 	-- arcs
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id IN 
+	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "values":',v_result, '}');
+	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "features":',v_result,'}'); 
 
 
 	-- Control nulls
@@ -183,6 +191,12 @@ BEGIN
 					  '"line":'||v_result_line||','||
 					  '"setVisibleLayers":[]'||
 					  '}}}')::json;
+
+	--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

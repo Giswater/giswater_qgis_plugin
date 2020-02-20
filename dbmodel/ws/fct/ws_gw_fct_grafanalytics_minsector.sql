@@ -58,7 +58,7 @@ v_input json;
 v_visible_layer text;
 v_usepsectors boolean;
 v_concavehull float = 0.85;
-
+v_error_context text;
 
 BEGIN
 
@@ -328,17 +328,17 @@ BEGIN
 	--points
 	v_result = null;
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
 	--lines
 	v_result = null;
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
 	--polygons
 	v_result = null;
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
+	v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
 	
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
@@ -360,6 +360,12 @@ BEGIN
 	    '}')::json;
 	
 RETURN v_cont1;
+
+--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
