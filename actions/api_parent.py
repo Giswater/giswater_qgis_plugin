@@ -1189,7 +1189,7 @@ class ApiParent(ParentAction):
         self.dlg_binfo = BasicInfo()
         self.load_settings(self.dlg_binfo)
 
-        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Please select 2 nodes')
+        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Select 2 nodes')
         self.dlg_binfo.lbl_text.setText("Node1: \nNode2:")
 
         self.dlg_binfo.btn_accept.clicked.connect(partial(self.set_values))
@@ -1299,17 +1299,19 @@ class ApiParent(ParentAction):
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
-                utils_giswater.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.setStyleSheet(None)
+                utils_giswater.setWidgetText(self.dlg_cf, widget, f'{v}')
+                widget.editingFinished.emit()
+
         self.close_dialog(self.dlg_binfo)
 
 
     def remove_interpolate_rb(self):
         # Remove the circumferences made by the interpolate
-        vertex_items = [i for i in self.iface.mapCanvas().scene().items() if issubclass(type(i), QgsRubberBand)]
-        for ver in vertex_items:
-            if ver in self.iface.mapCanvas().scene().items() and ver != self.rubber_point:
-                self.iface.mapCanvas().scene().removeItem(ver)
+        rubber_bands = [i for i in self.iface.mapCanvas().scene().items() if issubclass(type(i), QgsRubberBand)]
+        for rb in rubber_bands:
+            if rb in self.iface.mapCanvas().scene().items() and rb != self.rubber_point:
+                self.iface.mapCanvas().scene().removeItem(rb)
 
 
 
