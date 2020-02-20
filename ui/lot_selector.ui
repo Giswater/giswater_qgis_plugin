@@ -131,7 +131,7 @@
           <item row="0" column="2">
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>Nom actuació:</string>
+             <string>Tipus actuació:</string>
             </property>
            </widget>
           </item>

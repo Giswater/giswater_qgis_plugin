@@ -1425,8 +1425,8 @@ class AddNewLot(ParentManage):
             utils_giswater.set_item_data(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
 
         # Populate combo date type
-        rows = [['Real inici', 'Real inici'],['Real fi', 'Real fi'], ['Planificada inici', 'Planificada inici'],
-                ['Planificada fi', 'Planificada fi']]
+        rows = [['Data inici', 'Data inici'],['Data fi', 'Data fi'], ['Data inici planificada', 'Data inici planificada'],
+                ['Data final planificada', 'Data final planificada']]
         utils_giswater.set_item_data(self.dlg_lot_man.cmb_date_filter_type, rows, 1, sort_combo=False)
 
         table_object = "v_ui_om_visit_lot"
@@ -1660,8 +1660,8 @@ class AddNewLot(ParentManage):
         field_id_left = "id"
         field_id_right = "lot_id"
 
-        hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16]
-        hide_right = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20]
+        hide_left = [1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        hide_right = [1, 2, 3, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
         self.populate_lot_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right,
                                 hide_left, hide_right)
