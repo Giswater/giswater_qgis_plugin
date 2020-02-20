@@ -21,10 +21,8 @@ $BODY$
 
 
 DECLARE
-	sys_elev1_var numeric(12,3);
-	sys_elev2_var numeric(12,3);
-	rec_node record;
-	rec_arc record;
+	v_sys_elev1 numeric(12,3);
+	v_sys_elev2 numeric(12,3);
 	v_version text;
 	v_saveondatabase boolean;
 	v_result json;
@@ -39,7 +37,11 @@ DECLARE
 	v_querytextres record;
 	v_i integer;
 	v_count text;
-
+    v_qmlpointpath	text;
+    v_error_context text;
+	
+	rec_node record;
+	rec_arc record;
 	
 BEGIN
 
@@ -58,6 +60,8 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
+	--select default geometry style
+	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Computing process
 	IF v_array != '()' THEN
@@ -76,8 +80,8 @@ BEGIN
 			v_i=v_i+1;
 
 			-- setting variables
-			sys_elev1_var=0;
-			sys_elev2_var=0;
+			v_sys_elev1=0;
+			v_sys_elev2=0;
 			
 			-- as node1
 			v_querytext = 'SELECT * FROM v_edit_arc where node_1::integer='||rec_node.node_id;
@@ -85,10 +89,10 @@ BEGIN
 			IF v_querytextres.arc_id IS NOT NULL THEN
 				FOR rec_arc IN EXECUTE v_querytext
 				LOOP
-					sys_elev1_var=greatest(sys_elev1_var,rec_arc.sys_elev1);
+					v_sys_elev1=greatest(v_sys_elev1,rec_arc.sys_elev1);
 				END LOOP;
 			ELSE
-				sys_elev1_var=NULL;
+				v_sys_elev1=NULL;
 			END IF;
 			
 			-- as node2
@@ -97,16 +101,16 @@ BEGIN
 			IF v_querytextres.arc_id IS NOT NULL THEN
 				FOR rec_arc IN EXECUTE v_querytext
 				LOOP
-					sys_elev2_var=greatest(sys_elev2_var,rec_arc.sys_elev2);
+					v_sys_elev2=greatest(v_sys_elev2,rec_arc.sys_elev2);
 				END LOOP;
 			ELSE
-				sys_elev2_var=NULL;
+				v_sys_elev2=NULL;
 			END IF;
 			
-			IF sys_elev1_var > sys_elev2_var AND sys_elev1_var IS NOT NULL AND sys_elev2_var IS NOT NULL THEN
+			IF v_sys_elev1 > v_sys_elev2 AND v_sys_elev1 IS NOT NULL AND v_sys_elev2 IS NOT NULL THEN
 				INSERT INTO anl_node (node_id, nodecat_id, expl_id, fprocesscat_id, the_geom, arc_distance, state) VALUES
-				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 11, rec_node.the_geom,sys_elev1_var - sys_elev2_var,rec_node.state );
-				raise notice 'Node found % :[% / %] maxelevin % maxelevout %',rec_node.node_id, v_i, v_count, sys_elev2_var , sys_elev1_var ;
+				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 11, rec_node.the_geom,v_sys_elev1 - v_sys_elev2,rec_node.state );
+				raise notice 'Node found % :[% / %] maxelevin % maxelevout %',rec_node.node_id, v_i, v_count, v_sys_elev2 , v_sys_elev1 ;
 			END IF;
 		
 		END LOOP;
@@ -120,10 +124,18 @@ BEGIN
 
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom, fprocesscat_id FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
+  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
@@ -139,13 +151,18 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"setVisibleLayers":[]'||
 			'}}'||
 	    '}')::json;
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
