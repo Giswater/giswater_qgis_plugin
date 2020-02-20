@@ -64,6 +64,12 @@ BEGIN
 	v_valuefield = (SELECT (value::json->>'nodeTable')::json->>'valueField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
 	v_headerfield = (SELECT (value::json->>'nodeTable')::json->>'headerField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
 	
+	-- setting cost field when cost is null
+	IF v_costfield IS NULL 
+	
+	END IF;
+	
+	
 	-- get variables (from version)
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
 
@@ -150,7 +156,7 @@ BEGIN
 		-- inundation process
 		LOOP	
 			v_cont1 = v_cont1+1;
-			UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = n.value + length*cost FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
+			EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = n.value + length'|| * v_costfield||' FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id';
 			GET DIAGNOSTICS v_affectedrows =row_count;
 			EXIT WHEN v_affectedrows = 0;
 			EXIT WHEN v_cont1 = 200;
