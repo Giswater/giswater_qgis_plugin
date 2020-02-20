@@ -162,6 +162,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(
             partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.reload_table_visit))
+        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.populate_cmb_team))
         self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.manage_cmb_status))
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
@@ -342,11 +343,17 @@ class AddNewLot(ParentManage):
 
     def populate_cmb_team(self):
         """ Fill ComboBox cmb_assigned_to """
+        visit_class = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
 
-        sql = ("SELECT id, idval "
-               "FROM cat_team "
-               "WHERE active is True "
-               "ORDER BY idval")
+        sql = ("SELECT DISTINCT(cat_team.id), idval "
+               "FROM cat_team ")
+        if visit_class:
+            sql += ("JOIN om_team_x_visitclass ON cat_team.id = om_team_x_visitclass.team_id "
+                    "WHERE active is True AND visitclass_id = " + str(visit_class) + " ")
+        else:
+            sql += ("WHERE active is True ")
+        sql += ("ORDER BY idval")
+
         rows = self.controller.get_rows(sql, commit=True)
         if rows:
             utils_giswater.set_item_data(self.dlg_lot.cmb_assigned_to, rows, 1)
