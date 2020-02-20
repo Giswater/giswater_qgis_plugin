@@ -88,7 +88,7 @@ BEGIN
 	v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
 	
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Capture system values of selected node 1 - top elev:',v_top1 , ', elev:', v_elev1));
+    VALUES (113, 4, concat('System values of node 1 - top elev:',v_top1 , ', elev:', v_elev1));
 
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
@@ -96,7 +96,7 @@ BEGIN
 	v_elev2:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node2);
 
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Capture system values of selected node 2 - top elev:',v_top2 , ', elev:', v_elev2));
+    VALUES (113, 4, concat('System values of node 2 - top elev:',v_top2 , ', elev:', v_elev2));
 
 	-- Calculate distances
 	v_distance10 = (SELECT ST_distance (v_geom0 , v_geom1));
@@ -141,13 +141,13 @@ BEGIN
     VALUES (113, 4, concat('Final custom results for a selected node'));
 
     INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Top elev:',v_top));
+    VALUES (113, 4, concat('Top elev:',v_top0::numeric(12,3)::text));
 
     INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Ymax:',v_ymax));
+    VALUES (113, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
 
     INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-    VALUES (113, 4, concat('Elev:',v_elev));
+    VALUES (113, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
 
 	-- get results
 	-- info
