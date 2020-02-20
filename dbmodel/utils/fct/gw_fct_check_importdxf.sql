@@ -66,9 +66,9 @@ BEGIN
 		"feature":{"catFeature":"DXF_JUN"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}$$);
 
 		IF v_project_type = 'WS' THEN
-			INSERT INTO node_type(id, type, epa_default, man_table, epa_table, active, code_autofill, 
+			INSERT INTO node_type(id, type, epa_default, man_table, epa_table, active, code_autofill, choose_hemisphere,
 		            isarcdivide, graf_delimiter)
-			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, true,true ,'NONE') 
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, true,false, true ,'NONE') 
 			ON CONFLICT DO NOTHING;
 
 			INSERT INTO cat_node(id, nodetype_id, active)
@@ -220,14 +220,28 @@ BEGIN
 
 	v_result := COALESCE(v_result, '{}'); 
 	
+	v_result = null;
+	
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
+  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=106) row) features;
+
+	v_result := COALESCE(v_result, '{}'); 
+	
 	IF v_result::text = '{}' THEN 
 		v_result_point = '{"geometryType":"", "values":[]}';
 	ELSE 
-		v_result_point = concat ('{"geometryType":"Point", "values":',v_result,',"category_field":"descript","size":4}');
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result,',"category_field":"descript","size":4}'); 
 	END IF;
 
-	v_result_line = '{"geometryType":"", "values":[],"category_field":""}';
-	v_result_polygon = '{"geometryType":"", "values":[],"category_field":""}';
+	v_result_line = '{"geometryType":"", "features":[],"category_field":""}';
+	v_result_polygon = '{"geometryType":"", "features":[],"category_field":""}';
 
 --  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Check import dxf done succesfully"}, "version":"'||v_version||'"'||
