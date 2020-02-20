@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2304
 	
-	
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer)
   RETURNS json AS
 $BODY$
@@ -132,84 +131,80 @@ BEGIN
 		
         IF controlValue = 1 THEN
 	
-			-- Select public.geometry
-            SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+		-- Select public.geometry
+		SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 
-            -- Insert arc id
-            INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
-			
-			
-			-- call engine to determinate the isolated area
-			IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
- 			
-				-- call graf analytics function (MCBASE)
-				v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg ,', "process":"base"}}}');
-				RAISE NOTICE 'v_data MINCUT %', v_data;
-				PERFORM gw_fct_grafanalytics_mincut(v_data);
-			
-			ELSIF v_mincutversion = 3 THEN
-			
-				-- Run for extremes node
-				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
-
-				IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
-					PERFORM audit_function(3006,2304);
-				END IF;
-            
-
-				-- Check extreme being a valve
-				SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-				WHERE node_id = node_1_aux AND result_id=result_id_arg AND ((unaccess = FALSE AND broken = FALSE) OR (closed = TRUE));
-
-				IF controlValue = 1 THEN
-					-- Set proposed valve
-					UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
-					
-				ELSE
-					-- Check if extreme if being a inlet
-					SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_1_aux;
-				
-					IF controlValue = 0 THEN
-						-- Compute the tributary area using DFS
-						PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);	
-					ELSE
-						SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_1_aux;
-						INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES (node_1_aux, node_aux, result_id_arg);	
-					END IF;
-				END IF;
-
-				-- Check other extreme being a valve
-				SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-				WHERE node_id = node_2_aux AND result_id=result_id_arg AND ((unaccess = FALSE AND broken = FALSE) OR (closed = TRUE));
-				IF controlValue = 1 THEN
-
-					-- Check if the valve is already computed
-					SELECT node_id INTO exists_id FROM anl_mincut_result_valve 
-					WHERE node_id = node_2_aux AND (proposed = TRUE) AND result_id=result_id_arg;
+		-- call engine to determinate the isolated area
+		IF v_mincutversion = 4 OR v_mincutversion = 5 THEN
 		
-					-- Compute proceed
-					IF NOT FOUND THEN
-						-- Set proposed valve
-						UPDATE anl_mincut_result_valve SET proposed = TRUE 
-						WHERE node_id=node_2_aux AND result_id=result_id_arg;
-					END IF;
-				ELSE
-					-- Check if extreme if being a inlet
-					SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
-					IF controlValue = 0 THEN
-						-- Compute the tributary area using DFS
-						PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	
-					ELSE 
-						SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_2_aux;
-						INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_2_aux, node_aux, result_id_arg);		
-					END IF;	
-				END IF;
-				
+			-- call graf analytics function (step:1)
+			v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg, '}}}');
+			RAISE NOTICE 'v_data MINCUT %', v_data;
+			PERFORM gw_fct_grafanalytics_mincut(v_data);
+		
+		ELSIF v_mincutversion = 3 THEN
+		
+			-- Run for extremes node
+			SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+
+			IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
+				PERFORM audit_function(3006,2304);
 			END IF;
+    
+
+			-- Check extreme being a valve
+			SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+			WHERE node_id = node_1_aux AND result_id=result_id_arg AND ((unaccess = FALSE AND broken = FALSE) OR (closed = TRUE));
+
+			IF controlValue = 1 THEN
+				-- Set proposed valve
+				UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
+				
+			ELSE
+				-- Check if extreme if being a inlet
+				SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_1_aux;
+			
+				IF controlValue = 0 THEN
+					-- Compute the tributary area using DFS
+					PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);	
+				ELSE
+					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_1_aux;
+					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES (node_1_aux, node_aux, result_id_arg);	
+				END IF;
+			END IF;
+
+			-- Check other extreme being a valve
+			SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+			WHERE node_id = node_2_aux AND result_id=result_id_arg AND ((unaccess = FALSE AND broken = FALSE) OR (closed = TRUE));
+			IF controlValue = 1 THEN
+
+				-- Check if the valve is already computed
+				SELECT node_id INTO exists_id FROM anl_mincut_result_valve 
+				WHERE node_id = node_2_aux AND (proposed = TRUE) AND result_id=result_id_arg;
+	
+				-- Compute proceed
+				IF NOT FOUND THEN
+					-- Set proposed valve
+					UPDATE anl_mincut_result_valve SET proposed = TRUE 
+					WHERE node_id=node_2_aux AND result_id=result_id_arg;
+				END IF;
+			ELSE
+				-- Check if extreme if being a inlet
+				SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
+				IF controlValue = 0 THEN
+					-- Compute the tributary area using DFS
+					PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	
+				ELSE 
+					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_2_aux;
+					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_2_aux, node_aux, result_id_arg);		
+				END IF;	
+			END IF;
+			
+		END IF;
 		
 		-- The arc_id was not found
 		ELSE 
-				PERFORM audit_function(1082,2304,element_id_arg);
+			PERFORM audit_function(1082,2304,element_id_arg);
 		END IF;
 
     ELSE

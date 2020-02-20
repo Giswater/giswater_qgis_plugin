@@ -117,14 +117,16 @@ BEGIN
 	-- insert arc results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_arc (result_id, arc_id, the_geom)
 		SELECT '||v_mincutid||', a.arc_id, the_geom FROM (SELECT DISTINCT arc_id FROM temp_anlgraf WHERE water=1)a
-		JOIN arc ON arc.arc_id::integer=a.arc_id';
+		JOIN arc ON arc.arc_id::integer=a.arc_id
+		ON CONFLICT (arc_id, result_id) DO NOTHING';
 
 	-- insert node results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_node (result_id, node_id, the_geom)
 		SELECT '||v_mincutid||', b.node_1, the_geom FROM (SELECT DISTINCT node_1, the_geom FROM
 		(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
 		JOIN node ON node.node_id::integer = a.node_1
-		GROUP BY node_1, water, the_geom HAVING water=1) b';
+		GROUP BY node_1, water, the_geom HAVING water=1) b
+		ON CONFLICT (node_id, result_id) DO NOTHING';
 
 	-- insert valve results into table
 	IF v_mincutstep = 1 THEN 
