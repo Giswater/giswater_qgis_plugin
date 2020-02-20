@@ -30,6 +30,7 @@ v_result_point		json;
 v_array 		text;
 v_version 		text;
 v_qmlpointpath text;
+v_error_context text;
 
 BEGIN
 	-- Search path
@@ -76,10 +77,18 @@ BEGIN
 
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, connec_id, connecat_id, state, expl_id, descript, the_geom, fprocesscat_id FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=5) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, connec_id, connecat_id, state, expl_id, descript, the_geom, fprocesscat_id
+  	FROM  anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=5) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
@@ -95,13 +104,17 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"setVisibleLayers":[]'||
 			'}}'||
 	    '}')::json;
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

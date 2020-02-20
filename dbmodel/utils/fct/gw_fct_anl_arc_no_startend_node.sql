@@ -12,11 +12,14 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe", "id":["2004","2005"]},
-"data":{"selectionMode":"previousSelection",
-	"parameters":{"arcSearchNodes":1},"parameters":{"saveOnDatabase":true
-	}}$$)
+"client":{"device":9, "infoType":100, "lang":"ES"}, 
+"form":{}, 
+"feature":{"tableName":"v_edit_arc", 
+"featureType":"ARC", "id":[]}, 
+"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
+"parameters":{"arcSearchNodes":"0.1", 
+"saveOnDatabase":"true"}}}$$)::text
+
 */
 
 DECLARE
@@ -40,6 +43,7 @@ v_totcount integer = 0;
 v_version text;
 v_qmlpointpath text;
 v_qmllinepath text;
+v_error_context text;
 
 BEGIN
 
@@ -101,18 +105,36 @@ BEGIN
 
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, arccat_id, state, expl_id, descript, the_geom_p as the_geom, fprocesscat_id FROM anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=3) row; 
+
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom_p)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom_p'
+  	) AS feature
+  	FROM (SELECT id, node_id, arccat_id, state, expl_id, descript,fprocesscat_id, the_geom_p
+  	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=3) row) features;
+  	
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}');
 	
 
 	--lines
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=3) row; 
+
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fprocesscat_id, the_geom
+  	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=3) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, '}');
+	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
@@ -129,7 +151,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
@@ -137,6 +159,11 @@ BEGIN
 				'"setVisibleLayers":[]'||
 		       '}}'||
 	    '}')::json;
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 	 
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
