@@ -213,9 +213,9 @@ BEGIN
     v_result_info := COALESCE(v_result, '{}'); 
     v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-    v_result_point = '{"geometryType":"", "values":[]}';
-    v_result_line = '{"geometryType":"", "values":[]}';
-    v_result_polygon = '{"geometryType":"", "values":[]}';
+    v_result_point = '{"geometryType":"", "features":[]}';
+    v_result_line = '{"geometryType":"", "features":[]}';
+    v_result_polygon = '{"geometryType":"", "features":[]}';
 
 --  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Arc fusion done successfully"}, "version":"'||v_version||'"'||
