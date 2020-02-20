@@ -20,7 +20,7 @@ else:
     from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
 
-from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime
+from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime, QSettings
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout
@@ -71,7 +71,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.cmb_position = 16  # Variable used to set the position of the QCheckBox in the relations table
+        self.cmb_position = 17  # Variable used to set the position of the QCheckBox in the relations table
 
         self.srid = self.controller.plugin_settings_value('srid')
         # Get layers of every geom_type
@@ -1060,7 +1060,7 @@ class AddNewLot(ParentManage):
         combo_values = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if combo_values is None:
             return
-        self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 16, combo_values)
+        self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 17, combo_values)
 
 
     def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
@@ -1249,11 +1249,11 @@ class AddNewLot(ParentManage):
             visit_id = None
             status = None
             for key, value in list(item.items()):
-                if key == "visit_id":
+                if key == "Id visita":
                     visit_id = str(value)
-                if key == "status_name":
+                if key == "Estat visita":
                     if value not in ('', None):
-                        _sql = ("SELECT id FROM om_typevalue WHERE idval = '" + str(value) + "'")
+                        _sql = ("SELECT id FROM om_typevalue WHERE id = '" + str(value) + "' AND typevalue = 'visit_cat_status'")
                         result = self.controller.get_row(_sql, commit=True)
                         if result not in ('', None):
                             status = "$$" + str(result[0]) + "$$ "
@@ -1423,7 +1423,8 @@ class AddNewLot(ParentManage):
             utils_giswater.set_item_data(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
 
         # Populate combo date type
-        rows = [['Real', 'Real'],['Planificada', 'Planificada']]
+        rows = [['Real inici', 'Real inici'],['Real fi', 'Real fi'], ['Planificada inici', 'Planificada inici'],
+                ['Planificada fi', 'Planificada fi']]
         utils_giswater.set_item_data(self.dlg_lot_man.cmb_date_filter_type, rows, 1, sort_combo=False)
 
         table_object = "v_ui_om_visit_lot"
@@ -1463,6 +1464,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.btn_manage_load.clicked.connect(partial(self.open_load_manage))
         self.dlg_lot_man.btn_lot_selector.clicked.connect(partial(self.lot_selector))
 
+
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
         self.dlg_lot_man.cmb_actuacio.currentIndexChanged.connect(self.filter_lot)
@@ -1472,6 +1474,13 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_to.dateChanged.connect(self.filter_lot)
         self.dlg_lot_man.cmb_date_filter_type.currentIndexChanged.connect(self.filter_lot)
+        self.dlg_lot_man.cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
+        self.dlg_lot_man.chk_show_nulls.stateChanged.connect(self.filter_lot)
+
+        # Get date filter vdefault (last selection)
+        date_filter_vdef = QSettings().value('vdefault/date_filter')
+        if date_filter_vdef:
+            utils_giswater.set_combo_itemData(self.dlg_lot_man.cmb_date_filter_type, str(date_filter_vdef), 1)
 
         # Open form
         self.filter_lot()
@@ -1955,14 +1964,21 @@ class AddNewLot(ParentManage):
         status = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_estat, 1, add_quote=True)
         assignat = utils_giswater.isChecked(self.dlg_lot_man, self.dlg_lot_man.chk_assignacio)
 
+        # Get show null values
+        show_nulls = self.dlg_lot_man.chk_show_nulls.isChecked()
+
         # Get date type
         date_type = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type)
-        if date_type == 'Real':
-            start_filter_name = 'Data inici'
-            end_filter_name = 'Data fi'
+        if date_type == 'Real inici':
+            filter_name = 'Data inici'
+        elif date_type == 'Real fi':
+            filter_name = 'Data fi'
+        elif date_type == 'Planificada inici':
+            filter_name = 'Data inici planificada'
+        elif date_type == 'Planificada fi':
+            filter_name = 'Data final planificada'
         else:
-            start_filter_name = 'Data inici planificada'
-            end_filter_name = 'Data final planificada'
+            return
 
 
         visit_start = self.dlg_lot_man.date_event_from.date()
@@ -1980,8 +1996,13 @@ class AddNewLot(ParentManage):
 
         # expr_filter = ("(\"Data inici planificada\" BETWEEN "+str(interval)+" OR \"Data inici planificada\" IS NULL) "
         #                "AND (\"Data final planificada\" BETWEEN "+str(interval)+" OR \"Data final planificada\" IS NULL)")
-        expr_filter = ("(\"" + str(start_filter_name) + "\" BETWEEN " + str(interval) + " OR \"" + str(start_filter_name) + "\" IS NULL) "
-                       "AND (\"" + str(end_filter_name) + "\" BETWEEN " + str(interval) + " OR \"" + str(end_filter_name) + "\" IS NULL)")
+        # expr_filter = ("(\"" + str(filter_name) + "\" BETWEEN " + str(interval) + " OR \"" + str(filter_name) + "\" IS NULL) ")
+
+        expr_filter = ("(\"" + str(filter_name) + "\" BETWEEN " + str(interval) + " ")
+        if show_nulls:
+            expr_filter += " OR \"" + str(filter_name) + "\" IS NULL) "
+        else:
+            expr_filter += ") "
         if serie != 'null':
             expr_filter += " AND \"Serie\" ILIKE '%"+str(serie)+"%'"
         if actuacio != '' and actuacio != -1:
@@ -2367,3 +2388,12 @@ class AddNewLot(ParentManage):
         if not add_vehicle:
             self.dlg_basic_table.btn_add_row.setVisible(False)
         self.open_dialog(self.dlg_basic_table)
+
+
+    def manage_date_filter(self):
+
+        # Get date type
+        date_type = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.cmb_date_filter_type)
+
+        settings = QSettings()
+        settings.setValue("vdefault/date_filter", str(date_type))
