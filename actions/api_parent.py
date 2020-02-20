@@ -1192,7 +1192,7 @@ class ApiParent(ParentAction):
         utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Select 2 nodes')
         self.dlg_binfo.lbl_text.setText("Node1: \nNode2:")
 
-        self.dlg_binfo.btn_accept.clicked.connect(partial(self.set_values))
+        self.dlg_binfo.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
         self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
         self.dlg_binfo.rejected.connect(partial(self.save_settings, self.dlg_binfo))
         self.dlg_binfo.rejected.connect(partial(self.remove_interpolate_rb))
@@ -1294,6 +1294,22 @@ class ApiParent(ParentAction):
             self.add_layer.populate_info_text(self.dlg_binfo, self.interpolate_result['body']['data'])
 
 
+    def chek_for_existing_values(self):
+        text = False
+        for k, v in self.interpolate_result['body']['data']['fields'][0].items():
+            widget = self.dlg_cf.findChild(QWidget, k)
+            if widget:
+                text = utils_giswater.getWidgetText(self.dlg_cf, widget, False, False)
+                if text:
+                    msg = "Do you want to overwrite values?"
+                    answer = self.controller.ask_question(msg, "Overwrite values")
+                    if answer:
+                        self.set_values()
+                    break
+        if not text:
+            self.set_values()
+
+
     def set_values(self):
         # Set values tu info form
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
@@ -1302,7 +1318,6 @@ class ApiParent(ParentAction):
                 widget.setStyleSheet(None)
                 utils_giswater.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
-
         self.close_dialog(self.dlg_binfo)
 
 
