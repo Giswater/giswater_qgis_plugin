@@ -38,6 +38,7 @@ v_result_id 		text;
 v_features 		text;
 v_edit			text;
 v_config_param 		text;
+v_error_context text;
 
 BEGIN
 
@@ -633,32 +634,47 @@ BEGIN
 	--points
 	v_result = null;
 
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() 
 	AND fprocesscat_id IN (4,87,96,87,102,103)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() 
-	AND fprocesscat_id IN (101,102,104,105,106)) row;  
+	AND fprocesscat_id IN (101,102,104,105,106)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	
+
 	IF v_result = '{}' THEN 
-		v_result_point = '{"geometryType":"", "values":[]}';
+		v_result_point = '{"geometryType":"", "features":[]}';
 	ELSE 
-		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 	END IF;
 
 	--lines
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() 
-	AND (fprocesscat_id=4 OR fprocesscat_id=88 OR fprocesscat_id=102)) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (4, 88, 102)) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+
 
 	IF v_result = '{}' THEN 
-		v_result_line = '{"geometryType":"", "values":[]}';
+		v_result_line = '{"geometryType":"", "features":[]}';
 	ELSE 
-		v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 	END IF;
 
 	--polygons
@@ -680,7 +696,13 @@ BEGIN
 				'"setVisibleLayers":[] }'||
 		       '}'||
 	    '}')::json;
-	
+
+--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

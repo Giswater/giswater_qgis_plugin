@@ -35,6 +35,7 @@ DECLARE
 	v_count			integer;
 	v_qmlpointpath		text;
 	v_qmllinepath		text;
+	v_errcontext text;
 
 BEGIN
 
@@ -114,18 +115,33 @@ BEGIN
 
 	-- points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, connec_id, connecat_id, state, expl_id, descript, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=92) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, connec_id, connecat_id, state, expl_id, descript, the_geom
+  	FROM  anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=92) row) features;
 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 	-- lines
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=90) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=90) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, '}');
-	
+	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
+
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
@@ -138,7 +154,13 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||
 		     '}}}')::json;
-	
+
+
+--  Exception handling
+    EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	  
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

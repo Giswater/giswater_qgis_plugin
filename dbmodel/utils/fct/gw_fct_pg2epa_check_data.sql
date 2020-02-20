@@ -87,6 +87,7 @@ v_advancedsettings text;
 v_advancedsettingsval text;
 v_curvedefault text;
 v_options json;
+v_error_context text;
 
 BEGIN
 
@@ -272,7 +273,7 @@ BEGIN
 
 	IF v_usenetworkgeom IS TRUE THEN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 2, concat('WARNING: Use result network geometry have been checked. Network geometry defined on the same result done before have been used. This method is faster but be shure existing geometry is well-built.'));
+		VALUES (14, v_result_id, 2, concat('WARNING: Use result network geometry have been checked. Network geometry defined on the same result done before have been used. This method is faster but be sure existing geometry is well-built.'));
 	ELSE
 		-- UTILS
 		RAISE NOTICE '1 - Check orphan nodes (7)';
@@ -1194,7 +1195,7 @@ BEGIN
 
 		IF v_usenetworkdemand IS TRUE THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 2, concat('WARNING: Skip demand control have been checked. Demands applied on the same result done before have been used. This method is faster but be shure demands are well-built.'));
+			VALUES (14, v_result_id, 2, concat('WARNING: Skip demand control have been checked. Demands applied on the same result done before have been used. This method is faster but be sure demands are well-built.'));
 		ELSE 
 			IF v_demandtype = 1 THEN
 
@@ -1475,24 +1476,49 @@ BEGIN
 	
 		--points
 		v_result = null;
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (7, 14, 64, 66, 70, 71, 98)) row; 
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "values":',v_result, '}');
+	
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+	  	SELECT jsonb_build_object(
+	     'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
+	  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (7, 14, 64, 66, 70, 71, 98)) row) features;
 
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+	
 		--lines
 		v_result = null;
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (3, 14, 39)) row; 
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+  		SELECT jsonb_build_object(
+     	'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fprocesscat_id
+	  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (3, 14, 39)) row) features;
+
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "values":',v_result, '}');
+		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
 
 		--polygons
 		v_result = null;
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom FROM anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=14) row; 
+		SELECT jsonb_agg(features.feature) INTO v_result
+		FROM (
+  		SELECT jsonb_build_object(
+     	'type',       'Feature',
+	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+	    'properties', to_jsonb(row) - 'the_geom'
+	  	) AS feature
+	  	FROM (SELECT id, pol_id, pol_type, state, expl_id, descript, the_geom
+	  	FROM  anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id =14) row) features;
+
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_polygon = concat ('{"geometryType":"Polygon","qmlPath":"',v_qmlpolpath,'", "values":',v_result, '}');
+		v_result_polygon = concat ('{"geometryType":"Polygon","qmlPath":"',v_qmlpolpath,'", "features":',v_result, '}');
 
 		--    Control nulls
 		v_result_point := COALESCE(v_result_point, '{}'); 
@@ -1522,6 +1548,12 @@ BEGIN
 			'}')::json;
 
 	END IF;
+
+	--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

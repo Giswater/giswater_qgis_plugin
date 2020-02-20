@@ -33,7 +33,7 @@ v_result_line 		json;
 v_result_polygon	json;
 v_saveondatabase 	boolean;
 v_result_id 		text = 0;
-
+v_error_context text;
 
 BEGIN 
 
@@ -378,6 +378,12 @@ BEGIN
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
 	    '}')::json;
+
+
+--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
