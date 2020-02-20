@@ -338,6 +338,11 @@ class TmBasic(TmParentAction):
 
         utils_giswater.set_item_data(dlg_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
 
+        filter_builder = [['','']]
+        for item in self.rows_cmb_builder:
+            filter_builder.append(item)
+        utils_giswater.set_item_data(dlg_selector.cmb_filter_builder, filter_builder, 1, sort_combo=False)
+
         # Populate QTableView
         self.fill_table(dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers, update=True)
         if update:
@@ -352,18 +357,13 @@ class TmBasic(TmParentAction):
 
         # Set signals
         dlg_selector.chk_permanent.stateChanged.connect(partial(self.force_chk_current, dlg_selector))
-        dlg_selector.btn_select.clicked.connect(
-            partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.all_rows.doubleClicked.connect(
-            partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.btn_unselect.clicked.connect(
-            partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.selected_rows.doubleClicked.connect(
-            partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))   
-        dlg_selector.txt_search.textChanged.connect(
-            partial(self.fill_main_table, dlg_selector, tableleft, set_edit_triggers=QTableView.NoEditTriggers))
-        dlg_selector.txt_selected_filter.textChanged.connect(
-            partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.btn_select.clicked.connect(partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.all_rows.doubleClicked.connect(partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.btn_unselect.clicked.connect(partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.selected_rows.doubleClicked.connect(partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.txt_search.textChanged.connect(partial(self.fill_main_table, dlg_selector, tableleft, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.txt_selected_filter.textChanged.connect(partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.cmb_filter_builder.currentIndexChanged.connect(partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
         dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, dlg_selector))
         dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, dlg_selector))
         dlg_selector.rejected.connect(partial(self.close_dialog, dlg_selector))  
@@ -404,15 +404,14 @@ class TmBasic(TmParentAction):
         for x in range(0, len(id_all_selected_rows)):
             ids += str(id_all_selected_rows[x]) + ", "
         ids = ids[:-2] + ""
-
-        # Build expression
         expr = (f" mu_name ILIKE '%{dialog.txt_search.text()}%'"
                 f" AND mu_id NOT IN ({ids})"
-                f" AND campaign_id::text = '{self.campaign_id}'"
+                f" AND campaign_id = {self.campaign_id}"
                 f" OR (campaign_id IS null AND mu_id NOT IN ({ids}))")
-        # (is_valid, expr) = self.check_expression(expr)  # @UnusedVariable
-        # # if not is_valid:
-        # #     return
+        (is_valid, exp) = self.check_expression(expr)
+        if not is_valid:
+            print("IS NOT VALID")
+            return
         model.setFilter(expr)
         
         # Refresh model?
@@ -444,14 +443,15 @@ class TmBasic(TmParentAction):
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
-
+        builder = utils_giswater.get_item_data(dialog, dialog.cmb_filter_builder, 1)
         # Create expresion
-        expr = f" mu_name ILIKE '%{dialog.txt_selected_filter.text()}%'"
+        expr = f" (mu_name ILIKE '%{dialog.txt_selected_filter.text()}%'"
+        expr += f" AND builder ILIKE '%{builder}%')"
         if self.selected_camp is not None:
             expr += f" AND campaign_id = '{self.campaign_id}'"
             if update:
                 expr += f" OR campaign_id = '{self.selected_camp}'"
-
+        print(expr)
         # Attach model to table or view
         dialog.selected_rows.setModel(model)
         dialog.selected_rows.model().setFilter(expr)
@@ -676,6 +676,9 @@ class TmBasic(TmParentAction):
         self.plan_code = utils_giswater.getWidgetText(dialog, dialog.txt_plan_code)
         self.planned_camp_id = utils_giswater.get_item_data(dialog, dialog.cbx_years, 0)
         self.planned_camp_name = utils_giswater.get_item_data(dialog, dialog.cbx_years, 1)
+        sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
+        sql += f"INSERT INTO selector_planning VALUES ('{self.planned_camp_id}', current_user);"
+        self.controller.execute_sql(sql, commit=True, log_sql=True)
 
         if self.planned_camp_id == -1:
             message = "No hi ha cap any planificat"
