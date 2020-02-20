@@ -697,6 +697,7 @@ class DaoController(object):
         self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
         self.dlg_info.setWindowTitle(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_info.exec()
 
 
