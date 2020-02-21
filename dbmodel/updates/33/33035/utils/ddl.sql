@@ -26,3 +26,7 @@ CREATE TABLE doc_x_workcat
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_function", "column":"sample_query", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"addparam", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_node", "column":"addparam", "dataType":"text", "isUtils":"False"}}$$);
+
+-- 2020/02/20
+ALTER TABLE anl_polygon ALTER COLUMN the_geom TYPE geometry('MULTIPOLYGON')
+
