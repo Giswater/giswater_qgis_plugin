@@ -189,9 +189,9 @@ BEGIN
 
     --geometry
 
-    v_result_line = '{"geometryType":"", "values":[]}';
-    v_result_polygon = '{"geometryType":"", "values":[]}';
-    v_result_point = '{"geometryType":"", "values":[]}';
+    v_result_line = '{"geometryType":"", "features":[]}';
+    v_result_polygon = '{"geometryType":"", "features":[]}';
+    v_result_point = '{"geometryType":"", "features":[]}';
 
 --  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Copy schema done successfully"}, "version":"'||v_version||'"'||

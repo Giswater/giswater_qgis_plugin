@@ -589,10 +589,7 @@ BEGIN
 
 		-- arc elements
 		v_result = null;
-raise notice 'v_field,%',v_field;
-raise notice 'v_fieldmp,%',v_fieldmp;
-raise notice 'v_table,%',v_table;
-raise notice 'v_fprocesscat_id,%',v_fprocesscat_id;
+
 		EXECUTE 'SELECT jsonb_agg(features.feature) 
 		FROM (
 	  	SELECT jsonb_build_object(
