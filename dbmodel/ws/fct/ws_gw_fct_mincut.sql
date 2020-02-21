@@ -16,35 +16,35 @@ SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', 1)
 */
 
 DECLARE
-    node_1_aux		text;
-    node_2_aux		text;
-    controlValue	integer;
-    exists_id		text;
-    polygon_aux		public.geometry;
-    polygon_aux2	public.geometry;
-    arc_aux        	 public.geometry;
-    node_aux        	public.geometry;    
-    srid_schema		text;
-    expl_id_arg         integer;
-    macroexpl_id_arg	integer;
-    v_return		json;
-    cont1 		integer default 0;
-    v_publish_user 	text;
-    v_muni_id 		integer;
-    v_numarcs		integer;
-    v_length 		double precision;
-    v_numconnecs 	integer;
-    v_numhydrometer	integer;
-    v_debug		Boolean;
-    v_overlap		text;
-    v_geometry 		text;
-    v_data		json;
-    v_volume 		float;
-    v_priority		json;
-    v_count		int2;
-    v_mincutversion 	integer;
-    v_mincutdetails	text;
-    v_outpùt		json;
+node_1_aux text;
+node_2_aux text;
+controlValue integer;
+exists_id text;
+polygon_aux public.geometry;
+polygon_aux2 public.geometry;
+arc_aux public.geometry;
+node_aux public.geometry;    
+srid_schema text;
+expl_id_arg integer;
+macroexpl_id_arg integer;
+v_return json;
+cont1 integer default 0;
+v_publish_user text;
+v_muni_id integer;
+v_numarcs integer;
+v_length double precision;
+v_numconnecs integer;
+v_numhydrometer integer;
+v_debug Boolean;
+v_overlap text;
+v_geometry text;
+v_data json;
+v_volume float;
+v_priority json;
+v_count int2;
+v_mincutversion integer;
+v_mincutdetails	text;
+v_output json;
 
 BEGIN
     -- Search path
@@ -144,6 +144,10 @@ BEGIN
 		
 		ELSIF v_mincutversion = 3 THEN
 		
+			-- insert the initial arc
+			INSERT INTO anl_mincut_result_arc (arc_id, the_geom, result_id) 
+			SELECT arc_id, the_geom, result_id_arg FROM arc WHERE arc_id = element_id_arg;
+ 	
 			-- Run for extremes node
 			SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 
@@ -277,19 +281,19 @@ BEGIN
 	v_mincutdetails = (concat('"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
 	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}'));
 
-	v_outpùt = concat ('{', v_mincutdetails , '}');
+	v_output = concat ('{', v_mincutdetails , '}');
 			
-	INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_outpùt);
+	INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_output);
 
 	--update output results
-	UPDATE anl_mincut_result_cat SET output = v_outpùt WHERE id = result_id_arg;
+	UPDATE anl_mincut_result_cat SET output = v_output WHERE id = result_id_arg;
 
 	-- calculate the boundary of mincut using arcs and valves
 	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
 		' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
 	        INTO v_geometry;
 
-	RAISE NOTICE 'v_outpùt %', v_outpùt;
+	RAISE NOTICE 'v_output %', v_output;
 			
 	-- restore state selector
 	INSERT INTO selector_state (state_id, cur_user)
@@ -302,7 +306,6 @@ BEGIN
 	IF v_debug THEN RAISE NOTICE 'End of process ';	END IF;
 	
 	RETURN v_return;
-
 
 END;
 $BODY$
