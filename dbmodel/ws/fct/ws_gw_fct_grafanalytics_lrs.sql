@@ -64,11 +64,10 @@ BEGIN
 	v_valuefield = (SELECT (value::json->>'nodeTable')::json->>'valueField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
 	v_headerfield = (SELECT (value::json->>'nodeTable')::json->>'headerField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
 	
-	-- setting cost field when cost is null
-	IF v_costfield IS NULL 
-	
+	-- setting cost field when has not configure value
+	IF v_costfield IS NULL THEN
+		v_costfield =  '1::float';
 	END IF;
-	
 	
 	-- get variables (from version)
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
@@ -119,11 +118,11 @@ BEGIN
 
 	-- getting v_querys of nodeparents (node_id and toarc) from config variable
 	v_querynode = 'SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
-			FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf''';
+				  FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf''';
 			
 	v_queryarc =  'SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' as node_id,
 			      json_array_elements_text(((json_array_elements_text((value::json->>''headers'')::json))::json->>''toArc'')::json) as to_arc 
-			FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'' order by 1,2';
+				  FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'' order by 1,2';
 
 	-- close boundary conditions, setting flag=1 for all nodes that fits on graf delimiters
 	EXECUTE 'UPDATE temp_anlgraf SET flag=1 WHERE node_1 IN ('||v_querynode||') OR  node_2 IN ('||v_querynode||')';
@@ -136,14 +135,14 @@ BEGIN
 	-- starting process
 	LOOP
 	
-		-- looking for gra delimiter
+		-- looking for pick one graf header
 		v_querytext = 'SELECT * FROM temp_anlgraf WHERE node_id IN ('||v_querynode||') AND checkf = 0 LIMIT 1 ) a';
 		IF v_querytext IS NOT NULL THEN
 			RAISE NOTICE 'v_querytext %', v_querytext;
 			EXECUTE v_querytext INTO v_feature;
 		END IF;
 
-		-- finish process when grafdelimiter is not found
+		-- finish process when graf header is not found
 		EXIT WHEN v_feature.id IS NULL;
 
 		-- reset water flag
@@ -196,13 +195,11 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
-	
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_visible_layer := COALESCE(v_visible_layer, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	
-
 --  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
