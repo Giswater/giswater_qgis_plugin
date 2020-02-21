@@ -1717,16 +1717,16 @@ class AddNewLot(ParentManage):
         # QLineEdit
         dialog.txt_name.textChanged.connect(
             partial(self.filter_lot_selector, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright,
-                    field_id_right, field_id_left))
+                    field_id_right, field_id_left, data))
         dialog.txt_status_filter.textChanged.connect(
             partial(self.filter_lot_selector, dialog, dialog.txt_status_filter, tbl_all_rows, tableleft, tableright,
-                    field_id_right, field_id_left))
+                    field_id_right, field_id_left, data))
         dialog.txt_wotype_filter.textChanged.connect(
             partial(self.filter_lot_selector, dialog, dialog.txt_wotype_filter, tbl_all_rows, tableleft, tableright,
-                    field_id_right, field_id_left))
+                    field_id_right, field_id_left, data))
 
 
-    def filter_lot_selector(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l):
+    def filter_lot_selector(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, filter_data):
         """ Fill the QTableView by filtering through the QLineEdit"""
         filter_id = utils_giswater.getWidgetText(dialog, dialog.txt_name)
         filter_status = utils_giswater.getWidgetText(dialog, dialog.txt_status_filter)
@@ -1745,11 +1745,12 @@ class AddNewLot(ParentManage):
                 " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
                 " WHERE cur_user = current_user) AND LOWER(id::text) LIKE '%" + str(filter_id) + "%'"
                 " AND LOWER("+'"Estat"'+"::text) LIKE '%" + str(filter_status) + "%'"
-                " AND (LOWER("+'"Tipus actuacio"'+"::text) LIKE '%" + str(filter_wotype) + "%'")
+                " AND LOWER(id::text) = ANY(ARRAY" + str(filter_data) + ")"
+                " AND (LOWER(" + '"Tipus actuacio"' + "::text) LIKE '%" + str(filter_wotype) + "%'")
         if filter_wotype in (None, ''):
-            sql += " OR LOWER("+'"Tipus actuacio"'+"::text) IS NULL)"
-        else:
-            sql += ")"
+            sql += " OR LOWER("+'"Tipus actuacio"'+"::text) IS NULL"
+        sql += " ) ORDER BY id desc"
+
         self.fill_table_by_query(qtable, sql)
 
 
