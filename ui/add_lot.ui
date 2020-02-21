@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>603</width>
-    <height>660</height>
+    <width>445</width>
+    <height>734</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,6 +33,13 @@
              <string>Ordre de treball:</string>
             </property>
             <layout class="QGridLayout" name="gridLayout">
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Observacions:</string>
+               </property>
+              </widget>
+             </item>
              <item row="3" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
@@ -162,6 +169,9 @@
                 <widget class="QLineEdit" name="txt_wotype_id"/>
                </item>
               </layout>
+             </item>
+             <item row="8" column="0">
+              <widget class="QTextEdit" name="txt_observ"/>
              </item>
             </layout>
            </widget>

@@ -198,6 +198,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.txt_ot_type.setReadOnly(True)
         self.dlg_lot.txt_wotype_id.setReadOnly(True)
         self.dlg_lot.txt_ot_address.setReadOnly(True)
+        self.dlg_lot.txt_observ.setReadOnly(True)
 
         # Check if enable or disable tab relation if
         self.set_tab_dis_enabled()
@@ -418,7 +419,7 @@ class AddNewLot(ParentManage):
 
         # Fill ComboBox cmb_ot
         sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
-               " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id "
+               " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id, ext_workorder.observations "
                " FROM ext_workorder "
                " LEFT JOIN om_visit_lot ON om_visit_lot.serie = ext_workorder.serie ")
         if lot_id:
@@ -435,8 +436,8 @@ class AddNewLot(ParentManage):
         if rows:
             for row in rows:
                 self.list_to_show.append(row[0])
-                # elem = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address, 4-serie,5-visitclass_id)
-                elem = [row[1], row[2], row[3], row[4], row[5], row[6]]
+                # elem = (0-class_id, 1-wotype_id, 2-wotype_name, 3-address, 4-serie,5-visitclass_id, 6-observations)
+                elem = [row[1], row[2], row[3], row[4], row[5], row[6], row[7]]
                 self.list_to_work.append(elem)
                 ot_result = True
         else:
@@ -505,11 +506,12 @@ class AddNewLot(ParentManage):
     def set_ot_fields(self, index):
 
         item = self.list_to_work[index]
+
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_wotype_id, item[2])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[3])
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript, item[1])
         utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_observ, item[6])
 
         # Enable/Disable visit class combo according selected OT
         if utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot) == 'null':
@@ -744,6 +746,7 @@ class AddNewLot(ParentManage):
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(lot['visitclass_id']), 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, str(lot['team_id']), 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, str(lot['status']), 0)
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript, lot['descript'])
             if lot['status'] in (4, 5):
                 self.dlg_lot.cmb_assigned_to.setEnabled(False)
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
@@ -1158,6 +1161,7 @@ class AddNewLot(ParentManage):
         lot['adreca'] = item[3]
         lot['serie'] = item[4]
         lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
+        lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.descript, False, False)
 
         keys = ""
         values = ""
