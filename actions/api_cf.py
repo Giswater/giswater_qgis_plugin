@@ -481,11 +481,11 @@ class ApiCF(ApiParent, QObject):
         result = complet_result[0]['body']['data']
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
-                continue
+            if 'hidden' in field and field['hidden']: continue
+
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
-            if widget is None:
-                return False, False
+            if widget is None: continue
+
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
 
             # Take the QGridLayout with the intention of adding a QSpacerItem later
@@ -636,19 +636,20 @@ class ApiCF(ApiParent, QObject):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-
-        try :
+                
+        try:
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
-            if widget.property('column_id') == self.field_id:
-                self.feature_id = widget.text()
-                # Set filter expression
-                expr_filter = f"{self.field_id} = '{self.feature_id}'"
-                self.feature = self.get_feature_by_expr(self.layer, expr_filter)
-
         except AttributeError as e:
             message = "The field widgettype is not configured for"
-            self.controller.show_message(message, 2, parameter=field['column_id'])
+            msg = f"formname:{self.tablename}, column_id:{field['column_id']}"
+            self.controller.show_message(message, 2, parameter=msg)
+            return label, widget
 
+        if widget.property('column_id') == self.field_id:
+            self.feature_id = widget.text()
+            # Set filter expression
+            expr_filter = f"{self.field_id} = '{self.feature_id}'"
+            self.feature = self.get_feature_by_expr(self.layer, expr_filter)
         return label, widget
 
 
