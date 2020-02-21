@@ -69,11 +69,16 @@ BEGIN
 			END IF;
 				
 		ELSIF v_view='vi_subcatchments' THEN 
+
 			INSERT INTO subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id) 
 			VALUES (NEW.subc_id, NEW.rg_id, NEW.outlet_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, 1);
 			
 			INSERT INTO cat_hydrology (hydrology_id,name, infiltration) SELECT DISTINCT hydrology_id, 'Default scenario','CURVE_NUMBER' FROM subcatchment 
 			WHERE hydrology_id NOT IN (SELECT hydrology_id FROM cat_hydrology);
+
+
+			INSERT INTO inp_snowpack_id (snow_id) 
+			SELECT NEW.snow_id FROM subcatchment WHERE NEW.snow_id not in (select snow_id FROM inp_snowpack_id);
 
 		ELSIF v_view='vi_subareas' THEN
 			UPDATE subcatchment SET nimp=NEW.nimp, nperv=NEW.nperv, simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted WHERE subc_id=NEW.subc_id;
@@ -102,6 +107,9 @@ BEGIN
 			INSERT INTO inp_snowpack (snow_id, snow_type, value_1, value_2, value_3, value_4, value_5, value_6, value_7)
 			VALUES (NEW.snow_id,NEW.snow_type, NEW.value_1, NEW.value_2, NEW.value_3, NEW.value_4, NEW.value_5, NEW.value_6, NEW.value_7);
 			
+			INSERT INTO inp_snowpack_id (snow_id) 
+			SELECT NEW.snow_id FROM inp_snowpack WHERE NEW.snow_id not in (select snow_id FROM inp_snowpack_id);
+
 		ELSIF v_view='vi_gwf' THEN 
 			UPDATE inp_groundwater set fl_eq_lat=split_part(NEW.fl_eq_lat,';',2),fl_eq_deep=split_part(NEW.fl_eq_deep,';',2) WHERE subc_id=NEW.subc_id;
 			
@@ -169,12 +177,12 @@ BEGIN
 			v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
 
 			IF v_linkoffsets ='ELEVATION' THEN
-				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, sys_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
+				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, custom_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
 				VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, NEW.z1, NEW.z2, NEW.length, 'EPACOND', 'CONDUIT', NEW.n, 1, 1, 1, 1, 2);
 			ELSE
 				v_y1 = (SELECT ymax FROM node WHERE node_id=NEW.node_1 LIMIT 1)-NEW.z1;
 				v_y2 = (SELECT ymax FROM node WHERE node_id=NEW.node_1 LIMIT 1)-NEW.z1;
-				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, sys_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
+				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, custom_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
 				VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, v_y1, v_y2, NEW.length, 'EPACOND', 'CONDUIT', NEW.n, 1, 1, 1, 1, 2);
 			END IF;
 
@@ -252,8 +260,8 @@ BEGIN
 			INSERT INTO inp_controls_importinp (text) VALUES (NEW.text);
 			
 		ELSIF v_view='vi_pollutants' THEN 
-			INSERT INTO inp_pollutants (poll_id, units_type, crain, cgw, cii, kd, sflag, copoll_id, cofract, cdwf) 
-			VALUES (NEW.poll_id, NEW.units_type, NEW.crain, NEW.cgw, NEW.cii, NEW.kd, NEW.sflag, NEW.copoll_id, NEW.cofract, NEW.cdwf);
+			INSERT INTO inp_pollutant (poll_id, units_type, crain, cgw, cii, kd, sflag, copoll_id, cofract, cdwf, cinit) 
+			VALUES (NEW.poll_id, NEW.units_type, NEW.crain, NEW.cgw, NEW.cii, NEW.kd, NEW.sflag, NEW.copoll_id, NEW.cofract, NEW.cdwf, NEW.cinit);
 			
 		ELSIF v_view='vi_landuses' THEN 
 			INSERT INTO inp_landuses (landus_id, sweepint, availab, lastsweep) VALUES (NEW.landus_id, NEW.sweepint, NEW.availab, NEW.lastsweep);
@@ -261,6 +269,8 @@ BEGIN
 		ELSIF v_view='vi_coverages' THEN 
 			INSERT INTO inp_coverage_land_x_subc(subc_id, landus_id, percent) VALUES (NEW.subc_id, NEW.landus_id, NEW.percent);
 			
+			INSERT INTO inp_landuses (landus_id) VALUES (NEW.landus_id) ON CONFLICT  (landus_id) DO NOTHING;
+
 		ELSIF v_view='vi_buildup' THEN
 			INSERT INTO inp_buildup_land_x_pol(landus_id, poll_id, funcb_type, c1, c2, c3, perunit) 
 			VALUES (NEW.landus_id, NEW.poll_id, NEW.funcb_type, NEW.c1, NEW.c2, NEW.c3, NEW.perunit);

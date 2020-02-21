@@ -53,15 +53,16 @@ $BODY$
 	v_result_info 	json;
 	v_result_point	json;
 	v_result_line 	json;
-	v_version	json;
+	v_version	text;
 	v_path 		text;
+	v_error_context text;
 
 BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get project type and srid
-	SELECT wsoftware, epsg INTO v_projecttype, v_epsg FROM version LIMIT 1;
+	SELECT wsoftware, epsg, giswater INTO v_projecttype, v_epsg, v_version FROM version LIMIT 1;
 
 	-- get input data
 	v_createsubcgeom := (((p_data ->>'data')::json->>'parameters')::json->>'createSubcGeom')::boolean;
@@ -107,6 +108,8 @@ BEGIN
 		DELETE FROM man_manhole;
 		DELETE FROM man_conduit;
 		DELETE FROM man_varc;
+		DELETE FROM config_param_user WHERE parameter ILIKE 'inp_options%' AND cur_user = current_user;
+		DELETE FROM config_param_user WHERE parameter ILIKE 'inp_report%' AND cur_user = current_user;
 
 		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_edit' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
 		LOOP 
@@ -180,7 +183,7 @@ BEGIN
 	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
 	INSERT INTO inp_selector_sector(sector_id,cur_user) VALUES (1,current_user);
 	INSERT INTO inp_selector_hydrology(hydrology_id,cur_user) VALUES (1,current_user);
-	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user) ;
+	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user);
 
 
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Setting selectors -> Done');
@@ -188,6 +191,7 @@ BEGIN
 
 	-- CATALOGS
 	--cat_feature
+	ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature;
 	--node
 	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAMANH','JUNCTION','NODE', 'v_edit_node');
 	INSERT INTO cat_feature (id, system_id, feature_type, parent_layer) VALUES ('EPAOUTF','OUTFALL','NODE', 'v_edit_node');
@@ -205,17 +209,18 @@ BEGIN
 	
 	--arc_type
 	--arc
-	INSERT INTO arc_type VALUES ('EPACOND', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', TRUE);
-	INSERT INTO arc_type VALUES ('EPAWEIR', 'VARC', 'WEIR', 'man_varc', 'inp_weir', TRUE);
-	INSERT INTO arc_type VALUES ('EPAORIF', 'VARC', 'ORIFICE', 'man_varc', 'inp_orifice', TRUE);
-	INSERT INTO arc_type VALUES ('EPAPUMP', 'VARC', 'PUMP', 'man_varc', 'inp_pump', TRUE);
-	INSERT INTO arc_type VALUES ('EPAOUTL', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', TRUE);
+	INSERT INTO arc_type VALUES ('EPACOND', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', TRUE,TRUE);
+	INSERT INTO arc_type VALUES ('EPAWEIR', 'VARC', 'WEIR', 'man_varc', 'inp_weir', TRUE,TRUE);
+	INSERT INTO arc_type VALUES ('EPAORIF', 'VARC', 'ORIFICE', 'man_varc', 'inp_orifice', TRUE,TRUE);
+	INSERT INTO arc_type VALUES ('EPAPUMP', 'VARC', 'PUMP', 'man_varc', 'inp_pump', TRUE,TRUE);
+	INSERT INTO arc_type VALUES ('EPAOUTL', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', TRUE,TRUE);
 
 	--node_type
-	INSERT INTO node_type VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE);
-	INSERT INTO node_type VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', TRUE);
-	INSERT INTO node_type VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', TRUE);
-
+	INSERT INTO node_type VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE,TRUE,2,FALSE);
+	INSERT INTO node_type VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', TRUE,TRUE,2,FALSE);
+	INSERT INTO node_type VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', TRUE,TRUE,2,FALSE);
+	
+	ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 	--cat_mat_node 
 	INSERT INTO cat_mat_node VALUES ('EPAMAT');
 	INSERT INTO cat_mat_arc VALUES ('EPAMAT');
@@ -369,41 +374,60 @@ BEGIN
 	
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=41) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=41) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 	--lines
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=41)) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=41) row) features;
 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
 	--Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 	
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
-
 
 	--Control nulls
+	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 
 -- 	Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
+				'"line":'||v_result_line||'}'||
 		       '}'||
 	    '}')::json;
-	
+
+--  Exception handling
+    EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	  
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
