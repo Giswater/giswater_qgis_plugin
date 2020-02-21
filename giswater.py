@@ -895,9 +895,10 @@ class Giswater(QObject):
         try:
             #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
             row = self.controller.get_config('qgis_toolbar_hidebuttons')
+            if not row: return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
-        except  KeyError as e:
+        except KeyError as e:
             pass
         except JSONDecodeError as e:
             # Control if json have a correct format
