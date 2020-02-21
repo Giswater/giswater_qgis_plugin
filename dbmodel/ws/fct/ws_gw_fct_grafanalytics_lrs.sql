@@ -53,16 +53,16 @@ v_layer record;
 
 BEGIN
 
-    -- Search path
-    SET search_path = "ws_sample", public;
+	-- Search path
+	SET search_path = "ws_sample", public;
 
 	-- get variables (from input)
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- get variables (from config_param_system)
-	v_costfield = (SELECT (value::json->>'arcTable')::json->>'costField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
-	v_valuefield = (SELECT (value::json->>'nodeTable')::json->>'valueField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
-	v_headerfield = (SELECT (value::json->>'nodeTable')::json->>'headerField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
+	v_costfield = (SELECT (value::json->>'arc')::json->>'costField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
+	v_valuefield = (SELECT (value::json->>'nodeChild')::json->>'valueField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
+	v_headerfield = (SELECT (value::json->>'nodeChild')::json->>'headerField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
 	
 	-- setting cost field when has not configure value
 	IF v_costfield IS NULL THEN
@@ -78,6 +78,9 @@ BEGIN
 	-- data quality analysis
 	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 	PERFORM gw_fct_om_check_data(v_input);
+
+	-- todo: manage result of quality data in case of errors
+	
 
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('DYNAMIC LINEAR REFERENCING SYSTEM'));
@@ -108,6 +111,13 @@ BEGIN
 		(SELECT distinct(macroexpl_id) FROM ws_sample.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
+	-- water:  dry (0) wet (1)
+	-- flag: open (0) closed (1)
+	-- checkf: not used (0) used (1)
+	-- length: arc length
+	-- cost: cost value (only when lrs analytics is used)
+	-- value: result value (only when lrs analytics is used)
+
 	-- create graf (all boundary conditions are opened, flag=0)
 	EXECUTE 'INSERT INTO temp_anlgraf ( arc_id, node_1, node_2, water, flag, checkf, length, cost, value )
 	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0, st_length(the_geom), '||v_costfield||', 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
@@ -116,7 +126,7 @@ BEGIN
 	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0, st_length(the_geom), '||v_costfield||', 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE';
 
-	-- getting v_querys of nodeparents (node_id and toarc) from config variable
+	-- getting v_querys of node header (node_id and toarc) from config variable
 	v_querynode = 'SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
 				  FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf''';
 			
@@ -131,7 +141,7 @@ BEGIN
 	EXECUTE 'UPDATE temp_anlgraf SET flag=0 WHERE id IN (SELECT id FROM temp_anlgraf 
 								JOIN ('||v_queryarc||') a ON to_arc::integer=arc_id::integer 
 								WHERE node_id::integer=node_1::integer)';
-								
+					
 	-- starting process
 	LOOP
 	
@@ -155,7 +165,11 @@ BEGIN
 		-- inundation process
 		LOOP	
 			v_cont1 = v_cont1+1;
-			EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = n.value + length'|| * v_costfield||' FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id';
+			EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = length*cost + a.value
+			FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id';
+
+			-- todo: possible update of anl_node values here
+
 			GET DIAGNOSTICS v_affectedrows =row_count;
 			EXIT WHEN v_affectedrows = 0;
 			EXIT WHEN v_cont1 = 200;
@@ -164,20 +178,23 @@ BEGIN
 		-- insert arc results into anl table
 		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
 			SELECT DISTINCT ON (arc_id)'||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, concat (''{"value":'',value,'', "header":'''||v_feature.node_id||'}'') 
-			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer';
+			FROM (SELECT arc_id, max(water) as water, value FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a 
+			JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer';
 	
-		-- insert node results into anl table
+		-- todo: possible update of anl_node values here
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, concat (''{"value":'',value,'', "header":'''||v_feature.node_id||'}'')
-			FROM (SELECT node_1 as node_id, value FROM (SELECT node_1, water, value FROM temp_anlgraf UNION SELECT node_2, water, value FROM temp_anlgraf)a
-			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id::integer=b.node_id::integer';
+			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, concat (''{"value":'',value,'', "header":'''||
+			v_feature.node_id||'}'')
+			FROM (SELECT min(value), node_id FROM (SELECT node_1 as node_id, water, value FROM temp_anlgraf UNION SELECT node_2, water, value FROM temp_anlgraf)a
+			GROUP BY node_id, water HAVING water=1)b JOIN v_edit_node c ON c.node_id::integer=b.node_id::integer';
 
 	END LOOP;
 		
 	-- update fields for node layers (value and header)
 	FOR v_layer IN SELECT child_layer FROM cat_feature
 	LOOP
-		EXECUTE 'UPDATE '||v_layer||' SET '||v_valuefield||' = a.descript::json->>''value'', '||v_headerfield||' = a.descript::json->>''header'' FROM anl_node a WHERE fprocesscat_id=XX AND a.node_id=node.node_id AND cur_user=current_user';
+		EXECUTE 'UPDATE '||v_layer||' SET '||v_valuefield||' = a.descript::json->>''value'', '||v_headerfield||
+		' = a.descript::json->>''header'' FROM anl_node a WHERE fprocesscat_id=XX AND a.node_id=node.node_id AND cur_user=current_user';
 	END LOOP;
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 	VALUES (v_fprocesscat_id, concat('WARNING: LRS attributes on node features have been updated by this process'));
