@@ -445,13 +445,15 @@ class TmBasic(TmParentAction):
             self.controller.show_warning(model.lastError().text())
         builder = utils_giswater.get_item_data(dialog, dialog.cmb_filter_builder, 1)
         # Create expresion
-        expr = f" (mu_name ILIKE '%{dialog.txt_selected_filter.text()}%'"
-        expr += f" AND builder ILIKE '%{builder}%')"
+        expr = f" mu_name ILIKE '%{dialog.txt_selected_filter.text()}%'"
+        if builder:
+            expr = f" AND builder ILIKE '%{builder}%'"
+
         if self.selected_camp is not None:
             expr += f" AND campaign_id = '{self.campaign_id}'"
             if update:
                 expr += f" OR campaign_id = '{self.selected_camp}'"
-        print(expr)
+ 
         # Attach model to table or view
         dialog.selected_rows.setModel(model)
         dialog.selected_rows.model().setFilter(expr)
