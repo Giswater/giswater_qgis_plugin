@@ -36,7 +36,7 @@ v_length double precision;
 v_numconnecs integer;
 v_numhydrometer integer;
 v_debug Boolean;
-v_overlap text;
+v_overlap text;  -- not used variable. Pending to refactor
 v_geometry text;
 v_data json;
 v_volume float;

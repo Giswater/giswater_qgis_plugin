@@ -1,4 +1,5 @@
 3.3.035
 *************
-Update go2epa capabilities, refactoring buildup models
-Create doc_x_workcat table and view
+- Update go2epa capabilities, refactoring buildup models
+- Create doc_x_workcat table and view
+- Mincut enhancement
