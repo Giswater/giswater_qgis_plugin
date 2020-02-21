@@ -668,7 +668,7 @@ class DaoController(object):
             self.show_warning("Function not found in database", parameter=function_name)
             return None
 
-        sql = f"SELECT {function_name} ($${{{body}}}$$);"
+        sql = f"SELECT {function_name} ({body});"
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
             self.show_critical("NOT ROW FOR", parameter=sql)

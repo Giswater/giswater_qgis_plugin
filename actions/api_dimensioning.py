@@ -69,14 +69,8 @@ class ApiDimensioning(ApiParent):
         self.create_map_tips()
         body = self.create_body()
         # Get layers under mouse clicked
-        sql = f"SELECT gw_api_getdimensioning($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        if row is None or row[0] is None:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        # Parse string to order dict into List
-        complet_result = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
+        complet_result = [self.controller.get_json('gw_api_getdimensioning', f'$${{{body}}}$$', log_sql=True)]
+        if not complet_result: return False
 
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
@@ -133,10 +127,7 @@ class ApiDimensioning(ApiParent):
 
         feature = '"tableName":"v_edit_dimensions"'
         body = self.create_body(feature=feature, filter_fields=fields)
-
-        # Execute query
-        sql = f"SELECT gw_api_setdimensioning($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_json('gw_api_setdimensioning', f'$${{{body}}}$$', log_sql=True)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)

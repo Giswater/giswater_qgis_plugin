@@ -690,17 +690,11 @@ class ApiParent(ParentAction):
         extras += f', "parentValue":"{utils_giswater.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
         extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
-        # Get layers under mouse clicked
-        sql = f"SELECT gw_api_gettypeahead($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, commit=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        # if 'fields' not in result:
-        #     return
+        complet_list = self.controller.get_json('gw_api_gettypeahead', f'$${{{body}}}$$')
+        if not complet_list: return False
+
         list_items = []
-        for field in complet_list[0]['body']['data']:
+        for field in complet_list['body']['data']:
             list_items.append(field['idval'])
         self.set_completer_object_api(completer, model, widget, list_items)
 
@@ -843,9 +837,10 @@ class ApiParent(ParentAction):
         feature += f'"idName":"{field_id}"'
         extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getchilds($${{{body}}}$$)"
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
-        for combo_child in row[0]['body']['data']:
+        result = self.controller.get_json('gw_api_getchilds', f'$${{{body}}}$$')
+        if not result: return False
+
+        for combo_child in result['body']['data']:
             if combo_child is not None:
                 self.populate_child(dialog, combo_child)
 
@@ -1296,7 +1291,7 @@ class ApiParent(ParentAction):
             extras += f'"node1":"{self.node1}", '
             extras += f'"node2":"{self.node2}"}}'
             body = self.create_body(extras=extras)
-            self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
+            self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', f'$${{{body}}}$$', log_sql=True)
             self.add_layer.populate_info_text(self.dlg_binfo, self.interpolate_result['body']['data'])
 
 
@@ -1752,7 +1747,7 @@ class ApiParent(ParentAction):
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
         extras = f'"selector_type":{selector_type}'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_getselectors', body, commit=True, log_sql=True)
+        complet_result = self.controller.get_json('gw_api_getselectors', f'$${{{body}}}$$', commit=True, log_sql=True)
         if not complet_result: return False
 
         for form_tab in complet_result['body']['form']['formTabs']:
@@ -1794,7 +1789,7 @@ class ApiParent(ParentAction):
         extras += f'"result_name":"{widget.objectName()}", '
         extras += f'"result_value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_setselectors', body, log_sql=True, commit=True)
+        complet_result = self.controller.get_json('gw_api_setselectors', f'$${{{body}}}$$', log_sql=True, commit=True)
         if not complet_result: return False
         for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
             self.controller.indexing_spatial_layer(layer_name)

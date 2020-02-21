@@ -1137,7 +1137,7 @@ class Giswater(QObject):
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_audit_check_project', f'$${{{body}}}$$', log_sql=True)
         if not result: return True
 
         self.dlg_audit_project = AuditCheckProjectResult()
@@ -1379,7 +1379,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body)
+            complet_result = self.controller.get_json('gw_api_getinfofromid', f'$${{{body}}}$$')
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:

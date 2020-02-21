@@ -49,15 +49,11 @@ class ApiManageComposer(ApiParent):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_api_getprint($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            return False
+        complet_result = self.controller.get_json('gw_api_getprint', f'$${{{body}}}$$', log_sql=True)
+        if not complet_result: return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        if complet_result[0]['formTabs']:
-            fields = complet_result[0]['formTabs'][0]
+        if complet_result['formTabs']:
+            fields = complet_result['formTabs'][0]
             # This dialog is created from config_api_form_fieds
             # where formname == 'printGeneric' and formtype == 'utils'
             # At the moment, u can set column widgetfunction with 'gw_api_setprint' or open_composer
@@ -300,16 +296,12 @@ class ApiManageComposer(ApiParent):
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "" + client + form + feature + data
-        sql = f"SELECT gw_api_setprint($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            return False
+        complet_result = self.controller.get_json('gw_api_setprint', f'$${{{body}}}$$', log_sql=True)
+        if not complet_result: return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        result = complet_result[0]['data']
+        result = complet_result['data']
         self.draw_rectangle(result)
-        map_index = complet_result[0]['data']['mapIndex']
+        map_index = complet_result['data']['mapIndex']
 
         maps = []
         active_composers = self.get_composers_list()
