@@ -1137,25 +1137,8 @@ class Giswater(QObject):
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_fct_audit_check_project($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
-
-        if not row:
-            return False
-
-        result = json.loads(row[0], object_pairs_hook=OrderedDict)
-        if 'status' in result and result['status'] == 'Failed':
-            try:
-                title = "Execute failed."
-                msg = f"<b>Error: </b>{result['SQLERR']}<br>"
-                msg += f"<b>Context: </b>{result['SQLCONTEXT']} <br><br>"
-            except KeyError as e:
-                title = "Key on returned json from ddbb is missed."
-                msg = f"<b>Key: </b>{e}<br>"
-                msg += f"<b>Python file: </b>{__name__} <br>"
-                msg += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br><br>"
-            self.controller.show_exceptions_msg(title, msg)
-            return True
+        result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
+        if not result: return True
 
         self.dlg_audit_project = AuditCheckProjectResult()
         self.parent.load_settings(self.dlg_audit_project)
