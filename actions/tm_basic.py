@@ -447,7 +447,7 @@ class TmBasic(TmParentAction):
         # Create expresion
         expr = f" mu_name ILIKE '%{dialog.txt_selected_filter.text()}%'"
         if builder:
-            expr = f" AND builder ILIKE '%{builder}%'"
+            expr += f" AND builder ILIKE '%{builder}%'"
 
         if self.selected_camp is not None:
             expr += f" AND campaign_id = '{self.campaign_id}'"
