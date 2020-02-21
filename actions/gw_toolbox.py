@@ -68,7 +68,6 @@ class GwToolBox(ApiParent):
 
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
         complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
         if not complet_result :
             return False
@@ -98,14 +97,10 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
-            return False
+        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$', log_sql=True)
+        if not complet_result: return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        status = self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
+        status = self.populate_functions_dlg(self.dlg_functions, complet_result['body']['data'])
 
         if not status:
             self.alias_function = index.sibling(index.row(), 1).data()
@@ -114,7 +109,7 @@ class GwToolBox(ApiParent):
             return
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
-                                                   self.dlg_functions.cmb_layers, complet_result[0]['body']['data']))
+                                                   self.dlg_functions.cmb_layers, complet_result['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_functions))
