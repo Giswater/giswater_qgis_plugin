@@ -24,20 +24,20 @@ SELECT gw_fct_om_check_data($${
 
 
 DECLARE
-v_project_type 		text;
-v_count			integer;
-v_saveondatabase 	boolean;
-v_result 		text;
-v_version		text;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
-v_result_polygon	json;
-v_querytext		text;
-v_result_id 		text;
-v_features 		text;
-v_edit			text;
-v_config_param 		text;
+v_project_type text;
+v_count integer;
+v_saveondatabase boolean;
+v_result text;
+v_version text;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_querytext	text;
+v_result_id text;
+v_features text;
+v_edit text;
+v_config_param text;
 v_error_context text;
 
 BEGIN
