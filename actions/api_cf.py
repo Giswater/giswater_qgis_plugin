@@ -61,30 +61,26 @@ class ApiCF(ApiParent, QObject):
         scale_zoom = self.iface.mapCanvas().scale()
         srid = self.controller.plugin_settings_value('srid')
 
+        # Get layers under mouse clicked
         extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom}, '
         extras += '"srid":' + str(srid)
         body = self.create_body(extras=extras)
-        # Get layers under mouse clicked
-        sql = f"SELECT gw_api_getlayersfromcoordinates($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        complet_list = self.controller.get_json('gw_api_getlayersfromcoordinates' ,body, log_sql=True)
+        if not complet_list: return False
 
         # hide QMenu identify if no feature under mouse
-        len_layers = len(complet_list[0]['body']['data']['layersNames'])
-        if len_layers == 0:
-            return False
+        len_layers = len(complet_list['body']['data']['layersNames'])
+        if len_layers == 0: return False
+
         self.icon_folder = self.plugin_dir + '/icons/'
 
         # Right click main QMenu
         main_menu = QMenu()
 
         # Create one menu for each layer
-        for layer in complet_list[0]['body']['data']['layersNames']:
+        for layer in complet_list['body']['data']['layersNames']:
             layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
             icon = None
             icon_path = self.icon_folder + layer['icon'] + '.svg'
@@ -103,7 +99,7 @@ class ApiCF(ApiParent, QObject):
         main_menu.addSeparator()
         # Identify all
         cont = 0
-        for layer in complet_list[0]['body']['data']['layersNames']:
+        for layer in complet_list['body']['data']['layersNames']:
             cont += len(layer['ids'])
         action = QAction(f'Identify all ({cont})', None)
         action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
@@ -117,7 +113,7 @@ class ApiCF(ApiParent, QObject):
         self.resetRubberbands()
         for rb in rb_list:
             rb.reset()
-        for layer in complet_list[0]['body']['data']['layersNames']:
+        for layer in complet_list['body']['data']['layersNames']:
             for feature in layer['ids']:
                 points = []
                 list_coord = re.search('\((.*)\)', str(feature['geometry']))
@@ -230,7 +226,7 @@ class ApiCF(ApiParent, QObject):
             feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
             extras += f', "coordinates":{{{point}}}'
             body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_getfeatureinsert($${{{body}}}$$)"
+            function_name = 'gw_api_getfeatureinsert'
         # IF click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
@@ -239,18 +235,14 @@ class ApiCF(ApiParent, QObject):
             extras += f', "visibleLayer":{visible_layer}'
             extras += f', "coordinates":{{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
-            sql = f"SELECT gw_api_getinfofromcoordinates($${{{body}}}$$)"
+            function_name = 'gw_api_getinfofromcoordinates'
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             body = self.create_body(feature=feature, extras=extras)
-            sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
-
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False, None
-
+            function_name = 'gw_api_getinfofromid'
+        row = [self.controller.get_json(function_name, body)]
+        if not row: return False, None
         # When something is wrong
         if row[0]['message']:
             level = 1
@@ -275,12 +267,6 @@ class ApiCF(ApiParent, QObject):
                 return False, None
 
         self.complet_result = row
-
-        result = row[0]['body']['data']
-        if 'fields' not in result:
-            self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
-            return False, None
-
         if self.complet_result[0]['body']['form']['template'] == 'GENERIC':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
@@ -606,7 +592,6 @@ class ApiCF(ApiParent, QObject):
 
         self.iface.actionRollbackEdits().trigger()
 
-
     def set_widgets(self, dialog, complet_result, field):
         """
         functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field):
@@ -636,14 +621,20 @@ class ApiCF(ApiParent, QObject):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-                
-        try:
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
-        except AttributeError as e:
+
+        if 'widgettype' in field and not field['widgettype']:
             message = "The field widgettype is not configured for"
             msg = f"formname:{self.tablename}, column_id:{field['column_id']}"
             self.controller.show_message(message, 2, parameter=msg)
             return label, widget
+
+        try:
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+        except Exception as e:
+            msg = f"{type(e).__name__}: {e}"
+            self.controller.show_message(msg, 2)
+            return label, widget
+
 
         if widget.property('column_id') == self.field_id:
             self.feature_id = widget.text()
@@ -791,19 +782,14 @@ class ApiCF(ApiParent, QObject):
         self.load_settings(dlg_sections)
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
-        sql = ("SELECT gw_api_getinfocrossection($${" + body + "}$$)")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row:
-            return False
-
-        section_result = row
-
+        section_result = self.controller.get_json('gw_api_getinfocrossection', body)
+        if not section_result: return False
         # Set image
-        img = section_result[0]['body']['data']['shapepng']
+        img = section_result['body']['data']['shapepng']
         utils_giswater.setImage(dlg_sections, 'lbl_section_image', img)
 
         # Set values into QLineEdits
-        for field in section_result[0]['body']['data']['fields']:
+        for field in section_result['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['column_id'])
             if widget:
                 if 'value' in field:
@@ -874,23 +860,16 @@ class ApiCF(ApiParent, QObject):
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        if not row:
-            msg = f"Fail in: {sql}"
-            self.controller.show_message(msg, message_level=2)
-            self.controller.log_info(str("FAIL IN: ")+str(sql))
-            return
+        result = self.controller.get_json('gw_api_setfields', body, log_sql=True)
+        if not result: return
 
         if clear_json:
             _json = {}
-        result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         if "Accepted" in result['status']:
             msg = "OK"
             self.controller.show_message(msg, message_level=3)
-            self.reload_fields(dialog, row, p_widget)
+            self.reload_fields(dialog, result, p_widget)
         elif "Failed" in result['status']:
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
@@ -1032,7 +1011,6 @@ class ApiCF(ApiParent, QObject):
         :param p_widget: Widget that has changed
         """
         if not p_widget: return
-        result = json.loads(result[0], object_pairs_hook=OrderedDict)
 
         for field in result['body']['data']['fields']:
             widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
@@ -2270,15 +2248,8 @@ class ApiCF(ApiParent, QObject):
         id_name = complet_result[0]['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = self.create_body(form, feature,  filter_fields)
-        sql = f"SELECT gw_api_getlist($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        if row is None or row[0] is None:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        # Parse string to order dict into List
-        complet_list = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
-
+        complet_list = [self.controller.get_json('gw_api_getlist', body)]
+        if not complet_list: return False
         return complet_list
 
 
@@ -2365,18 +2336,13 @@ class ApiCF(ApiParent, QObject):
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
             body = self.create_body(form, feature, filter_fields='')
-            sql = f"SELECT gw_api_getinfoplan($${{{body}}}$$)::text"
-            row = self.controller.get_row(sql, log_sql=False, commit=True)
-            if not row:
-                self.controller.show_message("NOT ROW FOR: " + sql, 2)
-                return False
-
-            complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            result = complet_list[0]['body']['data']
+            complet_list = self.controller.get_json('gw_api_getinfoplan', body)
+            if not complet_list: return False
+            result = complet_list['body']['data']
             if 'fields' not in result:
-                self.controller.show_message("No listValues for: " + row[0]['body']['data'], 2)
+                self.controller.show_message("No listValues for: " + complet_list['body']['data'], 2)
             else:
-                for field in complet_list[0]['body']['data']['fields']:
+                for field in complet_list['body']['data']['fields']:
                     if field['widgettype'] == 'formDivider':
                         for x in range(0, 2):
                             line = self.add_frame(field, x)
@@ -2408,12 +2374,8 @@ class ApiCF(ApiParent, QObject):
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
         body += '"feature":{}, '
         body += '"data":{}'
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row:
-            return
-
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        complet_list = [self.controller.get_json('gw_api_getcatalog', body)]
+        if not complet_list: return
 
         self.dlg_new_workcat = ApiBasicInfo()
         self.load_settings(self.dlg_new_workcat)
