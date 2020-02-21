@@ -1539,6 +1539,8 @@ class AddNewLot(ParentManage):
         self.load_settings(self.dlg_work_register)
 
         table_object = 'om_visit_lot_x_user'
+        # table_object = 'v_om_lot_x_user'
+
         self.dlg_work_register.tbl_work.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set a model with selected filter. Attach that model to selected table
@@ -1569,6 +1571,7 @@ class AddNewLot(ParentManage):
         sql = ('SELECT MIN(starttime), MAX(endtime)'
                ' FROM om_visit_lot_x_user')
         row = self.controller.get_row(sql, commit=self.autocommit)
+
         if row:
             if row[0]:
                 self.dlg_work_register.date_event_from.setDate(row[0])
@@ -2169,23 +2172,26 @@ class AddNewLot(ParentManage):
 
         # Tab Users
         self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id",
-                                     [0,2], [0,2,3,4,5,6],
-                                     "all_user_rows", "selected_user_rows", "btn_user_select", "btn_user_unselect")
+                                     [], [], "all_user_rows", "selected_user_rows", "btn_user_select", "btn_user_unselect",
+                                     'id AS "Usuaris"', 'user_id AS "Usuaris"')
         # Tab Vehciles
         self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle",
-                                     [0], [0, 5, 6, 7],
-                                     "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select", "btn_vehicle_unselect")
+                                     [], [], "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select",
+                                     "btn_vehicle_unselect", 'idval AS "Vehicle", descript AS "Descripcio", model AS "Model", number_plate AS "Matricula"',
+                                     'vehicle AS "Vehicle", descript AS "Descripcio", model AS "Model", number_plate AS "Matricula"')
         # Tab Visitclass
-        self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "idval", "visitclass",
-                                     [0, 3, 4, 5, 6, 7, 8, 9], [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-                                    "all_visitclass_rows", "selected_visitclass_rows", "btn_visitclass_select",
-                                    "btn_visitclass_unselect")
-        # Open form
+        self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "idval",
+                                     "visitclass", [], [],
+                                     "all_visitclass_rows", "selected_visitclass_rows", "btn_visitclass_select",
+                                     "btn_visitclass_unselect", 'idval AS "Classe visita", descript AS "Descripcio"',
+                                     'idval AS "Classe visita", descript AS "Descripcio"')
+        # Open forms
         self.open_dialog(self.dlg_team_man)
 
 
     def populate_team_selectors(self, dialog, tableleft, tableright, field_id_left, field_id_right,
-                                hide_left, hide_right, table_all, table_selected, button_select, button_unselect):
+                                hide_left, hide_right, table_all, table_selected, button_select, button_unselect,
+                                parameters_left, parameters_right):
 
         # Get team selected
         filter_team = utils_giswater.getWidgetText(self.dlg_resources_man, "cmb_team")
@@ -2201,7 +2207,7 @@ class AddNewLot(ParentManage):
         tbl_all_rows = dialog.findChild(QTableView, table_all)
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + tableleft + " WHERE id NOT IN "
+        query_left = "SELECT " + str(parameters_left) + " FROM " + tableleft + " WHERE id NOT IN "
         query_left += "(SELECT " + tableleft + ".id FROM " + tableleft + ""
         query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
         query_left += " WHERE team = '" + str(filter_team) + "')"
@@ -2214,7 +2220,7 @@ class AddNewLot(ParentManage):
         tbl_selected_rows = dialog.findChild(QTableView, table_selected)
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = "SELECT * FROM " + tableleft + ""
+        query_right = "SELECT " + str(parameters_right) + " FROM " + tableleft + ""
         query_right += " JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE team = '" + str(filter_team) + "'"
 
