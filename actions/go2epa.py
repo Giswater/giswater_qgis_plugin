@@ -646,7 +646,7 @@ class Go2Epa(ApiParent):
             if self.imports_canceled:
                 break
 
-            complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
+            complet_result = self.controller.get_json('gw_fct_pg2epa_main', f'$${{{body}}}$$', log_sql=True, commit=True)
             if not complet_result:
                 self.controller.show_warning("NOT ROW FOR: " + sql)
                 message = "Export failed"

@@ -54,8 +54,7 @@ class DeleteFeature(ApiParent):
         self.filter_typeahead(self.dlg_delete_feature.feature_id, completer, model)
 
         # Set listeners
-        self.dlg_delete_feature.feature_id.textChanged.connect(
-            partial(self.filter_typeahead, self.dlg_delete_feature.feature_id, completer, model))
+        self.dlg_delete_feature.feature_id.textChanged.connect(partial(self.filter_typeahead, self.dlg_delete_feature.feature_id, completer, model))
 
         # Set button snapping
         self.dlg_delete_feature.btn_snapping.clicked.connect(partial(self.set_active_layer))
@@ -103,18 +102,15 @@ class DeleteFeature(ApiParent):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = f"SELECT gw_fct_get_feature_relation($${{{body}}}$$)"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        if not row:
-            return
+        result = self.controller.get_json('gw_fct_get_feature_relation', f'$${{{body}}}$$', log_sql=True)
+        if not result: return
 
         # Construct message result
         result_msg = ''
-        for value in row[0]['body']['data']['info']['values']:
+        for value in result['body']['data']['info']['values']:
             result_msg += value['message'] + '\n\n'
 
-        utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.txt_infolog, result_msg)
+        utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.txt_info_relation, result_msg)
 
         # Enable button delete feature
         if result_msg != '':
@@ -130,16 +126,12 @@ class DeleteFeature(ApiParent):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = f"SELECT gw_fct_set_delete_feature($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        if not row or row[0] is None:
+        complet_result = self.controller.get_json('gw_fct_set_delete_feature', f'$${{{body}}}$$', log_sql=True)
+        if not complet_result:
             self.controller.show_message("Function gw_fct_set_delete_feature executed with no result ", 3)
             return
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
         # Populate tab info
-        data = complet_result[0]['body']['data']
+        data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
                 change_tab = self.add_layer.populate_info_text(self.dlg_delete_feature, data)

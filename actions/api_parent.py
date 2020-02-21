@@ -1724,18 +1724,10 @@ class ApiParent(ParentAction):
             extras += f'"{widget_name}":"{value}", '
         extras = extras[:-2]
         body = self.create_body(extras)
-        sql = f"SELECT gw_fct_check_importdxf()::text;"
-        row = self.controller.get_row(sql, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
-            result = None
-        else:
-            result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        result = self.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
+        if not result: return False
 
         return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
-
-
-
 
 
     def get_selector(self, dialog, selector_type):

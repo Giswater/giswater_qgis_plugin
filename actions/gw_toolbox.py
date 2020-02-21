@@ -54,7 +54,7 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
         if not complet_result:
             self.controller.show_message(f"No results for: SELECT {function_name} ($${{{body}}}$$);", 2)
             return False
@@ -69,7 +69,7 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_api_gettoolbox($${{{body}}}$$)::text"
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
         if not complet_result :
             return False
 

@@ -271,7 +271,7 @@ class AddLayer(object):
                         change_tab = True
                 else:
                     text += "\n"
-
+        print(f"{text}")
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
         qtabwidget = dialog.findChild(QTabWidget,'mainTab')
         if change_tab and qtabwidget is not None:

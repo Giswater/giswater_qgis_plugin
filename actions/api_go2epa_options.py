@@ -80,7 +80,6 @@ class Go2EpaOptions(ApiParent):
 
 
     def get_event_combo_parent(self, complet_result):
-        # complet_result[0]['body']['form']['formTabs']
         for field in complet_result['body']['form']['formTabs'][0]["fields"]:
             if field['isparent']:
                 widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
@@ -91,9 +90,10 @@ class Go2EpaOptions(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
-        sql = f"SELECT gw_api_get_combochilds('epaoptions', '', '', '{combo_parent}', '{combo_id}', '')"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        for combo_child in row[0]['fields']:
+        result = self.controller.get_json('gw_api_get_combochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''", log_sql=True)
+        if not result: return False
+
+        for combo_child in result['fields']:
             if combo_child is not None:
                 self.manage_child(widget, combo_child)
 

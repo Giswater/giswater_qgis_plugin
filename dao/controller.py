@@ -653,7 +653,7 @@ class DaoController(object):
         return True
 
 
-    def get_json(self, function_name, body, commit=True, log_sql=False):
+    def get_json(self, function_name, parameters=None, commit=True, log_sql=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param body: Parameter for function (json)
@@ -667,8 +667,10 @@ class DaoController(object):
         if not row:
             self.show_warning("Function not found in database", parameter=function_name)
             return None
+        sql = f"SELECT {function_name}("
+        if parameters: sql += f"{parameters}"
+        sql += f");"
 
-        sql = f"SELECT {function_name} ({body});"
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
             self.show_critical("NOT ROW FOR", parameter=sql)
