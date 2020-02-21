@@ -5,9 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: xxxx
-
---SELECT SCHEMA_NAME.gw_fct_admin_test_function();
-
 --DROP FUNCTION SCHEMA_NAME.gw_fct_admin_test_function();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_test_function()
   RETURNS json AS
@@ -151,19 +148,17 @@ BEGIN
 
 							select replace(rec_fct.sample_query::text,'node_id'::text,v_feature_id::text)
 							INTO v_function;
-							
-							raise notice 'v_function,%',v_function;
+						
 
 							IF v_function IS NOT NULL THEN
 								v_query = 'SELECT '||v_schemaname||'.'||v_function||';';
 								EXECUTE v_query
 								INTO v_query_result;
 
-								raise notice 'v_query_result,%',v_query_result;
 								INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, error_message) 
 								VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 							END IF;
-						
+						RAISE NOTICE'ARCDIVIDE,%',rec_node_type.isarcdivide;
 								--fusion arcs or delete node if it's not connected to arcs
 								IF rec_node_type.isarcdivide is true then
 									
@@ -177,7 +172,14 @@ BEGIN
 									
 								ELSE
 									RAISE NOTICE 'DELETE,%',v_feature_id;
-									EXECUTE 'DELETE FROM '||rec_node_type.child_layer||' WHERE node_id = '||v_feature_id||'::text;';
+									--EXECUTE 'DELETE FROM '||rec_node_type.child_layer||' WHERE node_id = '||v_feature_id||'::text;';
+									EXECUTE 'SELECT gw_fct_set_delete_feature($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"type":"NODE"}, 
+									"data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_feature_id||'"}}$$)::text;'
+									INTO v_query_result;
+									
+									INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, error_message) 
+									VALUES (115, 'gw_fct_set_delete_feature',rec_role.id,v_query_result);
+
 								END IF;
 								
 								IF rec_state = 2 THEN
@@ -213,16 +215,16 @@ SET ROLE role_admin;
 GRANT SELECT ON TABLE node_type TO role_basic;
 
 --  Return
-raise notice 'return';
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE user_name="current_user"() AND fprocesscat_id=115 ORDER BY criticity desc, id asc) row; 
-	
+  	SELECT jsonb_build_object(
+	'function_result', json_agg(row)
+  	) AS feature INTO v_result
+  	FROM (SELECT  table_id, column_id,criticity,error_message::json
+  	FROM  audit_check_data WHERE  fprocesscat_id=115) row;
+  	RAISE NOTICE 'v_result,%',v_result;
+
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 	
-	--v_result_info := v_result;
-raise notice 'v_result_info,%',v_result_info;
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Test fct done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
