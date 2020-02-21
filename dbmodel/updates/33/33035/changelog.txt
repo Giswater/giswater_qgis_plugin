@@ -3,3 +3,5 @@
 - Update go2epa capabilities, refactoring buildup models
 - Create doc_x_workcat table and view
 - Mincut enhancement
+- New strategy of map analytics (LRS)
+- New function to desmultiplier multi-feature visits

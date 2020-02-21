@@ -34,3 +34,8 @@ where function_name='gw_api_getinfofromcoordinates';
 -- 2020/02/21
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (116, 'Mincut results', 'om', 'ws') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2802, 'gw_fct_visit_multiplier', 'utils', 'function', null, null, null,'Function desmultiplier visits when multifeature', 'role_om',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
