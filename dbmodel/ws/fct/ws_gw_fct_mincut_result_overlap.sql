@@ -155,12 +155,12 @@ BEGIN
 					-- Storing information about possible conflict
 					IF v_conflictmsg IS NULL THEN
 						v_conflictarray = array_append(v_conflictarray::integer[], v_rec.id::integer);
-						v_conflictmsg:=concat('Id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ', 
-						(v_rec.output->>'connecs')::json->>'number', ' affected connecs');
+						v_conflictmsg:=concat('<br>Mincut id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ', 
+						(v_rec.output->>'connecs')::json->>'number', ' affected connecs.');
 					ELSE
 						v_conflictarray = array_append(v_conflictarray, v_rec.id);
-						v_conflictmsg:=concat(v_conflictmsg,' , Id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ',
-						(v_rec.output->>'connecs')::json->>'number', ' affected connecs');
+						v_conflictmsg:=concat(v_conflictmsg,' <br>Mincut id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ',
+						(v_rec.output->>'connecs')::json->>'number', ' affected connecs.');
 					END IF;
 					
 				END IF;
@@ -174,14 +174,10 @@ BEGIN
 			PERFORM gw_fct_mincut_inverted_flowtrace (v_conflict_id);
 
 			v_count2:=(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=v_conflict_id) ;
-
-			--raise exception ' % % ', v_count, v_count2;
 			
 			IF v_count < v_count2 THEN -- check for overlaps with additional affectations
 
 				v_status ='Conflict';
-
-				--raise exception 'count % count2 % ', v_count, v_count2;
 
 				v_querytext = replace(replace(v_conflictarray::text,'{',''),'}','');
 				
@@ -207,8 +203,9 @@ BEGIN
 
 				IF v_addaffconnecs > 0 THEN -- there is a overlap (temporal & spatial intersection) with additional connecs affected
 
-					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,' overlaps date-time with other mincuts (',v_conflictmsg,
-					') on same macroexploitation and has conflicts at least with one. Additional pipes are involved and more are connecs affected"');
+					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,
+					' overlaps with other mincuts and has conflicts at least with one. Additional pipes are involved but and there are more connecs affected'
+					,v_conflictmsg,'"');	
 								
 					-- insert additional connecs
 					EXECUTE 'INSERT INTO anl_connec (connec_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
@@ -218,7 +215,7 @@ BEGIN
 
 					-- info
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-					VALUES (116, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation with ( ',v_conflictmsg,' )'));
+					VALUES (116, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat ('WARNING: additional pipes are involved and more connecs are affected ( ',v_addaffconnecs,' units. )'));
 												
 					-- point: connecs affected
@@ -227,14 +224,16 @@ BEGIN
 					
 				ELSE -- there is a overlap (temporal & spatial intersection) with additional network but without connecs affected
 
-					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,' overlaps date-time with other mincuts (',v_conflictmsg,
-					') on same macroexploitation and has conflicts at least with one. Additional pipes are involved but no more connecs are affected"');		
+					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,
+					' overlaps with other mincuts and has conflicts at least with one. Additional pipes are involved but no more connecs affected'
+					,v_conflictmsg,'"');		
 
 					-- info
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-					VALUES (116, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation with ( ',v_conflictmsg,' )'));
+					VALUES (116, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation wit:',v_conflictmsg));
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat ('WARNING: additional pipes are involved'));
-					INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat ('INFO: No more connecs are affected'));										
+					INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat ('INFO: No more connecs are affected'));
+					
 				END IF;
 				
 				-- line: the opposite mincuts 
@@ -266,18 +265,20 @@ BEGIN
 					
 					--info
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-					VALUES (116, concat ('INFO: There is a temporal overlap without spatial intersection on the same macroexploitation with ( ',v_conflictmsg,' )'));
+					VALUES (116, concat ('INFO: There is a temporal overlap without spatial intersection on the same macroexploitation with:',v_conflictmsg));
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat ('INFO: No additional pipes are involved and no more connecs are affected'));
 					
 				ELSE -- There is a temporal overlap with spatial intersection on the same macroexploitation without additional network affected
 
 					v_status ='Conflict';
-					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,' overlaps date-time with other mincuts (',v_conflictmsg,
-					') on same macroexploitation and has conflicts at least with one but no additional pipes are involved and no more connecs are affected."');
-
+					
+					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,
+					' overlaps with other mincuts and has conflicts at least with one but no additional pipes are involved and no more connecs are affected.'
+					,v_conflictmsg,'"');
+					
 					--info
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-					VALUES (116, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation with ( ',v_conflictmsg,' )'));
+					VALUES (116, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat ('INFO: No additional pipes are involved and no more connecs are affected'));
 					
 					-- line: the oposite mincuts 
@@ -294,7 +295,8 @@ BEGIN
 			v_status ='Accepted';
 
 			-- info
-			INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, 'INFO: There is no temporal overlap on the same macroexploitation');
+			INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, 
+			'INFO: There are no more mincuts on the same macroexploitation on planned on the same date-time');
 		END IF;
 
 		-- mincut details
@@ -456,8 +458,7 @@ BEGIN
 		-- Control nulls
 		v_result_info := COALESCE(v_result_info, '{}'); 
 		v_geometry := COALESCE(v_geometry, '{}'); 
-
-		
+	
 		-- return
 		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version.giswater||'"'||
 			',"body":{"form":{}'||
@@ -466,12 +467,12 @@ BEGIN
 				  '"setVisibleLayers":['||v_visiblelayer||']'||
 			'}}'||
 			'}')::json;
-
+			
 	END IF;
 
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
