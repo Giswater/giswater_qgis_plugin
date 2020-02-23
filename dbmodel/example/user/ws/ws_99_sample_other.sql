@@ -247,3 +247,5 @@ UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_co
 UPDATE connec SET the_geom  = '0101000020E764000044D7D93156941941F95742A672755141' 
 WHERE connec_id ='3024';
 
+UPDATE inp_valve SET diameter = 100;
+
