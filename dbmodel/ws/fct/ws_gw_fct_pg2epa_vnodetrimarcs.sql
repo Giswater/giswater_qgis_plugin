@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2728
 
 
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_vnodetrimarcs(result_id_var character varying)  RETURNS json AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs(result_id_var character varying)  RETURNS json AS 
 $BODY$
 
 
 /*
-SELECT ws.gw_fct_pg2epa_vnodetrimarcs('t1')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('t1')
 */
 
 DECLARE
@@ -24,7 +24,7 @@ DECLARE
 BEGIN
 
 	--  Search path
-	SET search_path = "ws", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting pg2epa vnode trim arcs';
 	DELETE FROM temp_go2epa;
@@ -43,7 +43,7 @@ BEGIN
 			else (st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
 		FROM rpt_inp_arc , vnode
 		JOIN v_edit_link a ON vnode_id=exit_id::integer
-		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id='t1'
+		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id=||quote_literal(result_id_var)||
 		) a
 	JOIN v_arc USING (arc_id)
 	ORDER BY arc_id, locate;
@@ -54,7 +54,7 @@ BEGIN
 	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
 	(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3) as depth
 	FROM (
-		SELECT node_1 as vnode_id, arc_id,  0 as locate FROM rpt_inp_arc WHERE result_id='t1' AND arc_type != 'NODE2ARC'
+		SELECT node_1 as vnode_id, arc_id,  0 as locate FROM rpt_inp_arc WHERE result_id=||quote_literal(result_id_var)|| AND arc_type != 'NODE2ARC'
 		) a
 	JOIN v_arc USING (arc_id)
 	ORDER BY arc_id, locate;
@@ -65,7 +65,7 @@ BEGIN
 	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
 	(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3) as depth
 	FROM (
-		SELECT node_2 as vnode_id, arc_id,  1 as locate FROM rpt_inp_arc WHERE result_id='t1' AND arc_type != 'NODE2ARC'
+		SELECT node_2 as vnode_id, arc_id,  1 as locate FROM rpt_inp_arc WHERE result_id=||quote_literal(result_id_var)|| AND arc_type != 'NODE2ARC'
 		) a
 	JOIN v_arc USING (arc_id)
 	ORDER BY arc_id, locate;
@@ -73,7 +73,7 @@ BEGIN
 	RAISE NOTICE 'new nodes on rpt_inp_node table ';
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
 	SELECT 
-		't1',
+		result_id_var,
 		vnode_id as node_id, 
 		CASE 
 			WHEN connec.elevation IS NULL THEN t.elevation::numeric(12,3) -- elevation it's interpolated elevation againts node1 and node2 of pipe
@@ -93,12 +93,12 @@ BEGIN
 		JOIN rpt_inp_arc a USING (arc_id)
 		JOIN connec ON concat('VN',pjoint_id)=vnode_id
 		WHERE vnode_id ilike 'VN%'
-		AND result_id='t1';
+		AND result_id=result_id_var;
 
 	RAISE NOTICE 'new arcs on rpt_inp_arc table';
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, flw_code, minorloss, addparam)
 	SELECT
-		't1',
+		result_id_var,
 		concat(arc_id,'P',a.id-min) as arc_id, 
 		a.node_1,
 		a.node_2,
@@ -132,19 +132,19 @@ BEGIN
 				AND a.arc_id = b.arc_id
 				ORDER BY a.id) a group by arc_id) b USING (arc_id)
 		JOIN rpt_inp_arc USING (arc_id)
-		WHERE result_id='t1' AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
+		WHERE result_id=result_id_var AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
 		ORDER BY arc_id, a.id;
 	
 	RAISE NOTICE 'delete only trimmed arc on rpt_inp_arc table  - step 1';
 	UPDATE rpt_inp_arc SET epa_type ='PIPENOTUSED' 
-		FROM (SELECT DISTINCT (addparam::json->>'parentArc') AS arc_id FROM rpt_inp_arc WHERE addparam::json->>'parentArc' !='' AND result_id='t1') a
-		WHERE a.arc_id = rpt_inp_arc.arc_id AND result_id='t1';
+		FROM (SELECT DISTINCT (addparam::json->>'parentArc') AS arc_id FROM rpt_inp_arc WHERE addparam::json->>'parentArc' !='' AND result_id=result_id_var) a
+		WHERE a.arc_id = rpt_inp_arc.arc_id AND result_id=result_id_var;
 
 	RAISE NOTICE 'delete only trimmed arc on rpt_inp_arc table - step 2';
-	DELETE FROM rpt_inp_arc WHERE epa_type ='PIPENOTUSED' and result_id='t1';
+	DELETE FROM rpt_inp_arc WHERE epa_type ='PIPENOTUSED' and result_id=result_id_var;
 
 	RAISE NOTICE 'set minimum value of arcs';
-	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id='t1';
+	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id=result_id_var;
 
 	
 RETURN v_result;

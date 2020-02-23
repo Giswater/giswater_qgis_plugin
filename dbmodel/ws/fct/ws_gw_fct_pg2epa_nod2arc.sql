@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2316
 
 
-DROP FUNCTION IF EXISTS "ws".gw_fct_pg2epa_nod2arc(varchar);
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
 AS $BODY$
 
 /*example
-select ws.gw_fct_pg2epa_nod2arc ('testbgeo3', true)
+select SCHEMA_NAME.gw_fct_pg2epa_nod2arc ('testbgeo3', true)
 */
 
 DECLARE
@@ -27,7 +27,7 @@ v_nodarc1 boolean = false;
 BEGIN
 
 	--  Search path
-	SET search_path = "ws", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get condig values
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
@@ -168,8 +168,11 @@ BEGIN
 			AND rpt_inp_arc.result_id = '||quote_literal(result_id_var);
 
 	RAISE NOTICE ' Deleting old node from node table';
-	EXECUTE ' DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM  ('||v_querytext||')a) AND result_id = '||quote_literal(result_id_var);
+	EXECUTE ' UPDATE rpt_inp_node SET epa_type =''NODE2DELETE'' FROM (SELECT node_id FROM  ('||v_querytext||') a ) b
+					WHERE rpt_inp_node.node_id = b.node_id AND result_id = '||quote_literal(result_id_var);
 
+	EXECUTE ' DELETE FROM rpt_inp_node WHERE epa_type =''NODE2DELETE'' AND result_id = '||quote_literal(result_id_var);
+	
 	RETURN 1;
 		
 END;

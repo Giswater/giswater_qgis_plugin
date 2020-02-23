@@ -6,18 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2314
 
-DROP FUNCTION IF EXISTS ws.gw_fct_pg2epa(character varying, boolean, boolean);
-DROP FUNCTION IF EXISTS ws.gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ws.gw_fct_pg2epa_check_data($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
 
-SELECT ws.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t1", "useNetworkGeom":"false", "skipCheckData": "true", "export":"false","dumpSubcatch":"true"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t1", "useNetworkGeom":"false", "skipCheckData": "true", "export":"false","dumpSubcatch":"true"}}$$)
 
 select * from rpt_cat_result
 
@@ -46,11 +46,11 @@ v_export boolean;
 BEGIN
 
 	--  Get input data
-	v_result =  (p_data->>'data')::json->>'resultId';
-	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
-	v_usenetworkdemand =  (p_data->>'data')::json->>'useNetworkDemand';
-	v_skipcheckdata =  (p_data->>'data')::json->>'skipCheckData';
-	v_export =  (p_data->>'data')::json->>'export';
+	v_result = (p_data->>'data')::json->>'resultId';
+	v_usenetworkgeom = (p_data->>'data')::json->>'useNetworkGeom';
+	v_usenetworkdemand = (p_data->>'data')::json->>'useNetworkDemand';
+	v_skipcheckdata = (p_data->>'data')::json->>'skipCheckData';
+	v_export = (p_data->>'data')::json->>'export';
 
 
 	IF v_usenetworkdemand IS NULL THEN
@@ -58,11 +58,11 @@ BEGIN
 	END IF;
 
 	IF v_skipcheckdata IS NULL THEN
-		v_skipcheckdata =  true;
+		--v_skipcheckdata =  true;
 	END IF;
 
 	--  Search path
-	SET search_path = "ws", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Getting user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
@@ -156,10 +156,12 @@ BEGIN
 		
 
 		IF v_skipcheckdata IS NOT TRUE THEN
+
+			v_usenetworkgeom = true;
 		
 			RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
 			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
-			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
+			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
 			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;			
 		ELSE
 			v_return = '{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"", "body":{"form":{},"data":{"options":"","info":"","setVisibleLayers":[]}}}';
