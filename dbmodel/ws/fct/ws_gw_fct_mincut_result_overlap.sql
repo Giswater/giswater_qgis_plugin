@@ -47,7 +47,7 @@ v_result_line json;
 v_result_pol json;
 v_visiblelayer text;
 v_error_context text;
-v_status text;
+v_signal text;
 v_geometry text;
 v_mincutdetails text;
 v_numarcs int4;
@@ -177,7 +177,7 @@ BEGIN
 			
 			IF v_count < v_count2 THEN -- check for overlaps with additional affectations
 
-				v_status ='Conflict';
+				v_signal ='Conflict';
 
 				v_querytext = replace(replace(v_conflictarray::text,'{',''),'}','');
 				
@@ -261,7 +261,7 @@ BEGIN
 				
 				IF v_count = 0 THEN  -- There is a temporal overlap without spatial intersection on the same macroexploitation
 
-					v_status ='Accepted';
+					v_signal = 'Ok';
 					
 					--info
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
@@ -270,7 +270,7 @@ BEGIN
 					
 				ELSE -- There is a temporal overlap with spatial intersection on the same macroexploitation without additional network affected
 
-					v_status ='Conflict';
+					v_signal ='Conflict';
 					
 					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,
 					' overlaps with other mincuts and has conflicts at least with one but no additional pipes are involved and no more connecs are affected.'
@@ -292,7 +292,7 @@ BEGIN
 
 		ELSE -- There is no temporal overlap on same exploitaiton
 
-			v_status ='Accepted';
+			v_signal = 'Ok';
 
 			-- info
 			INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, 
@@ -372,7 +372,7 @@ BEGIN
 		v_geometry := COALESCE(v_geometry, '{}'); 
 
 		--  Return
-		RETURN ('{"status":"'||v_status||'", "message":{'||v_message||'}, "version":"'||v_version.giswater||'"'||
+		RETURN ('{"status":"Accepted", "message":{'||v_message||'}, "version":"'||v_version.giswater||'", "signal":"'||v_signal||'"'||
 			',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||','||
 				'"geometry":"'||v_geometry||'",'|| 			
