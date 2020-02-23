@@ -60,29 +60,13 @@ class ChangeElemType(ParentMapTool):
                 if not row:
                     return
 
-                # Delete from current table 
-                sql = (f"DELETE FROM {row[0]} "
-                       f"WHERE node_id = '{self.node_id}'")
-                self.controller.execute_sql(sql)
-
-                sql = (f"SELECT man_table FROM node_type "
-                       f"WHERE id = '{node_node_type_new}'")
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-
-                # Insert into new table
-                sql = (f"INSERT INTO {row[0]} (node_id) "
-                       f"VALUES ('{self.node_id}')")
-                self.controller.execute_sql(sql)
-
                 # Update field 'nodecat_id'
-                sql = (f"UPDATE node SET nodecat_id = '{node_nodecat_id}' "
+                sql = (f"UPDATE v_edit_node SET nodecat_id = '{node_nodecat_id}' "
                        f"WHERE node_id = '{self.node_id}'")
                 self.controller.execute_sql(sql)
 
                 if project_type == 'ud':
-                    sql = (f"UPDATE node SET node_type = '{node_node_type_new}' "
+                    sql = (f"UPDATE v_edit_node SET node_type = '{node_node_type_new}' "
                            f"WHERE node_id = '{self.node_id}'")
                     self.controller.execute_sql(sql)
                     
