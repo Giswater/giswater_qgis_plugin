@@ -43,6 +43,12 @@ ALTER TABLE anl_polygon ALTER COLUMN the_geom TYPE geometry('MULTIPOLYGON');
 CREATE INDEX rpt_inp_arc_result_id ON rpt_inp_arc
 USING btree (result_id COLLATE pg_catalog."default");
 
+CREATE INDEX rpt_inp_arc_node_1_type ON rpt_inp_arc
+USING btree (node_1 COLLATE pg_catalog."default");
+
+CREATE INDEX rpt_inp_arc_node_2_type ON rpt_inp_arc
+USING btree (node_2 COLLATE pg_catalog."default");
+
 CREATE INDEX rpt_inp_arc_arc_type ON rpt_inp_arc
 USING btree (arc_type COLLATE pg_catalog."default");
 

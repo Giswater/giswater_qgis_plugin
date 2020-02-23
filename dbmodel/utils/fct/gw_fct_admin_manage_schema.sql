@@ -6,15 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2084
 
---drop function ws.gw_fct_admin_manage_schema(json)
-CREATE OR REPLACE FUNCTION ws.gw_fct_admin_manage_schema(p_data json)
+--drop function SCHEMA_NAME.gw_fct_admin_manage_schema(json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_schema(p_data json)
   RETURNS void AS
 $BODY$
 
 
 /*EXAMPLE
 
-SELECT ws.gw_fct_admin_manage_schema($${"client":{"lang":"ES"}, "data":{"action":"REPAIRVIEWS","source":"ws_sample", "target":"ws"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_schema($${"client":{"lang":"ES"}, "data":{"action":"REPAIRVIEWS","source":"ws_sample", "target":"ws"}}$$);
 
 */
 
