@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/02/07
- ALTER TABLE config_api_layer ADD COLUMN add_param json;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_layer", "column":"add_param", "dataType":"json", "isUtils":"False"}}$$);

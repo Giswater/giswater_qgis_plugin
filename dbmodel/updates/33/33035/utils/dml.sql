@@ -39,3 +39,8 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2802, 'gw_fct_visit_multiplier', 'utils', 'function', null, null, null,'Function desmultiplier visits when multifeature', 'role_om',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2804, 'gw_fct_admin_manage_schema', 'utils', 'function', null, null, null,'Function to manage (repair, update, compare) giswater schemas', 'role_admin',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;

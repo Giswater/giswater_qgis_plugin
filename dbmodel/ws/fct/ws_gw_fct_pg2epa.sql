@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
 
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+SELECT ws.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
 select * from rpt_cat_result
 

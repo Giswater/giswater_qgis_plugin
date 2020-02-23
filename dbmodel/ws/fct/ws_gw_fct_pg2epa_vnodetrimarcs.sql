@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2728
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs(result_id_var character varying)  RETURNS json AS 
+CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_vnodetrimarcs(result_id_var character varying)  RETURNS json AS 
 $BODY$
 
 
 /*
-SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('p1')
+SELECT ws.gw_fct_pg2epa_vnodetrimarcs('p1')
 */
 
 DECLARE
@@ -24,15 +24,15 @@ DECLARE
 BEGIN
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws", public;
 
 	RAISE NOTICE 'Starting pg2epa vnode trim arcs';
 
-	-- step 1: for those that vnodes not overlaps node2arc
-	
-	DELETE FROM temp_go2epa;
+	--step 1: for those that vnodes not overlaps node2arc
 
-	-- insert data on temp_table
+	DELETE FROM temp_go2epa;
+	
+	RAISE NOTICE 'insert data on temp_table';
 	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
 	SELECT  arc_id, vnode_id, locate,
 	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
@@ -56,7 +56,7 @@ BEGIN
 	ORDER BY arc_id, locate;
 	
 
-	-- new nodes on rpt_inp_node table
+	RAISE NOTICE ' new nodes on rpt_inp_node table ';
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
 	SELECT 
 		result_id_var,
@@ -81,7 +81,7 @@ BEGIN
 		WHERE vnode_id ilike 'VN%'
 		AND result_id=result_id_var;
 
-	-- new arcs on rpt_inp_arc table
+	RAISE NOTICE ' new arcs on rpt_inp_arc table';
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, flw_code, minorloss, addparam)
 	SELECT
 		result_id_var,
@@ -126,10 +126,10 @@ BEGIN
 		WHERE result_id=result_id_var AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
 		ORDER BY arc_id, a.id;
 	
-	--delete only trimmed arc on rpt_inp_arc table
+	RAISE NOTICE 'delete only trimmed arc on rpt_inp_arc table';
 	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT addparam::json->>'parentArc' FROM rpt_inp_arc WHERE result_id=result_id_var AND addparam::json->>'parentArc' !='') AND result_id=result_id_var;
 
-	-- set minimum value of arcs
+	RAISE NOTICE 'set minimum value of arcs';
 	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id=result_id_var;
 
 	

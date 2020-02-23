@@ -31,7 +31,7 @@ v_idlast bigint;
 v_eventlast bigint;
 v_project_type text;
 v_doc record;
-v_return json
+v_return json;
 v_visitid integer;
 
 BEGIN 
@@ -47,7 +47,7 @@ BEGIN
 	v_visitid :=  ((p_data ->>'feature')::json->>'id')::integer;
 	
 	--test
-	v_return: '{"text":"test"}';
+	v_return = '{"text":"test"}';
 
     
 	-- looking for all node features relateds to visit
