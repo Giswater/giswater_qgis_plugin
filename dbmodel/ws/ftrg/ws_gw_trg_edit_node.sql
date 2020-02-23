@@ -7,32 +7,35 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NODE: 1320
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node()
+CREATE OR REPLACE FUNCTION "ws_sample".gw_trg_edit_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    v_inp_table varchar;
-    v_man_table varchar;
-	v_type_man_table varchar;
-	v_code_autofill_bool boolean;
-	v_node_id text;
-	v_tablename varchar;
-	v_pol_id varchar;
-	v_sql text;
-	v_count integer;
-	v_promixity_buffer double precision;
-	v_edit_node_reduction_auto_d1d2 boolean;
-	v_link_path varchar;
-	v_insert_double_geom boolean;
-	v_double_geom_buffer double precision;
-	v_new_node_type text;
-	v_old_node_type text;
-	v_addfields record;
-	v_new_value_param text;
-	v_old_value_param text;
-	v_customfeature text;
-	v_featurecat text;
-	v_auto_pol_id text;
+v_inp_table varchar;
+v_man_table varchar;
+v_type_man_table varchar;
+v_code_autofill_bool boolean;
+v_node_id text;
+v_tablename varchar;
+v_pol_id varchar;
+v_sql text;
+v_count integer;
+v_promixity_buffer double precision;
+v_edit_node_reduction_auto_d1d2 boolean;
+v_link_path varchar;
+v_insert_double_geom boolean;
+v_double_geom_buffer double precision;
+v_new_node_type text;
+v_old_node_type text;
+v_addfields record;
+v_new_value_param text;
+v_old_value_param text;
+v_customfeature text;
+v_featurecat text;
+v_auto_pol_id text;
+v_new_epatable text;
+v_old_epatable text;
+v_new_epatype text;
 
 BEGIN
 
@@ -563,9 +566,11 @@ BEGIN
 		END IF;
 		
 
-		-- Node type for parent table
+		-- Man and epa epa tables when parent is used
 		IF v_man_table='parent' THEN
 	    	IF (NEW.nodecat_id != OLD.nodecat_id) THEN
+
+				-- man tables
 				v_new_node_type= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=NEW.nodecat_id);
 				v_old_node_type= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=OLD.nodecat_id);
 				IF v_new_node_type != v_old_node_type THEN
@@ -574,9 +579,20 @@ BEGIN
 					v_sql='DELETE FROM man_'||lower(v_old_node_type)||' WHERE node_id='||quote_literal(OLD.node_id);
 					EXECUTE v_sql;
 				END IF;
+
+				-- epa tables
+				v_new_epatable = (SELECT epa_table FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=NEW.nodecat_id);
+				v_old_epatable = (SELECT epa_table FROM node_type WHERE epa_default = OLD.epa_type LIMIT 1);
+				NEW.epa_type = (SELECT epa_default FROM node_type WHERE epa_table = v_new_epatable LIMIT 1);
+				IF v_new_epatable != v_old_epatable THEN
+					v_sql='DELETE FROM '||v_old_epatable||' WHERE node_id='||quote_literal(OLD.node_id);
+					EXECUTE v_sql;
+					v_sql='INSERT INTO '||v_new_epatable||' (node_id) VALUES ('||NEW.node_id||')';
+					EXECUTE v_sql;
+				END IF;
+				
 			END IF;
 		END IF;
-		
 
 		UPDATE node 
 		SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, arc_id=NEW.arc_id, parent_id=NEW.parent_id,
