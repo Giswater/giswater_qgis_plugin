@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = ws_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 CREATE OR REPLACE VIEW vi_reservoirs AS 
@@ -83,29 +83,28 @@ UNION
   WHERE b.ct > 1 AND rpt_inp_node.epa_type::text = 'INLET'::text;
 
 
-  drop view vi_pumps;
+drop view vi_pumps;
+
 CREATE OR REPLACE VIEW vi_pumps AS 
- SELECT arc_id,
+ SELECT arc_id::varchar(16),
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
-    ('POWER'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'power')::text AS power,
-    ('HEAD'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'curve_id')::text AS head,
-    ('SPEED'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'speed')::text AS speed,
-    ('PATTERN'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'pattern')::text AS pattern
+    CASE WHEN addparam::json->>'power' !='' THEN ('POWER'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'power')::text ELSE NULL END AS power,
+    CASE WHEN addparam::json->>'curve_id' !='' THEN ('HEAD'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'curve_id')::text ELSE NULL END AS head,
+    CASE WHEN addparam::json->>'speed' !='' THEN ('SPEED'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'speed')::text ELSE NULL END AS speed,
+    CASE WHEN addparam::json->>'pattern' !='' THEN ('PATTERN'::text || ' '::text) || (rpt_inp_arc.addparam::json->>'pattern')::text ELSE NULL END AS pattern
    FROM inp_selector_result, rpt_inp_arc
      WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-      AND epa_type = 'PUMP'::text
-UNION
- SELECT rpt_inp_arc.arc_id::text AS arc_id,
-    rpt_inp_arc.node_1,
-    rpt_inp_arc.node_2,
-    ('POWER'::text || ' '::text) || inp_pump_additional.power::text AS power,
-    ('HEAD'::text || ' '::text) || inp_pump_additional.curve_id::text AS head,
-    ('SPEED'::text || ' '::text) || inp_pump_additional.speed::text AS speed,
-    ('PATTERN'::text || ' '::text) || inp_pump_additional.pattern::text AS pattern
-   FROM inp_selector_result,  inp_pump_additional
-     JOIN rpt_inp_arc ON rpt_inp_arc.flw_code::text = concat(inp_pump_additional.node_id, '_n2a')
-  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+      AND epa_type = 'PUMP'::text;
+
+
+      
+CREATE TRIGGER gw_trg_vi_pumps
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON SCHEMA_NAME.vi_pumps
+  FOR EACH ROW
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_pumps');
+
 
 
 drop VIEW vi_valves;
@@ -492,3 +491,33 @@ CREATE OR REPLACE VIEW ve_node AS
     v_node.lastupdate_user,
     v_node.insert_user
    FROM v_node;
+
+   
+   
+DROP VIEW SCHEMA_NAME.v_edit_inp_virtualvalve;
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_virtualvalve AS 
+ SELECT v_arc.arc_id,
+    v_arc.node_1,
+    v_arc.node_2,
+    (v_arc.elevation1 + v_arc.elevation2) / 2::numeric AS elevation,
+    (v_arc.depth1 + v_arc.depth2) / 2::numeric AS depth,
+    v_arc.arccat_id,
+    v_arc.sector_id,
+    v_arc.macrosector_id,
+    v_arc.state,
+    v_arc.annotation,
+    v_arc.the_geom,
+    inp_virtualvalve.valv_type,
+    inp_virtualvalve.pressure,
+    inp_virtualvalve.flow,
+    inp_virtualvalve.coef_loss,
+    inp_virtualvalve.curve_id,
+    inp_virtualvalve.minorloss,
+    inp_virtualvalve.to_arc,
+    inp_virtualvalve.status
+   FROM SCHEMA_NAME.inp_selector_sector,
+    SCHEMA_NAME.v_arc
+     JOIN SCHEMA_NAME.inp_virtualvalve USING (arc_id)
+     JOIN SCHEMA_NAME.value_state_type ON v_arc.state_type = value_state_type.id
+  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text AND value_state_type.is_operative IS TRUE;
+   

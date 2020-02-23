@@ -6,19 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2314
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa(character varying, boolean, boolean);
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT gw_fct_pg2epa_check_data($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t100","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
+"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
 
 
-SELECT ws_sample.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
 select * from rpt_cat_result
 
@@ -59,7 +59,7 @@ BEGIN
 	END IF;
 
 	--  Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Getting user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);

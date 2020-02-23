@@ -42,7 +42,7 @@ BEGIN
 	-- update child param for inp_junction
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 
-	-- update child param for inp_tank
+--	-- update child param for inp_tank
 	UPDATE rpt_inp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
 	FROM inp_tank WHERE rpt_inp_node.node_id=inp_tank.node_id AND result_id=result_id_var;
@@ -99,6 +99,13 @@ BEGIN
 	status = inp_virtualvalve.status, 
 	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "to_arc":"',to_arc,'"}')
 	FROM inp_virtualvalve WHERE rpt_inp_arc.arc_id=inp_virtualvalve.arc_id AND result_id=result_id_var;
+
+	-- update addparam for inp_shortpipe
+	UPDATE rpt_inp_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"',a.diameter,'", "roughness":"',a.roughness,'"}')
+	FROM inp_shortpipe 
+	JOIN (SELECT node_1 as node_id, diameter, roughness FROM rpt_inp_arc WHERE result_id=result_id_var UNION SELECT node_2, diameter, roughness FROM rpt_inp_arc WHERE result_id=result_id_var) 
+	a USING (node_id)
+	WHERE rpt_inp_node.node_id=inp_shortpipe.node_id AND result_id=result_id_var;
 
     RETURN 1;
 		

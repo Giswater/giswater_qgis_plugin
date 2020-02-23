@@ -10,6 +10,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs(result_id_var character varying)  RETURNS json AS 
 $BODY$
 
+
 /*
 SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('p1')
 */
@@ -28,20 +29,21 @@ BEGIN
 	RAISE NOTICE 'Starting pg2epa vnode trim arcs';
 
 	-- step 1: for those that vnodes not overlaps node2arc
-	DELETE FROM temp_table WHERE fprocesscat_id=50 and user_name=current_user;
+	
+	DELETE FROM temp_go2epa;
 
 	-- insert data on temp_table
-	INSERT INTO temp_table (fprocesscat_id, geom_line, text_column)
-	SELECT  50, v_arc.the_geom, concat('{"arc_id":"',arc_id,'", "vnode_id":"' ,vnode_id, '", "locate":', locate,', "elevation":',
-	(CASE WHEN (elevation1 - locate*(elevation1-elevation2)) IS NULL THEN 0 ELSE (elevation1 - locate*(elevation1-elevation2))::numeric(12,3) END),
-	', "depth":',(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3), '}')::json
+	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
+	SELECT  arc_id, vnode_id, locate,
+	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
+	(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3) as depth
 	FROM (
 		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, arc_id, 
 		case 	
 			when st_linelocatepoint (rpt_inp_arc.the_geom , v_edit_vnode.the_geom)=1 then 0.9900 
 			when st_linelocatepoint (rpt_inp_arc.the_geom , v_edit_vnode.the_geom)=0 then 0.0100 
 			else (st_linelocatepoint (rpt_inp_arc.the_geom , v_edit_vnode.the_geom))::numeric(12,4) end as locate
-		FROM rpt_inp_arc , vnode v_edit_vnode
+		FROM rpt_inp_arc , v_edit_vnode
 		JOIN v_edit_link a ON vnode_id=exit_id::integer
 		WHERE st_dwithin ( rpt_inp_arc.the_geom, v_edit_vnode.the_geom, 0.01) AND v_edit_vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC'
 		AND result_id=result_id_var
@@ -52,55 +54,37 @@ BEGIN
 		) a
 	JOIN v_arc USING (arc_id)
 	ORDER BY arc_id, locate;
+	
 
-
-	RAISE NOTICE 'Inserting new nodes on rpt_inp_node table';
 	-- new nodes on rpt_inp_node table
-	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
+	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
 	SELECT 
 		result_id_var,
-		text_column::json->>'vnode_id' as node_id, 
-		(text_column::json->>'elevation')::numeric(12,3), -- elevation it's interpolated elevation againts node1 and node2 of pipe
-		(text_column::json->>'elevation')::numeric(12,3) - (text_column::json->>'depth')::numeric(12,3),-- elev it's interpolated using elevation-depth againts node1 and node2 of pipe
-	
-		/*CASE 
-			WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) -- elevation it's interpolated elevation againts node1 and node2 of pipe
+		vnode_id as node_id, 
+		CASE 
+			WHEN connec.elevation IS NULL THEN t.elevation::numeric(12,3) -- elevation it's interpolated elevation againts node1 and node2 of pipe
 			ELSE connec.elevation END as elevation,
-		CASE	WHEN connec.elevation IS NULL THEN (text_column::json->>'elevation')::numeric(12,3) - (text_column::json->>'depth')::numeric(12,3)-- elev it's interpolated using elevation-depth againts node1 and node2 of pipe
-			ELSE connec.elevation - connec.depth END as elev,*/
+		CASE	WHEN connec.elevation IS NULL THEN t.elevation::numeric(12,3) - t.depth::numeric(12,3)-- elev it's interpolated using elevation-depth againts node1 and node2 of pipe
+			ELSE connec.elevation - connec.depth END as elev,
 		'VNODE',
 		'VNODE',
 		'JUNCTION',
+		a.sector_id,
+		a.state,
+		a.state_type,
 		null,
-		null,
-		null,
-		--a.sector_id,
-		--a.state,
-		--a.state_type,
-		null,
-		ST_LineInterpolatePoint (geom_line, (text_column::json->>'locate')::numeric(12,4)) as the_geom
-		FROM temp_table
-		--JOIN rpt_inp_arc a ON arc_id=text_column::json->>'arc_id'
-		--JOIN connec ON concat('VN',pjoint_id)=text_column::json->>'vnode_id'
-		WHERE text_column::json->>'vnode_id' ilike 'VN%' AND user_name=current_user
-		--AND result_id=result_id_var
-		AND fprocesscat_id=50 ;
+		ST_LineInterpolatePoint (a.the_geom, locate::numeric(12,4)) as the_geom,
+		addparam
+		FROM temp_go2epa t
+		JOIN rpt_inp_arc a USING (arc_id)
+		JOIN connec ON concat('VN',pjoint_id)=vnode_id
+		WHERE vnode_id ilike 'VN%'
+		AND result_id=result_id_var;
 
-	RAISE NOTICE 'Update connec elevation values';
-	UPDATE rpt_inp_node 
-	SET 
-	elevation = c.elevation, 
-	elev = c.elevation - c.depth 
-	FROM connec c
-	WHERE concat('VN',pjoint_id)= node_id AND result_id=result_id_var
-	AND c.elevation IS NOT NULL;
-
-
-	RAISE NOTICE 'Inserting new arcs on rpt_inp_arc table';
 	-- new arcs on rpt_inp_arc table
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, flw_code, minorloss)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, flw_code, minorloss, addparam)
 	SELECT
-		't200',
+		result_id_var,
 		concat(arc_id,'P',a.id-min) as arc_id, 
 		a.node_1,
 		a.node_2,
@@ -110,51 +94,43 @@ BEGIN
 		rpt_inp_arc.sector_id,
 		rpt_inp_arc.state,
 		rpt_inp_arc.state_type,
-		concat ('{"parentArc":"', a.arc_id, '", "annotation":"',(CASE WHEN rpt_inp_arc.annotation IS NULL THEN '' ELSE replace (rpt_inp_arc.annotation,'"','') END),'"}'),
+		rpt_inp_arc.annotation,
 		rpt_inp_arc.diameter,
 		rpt_inp_arc.roughness,
 		st_length(ST_LineSubstring(the_geom, locate_1, locate_2)),
-		rpt_inp_arc.status,
+		rpt_inp_arc.status,		
 		CASE 
 			WHEN st_geometrytype(ST_LineSubstring(the_geom, locate_1, locate_2))='ST_LineString' THEN ST_LineSubstring(the_geom, locate_1, locate_2)
 			ELSE null END AS the_geom,
-		rpt_inp_arc.flw_code,
-		rpt_inp_arc.minorloss
-		FROM (	SELECT a.id, a.text_column::json->>'arc_id' as arc_id, a.text_column::json->>'vnode_id' as node_1, (a.text_column::json->>'locate')::numeric(12,4) as locate_1 ,
-			b.text_column::json->>'vnode_id' as node_2, (b.text_column::json->>'locate')::numeric(12,4) as locate_2
-			FROM temp_table a
-			JOIN temp_table b ON a.id=b.id-1
-			WHERE a.fprocesscat_id=50 AND a.user_name=current_user
-			AND b.fprocesscat_id=50
-			AND a.text_column::json->>'arc_id' = b.text_column::json->>'arc_id'
+		CASE 
+			WHEN st_geometrytype(ST_LineSubstring(the_geom, locate_1, locate_2))='ST_Point' THEN ST_LineSubstring(the_geom, locate_1, locate_2)
+			ELSE null END AS the_geom,
+		rpt_inp_arc.minorloss,
+		gw_fct_json_object_set_key (rpt_inp_arc.addparam::json, 'parentArc', a.arc_id)		
+		FROM (
+			SELECT a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
+			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
+			FROM temp_go2epa a
+			JOIN temp_go2epa b ON a.id=b.id-1
+			AND a.arc_id = b.arc_id
 			ORDER BY a.id) a
-			
 		JOIN (SELECT min(id), arc_id
-			FROM(	SELECT a.id, a.text_column::json->>'arc_id' as arc_id
-				FROM temp_table a
-				JOIN temp_table b ON a.id=b.id-1
-				WHERE a.fprocesscat_id=50 AND a.user_name=current_user 	
-				AND b.fprocesscat_id=50
-				AND a.text_column::json->>'arc_id' = b.text_column::json->>'arc_id'
-				ORDER BY a.id) a 
-				group by arc_id) b USING (arc_id)
-				
+			FROM(
+				SELECT a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
+				b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
+				FROM temp_go2epa a
+				JOIN temp_go2epa b ON a.id=b.id-1
+				AND a.arc_id = b.arc_id
+				ORDER BY a.id) a group by arc_id) b USING (arc_id)
 		JOIN rpt_inp_arc USING (arc_id)
-		WHERE (left(a.node_1,2)='VN' OR left(a.node_2,2)='VN') and  result_id='t200'
+		WHERE result_id=result_id_var AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
 		ORDER BY arc_id, a.id;
-
-	RAISE NOTICE 'delete only trimed arc on rpt_inp_arc table';
-
-	--delete trimed arc on rpt_inp_arc table
-	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT annotation::json->>'parentArc' FROM rpt_inp_arc WHERE result_id=result_id_var 
-	AND left (annotation,1)= '{') AND result_id=result_id_var;
-
-	RAISE NOTICE 'set minimum value of arcs';
+	
+	--delete only trimmed arc on rpt_inp_arc table
+	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT addparam::json->>'parentArc' FROM rpt_inp_arc WHERE result_id=result_id_var AND addparam::json->>'parentArc' !='') AND result_id=result_id_var;
 
 	-- set minimum value of arcs
 	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id=result_id_var;
-
-select * from rpt_inp_node WHERE node_id='183259'
 
 	
 RETURN v_result;

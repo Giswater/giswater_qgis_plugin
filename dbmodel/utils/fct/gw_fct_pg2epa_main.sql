@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"start", "resultId":"p2", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
 
-SELECT ws_sample.gw_fct_pg2epa_main($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
