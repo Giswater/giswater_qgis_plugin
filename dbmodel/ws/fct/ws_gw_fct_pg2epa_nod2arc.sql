@@ -22,7 +22,6 @@ v_arcsearchnodes float;
 v_nodarc_min float;
 v_buildupmode int2 = 2;
 v_query_number text;
-v_nodarc1 boolean = false;
 
 BEGIN
 
@@ -75,7 +74,7 @@ BEGIN
 		WHERE arc_id = to_arc AND to_arc IS NOT NULL )b )';
 
 
-	IF v_nodarc1 THEN
+	IF p_only_mandatory_nodarc IS FALSE THEN -- managing inconsistent nodarcs (due the possibility to have this scenario working with sectors is high)
 	
 		RAISE NOTICE 'new nodes when numarcs = 1';
 		EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
