@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = ws_sample, public, pg_catalog;
 
 
 CREATE OR REPLACE VIEW vi_reservoirs AS 
@@ -43,8 +43,7 @@ UNION
     rpt_inp_node
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND rpt_inp_node.node_type::text = 'VIRT-RESERVOIR'::text;
 
-
-drop VIEW IF EXISTS vi_curves;
+drop view IF EXISTS vi_curves;
 drop view IF EXISTS vi_tanks;
 CREATE OR REPLACE VIEW vi_tanks AS 
  SELECT rpt_inp_node.node_id,
@@ -54,7 +53,7 @@ CREATE OR REPLACE VIEW vi_tanks AS
     (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
     (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
     (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
-    (rpt_inp_node.addparam::json ->> 'curve_id'::text)::numeric AS curve_id
+    (rpt_inp_node.addparam::json ->> 'curve_id'::text) AS curve_id
    FROM inp_selector_result,
     rpt_inp_node
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND rpt_inp_node.epa_type::text = 'TANK'::text AND inp_selector_result.cur_user = "current_user"()::text
@@ -66,7 +65,7 @@ UNION
     (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
     (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
     (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
-    (rpt_inp_node.addparam::json ->> 'curve_id'::text)::numeric AS curve_id
+    (rpt_inp_node.addparam::json ->> 'curve_id'::text) AS curve_id
    FROM inp_selector_result,
     rpt_inp_node
      LEFT JOIN ( SELECT a.node_id,

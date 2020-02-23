@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/01/30
-CREATE TABLE doc_x_workcat
+CREATE TABLE doc_x_workcat IF NOT EXISTS
 (
   id serial NOT NULL,
   doc_id character varying(30),
@@ -30,3 +30,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_nod
 -- 2020/02/20
 ALTER TABLE anl_polygon ALTER COLUMN the_geom TYPE geometry('MULTIPOLYGON')
 
+CREATE INDEX rpt_inp_arc_result_id ON rpt_inp_arc
+USING btree (result_id COLLATE pg_catalog."default");
+
+CREATE INDEX rpt_inp_node_result_id ON rpt_inp_node
+USING btree (result_id COLLATE pg_catalog."default");
