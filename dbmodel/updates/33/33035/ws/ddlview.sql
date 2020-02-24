@@ -521,3 +521,23 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_virtualvalve AS
      JOIN SCHEMA_NAME.value_state_type ON v_arc.state_type = value_state_type.id
   WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text AND value_state_type.is_operative IS TRUE;
    
+
+   --2020/02/24
+CREATE OR REPLACE VIEW v_anl_graf AS
+ SELECT anl_graf.arc_id,
+    anl_graf.node_1,
+    anl_graf.node_2,
+    anl_graf.flag,
+    a.flag AS flagi,
+    a.value
+   FROM temp_anlgraf anl_graf
+     JOIN  (SELECT anl_graf_1.arc_id,
+            anl_graf_1.node_1,
+            anl_graf_1.node_2,
+            anl_graf_1.water,
+            anl_graf_1.flag,
+            anl_graf_1.checkf,
+            anl_graf_1.value
+           FROM temp_anlgraf anl_graf_1
+          WHERE anl_graf_1.water = 1)a ON anl_graf.node_1 = a.node_2
+  WHERE anl_graf.flag < 2 AND a.water = 0 AND a.flag < 2;
