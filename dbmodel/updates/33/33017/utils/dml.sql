@@ -17,4 +17,4 @@ UPDATE audit_cat_table SET notify_action = NULL WHERE id = 'config_param_system'
 
 --26/11/2019
 INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,isdeprecated)
-VALUES ('ext_district', 'table to external', 'Catalog of districts', 'role_edit', 0, 0, false);
+VALUES ('ext_district', 'table to external', 'Catalog of districts', 'role_edit', 0, 0, false) ON CONFLICT (id) DO NOTHING;

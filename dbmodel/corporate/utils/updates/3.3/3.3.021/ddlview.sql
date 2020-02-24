@@ -8,11 +8,20 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- 2019/12/21
+CREATE OR REPLACE VIEW ext_raster_dem AS 
 SELECT raster_dem.id,
+	code,
+	alias,
+  raster_type, 
+  cat_raster.descript,
+  source,
+  provider,
+  year,
     raster_dem.rast,
     a.expl_id,
     raster_dem.rastercat_id,
     raster_dem.envelope
-   FROM utils.raster_dem,
-    ws_test.exploitation a
+   FROM 
+    exploitation a, utils.raster_dem
+    JOIN utils.cat_raster ON cat_raster.id=rastercat_id
   WHERE st_dwithin(raster_dem.envelope, a.the_geom, 0::double precision);

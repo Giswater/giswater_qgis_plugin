@@ -38,3 +38,7 @@ INSERT INTO audit_cat_param_user VALUES ('visitclass_vdefault_arc', 'config', 'D
 INSERT INTO audit_cat_param_user VALUES ('visitcat_vdefault', 'dynamic_param', 'Default value of visit catalog', 'role_om', NULL, NULL, 'Visit catalog:', 'SELECT id AS id, name as idval  FROM om_visit_cat WHERE id IS NOT NULL', NULL, true, NULL, NULL, 'utils', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
 
 INSERT INTO value_state_type VALUES (99, 2, 'FICTICIUS', true, false) ON CONFLICT (id) DO NOTHING;
+
+update audit_cat_table SET context=a.text
+FROM (select case when lower(value)='true' then 'view from external schema' ELSE 'external_table' END AS text from config_param_system where parameter = 'sys_utils_schema')a 
+where audit_cat_table.id like 'ext_%';

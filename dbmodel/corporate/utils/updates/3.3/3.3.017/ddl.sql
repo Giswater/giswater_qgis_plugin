@@ -19,3 +19,6 @@ CREATE TABLE district
   the_geom geometry(MultiPolygon,SRID_VALUE),
   CONSTRAINT district_pkey PRIMARY KEY (district_id)
 );
+
+
+ALTER TABLE utils.raster_dem ADD COLUMN envelope geometry (POLYGON,25831);

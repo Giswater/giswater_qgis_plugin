@@ -155,7 +155,7 @@ CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS
     rtc_hydrometer_x_connec.connec_id,
     connec.arc_id,
     ext_rtc_hydrometer_x_data.hydrometer_id,
-    ext_rtc_hydrometer.cat_hydrometer_id,
+    ext_rtc_hydrometer.catalog_id,
     ext_cat_hydrometer.madeby,
     ext_cat_hydrometer.class,
     ext_rtc_hydrometer_x_data.cat_period_id,
@@ -163,7 +163,7 @@ CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS
     ext_rtc_hydrometer_x_data.custom_sum
    FROM ext_rtc_hydrometer_x_data
      JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
      JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
   ORDER BY ext_rtc_hydrometer_x_data.id;
