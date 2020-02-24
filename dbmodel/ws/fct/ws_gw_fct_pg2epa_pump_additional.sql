@@ -34,6 +34,7 @@ yp2 float;
 odd_var float;
 pump_order float;
 v_old_arc_id varchar(16);
+v_addparam json;
 
 
 BEGIN
@@ -55,6 +56,7 @@ BEGIN
 --  	Loop for additional pumps
 	FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id=node_id_aux
 	LOOP
+			
 
 		-- Id creation from pattern arc
 		v_old_arc_id = arc_rec.arc_id;
@@ -98,13 +100,18 @@ BEGIN
 
 		--create arc
 		record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(arc_rec.the_geom)]);
+	
+		--addparam
+		v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern,'","to_arc":"',
+				     arc_rec.addparam::json->>'to_arc','", "energyparam":"',pump_rec.energyparam,'","energyvalue":"',pump_rec.energyvalue,'","pump_type":"',
+				     arc_rec.addparam::json->>'pump_type','"}');	
 
 		-- Inserting into rpt_inp_arc
-		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code) 
+		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, length, diameter, roughness) 
 		VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
-		record_new_arc.arccat_id, record_new_arc.state, record_new_arc.state_type, pump_rec.status, record_new_arc.the_geom, record_new_arc.expl_id, v_old_arc_id);			
+		record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, arc_rec.length, arc_rec.diameter, arc_rec.roughness);			
 	END LOOP;
-    
+
     END LOOP;
      	
     RETURN 1;

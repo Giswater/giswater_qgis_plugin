@@ -22,9 +22,13 @@ BEGIN
 --  Get variables
     v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);
 
+    raise notice 'delete';
+
 -- Delete previous results on rpt_inp_node & arc tables
    DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
    DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
+
+    raise notice 'nodes';
 
 -- Insert on node rpt_inp table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
@@ -42,7 +46,7 @@ BEGIN
 	-- update child param for inp_junction
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 
-	-- update child param for inp_tank
+--	-- update child param for inp_tank
 	UPDATE rpt_inp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
 	FROM inp_tank WHERE rpt_inp_node.node_id=inp_tank.node_id AND result_id=result_id_var;
@@ -62,6 +66,9 @@ BEGIN
 	UPDATE rpt_inp_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',pattern,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "energyparam":"', energyparam,'", "energyvalue":"',energyvalue,'", "pump_type":"',pump_type,'"}')
 	FROM inp_pump WHERE rpt_inp_node.node_id=inp_pump.node_id AND result_id=result_id_var;
+
+
+    raise notice 'arcs';
 
 	-- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
@@ -85,12 +92,16 @@ BEGIN
 		AND (is_operative IS TRUE)
 		AND v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
+	raise notice 'inp_pipe';
+	
 	-- update child param for inp_pipe
 	UPDATE rpt_inp_arc SET 
 	minorloss = inp_pipe.minorloss,
 	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),	
 	addparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reactionvalue,'"}')
 	FROM inp_pipe WHERE rpt_inp_arc.arc_id=inp_pipe.arc_id AND result_id=result_id_var;
+
+	raise notice 'inp_virtualvalve';
 
 	-- update child param for inp_virtualvalve
 	UPDATE rpt_inp_arc SET 
@@ -99,6 +110,21 @@ BEGIN
 	status = inp_virtualvalve.status, 
 	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "to_arc":"',to_arc,'"}')
 	FROM inp_virtualvalve WHERE rpt_inp_arc.arc_id=inp_virtualvalve.arc_id AND result_id=result_id_var;
+
+	raise notice 'inp_shortpipe';
+
+	-- update addparam for inp_shortpipe (step 1)
+	UPDATE rpt_inp_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"',a.diameter,'", "roughness":"',a.roughness,'"}')
+	FROM inp_shortpipe 
+	JOIN (SELECT node_1 as node_id, diameter, roughness FROM rpt_inp_arc WHERE result_id=result_id_var) a USING (node_id)
+	WHERE rpt_inp_node.node_id=inp_shortpipe.node_id AND result_id=result_id_var;
+ 
+	-- update addparam for inp_shortpipe (step 2)
+	UPDATE rpt_inp_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"',a.diameter,'", "roughness":"',a.roughness,'"}')
+	FROM inp_shortpipe 
+	JOIN (SELECT node_2 as node_id, diameter, roughness FROM rpt_inp_arc WHERE result_id=result_id_var) a USING (node_id)
+	WHERE rpt_inp_node.node_id=inp_shortpipe.node_id AND result_id=result_id_var;
+	
 
     RETURN 1;
 		

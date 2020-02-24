@@ -24,20 +24,20 @@ SELECT gw_fct_om_check_data($${
 
 
 DECLARE
-v_project_type 		text;
-v_count			integer;
-v_saveondatabase 	boolean;
-v_result 		text;
-v_version		text;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
-v_result_polygon	json;
-v_querytext		text;
-v_result_id 		text;
-v_features 		text;
-v_edit			text;
-v_config_param 		text;
+v_project_type text;
+v_count integer;
+v_saveondatabase boolean;
+v_result text;
+v_version text;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_querytext	text;
+v_result_id text;
+v_features text;
+v_edit text;
+v_config_param text;
 v_error_context text;
 
 BEGIN
@@ -153,7 +153,28 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
 	END IF;	
+
+	-- Check all state=2 are involved in at least in one psector
+	v_querytext = 'SELECT a.arc_id FROM '||v_edit||'arc a RIGHT JOIN plan_psector_x_arc USING (arc_id) WHERE a.state = 2 AND a.arc_id IS NULL
+			UNION
+			SELECT a.node_id FROM '||v_edit||'node a RIGHT JOIN plan_psector_x_node USING (node_id) WHERE a.state = 2 AND a.node_id IS NULL
+			UNION
+			SELECT a.connec_id FROM '||v_edit||'connec a RIGHT JOIN plan_psector_x_connec USING (connec_id) WHERE a.state = 2 AND a.connec_id IS NULL';
+
+	IF v_project_type = 'UD' THEN
+		v_querytext = concat (v_querytext, ' UNION SELECT a.gully_id FROM '||v_edit||'gully a RIGHT JOIN plan_psector_x_gully USING (gully_id) WHERE a.state = 2 AND a.gully_id IS NULL');
+	END IF;
+		
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')') INTO v_count;
 	
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' features with state=2 without psector assigned. Please, check your data before continue'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No features with state=2 without psector assigned.');
+	END IF;
+
 
 	-- Check state_type nulls (arc, node)
 	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 

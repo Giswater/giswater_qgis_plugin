@@ -13,12 +13,11 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT gw_fct_pg2epa_check_data($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t100","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
+"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
 
-
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t200", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"t1", "useNetworkGeom":"false", "skipCheckData": "true", "export":"false","dumpSubcatch":"true"}}$$)
 
 select * from rpt_cat_result
 
@@ -41,21 +40,25 @@ v_inpoptions json;
 v_advancedsettings boolean;
 v_file json;
 v_body json;
+v_export boolean;
+
 	
 BEGIN
 
 	--  Get input data
-	v_result =  (p_data->>'data')::json->>'resultId';
-	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
-	v_usenetworkdemand =  (p_data->>'data')::json->>'useNetworkDemand';
-	v_skipcheckdata =  (p_data->>'data')::json->>'skipCheckData';
+	v_result = (p_data->>'data')::json->>'resultId';
+	v_usenetworkgeom = (p_data->>'data')::json->>'useNetworkGeom';
+	v_usenetworkdemand = (p_data->>'data')::json->>'useNetworkDemand';
+	v_skipcheckdata = (p_data->>'data')::json->>'skipCheckData';
+	v_export = (p_data->>'data')::json->>'export';
+
 
 	IF v_usenetworkdemand IS NULL THEN
 		v_usenetworkdemand =  FALSE;
 	END IF;
 
 	IF v_skipcheckdata IS NULL THEN
-		v_skipcheckdata =  FALSE;
+		--v_skipcheckdata =  true;
 	END IF;
 
 	--  Search path
@@ -153,13 +156,17 @@ BEGIN
 		
 
 		IF v_skipcheckdata IS NOT TRUE THEN
+
+			v_usenetworkgeom = true;
 		
 			RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
 			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
-			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
-		
-			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
+			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;			
+		ELSE
+			v_return = '{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"", "body":{"form":{},"data":{"options":"","info":"","setVisibleLayers":[]}}}';
 		END IF;
+		
 
 		IF v_buildupmode = 1 THEN
 			RAISE NOTICE '9 - Use supply buildup model (modifying values in order to force buildupmode 1)';
@@ -176,17 +183,11 @@ BEGIN
 		END IF;
 
 		RAISE NOTICE '11 - Calling for the export function';
-		SELECT gw_fct_utils_csv2pg_export_epanet_inp(v_result, null) INTO v_file;
-
-	END IF;
-
-	IF v_usenetworkgeom IS TRUE THEN
-	
-		RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
-		v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
-		"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "message":"',v_usenetworkgeom,'","saveOnDatabase":true}}')::json;
-	
-		SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+		IF v_export THEN
+			SELECT gw_fct_utils_csv2pg_export_epanet_inp(v_result, null) INTO v_file;
+		END IF;
+	ELSE
+		v_return = '{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"", "body":{"form":{},"data":{"options":"","info":"","setVisibleLayers":[]}}}';
 	END IF;
 	
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
@@ -194,8 +195,7 @@ BEGIN
 	
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 
-
-RETURN v_return;
+	RETURN v_return;
 	
 END;
 $BODY$

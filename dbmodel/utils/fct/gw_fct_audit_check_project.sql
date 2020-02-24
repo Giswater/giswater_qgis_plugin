@@ -56,6 +56,7 @@ v_qmlpolpath text = '';
 v_user_control boolean = false;
 v_layer_log boolean = false;
 v_error_context text;
+v_hidden_form boolean;
 
 BEGIN 
 
@@ -75,6 +76,7 @@ BEGIN
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 	SELECT value INTO v_user_control FROM config_param_user where parameter='audit_project_user_control' AND cur_user=current_user;
 	SELECT value INTO v_layer_log FROM config_param_user where parameter='audit_project_layer_log' AND cur_user=current_user;
+	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
 
 	
 	-- init process
@@ -175,6 +177,10 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
 	END LOOP;
+
+	-- arrange vnode
+	UPDATE vnode set state=0 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=0;
+	UPDATE vnode set state=1 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=1;
 
 	-- manage mandatory values of config_param_user where feature is deprecated
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_project_type='WS' THEN
@@ -292,188 +298,196 @@ BEGIN
 		SELECT id, current_user FROM ext_rtc_hydrometer_state ON CONFLICT (state_id, cur_user) DO NOTHING;
 	END IF;
 
-	-- check qgis project (1)
-	IF v_fprocesscat_id_aux=1 THEN
-	
-		-- get values using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
-		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
-		FROM audit_check_project where table_id = 'v_edit_node' and user_name=current_user;
+	-- show form
+
+	IF v_hidden_form IS FALSE THEN
+
+		-- check qgis project (1)
+		IF v_fprocesscat_id_aux=1 THEN
 		
-		--check layers host
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-		FROM audit_check_project WHERE table_host != v_table_host AND user_name=current_user;
-		
-		IF v_count>0 THEN
-			v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
-		
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 3,v_errortext );
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
+			-- get values using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
+			SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
+			FROM audit_check_project where table_id = 'v_edit_node' and user_name=current_user;
+			
+			--check layers host
+			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+			FROM audit_check_project WHERE table_host != v_table_host AND user_name=current_user;
+			
+			IF v_count>0 THEN
+				v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
+			
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 3,v_errortext );
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
+			END IF;
+			
+			--check layers database
+			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+			FROM audit_check_project WHERE table_dbname != v_table_dbname AND user_name=current_user;
+			
+			IF v_count>0 THEN
+				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
+			
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 3,v_errortext );
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
+			END IF;
+
+			--check layers database
+			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+			FROM audit_check_project WHERE table_schema != v_table_schema AND user_name=current_user;
+			
+			IF v_count>0 THEN
+				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
+			
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 3,v_errortext );
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
+			END IF;
+
+			--check layers user
+			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+			FROM audit_check_project WHERE user_name != table_user AND table_user != 'None' AND user_name=current_user;
+			
+			IF v_count>0 THEN
+				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
+			
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 3,v_errortext );
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+				VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
+			END IF;
+
+			-- start process
+			FOR rec_table IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN 
+			(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') AND isdeprecated IS FALSE)
+			LOOP
+			
+				--RAISE NOTICE 'v_count % id % ', v_count, rec_table.id;
+				IF rec_table.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=v_fprocesscat_id_aux) THEN
+					INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) VALUES (rec_table.id, 1, rec_table.qgis_criticity, FALSE, rec_table.qgis_message);
+				--ELSE 
+				--	UPDATE audit_check_project SET criticity=rec_table.qgis_criticity, enabled=TRUE WHERE table_id=rec_table.id;
+				END IF;	
+				v_count=v_count+1;
+			END LOOP;
+			
+			--error 1 (criticity = 3 and false)
+			SELECT count (*) INTO v_error FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
+
+			--list missing layers with criticity 3 and 2
+
+			EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
+			'''||v_srid||''' as srid,b.column_name as field_the_geom,''3'' as criticity, qgis_message
+			FROM '||v_schema||'.audit_check_project 
+			JOIN information_schema.columns ON table_name = table_id 
+			AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
+			LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
+			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
+			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
+			WHERE criticity=3 and enabled IS NOT TRUE) a'
+			INTO v_result_layers_criticity3;
+
+
+			EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
+			'''||v_srid||''' as srid,b.column_name as field_the_geom,''2'' as criticity, qgis_message
+			FROM '||v_schema||'.audit_check_project 
+			JOIN information_schema.columns ON table_name = table_id 
+			AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
+			LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
+			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
+			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
+			WHERE criticity=2 and enabled IS NOT TRUE) a'
+			INTO v_result_layers_criticity2;
+
+			v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
+			v_result_layers_criticity2 := COALESCE(v_result_layers_criticity2, '{}'); 
+
+			v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
+
 		END IF;
-		
-		--check layers database
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-		FROM audit_check_project WHERE table_dbname != v_table_dbname AND user_name=current_user;
-		
-		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
-		
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 3,v_errortext );
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
-		END IF;
 
-		--check layers database
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-		FROM audit_check_project WHERE table_schema != v_table_schema AND user_name=current_user;
-		
-		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
-		
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 3,v_errortext );
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
-		END IF;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);	
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
 
-		--check layers user
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-		FROM audit_check_project WHERE user_name != table_user AND table_user != 'None' AND user_name=current_user;
-		
-		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
-		
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 3,v_errortext );
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
-		END IF;
-
-		-- start process
-		FOR rec_table IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN 
-		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') AND isdeprecated IS FALSE)
-		LOOP
-		
-			--RAISE NOTICE 'v_count % id % ', v_count, rec_table.id;
-			IF rec_table.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=v_fprocesscat_id_aux) THEN
-				INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) VALUES (rec_table.id, 1, rec_table.qgis_criticity, FALSE, rec_table.qgis_message);
-			--ELSE 
-			--	UPDATE audit_check_project SET criticity=rec_table.qgis_criticity, enabled=TRUE WHERE table_id=rec_table.id;
-			END IF;	
-			v_count=v_count+1;
-		END LOOP;
-		
-		--error 1 (criticity = 3 and false)
-		SELECT count (*) INTO v_error FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
-
-		--list missing layers with criticity 3 and 2
-
-		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
-		'''||v_srid||''' as srid,b.column_name as field_the_geom,''3'' as criticity, qgis_message
-		FROM '||v_schema||'.audit_check_project 
-		JOIN information_schema.columns ON table_name = table_id 
-		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
-		LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
-		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-		WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
-   		WHERE criticity=3 and enabled IS NOT TRUE) a'
-		INTO v_result_layers_criticity3;
-
-
-		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
-		'''||v_srid||''' as srid,b.column_name as field_the_geom,''2'' as criticity, qgis_message
-		FROM '||v_schema||'.audit_check_project 
-		JOIN information_schema.columns ON table_name = table_id 
-		AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
-		LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
-		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-		WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
-   		WHERE criticity=2 and enabled IS NOT TRUE) a'
-		INTO v_result_layers_criticity2;
-
-		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
-		v_result_layers_criticity2 := COALESCE(v_result_layers_criticity2, '{}'); 
-
-		v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
-
-	END IF;
-
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
-
-	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=101 order by criticity desc, id asc) row; 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
-	IF v_layer_log THEN
-	
-		--points
-		v_result = null;
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-	  	SELECT jsonb_build_object(
-	     'type',       'Feature',
-	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	    'properties', to_jsonb(row) - 'the_geom'
-	  	) AS feature
-	  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (7,14,64,66,70,71,98) -- epa
-		UNION
-		SELECT id, node_id, nodecat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103)  -- om
-		UNION
-		SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id IN (101,102,104,105,106) -- om
-		) row) features;
-
+		-- get results
+		-- info
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=101 order by criticity desc, id asc) row; 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result,',"category_field":"descript"}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-		--lines
-		v_result = null;
+		IF v_layer_log THEN
+		
+			--points
+			v_result = null;
+			SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+			SELECT jsonb_build_object(
+		     'type',       'Feature',
+		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		    'properties', to_jsonb(row) - 'the_geom'
+			) AS feature
+			FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (7,14,64,66,70,71,98) -- epa
+			UNION
+			SELECT id, node_id, nodecat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id IN (4,76,79,80,81,82,87,96,97,102,103)  -- om
+			UNION
+			SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id IN (101,102,104,105,106) -- om
+			) row) features;
 
-		SELECT jsonb_agg(features.feature) INTO v_result
-		FROM (
-	  	SELECT jsonb_build_object(
-	     'type',       'Feature',
-	    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	    'properties', to_jsonb(row) - 'the_geom'
-	  	) AS feature
-	  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (3, 14, 39)  -- epa
-		UNION
-		SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (4, 88, 102) -- om 
-		) row) features;
+			v_result := COALESCE(v_result, '{}'); 
+			v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result,',"category_field":"descript"}'); 
 
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, ',"category_field":"descript"}');
+			--lines
+			v_result = null;
 
+			SELECT jsonb_agg(features.feature) INTO v_result
+			FROM (
+			SELECT jsonb_build_object(
+		     'type',       'Feature',
+		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+		    'properties', to_jsonb(row) - 'the_geom'
+			) AS feature
+			FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (3, 14, 39)  -- epa
+			UNION
+			SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (4, 88, 102) -- om 
+			) row) features;
+
+			v_result := COALESCE(v_result, '{}'); 
+			v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, ',"category_field":"descript"}');
+
+		END IF;
+
+		--    Control null
+		v_version:=COALESCE(v_version,'{}');
+		v_result_info:=COALESCE(v_result_info,'{}');
+		v_result_point:=COALESCE(v_result_point,'{}');
+		v_result_line:=COALESCE(v_result_line,'{}');
+		v_result_polygon:=COALESCE(v_result_polygon,'{}');
+		v_missing_layers:=COALESCE(v_missing_layers,'{}');
+
+		--return definition for v_audit_check_result
+		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'", "signal":"showform"'||
+			',"body":{"form":{}'||
+				',"data":{ "info":'||v_result_info||','||
+						'"point":'||v_result_point||','||
+						'"line":'||v_result_line||','||
+						'"polygon":'||v_result_polygon||','||
+						'"missingLayers":'||v_missing_layers||'}'||
+				'}}')::json;
+	ELSE
+		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'", "signal":"hideform"}')::json;
 	END IF;
-
-	--    Control null
-	v_version:=COALESCE(v_version,'{}');
-	v_result_info:=COALESCE(v_result_info,'{}');
-	v_result_point:=COALESCE(v_result_point,'{}');
-	v_result_line:=COALESCE(v_result_line,'{}');
-	v_result_polygon:=COALESCE(v_result_polygon,'{}');
-	v_missing_layers:=COALESCE(v_missing_layers,'{}');
-
-	--return definition for v_audit_check_result
-	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
-		     ',"body":{"form":{}'||
-			     ',"data":{ "info":'||v_result_info||','||
-					'"point":'||v_result_point||','||
-					'"line":'||v_result_line||','||
-					'"polygon":'||v_result_polygon||','||
-					'"missingLayers":'||v_missing_layers||'}'||
-			      '}}')::json;
+		
 	--  Return	   
 	RETURN v_return;
 

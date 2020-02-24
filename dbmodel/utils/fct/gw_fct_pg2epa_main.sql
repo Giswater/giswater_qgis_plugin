@@ -23,7 +23,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"true", "dumpSubcatch":"true"}}$$)
+"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
 */
 
@@ -140,8 +140,8 @@ BEGIN
 RETURN v_return;
 	
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 
 END;

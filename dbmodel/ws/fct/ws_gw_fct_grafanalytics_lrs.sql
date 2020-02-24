@@ -7,22 +7,22 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_grafanalytics_lrs(json);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_grafanalytics_lrs(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_lrs(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_lrs(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
 TO EXECUTE
-SELECT ws_sample.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitation":"[1,2]"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitation":"[1,2]"}}}');
 
 
-delete from ws_sample.audit_log_data;
-delete from ws_sample.temp_anlgraf
+delete from SCHEMA_NAME.audit_log_data;
+delete from SCHEMA_NAME.temp_anlgraf
 
-SELECT * FROM ws_sample.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM ws_sample.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM ws_sample.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
+SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
 
 
 */
@@ -54,7 +54,7 @@ v_layer record;
 BEGIN
 
 	-- Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get variables (from input)
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
@@ -108,7 +108,7 @@ BEGIN
 	IF v_expl IS NOT NULL THEN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN
-		(SELECT distinct(macroexpl_id) FROM ws_sample.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
+		(SELECT distinct(macroexpl_id) FROM SCHEMA_NAME.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
 	-- water:  dry (0) wet (1)
