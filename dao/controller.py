@@ -671,7 +671,7 @@ class DaoController(object):
 
         json_result = row[0]
         if 'status' in json_result and json_result['status'] == 'Failed':
-            self.manage_exception_api(json_result)
+            self.manage_exception_api(json_result, sql)
             return False
 
         return json_result
@@ -1503,8 +1503,10 @@ class DaoController(object):
             msg += f"File name: {file_name}\n"
             msg += f"Function name: {function_name}\n"
             msg += f"Line number: {function_line}\n"
-            msg += f"Detail: {json_result['SQLERR']}\n"
-            msg += f"Context: {json_result['SQLCONTEXT']}\n"
+            if 'SQLERR' in json_result:
+                msg += f"Detail: {json_result['SQLERR']}\n"
+            if 'SQLCONTEXT' in json_result:
+                msg += f"Context: {json_result['SQLCONTEXT']}\n"
             if sql:
                 msg += f"SQL:\n {sql}\n"
 
@@ -1513,9 +1515,6 @@ class DaoController(object):
             self.show_exceptions_msg(title, msg)
             self.log_warning(msg, stack_level_increase=2)
 
-        except KeyError as e:
-            title = "KeyError"
-            self.manage_exception(title)
         except Exception as e:
             self.manage_exception("Unhandled Error")
 
