@@ -466,7 +466,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None, show_warning_detail=True):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -475,7 +475,7 @@ class DaoController(object):
         if not row:
             # Check if any error has been raised
             if self.last_error:
-                self.manage_exception_db(self.last_error, sql)
+                self.manage_exception_db(self.last_error, sql, stack_level_increase=1)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
@@ -667,23 +667,11 @@ class DaoController(object):
         sql = f"SELECT {function_name} ($${{{body}}}$$);"
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
-            # Check if any error has been raised
-            if self.last_error:
-                self.manage_exception_db(self.last_error, sql)
             return None
 
         json_result = row[0]
         if 'status' in json_result and json_result['status'] == 'Failed':
-            try:
-                title = "Execute failed."
-                msg = f"<b>Error: </b>{json_result['SQLERR']}<br>"
-                msg += f"<b>Context: </b>{json_result['SQLCONTEXT']} <br>"
-            except KeyError as e:
-                title = "Key on returned json from ddbb is missed."
-                msg = f"<b>Key: </b>{e}<br>"
-                msg += f"<b>Python file: </b>{__name__} <br>"
-                msg += f"<b>Python function: </b>{self.get_json.__name__} <br>"
-            self.show_exceptions_msg(title, msg)
+            self.manage_exception_api(json_result)
             return False
 
         return json_result
@@ -1471,10 +1459,11 @@ class DaoController(object):
         self.log_warning(msg)
 
 
-    def manage_exception_db(self, description=None, sql=None, stack_level=2):
+    def manage_exception_db(self, description=None, sql=None, stack_level=2, stack_level_increase=0):
         """ Manage exception in database queries and show information to the user """
 
         try:
+            stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
             file_name = os.path.basename(module_path)
             function_line = inspect.stack()[stack_level][2]
@@ -1496,7 +1485,39 @@ class DaoController(object):
             self.log_warning(msg, stack_level_increase=2)
 
         except Exception as e:
-            self.log_warning(f"Error logging: {e}", logger_file=False)
+            self.manage_exception("Unhandled Error")
+
+
+    def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
+        """ Manage exception in JSON database queries and show information to the user """
+
+        try:
+            stack_level += stack_level_increase
+            module_path = inspect.stack()[stack_level][1]
+            file_name = os.path.basename(module_path)
+            function_line = inspect.stack()[stack_level][2]
+            function_name = inspect.stack()[stack_level][3]
+
+            # Set exception message details
+            msg = ""
+            msg += f"File name: {file_name}\n"
+            msg += f"Function name: {function_name}\n"
+            msg += f"Line number: {function_line}\n"
+            msg += f"Detail: {json_result['SQLERR']}\n"
+            msg += f"Context: {json_result['SQLCONTEXT']}\n"
+            if sql:
+                msg += f"SQL:\n {sql}\n"
+
+            # Show exception message in dialog and log it
+            title = "Database API error"
+            self.show_exceptions_msg(title, msg)
+            self.log_warning(msg, stack_level_increase=2)
+
+        except KeyError as e:
+            title = "KeyError"
+            self.manage_exception(title)
+        except Exception as e:
+            self.manage_exception("Unhandled Error")
 
 
     def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
