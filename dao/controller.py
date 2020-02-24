@@ -671,6 +671,7 @@ class DaoController(object):
             if self.last_error:
                 self.manage_exception_db(self.last_error, sql)
             return None
+
         json_result = row[0]
         if 'status' in json_result and json_result['status'] == 'Failed':
             try:
@@ -1505,7 +1506,7 @@ class DaoController(object):
         self.dlg_info.setWindowTitle(window_title)
         if title:
             self.dlg_info.lbl_title.setText(title)
-        self.dlg_info.txt_info.setText(msg)
+        self.dlg_info.txt_infolog.setText(msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_info.show()
 
