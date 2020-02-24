@@ -37,6 +37,7 @@ DECLARE
 	v_version	text;
 	v_path 		text;
 	v_result_id	text;
+	v_error_context text;
 
 BEGIN
 
@@ -272,17 +273,33 @@ BEGIN
 	
 	--points
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=40) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=40) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 	--lines
 	v_result = null;
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=40)) row; 
+	SELECT jsonb_agg(features.feature) INTO v_result
+	FROM (
+  	SELECT jsonb_build_object(
+     'type',       'Feature',
+    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
+    'properties', to_jsonb(row) - 'the_geom'
+  	) AS feature
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=40) row) features;
+
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
 	--Control nulls
 	v_version := COALESCE(v_version, '{}'); 
@@ -291,13 +308,19 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 
 -- 	Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import succesfully"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import rpt done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||
 		       '}}'||
 	    '}')::json;	
+
+--  Exception handling
+    EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	  
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
