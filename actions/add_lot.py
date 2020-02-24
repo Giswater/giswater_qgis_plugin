@@ -2171,17 +2171,17 @@ class AddNewLot(ParentManage):
         self.dlg_team_man.rejected.connect(partial(self.save_settings, self.dlg_team_man))
 
         # Tab Users
-        self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id",
+        self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id", "Usuaris",
                                      [], [], "all_user_rows", "selected_user_rows", "btn_user_select", "btn_user_unselect",
                                      'id AS "Usuaris"', 'user_id AS "Usuaris"')
         # Tab Vehciles
-        self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle",
+        self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle", "Vehicle",
                                      [], [], "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select",
                                      "btn_vehicle_unselect", 'idval AS "Vehicle", descript AS "Descripcio", model AS "Model", number_plate AS "Matricula"',
                                      'vehicle AS "Vehicle", descript AS "Descripcio", model AS "Model", number_plate AS "Matricula"')
         # Tab Visitclass
         self.populate_team_selectors(self.dlg_team_man, "om_visit_class", "v_om_team_x_visitclass", "idval",
-                                     "visitclass", [], [],
+                                     "visitclass", "Classe visita", [], [],
                                      "all_visitclass_rows", "selected_visitclass_rows", "btn_visitclass_select",
                                      "btn_visitclass_unselect", 'idval AS "Classe visita", descript AS "Descripcio"',
                                      'idval AS "Classe visita", descript AS "Descripcio"')
@@ -2189,7 +2189,7 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_team_man)
 
 
-    def populate_team_selectors(self, dialog, tableleft, tableright, field_id_left, field_id_right,
+    def populate_team_selectors(self, dialog, tableleft, tableright, field_id_left, field_id_right, alias,
                                 hide_left, hide_right, table_all, table_selected, button_select, button_unselect,
                                 parameters_left, parameters_right):
 
@@ -2229,13 +2229,13 @@ class AddNewLot(ParentManage):
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
         btn_select.clicked.connect(
-            partial(self.multi_rows_team_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright,
+            partial(self.multi_rows_team_selector, tbl_all_rows, tbl_selected_rows, alias, tableright,
                     field_id_right, query_left, query_right, field_id_right, filter_team))
 
         # Button unselect
         btn_unselect.clicked.connect(
             partial(self.team_unselector, tbl_all_rows, tbl_selected_rows, query_left, query_right,
-                    field_id_right, tableright, tableleft, filter_team))
+                    field_id_right, alias, tableright, tableleft, filter_team))
 
 
     def multi_rows_team_selector(self, qtable_left, qtable_right, id_ori,
@@ -2283,7 +2283,7 @@ class AddNewLot(ParentManage):
         self.fill_table_by_query(qtable_left, query_left)
 
 
-    def team_unselector(self, qtable_left, qtable_right, query_left, query_right, field_id_right, tableright, tableleft, filter_team):
+    def team_unselector(self, qtable_left, qtable_right, query_left, query_right, field_id_right, alias, tableright, tableleft, filter_team):
 
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -2293,7 +2293,7 @@ class AddNewLot(ParentManage):
         expl_id = []
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = str(qtable_right.model().record(row).value(field_id_right))
+            id_ = str(qtable_right.model().record(row).value(alias))
             expl_id.append(id_)
         for i in range(0, len(expl_id)):
             query_delete = "DELETE FROM " + tableright + ""
