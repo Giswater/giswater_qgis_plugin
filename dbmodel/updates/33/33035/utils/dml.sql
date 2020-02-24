@@ -50,3 +50,15 @@ false, false, null, false) ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox,isparametric)
 VALUES (2806, 'gw_fct_admin_test_ci', 'utils','function', 'Function used in continous integration to test database processes', 
 'role_admin', FALSE, FALSE, FALSE) ON CONFLICT (id) DO NOTHING;
+
+
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+    VALUES ('ext_cat_raster', 'external catalog', 'Catalog of rasters', 'role_edit', 0, 0, false)
+    ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+    VALUES ('ext_raster_dem', 'external table', 'Table to store raster DEM', 'role_edit', 0, 0, false)
+    ON CONFLICT (id) DO NOTHING;
+    
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,isdeprecated)
+VALUES ('ext_district', 'table to external', 'Catalog of districts', 'role_edit', 0, 0, false) ON CONFLICT (id) DO NOTHING;
