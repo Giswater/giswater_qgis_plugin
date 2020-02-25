@@ -54,7 +54,7 @@ class UpdateSQL(ApiParent):
         self.dlg_info = None
 
 
-    def init_sql(self, set_database_connection=False):
+    def init_sql(self, set_database_connection=False, username=None):
         """ Button 100: Execute SQL. Info show info """
 
         # Populate combo connections
@@ -87,7 +87,7 @@ class UpdateSQL(ApiParent):
         if self.project_type is not None and len(layers) != 0:
             self.info_show_info()
         else:
-            self.info_show_database()
+            self.info_show_database(username=username)
 
 
     def populate_combo_connections(self):
@@ -244,7 +244,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self.update_sys_fields))
 
 
-    def info_show_database(self, connection_status=True):
+    def info_show_database(self, connection_status=True, username=None):
 
         self.message_update = ''
         self.error_count = 0
@@ -254,7 +254,9 @@ class UpdateSQL(ApiParent):
         self.last_connection = self.get_last_connection()
 
         # Get database connection user and role
-        self.username = self.get_user_connection(self.last_connection)
+        self.username = username
+        if username is None:
+            self.username = self.get_user_connection(self.last_connection)
 
         self.dlg_readsql.btn_info.setText('Update Project Schema')
         self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
@@ -268,11 +270,10 @@ class UpdateSQL(ApiParent):
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
-        # Open dialog
+        # Set title
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
-        self.open_dialog(self.dlg_readsql)
 
         if connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
@@ -281,6 +282,7 @@ class UpdateSQL(ApiParent):
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
+            self.open_dialog(self.dlg_readsql)
             return
 
         # Create extension postgis if not exist
@@ -325,6 +327,8 @@ class UpdateSQL(ApiParent):
         if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
                 str(self.controller.plugin_settings_value('last_schema_name_selected')))
+
+        self.open_dialog(self.dlg_readsql)
 
 
     def set_credentials(self, dialog, new_connection=False):
@@ -1459,6 +1463,7 @@ class UpdateSQL(ApiParent):
             self.manage_process_result()
             return
         self.task1.setProgress(70)
+
         # Custom execution
         if self.rdb_import_data.isChecked():
             #TODO:
@@ -2163,7 +2168,7 @@ class UpdateSQL(ApiParent):
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
-        #Load user values
+        # Load user values
         self.project_name.setText(str(self.controller.plugin_settings_value('project_name_schema')))
         self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
         create_schema_type = self.controller.plugin_settings_value('create_schema_type')
