@@ -57,26 +57,29 @@ BEGIN
 			ELSIF NEW.status=4 AND NEW.lot_id IS NULL THEN
 				UPDATE om_visit SET publish=TRUE WHERE id=NEW.id;
 			END IF;
+            
+            --set visit_type captured from class_id
+			UPDATE om_visit SET visit_type=(SELECT visit_type FROM om_visit_class WHERE id=NEW.class_id) WHERE id=NEW.id;
 
 		ELSIF v_triggerfromtable ='om_visit_x_feature' THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
 
 			-- insert element into lot_x_element table in case if doesn't exist
-			IF v_featuretype ='arc' AND v_lot IS NOT NULL THEN	
+			IF v_featuretype ='arc' THEN	
 				IF (SELECT arc_id FROM om_visit_lot_x_arc where arc_id=NEW.arc_id AND lot_id=v_lot) IS NULL THEN
 					v_code = (SELECT code FROM arc WHERE arc_id=NEW.arc_id);
-					INSERT INTO om_visit_lot_x_arc VALUES (v_lot, NEW.arc_id, v_code, 1);
+					INSERT INTO om_visit_lot_x_arc SELECT (v_lot, NEW.arc_id, v_code, 1);
 				END IF;				
-			ELSIF v_featuretype ='node' AND v_lot IS NOT NULL THEN	
+			ELSIF v_featuretype ='node' THEN	
 				IF (SELECT node_id FROM om_visit_lot_x_node where node_id=NEW.node_id AND lot_id=v_lot) IS NULL THEN
 					v_code = (SELECT code FROM node WHERE node_id=NEW.node_id);
-					INSERT INTO om_visit_lot_x_node VALUES (v_lot, NEW.node_id, v_code, 1);
+					INSERT INTO om_visit_lot_x_node SELECT (v_lot, NEW.node_id, v_code, 1);
 				END IF;	
-			ELSIF v_featuretype ='connec' AND v_lot IS NOT NULL THEN	
+			ELSIF v_featuretype ='connec' THEN	
 				IF (SELECT connec_id FROM om_visit_lot_x_connec where connec_id=NEW.connec_id AND lot_id=v_lot) IS NULL THEN
 					v_code = (SELECT code FROM connec WHERE connec_id=NEW.connec_id);
-					INSERT INTO om_visit_lot_x_connec VALUES (v_lot, NEW.connec_id, v_code, 1);
+					INSERT INTO om_visit_lot_x_connec SELECT (v_lot, NEW.connec_id, v_code, 1);
 				END IF;	
-			ELSIF v_featuretype ='gully' AND v_lot IS NOT NULL THEN	
+			ELSIF v_featuretype ='gully' THEN	
 				IF (SELECT gully_id FROM om_visit_lot_x_gully where gully_id=NEW.gully_id AND lot_id=v_lot) IS NULL THEN
 					v_code = (SELECT code FROM gully WHERE gully_id=NEW.gully_id);
 					INSERT INTO om_visit_lot_x_gully VALUES (v_lot, NEW.gully_id, v_code, 1);
@@ -86,7 +89,8 @@ BEGIN
 			SELECT * INTO v_visit FROM om_visit WHERE id=NEW.visit_id;
 
 			-- move status of lot element to status=0 (visited)
-			IF v_visit.status=4 THEN
+			IF v_visit.status=4 AND v_visit.visit_type=1 THEN
+			--visit type=1 is planned visit. For unexpected visits planned element keeps planned
 
 				IF v_featuretype ='arc' THEN	
 					v_querytext= 'UPDATE om_visit_lot_x_arc SET status=0 WHERE lot_id::text=' || quote_literal (v_visit.lot_id) ||' AND arc_id::text ='||quote_literal(NEW.arc_id);
