@@ -476,16 +476,23 @@ BEGIN
 		v_missing_layers:=COALESCE(v_missing_layers,'{}');
 
 		--return definition for v_audit_check_result
-		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'", "signal":"showform"'||
+		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
 				',"data":{ "info":'||v_result_info||','||
 						'"point":'||v_result_point||','||
 						'"line":'||v_result_line||','||
 						'"polygon":'||v_result_polygon||','||
 						'"missingLayers":'||v_missing_layers||'}'||
-				'}}')::json;
+				', "actions":{"hideform":' || v_hidden_form || '}}}')::json;
 	ELSE
-		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'", "signal":"hideform"}')::json;
+		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
+			',"body":{"form":{}'||
+				',"data":{ "info":{},'||
+						'"point":{},'||
+						'"line":{},'||
+						'"polygon":{},'||
+						'"missingLayers":{}}'||
+				', "actions":{"hideform":' || v_hidden_form || '}}}')::json;
 	END IF;
 		
 	--  Return	   

@@ -164,7 +164,9 @@ BEGIN
 			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
 			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;			
 		ELSE
-			v_return = '{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"", "body":{"form":{},"data":{"options":"","info":"","setVisibleLayers":[]}}}';
+			
+			SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"text":"Data quality analysis done succesfully"}}}'::json) INTO v_return;
+			
 		END IF;
 		
 
@@ -187,7 +189,9 @@ BEGIN
 			SELECT gw_fct_utils_csv2pg_export_epanet_inp(v_result, null) INTO v_file;
 		END IF;
 	ELSE
-		v_return = '{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"", "body":{"form":{},"data":{"options":"","info":"","setVisibleLayers":[]}}}';
+		
+		SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"text":"Data quality analysis done succesfully"}}}'::json) INTO v_return;
+		
 	END IF;
 	
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
