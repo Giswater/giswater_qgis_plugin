@@ -6,15 +6,15 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import Qgis, QgsVectorLayer, QgsProject, QgsTask, QgsApplication
+from qgis.core import QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
 from qgis.PyQt.QtCore import QSettings, Qt, QDate
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
-    QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox, QAbstractButton, \
+from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
+    QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
 
 import os
@@ -29,13 +29,13 @@ from collections import OrderedDict
 from functools import partial
 from time import sleep
 
-
 from .. import utils_giswater
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
     ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
 from .gw_task import GwTask
+
 
 class UpdateSQL(ApiParent):
 
@@ -127,7 +127,7 @@ class UpdateSQL(ApiParent):
             self.super_users.append(str(super_user))
 
         # Get locale of QGIS application
-        self.locale = QSettings().value('locale/userLocale').lower()
+        self.locale = self.controller.plugin_settings_value('locale/userLocale', 'en_us').lower()
         if self.locale == 'es_es':
             self.locale = 'ES'
         elif self.locale == 'es_ca':
@@ -179,9 +179,7 @@ class UpdateSQL(ApiParent):
             self.project_types = self.settings.value('system_variables/project_types_dev')
 
         # Populate combo types
-        #self.cmb_project_type.blockSignals(True)
         self.cmb_project_type.clear()
-        #self.cmb_project_type.blockSignals(False)
         for project_type in self.project_types:
             self.cmb_project_type.addItem(str(project_type))
         self.change_project_type(self.cmb_project_type)
@@ -1970,10 +1968,10 @@ class UpdateSQL(ApiParent):
             sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables "
                    "WHERE table_schema = '" + str(row[0]) + "' "
                    "AND table_name = 'version')")
-            exists = self.controller.get_row(sql, show_warning_detail=False)
+            exists = self.controller.get_row(sql, commit=True)
             if exists and str(exists[0]) == 'True':
                 sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
-                result = self.controller.get_row(sql, show_warning_detail=False)
+                result = self.controller.get_row(sql, commit=True)
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
