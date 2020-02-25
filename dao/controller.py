@@ -677,7 +677,7 @@ class DaoController(object):
 
 
     def show_exceptions_msg(self, title, msg=""):
-        cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
+
         self.dlg_info = BasicInfo()
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
@@ -1518,28 +1518,44 @@ class DaoController(object):
         """ Manage exception in JSON database queries and show information to the user """
 
         try:
-            stack_level += stack_level_increase
-            module_path = inspect.stack()[stack_level][1]
-            file_name = sys_manager.get_file_with_parents(module_path, 2)
-            function_line = inspect.stack()[stack_level][2]
-            function_name = inspect.stack()[stack_level][3]
 
-            # Set exception message details
-            msg = ""
-            msg += f"File name: {file_name}\n"
-            msg += f"Function name: {function_name}\n"
-            msg += f"Line number: {function_line}\n"
-            if 'SQLERR' in json_result:
-                msg += f"Detail: {json_result['SQLERR']}\n"
-            if 'SQLCONTEXT' in json_result:
-                msg += f"Context: {json_result['SQLCONTEXT']}\n"
-            if sql:
-                msg += f"SQL:\n {sql}\n"
+            if 'message' in json_result:
 
-            # Show exception message in dialog and log it
-            title = "Database API error"
-            self.show_exceptions_msg(title, msg)
-            self.log_warning(msg, stack_level_increase=2)
+                parameter = None
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                if 'text' in json_result['message']:
+                    msg = json_result['message']['text']
+                else:
+                    parameter = 'text'
+                    msg = "Key on returned json from ddbb is missed"
+                self.show_message(msg, level, parameter=parameter)
+
+            else:
+
+                stack_level += stack_level_increase
+                module_path = inspect.stack()[stack_level][1]
+                file_name = sys_manager.get_file_with_parents(module_path, 2)
+                function_line = inspect.stack()[stack_level][2]
+                function_name = inspect.stack()[stack_level][3]
+
+                # Set exception message details
+                title = "Database API execution failed"
+                msg = ""
+                msg += f"File name: {file_name}\n"
+                msg += f"Function name: {function_name}\n"
+                msg += f"Line number: {function_line}\n"
+                if 'SQLERR' in json_result:
+                    msg += f"Detail: {json_result['SQLERR']}\n"
+                if 'SQLCONTEXT' in json_result:
+                    msg += f"Context: {json_result['SQLCONTEXT']}\n"
+                if sql:
+                    msg += f"SQL:\n {sql}\n"
+
+                # Show exception message in dialog and log it
+                self.show_exceptions_msg(title, msg)
+                self.log_warning(msg, stack_level_increase=2)
 
         except Exception as e:
             self.manage_exception("Unhandled Error")
