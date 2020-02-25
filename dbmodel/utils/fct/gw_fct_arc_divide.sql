@@ -70,12 +70,22 @@ v_result_point text;
 v_result_line text;
 v_result_polygon text;
 v_error_context text;
+v_audit_result text;
+v_level integer;
+v_status text;
+v_message text;
 
 BEGIN
 
 -- Search path
     SET search_path = "SCHEMA_NAME", public;
     v_schemaname = 'SCHEMA_NAME';
+
+    --set current process as users parameter
+    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+
+    INSERT INTO config_param_user (value, parameter, cur_user)
+    VALUES (txid_current(),'cur_trans',current_user );
 
 	-- Get project type
 	SELECT wsoftware, epsg, giswater INTO v_project_type, v_srid,v_version FROM version LIMIT 1;
@@ -116,9 +126,9 @@ BEGIN
 	
 	-- State control
 	IF v_state=0 THEN
-		PERFORM audit_function(1050,2114);
+		EXECUTE 'SELECT gw_fct_audit_function(1050,2114, NULL)' INTO v_audit_result;
 	ELSIF v_state_node=0 THEN
-		PERFORM audit_function(1052,2114);
+		EXECUTE 'SELECT gw_fct_audit_function(1052,2114, NULL)' INTO v_audit_result;
 	END IF;
 
 	-- Control if node divides arc
@@ -680,23 +690,20 @@ BEGIN
 				VALUES (112, 1, 'Delete old arc.');	
 
 			ELSIF (v_state=2 AND v_state_node=1) THEN
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (112, 3, 'Arc with state 2 cant be divide by node with state 1.');	
-	
+				EXECUTE 'SELECT gw_fct_audit_function(3042,2114, NULL)' INTO v_audit_result; 
+
 			ELSE  
-				--PERFORM audit_function(2120,2114); 
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (112, 3, 'There is an inconsistency between node and arc state.');
+				EXECUTE 'SELECT gw_fct_audit_function(2120,2114, NULL)' INTO v_audit_result; 
+
 			END IF;
 		ELSE
-			--RETURN 0;
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (112, 3, 'Cant detect any arc to divide.');
+			EXECUTE 'SELECT gw_fct_audit_function(3044,2114, NULL)' INTO v_audit_result; 
+
 		END IF;
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (112, 3, concat('Node type ', v_node_type,' doesnt divide arcs.'));
-		--RETURN 0;
+
+		EXECUTE 'SELECT gw_fct_audit_function(3046,2114, '''||v_node_type||''')' INTO v_audit_result; 
+
 	END IF;
 
 	
@@ -707,6 +714,18 @@ BEGIN
 	FROM (SELECT id, error_message as message FROM audit_check_data 
 	WHERE user_name="current_user"() AND fprocesscat_id=112 ORDER BY criticity desc, id asc) row; 
 	
+	IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'Arc divide done successfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
@@ -715,7 +734,7 @@ BEGIN
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Arc divide done successfully"}, "version":"'||v_version||'"'||
+     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 		     	'"setVisibleLayers":[]'||','||

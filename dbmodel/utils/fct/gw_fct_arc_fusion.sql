@@ -37,6 +37,10 @@ DECLARE
     v_result_line text;
     v_result_polygon text;
     v_error_context text;
+    v_audit_result text;
+    v_level integer;
+    v_status text;
+    v_message text;
 
 BEGIN
 
@@ -45,7 +49,13 @@ BEGIN
 
     SELECT wsoftware, giswater INTO v_project_type, v_version FROM version LIMIT 1;
 
-        -- delete old values on result table
+    --set current process as users parameter
+    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+
+    INSERT INTO config_param_user (value, parameter, cur_user)
+    VALUES (txid_current(),'cur_trans',current_user );
+
+    -- delete old values on result table
     DELETE FROM audit_check_data WHERE fprocesscat_id=114 AND user_name=current_user;
     
     -- Starting process
@@ -114,7 +124,7 @@ BEGIN
                 v_new_record.the_geom := v_arc_geom;
                 v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
                 v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
-		v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
+        v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
 
             --Compare addfields and assign them to new arc
             FOR rec_param IN SELECT DISTINCT parameter_id FROM man_addfields_value WHERE feature_id=v_my_record1.arc_id
@@ -125,7 +135,8 @@ BEGIN
             SELECT * INTO rec_addfield2 FROM man_addfields_value WHERE feature_id=v_my_record2.arc_id and parameter_id=rec_param;
 
                 IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
-                    RETURN audit_function(3008,2114);
+                    EXECUTE 'SELECT gw_fct_audit_function(3008,2112, NULL)'
+                    INTO v_audit_result;
                 ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
                     UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param;
                 ELSIF rec_addfield1.value_param IS NULL and rec_addfield2.value_param IS NOT NULL THEN
@@ -135,74 +146,80 @@ BEGIN
                END IF;
 
             END LOOP;
-			-- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
-			-- to get values topocontrol arc needs to be before, but this is not possible
-			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'arc_searchnodes';
-			INSERT INTO v_edit_arc SELECT v_new_record.*;
-			UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'arc_searchnodes';
+            -- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
+            -- to get values topocontrol arc needs to be before, but this is not possible
+            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'arc_searchnodes';
+            INSERT INTO v_edit_arc SELECT v_new_record.*;
+            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'arc_searchnodes';
 
-			UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
-					
-			--Insert data on audit_log_arc_traceability table
-			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
-			VALUES ('ARC FUSION', v_new_record.arc_id, v_my_record2.arc_id,v_my_record1.arc_id,v_exists_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
-				
-			-- Update complementary information from old arcs to new one
-			UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+            UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
+                    
+            --Insert data on audit_log_arc_traceability table
+            INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+            VALUES ('ARC FUSION', v_new_record.arc_id, v_my_record2.arc_id,v_my_record1.arc_id,v_exists_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
+                
+            -- Update complementary information from old arcs to new one
+            UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+            UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+            UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+            UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+            UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-			-- update links related to node
-			IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=node_id_arg LIMIT 1) IS NOT NULL THEN
-			
-				-- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
-				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_new_record.state, v_new_record.sector_id, v_new_record.dma_id, v_new_record.expl_id, v_node_geom) 
-				RETURNING vnode_id INTO v_vnode;
-				
-				-- update link with new vnode
-				UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=node_id_arg;	
-			END IF;
-	
-			IF v_project_type='UD' THEN
-				UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			END IF;
+            -- update links related to node
+            IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=node_id_arg LIMIT 1) IS NOT NULL THEN
+            
+                -- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
+                INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
+                VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_new_record.state, v_new_record.sector_id, v_new_record.dma_id, v_new_record.expl_id, v_node_geom) 
+                RETURNING vnode_id INTO v_vnode;
+                
+                -- update link with new vnode
+                UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=node_id_arg;  
+            END IF;
+    
+            IF v_project_type='UD' THEN
+                UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+            END IF;
 
-			-- Delete information of arc deleted
-			DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
-			DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
+            -- Delete information of arc deleted
+            DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
+            DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
 
-			-- create links that where related to deprecated node
-		
-			-- Moving to obsolete the previous node
-			UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
+            -- create links that were related to deprecated node
+        
+            -- Moving to obsolete the previous node
+            UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
 
             -- Arcs has different types
             ELSE
                 --INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (1, node_id_arg);
-                --RETURN audit_function(2004,2114);
-                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-                VALUES (114, 3, 'It is impossible to use the node to fusion two arcs. HINT: Pipes have different types');
+                --RETURN gw_fct_audit_function(2004,2112);
+                EXECUTE 'SELECT gw_fct_audit_function(2004,2112, NULL)'
+                INTO v_audit_result;
+                --INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                --VALUES (114, 3, 'It is impossible to use the node to fusion two arcs. HINT: Pipes have different types');
             END IF;
          
         -- Node has not 2 arcs
         ELSE
-            RETURN audit_function(2006,2114);
-            INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-            VALUES (114, 3, 'It is impossible to use the node to fusion two arcs. HINT: Node doesnt have 2 arcs');
+            --RETURN gw_fct_audit_function(2006,2112);
+            EXECUTE 'SELECT gw_fct_audit_function(2006,2112, NULL)'
+            INTO v_audit_result;
+            --INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+            --VALUES (114, 3, 'It is impossible to use the node to fusion two arcs. HINT: Node doesnt have 2 arcs');
             
         END IF;
 
     -- Node not found
     ELSE 
-        RETURN audit_function(2002,2114);
-        INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-        VALUES (114, 3, 'Node not found . HINT: Please check table node');
+        --RETURN gw_fct_audit_function(2002,2112);
+        EXECUTE 'SELECT gw_fct_audit_function(2002,2112, NULL)'
+        INTO v_audit_result;
+        --INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+        --VALUES (114, 3, 'Node not found . HINT: Please check table node');
     END IF;
 
-   -- RETURN audit_function(0,2114);
+   -- RETURN gw_fct_audit_function(0,2112);
 -- get results
     -- info
 
@@ -210,6 +227,18 @@ BEGIN
     FROM (SELECT id, error_message as message FROM audit_check_data 
     WHERE user_name="current_user"() AND fprocesscat_id=114 ORDER BY criticity desc, id asc) row; 
     
+    IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'Arc fusion done successfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
     v_result_info := COALESCE(v_result, '{}'); 
     v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
@@ -218,7 +247,7 @@ BEGIN
     v_result_polygon = '{"geometryType":"", "features":[]}';
 
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Arc fusion done successfully"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
              ',"data":{ "info":'||v_result_info||','||
                 '"setVisibleLayers":[]'||','||
