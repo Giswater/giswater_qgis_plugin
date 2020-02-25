@@ -676,17 +676,6 @@ class DaoController(object):
         return json_result
 
 
-    def show_exceptions_msg(self, title, msg=""):
-
-        self.dlg_info = BasicInfo()
-        self.dlg_info.btn_accept.setVisible(False)
-        self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
-        self.dlg_info.setWindowTitle(title)
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
-        self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_info.exec()
-
-
     def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """
         
@@ -1565,10 +1554,10 @@ class DaoController(object):
         """ Show exception message in dialog """
 
         self.dlg_info = BasicInfo()
+        self.dlg_info.btn_accept.setVisible(False)
+        self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
         self.dlg_info.setWindowTitle(window_title)
-        if title:
-            self.dlg_info.lbl_title.setText(title)
-        self.dlg_info.txt_infolog.setText(msg)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_info.show()
 
