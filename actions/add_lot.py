@@ -1538,8 +1538,7 @@ class AddNewLot(ParentManage):
         self.dlg_work_register = WorkManagement()
         self.load_settings(self.dlg_work_register)
 
-        table_object = 'om_visit_lot_x_user'
-        # table_object = 'v_om_lot_x_user'
+        table_object = 'v_om_lot_x_user'
 
         self.dlg_work_register.tbl_work.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -1626,8 +1625,7 @@ class AddNewLot(ParentManage):
         expr_filter = ("(starttime BETWEEN "+str(interval)+" OR starttime IS NULL) "
                        "AND (endtime BETWEEN "+str(interval)+" OR endtime IS NULL)")
 
-        expr_filter += " AND team_id::text LIKE '%"+str(filter)+"%'"
-
+        expr_filter += " AND team::text LIKE '%"+str(filter)+"%'"
         self.dlg_work_register.tbl_work.model().setFilter(expr_filter)
         self.dlg_work_register.tbl_work.model().select()
 
@@ -2211,7 +2209,8 @@ class AddNewLot(ParentManage):
         query_left += "(SELECT " + tableleft + ".id FROM " + tableleft + ""
         query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
         query_left += " WHERE team = '" + str(filter_team) + "')"
-
+        if tableleft == 'om_visit_class':
+            query_left += " AND visit_type = 1"
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
