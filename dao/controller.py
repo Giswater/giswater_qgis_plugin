@@ -11,9 +11,6 @@ from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTa
 from qgis.PyQt.QtSql import QSqlDatabase
 
 import os.path
-import json
-
-from collections import OrderedDict
 from functools import partial
 import inspect
 import traceback
@@ -1465,7 +1462,7 @@ class DaoController(object):
         try:
             stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
-            file_name = os.path.basename(module_path)
+            file_name = sys_manager.get_file_with_parents(module_path, 2)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
 
@@ -1494,7 +1491,7 @@ class DaoController(object):
         try:
             stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
-            file_name = os.path.basename(module_path)
+            file_name = sys_manager.get_file_with_parents(module_path, 2)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
 
