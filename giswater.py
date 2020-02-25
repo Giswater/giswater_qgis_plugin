@@ -62,6 +62,7 @@ class Giswater(QObject):
             application at run time.
         :type iface: QgsInterface
         """
+
         super(Giswater, self).__init__()
 
         # Initialize instance attributes
@@ -106,8 +107,6 @@ class Giswater(QObject):
         self.qgis_settings = QSettings()
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
-        # if 'toolbars_position' not in self.qgis_settings:
-        #     self.controller.plugin_settings_set_value()
         # Define signals
         self.set_signals()
 
@@ -115,8 +114,11 @@ class Giswater(QObject):
     def set_signals(self):
         """ Define widget and event signals """
 
-        self.iface.projectRead.connect(self.project_read)
-        self.iface.newProjectCreated.connect(self.project_new)
+        try:
+            self.iface.projectRead.connect(self.project_read)
+            self.iface.newProjectCreated.connect(self.project_new)
+        except AttributeError as e:
+            print(f"set_signals: {e}")
 
 
     def set_info_button(self):
@@ -593,13 +595,28 @@ class Giswater(QObject):
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
-        # Delete python compiled files
-        self.delete_pyc_files()
-
         # Force project read (to work with PluginReloader)
         self.project_read(False)
 
+
+    def init_plugin(self, enable_toolbars=True):
+
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=True)
+        self.controller.set_plugin_dir(self.plugin_dir)
+        self.controller.set_qgis_settings(self.qgis_settings)
+        self.controller.set_giswater(self)
+
+        # Set main information button (always visible)
         self.set_info_button()
+
+        if enable_toolbars:
+            self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.basic.set_giswater(self)
+            self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
 
 
     def manage_feature_cat(self):
@@ -611,8 +628,8 @@ class Giswater(QObject):
 
         self.feature_cat = {}
         if self.wsoftware.upper() == 'WS':
-            sql = ("SELECT cat_feature.* FROM cat_feature JOIN " 
-                  "(SELECT id, active FROM node_type UNION "
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
+                   "(SELECT id, active FROM node_type UNION "
                    "SELECT id, active FROM arc_type UNION "
                    "SELECT id, active FROM connec_type) a USING (id) "
                    "WHERE a.active IS TRUE ORDER BY id")
@@ -760,11 +777,6 @@ class Giswater(QObject):
         # Unload plugin before reading opened project
         self.unload(False)
 
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
-        self.controller.set_plugin_dir(self.plugin_dir)
-        self.controller.set_qgis_settings(self.qgis_settings)
-        self.controller.set_giswater(self)
-
         # Check if table 'v_edit_node' is loaded
         layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         if not layer_node and show_warning:
@@ -812,11 +824,6 @@ class Giswater(QObject):
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
-        # Set common plugin toolbars (one action class per toolbar)
-        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic.set_giswater(self)
-        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
-
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
         if self.wsoftware is None:
@@ -835,10 +842,6 @@ class Giswater(QObject):
             return
 
         # Set custom plugin toolbars (one action class per toolbar)
-        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
@@ -1080,14 +1083,6 @@ class Giswater(QObject):
             self.controller.show_warning("AttributeError: "+str(e))
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))
-
-
-    def delete_pyc_files(self):
-        """ Delete python compiled files """
-
-        filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
-        for f in filelist:
-            os.remove(f)
 
 
     def manage_expl_id(self):
