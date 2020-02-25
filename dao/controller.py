@@ -1543,15 +1543,15 @@ class DaoController(object):
                 # Set exception message details
                 title = "Database API execution failed"
                 msg = ""
-                msg += f"File name: {file_name}\n"
-                msg += f"Function name: {function_name}\n"
-                msg += f"Line number: {function_line}\n"
+                msg += f"<b>File name:</b> {file_name}<br>"
+                msg += f"<b>Function name:</b> {function_name}<br>"
+                msg += f"<b>Line number:</b> {function_line}<br>"
                 if 'SQLERR' in json_result:
-                    msg += f"Detail: {json_result['SQLERR']}\n"
+                    msg += f"<b>Detail:</b> {json_result['SQLERR']}<br>"
                 if 'SQLCONTEXT' in json_result:
-                    msg += f"Context: {json_result['SQLCONTEXT']}\n"
+                    msg += f"<b>Context:</b> {json_result['SQLCONTEXT']}<br>"
                 if sql:
-                    msg += f"SQL:\n {sql}\n"
+                    msg += f"<b>SQL:</b> {sql}<br>"
 
                 # Show exception message in dialog and log it
                 self.show_exceptions_msg(title, msg)
