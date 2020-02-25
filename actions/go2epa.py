@@ -662,9 +662,6 @@ class Go2Epa(ApiParent):
             if str(complet_result['continue']).lower() == 'true':
                 _continue = True
 
-            if not _continue:
-                force_tab = True
-
             # Export to inp file
             if export_inp is True:
                 if complet_result['status'] == "Accepted":
