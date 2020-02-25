@@ -22,6 +22,8 @@ from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 
 from .parent import ParentMapTool
+from ..actions.add_layer import AddLayer
+from ..ui_manager import BasicInfo
 
 
 class MoveNodeMapTool(ParentMapTool):
@@ -44,18 +46,15 @@ class MoveNodeMapTool(ParentMapTool):
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
         sql = (f"UPDATE node SET the_geom = {the_geom} "
                f"WHERE node_id = '{node_id}'")
-        status = self.controller.execute_sql(sql) 
+        status = self.controller.execute_sql(sql)
         if status:
-            # Execute SQL function and show result to the user
-            function_name = "gw_fct_arc_divide"
-            row = self.controller.check_function(function_name)
-            if not row:
-                message = "Database function not found"
-                self.controller.show_warning(message, parameter=function_name)
-                return
-
-            sql = f"SELECT {function_name} ('{node_id}');"
-            self.controller.execute_sql(sql, commit=True)
+            result = self.controller.get_json('gw_fct_arc_divide', f"'{node_id}'", log_sql=True)
+            if not result: return
+            self.dlg_binfo = BasicInfo()
+            self.dlg_binfo.btn_accept.hide()
+            self.dlg_binfo.btn_close.clicked.connect(lambda: self.dlg_binfo.close())
+            self.add_layer.add_temp_layer(self.dlg_binfo, result['body']['data'], "TEST", True, True, 1, True)
+            self.dlg_binfo.exec()
 
         else:
             message = "Move node: Error updating geometry"
@@ -65,8 +64,8 @@ class MoveNodeMapTool(ParentMapTool):
         self.reset()
                                 
         # Refresh map canvas
-        self.refresh_map_canvas()  
-        
+        self.refresh_map_canvas()
+
         # Deactivate map tool
         self.deactivate()
         self.set_action_pan()
@@ -148,8 +147,8 @@ class MoveNodeMapTool(ParentMapTool):
             # Make sure active layer is 'v_edit_node'
             cur_layer = self.iface.activeLayer()
             if cur_layer != self.layer_node:
-                self.iface.setActiveLayer(self.layer_node)             
-            
+                self.iface.setActiveLayer(self.layer_node)
+            self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
             # Snapping
             result = self.snapper_manager.snap_to_current_layer(event_point)
             if self.snapper_manager.result_is_valid():
