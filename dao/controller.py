@@ -677,16 +677,22 @@ class DaoController(object):
             return None
         json_result = row[0]
         if 'status' in json_result and json_result['status'] == 'Failed':
-            try:
+            if 'message' in json_result:
+                level = 1
+                if 'level' in json_result['message']: level = int(json_result['message']['level'])
+                try:
+                    self.show_message(json_result['message']['text'], level)
+                except KeyError as e:
+                    title = "Key on returned json from ddbb is missed."
+                    msg = f"<b>Key: </b>{e}<br>"
+                    msg += f"<b>Python file: </b>{__name__} <br>"
+                    msg += f"<b>Python function: </b>{self.get_json.__name__} <br>"
+            else:
                 title = "Execute failed."
-                msg = f"<b>Error: </b>{json_result['SQLERR']}<br>"
-                msg += f"<b>Context: </b>{json_result['SQLCONTEXT']} <br>"
-            except KeyError as e:
-                title = "Key on returned json from ddbb is missed."
-                msg = f"<b>Key: </b>{e}<br>"
-                msg += f"<b>Python file: </b>{__name__} <br>"
-                msg += f"<b>Python function: </b>{self.get_json.__name__} <br>"
-            self.show_exceptions_msg(title, msg)
+                msg = ""
+                if 'SQLERR' in json_result: msg += f"<b>Error: </b>{json_result['SQLERR']}<br>"
+                if 'SQLCONTEXT' in json_result: msg += f"<b>Context: </b>{json_result['SQLCONTEXT']} <br>"
+                self.show_exceptions_msg(title, msg)
             return False
 
         return json_result
