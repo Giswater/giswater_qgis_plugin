@@ -1,20 +1,3 @@
-#################
-## Project
-#################
-
-*.qgs~
-*.bat
-*.db
-test
-data/
-log/*.*
-templates/profile.png
-
-
-#############
-## Python
-#############
-
 *.pydevproject
 .project
 .metadata
