@@ -383,17 +383,14 @@ class Giswater(QObject):
 
     def manage_toolbars_common(self):
         """ Manage actions of the common plugin toolbars """
-        self.toolbar_basic()
-        self.toolbar_utils()
+        self.toolbar_basic("basic")
+        self.toolbar_utils("utils")
 
 
-    def toolbar_basic(self, x=None, y=None):
+    def toolbar_basic(self, toolbar_id, x=None, y=None):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-
-        toolbar_id = "basic"
-        list_actions = []
         if self.controller.get_project_type() == 'ws':
             list_actions = ['37', '41', '48', '86', '32']
         elif self.controller.get_project_type() == 'ud':
@@ -405,13 +402,10 @@ class Giswater(QObject):
             self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_utils(self, x=None, y=None):
+    def toolbar_utils(self, toolbar_id, x=None, y=None):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-
-        toolbar_id = "utils"
-        list_actions = []
         if self.controller.get_project_type() in ('ws', 'ud'):
             list_actions = ['206', '99', '83', '58']
         elif self.controller.get_project_type() in ('tm', 'pl'):
@@ -426,74 +420,68 @@ class Giswater(QObject):
         self.utils.set_project_type(self.wsoftware)
 
 
-    def toolbar_om_ws(self, x=0, y=0):
+    def toolbar_om_ws(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "om_ws"
         list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_om_ud(self, x=0, y=0):
+    def toolbar_om_ud(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "om_ud"
         list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_edit(self, x=0, y=0):
+    def toolbar_edit(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "edit"
+
         list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '69', '39', '34', '66', '33', '67']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_cad(self, x=0, y=0):
+    def toolbar_cad(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "cad"
         list_actions = ['71', '72']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_epa(self, x=0, y=0):
+    def toolbar_epa(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "epa"
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
-    def toolbar_master(self, x=0, y=0):
+    def toolbar_master(self, toolbar_id, x=0, y=0):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
-        toolbar_id = "master"
         list_actions = ['45', '46', '47', '38', '49', '50']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
     def save_toolbars_position(self):
-
-        parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        path = os.path.dirname(__file__) + '/config/ui_config.config'
-        if not os.path.exists(path):
-            self.controller.log_warning("File not found", parameter=path)
-            return
-
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path = config_folder + 'ui_config.config'
         parser.read(path)
 
         # Get all QToolBar
@@ -507,6 +495,12 @@ class Giswater(QObject):
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
+
+        # Check if section toolbars_position exists in file
+        if 'toolbars_position' not in parser:
+            parser = configparser.RawConfigParser()
+            parser.add_section('toolbars_position')
+
         if len(own_toolbars)==8:
             for w in own_toolbars:
                 parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
@@ -526,20 +520,31 @@ class Giswater(QObject):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
         """
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        path = config_folder + 'ui_config.config'
 
-        parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        path = os.path.dirname(__file__) + '/config/ui_config.config'
+        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils')
         if not os.path.exists(path):
-            self.controller.log_warning("File not found", parameter=path)
-            return
+            # Create file and configure section 'toolbars_position'
+            parser = configparser.RawConfigParser()
+            parser.add_section('toolbars_position')
+            for pos, tb in enumerate(toolbar_names):
+                parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos *10}, 98')
+
+            # Writing our configuration file to 'ui_config.config'
+            with open(path, 'w') as configfile:
+                parser.write(configfile)
+                configfile.close()
+                del configfile
 
         parser.read(path)
-
-        # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, x=0, y=0):'
-        for x in range(0,8):
-            toolbar_id = parser.get("toolbars_position", 'pos_'+str(x)).split(',')
+        # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
+        for pos, tb in enumerate(toolbar_names):
+            toolbar_id = parser.get("toolbars_position", 'pos_'+str(pos)).split(',')
             if toolbar_id:
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
+                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[0], toolbar_id[1], toolbar_id[2])
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
@@ -817,6 +822,8 @@ class Giswater(QObject):
         if self.wsoftware is None:
             return
 
+        self.get_buttons_to_hide()
+
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
             self.project_read_tm(show_warning)
@@ -845,22 +852,6 @@ class Giswater(QObject):
         # Manage snapping layers
         self.manage_snapping_layers()
 
-        self.list_to_hide = []
-        try:
-            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
-            row = self.controller.get_config('qgis_toolbar_hidebuttons')
-            if row:
-                json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
-                self.list_to_hide = [str(x) for x in json_list['action_index']]
-        except KeyError as e:
-            pass
-        except JSONDecodeError as e:
-            # Control if json have a correct format
-            pass
-        finally:
-            # TODO remove this line when do you want enabled api info for epa
-            self.list_to_hide.append('199')
-
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
 
@@ -869,9 +860,6 @@ class Giswater(QObject):
 
         # Set objects for map tools classes
         self.manage_map_tools()
-
-        # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'
-        self.manage_custom_forms()
 
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")
@@ -897,7 +885,6 @@ class Giswater(QObject):
 
         # Set config layer fields when user add new layer into the TOC
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
-        # QgsProject.instance().legendLayersAdded.connect(self.add_layers_button)
 
         # Put add layers button into toc
         self.add_layers_button()
@@ -905,6 +892,24 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
+
+
+    def get_buttons_to_hide(self):
+        self.list_to_hide = []
+        try:
+            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
+            row = self.controller.get_config('qgis_toolbar_hidebuttons')
+            if not row: return
+            json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
+            self.list_to_hide = [str(x) for x in json_list['action_index']]
+        except KeyError as e:
+            pass
+        except JSONDecodeError as e:
+            # Control if json have a correct format
+            pass
+        finally:
+            # TODO remove this line when do you want enabled api info for epa
+            self.list_to_hide.append('199')
 
 
     def add_layers_button(self):
@@ -992,32 +997,10 @@ class Giswater(QObject):
     def manage_layers(self):
         """ Get references to project main layers """
 
-        # Initialize variables
-        self.layer_arc = None
-        self.layer_connec = None
-        self.layer_dimensions = None
-        self.layer_gully = None
-        self.layer_node = None
-
         # Check if we have any layer loaded
         layers = self.controller.get_layers()
         if len(layers) == 0:
             return False
-
-        # Iterate over all layers
-        for cur_layer in layers:
-            uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
-            if uri_table:
-                if 'v_edit_arc' == uri_table:
-                    self.layer_arc = cur_layer
-                elif 'v_edit_connec' == uri_table:
-                    self.layer_connec = cur_layer
-                elif 'v_edit_dimensions' == uri_table:
-                    self.layer_dimensions = cur_layer
-                elif 'v_edit_gully' == uri_table:
-                    self.layer_gully = cur_layer
-                elif 'v_edit_node' == uri_table:
-                    self.layer_node = cur_layer
 
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
@@ -1052,48 +1035,6 @@ class Giswater(QObject):
         elif snapping_type == 2:
             snapping_type = QgsPointLocator.All
         QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
-
-
-    def manage_custom_forms(self):
-        """ Set layer custom UI form and init function """
-
-        # Set custom for layer dimensions
-        self.set_layer_custom_form_dimensions(self.layer_dimensions)
-
-
-    def set_layer_custom_form_dimensions(self, layer):
-
-        if layer is None:
-            return
-
-        name_ui = 'dimensions.ui'
-        name_init = 'dimensions.py'
-        name_function = 'formOpen'
-        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, 'init', name_init)
-        layer.editFormConfig().setUiForm(file_ui)
-        layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(file_init)
-        layer.editFormConfig().setInitFunction(name_function)
-
-        fieldname_node = ""
-        fieldname_connec = ""
-        if self.wsoftware == 'ws':
-            fieldname_node = "depth"
-            fieldname_connec = "depth"
-        elif self.wsoftware == 'ud':
-            fieldname_node = "ymax"
-            fieldname_connec = "connec_depth"
-
-        if self.layer_node:
-            display_field = 'depth : [% "' + fieldname_node + '" %]'
-            self.layer_node.setMapTipTemplate(display_field)
-            self.layer_node.setDisplayExpression(display_field)
-
-        if self.layer_connec:
-            display_field = 'depth : [% "' + fieldname_connec + '" %]'
-            self.layer_connec.setMapTipTemplate(display_field)
-            self.layer_connec.setDisplayExpression(display_field)
 
 
     def manage_map_tools(self):
@@ -1202,24 +1143,8 @@ class Giswater(QObject):
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_fct_audit_check_project($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
-        if not row:
-            return False
-
-        result = json.loads(row[0], object_pairs_hook=OrderedDict)
-        if 'status' in result and result['status'] == 'Failed':
-            try:
-                title = "Execute failed."
-                msg = f"<b>Error: </b>{result['SQLERR']}<br>"
-                msg += f"<b>Context: </b>{result['SQLCONTEXT']} <br><br>"
-            except KeyError as e:
-                title = "Key on returned json from ddbb is missed."
-                msg = f"<b>Key: </b>{e}<br>"
-                msg += f"<b>Python file: </b>{__name__} <br>"
-                msg += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br><br>"
-            self.controller.show_exceptions_msg(title, msg)
-            return True
+        result = self.controller.get_json('gw_fct_audit_check_project', f'$${{{body}}}$$', log_sql=True)
+        if not result: return True
 
         self.dlg_audit_project = AuditCheckProjectResult()
         self.parent.load_settings(self.dlg_audit_project)
@@ -1460,29 +1385,9 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
-            row = self.controller.get_row(sql, commit=True)
-            if not row:
-                self.controller.show_message("NOT ROW FOR: " + sql, 2)
-                continue
-            complet_result = row[0]
-
-            # When info is nothing
-            if 'results' in complet_result:
-                if complet_result['results'] == 0:
-                    self.controller.show_message(complet_result['message']['text'], 1)
-                    continue
-
-            if 'status' in complet_result and complet_result['status'] == 'Failed':
-                try:
-                    msg_failed += f"<b>Error: </b>{complet_result['SQLERR']}<br>"
-                    msg_failed += f"<b>Context: </b>{complet_result['SQLCONTEXT']} <br><br>"
-                except KeyError as e:
-                    msg_key += f"<b>Key: </b>{e}<br>"
-                    msg_key += f"<b>Python file: </b>{__name__} <br>"
-                    msg_key += f"<b>Python function: </b>{self.set_layer_config.__name__} <br><br>"
-                continue
-
+            complet_result = self.controller.get_json('gw_api_getinfofromid', f'$${{{body}}}$$')
+            if not complet_result: continue
+            
             for field in complet_result['body']['data']['fields']:
                 _values = {}
 

@@ -51,11 +51,8 @@ class ApiConfig(ApiParent):
         body += '"feature":{}, '
         body += '"data":{}'
 
-        # Get layers under mouse clicked
-        sql = f"SELECT gw_api_getconfig($${{{body}}}$$)::text"
-
-        row = self.controller.get_row(sql, log_sql=True)
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        complet_list = self.controller.get_json('gw_api_getconfig', f'$${{{body}}}$$', log_sql=True)
+        if not complet_list: return False
 
         self.dlg_config = ApiConfigUi()
         self.load_settings(self.dlg_config)
@@ -131,8 +128,8 @@ class ApiConfig(ApiParent):
         self.addfields_form = QGridLayout()
 
         # Construct form for config and admin
-        self.construct_form_param_user(complet_list[0]['body']['form']['formTabs'], 0)
-        self.construct_form_param_system(complet_list[0]['body']['form']['formTabs'], 1)
+        self.construct_form_param_user(complet_list['body']['form']['formTabs'], 0)
+        self.construct_form_param_system(complet_list['body']['form']['formTabs'], 1)
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
@@ -201,7 +198,7 @@ class ApiConfig(ApiParent):
         addfields_layout1.addItem(verticalSpacer1)
 
         # Event on change from combo parent
-        self.get_event_combo_parent(complet_list[0]['body']['form']['formTabs'])
+        self.get_event_combo_parent(complet_list['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
         chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
@@ -572,10 +569,8 @@ class ApiConfig(ApiParent):
         body += '"form":{"formName":"config"}, '
         body += '"feature":{}, '
         body += f'"data":{{"fields":{my_json}}}'
-
-        sql = f"SELECT gw_api_setconfig($${{{body}}}$$)"
-        self.controller.log_info(str(sql))
-        self.controller.execute_sql(sql)
+        result = self.controller.get_json('gw_api_setconfig', f'$${{{body}}}$$')
+        if not result: return False
 
         message = "Values has been updated"
         self.controller.show_info(message)

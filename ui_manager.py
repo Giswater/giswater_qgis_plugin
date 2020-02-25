@@ -529,23 +529,8 @@ class SelectorDate(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('toolbox.ui')
-class Toolbox(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('ud_catalog.ui')
-class UDcatalog(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('user_management.ui')
 class UserManagement(GwMainWindow, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('cf_ud_catalog.ui')
-class CFUDcatalog(GwDialog, FORM_CLASS):
     pass
 
 
@@ -556,16 +541,6 @@ class VisitManagement(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('workcat_end.ui')
 class WorkcatEnd(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('ws_catalog.ui')
-class WScatalog(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('cf_ws_catalog.ui')
-class CFWScatalog(GwDialog, FORM_CLASS):
     pass
 
 

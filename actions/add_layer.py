@@ -153,13 +153,22 @@ class AddLayer(object):
             elif str(k) == "info":
                 text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
             elif k in ('point', 'line', 'polygon'):
-                if not 'values' in data[k]: continue
-                counter = len(data[k]['values'])
+                if 'values' in data[k]:
+                    key = 'values'
+                elif 'features' in data[k]:
+                    key = 'features'
+                else: continue
+                counter = len(data[k][key])
                 if counter > 0:
-                    counter = len(data[k]['values'])
+                    counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-                    self.populate_vlayer(v_layer, data, k, counter, group)
+                    #TODO This if controls if the function already works with GeoJson or is still to be refactored
+                    # once all are refactored the if should be: if 'feature' not in data [k]: continue
+                    if key=='values':
+                        self.populate_vlayer_old(v_layer, data, k, counter, group)
+                    elif key=='features':
+                        self.populate_vlayer(v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
@@ -168,6 +177,7 @@ class AddLayer(object):
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                         self.categoryze_layer(v_layer, cat_field, size)
                     temp_layers_added.append(v_layer)
+                    self.iface.setActiveLayer(v_layer)
         return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
 
 
@@ -270,8 +280,140 @@ class AddLayer(object):
         return text
 
 
-
     def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
+        """
+        :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
+        :param data: Json
+        :param layer_type: point, line, polygon...(string)
+        :param counter: control if json have values (integer)
+        :param group: group to which we want to add the layer (string)
+        :return:
+        """
+        prov = virtual_layer.dataProvider()
+        # Enter editing mode
+        virtual_layer.startEditing()
+
+        # Add headers to layer
+        if counter > 0:
+            for key, value in list(data[layer_type]['features'][0]['properties'].items()):
+                if key == 'the_geom': continue
+                prov.addAttributes([QgsField(str(key), QVariant.String)])
+
+        for feature in data[layer_type]['features']:
+            geometry = self.get_geometry(feature)
+            if not geometry: continue
+            attributes = []
+            fet = QgsFeature()
+            fet.setGeometry(geometry)
+            for key, value in feature['properties'].items():
+                if key =='the_geom': continue
+                attributes.append(value)
+
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        # Commit changes
+        virtual_layer.commitChanges()
+        QgsProject.instance().addMapLayer(virtual_layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup(group)
+        if my_group is None:
+            my_group = root.insertGroup(0, group)
+        my_group.insertLayer(0, virtual_layer)
+
+
+    def get_geometry(self, feature):
+        """ Get coordinates from GeoJson and return QGsGeometry
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Geometry of the feature (QgsGeometry)
+        functions  called in -> getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature):
+            def get_point(self, feature)
+            get_linestring(self, feature)
+            get_multilinestring(self, feature)
+            get_polygon(self, feature)
+            get_multipolygon(self, feature)
+        """
+        try:
+            coordinates = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+            type_ = feature['geometry']['type']
+            geometry = f"{type_}{coordinates}"
+            return QgsGeometry.fromWkt(geometry)
+        except AttributeError as e:
+            print(f"{type(e).__name__} --> {e}")
+            return None
+
+
+    def get_point(self, feature):
+        """ Manage feature geometry when is Point
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
+
+
+    def get_linestring(self, feature):
+        """ Manage feature geometry when is LineString
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return self.get_coordinates(feature)
+
+
+    def get_multilinestring(self, feature):
+        """ Manage feature geometry when is MultiLineString
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return self.get_multi_coordinates(feature)
+
+
+    def get_polygon(self, feature):
+        """ Manage feature geometry when is Polygon
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return self.get_multi_coordinates(feature)
+
+
+    def get_multipolygon(self, feature):
+        """ Manage feature geometry when is MultiPolygon
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return self.get_multi_coordinates(feature)
+
+
+    def get_coordinates(self, feature):
+        coordinates = "("
+        for coords in feature['geometry']['coordinates']:
+            coordinates += f"{coords[0]} {coords[1]}, "
+        coordinates = coordinates[:-2]+")"
+        return coordinates
+
+
+    def get_multi_coordinates(self, feature):
+
+        coordinates = "("
+        for coords in feature['geometry']['coordinates']:
+            coordinates += "("
+            for c in coords:
+                coordinates += f"{c[0]} {c[1]}, "
+            coordinates = coordinates[:-2] + "), "
+        coordinates = coordinates[:-2] + ")"
+        return coordinates
+
+
+    def populate_vlayer_old(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
         """
         :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
         :param data: Json

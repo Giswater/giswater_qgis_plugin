@@ -315,20 +315,14 @@ class Master(ParentAction):
                   f'", "resultType":"{result_type}", "resultId":"{result_id}"}}')
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_fct_plan_result($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            message = "Import failed"
+        result = self.controller.get_json('gw_fct_plan_result', f'$${{{body}}}$$', log_sql=True)
+        if not result: return False
+
+        if result['status'] == "Accepted":
+            self.add_layer.populate_info_text(dialog, result['body']['data'])
+        message = result['message']['text']
+        if message is not None:
             self.controller.show_info_box(message)
-            return
-        else:
-            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            if complet_result[0]['status'] == "Accepted":
-                self.add_layer.populate_info_text(dialog, complet_result[0]['body']['data'])
-            message = complet_result[0]['message']['text']
-            if message is not None:
-                self.controller.show_info_box(message)
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
 

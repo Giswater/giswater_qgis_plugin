@@ -61,7 +61,7 @@ class ApiSearch(ApiParent):
 
         body = self.create_body()
         function_name = "gw_api_getsearch"
-        complet_list = self.controller.get_json(function_name, body)
+        complet_list = self.controller.get_json(function_name, f'$${{{body}}}$$')
         if not complet_list:
             return False
 
@@ -258,7 +258,7 @@ class ApiSearch(ApiParent):
         extras_search = ''
         form_search_add = ''
         extras_search_add = ''
-        row = None
+        result = None
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
@@ -284,13 +284,14 @@ class ApiSearch(ApiParent):
             extras_search += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             extras_search_add += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
-            sql = f"SELECT gw_api_setsearch($${{{body}}}$$)"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if row:
-                self.result_data = row[0]
+            result = self.controller.get_json('gw_api_setsearch', f'$${{{body}}}$$', log_sql=True)
+            if not result: return False
+
+            if result:
+                self.result_data = result
 
         # Set label visible
-        if row:
+        if result:
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
                 if len(line_list) == 2:
@@ -315,11 +316,12 @@ class ApiSearch(ApiParent):
 
             extras_search_add += f', "{line_edit_add.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
-            sql = f"SELECT gw_api_setsearch_add($${{{body}}}$$)"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if row:
-                self.result_data = row[0]
-                if row is not None:
+            result = self.controller.get_json('gw_api_setsearch_add', f'$${{{body}}}$$', log_sql=True)
+            if not result: return False
+
+            if result:
+                self.result_data = result
+                if result is not None:
                     display_list = []
                     for data in self.result_data['data']:
                         display_list.append(data['display_name'])
@@ -375,11 +377,8 @@ class ApiSearch(ApiParent):
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         body = self.create_body(feature=feature)
-        sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return
+        result = [self.controller.get_json('gw_api_getinfofromid', f'$${{{body}}}$$', log_sql=True)]
+        if not result: return
 
         self.hydro_info_dlg = ApiBasicInfo()
         self.load_settings(self.hydro_info_dlg)
@@ -387,8 +386,8 @@ class ApiSearch(ApiParent):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
-        field_id = str(row[0]['body']['feature']['idName'])
-        self.populate_basic_info(self.hydro_info_dlg, row, field_id)
+        field_id = str(result[0]['body']['feature']['idName'])
+        self.populate_basic_info(self.hydro_info_dlg, result, field_id)
 
         self.open_dialog(self.hydro_info_dlg)
 

@@ -32,6 +32,8 @@ from .. import utils_giswater
 from .parent import ParentAction
 from .HyperLinkLabel import HyperLinkLabel
 
+from ..ui_manager import BasicInfo
+
 
 class ApiParent(ParentAction):
 
@@ -688,17 +690,11 @@ class ApiParent(ParentAction):
         extras += f', "parentValue":"{utils_giswater.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
         extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
-        # Get layers under mouse clicked
-        sql = f"SELECT gw_api_gettypeahead($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, commit=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        # if 'fields' not in result:
-        #     return
+        complet_list = self.controller.get_json('gw_api_gettypeahead', f'$${{{body}}}$$')
+        if not complet_list: return False
+
         list_items = []
-        for field in complet_list[0]['body']['data']:
+        for field in complet_list['body']['data']:
             list_items.append(field['idval'])
         self.set_completer_object_api(completer, model, widget, list_items)
 
@@ -841,9 +837,10 @@ class ApiParent(ParentAction):
         feature += f'"idName":"{field_id}"'
         extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
         body = self.create_body(feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getchilds($${{{body}}}$$)"
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
-        for combo_child in row[0]['body']['data']:
+        result = self.controller.get_json('gw_api_getchilds', f'$${{{body}}}$$')
+        if not result: return False
+
+        for combo_child in result['body']['data']:
             if combo_child is not None:
                 self.populate_child(dialog, combo_child)
 
@@ -987,7 +984,7 @@ class ApiParent(ParentAction):
         return points
 
 
-    def draw(self, complet_result, zoom=True):
+    def draw(self, complet_result, zoom=True, reset_rb=True):
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
         if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
@@ -995,7 +992,7 @@ class ApiParent(ParentAction):
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
 
-        self.resetRubberbands()
+        if reset_rb: self.resetRubberbands()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
             point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
@@ -1007,11 +1004,15 @@ class ApiParent(ParentAction):
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
             
-    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
+    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
         """
         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
         """
-        rb = self.rubber_point
+        if is_new:
+            rb = QgsRubberBand(self.canvas, 0)
+
+        else:
+            rb = self.rubber_point
         rb.setColor(color)
         rb.setWidth(width)
         rb.addPoint(point)
@@ -1019,7 +1020,7 @@ class ApiParent(ParentAction):
         # wait to simulate a flashing effect
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
-
+        return rb
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points
@@ -1176,8 +1177,26 @@ class ApiParent(ParentAction):
 
         return widget
 
+    def manage_close_interpolate(self):
+        self.save_settings(self.dlg_binfo)
+        self.remove_interpolate_rb()
 
-    def activate_snapping(self, emit_point):
+    def activate_snapping(self, complet_result, ep):
+        self.rb_interpolate = []
+        self.interpolate_result = None
+        self.resetRubberbands()
+        self.dlg_binfo = BasicInfo()
+        self.load_settings(self.dlg_binfo)
+
+        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Select 2 nodes')
+        self.dlg_binfo.lbl_text.setText("Node1: \nNode2:")
+
+        self.dlg_binfo.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
+        self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+        self.dlg_binfo.rejected.connect(partial(self.save_settings, self.dlg_binfo))
+        self.dlg_binfo.rejected.connect(partial(self.remove_interpolate_rb))
+
+        self.open_dialog(self.dlg_binfo)
 
         # Set circle vertex marker
         color = QColor(255, 100, 255)
@@ -1189,7 +1208,10 @@ class ApiParent(ParentAction):
 
         self.node1 = None
         self.node2 = None
-        self.canvas.setMapTool(emit_point)
+
+        self.canvas.setMapTool(ep)
+        # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
+        self.draw(complet_result, False, False)
 
         # Store user snapping configuration
         self.snapper_manager = SnappingConfigManager(self.iface)
@@ -1202,7 +1224,7 @@ class ApiParent(ParentAction):
         self.iface.setActiveLayer(self.layer_node)
 
         self.canvas.xyCoordinates.connect(partial(self.mouse_move))
-        emit_point.canvasClicked.connect(partial(self.snapping_node))
+        ep.canvasClicked.connect(partial(self.snapping_node, ep))
 
 
     def dlg_destroyed(self, layer=None, vertex=None):
@@ -1225,7 +1247,7 @@ class ApiParent(ParentAction):
         except:
             pass
 
-    def snapping_node(self, point, button):
+    def snapping_node(self, ep, point, button):
         """ Get id of selected nodes (node1 and node2) """
 
         if button == 2:
@@ -1241,36 +1263,72 @@ class ApiParent(ParentAction):
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node:
-                # Get the point
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
                 if self.node1 is None:
                     self.node1 = str(element_id)                    
-                    self.draw_point(QgsPointXY(result.point()))
+                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    self.rb_interpolate.append(rb)
+                    self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    self.draw_point(QgsPointXY(result.point()))
+                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    self.rb_interpolate.append(rb)
+                    self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
 
         if self.node1 and self.node2:
-            self.iface.actionPan().trigger()
+            self.canvas.xyCoordinates.disconnect()
+            ep.canvasClicked.disconnect()
+
             self.iface.setActiveLayer(self.layer)
             self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
-            sql = (f"SELECT gw_fct_node_interpolate('"
-                   f"{self.last_point[0]}', '{self.last_point[1]}', '"
-                   f"{self.node1}', '{self.node2}')")
-            row = self.controller.get_row(sql, log_sql=True)
-            if row:
-                if 'elev' in row[0]:
-                    utils_giswater.setWidgetText(self.dlg_cf, 'elev', row[0]['elev'])
-                if 'top_elev' in row[0]:
-                    utils_giswater.setWidgetText(self.dlg_cf, 'top_elev', row[0]['top_elev'])
+            extras = f'"parameters":{{'
+            extras += f'"x":{self.last_point[0]}, '
+            extras += f'"y":{self.last_point[1]}, '
+            extras += f'"node1":"{self.node1}", '
+            extras += f'"node2":"{self.node2}"}}'
+            body = self.create_body(extras=extras)
+            self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', f'$${{{body}}}$$', log_sql=True)
+            self.add_layer.populate_info_text(self.dlg_binfo, self.interpolate_result['body']['data'])
+
+
+    def chek_for_existing_values(self):
+        text = False
+        for k, v in self.interpolate_result['body']['data']['fields'][0].items():
+            widget = self.dlg_cf.findChild(QWidget, k)
+            if widget:
+                text = utils_giswater.getWidgetText(self.dlg_cf, widget, False, False)
+                if text:
+                    msg = "Do you want to overwrite custom values?"
+                    answer = self.controller.ask_question(msg, "Overwrite values")
+                    if answer:
+                        self.set_values()
+                    break
+        if not text:
+            self.set_values()
+
+
+    def set_values(self):
+        # Set values tu info form
+        for k, v in self.interpolate_result['body']['data']['fields'][0].items():
+            widget = self.dlg_cf.findChild(QWidget, k)
+            if widget:
+                widget.setStyleSheet(None)
+                utils_giswater.setWidgetText(self.dlg_cf, widget, f'{v}')
+                widget.editingFinished.emit()
+        self.close_dialog(self.dlg_binfo)
+
+
+    def remove_interpolate_rb(self):
+        # Remove the circumferences made by the interpolate
+        for rb in self.rb_interpolate:
+            self.iface.mapCanvas().scene().removeItem(rb)
 
 
     def mouse_move(self, point):
-
         # Get clicked point
         event_point = self.snapper_manager.get_event_point(point=point)
 
@@ -1666,18 +1724,10 @@ class ApiParent(ParentAction):
             extras += f'"{widget_name}":"{value}", '
         extras = extras[:-2]
         body = self.create_body(extras)
-        sql = f"SELECT gw_fct_check_importdxf()::text;"
-        row = self.controller.get_row(sql, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
-            result = None
-        else:
-            result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        result = self.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
+        if not result: return False
 
         return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
-
-
-
 
 
     def get_selector(self, dialog, selector_type):
@@ -1689,12 +1739,10 @@ class ApiParent(ParentAction):
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
         extras = f'"selector_type":{selector_type}'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_getselectors($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
-        if not row:
-            return
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        for form_tab in complet_result[0]['body']['form']['formTabs']:
+        complet_result = self.controller.get_json('gw_api_getselectors', f'$${{{body}}}$$', commit=True, log_sql=True)
+        if not complet_result: return False
+
+        for form_tab in complet_result['body']['form']['formTabs']:
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(form_tab['tabName'])
@@ -1733,8 +1781,7 @@ class ApiParent(ParentAction):
         extras += f'"result_name":"{widget.objectName()}", '
         extras += f'"result_value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_setselectors($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        complet_result = self.controller.get_json('gw_api_setselectors', f'$${{{body}}}$$', log_sql=True, commit=True)
+        if not complet_result: return False
         for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
             self.controller.indexing_spatial_layer(layer_name)

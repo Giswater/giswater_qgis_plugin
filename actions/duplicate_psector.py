@@ -55,7 +55,7 @@ class DuplicatePsector(ParentManage, QObject):
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
-        complet_result = self.controller.get_json('gw_fct_duplicate_psector', body)
+        complet_result = self.controller.get_json('gw_fct_duplicate_psector', f'$${{{body}}}$$')
         if not complet_result:
             self.controller.show_message("Function gw_fct_duplicate_psector executed with no result ", 3)
             return

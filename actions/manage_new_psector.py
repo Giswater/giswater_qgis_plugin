@@ -433,7 +433,7 @@ class ManageNewPsector(ParentManage):
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
-
+        self.controller.translate_form(self.dlg_plan_psector, 'plan_psector')
         # Open dialog
         self.open_dialog(self.dlg_plan_psector, maximize_button=False)
 

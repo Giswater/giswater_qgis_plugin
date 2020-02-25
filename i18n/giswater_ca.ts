@@ -278,6 +278,26 @@
         <source>37_text</source>
         <translation>Identificar objecte</translation>
     </message>
+        <message>
+        <source>301_text</source>
+        <translation>Planificador anual</translation>
+    </message>
+    <message>
+        <source>302_text</source>
+        <translation>Planificador mensual</translation>
+    </message>
+    <message>
+        <source>303_text</source>
+        <translation>Generador de preus</translation>
+    </message>
+    <message>
+        <source>304_text</source>
+        <translation>Afegir visita</translation>
+    </message>
+    <message>
+        <source>305_text</source>
+        <translation>Planificador unitari</translation>
+    </message>
 
 
 
@@ -359,6 +379,11 @@
         <source>label_node_proximity</source>
         <translation>Node proximity</translation>
     </message>
+        <message>
+        <source>tooltip_label_node_proximity</source>
+        <translation>Node proximity</translation>
+    </message>
+
     <message>
         <source>label_arc_searchnodes</source>
         <translation>Arc search nodes</translation>

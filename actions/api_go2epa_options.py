@@ -41,15 +41,10 @@ class Go2EpaOptions(ApiParent):
 
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
-        # Get layers under mouse clicked
-        sql = f"SELECT gw_api_getconfig($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        complet_result = self.controller.get_json('gw_api_getconfig', f'$${{{body}}}$$', log_sql=True)
+        if not complet_result: return False
 
-        self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list)
+        self.construct_form_param_user(self.dlg_options, complet_result['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)
@@ -75,8 +70,9 @@ class Go2EpaOptions(ApiParent):
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
         body = self.create_body(form=form, extras=extras)
-        sql = f"SELECT gw_api_setconfig($${{{body}}}$$)"
-        self.controller.execute_sql(sql, log_sql=True, commit=True)
+        result = self.controller.get_json('gw_api_setconfig', f'$${{{body}}}$$', log_sql=True)
+        if not result: return False
+
         message = "Values has been updated"
         self.controller.show_info(message)
         # Close dialog
@@ -84,8 +80,7 @@ class Go2EpaOptions(ApiParent):
 
 
     def get_event_combo_parent(self, complet_result):
-        # complet_result[0]['body']['form']['formTabs']
-        for field in complet_result[0]['body']['form']['formTabs'][0]["fields"]:
+        for field in complet_result['body']['form']['formTabs'][0]["fields"]:
             if field['isparent']:
                 widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, widget))
@@ -95,9 +90,10 @@ class Go2EpaOptions(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
-        sql = f"SELECT gw_api_get_combochilds('epaoptions', '', '', '{combo_parent}', '{combo_id}', '')"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        for combo_child in row[0]['fields']:
+        result = self.controller.get_json('gw_api_get_combochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''", log_sql=True)
+        if not result: return False
+
+        for combo_child in result['fields']:
             if combo_child is not None:
                 self.manage_child(widget, combo_child)
 
