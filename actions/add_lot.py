@@ -1622,10 +1622,11 @@ class AddNewLot(ParentManage):
         format_high = self.lot_date_format + ' 23:59:59.999'
         interval = "'"+str(visit_start.toString(format_low))+"'::timestamp AND '"+str(visit_end.toString(format_high))+"'::timestamp"
 
-        expr_filter = ("(starttime BETWEEN "+str(interval)+" OR starttime IS NULL) "
-                       "AND (endtime BETWEEN "+str(interval)+" OR endtime IS NULL)")
+        expr_filter = ('("Data inici" BETWEEN '+str(interval)+' OR "Data inici" IS NULL) '
+                       'AND ("Data fi" BETWEEN '+str(interval)+' OR "Data fi" IS NULL)')
 
-        expr_filter += " AND team::text LIKE '%"+str(filter)+"%'"
+        expr_filter += ' AND "Equip"::text LIKE ' + str("'%") + str(filter) + str("%'") + ''
+
         self.dlg_work_register.tbl_work.model().setFilter(expr_filter)
         self.dlg_work_register.tbl_work.model().select()
 
