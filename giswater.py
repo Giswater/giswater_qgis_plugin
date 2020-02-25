@@ -595,12 +595,17 @@ class Giswater(QObject):
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
+        # Initialize plugin
+        self.init_plugin()
+
         # Force project read (to work with PluginReloader)
         self.project_read(False)
 
 
     def init_plugin(self, enable_toolbars=True):
+        """ Plugin main initialization function """
 
+        # Set controller (no database connection yet)
         self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=True)
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
