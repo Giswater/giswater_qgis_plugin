@@ -53,11 +53,10 @@ from .models.sys_feature_cat import SysFeatureCat
 from .ui_manager import AuditCheckProjectResult
 
 
-
 class Giswater(QObject):
 
     def __init__(self, iface):
-        """ Constructor 
+        """ Constructor
         :param iface: An interface instance that will be passed to this class
             which provides the hook by which you can manipulate the QGIS
             application at run time.
@@ -87,14 +86,14 @@ class Giswater(QObject):
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
         QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
 
-        # Check if config file exists    
+        # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
             message = "Config file not found at: " + setting_file
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return
 
-            # Set plugin settings
+        # Set plugin settings
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())
 
@@ -190,7 +189,7 @@ class Giswater(QObject):
             elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)
-                # OM toolbar actions
+            # OM toolbar actions
             elif int(index_action) in (18, 64, 65, 74, 75, 76, 81, 82, 84):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
@@ -252,13 +251,14 @@ class Giswater(QObject):
         action.setCheckable(is_checkable)
         self.actions[index_action] = action
 
-        # Management of the action                     
+        # Management of the action
         self.manage_action(index_action, function_name)
 
         # Management of the map_tool associated to this action (if it has one)
         self.manage_map_tool(index_action, function_name)
 
         return action
+
 
     def manage_dropdown_menu(self, action, index_action):
         """ Create dropdown menu for insert management of nodes and arcs """
@@ -311,7 +311,7 @@ class Giswater(QObject):
 
 
     def add_action(self, index_action, toolbar, action_group):
-        """ Add new action into specified @toolbar. 
+        """ Add new action into specified @toolbar.
             It has to be defined in the configuration file.
             Associate it to corresponding @action_group
         """
@@ -328,7 +328,7 @@ class Giswater(QObject):
         if int(index_action) in list_actions:
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
 
-        # Buttons checkable (normally related with 'map_tools')                
+        # Buttons checkable (normally related with 'map_tools')
         else:
             action = self.create_action(index_action, text_action, toolbar, True, function_name, action_group)
 
@@ -342,13 +342,13 @@ class Giswater(QObject):
 
     def manage_map_tool(self, index_action, function_name):
         """ Get the action with @index_action and check if has an associated map_tool.
-            If so, add it to dictionary of available map_tools 
+            If so, add it to dictionary of available map_tools
         """
 
         map_tool = None
         action = self.actions[index_action]
 
-        # Check if the @action has an associated map_tool         
+        # Check if the @action has an associated map_tool
         if int(index_action) == 16:
             map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 17:
@@ -486,9 +486,8 @@ class Giswater(QObject):
 
         # Get all QToolBar
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
-
-        x=0
-        own_toolbars=[]
+        x = 0
+        own_toolbars = []
         # Get a list with own QToolBars
         for w in widget_list:
             if w.property('gw_name'):
@@ -512,6 +511,7 @@ class Giswater(QObject):
 
 
     def set_toolbar_position(self, tb_name, x, y):
+
         toolbar = self.iface.mainWindow().findChild(QToolBar, tb_name)
         toolbar.move(int(x), int(y))
 
@@ -610,16 +610,20 @@ class Giswater(QObject):
         # Value: Object of the class SysFeatureCat
 
         self.feature_cat = {}
-
         if self.wsoftware.upper() == 'WS':
-            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
-                   "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN " 
+                  "(SELECT id, active FROM node_type UNION "
+                   "SELECT id, active FROM arc_type UNION "
+                   "SELECT id, active FROM connec_type) a USING (id) "
+                   "WHERE a.active IS TRUE ORDER BY id")
         elif self.wsoftware.upper() == 'UD':
             sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
-                   "(SELECT id,active FROM node_type UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
-
+                   "(SELECT id, active FROM node_type UNION "
+                   "SELECT id, active FROM arc_type UNION "
+                   "SELECT id, active FROM connec_type UNION "
+                   "SELECT id, active FROM gully_type) a USING (id) "
+                   "WHERE a.active IS TRUE ORDER BY id")
         rows = self.controller.get_rows(sql, commit=True)
-
         if not rows:
             return False
 
@@ -860,7 +864,7 @@ class Giswater(QObject):
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")
 
-        # Check roles of this user to show or hide toolbars 
+        # Check roles of this user to show or hide toolbars
         self.controller.check_user_roles()
 
         # Manage project variable 'expl_id'
@@ -969,9 +973,11 @@ class Giswater(QObject):
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layers=child_layers, group=None))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
+                        child_layers=child_layers, group=None))
                 else:
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layer[0], "the_geom", child_layer[1]+"_id", None, None))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
+                        child_layer[0], "the_geom", child_layer[1]+"_id", None, None))
 
         main_menu.exec_(click_point)
 
@@ -993,7 +999,6 @@ class Giswater(QObject):
 
         # Check if we have any layer loaded
         layers = self.controller.get_layers()
-
         if len(layers) == 0:
             return False
 
@@ -1106,6 +1111,7 @@ class Giswater(QObject):
 
     def populate_audit_check_project(self, layers):
         """ Fill table 'audit_check_project' with layers data """
+
         sql = ("DELETE FROM audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
@@ -1125,9 +1131,9 @@ class Giswater(QObject):
                 db_name = layer_source['db']
                 host_name = layer_source['host']
                 table_user = layer_source['user']
-                sql += ("\nINSERT INTO audit_check_project"
-                        " (table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user)"
-                        " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1, '"+str(table_user)+"');")
+                sql += ("\nINSERT INTO audit_check_project "
+                        "(table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user) "
+                        "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1, '"+str(table_user)+"');")
 
         status = self.controller.execute_sql(sql)
         if not status:
@@ -1146,10 +1152,12 @@ class Giswater(QObject):
 
         # Populate info_log and missing layers
         critical_level = 0
-        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'], 'gw_fct_audit_check_project_result', True, False, 0, True)
+        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
+            'gw_fct_audit_check_project_result', True, False, 0, True)
 
         if 'missingLayers' in result['body']['data']:
-            critical_level= self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
+            critical_level = self.get_missing_layers(self.dlg_audit_project,
+                result['body']['data']['missingLayers'], critical_level)
 
         self.parent.hide_void_groupbox(self.dlg_audit_project)
 
@@ -1165,6 +1173,7 @@ class Giswater(QObject):
 
     def update_config(self, state):
         """ Set qgis_form_initproject_hidden True or False into config_param_user """
+
         value = {0:"False", 2:"True"}
         sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
@@ -1177,8 +1186,6 @@ class Giswater(QObject):
 
         grl_critical = dialog.findChild(QGridLayout, "grl_critical")
         grl_others = dialog.findChild(QGridLayout, "grl_others")
-        msg = ""
-        exceptions = []
         for pos, item in enumerate(m_layers):
             try:
                 if not item: continue
@@ -1204,17 +1211,14 @@ class Giswater(QObject):
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
             except KeyError as e:
-                if type(e).__name__ not in exceptions:
-                    exceptions.append(type(e).__name__)
-                    msg += f"<b>Key: </b>{e}<br>"
-                    msg += f"<b>Python file: </b>{__name__} <br>"
-                    msg += f"<b>Python function: </b>{self.get_missing_layers.__name__} <br>"
-        if "KeyError" in exceptions:
-            self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+                description = "Key on returned json from ddbb is missed"
+                self.controller.manage_exception(None, description)
+
         return critical_level
 
 
     def add_selected_layers(self):
+
         checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
         schemaname = self.schema_name.replace('"','')
         for check in checks:
@@ -1316,8 +1320,8 @@ class Giswater(QObject):
 
 
     def get_layers_to_config(self):
-
         """ Get available layers to be configured """
+
         schema_name = self.schema_name.replace('"','')
         sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature "
               f"UNION "
@@ -1340,6 +1344,7 @@ class Giswater(QObject):
 
     def set_form_suppress(self, layers_list):
         """ Set form suppress on "Hide form on add feature (global settings) """
+
         for layer_name in layers_list:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if layer is None: continue
@@ -1349,7 +1354,8 @@ class Giswater(QObject):
 
 
     def set_read_only(self, layer, field, field_index):
-        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable') """
+
         # Get layer config
         config = layer.editFormConfig()
         try:

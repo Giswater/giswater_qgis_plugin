@@ -10,10 +10,11 @@ from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
 
-import json, os.path
-
-from collections import OrderedDict
+import os.path
 from functools import partial
+import inspect
+import traceback
+import sys
 
 from .pg_dao import PgDao
 from .logger import Logger
@@ -70,6 +71,7 @@ class DaoController(object):
 
     def set_plugin_dir(self, plugin_dir):
         self.plugin_dir = plugin_dir
+        self.log_info(f"Plugin folder: {self.plugin_dir}")
         
         
     def set_logger(self, logger_name=None):
@@ -107,14 +109,22 @@ class DaoController(object):
         
         if context_name is None:
             context_name = self.plugin_name
-        value = QCoreApplication.translate(context_name, message)
-        # If not translation has been found, check into 'ui_message' context
-        if value == message:
-            value = QCoreApplication.translate('ui_message', message)
+
+        value = None
+        try:
+            value = QCoreApplication.translate(context_name, message)
+        except TypeError:
+            value = QCoreApplication.translate(context_name, str(message))
+        finally:
+            # If not translation has been found, check into 'ui_message' context
+            if value == message:
+                value = QCoreApplication.translate('ui_message', message)
+
         return value                            
     
         
     def plugin_settings_value(self, key, default_value=""):
+
         key = self.plugin_name + "/" + key
         value = self.qgis_settings.value(key, default_value)
         return value    
@@ -213,6 +223,7 @@ class DaoController(object):
                 return None, not_version
 
         self.credentials = credentials
+
         return credentials, not_version
 
 
@@ -452,7 +463,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None, show_warning_detail=True):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -461,12 +472,7 @@ class DaoController(object):
         if not row:
             # Check if any error has been raised
             if self.last_error:
-                text = "Undefined error"
-                if '-1' in self.log_codes:
-                    text = self.log_codes[-1]
-                if show_warning_detail:
-                    self.show_warning_detail(text, str(self.last_error))
-                self.log_info(sql)
+                self.manage_exception_db(self.last_error, sql, stack_level_increase=1)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
@@ -483,10 +489,7 @@ class DaoController(object):
         if not rows2:
             # Check if any error has been raised
             if self.last_error:
-                text = "Undefined error"
-                if '-1' in self.log_codes:
-                    text = self.log_codes[-1]
-                self.show_warning_detail(text, str(self.dao.last_error))
+                self.manage_exception_db(self.last_error, sql)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
@@ -509,10 +512,7 @@ class DaoController(object):
         if not result:
             if log_error:
                 self.log_info(sql, stack_level_increase=1)
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
+            self.manage_exception_db(self.last_error, sql)
             return False
         else:
             if search_audit:
@@ -532,10 +532,7 @@ class DaoController(object):
         if not value:
             if log_error:
                 self.log_info(sql, stack_level_increase=1)
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
+            self.manage_exception_db(self.last_error, sql)
             return False
         else:
             if search_audit:
@@ -592,13 +589,11 @@ class DaoController(object):
         result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
-            return False
+            # Check if any error has been raised
+            if self.last_error:
+                self.manage_exception_db(self.last_error, sql)
 
-        return True
+        return result
                
             
     def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
@@ -644,13 +639,11 @@ class DaoController(object):
         result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
-            text = "Undefined error"
-            if '-1' in self.log_codes:
-                text = self.log_codes[-1]
-            self.show_warning_detail(text, str(self.dao.last_error))
-            return False
+            # Check if any error has been raised
+            if self.last_error:
+                self.manage_exception_db(self.last_error, sql)
 
-        return True
+        return result
 
 
     def get_json(self, function_name, parameters=None, commit=True, log_sql=False):
@@ -673,33 +666,18 @@ class DaoController(object):
 
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
-            self.show_critical("NOT ROW FOR", parameter=sql)
             return None
+
         json_result = row[0]
         if 'status' in json_result and json_result['status'] == 'Failed':
-            if 'message' in json_result:
-                level = 1
-                if 'level' in json_result['message']: level = int(json_result['message']['level'])
-                try:
-                    self.show_message(json_result['message']['text'], level)
-                except KeyError as e:
-                    title = "Key on returned json from ddbb is missed."
-                    msg = f"<b>Key: </b>{e}<br>"
-                    msg += f"<b>Python file: </b>{__name__} <br>"
-                    msg += f"<b>Python function: </b>{self.get_json.__name__} <br>"
-            else:
-                title = "Execute failed."
-                msg = ""
-                if 'SQLERR' in json_result: msg += f"<b>Error: </b>{json_result['SQLERR']}<br>"
-                if 'SQLCONTEXT' in json_result: msg += f"<b>Context: </b>{json_result['SQLCONTEXT']} <br>"
-                self.show_exceptions_msg(title, msg)
+            self.manage_exception_api(json_result, sql)
             return False
 
         return json_result
 
 
     def show_exceptions_msg(self, title, msg=""):
-        cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
+
         self.dlg_info = BasicInfo()
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
@@ -981,7 +959,6 @@ class DaoController(object):
             tab_name = self.plugin_name
 
         if message_level >= self.min_message_level:
-            msg = "QGIS: " + str(msg)
             QgsMessageLog.logMessage(msg, tab_name, message_level)
 
         return msg
@@ -1480,3 +1457,127 @@ class DaoController(object):
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()
+
+
+    def manage_exception(self, title=None, description=None, sql=None):
+        """ Manage exception and show information to the user """
+
+        # Get traceback
+        trace = traceback.format_exc()
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        path = exc_tb.tb_frame.f_code.co_filename
+        file_name = os.path.split(path)[1]
+        #folder_name = os.path.dirname(path)
+
+        # Set exception message details
+        msg = ""
+        msg += f"Error type: {exc_type}\n"
+        msg += f"File name: {file_name}\n"
+        msg += f"Line number: {exc_tb.tb_lineno}\n"
+        msg += f"{trace}\n"
+        if description:
+            msg += f"Description: {description}\n"
+        if sql:
+            msg += f"SQL:\n {sql}\n"
+
+        # Show exception message in dialog and log it
+        self.show_exceptions_msg(title, msg)
+        self.log_warning(msg)
+
+
+    def manage_exception_db(self, description=None, sql=None, stack_level=2, stack_level_increase=0):
+        """ Manage exception in database queries and show information to the user """
+
+        try:
+            stack_level += stack_level_increase
+            module_path = inspect.stack()[stack_level][1]
+            file_name = sys_manager.get_file_with_parents(module_path, 2)
+            function_line = inspect.stack()[stack_level][2]
+            function_name = inspect.stack()[stack_level][3]
+
+            # Set exception message details
+            msg = ""
+            msg += f"File name: {file_name}\n"
+            msg += f"Function name: {function_name}\n"
+            msg += f"Line number: {function_line}\n"
+            if description:
+                msg += f"Description:\n {description}\n"
+            if sql:
+                msg += f"SQL:\n {sql}\n"
+
+            # Show exception message in dialog and log it
+            title = "Database error"
+            self.show_exceptions_msg(title, msg)
+            self.log_warning(msg, stack_level_increase=2)
+
+        except Exception as e:
+            self.manage_exception("Unhandled Error")
+
+
+    def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
+        """ Manage exception in JSON database queries and show information to the user """
+
+        try:
+
+            if 'message' in json_result:
+
+                parameter = None
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                if 'text' in json_result['message']:
+                    msg = json_result['message']['text']
+                else:
+                    parameter = 'text'
+                    msg = "Key on returned json from ddbb is missed"
+                self.show_message(msg, level, parameter=parameter)
+
+            else:
+
+                stack_level += stack_level_increase
+                module_path = inspect.stack()[stack_level][1]
+                file_name = sys_manager.get_file_with_parents(module_path, 2)
+                function_line = inspect.stack()[stack_level][2]
+                function_name = inspect.stack()[stack_level][3]
+
+                # Set exception message details
+                title = "Database API execution failed"
+                msg = ""
+                msg += f"File name: {file_name}\n"
+                msg += f"Function name: {function_name}\n"
+                msg += f"Line number: {function_line}\n"
+                if 'SQLERR' in json_result:
+                    msg += f"Detail: {json_result['SQLERR']}\n"
+                if 'SQLCONTEXT' in json_result:
+                    msg += f"Context: {json_result['SQLCONTEXT']}\n"
+                if sql:
+                    msg += f"SQL:\n {sql}\n"
+
+                # Show exception message in dialog and log it
+                self.show_exceptions_msg(title, msg)
+                self.log_warning(msg, stack_level_increase=2)
+
+        except Exception as e:
+            self.manage_exception("Unhandled Error")
+
+
+    def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
+        """ Show exception message in dialog """
+
+        self.dlg_info = BasicInfo()
+        self.dlg_info.setWindowTitle(window_title)
+        if title:
+            self.dlg_info.lbl_title.setText(title)
+        self.dlg_info.txt_infolog.setText(msg)
+        self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_info.show()
+
+
+    def test_exception(self):
+        """ Function to test exception manager """
+
+        try:
+            print(4 / 0)
+        except Exception:
+            self.manage_exception()
+

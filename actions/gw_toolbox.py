@@ -56,7 +56,6 @@ class GwToolBox(ApiParent):
         body = self.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
         if not complet_result:
-            self.controller.show_message(f"No results for: SELECT {function_name} ($${{{body}}}$$);", 2)
             return False
 
         self.populate_trv(self.dlg_toolbox.trv, complet_result['body']['data'])
