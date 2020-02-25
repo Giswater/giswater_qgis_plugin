@@ -50,12 +50,9 @@ class MoveNodeMapTool(ParentMapTool):
             function_name = "gw_fct_arc_divide"
             row = self.controller.check_function(function_name)
             if not row:
-                function_name = "gw_fct_node2arc"
-                row = self.controller.check_function(function_name)
-                if not row:
-                    message = "Database function not found"
-                    self.controller.show_warning(message, parameter=function_name)
-                    return
+                message = "Database function not found"
+                self.controller.show_warning(message, parameter=function_name)
+                return
 
             sql = f"SELECT {function_name} ('{node_id}');"
             self.controller.execute_sql(sql, commit=True)
