@@ -324,11 +324,11 @@ class AddNewLot(ParentManage):
     def manage_team(self):
         """ Open dialog of teams """
 
-        self.max_id = self.get_max_id('cat_team')
+        self.max_id = self.get_max_id('v_edit_cat_team')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
         self.dlg_basic_table.setWindowTitle("Team management")
-        table_name = 'cat_team'
+        table_name = 'v_edit_cat_team'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
@@ -2361,11 +2361,11 @@ class AddNewLot(ParentManage):
     def manage_vehicle(self, add_vehicle=False):
         """ Open dialog of teams """
 
-        self.max_id = self.get_max_id('ext_cat_vehicle')
+        self.max_id = self.get_max_id('v_ext_cat_vehicle')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
         self.dlg_basic_table.setWindowTitle("Vehicle management")
-        table_name = 'ext_cat_vehicle'
+        table_name = 'v_ext_cat_vehicle'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
