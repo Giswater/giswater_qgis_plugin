@@ -1,8 +1,8 @@
-import os
 from qgis.core import QgsProject, QgsApplication, QgsProviderRegistry, QgsVectorLayer, QgsFeature, QgsGeometry
 from qgis.gui import QgsMapCanvas
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
+
+import os
 
 
 # dummy instance to replace qgis.utils.iface
@@ -32,26 +32,27 @@ class TestQgis():
             raise RuntimeError('No data providers available.')
 
 
-    def exec_layer(self):
+    def load_layer(self):
 
         # Check using assertion versus normal check
         layer_path = r'/home/david/workspace/temp/comarques.shp'
-        #self.assertTrue(os.path.exists(layer_path), f"File not found: {layer_path}")
         if not os.path.exists(layer_path):
-            print("File not found")
-            return
+            print(f"File not found: {layer_path}")
+            return False
 
+        # Make assert if file exists
+        assert os.path.exists(layer_path) == True
+
+        # Set layer
         layer = QgsVectorLayer(layer_path, 'input', 'ogr')
-
-        # Check using assertion versus normal check
-        #self.assertTrue(layer.isValid(), 'Failed to load "{}".'.format(layer.source()))
         if not layer.isValid():
-            print("Layer failed to load: " + layer_path)
+            print(f"Layer failed to load: {layer_path}")
+            assert False
 
         # Set canvas
-        canvas = QgsMapCanvas()
+        self.canvas = QgsMapCanvas()
         title = "PyQGIS Standalone Application Example"
-        canvas.setWindowTitle(title)
+        self.canvas.setWindowTitle(title)
         #canvas.setCanvasColor(QColor("#222222"))
 
         # Set memory layer
@@ -68,14 +69,10 @@ class TestQgis():
         # Add layer to the map
         QgsProject.instance().addMapLayer(layer)
 
-        canvas.setExtent(layer.extent())
-        canvas.setLayers([layer])
+        self.canvas.setExtent(layer.extent())
+        self.canvas.setLayers([layer])
         #QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(True)
         #canvas.zoomToFullExtent()
-
-        canvas.show()
-        exitcode = self.qgs.exec_()
-        self.qgs.exitQgis()
 
 
     def import_plugin(self):
@@ -89,27 +86,60 @@ class TestQgis():
         self.dlg.show()
 
 
-    def exec_qgis(self):
+    def open_qgis(self, open_qgis=False):
 
-        exitcode = self.qgs.exec_()
-        self.qgs.exitQgis()
+        user_name = self.qgs.userFullName()
+        #print(user_name)
+        if open_qgis:
+            self.canvas.show()
+            exitcode = self.qgs.exec_()
+            self.qgs.exitQgis()
+
+        return True
 
 
-    def import_giswater(self):
+    def create_project(self):
 
         import giswater
 
-        self.plugin = giswater.classFactory(self.iface)
-        self.plugin.initGui()
-        print(self.plugin.plugin_dir)
-        #self.plugin.project_read()
+        print("\nStart create_project")
+        self.giswater = giswater.classFactory(self.iface)
+        #print(self.plugin.plugin_dir)
+        self.giswater.init_plugin(False)
+
+        # Connect to a database providing a service_name set in .pg_service.conf
+        service_name = 'localhost_giswater'
+        status = self.giswater.controller.connect_to_database_service(service_name)
+        self.giswater.controller.logged = status
+        if self.giswater.controller.last_error:
+            msg = self.giswater.controller.last_error
+            print(msg)
+            return
+
+        self.giswater.update_sql.init_sql(False, user)
+        self.giswater.update_sql.init_dialog_create_project()
+        self.giswater.update_sql.create_project_data_schema('bb', 'bb_title', 'ws', '25831', 'EN', True)
+
+
+def test_open_qgis():
+
+    test = TestQgis()
+    test.init_config()
+    test.load_layer()
+    test.open_qgis(True)
+
+
+def test_create_project():
+
+    test = TestQgis()
+    test.init_config()
+    test.create_project()
+    print("Finish create_project")
 
 
 if __name__ == '__main__':
 
     test = TestQgis()
     test.init_config()
-    test.exec_layer()
-    #test.import_giswater()
-    test.exec_qgis()
+    test.create_project()
 
