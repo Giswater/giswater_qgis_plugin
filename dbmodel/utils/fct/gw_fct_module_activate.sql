@@ -12,15 +12,15 @@ $BODY$
 
 DECLARE 
 
-project_type_aux text;
+v_project_type text;
 
 BEGIN 
 
     SET search_path=SCHEMA_NAME, public;
 	
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	
-	IF project_type_aux='UD' THEN
+	IF v_project_type='UD' THEN
 	
 		IF module_id_var = 'om_insp_reh' THEN
 			-- UPDATE config_param_system SET extension_om_insp_reh=TRUE
@@ -34,17 +34,17 @@ BEGIN
 			-- to do
 	
 		ELSE 
-			RETURN audit_function (2082,2432,extension_id_var);
+			RETURN gw_fct_audit_function (2082,2432,extension_id_var);
 	  	
 		END IF;
 	
-	ELSIF project_type_aux='WS' THEN
+	ELSIF v_project_type='WS' THEN
 	
 		IF module_id_var = 'epa_rtc' THEN
 				
 		
 		ELSE 
-			RETURN audit_function(2084,2432,extension_id_var);
+			RETURN gw_fct_audit_function(2084,2432,extension_id_var);
 	  	
 		END IF;
 
