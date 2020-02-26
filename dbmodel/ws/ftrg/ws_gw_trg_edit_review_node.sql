@@ -14,10 +14,10 @@ $BODY$
 
 DECLARE
 
-	tol_filter_bool boolean;
-	review_status_aux smallint;
+	v_tol_filter_bool boolean;
+	v_review_status smallint;
 	rec_node record;
-	status_new integer;
+	v_status_new integer;
 	rev_node_elevation_tol double precision;
 	rev_node_depth_tol double precision;
 
@@ -49,7 +49,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,2482,NEW.node_id);
+					PERFORM gw_fct_audit_function(2012,2482,NEW.node_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -78,7 +78,7 @@ BEGIN
 		observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE node_id=NEW.node_id;
 
-		SELECT review_status_id INTO status_new FROM review_audit_node WHERE node_id=NEW.node_id;
+		SELECT review_status_id INTO v_status_new FROM review_audit_node WHERE node_id=NEW.node_id;
 		
 		--looking for insert/update/delete values on audit table
 		IF 
@@ -87,29 +87,29 @@ BEGIN
 			rec_node.annotation != NEW.annotation	OR  (rec_node.elevation IS NULL AND NEW.elevation IS NOT NULL) OR
 			rec_node.observ != NEW.observ OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_node.the_geom::text<>NEW.the_geom::text THEN
-			tol_filter_bool=TRUE;
+			v_tol_filter_bool=TRUE;
 		ELSE
-			tol_filter_bool=FALSE;
+			v_tol_filter_bool=FALSE;
 		END IF;
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			
 			-- updating review_status parameter value
-			IF status_new=1 THEN
-				review_status_aux=1;
-			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
-				review_status_aux=2;
-			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
-				review_status_aux=3;
-			ELSIF (tol_filter_bool is FALSE) THEN
-				review_status_aux=0;	
+			IF v_status_new=1 THEN
+				v_review_status=1;
+			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
+				v_review_status=2;
+			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
+				v_review_status=3;
+			ELSIF (v_tol_filter_bool is FALSE) THEN
+				v_review_status=0;	
 			END IF;
 		
 			-- upserting values on review_audit_node node table	
 			IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN					
 				UPDATE review_audit_node SET old_elevation=rec_node.elevation, new_elevation=NEW.elevation, old_depth=rec_node.depth, new_depth=NEW.depth, 
 				old_nodecat_id=rec_node.nodecat_id, annotation=NEW.annotation,
-				observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=review_status_aux, field_date=now(), 
+				observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status, field_date=now(), 
 				field_user=current_user WHERE node_id=NEW.node_id;
 			ELSE
 			
@@ -117,7 +117,7 @@ BEGIN
 				old_nodecat_id , annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
 				VALUES (NEW.node_id, rec_node.elevation, NEW.elevation, rec_node.depth,
 				NEW.depth, rec_node.nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id,
-				NEW.the_geom, review_status_aux, now(), current_user);
+				NEW.the_geom, v_review_status, now(), current_user);
 			END IF;
 				
 		END IF;

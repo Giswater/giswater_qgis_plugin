@@ -14,10 +14,10 @@ $BODY$
 
 DECLARE
 
-	tol_filter_bool boolean;
-	review_status_aux smallint;
+	v_tol_filter_bool boolean;
+	v_review_status smallint;
 	rec_connec record;
-	status_new integer;
+	v_status_new integer;
 
 
 BEGIN
@@ -43,7 +43,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,2490,NEW.connec_id);
+					PERFORM gw_fct_audit_function(2012,2490,NEW.connec_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -72,7 +72,7 @@ BEGIN
 		observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE connec_id=NEW.connec_id;
 
-		SELECT review_status_id INTO status_new FROM review_audit_connec WHERE connec_id=NEW.connec_id;
+		SELECT review_status_id INTO v_status_new FROM review_audit_connec WHERE connec_id=NEW.connec_id;
 		
 		--looking for insert/update/delete values on audit table
 		IF 
@@ -82,26 +82,26 @@ BEGIN
 			rec_connec.annotation != NEW.annotation	OR (rec_connec.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
 			rec_connec.observ != NEW.observ	OR  (rec_connec.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_connec.the_geom::text<>NEW.the_geom::text THEN
-			tol_filter_bool=TRUE;
+			v_tol_filter_bool=TRUE;
 		ELSE
-			tol_filter_bool=FALSE;
+			v_tol_filter_bool=FALSE;
 		END IF;
 		
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			
 			-- updating review_status parameter value
-			IF status_new=1 THEN
-				review_status_aux=1;
-			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
-				review_status_aux=2;
-			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
-				review_status_aux=3;
+			IF v_status_new=1 THEN
+				v_review_status=1;
+			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
+				v_review_status=2;
+			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
+				v_review_status=3;
 			
 			END IF;
 			
-		ELSIF (tol_filter_bool is FALSE) THEN
-		review_status_aux=0;	
+		ELSIF (v_tol_filter_bool is FALSE) THEN
+		v_review_status=0;	
 		END IF;
 		
 			-- upserting values on review_audit_connec connec table	
@@ -109,14 +109,14 @@ BEGIN
 				UPDATE review_audit_connec	SET  old_matcat_id=rec_connec.matcat_id, new_matcat_id=NEW.matcat_id, old_pnom=rec_connec.pnom, 
 				new_pnom=NEW.pnom, old_dnom=rec_connec.dnom, new_dnom=NEW.dnom, old_connecat_id=rec_connec.connecat_id, old_connectype_id=rec_connec.connectype_id,
 				new_connectype_id=NEW.connectype_id, annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, 
-				review_status_id=review_status_aux, field_date=now(), field_user=current_user WHERE connec_id=NEW.connec_id;
+				review_status_id=v_review_status, field_date=now(), field_user=current_user WHERE connec_id=NEW.connec_id;
 			ELSE
 			
 				INSERT INTO review_audit_connec(connec_id, old_matcat_id, new_matcat_id, old_pnom, new_pnom,
 				old_dnom ,new_dnom ,old_connecat_id ,old_connectype_id, new_connectype_id,annotation, observ ,expl_id ,the_geom ,review_status_id, field_date, field_user)
 				VALUES (NEW.connec_id, rec_connec.matcat_id, NEW.matcat_id, rec_connec.pnom,
 				NEW.pnom, rec_connec.dnom, NEW.dnom,  rec_connec.connecat_id, rec_connec.connectype_id, NEW.connectype_id, NEW.annotation, NEW.observ, NEW.expl_id,
-				NEW.the_geom, review_status_aux, now(), current_user);
+				NEW.the_geom, v_review_status, now(), current_user);
 			END IF;
 				
 		--END IF;
