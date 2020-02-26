@@ -55,7 +55,7 @@ BEGIN
 
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-				RETURN audit_function(110,430);  
+				RETURN gw_fct_audit_function(110,430, NULL);  
 			END IF;
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.nodecat_id IS NULL) THEN
@@ -75,22 +75,22 @@ BEGIN
      -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,430);  
+                RETURN gw_fct_audit_function(115,430, NULL);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,430);          
+                RETURN gw_fct_audit_function(120,430, NULL);          
             END IF;            
         END IF;
         
      -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,430);  
+                RETURN gw_fct_audit_function(125,430, NULL);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,430);  
+                RETURN gw_fct_audit_function(130,430, NULL);  
             END IF;            
         END IF;
 		
@@ -117,12 +117,12 @@ BEGIN
 		
 	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
+                --PERFORM gw_fct_audit_function(125,340);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
+                --PERFORM gw_fct_audit_function(130,340);
 				RETURN NULL; 
             END IF;
 
@@ -787,7 +787,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;	
 		*/
-        --PERFORM audit_function(XXX,XXX); 
+        --PERFORM gw_fct_audit_function(XXX,XXX); 
         RETURN NEW;
 
 
@@ -844,7 +844,7 @@ BEGIN
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
             IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
-                RETURN audit_function(135,430);  
+                RETURN gw_fct_audit_function(135,430, NULL);  
             END IF;
         END IF;
 
@@ -1312,7 +1312,7 @@ BEGIN
 	END IF;
 
             
-        --PERFORM audit_function(2,430); 
+        --PERFORM gw_fct_audit_function(2,430, NULL); 
         RETURN NEW;
     
 
@@ -1337,7 +1337,7 @@ BEGIN
 		DELETE FROM node WHERE node_id = OLD.node_id;
 	END IF;
 	
-	-- PERFORM audit_function(3,430); 
+	-- PERFORM gw_fct_audit_function(3,430, NULL); 
         RETURN NULL;
    
     END IF;

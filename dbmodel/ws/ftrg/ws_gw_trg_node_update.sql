@@ -9,20 +9,16 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update() RETURNS trigger AS
 $BODY$
 DECLARE 
-    numNodes numeric;
-    psector_vdefault_var integer;
-    replace_node_aux boolean;
-    node_id_var varchar;
-    node_rec record;
-	querystring Varchar; 
-    arcrec Record; 
-    nodeRecord1 Record; 
-    nodeRecord2 Record; 
-    z1 double precision;
-    z2 double precision;
-    xvar double precision;
-    yvar double precision;
-    pol_id_var varchar;
+
+    rec_node record;
+    rec_arcRecord; 
+    rec_node1 Record; 
+    rec_node2 Record; 
+    v_numNodes numeric; 
+	v_querystring Varchar; 
+    v_xvar double precision;
+    v_yvar double precision;
+    v_pol_id varchar;
     v_psector_id integer;
     v_arc record;
     v_arcrecord "SCHEMA_NAME".v_edit_arc;
@@ -53,34 +49,34 @@ BEGIN
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 
 			-- Checking number of nodes 
-			numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.state!=0);
+			v_numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.state!=0);
 			
-			IF (numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
+			IF (v_numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
 				IF v_dsbl_error IS NOT TRUE THEN
-					PERFORM audit_function (1096,1334, NEW.node_id);	
+					PERFORM gw_fct_audit_function (1096,1334, NEW.node_id);	
 				ELSE
 					INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state 1 or 2)');
 				END IF;
 				
-			ELSIF (numNodes =1) AND (v_node_proximity_control IS TRUE) THEN
-				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
-				IF (NEW.state=2 AND node_rec.state=1) THEN
-				--IF (NEW.state=1 AND node_rec.state=2) OR (NEW.state=2 AND node_rec.state=1) THEN
+			ELSIF (v_numNodes =1) AND (v_node_proximity_control IS TRUE) THEN
+				SELECT * INTO rec_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
+				IF (NEW.state=2 AND rec_node.state=1) THEN
+				--IF (NEW.state=1 AND rec_node.state=2) OR (NEW.state=2 AND rec_node.state=1) THEN
 
 					-- inserting on plan_psector_x_node the existing node as state=0
-					INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
+					INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, rec_node.node_id, 0);
 
 					-- looking for all the arcs (1 and 2) using existing node
-					FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=node_rec.node_id UNION SELECT arc_id, node_2 FROM arc WHERE node_2=node_rec.node_id)
+					FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=rec_node.node_id UNION SELECT arc_id, node_2 FROM arc WHERE node_2=rec_node.node_id)
 					LOOP
 						-- if exists some arc planified on same alternative attached to that existing node
 						IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id=v_psector_id) THEN 
 						
 							-- reconnect the planified arc to the new planified node in spite of connected to the node state=1
 							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
-								UPDATE arc SET node_1=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_1=node_rec.node_id;							
+								UPDATE arc SET node_1=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_1=rec_node.node_id;							
 							ELSE
-								UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=node_rec.node_id;
+								UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=rec_node.node_id;
 							END IF;
 							
 						ELSE
@@ -125,10 +121,10 @@ BEGIN
 						END IF;
 					END LOOP;
 				
-				ELSIF (NEW.state=2 AND node_rec.state=2) THEN
+				ELSIF (NEW.state=2 AND rec_node.state=2) THEN
 				
 					IF v_dsbl_error IS NOT TRUE THEN
-						PERFORM audit_function (1100,1334, NEW.node_id);	
+						PERFORM gw_fct_audit_function (1100,1334, NEW.node_id);	
 					ELSE
 						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state = 2)');
 					END IF;
@@ -146,28 +142,28 @@ BEGIN
 			END IF;
 				
 		-- Updating polygon geometry in case of exists it
-			pol_id_var:= (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_tank WHERE node_id=OLD.node_id);
-			IF (pol_id_var IS NOT NULL) THEN   
-				xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
-				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
-				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;
+			v_pol_id:= (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_tank WHERE node_id=OLD.node_id);
+			IF (v_pol_id IS NOT NULL) THEN   
+				v_xvar= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
+				v_yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
+				UPDATE polygon SET the_geom=ST_translate(the_geom, v_xvar, v_yvar) WHERE pol_id=v_pol_id;
 			END IF;      
 				
 							
 		-- Select arcs with start-end on the updated node
-			querystring := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
-			FOR arcrec IN EXECUTE querystring
+			v_querystring := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
+			FOR rec_arcIN EXECUTE v_querystring
 			LOOP
 
 			-- Initial and final node of the arc
-				SELECT * INTO nodeRecord1 FROM node WHERE node.node_id = arcrec.node_1;
-				SELECT * INTO nodeRecord2 FROM node WHERE node.node_id = arcrec.node_2;
+				SELECT * INTO rec_node1 FROM node WHERE node.node_id = arcrec.node_1;
+				SELECT * INTO rec_node2 FROM node WHERE node.node_id = arcrec.node_2;
 
 			-- Control de lineas de longitud 0
-				IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+				IF (rec_node1.node_id IS NOT NULL) AND (rec_node2.node_id IS NOT NULL) THEN
 
 				-- Update arc node coordinates, node_id and direction
-					IF (nodeRecord1.node_id = NEW.node_id) THEN
+					IF (rec_node1.node_id = NEW.node_id) THEN
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
 							ELSE
 							EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 

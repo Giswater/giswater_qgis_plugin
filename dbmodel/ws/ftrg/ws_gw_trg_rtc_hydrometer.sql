@@ -22,7 +22,7 @@ BEGIN
         --IF NEW.hydrometer_id IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
         --ELSE
-            --PERFORM audit_function(1102,1342);
+            --PERFORM gw_fct_audit_function(1102,1342, NULL);
         --END IF;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -34,7 +34,7 @@ BEGIN
         --IF OLD.hydrometer_id NOT IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN OLD;
         --ELSE
-            --PERFORM audit_function(1106,1342);
+            --PERFORM gw_fct_audit_function(1106,1342, NULL);
         --END IF;
     
     END IF;

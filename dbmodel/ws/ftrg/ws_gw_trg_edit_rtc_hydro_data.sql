@@ -17,7 +17,7 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        -- to do PERFORM audit_function(1030,1310); 
+        -- to do PERFORM gw_fct_audit_function(1030,1310, NULL); 
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -25,11 +25,11 @@ BEGIN
         UPDATE ext_rtc_hydrometer_x_data 
         SET custom_sum=NEW.custom_sum
         WHERE id=OLD.id;
-        -- to do PERFORM audit_function(2,1310); 
+        -- to do PERFORM gw_fct_audit_function(2,1310, NULL); 
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        --to do PERFORM audit_function(1032,1310); 
+        --to do PERFORM gw_fct_audit_function(1032,1310, NULL); 
         RETURN NEW;
     
     END IF;

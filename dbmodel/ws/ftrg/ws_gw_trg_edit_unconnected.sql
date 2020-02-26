@@ -27,7 +27,7 @@ BEGIN
         			
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(1110,1330);
+                --PERFORM gw_fct_audit_function(1110,1330, NULL);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -46,7 +46,7 @@ BEGIN
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-             --   PERFORM audit_function(1012,1330); 
+             --   PERFORM gw_fct_audit_function(1012,1330, NULL); 
                 RETURN NULL;                         
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
@@ -54,7 +54,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-             --   PERFORM audit_function(1014,1330); 
+             --   PERFORM gw_fct_audit_function(1014,1330, NULL); 
                 RETURN NULL; 
             END IF;
         END IF;
@@ -107,7 +107,7 @@ BEGIN
 		
 		END IF;
 		
-        PERFORM audit_function(2,1302); 
+        PERFORM gw_fct_audit_function(2,1302); 
         RETURN NEW;
 
 		 ELSIF TG_OP = 'DELETE' THEN  
@@ -121,7 +121,7 @@ BEGIN
 
 			END IF;
 		
-        PERFORM audit_function(3,1302); 
+        PERFORM gw_fct_audit_function(3,1302); 
         RETURN NULL;
      
      END IF;

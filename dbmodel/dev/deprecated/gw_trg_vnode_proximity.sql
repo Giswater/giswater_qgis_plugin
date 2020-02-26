@@ -33,8 +33,9 @@ BEGIN
 
     -- If there is an existing vnode closer than 'rec.node_tolerance' meters --> error
     IF (numNodes > 0) AND (rec.node_proximity_control IS TRUE) THEN
-	PERFORM audit_function(2020,1142);
-        RETURN NULL;
+
+        RETURN gw_fct_audit_function (2020,1142,NULL);
+        
     END IF;
 
     RETURN NEW;
