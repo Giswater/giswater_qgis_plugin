@@ -4,6 +4,8 @@ from qgis.PyQt.QtGui import QColor
 
 import os
 
+import giswater
+
 
 # dummy instance to replace qgis.utils.iface
 class QgisInterfaceDummy(object):
@@ -16,7 +18,16 @@ class QgisInterfaceDummy(object):
         return dummy
 
 
-class TestQgis():
+class TestQgis:
+
+    def load_plugin(self):
+        """ Load main plugin class """
+
+        self.init_config()
+        self.giswater = giswater.classFactory(self.iface)
+        self.giswater.init_plugin(False)
+        #print(self.plugin.plugin_dir)
+
 
     def init_config(self):
 
@@ -30,6 +41,19 @@ class TestQgis():
         aux = len(QgsProviderRegistry.instance().providerList())
         if aux == 0:
             raise RuntimeError('No data providers available.')
+
+
+    def connect_to_database(self, service_name):
+        """ Connect to a database providing a service_name set in .pg_service.conf """
+
+        status = self.giswater.controller.connect_to_database_service(service_name)
+        self.giswater.controller.logged = status
+        if self.giswater.controller.last_error:
+            msg = self.giswater.controller.last_error
+            print(f"Database connection error: {msg}")
+            return False
+
+        return True
 
 
     def load_layer(self):
@@ -100,26 +124,40 @@ class TestQgis():
 
     def create_project(self):
 
-        import giswater
-
         print("\nStart create_project")
-        self.giswater = giswater.classFactory(self.iface)
-        #print(self.plugin.plugin_dir)
-        self.giswater.init_plugin(False)
+
+        # Load main plugin class
+        self.load_plugin()
 
         # Connect to a database providing a service_name set in .pg_service.conf
-        user = "gisadmin"
-        service_name = 'localhost_giswater'
-        status = self.giswater.controller.connect_to_database_service(service_name)
-        self.giswater.controller.logged = status
-        if self.giswater.controller.last_error:
-            msg = self.giswater.controller.last_error
-            print(msg)
+        service_name = "localhost_giswater"
+        if not self.connect_to_database(service_name):
             return
 
+        user = "gisadmin"
         self.giswater.update_sql.init_sql(False, user)
         self.giswater.update_sql.init_dialog_create_project()
         self.giswater.update_sql.create_project_data_schema('test_ws', 'test_ws_title', 'ws', '25831', 'EN', True)
+
+        print("Finish create_project")
+
+
+    def check_project(self):
+
+        print("\nStart check_project")
+
+        # Load main plugin class
+        self.load_plugin()
+
+        # Connect to a database providing a service_name set in .pg_service.conf
+        service_name = "localhost_giswater"
+        if not self.connect_to_database(service_name):
+            return
+
+        layers = self.giswater.controller.get_layers()
+        status = self.giswater.populate_audit_check_project(layers)
+
+        print("Finish check_project")
 
 
 def test_open_qgis():
@@ -133,14 +171,17 @@ def test_open_qgis():
 def test_create_project():
 
     test = TestQgis()
-    test.init_config()
     test.create_project()
-    print("Finish create_project")
+
+
+def test_check_project():
+
+    test = TestQgis()
+    test.check_project()
 
 
 if __name__ == '__main__':
 
     test = TestQgis()
-    test.init_config()
-    test.create_project()
+    test.check_project()
 
