@@ -10,7 +10,7 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varyin
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(
     connec_array character varying[],
     feature_type_aux character varying)
-  RETURNS integer AS
+  RETURNS json AS
 $BODY$
 
 /*
@@ -44,6 +44,20 @@ DECLARE
 	v_endfeature_geom public.geometry;
 	v_pjointtype text;
 	v_pjointid text;
+
+	v_result text;
+	v_result_info text;
+	v_result_point text;
+	v_result_line text;
+	v_result_polygon text;
+	v_error_context text;
+	v_audit_result text;
+	v_level integer;
+	v_status text;
+	v_message text;
+	v_hide_form boolean;
+	v_version text;
+
 BEGIN
 
     -- Search path
@@ -51,9 +65,10 @@ BEGIN
 
     SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
     IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
+	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
     -- select project type
-    SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+    SELECT wsoftware, giswater INTO v_projecttype, v_version FROM version LIMIT 1;
 
     -- Main loop
     IF connec_array IS NOT NULL THEN
@@ -75,9 +90,11 @@ BEGIN
 		-- exception control. It's no possible to create another link when already exists for the connect
 		IF v_connect.state=2 AND v_link.exit_id IS NOT NULL THEN
 			IF feature_type_aux = 'CONNEC' THEN
-				RAISE EXCEPTION 'The connect2network tool is not enabled to work with connec''s with state=2. For planned connec''s you must to create the links for that connec (one link for each alternative and each connec) by using the psector form and relate the connec using the arc_id field. After that you will can customize the link''s geometry. connec_id: %' ,connect_id_aux;
+				EXECUTE 'SELECT gw_fct_audit_function(3052,2124, '||connect_id_aux||'::text)' INTO v_audit_result;
+
 			ELSIF feature_type_aux = 'GULLY' THEN
-				RAISE EXCEPTION 'The connect2network tool is not enabled to work with gully''s with state=2. For planned gully''s you must to create the links for that gully (one link for each alternative and each gully) by using the psector form and relate the gully using the arc_id field. After that you will can customize the link''s geometry. gully_id: %' ,connect_id_aux;
+		
+				EXECUTE 'SELECT gw_fct_audit_function(3054,2124, '||connect_id_aux||'::text)' INTO v_audit_result;
 			END IF;
 		END IF;
 
@@ -104,7 +121,7 @@ BEGIN
 
 		-- state control
 		IF v_arc.state=2 AND v_connect.state=1 THEN
-			RAISE EXCEPTION 'It is not possible to relate connects with state=1 to arcs with state=2. Please check your map';
+			PERFORM gw_fct_audit_function(3050,2124,NULL);
 		END IF;
 
 		-- compute link
@@ -214,8 +231,49 @@ BEGIN
 
     END IF;
 
-    --PERFORM audit_function(0,2124);
-    RETURN 0;
+    --PERFORM gw_fct_audit_function(0,2124,NULL);
+-- get results
+	-- info
+
+	/*SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data 
+	WHERE user_name="current_user"() AND fprocesscat_id=112 ORDER BY criticity desc, id asc) row; */
+	
+	IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'Process done successfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
+	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+
+	v_result_point = '{"geometryType":"", "features":[]}';
+	v_result_line = '{"geometryType":"", "features":[]}';
+	v_result_polygon = '{"geometryType":"", "features":[]}';
+
+--  Return
+     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+		     	'"setVisibleLayers":[]'||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||'}'||
+				', "actions":{"hideForm":' || v_hide_form || '}'||
+		       '}'||
+	    '}')::json;
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 
 END;
 $BODY$
