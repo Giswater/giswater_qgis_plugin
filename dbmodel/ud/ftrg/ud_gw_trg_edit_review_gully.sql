@@ -13,29 +13,29 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_gully()  RETURNS tri
 $BODY$
 
 DECLARE
-	rev_gully_top_elev_tol double precision;
-	rev_gully_ymax_tol double precision;
-	rev_gully_connec_geom1_tol double precision;
-	rev_gully_connec_geom2_tol double precision;
-	rev_gully_sandbox_tol double precision;
-	rev_gully_units_tol double precision;
-	tol_filter_bool boolean;
-	review_status_aux smallint;
-	rec_gully record;
-	status_new integer;
+	v_rev_gully_top_elev_tol double precision;
+	v_rev_gully_ymax_tol double precision;
+	v_rev_gully_connec_geom1_tol double precision;
+	v_rev_gully_connec_geom2_tol double precision;
+	v_rev_gully_sandbox_tol double precision;
+	v_rev_gully_units_tol double precision;
+	v_tol_filter_bool boolean;
+	v_review_status smallint;
+	v_status_new integer;
 
+	rec_gully record;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- getting tolerance parameters
-	rev_gully_top_elev_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_top_elev_tol');
-	rev_gully_ymax_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_ymax_tol');		
-	rev_gully_connec_geom1_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_connec_geom1_tol');
-	rev_gully_connec_geom2_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_connec_geom2_tol');	
-	rev_gully_sandbox_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_sandbox_tol');	
-	rev_gully_units_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_units_tol');	
+	v_rev_gully_top_elev_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_top_elev_tol');
+	v_rev_gully_ymax_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_ymax_tol');		
+	v_rev_gully_connec_geom1_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_connec_geom1_tol');
+	v_rev_gully_connec_geom2_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_connec_geom2_tol');	
+	v_rev_gully_sandbox_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_sandbox_tol');	
+	v_rev_gully_units_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_units_tol');	
 
 	--getting original values
 	SELECT gully_id, top_elev, ymax, sandbox, gully.matcat_id, gully_type,gratecat_id, units, groove, siphon, cat_arc.matcat_id as connec_matcat_id, shape, geom1, 
@@ -58,7 +58,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,2478,NEW.gully_id);
+					PERFORM gw_fct_audit_function(2012,2478,NEW.gully_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -94,15 +94,15 @@ BEGIN
 				observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE gully_id=NEW.gully_id;
 
-		SELECT review_status_id INTO status_new FROM review_audit_gully WHERE gully_id=NEW.gully_id;
+		SELECT review_status_id INTO v_status_new FROM review_audit_gully WHERE gully_id=NEW.gully_id;
 		
 		--looking for insert/update/delete values on audit table
-		IF abs(rec_gully.top_elev-NEW.top_elev)>rev_gully_top_elev_tol OR  (rec_gully.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
-			abs(rec_gully.ymax-NEW.ymax)>rev_gully_ymax_tol OR  (rec_gully.ymax IS NULL AND NEW.ymax IS NOT NULL) OR
-			abs(rec_gully.geom1-NEW.connec_geom1)>rev_gully_connec_geom1_tol OR  (rec_gully.geom1 IS NULL AND NEW.connec_geom1 IS NOT NULL) OR
-			abs(rec_gully.geom2-NEW.connec_geom2)>rev_gully_connec_geom2_tol OR  (rec_gully.geom2 IS NULL AND NEW.connec_geom2 IS NOT NULL) OR
-			abs(rec_gully.sandbox-NEW.sandbox)>rev_gully_sandbox_tol OR  (rec_gully.sandbox IS NULL AND NEW.sandbox IS NOT NULL) OR
-			abs(rec_gully.units-NEW.units)>rev_gully_units_tol OR  (rec_gully.units IS NULL AND NEW.units IS NOT NULL) OR
+		IF abs(rec_gully.top_elev-NEW.top_elev)>v_rev_gully_top_elev_tol OR  (rec_gully.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
+			abs(rec_gully.ymax-NEW.ymax)>v_rev_gully_ymax_tol OR  (rec_gully.ymax IS NULL AND NEW.ymax IS NOT NULL) OR
+			abs(rec_gully.geom1-NEW.connec_geom1)>v_rev_gully_connec_geom1_tol OR  (rec_gully.geom1 IS NULL AND NEW.connec_geom1 IS NOT NULL) OR
+			abs(rec_gully.geom2-NEW.connec_geom2)>v_rev_gully_connec_geom2_tol OR  (rec_gully.geom2 IS NULL AND NEW.connec_geom2 IS NOT NULL) OR
+			abs(rec_gully.sandbox-NEW.sandbox)>v_rev_gully_sandbox_tol OR  (rec_gully.sandbox IS NULL AND NEW.sandbox IS NOT NULL) OR
+			abs(rec_gully.units-NEW.units)>v_rev_gully_units_tol OR  (rec_gully.units IS NULL AND NEW.units IS NOT NULL) OR
 			rec_gully.matcat_id!= NEW.matcat_id OR  (rec_gully.matcat_id IS NULL AND NEW.matcat_id IS NOT NULL) OR
 			rec_gully.annotation != NEW.annotation OR  (rec_gully.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
 			rec_gully.observ != NEW.observ	OR  (rec_gully.observ IS NULL AND NEW.observ IS NOT NULL) OR
@@ -113,23 +113,23 @@ BEGIN
 			rec_gully.featurecat_id != NEW.featurecat_id	OR  (rec_gully.featurecat_id IS NULL AND NEW.featurecat_id IS NOT NULL) OR
 			rec_gully.feature_id != NEW.feature_id	or  (rec_gully.feature_id IS NULL AND NEW.feature_id IS NOT NULL) OR
 			rec_gully.the_geom::text<>NEW.the_geom::text THEN
-			tol_filter_bool=TRUE;
+			v_tol_filter_bool=TRUE;
 		ELSE
-			tol_filter_bool=FALSE;
+			v_tol_filter_bool=FALSE;
 		END IF;
 
 		-- if user finish review visit
 		IF (NEW.field_checked is TRUE) THEN
 			
 			-- updating review_status parameter value
-			IF status_new=1 THEN
-				review_status_aux=1;
-			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
-				review_status_aux=2;
-			ELSIF (tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
-				review_status_aux=3;
-			ELSIF (tol_filter_bool is FALSE) THEN
-				review_status_aux=0;	
+			IF v_status_new=1 THEN
+				v_review_status=1;
+			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
+				v_review_status=2;
+			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
+				v_review_status=3;
+			ELSIF (v_tol_filter_bool is FALSE) THEN
+				v_review_status=0;	
 			END IF;
 		
 			-- upserting values on review_audit_gully gully table	
@@ -143,7 +143,7 @@ BEGIN
        			old_connec_geom1=rec_gully.geom1, new_connec_geom1=NEW.connec_geom1, old_connec_geom2=rec_gully.geom2, 
        			new_connec_geom2=NEW.connec_geom2, old_connec_arccat_id=rec_gully.connec_arccat_id, old_featurecat_id=rec_gully.featurecat_id, 
        			new_featurecat_id=NEW.featurecat_id, old_feature_id=rec_gully.feature_id, new_feature_id=NEW.feature_id,
-       			annotation=NEW.annotation, observ=NEW.observ,expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=review_status_aux, 
+       			annotation=NEW.annotation, observ=NEW.observ,expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status, 
        			field_date=now(), field_user=current_user
        			WHERE gully_id=NEW.gully_id;
 
@@ -160,7 +160,7 @@ BEGIN
 				NEW.groove, rec_gully.siphon, NEW.siphon, rec_gully.connec_matcat_id, NEW.connec_matcat_id,
 				rec_gully.shape, NEW.connec_shape, rec_gully.geom1, NEW.connec_geom1, rec_gully.geom2, NEW.connec_geom2, 
 				rec_gully.featurecat_id, NEW.featurecat_id, rec_gully.feature_id, NEW.feature_id, NEW.annotation, NEW.observ, 
-				NEW.expl_id, NEW.the_geom, review_status_aux, now(), current_user);
+				NEW.expl_id, NEW.the_geom, v_review_status, now(), current_user);
 
 			END IF;
 				
