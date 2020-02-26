@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
-from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
+from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
+from qgis.PyQt.QtGui import QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 
 import os.path
 from functools import partial
@@ -1531,6 +1532,28 @@ class DaoController(object):
             self.manage_exception("Unhandled Error")
 
 
+    def set_text_bold(self, widget, pattern = "File\s|name:|Function\s|name:|Line\s|number:|SQL:|Detail:|Context:"):
+        """ Set bold text when word match with pattern
+        :param widget:QTextEdit
+        :return:
+        """
+
+        cursor = widget.textCursor()
+        format = QTextCharFormat()
+        format.setFontWeight(QFont.Bold)
+        regex = QRegExp(pattern)
+        pos = 0
+        index = regex.indexIn(widget.toPlainText(), pos)
+        while (index != -1):
+            # Select the matched text and apply the desired format
+            cursor.setPosition(index)
+            cursor.movePosition(14, 3)
+            cursor.mergeCharFormat(format)
+            # Move to the next match
+            pos = index + regex.matchedLength()
+            index = regex.indexIn(widget.toPlainText(), pos)
+
+
     def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
         """ Manage exception in JSON database queries and show information to the user """
 
@@ -1560,15 +1583,15 @@ class DaoController(object):
                 # Set exception message details
                 title = "Database API execution failed"
                 msg = ""
-                msg += f"<b>File name:</b> {file_name}<br>"
-                msg += f"<b>Function name:</b> {function_name}<br>"
-                msg += f"<b>Line number:</b> {function_line}<br>"
+                msg += f"File name: {file_name}\n"
+                msg += f"Function name: {function_name}\n"
+                msg += f"Line number:> {function_line}\n"
                 if 'SQLERR' in json_result:
-                    msg += f"<b>Detail:</b> {json_result['SQLERR']}<br>"
+                    msg += f"Detail: {json_result['SQLERR']}\n"
                 if 'SQLCONTEXT' in json_result:
-                    msg += f"<b>Context:</b> {json_result['SQLCONTEXT']}<br>"
+                    msg += f"Context: {json_result['SQLCONTEXT']}\n"
                 if sql:
-                    msg += f"<b>SQL:</b> {sql}<br>"
+                    msg += f"SQL: {sql}"
 
                 # Show exception message in dialog and log it
                 self.show_exceptions_msg(title, msg)
@@ -1588,6 +1611,7 @@ class DaoController(object):
         if title: self.dlg_info.lbl_title.setText(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()
 
 
