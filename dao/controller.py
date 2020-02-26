@@ -1539,7 +1539,7 @@ class DaoController(object):
         :return:
         """
         if not pattern:
-            pattern = "File\s|name:|Function\s|name:|Line\s|number:|SQL:|Detail:|Context:"
+            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|Detail:|Context:"
         cursor = widget.textCursor()
         format = QTextCharFormat()
         format.setFontWeight(QFont.Bold)
@@ -1547,13 +1547,18 @@ class DaoController(object):
         pos = 0
         index = regex.indexIn(widget.toPlainText(), pos)
         while index != -1:
-            # Select the matched text and apply the desired format
-            cursor.setPosition(index)
-            cursor.movePosition(14, 1)
-            cursor.mergeCharFormat(format)
-            # Move to the next match
+            # Set cursor at begin of match
+            cursor.setPosition(index, 0)
             pos = index + regex.matchedLength()
+            # Set cursor at end of match
+            cursor.setPosition(pos, 1)
+
+            # Select the matched text and apply the desired format
+            cursor.mergeCharFormat(format)
+
+            # Move to the next match
             index = regex.indexIn(widget.toPlainText(), pos)
+
 
 
     def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
