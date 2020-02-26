@@ -483,7 +483,7 @@ BEGIN
 						'"line":'||v_result_line||','||
 						'"polygon":'||v_result_polygon||','||
 						'"missingLayers":'||v_missing_layers||'}'||
-				', "actions":{"hideform":' || v_hidden_form || '}}}')::json;
+				', "actions":{"hideForm":' || v_hidden_form || '}}}')::json;
 	ELSE
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
@@ -492,7 +492,7 @@ BEGIN
 						'"line":{},'||
 						'"polygon":{},'||
 						'"missingLayers":{}}'||
-				', "actions":{"hideform":' || v_hidden_form || '}}}')::json;
+				', "actions":{"hideForm":' || v_hidden_form || '}}}')::json;
 	END IF;
 		
 	--  Return	   
