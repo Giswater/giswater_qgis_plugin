@@ -1145,7 +1145,7 @@ class Giswater(QObject):
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', f'$${{{body}}}$$', log_sql=True)
         try:
-            if not result or (result['body']['actions']['hideform'] == True): return True
+            if not result or (result['body']['actions']['hideForm'] == True): return True
         except KeyError as e:
             self.controller.log_info(f"EXCEPTION: {type(e).__name__}, {e}")
             return True
