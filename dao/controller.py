@@ -1532,22 +1532,24 @@ class DaoController(object):
             self.manage_exception("Unhandled Error")
 
 
-    def set_text_bold(self, widget, pattern = "File\s|name:|Function\s|name:|Line\s|number:|SQL:|Detail:|Context:"):
+    def set_text_bold(self, widget, pattern=None):
         """ Set bold text when word match with pattern
         :param widget:QTextEdit
+        :param pattern: Text to find used as pattern for QRegExp (String)
         :return:
         """
-
+        if not pattern:
+            pattern = "File\s|name:|Function\s|name:|Line\s|number:|SQL:|Detail:|Context:"
         cursor = widget.textCursor()
         format = QTextCharFormat()
         format.setFontWeight(QFont.Bold)
         regex = QRegExp(pattern)
         pos = 0
         index = regex.indexIn(widget.toPlainText(), pos)
-        while (index != -1):
+        while index != -1:
             # Select the matched text and apply the desired format
             cursor.setPosition(index)
-            cursor.movePosition(14, 3)
+            cursor.movePosition(14, 1)
             cursor.mergeCharFormat(format)
             # Move to the next match
             pos = index + regex.matchedLength()
