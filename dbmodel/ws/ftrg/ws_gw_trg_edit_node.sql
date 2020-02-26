@@ -70,7 +70,7 @@ BEGIN
 		-- Node Catalog ID
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-				RETURN audit_function(1006,1320);  
+				RETURN gw_fct_audit_function(1006,1320, NULL);  
 			END IF;
 			
 			IF v_customfeature IS NOT NULL THEN		
@@ -85,7 +85,7 @@ BEGIN
 			END IF;
 			
 			IF (NEW.nodecat_id IS NULL) THEN
-				PERFORM audit_function(1090,1320);
+				PERFORM gw_fct_audit_function(1090,1320, NULL);
 			END IF;				
 
 		END IF;
@@ -98,7 +98,7 @@ BEGIN
 		-- Sector ID
 		IF (NEW.sector_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-			RETURN audit_function(1008,1320);  
+			RETURN gw_fct_audit_function(1008,1320, NULL);  
 				END IF;
 					SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 				IF v_count = 1 THEN
@@ -111,14 +111,14 @@ BEGIN
 					NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 				END IF;
 				IF (NEW.sector_id IS NULL) THEN
-			RETURN audit_function(1010,1320,NEW.node_id);          
+			RETURN gw_fct_audit_function(1010,1320,NEW.node_id);          
 		    END IF;            
 		END IF;
 		
 		-- Dma ID
 		IF (NEW.dma_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-			RETURN audit_function(1012,1320);  
+			RETURN gw_fct_audit_function(1012,1320, NULL);  
 		    END IF;
 					SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 				IF v_count = 1 THEN
@@ -131,7 +131,7 @@ BEGIN
 					NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 				END IF; 
 		    IF (NEW.dma_id IS NULL) THEN
-			RETURN audit_function(1014,1320,NEW.node_id);  
+			RETURN gw_fct_audit_function(1014,1320,NEW.node_id);  
 		    END IF;            
 		END IF;
 			
@@ -157,7 +157,7 @@ BEGIN
 
 		--check relation state - state_type
 		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-			RETURN audit_function(3036,1320,NEW.state::text);
+			RETURN gw_fct_audit_function(3036,1320,NEW.state::text);
 		END IF;
 
 		--Inventory	
@@ -172,7 +172,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1320,NEW.node_id);
+					PERFORM gw_fct_audit_function(2012,1320,NEW.node_id);
 				END IF;		
 			END IF;
 		END IF;
@@ -183,7 +183,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM audit_function(2024,1320,NEW.node_id);
+					PERFORM gw_fct_audit_function(2024,1320,NEW.node_id);
 				END IF;	
 			END IF;
 		END IF;
@@ -514,7 +514,7 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-						RETURN audit_function(2110,1320);
+						RETURN gw_fct_audit_function(2110,1320, NULL);
 					END IF;
 				END IF;
 			END IF;
@@ -522,7 +522,7 @@ BEGIN
 		
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-			RETURN audit_function(3036,1320,NEW.state::text);
+			RETURN gw_fct_audit_function(3036,1320,NEW.state::text);
 		END IF;
 
 		-- rotation
