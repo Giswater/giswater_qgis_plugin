@@ -13,8 +13,8 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_elements($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"featureType":"arc"}}$$)
+"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+"data":{"filterFields":{}, "pageInfo":{}, "importParam":"node", "csv2pgCat":"3"}}$$)::text
 */
 
 
@@ -40,7 +40,7 @@ BEGIN
 	SELECT wsoftware, giswater, epsg  INTO v_project_type, v_version, v_epsg FROM version order by 1 desc limit 1;
 
 	-- get input parameter
-	v_featuretype =  (p_data::json->>'data')::json->>'featureType';
+	v_featuretype =  (p_data::json->>'data')::json->>'importParam';
 	v_featuretable = concat ('element_x_',v_featuretype);
 
 	-- manage log (fprocesscat 42)
@@ -53,22 +53,22 @@ BEGIN
 	LOOP 
 		IF v_featuretype='node' THEN
 			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
-			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer) RETURNING element_id INTO v_idlast;
+			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_node (element_id, node_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='arc' THEN 
 			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
-			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer) RETURNING element_id INTO v_idlast;
+			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_arc (element_id, arc_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='connec' THEN	
 			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
-			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer) RETURNING element_id INTO v_idlast;
+			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_connec (element_id, connec_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='gully' THEN
 			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
-			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer) RETURNING element_id INTO v_idlast;
+			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_gully (element_id, gully_id) VALUES (v_idlast, v_element.csv1);
 		END IF;	
 	END LOOP;
