@@ -13,9 +13,8 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_element()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-	element_seq int8;
-	expl_id_int integer;
-	code_autofill_bool boolean;
+	v_expl_id_int integer;
+	v_code_autofill_bool boolean;
 
 BEGIN
 
@@ -52,7 +51,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1114, NEW.element_id);
+					PERFORM gw_fct_audit_function(2012,1114, NEW.element_id);
 				END IF;		
 			END IF;
 		END IF;		
@@ -73,10 +72,10 @@ BEGIN
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 		
-		SELECT code_autofill INTO code_autofill_bool FROM element_type join cat_element on element_type.id=cat_element.elementtype_id where cat_element.id=NEW.elementcat_id;
+		SELECT code_autofill INTO v_code_autofill_bool FROM element_type join cat_element on element_type.id=cat_element.elementtype_id where cat_element.id=NEW.elementcat_id;
 
 		--Copy id to code field
-		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.element_id;
 		END IF;
 

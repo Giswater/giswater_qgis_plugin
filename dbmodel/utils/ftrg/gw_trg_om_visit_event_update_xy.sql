@@ -34,13 +34,13 @@ BEGIN
 	
 		-- control of the position_value againts arc length
 		IF NEW.position_value <0 OR NEW.position_value> ST_length(v_the_geom) THEN
-            RETURN audit_function(3012, 2498,v_arc_id::text); 
+            RETURN gw_fct_audit_function(3012, 2498,v_arc_id::text); 
 
 		END IF;
 
 		-- control of the position_id againsts arc's node_1 and node_2
 		IF NEW.position_id!=v_node_1 AND NEW.position_id!=v_node_2 THEN
-            RETURN audit_function(3014,2498,v_arc_id::text); 
+            RETURN gw_fct_audit_function(3014,2498,v_arc_id::text); 
 		ELSIF NEW.position_id=v_node_2 THEN
 			v_the_geom = ST_reverse(v_the_geom);
 		END IF;

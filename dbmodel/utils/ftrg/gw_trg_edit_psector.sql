@@ -12,7 +12,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_psector()
 $BODY$
 DECLARE 
 	v_sql varchar;
-	plan_psector_seq int8;
 	om_aux text;
 	rec_type record;
 	v_plan_table text;
@@ -173,7 +172,7 @@ BEGIN
 				--reestablish topology control
 				UPDATE config_param_system set value = 'true' WHERE parameter='state_topocontrol';	
 				--show information about performed state update
-				PERFORM audit_function(3034,2446);
+				PERFORM gw_fct_audit_function(3034,2446, NULL);
 			END LOOP;
 			
 		END IF;

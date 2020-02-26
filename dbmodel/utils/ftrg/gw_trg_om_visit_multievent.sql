@@ -103,7 +103,7 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
             DELETE FROM om_visit CASCADE WHERE id = OLD.visit_id ;
 
-    --  PERFORM audit_function(3); 
+    --  PERFORM gw_fct_audit_function(3); 
         RETURN NULL;
     
     END IF;

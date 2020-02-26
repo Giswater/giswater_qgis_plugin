@@ -21,7 +21,7 @@ BEGIN
     IF table_name = 'connec' AND NEW.state = 1 THEN 
    
 	   IF (SELECT count(connec_id) FROM connec WHERE state=1 AND customer_code=NEW.customer_code) > 1 THEN
-	       PERFORM audit_function(3018,2702);
+	       PERFORM gw_fct_audit_function(3018,2702, NULL);
 	   END IF;
 	   
     END IF;

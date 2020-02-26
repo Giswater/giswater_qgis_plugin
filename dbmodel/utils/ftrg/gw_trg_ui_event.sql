@@ -21,14 +21,14 @@ BEGIN
 
 
    -- ELSIF TG_OP = 'UPDATE' THEN
-        --  PERFORM audit_function(2); 
+        --  PERFORM gw_fct_audit_function(2); 
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
 
             v_sql:= 'DELETE FROM '||event_table||' WHERE id = '||quote_literal(OLD.event_id)||';';
             EXECUTE v_sql;
-    --  PERFORM audit_function(3); 
+    --  PERFORM gw_fct_audit_function(3); 
         RETURN NULL;
     
     END IF;

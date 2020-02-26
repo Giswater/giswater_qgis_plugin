@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_om_visit()
 $BODY$
 DECLARE 
 
-		om_visit_id_seq int8;
+		v_om_visit_id_seq int8;
 
 
 BEGIN
@@ -31,22 +31,22 @@ BEGIN
 	--Exploitation ID
 		IF (NEW.expl_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-					RETURN audit_function(1110,1118);
+					RETURN gw_fct_audit_function(1110,1118, NULL);
 				END IF;
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
 				END IF;
 				IF (NEW.expl_id IS NULL) THEN
-					RETURN audit_function(2012,1118,NEW.id);  
+					RETURN gw_fct_audit_function(2012,1118,NEW.id);  
 				END IF;            
 			END IF;
 					
 	-- FEATURE INSERT      
 	
 			IF (NEW.id IS NULL) THEN
-			SELECT max(id::integer) INTO om_visit_id_seq FROM om_visit;
-			PERFORM setval('om_visit_id_seq',om_visit_id_seq,true);
+			SELECT max(id::integer) INTO v_om_visit_id_seq FROM om_visit;
+			PERFORM setval('om_visit_id_seq',v_om_visit_id_seq,true);
 			NEW.id:= (SELECT nextval('om_visit_id_seq'));
 			END IF;
 			

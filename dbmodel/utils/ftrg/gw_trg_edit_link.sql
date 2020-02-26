@@ -51,28 +51,28 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1116); 
+                RETURN gw_fct_audit_function(1008,1116, NULL); 
             END IF;
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
 			END IF;
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1116,NEW.link_id::text); 
+                RETURN gw_fct_audit_function(1010,1116,NEW.link_id::text); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1116); 
+                RETURN gw_fct_audit_function(1012,1116, NULL); 
             END IF;
 			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1116,NEW.link_id::text); 
+                RETURN gw_fct_audit_function(1014,1116,NEW.link_id::text); 
             END IF;
         END IF;
 
@@ -90,7 +90,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1116,NEW.link_id::text);
+					PERFORM gw_fct_audit_function(2012,1116,NEW.link_id::text);
 				END IF;		
 			END IF;
 		END IF;	
@@ -300,7 +300,7 @@ BEGIN
 		
 		-- control of null exit_type
 		IF NEW.exit_type IS NULL THEN
-			PERFORM audit_function(2015,1116);
+			PERFORM gw_fct_audit_function(2015,1116, NULL);
 		END IF;
 		
 		-- upsert link
