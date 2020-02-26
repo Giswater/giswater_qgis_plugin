@@ -28,8 +28,7 @@ BEGIN
    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
    v_featuretype:= TG_ARGV[0];
    v_version = (SELECT giswater FROM version ORDER by 1 desc LIMIT 1);
-   v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
-
+   SELECT lot_id::integer INTO v_lot FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user;
 
    IF v_featuretype IS NULL THEN
 	v_triggerfromtable = 'om_visit';
@@ -61,7 +60,7 @@ BEGIN
             --set visit_type captured from class_id
 			UPDATE om_visit SET visit_type=(SELECT visit_type FROM om_visit_class WHERE id=NEW.class_id) WHERE id=NEW.id;
 
-		ELSIF v_triggerfromtable ='om_visit_x_feature' THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
+		ELSIF v_triggerfromtable ='om_visit_x_feature' AND v_lot IS NOT NULL THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
 
 			-- insert element into lot_x_element table in case if doesn't exist
 			IF v_featuretype ='arc' THEN	
