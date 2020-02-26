@@ -20,12 +20,12 @@ BEGIN
 		
 		--Exploitation ID
         IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-            --PERFORM audit_function(1012,1112);
+            --PERFORM gw_fct_audit_function(1012,1112, NULL);
 			RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(1014,1112);
+                --PERFORM gw_fct_audit_function(1014,1112, NULL);
 				RETURN NULL; 
             END IF;
 			

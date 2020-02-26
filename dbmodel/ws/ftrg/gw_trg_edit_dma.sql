@@ -21,23 +21,23 @@ BEGIN
 	     -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1320);  
+                RETURN gw_fct_audit_function(1008,1320, NULL);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1320);          
+                RETURN gw_fct_audit_function(1010,1320, NULL);          
             END IF;            
         END IF;
 		*/
 		
 		--Exploitation ID
         IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-            --PERFORM audit_function(1012,1112);
+            --PERFORM gw_fct_audit_function(1012,1112);
 			RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(1014,1112);
+                --PERFORM gw_fct_audit_function(1014,1112);
 				RETURN NULL; 
             END IF;
 			
@@ -47,7 +47,7 @@ BEGIN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-					PERFORM audit_function(2024,1212);
+					PERFORM gw_fct_audit_function(2024,1212, NULL);
 			END IF;
 		END IF;
 		*/

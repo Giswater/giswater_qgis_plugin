@@ -26,11 +26,11 @@ BEGIN
 	        -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1246);  
+                RETURN gw_fct_audit_function(1008,1246,NULL);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1246);          
+                RETURN gw_fct_audit_function(1010,1246,NULL);          
             END IF;            
         END IF;
 		*/

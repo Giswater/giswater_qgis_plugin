@@ -25,7 +25,7 @@ BEGIN
         				
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                PERFORM audit_function(1110,1312);
+                PERFORM gw_fct_audit_function(1110,1312, NULL);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -49,7 +49,7 @@ BEGIN
 			WHERE macrodma_id=NEW.macrodma_id;
 			
 	
-        PERFORM audit_function(2,1312); 
+        PERFORM gw_fct_audit_function(2,1312, NULL); 
         RETURN NEW;
 
 		 ELSIF TG_OP = 'DELETE' THEN  		
@@ -57,7 +57,7 @@ BEGIN
 				DELETE FROM macrodma WHERE macrodma_id=OLD.macrodma_id;
 		
 		
-        PERFORM audit_function(3,1312); 
+        PERFORM gw_fct_audit_function(3,1312, NULL); 
         RETURN NULL;
      
      END IF;
