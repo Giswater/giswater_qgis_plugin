@@ -89,7 +89,8 @@ BEGIN
 
 	-- get arc_id twin in case of exists to remove results (arc twin is that arc closest choosed arc connected with valve)
 	-- 1) get node twin
-	v_nodetwin = (select node_id FROM (SELECT node_1 AS node_id FROM temp_anlgraf WHERE arc_id = v_arc UNION SELECT node_2 FROM temp_anlgraf WHERE arc_id = v_arc)a WHERE node_id::varchar IN 
+	v_nodetwin = (select node_id FROM (SELECT node_1 AS node_id FROM temp_anlgraf WHERE arc_id = v_arc UNION 
+		SELECT node_2 FROM temp_anlgraf WHERE arc_id = v_arc)a WHERE node_id::varchar IN 
 		     (SELECT node_id FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE))));
 	-- get arc_id twin
 	SELECT arc_id INTO v_arctwin FROM temp_anlgraf WHERE (node_1 = v_nodetwin OR node_2 = v_nodetwin) AND arc_id <> v_arc;
@@ -132,14 +133,14 @@ BEGIN
 	IF v_mincutstep = 1 THEN 
 		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+			select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
 			)a group by node_1  having sum(flag) = 5)';
 		EXECUTE v_querytext;
 
 	ELSIF v_mincutstep = 2 THEN 
 		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+			select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
 			)a group by node_1  having sum(water) > 1 and sum(flag) > 2)';
 		EXECUTE v_querytext;
 	
@@ -147,7 +148,7 @@ BEGIN
 
 	v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select * from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+			select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
 			)a group by node_1  having sum(flag) = 6)';
 	EXECUTE v_querytext;
 	

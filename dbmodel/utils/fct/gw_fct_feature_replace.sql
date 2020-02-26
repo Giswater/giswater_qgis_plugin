@@ -165,7 +165,7 @@ BEGIN
 
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
-		EXECUTE 'SELECT gw_fct_audit_function(1070,2126,v_state::text)' INTO v_audit_result;
+		EXECUTE 'SELECT gw_fct_audit_function(1070,2126,'||v_state||'::text)' INTO v_audit_result;
 	ELSE
 
 		-- new feature_id

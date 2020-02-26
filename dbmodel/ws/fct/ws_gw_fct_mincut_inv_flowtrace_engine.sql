@@ -38,7 +38,7 @@ BEGIN
 
         --Control nulls
         IF node_id_arg IS NULL THEN
-		PERFORM audit_function(3006,2322);
+			PERFORM gw_fct_audit_function(3006,2322, NULL);
         END IF;
 
         -- Get node  public.geometry

@@ -67,7 +67,7 @@ BEGIN
 		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT id FROM price_value_unit);
 
 		IF v_units IS NOT NULL THEN
-			EXECUTE 'SELECT gw_fct_audit_function(2088,2440,(v_units)::text)' INTO v_audit_result;
+			EXECUTE 'SELECT gw_fct_audit_function(2088,2440,('||v_units||')::text)' INTO v_audit_result;
 		END IF;
 
 		-- control of price descript (csv3)
