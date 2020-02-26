@@ -78,3 +78,10 @@ INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_use
 VALUES (3048,'Flow length is longer than length of exit arc feature', 'Please review your project!', 2,true,'ud', false) ON CONFLICT (id) DO NOTHING;
 
 
+--2020/02/26
+INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, qgis_message, idval, label, dv_querytext, dv_parent_id, isenabled, layout_id, 
+layout_order, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, 
+ismandatory, widgetcontrols, vdefault, layoutname, reg_exp, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, isdeprecated) 
+VALUES ('qgis_form_log_hidden', 'config', 'Hide log form after executing a process', 'role_edit', NULL, NULL, 'Hide log form', NULL, NULL, true, 8, 9, 
+'utils', false, NULL, NULL, NULL, false, 'boolean', 'check', true, NULL, 'false', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
+ON conflict (id) DO NOTHING;

@@ -74,6 +74,7 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
+v_hide_form boolean;
 
 BEGIN
 
@@ -107,6 +108,7 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
 	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user;
 	SELECT value::smallint INTO v_ficticius FROM config_param_system WHERE parameter='plan_statetype_ficticius';
+	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=112 AND user_name=current_user;
@@ -741,6 +743,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
+				', "actions":{"hideForm":' || v_hide_form || '}'||
 		       '}'||
 	    '}')::json;
 

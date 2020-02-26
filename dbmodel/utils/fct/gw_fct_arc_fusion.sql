@@ -41,7 +41,8 @@ DECLARE
     v_level integer;
     v_status text;
     v_message text;
-
+    v_hide_form boolean;
+    
 BEGIN
 
     -- Search path
@@ -54,6 +55,9 @@ BEGIN
 
     INSERT INTO config_param_user (value, parameter, cur_user)
     VALUES (txid_current(),'cur_trans',current_user );
+
+    -- Get parameters from configs table
+    SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
     -- delete old values on result table
     DELETE FROM audit_check_data WHERE fprocesscat_id=114 AND user_name=current_user;
@@ -254,6 +258,7 @@ BEGIN
                 '"point":'||v_result_point||','||
                 '"line":'||v_result_line||','||
                 '"polygon":'||v_result_polygon||'}'||
+                ', "actions":{"hideForm":' || v_hide_form || '}'||
                '}'
         '}')::json;
 
