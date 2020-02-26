@@ -12,14 +12,14 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node_pol()  RETURNS tri
 $BODY$
 
 DECLARE 
-    man_table varchar;
-	sys_type_var text;
+    v_man_table varchar;
+	v_sys_type text;
 
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	man_table:= TG_ARGV[0];
+	v_man_table:= TG_ARGV[0];
 		
 	
 	-- INSERT
@@ -36,51 +36,51 @@ BEGIN
 			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
-				RETURN audit_function(2052,2418);
+				RETURN gw_fct_audit_function(2052,2418, NULL);
 			END IF;
 		END IF;
 		
-		IF man_table='man_netgully_pol' THEN
+		IF v_man_table='man_netgully_pol' THEN
 			IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN audit_function(2054,2418);
+				RETURN gw_fct_audit_function(2054,2418, NULL);
 			END  IF;
-			sys_type_var='NETGULLY';
+			v_sys_type='NETGULLY';
 			
-		ELSIF man_table='man_storage_pol' THEN
+		ELSIF v_man_table='man_storage_pol' THEN
 			IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN audit_function(2056,2418);
+				RETURN gw_fct_audit_function(2056,2418, NULL);
 			END  IF;
-			sys_type_var='STORAGE';
+			v_sys_type='STORAGE';
 			
-		ELSIF man_table='man_chamber_pol' THEN
+		ELSIF v_man_table='man_chamber_pol' THEN
 			IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN audit_function(2058,2418);
+				RETURN gw_fct_audit_function(2058,2418, NULL);
 			END  IF;
-			sys_type_var='CHAMBER';
+			v_sys_type='CHAMBER';
 			
-		ELSIF man_table='man_wwtp_pol' THEN
+		ELSIF v_man_table='man_wwtp_pol' THEN
 			IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN audit_function(2060,2418);
+				RETURN gw_fct_audit_function(2060,2418, NULL);
 			END  IF;
-			sys_type_var='WWTP';
+			v_sys_type='WWTP';
 
 		END IF;
 		
 		-- Insert into polygon table
-		INSERT INTO polygon (pol_id, sys_type, the_geom) VALUES (NEW.pol_id, sys_type_var, NEW.the_geom);
+		INSERT INTO polygon (pol_id, sys_type, the_geom) VALUES (NEW.pol_id, v_sys_type, NEW.the_geom);
 		
 		
 		-- Update man table
-		IF man_table='man_netgully_pol' THEN
+		IF v_man_table='man_netgully_pol' THEN
 			UPDATE man_netgully SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 	
-		ELSIF man_table='man_storage_pol' THEN
+		ELSIF v_man_table='man_storage_pol' THEN
 			UPDATE man_storage SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 		
-		ELSIF man_table='man_chamber_pol' THEN
+		ELSIF v_man_table='man_chamber_pol' THEN
 			UPDATE man_chamber SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 		
-		ELSIF man_table='man_wwtp_pol' THEN
+		ELSIF v_man_table='man_wwtp_pol' THEN
 			UPDATE man_wwtp SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 		
 		END IF;
@@ -94,30 +94,30 @@ BEGIN
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom WHERE pol_id=OLD.pol_id;
 		
 		IF (NEW.node_id != OLD.node_id) THEN
-			IF man_table ='man_netgully_pol' THEN
+			IF v_man_table ='man_netgully_pol' THEN
 				IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN audit_function(2062,2418);
+					RETURN gw_fct_audit_function(2062,2418, NULL);
 				END  IF;
 				UPDATE man_netgully SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_netgully SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
-			ELSIF man_table ='man_storage_pol' THEN
+			ELSIF v_man_table ='man_storage_pol' THEN
 				IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN audit_function(2064,2418);
+					RETURN gw_fct_audit_function(2064,2418, NULL);
 				END  IF;
 				UPDATE man_storage SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_storage SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
-			ELSIF man_table ='man_chamber_pol' THEN
+			ELSIF v_man_table ='man_chamber_pol' THEN
 				IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN audit_function(2066,2418);
+					RETURN gw_fct_audit_function(2066,2418, NULL);
 				END  IF;
 				UPDATE man_chamber SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_chamber SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
-			ELSIF man_table ='man_wwtp_pol' THEN
+			ELSIF v_man_table ='man_wwtp_pol' THEN
 				IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN audit_function(2068,2418);
+					RETURN gw_fct_audit_function(2068,2418, NULL);
 				END  IF;
 				UPDATE man_wwtp SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_wwtp SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;	
@@ -131,16 +131,16 @@ BEGIN
 	-- DELETE
     ELSIF TG_OP = 'DELETE' THEN
 	
-		IF man_table ='man_netgully_pol' THEN
+		IF v_man_table ='man_netgully_pol' THEN
 			UPDATE man_netgully SET pol_id=NULL WHERE node_id=OLD.node_id;
 					
-		ELSIF man_table ='man_storage_pol' THEN
+		ELSIF v_man_table ='man_storage_pol' THEN
 			UPDATE man_storage SET pol_id=NULL WHERE node_id=OLD.node_id;
 
-		ELSIF man_table ='man_chamber_pol' THEN
+		ELSIF v_man_table ='man_chamber_pol' THEN
 			UPDATE man_chamber SET pol_id=NULL WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table ='man_wwtp_pol' THEN
+		ELSIF v_man_table ='man_wwtp_pol' THEN
 			UPDATE man_wwtp SET pol_id=NULL WHERE node_id=OLD.node_id;
 						
 		END IF;

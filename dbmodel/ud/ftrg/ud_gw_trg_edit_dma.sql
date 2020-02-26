@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dma()  RETURNS trigger AS
 $BODY$
 
 DECLARE 
-	expl_id_int integer;
+	v_expl_id_int integer;
 
 BEGIN
 
@@ -35,8 +35,8 @@ BEGIN
             --PERFORM audit_function(1012,1112);
 			RETURN NULL;				
             END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
+            v_expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (v_expl_id_int IS NULL) THEN
                 --PERFORM audit_function(1014,1112);
 				RETURN NULL; 
             END IF;
@@ -53,7 +53,7 @@ BEGIN
 		*/
 			
 		INSERT INTO dma (dma_id, name, descript,  the_geom, undelete,  expl_id, pattern_id, link, minc, maxc, effc)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int, NEW.pattern_id, NEW.link, NEW.minc, NEW.maxc, NEW.effc);
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, v_expl_id_int, NEW.pattern_id, NEW.link, NEW.minc, NEW.maxc, NEW.effc);
 
 		RETURN NEW;
 		

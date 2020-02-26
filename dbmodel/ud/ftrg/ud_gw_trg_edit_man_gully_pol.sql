@@ -12,13 +12,13 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_gully_pol() RETURNS tri
 $BODY$
 
 DECLARE 
-    man_table varchar;
+    v_man_table varchar;
 
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	man_table:= TG_ARGV[0];
+	v_man_table:= TG_ARGV[0];
 		
 	
 	-- INSERT
@@ -34,7 +34,7 @@ BEGIN
 		IF (NEW.gully_id IS NULL) THEN
 			NEW.gully_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
 			IF (NEW.gully_id IS NULL) THEN
-				RETURN audit_function(2048,2416);
+				RETURN gw_fct_audit_function(2048,2416, NULL);
 			END IF;
 		END IF;
 			
@@ -54,7 +54,7 @@ BEGIN
 		
 		IF (NEW.gully_id != OLD.gully_id) THEN
 			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.gully_id) IS NULL THEN
-					RETURN audit_function(2050,2416);
+					RETURN gw_fct_audit_function(2050,2416, NULL);
 			END IF;
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;
 			UPDATE gully SET pol_id=NEW.pol_id WHERE gully_id=NEW.gully_id;

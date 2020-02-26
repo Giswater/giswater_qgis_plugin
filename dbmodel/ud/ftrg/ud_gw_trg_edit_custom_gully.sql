@@ -7,10 +7,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_custom_gully()
 $BODY$
 DECLARE 
     v_sql varchar;
-	gully_geometry varchar;
-    gully_id_seq int8;
-	count_aux integer;
-	promixity_buffer_aux double precision;
+	v_gully_geometry varchar;
+	v_count integer;
+	v_promixity_buffer double precision;
 	v_customfeature text;
 	v_addfields record;
 	v_new_value_param text;
@@ -21,7 +20,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 	
 	v_customfeature:= TG_ARGV[0];
     
@@ -66,40 +65,40 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1216);  
+                RETURN gw_fct_audit_function(1008,1216, NULL);  
 			END IF;
-				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1216,NEW.gully_id);          
+                RETURN gw_fct_audit_function(1010,1216,NEW.gully_id);          
             END IF;            
         END IF;
         
 	-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1216);  
+                RETURN gw_fct_audit_function(1012,1216, NULL);  
             END IF;
-				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1216,NEW.gully_id);  
+                RETURN gw_fct_audit_function(1014,1216,NEW.gully_id);  
             END IF;            
         END IF;
 
@@ -153,7 +152,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1216,NEW.gully_id);
+					PERFORM gw_fct_audit_function(2012,1216,NEW.gully_id);
 				END IF;		
 			END IF;
 		END IF;	
@@ -164,7 +163,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM audit_function(2024,1216,NEW.gully_id);
+					PERFORM gw_fct_audit_function(2024,1216,NEW.gully_id);
 				END IF;	
 			END IF;
 		END IF;
@@ -185,7 +184,7 @@ BEGIN
 	    END IF;
 	
         -- FEATURE INSERT
-	IF gully_geometry = 'gully' THEN
+	IF v_gully_geometry = 'gully' THEN
         INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id,
 					"state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id,
 					builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
@@ -198,7 +197,7 @@ BEGIN
 					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,  NEW.uncertain, NEW.num_value);
 
 
-        ELSIF gully_geometry = 'gully_pol' THEN
+        ELSIF v_gully_geometry = 'gully_pol' THEN
         INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state",
 					state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, 
 					enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
@@ -258,7 +257,7 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					RETURN audit_function(2110,1318);
+					RETURN gw_fct_audit_function(2110,1318);
 					END IF;
 				END IF;
 			END IF;
@@ -277,7 +276,7 @@ BEGIN
 		END IF;
       
         -- UPDATE values
-		IF gully_geometry = 'gully' THEN
+		IF v_gully_geometry = 'gully' THEN
 			UPDATE gully 
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
 			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
@@ -289,7 +288,7 @@ BEGIN
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
 			WHERE gully_id = OLD.gully_id;
 
-        ELSIF gully_geometry = 'gully_pol' THEN
+        ELSIF v_gully_geometry = 'gully_pol' THEN
 			UPDATE gully 
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
 			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  
