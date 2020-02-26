@@ -281,7 +281,35 @@ class DaoController(object):
             return False
         
         return status
-    
+
+
+    def connect_to_database_service(self, service):
+        """ Connect to database trough selected service
+        This service must exist in file pg_service.conf """
+
+        # We need to create this connections for Table Views
+        self.db = QSqlDatabase.addDatabase("QPSQL")
+        self.db.setConnectOptions(f"service={service}")
+        status = self.db.open()
+        if not status:
+            message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
+            self.last_error = self.tr(message)
+            details = self.db.lastError().databaseText()
+            self.log_warning(str(details))
+            return False
+
+        # Connect to Database
+        self.dao = PgDao()
+        self.dao.set_service(service)
+        status = self.dao.init_db()
+        if not status:
+            message = "Database connection error (PgDao). Please open plugin log file to get more details"
+            self.last_error = self.tr(message)
+            self.log_warning(str(self.dao.last_error))
+            return False
+
+        return status
+
     
     def get_error_message(self, log_code_id):    
         """ Get error message from selected error code """
