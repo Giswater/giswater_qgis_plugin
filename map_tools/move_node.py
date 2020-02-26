@@ -50,11 +50,12 @@ class MoveNodeMapTool(ParentMapTool):
         if status:
             result = self.controller.get_json('gw_fct_arc_divide', f"'{node_id}'", log_sql=True)
             if not result: return
-            self.dlg_binfo = BasicInfo()
-            self.dlg_binfo.btn_accept.hide()
-            self.dlg_binfo.btn_close.clicked.connect(lambda: self.dlg_binfo.close())
-            self.add_layer.add_temp_layer(self.dlg_binfo, result['body']['data'], "TEST", True, True, 1, True)
-            self.dlg_binfo.exec()
+            if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
+                self.dlg_binfo = BasicInfo()
+                self.dlg_binfo.btn_accept.hide()
+                self.dlg_binfo.btn_close.clicked.connect(lambda: self.dlg_binfo.close())
+                text_result = self.populate_info_text(self.dlg_binfo, result['body']['data'], False, True, 1)
+                self.dlg_binfo.exec()
 
         else:
             message = "Move node: Error updating geometry"
