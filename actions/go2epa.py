@@ -666,13 +666,13 @@ class Go2Epa(ApiParent):
             if export_inp is True:
                 if complet_result['status'] == "Accepted":
                     self.add_layer.add_temp_layer(self.dlg_go2epa, complet_result['body']['data'], 'INP results', True, True, 1, False)
-                message = complet_result['message']['text']
-                
+
                 # Get values from complet_result['body']['file'] and insert into INP file
                 if 'file' not in complet_result['body']:
                     self.show_widgets(False)
                     return
                 self.insert_into_inp(self.file_inp, complet_result['body']['file'])
+                message = complet_result['message']['text']
                 common_msg += "Export INP finished. "
 
             # Execute epa
