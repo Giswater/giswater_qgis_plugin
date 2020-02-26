@@ -69,7 +69,7 @@ BEGIN
 				IF node_rec.node_id IS NOT NULL THEN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
-						PERFORM audit_function (1097,1334, NEW.node_id);	
+						PERFORM gw_fct_audit_function (1097,1334, NEW.node_id);	
 					ELSE
 						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node with state 1 over another node with state=1 it is not allowed');
 					END IF;
@@ -85,7 +85,7 @@ BEGIN
 				IF node_rec.node_id IS NOT NULL THEN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
-						PERFORM audit_function (1096,1334, NEW.node_id);	
+						PERFORM gw_fct_audit_function (1096,1334, NEW.node_id);	
 					ELSE
 						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, 
 						NEW.node_id, 'Node with state 2 over another node with state=2 on same alternative it is not allowed');
