@@ -51,7 +51,7 @@ BEGIN
 		END IF;
 		--if there is a value - error message, if not create a trigger for the defined typevalue 
 		IF v_count > 0 THEN
-			PERFORM audit_function(3032,2750);
+			PERFORM gw_fct_audit_function(3032,2750,NULL);
 		ELSE 
 			PERFORM SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk', NEW.target_table);
 		END IF;
@@ -63,7 +63,7 @@ BEGIN
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue_cat) THEN
 			IF NEW.typevalue != OLD.typevalue OR NEW.id != OLD.id THEN
 
-					PERFORM audit_function(3028,2750,OLD.typevalue);
+					PERFORM gw_fct_audit_function(3028,2750,OLD.typevalue);
 			END IF;
 		ELSE
 			v_query =  'SELECT *  FROM typevalue_fk JOIN '||v_table||' ON '||v_table||'.typevalue = typevalue_name 
@@ -93,7 +93,7 @@ BEGIN
 		--if typevalue is a system typevalue - error, cant delete the value, else proceed with the delete process
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue_cat) THEN
 			
-			PERFORM audit_function(3028,2750,OLD.typevalue);
+			PERFORM gw_fct_audit_function(3028,2750,OLD.typevalue);
 		ELSE 
 			--select configuration from the typevalue_fk table
 			v_query = 'SELECT * FROM typevalue_fk WHERE typevalue_table = '''||v_table||''' AND typevalue_name = '''||OLD.typevalue||''';';
@@ -108,7 +108,7 @@ BEGIN
 
 				IF v_count > 0 THEN
 
-					PERFORM audit_function(3030,2750,rec.typevalue_name);
+					PERFORM gw_fct_audit_function(3030,2750,rec.typevalue_name);
 				END IF;
 				--check if the value is the last one defined for the typevalue, if so delete the configuration from typevalue_fk
 				EXECUTE 'SELECT count(typevalue) FROM '||v_typevalue_fk.typevalue_table||' WHERE typevalue = '''||v_typevalue_fk.typevalue_name||''''

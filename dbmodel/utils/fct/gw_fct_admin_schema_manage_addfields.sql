@@ -477,7 +477,7 @@ ELSE
 
 	--check if field order will overlap the existing field	
 	IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
-		PERFORM audit_function(3016,2690);
+		PERFORM gw_fct_audit_function(3016,2690, NULL);
 	END IF;
 
 	-- get view definition

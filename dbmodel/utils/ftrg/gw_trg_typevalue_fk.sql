@@ -53,7 +53,7 @@ BEGIN
 				IF  v_new_field = ANY(v_list) OR v_new_field IS NULL  THEN
 					CONTINUE;
 				ELSE 
-					PERFORM audit_function(3022,2744,concat(rec.typevalue_table,', ',rec.target_field));
+					PERFORM gw_fct_audit_function(3022,2744,concat(rec.typevalue_table,', ',rec.target_field));
 
 				END IF;
 				

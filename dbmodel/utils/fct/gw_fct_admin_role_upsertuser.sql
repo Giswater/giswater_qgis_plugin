@@ -99,7 +99,7 @@ BEGIN
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' created in a database'));
 	
 		ELSE
-			RETURN audit_function(3040,2780);
+			RETURN gw_fct_audit_function(3040,2780, NULL);
 		END IF;
 
 		EXECUTE 'GRANT '||v_role||' TO '||v_user_id||';';

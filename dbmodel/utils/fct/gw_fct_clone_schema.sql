@@ -181,7 +181,6 @@ BEGIN
         
         EXECUTE 'SELECT setval('''||v_dest_schema||'.urn_id_seq'', gw_fct_setvalurn(),true);';
 
-        PERFORM audit_function(0,2122);
 
 
     v_result_info := COALESCE(v_result, '{}'); 

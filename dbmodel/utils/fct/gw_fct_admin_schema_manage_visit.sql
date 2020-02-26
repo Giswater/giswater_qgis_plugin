@@ -373,7 +373,7 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 			END IF;
 
 		ELSE
-			 PERFORM audit_function(3024,2746);
+			 PERFORM gw_fct_audit_function(3024,2746, NULL);
 		END IF;
 
 ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
@@ -394,7 +394,7 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 		ELSE
 			UPDATE om_visit_class SET active = FALSE WHERE id = v_class_id;
 			
-			PERFORM audit_function(3026,2746);
+			PERFORM gw_fct_audit_function(3026,2746, NULL);
 		END IF;
 
 		EXECUTE 'DROP VIEW IF EXISTS '||v_viewname||';';
