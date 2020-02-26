@@ -327,7 +327,7 @@ class AddNewLot(ParentManage):
         self.max_id = self.get_max_id('v_edit_cat_team')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
-        self.dlg_basic_table.setWindowTitle("Team management")
+        self.dlg_basic_table.setWindowTitle("Administrador d'equips")
         table_name = 'v_edit_cat_team'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
@@ -2364,7 +2364,7 @@ class AddNewLot(ParentManage):
         self.max_id = self.get_max_id('v_ext_cat_vehicle')
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
-        self.dlg_basic_table.setWindowTitle("Vehicle management")
+        self.dlg_basic_table.setWindowTitle("Administrador de vehicles")
         table_name = 'v_ext_cat_vehicle'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
