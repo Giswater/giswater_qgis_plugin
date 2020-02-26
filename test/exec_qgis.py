@@ -108,6 +108,7 @@ class TestQgis():
         self.giswater.init_plugin(False)
 
         # Connect to a database providing a service_name set in .pg_service.conf
+        user = "gisadmin"
         service_name = 'localhost_giswater'
         status = self.giswater.controller.connect_to_database_service(service_name)
         self.giswater.controller.logged = status
@@ -118,7 +119,7 @@ class TestQgis():
 
         self.giswater.update_sql.init_sql(False, user)
         self.giswater.update_sql.init_dialog_create_project()
-        self.giswater.update_sql.create_project_data_schema('bb', 'bb_title', 'ws', '25831', 'EN', True)
+        self.giswater.update_sql.create_project_data_schema('test_ws', 'test_ws_title', 'ws', '25831', 'EN', True)
 
 
 def test_open_qgis():

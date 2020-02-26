@@ -1427,6 +1427,8 @@ class UpdateSQL(ApiParent):
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(0)
+        else:
+            self.rdb_sample.setChecked(True)
 
         # Initial checks
         if self.rdb_import_data.isChecked():
@@ -1501,12 +1503,12 @@ class UpdateSQL(ApiParent):
         elif self.rdb_sample.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
-            self.task1.setProgress(80)
+            if not is_test: self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-            self.task1.setProgress(80)
+            if not is_test: self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
 
