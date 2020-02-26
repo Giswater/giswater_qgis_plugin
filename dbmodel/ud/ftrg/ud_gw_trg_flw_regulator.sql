@@ -19,16 +19,16 @@ BEGIN
 	
 	-- check to_arc only to that arcs that have node_1 as the flowregulator node
 	IF NEW.to_arc IS NULL THEN
-		RETURN audit_function(2070,2420);
+		RETURN gw_fct_audit_function(2070,2420, NULL);
 	END IF;
 
 	-- flwreg_length
 	IF NEW.flwreg_length IS NULL THEN
-		RETURN audit_function(2074,2420);
+		RETURN gw_fct_audit_function(2074,2420, NULL);
 	END IF;
 	
 	IF (NEW.flwreg_length)>(SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
-		RAISE EXCEPTION 'Flow length is longer than length of exit arc feature. Please review your project!';
+		RETURN gw_fct_audit_function(3048,2420, NULL);
 	END IF;
 	
 	-- flowreg_id

@@ -8,23 +8,21 @@ This version of Giswater is provided by Giswater Association
    
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
-    arc_table varchar;
-    man_table varchar;
-    epa_type varchar;
+    v_arc_table varchar;
+    v_man_table varchar;
+    v_epa_type varchar;
     v_sql varchar;
-    old_arctype varchar;
-    new_arctype varchar;  
-
+    v_old_arctype varchar;
+    v_new_arctype varchar;  
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    arc_table:= TG_ARGV[0];
-    epa_type:= TG_ARGV[1];
+    v_arc_table:= TG_ARGV[0];
+    v_epa_type:= TG_ARGV[1];
     
     IF TG_OP = 'INSERT' THEN
-        RETURN audit_function(1026,1208); 
- 
+ 		RETURN gw_fct_audit_function(1026,1208, NULL);
 
     ELSIF TG_OP = 'UPDATE' THEN
 	
@@ -39,7 +37,7 @@ BEGIN
 		END IF;
 		
 	
-		IF (epa_type != 'VIRTUAL') THEN 
+		IF (v_epa_type != 'VIRTUAL') THEN 
 			-- depth fields
 			IF (NEW.y1 <> OLD.y1) OR (NEW.y2 <> OLD.y2) THEN
 				UPDATE arc SET y1=NEW.y1, y2=NEW.y2 WHERE arc_id=NEW.arc_id;
@@ -58,32 +56,32 @@ BEGIN
 			WHERE arc_id = OLD.arc_id;
 		END IF;
 
-        IF (epa_type = 'CONDUIT') THEN 
+        IF (v_epa_type = 'CONDUIT') THEN 
             UPDATE inp_conduit 
 			SET barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax, seepage=NEW.seepage, custom_n=NEW.custom_n 
 			WHERE arc_id=OLD.arc_id;
 			
-        ELSIF (epa_type = 'PUMP') THEN 
+        ELSIF (v_epa_type = 'PUMP') THEN 
             UPDATE inp_pump 
 			SET curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff 
 			WHERE arc_id=OLD.arc_id;
 			
-        ELSIF (epa_type = 'ORIFICE') THEN 
+        ELSIF (v_epa_type = 'ORIFICE') THEN 
             UPDATE inp_orifice 
 			SET ori_type=NEW.ori_type,"offset"=NEW."offset",cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 
 			WHERE arc_id=OLD.arc_id;
 			
-        ELSIF (epa_type = 'WEIR') THEN 
+        ELSIF (v_epa_type = 'WEIR') THEN 
             UPDATE inp_weir 
 			SET weir_type=NEW.weir_type,"offset"=NEW."offset",cd=NEW.cd,ec=NEW.ec,cd2=NEW.cd2,flap=NEW.flap,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4,surcharge=NEW.surcharge 
 			WHERE arc_id=OLD.arc_id;
 			
-        ELSIF (epa_type = 'OUTLET') THEN 
+        ELSIF (v_epa_type = 'OUTLET') THEN 
             UPDATE inp_outlet 
 			SET  outlet_type=NEW.outlet_type, "offset"=NEW."offset", curve_id=NEW.curve_id, cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap 
 			WHERE arc_id=OLD.arc_id;
 			
-      	ELSIF (epa_type = 'VIRTUAL') THEN 
+      	ELSIF (v_epa_type = 'VIRTUAL') THEN 
 		
 			IF NEW.add_length IS NULL THEN
 				NEW.add_length = FALSE;
@@ -91,7 +89,7 @@ BEGIN
 			
 			IF NEW.fusion_node IS NULL THEN
 				NEW.fusion_node = (SELECT node_id FROM v_edit_node, v_edit_arc WHERE arc_id=OLD.arc_id 
-				AND (node_id=NEW.node_1 OR node_id=NEW.node_2) AND epa_type='JUNCTION');
+				AND (node_id=NEW.node_1 OR node_id=NEW.node_2) AND v_epa_type='JUNCTION');
 			END IF;
 		
             UPDATE inp_virtual 
@@ -103,8 +101,8 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
-        RETURN audit_function(1028,1208); 
-    
+    	RETURN gw_fct_audit_function(1028,1208, NULL);
+
     END IF;
     
 END;

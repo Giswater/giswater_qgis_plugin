@@ -9,17 +9,17 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc()  RETURNS trigger AS $BODY$
 DECLARE 
-    arc_table varchar;
-    man_table varchar;
+    v_arc_table varchar;
+    v_man_table varchar;
     v_sql varchar;    
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    arc_table:= TG_ARGV[0];
+    v_arc_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
-        PERFORM audit_function(1026,1306);
+        PERFORM gw_fct_audit_function(1026,1306,NULL);
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -40,18 +40,18 @@ BEGIN
             custom_length=NEW.custom_length
         WHERE arc_id = OLD.arc_id;
 
-        IF arc_table = 'inp_pipe' THEN   
+        IF v_arc_table = 'inp_pipe' THEN   
             UPDATE inp_pipe SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness, custom_dint=NEW.custom_dint WHERE arc_id=OLD.arc_id;
-        ELSIF arc_table = 'inp_virtualvalve' THEN   
+        ELSIF v_arc_table = 'inp_virtualvalve' THEN   
             UPDATE inp_virtualvalve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
             minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE arc_id=OLD.arc_id;
         END IF;
 
-        PERFORM audit_function(2,1306); 
+        PERFORM gw_fct_audit_function(2,1306,NULL); 
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        PERFORM audit_function(1028,1306); 
+        PERFORM gw_fct_audit_function(1028,1306,NULL); 
         RETURN NEW;
     
     END IF;

@@ -16,7 +16,7 @@ BEGIN
        
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        PERFORM audit_function(1030,1310); 
+        PERFORM gw_fct_audit_function(1030,1310, NULL); 
         RETURN NEW;
 		
 
@@ -43,7 +43,7 @@ BEGIN
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        PERFORM audit_function(1032,1310); 
+        PERFORM gw_fct_audit_function(1032,1310, NULL); 
         RETURN NEW;
     
     END IF;
