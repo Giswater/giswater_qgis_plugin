@@ -1229,10 +1229,20 @@ class AddNewLot(ParentManage):
             keys = "lot_id, "
             values = "$$"+str(lot_id)+"$$, "
             for key, value in list(item.items()):
-                if key in (lot['feature_type'] + '_id', 'code', 'status', 'observ', 'validate'):
-                    if value not in ('', None):
-                        keys += key + ", "
-                        values += "$$"+str(value)+"$$, "
+                valid = False
+                # if key in (lot['feature_type'] + '_id', 'code', 'status', 'observ', 'validate'):
+                # if str(key) in ('Id embornal', 'Codi', 'Estat', 'observ', 'validate'):
+                if str(key) == 'Id embornal':
+                    key = lot['feature_type'] + '_id'
+                    valid = True
+                elif str(key) == 'Codi':
+                    key = 'code'
+                    valid = True
+                elif str(key) in ('status', 'observ', 'validate'):
+                    valid = True
+                if value not in ('', None) and valid:
+                    keys += key + ", "
+                    values += "$$"+str(value)+"$$, "
             keys = keys[:-2]
             values = values[:-2]
             sql += ("INSERT INTO om_visit_lot_x_"+str(lot['feature_type'])+"("+str(keys)+") "
