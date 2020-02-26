@@ -85,3 +85,15 @@ ismandatory, widgetcontrols, vdefault, layoutname, reg_exp, iseditable, dv_order
 VALUES ('qgis_form_log_hidden', 'config', 'Hide log form after executing a process', 'role_edit', NULL, NULL, 'Hide log form', NULL, NULL, true, 8, 9, 
 'utils', false, NULL, NULL, NULL, false, 'boolean', 'check', true, NULL, 'false', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3050,'It is not possible to relate connects with state=1 to arcs with state=2', 'Please check your map', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3052,'Connect2network tool is not enabled for connec''s with state=2. Connec_id:', 
+'For planned connec''s you must create the link manually (one link for each alternative and one connec) by using the psector form and relate the connec using the arc_id field. After that you will be able to customize the link''s geometry.', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3054,'Connect2network tool is not enabled for gullies with state=2. Gully_id:', 
+'For planned gullies you must create the link manually (one link for each alternative and one gully) by using the psector form and relate the gully using the arc_id field. After that you will be able to customize the link''s geometry.', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+

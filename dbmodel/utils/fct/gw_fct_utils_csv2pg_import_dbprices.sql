@@ -40,6 +40,12 @@ BEGIN
 	-- get system parameters
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
+    --set current process as users parameter
+    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+
+    INSERT INTO config_param_user (value, parameter, cur_user)
+    VALUES (txid_current(),'cur_trans',current_user );
+    
    	v_label = ((p_data ->>'data')::json->>'importParam')::text;
    	
 	-- manage log (fprocesscat = 42)
