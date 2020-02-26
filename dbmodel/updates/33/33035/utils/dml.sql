@@ -62,3 +62,19 @@ INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity
     
 INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,isdeprecated)
 VALUES ('ext_district', 'table to external', 'Catalog of districts', 'role_edit', 0, 0, false) ON CONFLICT (id) DO NOTHING;
+
+
+--2020/02/25
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3042,'Arc with state 2 cant be divided by node with state 1.', 'To divide an arc, the state of the node has to be the same', 2,true,NULL, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3044,'Can''t detect any arc to divide.', null, 2,true,NULL, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3046,'Selected node type doesn''t divide arc. Node type: ', null, 2,true,NULL, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3048,'Flow length is longer than length of exit arc feature', 'Please review your project!', 2,true,'ud', false) ON CONFLICT (id) DO NOTHING;
+
+
