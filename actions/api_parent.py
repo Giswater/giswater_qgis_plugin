@@ -19,13 +19,11 @@ from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoub
 from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QFileDialog
 from qgis.PyQt.QtSql import QSqlTableModel
 
-import json
 import os
 import re
 import subprocess
 import sys
 import webbrowser
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -43,13 +41,6 @@ class ApiParent(ParentAction):
         self.dlg_is_destroyed = None
         self.tabs_removed = 0
         self.tab_type = None
-
-        self.rubber_point = QgsRubberBand(self.canvas, 0)
-        self.rubber_point.setColor(Qt.yellow)
-        self.rubber_point.setIconSize(10)
-        self.rubber_polygon = QgsRubberBand(self.canvas, 2)
-        self.rubber_polygon.setColor(Qt.darkRed)
-        self.rubber_polygon.setIconSize(20)
         self.list_update = []
         self.temp_layers_added = []
 
@@ -967,23 +958,6 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def get_points(self, list_coord=None):
-        """ Return list of QgsPoints taken from geometry
-        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
-        """
-
-        coords = list_coord.group(1)
-        polygon = coords.split(',')
-        points = []
-
-        for i in range(0, len(polygon)):
-            x, y = polygon[i].split(' ')
-            point = QgsPointXY(float(x), float(y))
-            points.append(point)
-
-        return points
-
-
     def draw(self, complet_result, zoom=True, reset_rb=True):
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
@@ -1022,23 +996,7 @@ class ApiParent(ParentAction):
             QTimer.singleShot(duration_time, self.resetRubberbands)
         return rb
 
-    def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
-        """ Draw 'line' over canvas following list of points
-         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-         """
 
-        rb = self.rubber_polygon
-        polyline = QgsGeometry.fromPolylineXY(points)
-        rb.setToGeometry(polyline, None)
-        rb.setColor(color)
-        rb.setWidth(width)
-        rb.show()
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
-
-        return rb
 
 
     def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
@@ -1062,10 +1020,7 @@ class ApiParent(ParentAction):
         return rb
 
 
-    def resetRubberbands(self):
-    
-        self.rubber_point.reset(0)
-        self.rubber_polygon.reset(2)
+
 
             
     def fill_table(self, widget, table_name, filter_=None):

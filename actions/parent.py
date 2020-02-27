@@ -5,10 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsVectorLayerExporter, QgsDataSourceUri, QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsProject, QgsRectangle, QgsVectorLayer
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QVariant
+from qgis.core import QgsVectorLayerExporter, QgsDataSourceUri, QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsVectorLayer
+from qgis.gui import QgsRubberBand
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer, QVariant
 from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget, QSpacerItem, QLabel, QComboBox, QCheckBox, QSizePolicy, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget, QGridLayout
-from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
+from qgis.PyQt.QtGui import QIcon, QColor, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 import configparser, json, os, re, subprocess, sys, webbrowser
@@ -39,6 +40,12 @@ class ParentAction(object):
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
         self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
+        self.rubber_point = QgsRubberBand(self.canvas, 0)
+        self.rubber_point.setColor(Qt.yellow)
+        self.rubber_point.setIconSize(10)
+        self.rubber_polygon = QgsRubberBand(self.canvas, 2)
+        self.rubber_polygon.setColor(Qt.darkRed)
+        self.rubber_polygon.setIconSize(20)
     
     def set_controller(self, controller):
         """ Set controller class """
@@ -1075,3 +1082,43 @@ class ParentAction(object):
     def show_action_name(self, action):
         self.controller.log_info(str(action.objectName()))
 
+
+    def get_points(self, list_coord=None):
+        """ Return list of QgsPoints taken from geometry
+        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+        """
+
+        coords = list_coord.group(1)
+        polygon = coords.split(',')
+        points = []
+
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
+            point = QgsPointXY(float(x), float(y))
+            points.append(point)
+
+        return points
+
+
+    def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+        """ Draw 'line' over canvas following list of points
+         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+         """
+
+        rb = self.rubber_polygon
+        polyline = QgsGeometry.fromPolylineXY(points)
+        rb.setToGeometry(polyline, None)
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.show()
+
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+
+        return rb
+
+    def resetRubberbands(self):
+
+        self.rubber_point.reset(0)
+        self.rubber_polygon.reset(2)
