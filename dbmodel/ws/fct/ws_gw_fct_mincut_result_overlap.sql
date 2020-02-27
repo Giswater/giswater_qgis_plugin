@@ -88,7 +88,8 @@ BEGIN
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat('MINCUT ANALYSIS'));
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat('--------------------------------------'));
-    
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat('Minimun cut have been checked looking for overlaps againts other mincuts'));
+
 	SELECT * INTO v_mincutrec FROM anl_mincut_result_cat WHERE id = v_mincutid;
 
 	IF v_step  = 'check' THEN
@@ -154,11 +155,11 @@ BEGIN
 					-- Storing information about possible conflict
 					IF v_conflictmsg IS NULL THEN
 						v_conflictarray = array_append(v_conflictarray::integer[], v_rec.id::integer);
-						v_conflictmsg:=concat('<br>Mincut id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ', 
+						v_conflictmsg:=concat('Mincut id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ', 
 						(v_rec.output->>'connecs')::json->>'number', ' affected connecs.');
 					ELSE
 						v_conflictarray = array_append(v_conflictarray, v_rec.id);
-						v_conflictmsg:=concat(v_conflictmsg,' <br>Mincut id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ',
+						v_conflictmsg:=concat(v_conflictmsg,' Mincut id-', v_rec.id, ' at ',left(v_rec.forecast_start::time::text, 5),'H-',left(v_rec.forecast_end::time::text, 5),'H with ',
 						(v_rec.output->>'connecs')::json->>'number', ' affected connecs.');
 					END IF;
 					
@@ -219,7 +220,8 @@ BEGIN
 												
 					-- point: connecs affected
 					INSERT INTO anl_connec (fprocesscat_id, connec_id, descript, the_geom)
-					SELECT 116, connec_id, 'Affected connecs', the_geom FROM anl_connec WHERE fprocesscat_id = 31 AND result_id::integer = -2 AND cur_user = current_user;		
+					SELECT 116, connec_id, concat('Additional affected connecs for mincut ',v_mincutid, ' when has conflict againts other mincuts'), 
+					the_geom FROM anl_connec WHERE fprocesscat_id = 31 AND result_id::integer = -2 AND cur_user = current_user;		
 					
 				ELSE -- there is a overlap (temporal & spatial intersection) with additional network but without connecs affected
 
@@ -237,11 +239,14 @@ BEGIN
 				
 				-- line: the opposite mincuts 
 				INSERT INTO anl_arc (fprocesscat_id, arc_id, descript, the_geom)
-				SELECT 116, arc_id, descript, the_geom FROM anl_arc WHERE fprocesscat_id = 31 AND cur_user=current_user AND result_id NOT IN (v_mincutid::text, '-2');
+				SELECT 116, arc_id, concat('Arcs from other mincut(s) with conflict for current mincut ',v_mincutid), 
+				the_geom FROM anl_arc WHERE fprocesscat_id = 31 AND cur_user=current_user AND result_id NOT IN (v_mincutid::text, '-2');
 
 				-- polygon: buffer over affected pipes
 				INSERT INTO anl_polygon (fprocesscat_id, pol_id, descript, the_geom)
-				SELECT 116, v_mincutid,  'Network area affected', st_multi(st_buffer(st_collect(the_geom),5)) FROM anl_arc WHERE result_id::integer = -2 AND fprocesscat_id = 31 AND cur_user = current_user;		
+				SELECT 116, v_mincutid,  concat('Additional network area affected for current mincut ',v_mincutid,' when when has conflict againts other mincuts.'), 
+				st_multi(st_buffer(st_collect(the_geom),5)) FROM anl_arc WHERE result_id = '-2' AND fprocesscat_id = 31 AND cur_user = current_user;	
+
 
 			ELSE  -- when the number of affected arcs is the same, may exists a real overlap (intersect one againts other) without additional network affectations
 
@@ -356,7 +361,7 @@ BEGIN
 		FROM (SELECT pol_id, descript, the_geom
 		FROM  anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=116) row) features;
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmlpolygonpath,'", "features":',v_result, '}'); 
+		v_result_pol = concat ('{"geometryType":"MultiPolygon", "qmlPath":"',v_qmlpolygonpath,'", "features":',v_result, '}'); 
 
 		-- geometry (the boundary of mincut using arcs and valves)
 		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||v_mincutid||
