@@ -3358,7 +3358,7 @@ class UpdateSQL(ApiParent):
 
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
-            partial(self.set_credentials, self.dlg_credentials, new_connecton=True))
+            partial(self.set_credentials, self.dlg_credentials, new_connection=True))
         self.dlg_credentials.open()
 
 
