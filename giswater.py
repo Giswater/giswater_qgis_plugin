@@ -1118,7 +1118,7 @@ class Giswater(QObject):
         sql = ""
         for layer in layers:
             if layer is None: continue
-            if layer.providerType() in ('memory', 'ogr'): continue
+            if layer.providerType() != 'postgres': continue
             layer_source = self.controller.get_layer_source(layer)
             if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
