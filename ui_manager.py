@@ -397,30 +397,11 @@ class ManageVisitParam(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(GwMainWindow, FORM_CLASS):
-    dlg_rejected = QtCore.pyqtSignal()
-    
+
     def __init__(self):
         self.closeMainWin = False
         self.mincutCanceled = True
         super().__init__()
-
-    def closeEvent(self, event):
-        """ Overwrite closeEvent method """
-        # If client don't touch nothing just rejected dialog or press cancel
-        if not self.closeMainWin and self.mincutCanceled:
-            event.accept()
-            self.dlg_rejected.emit()
-            return super(Mincut, self).closeEvent(event)
-        
-        if self.closeMainWin:
-            event.accept()
-            if self.mincutCanceled:
-                self.dlg_rejected.emit()
-                return super(Mincut, self).closeEvent(event)
-        else:
-            event.accept()
-            # QMessageBox.information(self, "", "Press cancel to exit")
-            # event.ignore()
 
 
 FORM_CLASS = get_ui_class('mincut_add_connec.ui')

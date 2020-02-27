@@ -15,9 +15,8 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
-import json
-import os
-import operator
+import json, operator, os, re
+
 from datetime import datetime
 from collections import OrderedDict
 from functools import partial
@@ -103,6 +102,7 @@ class MincutParent(ParentAction):
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")                
 
         # Control current layer (due to QGIS bug in snapping system)
+        self.user_current_layer = self.iface.activeLayer()
         if self.canvas.currentLayer() is None:
             self.iface.setActiveLayer(self.layer_arc)
 
@@ -123,7 +123,7 @@ class MincutParent(ParentAction):
         # Set signals
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)        
         self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
-        self.dlg_mincut.dlg_rejected.connect(self.mincut_close)
+        self.dlg_mincut.dlg_closed.connect(self.mincut_close)
         self.dlg_mincut.btn_start.clicked.connect(self.real_start)
         self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
@@ -216,6 +216,7 @@ class MincutParent(ParentAction):
 
         self.open_dialog(self.dlg_mincut)
 
+
     def check_dates_coherence(self, date_from, date_to, time_from, time_to):
         """
         Chek if date_to.date() is >= than date_from.date()
@@ -231,7 +232,6 @@ class MincutParent(ParentAction):
         if d_from > d_to:
             date_to.setDate(date_from.date())
             time_to.setTime(time_from.time())
-
 
 
     def show_notified_list(self):
@@ -289,6 +289,10 @@ class MincutParent(ParentAction):
 
 
     def mincut_close(self):
+
+        self.restore_user_layer()
+        self.remove_selection()
+        self.resetRubberbands()
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
             self.close_dialog(self.dlg_mincut)
@@ -324,12 +328,20 @@ class MincutParent(ParentAction):
         """ Select 'Pan' as current map tool and disconnect snapping """
 
         try:
-            self.canvas.xyCoordinates.disconnect()             
+            self.canvas.xyCoordinates.disconnect()
+        except TypeError as e:
+            print(f"{type(e).__name__} --> {e}")
+
+        try:
             self.emit_point.canvasClicked.disconnect()
-            if action_pan:
-                self.iface.actionPan().trigger()     
+        except TypeError as e:
+            print(f"{type(e).__name__} --> {e}")
+
+        if action_pan:
+            self.iface.actionPan().trigger()
+        try:
             self.vertex_marker.hide()
-        except Exception as e:
+        except AttributeError as e:
             print(f"{type(e).__name__} --> {e}")
 
 
@@ -562,55 +574,116 @@ class MincutParent(ParentAction):
         
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
-
         sql = (f"SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
-        if row:
-            if str(row[0]) == '0' and str(row[1]) == '1':
-                cur_user = self.controller.get_project_user()
-                result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-                sql = f"SELECT gw_fct_mincut_result_overlap('{result_mincut_id_text}', '{cur_user}');"
-                row = self.controller.get_row(sql, commit=True, log_sql=True)
-                if row and row[0]:
-                    self.dlg_binfo = BasicInfo()
-                    self.dlg_binfo.setWindowTitle('Mincut conflict')
-                    msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]})<br>"
-                           f"on same macroexploitation and has conflicts at least with one. <br>"
-                           f"<b>It's not possible to continue. You can try to modify start-end values .</b><br>"
-                           f"For more information take a look on v_anl_arc or query: <br>")
-                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
-                    text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
-                            f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
-                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, text)
-                    self.open_dialog(self.dlg_binfo)
-                    self.dlg_binfo.btn_accept.hide()
-                    self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
-                    self.dlg_binfo.btn_close.clicked.connect(self.cancel_overlap)
-                    sql = ("SELECT * FROM selector_audit"
-                           " WHERE fprocesscat_id='31' AND cur_user=current_user")
-                    row = self.controller.get_row(sql, log_sql=False)
-                    if not row:
-                        sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
-                               " VALUES('31', current_user)")
-                        self.controller.execute_sql(sql, log_sql=False)
-                else:
-                    self.accept_overlap()
-            else:
-                self.accept_overlap()
-        else:
-            self.accept_overlap()
+        if not row or (str(row[0]) != '0' or str(row[1]) != '1'):
+            self.dlg_mincut.closeMainWin = False
+            self.dlg_mincut.mincutCanceled = True
+            self.dlg_mincut.close()
+            self.remove_selection()
+            return
 
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
+        extras = f'"step":"check", '  # check
+        extras += f'"result":"{result_mincut_id_text}"'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        if not result: return
+        if result['body']['actions']['overlap'] == 'Conflict':
+            self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut overlap', False)
+            self.dlg_binfo = BasicInfo()
+            self.load_settings(self.dlg_binfo)
+            self.dlg_binfo.btn_close.setText('Cancel')
+            self.dlg_binfo.setWindowTitle('Mincut conflict')
+            self.dlg_binfo.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
+            self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+            self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+            self.add_layer.populate_info_text(self.dlg_binfo, result['body']['data'], False)
+            self.open_dialog(self.dlg_binfo)
+
+        elif result['body']['actions']['overlap'] == 'Ok':
+            self.mincut_ok(result)
         self.iface.actionPan().trigger()
 
-    def accept_overlap(self):
-        self.dlg_mincut.closeMainWin = True
-        self.dlg_mincut.mincutCanceled = False
-        self.dlg_mincut.close()
-        self.remove_selection()
 
-    def cancel_overlap(self):
-        self.dlg_binfo.close()
+    def force_mincut_overlap(self):
+
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
+        extras = f'"step":"continue", '
+        extras += f'"result":"{result_mincut_id_text}"'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        self.mincut_ok(result)
+
+
+    def mincut_ok(self, result):
+        self.dlg_mincut.closeMainWin = False
+        self.dlg_mincut.mincutCanceled = True
+        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut result')
+        list_coord =  re.search('\(\((.*)\)\)', str(result['body']['data']['geometry']))
+        if list_coord:
+            points = self.get_points(list_coord)
+            self.draw_polyline(points)
+        self.dlg_mincut.btn_accept.hide()
+        self.dlg_mincut.btn_cancel.setText('Close')
+        self.dlg_mincut.btn_cancel.disconnect()
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_mincut))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.restore_user_layer))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.resetRubberbands))
+
+        # sql = (f"SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
+        #        f" WHERE id = '{result_mincut_id}'")
+        # row = self.controller.get_row(sql, log_sql=True)
+        # if row:
+        #     if str(row[0]) == '0' and str(row[1]) == '1':
+        #         # cur_user = self.controller.get_project_user()
+        #         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
+        #         # sql = f"SELECT gw_fct_mincut_result_overlap('{result_mincut_id_text}', '{cur_user}');"
+        #         # row = self.controller.get_row(sql, commit=True, log_sql=True)
+        #         extras = f'"step":"check", ' # check
+        #         extras += f'"result":"{result_mincut_id_text}"'
+        #         body = self.create_body(extras=extras)
+        #         result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        #         if not result: return
+        #         if result['body']['actions']['overlap']=='Conflict':
+        #             self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut overlap')
+        #             # self.dlg_binfo = BasicInfo()
+        #             # self.dlg_binfo.setWindowTitle('Mincut conflict')
+        #             # msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]})<br>"
+        #             #        f"on same macroexploitation and has conflicts at least with one. <br>"
+        #             #        f"<b>It's not possible to continue. You can try to modify start-end values .</b><br>"
+        #             #        f"For more information take a look on v_anl_arc or query: <br>")
+        #             # utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_title, json.load(str(result)))
+        #             # utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, result)
+        #             # self.open_dialog(self.dlg_binfo)
+        #             # self.dlg_binfo.btn_accept.hide()
+        #             # self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+        #             # self.dlg_binfo.btn_close.clicked.connect(self.cancel_overlap)
+        #             # sql = ("SELECT * FROM selector_audit"
+        #             #        " WHERE fprocesscat_id='31' AND cur_user=current_user")
+        #             # row = self.controller.get_row(sql, log_sql=False)
+        #             # if not row:
+        #             #     sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
+        #             #            " VALUES('31', current_user)")
+        #             #     self.controller.execute_sql(sql, log_sql=False)
+        #         elif result['body']['actions']['overlap']=='Ok':
+        #             self.accept_overlap()
+        #     else:
+        #         self.accept_overlap()
+        # else:
+        #     self.accept_overlap()
+        #
+        # self.iface.actionPan().trigger()
+
+    # def accept_overlap(self):
+    #     self.dlg_mincut.closeMainWin = True
+    #     self.dlg_mincut.mincutCanceled = False
+    #     self.dlg_mincut.close()
+    #     self.remove_selection()
+
+
     def update_result_selector(self, result_mincut_id, commit=True):    
         """ Update table 'anl_mincut_result_selector' """    
             
@@ -1701,6 +1774,7 @@ class MincutParent(ParentAction):
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()
         self.canvas.refresh()
+
         for a in self.iface.attributesToolBar().actions():
             if a.objectName() == 'mActionDeselectAll':
                 a.trigger()
