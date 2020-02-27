@@ -18,3 +18,23 @@ CREATE OR REPLACE VIEW v_ui_doc_x_workcat AS
     doc.user_name
    FROM doc_x_workcat
    JOIN doc ON doc.id::text = doc_x_workcat.doc_id::text;
+   
+
+CREATE OR REPLACE VIEW v_anl_graf AS 
+ SELECT anl_graf.arc_id,
+    anl_graf.node_1,
+    anl_graf.node_2,
+    anl_graf.flag,
+    a.flag AS flagi,
+    a.value
+   FROM temp_anlgraf anl_graf
+     JOIN ( SELECT anl_graf_1.arc_id,
+            anl_graf_1.node_1,
+            anl_graf_1.node_2,
+            anl_graf_1.water,
+            anl_graf_1.flag,
+            anl_graf_1.checkf,
+            anl_graf_1.value
+           FROM temp_anlgraf anl_graf_1
+          WHERE anl_graf_1.water = 1) a ON anl_graf.node_1 = a.node_2
+  WHERE anl_graf.flag < 2 AND a.water = 0 AND a.flag < 2;
