@@ -14,7 +14,7 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_schema($${"client":{"lang":"ES"}, "data":{"action":"REPAIRVIEWS","source":"ws_sample", "target":"ws"}}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_schema($${"client":{"lang":"ES"}, "data":{"action":"REPAIRVIEWS","source":"SCHEMA_NAME", "target":"ws"}}$$);
 
 */
 

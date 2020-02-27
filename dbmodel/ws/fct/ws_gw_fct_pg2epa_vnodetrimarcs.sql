@@ -43,32 +43,21 @@ BEGIN
 			else (st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
 		FROM rpt_inp_arc , vnode
 		JOIN v_edit_link a ON vnode_id=exit_id::integer
-		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id=||quote_literal(result_id_var)||
+		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id = result_id_var
+		union
+		SELECT  vnode_id, arc_id, locate
+		FROM (
+			SELECT node_1 as vnode_id, arc_id,  0 as locate FROM rpt_inp_arc WHERE result_id = result_id_var AND arc_type != 'NODE2ARC'
+			)z
+		union
+		SELECT  vnode_id, arc_id, locate
+		FROM (
+			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM rpt_inp_arc WHERE result_id = result_id_var AND arc_type != 'NODE2ARC'
+			)z
 		) a
 	JOIN v_arc USING (arc_id)
 	ORDER BY arc_id, locate;
 
-	RAISE NOTICE 'inserting original arcs nodes-1';
-	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
-	SELECT  arc_id, vnode_id, locate,
-	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
-	(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3) as depth
-	FROM (
-		SELECT node_1 as vnode_id, arc_id,  0 as locate FROM rpt_inp_arc WHERE result_id=||quote_literal(result_id_var)|| AND arc_type != 'NODE2ARC'
-		) a
-	JOIN v_arc USING (arc_id)
-	ORDER BY arc_id, locate;
-
-	RAISE NOTICE 'inserting original arcs nodes-2';
-	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
-	SELECT  arc_id, vnode_id, locate,
-	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
-	(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3) as depth
-	FROM (
-		SELECT node_2 as vnode_id, arc_id,  1 as locate FROM rpt_inp_arc WHERE result_id=||quote_literal(result_id_var)|| AND arc_type != 'NODE2ARC'
-		) a
-	JOIN v_arc USING (arc_id)
-	ORDER BY arc_id, locate;
 
 	RAISE NOTICE 'new nodes on rpt_inp_node table ';
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, addparam)
@@ -120,16 +109,16 @@ BEGIN
 		rpt_inp_arc.minorloss,
 		gw_fct_json_object_set_key (rpt_inp_arc.addparam::json, 'parentArc', a.arc_id)		
 		FROM (
-			SELECT DISTINCT on (arc_id, node_1) a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
+			SELECT  a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
 			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
 			FROM temp_go2epa a
-			JOIN temp_go2epa b ON a.id=b.id-1
-			AND a.arc_id = b.arc_id) a
+			JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
+			ORDER by arc_id			
+			) a
 		JOIN (SELECT min(id), arc_id
 			FROM(	SELECT a.id, a.arc_id 
 				FROM temp_go2epa a
-				JOIN temp_go2epa b ON a.id=b.id-1
-				AND a.arc_id = b.arc_id
+				JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
 				ORDER BY a.id) a group by arc_id) b USING (arc_id)
 		JOIN rpt_inp_arc USING (arc_id)
 		WHERE result_id=result_id_var AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')

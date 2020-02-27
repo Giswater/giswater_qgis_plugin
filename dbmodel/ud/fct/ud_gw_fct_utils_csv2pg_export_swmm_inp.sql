@@ -38,12 +38,12 @@ BEGIN
 	SELECT result_id INTO result_id_aux FROM inp_selector_result where cur_user=current_user;
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
 
-	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES ('[TITLE]',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (';Created by Giswater, the water management open source tool',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Project name: ',title_aux, v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Result name: ',p_result_id,v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';User: ',current_user, v_pg2csvcat_id);  
+	INSERT INTO temp_csv2pg (source, csv1,csv2pgcat_id) VALUES ('header','[TITLE]',v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2pgcat_id) VALUES ('header',';Created by Giswater, the water management open source tool',v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Project name: ',title_aux, v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Result name: ',p_result_id,v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';User: ',current_user, v_pg2csvcat_id);  
 
 	--node
 	FOR rec_table IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=v_pg2csvcat_id AND csvversion::json->>'from'='5.0.022' order by id
@@ -98,12 +98,23 @@ BEGIN
 	END IF;
 
 	-- build return
-	select (array_to_json(array_agg(row_to_json(a))))::json 
-	into v_return from
-	(select concat(rpad(csv1,20),' ',rpad(csv2,20),' ', rpad(csv3,20),' ',rpad(csv4,20),' ',rpad(csv5,20),' ',rpad(csv6,20),' ',rpad(csv7,20),' ',
-	rpad(csv8,20),' ',rpad(csv9,20),' ',rpad(csv10,20),' ',rpad(csv11,20),' ',rpad(csv12,20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20)) as text
-	from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user
-	order by id)a;
+	select (array_to_json(array_agg(row_to_json(row))))::json
+	into v_return 
+		from ( select text from
+		(select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source is null
+		union
+		select id, csv1 as text from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop', 'vi_hydrographs','vi_polygons','vi_transects')
+		union
+		select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source in ('header', 'vi_adjustments','vi_evaporation','vi_temperature')
+		union
+		select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source in ('vi_files')
+		union
+		select id, concat(rpad(csv1,20),' ',rpad(csv2,20),' ', rpad(csv3,20),' ',rpad(csv4,20),' ',rpad(csv5,20),' ',rpad(csv6,20),' ',rpad(csv7,20),' ',
+		rpad(csv8,20),' ',rpad(csv9,20),' ',rpad(csv10,20),' ',rpad(csv11,20),' ',rpad(csv12,20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ',
+		rpad(csv15,20),' ',rpad(csv16,20),' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
+		from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source not in 
+		('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects')
+		order by id)a )row;
 	
 RETURN v_return;
         
