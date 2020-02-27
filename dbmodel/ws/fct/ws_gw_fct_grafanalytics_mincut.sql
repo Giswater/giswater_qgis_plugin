@@ -133,14 +133,14 @@ BEGIN
 	IF v_mincutstep = 1 THEN 
 		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=TRUE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
 			)a group by node_1  having sum(flag) = 5)';
 		EXECUTE v_querytext;
 
 	ELSIF v_mincutstep = 2 THEN 
 		v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
 			)a group by node_1  having sum(water) > 1 and sum(flag) > 2)';
 		EXECUTE v_querytext;
 	
@@ -148,7 +148,7 @@ BEGIN
 
 	v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
+			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
 			)a group by node_1  having sum(flag) = 6)';
 	EXECUTE v_querytext;
 	
