@@ -57,7 +57,12 @@ DECLARE
 	v_result json;
 	v_result_info json;	
 	v_return json;	
-
+	v_audit_result text;
+	v_level integer;
+	v_status text;
+	v_message text;
+	v_error_context text;
+	
 	rec_schema text;
 	rec_expl integer;
 	rec_manager text;
@@ -68,6 +73,12 @@ BEGIN
 	SET search_path = 'SCHEMA_NAME' , public;
 
 	SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
+
+	--set current process as users parameter
+    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+
+    INSERT INTO config_param_user (value, parameter, cur_user)
+    VALUES (txid_current(),'cur_trans',current_user );
 
 	v_user_name = lower(((p_data ->>'data')::json->>'user_name')::text);
 	v_user_id = lower(((p_data ->>'data')::json->>'user_id')::text);
@@ -99,7 +110,7 @@ BEGIN
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' created in a database'));
 	
 		ELSE
-			RETURN gw_fct_audit_function(3040,2780, NULL);
+			EXECUTE 'SELECT (3040,2780, NULL)' INTO v_audit_result;
 		END IF;
 
 		EXECUTE 'GRANT '||v_role||' TO '||v_user_id||';';
@@ -296,6 +307,19 @@ BEGIN
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() 
 	AND fprocesscat_id=107 order by criticity desc, id asc) row; 
+
+	IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'User management done succesfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	v_result_point:=COALESCE(v_result_point,'{}');
@@ -303,7 +327,7 @@ BEGIN
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');
 
 		--return definition for v_audit_check_result
-	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"User management done succesfully"}, "version":"'||v_version||'"'||
+	 v_return = ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 		     ',"body":{"form":{}'||
 			     ',"data":{ "info":'||v_result_info||','||
 					'"point":'||v_result_point||','||
@@ -312,8 +336,14 @@ BEGIN
 			      '}}}')::json;
 
 	RETURN v_return;
-END;
 
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+END;
+ 
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
