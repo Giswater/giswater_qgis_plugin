@@ -13,14 +13,14 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_audit_node()
 $BODY$
 
 DECLARE
-	review_status integer;
+	v_review_status integer;
 	
 BEGIN
 EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF TG_OP = 'UPDATE' THEN
 	
-		SELECT review_status_id INTO review_status FROM review_audit_node WHERE node_id=NEW.node_id;
+		SELECT review_status_id INTO v_review_status FROM review_audit_node WHERE node_id=NEW.node_id;
 
 		IF NEW.is_validated = 0 THEN
 
@@ -31,22 +31,22 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 
 			IF NEW.new_nodecat_id IS NULL THEN
-				RAISE EXCEPTION 'It is impossible to validate the node % without assigning value of nodecat_id', NEW.node_id;
+				PERFORM gw_fct_audit_function (3060,2468, NEW.node_id);
 			END IF;
 			
 			UPDATE review_audit_node SET new_nodecat_id=NEW.new_nodecat_id, is_validated=NEW.is_validated WHERE node_id=NEW.node_id;
 			
-			IF review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN 
+			IF v_review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN 
 
 				INSERT INTO v_edit_node (node_id, top_elev, ymax, node_type, nodecat_id, annotation, observ, expl_id, the_geom)
 				VALUES (NEW.node_id, NEW.new_top_elev, NEW.new_ymax, NEW.new_node_type, NEW.new_nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id, NEW.the_geom); 
 				
 		
-			ELSIF review_status=2 THEN
+			ELSIF v_review_status=2 THEN
 				UPDATE v_edit_node SET the_geom=NEW.the_geom, top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, nodecat_id=NEW.new_nodecat_id, 
 				node_type=NEW.new_node_type WHERE node_id=NEW.node_id;
 					
-			ELSIF  review_status=3 THEN
+			ELSIF  v_review_status=3 THEN
 
 				UPDATE v_edit_node SET top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, nodecat_id=NEW.new_nodecat_id, node_type=NEW.new_node_type
 				WHERE node_id=NEW.node_id;
