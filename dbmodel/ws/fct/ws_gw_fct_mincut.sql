@@ -233,7 +233,7 @@ BEGIN
 		END IF;
 
     ELSE
-		RAISE EXCEPTION 'Only arc is avaliable to execute a mincut';
+    	EXECUTE 'SELECT gw_fct_audit_function (3092,2304, NULL)' INTO v_audit_result;
     END IF;
 
 	IF v_debug THEN	RAISE NOTICE '7-Compute flow trace on network';	END IF;	

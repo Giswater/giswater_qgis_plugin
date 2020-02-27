@@ -159,7 +159,7 @@ BEGIN
 
 		-- control if pattern exists
 		IF (SELECT pattern_id FROM inp_pattern WHERE pattern_id=v_pattern) IS NOT NULL THEN
-			RAISE EXCEPTION 'There is a pattern with same name on inp_pattern table. Please check before continue';
+			PERFORM gw_fct_audit_function (3064,2738, NULL);
 		END IF;
 	
 		-- inserting new pattern
@@ -202,10 +202,11 @@ BEGIN
 
 			-- control of existency of row on dmaRtc table
 			IF (SELECT id FROM ext_rtc_scada_dma_period WHERE dma_id=v_dma and cat_period_id=v_period) IS NULL THEN
-				RAISE EXCEPTION 'The dma and period don''t exists yet on dma-period table (ext_rtc_scada_dma_period). This means there are no values for that dma or for that CRM period into GIS. Please check it before continue';
+				PERFORM gw_fct_audit_function (3066,2738, NULL);
+			
 			ELSE
 				IF (SELECT pattern_id FROM ext_rtc_scada_dma_period WHERE dma_id=v_dma and cat_period_id=v_period) IS NOT NULL THEN
-					RAISE EXCEPTION 'The dma/period defined on the dma-period table (ext_rtc_scada_dma_period) has a pattern_id defined. Please check it before continue';
+					PERFORM gw_fct_audit_function (3068,2738, NULL);
 				ELSE	
 					UPDATE ext_rtc_scada_dma_period SET pattern_id=v_pattern WHERE dma_id=v_dma and cat_period_id=v_period;
 

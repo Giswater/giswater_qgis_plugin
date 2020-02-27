@@ -26,17 +26,17 @@ BEGIN
 
 	-- Insert
 	IF TG_OP = 'INSERT' THEN
-		RAISE EXCEPTION 'It is not enabled to insert vnodes. if you are looking for join links you can use vconnec to join it. You can create this vconnec feature and simbolyze it as vnodes. Using vconnec as vnodes you will have all features in terms of propagation of arc_id';
+		PERFORM gw_fct_audit_function (3084,1126, NULL);
 		RETURN NEW;
 
 	-- Update
 	ELSIF TG_OP = 'UPDATE' THEN
-		RAISE EXCEPTION 'It is not enabled to update vnodes. if you are looking for update endpoint of links use the link''s layer to do it';
+		PERFORM gw_fct_audit_function (3086,1126, NULL);
 		RETURN NEW;
 		
 	-- Delete
 	ELSIF TG_OP = 'DELETE' THEN
-		RAISE EXCEPTION 'It is not enabled to delete vnodes. Vnode will be automaticly deleted when any link connected to vnode exists';
+		PERFORM gw_fct_audit_function (3088,1126, NULL);
 		RETURN NULL;
    
 	END IF;

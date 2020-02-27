@@ -84,8 +84,7 @@ BEGIN
 		ELSIF feature_type_aux ='GULLY' THEN 
 			SELECT * INTO v_connect FROM gully WHERE gully_id = connect_id_aux;
 		END IF;
-		
-		--raise exception 'LINK: % CONNECT % ', v_link, v_connect;
+
 
 		-- exception control. It's no possible to create another link when already exists for the connect
 		IF v_connect.state=2 AND v_link.exit_id IS NOT NULL THEN

@@ -308,8 +308,7 @@ BEGIN
 
 
 			IF v_length*v_width IS NULL THEN
-			
-				RAISE EXCEPTION 'Selected gratecat_id has NULL width or length. Check catalog data or your custom config values before continue';
+				PERFORM gw_fct_audit_function(3062,1206,NEW.gratecat_id);
 				
 			ELSIF v_length*v_width != 0 THEN
  

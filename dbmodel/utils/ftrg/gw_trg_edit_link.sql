@@ -122,7 +122,7 @@ BEGIN
 			END IF;
 			
 			IF v_connect IS NULL THEN
-				RAISE EXCEPTION 'Link needs one connec/gully feature as start point. Geometry have been checked and there is no connec/gully feature as start/end point';
+				PERFORM gw_fct_audit_function (3070,1116, NULL);
 			END IF;		
 		END IF;
 
@@ -138,7 +138,7 @@ BEGIN
 		-- for ws projects control of link related to nodarc
 		IF v_projectype = 'WS' AND v_node IS NOT NULL THEN
 			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION SELECT node_id FROM inp_pump) THEN
-				RAISE EXCEPTION 'It is not possible to connect link closer than 0.25 meters from nod2arc features in order to prevent conflits if this node may be a nod2arc. Please check it before continue';
+				PERFORM gw_fct_audit_function (3072,1116, NULL);
 			END IF;
 		END IF;
 		
@@ -173,7 +173,7 @@ BEGIN
 
 		-- feature control
 		IF NEW.feature_type IS NULL THEN
-			RAISE EXCEPTION 'It is mandatory to connect as init point one connec or gully with link';
+			PERFORM gw_fct_audit_function (3074,1116, NULL);
 		END IF;	
 
 		-- end control
@@ -198,8 +198,6 @@ BEGIN
 				v_end_point = v_vnode.the_geom;
 				v_node_id = v_vnode.vnode_id;
 			END IF;
-
-			--raise exception 'vnode %', v_node_id;
 		
 			-- update connec
 			UPDATE connec SET arc_id=v_arc.arc_id, expl_id=v_arc.expl_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, 
@@ -315,15 +313,15 @@ BEGIN
 		-- exception control. It's no possible to create another link when already exists for the connect
 		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id) IS NOT NULL THEN
 			IF NEW.feature_type = 'CONNEC' THEN
-				RAISE EXCEPTION 'It is not possible to create the link. On inventory mode only one link it is enabled for each connec. On planning mode it is possible to create more than one links, one for each alternative, but it is mandatory to use the psector form and relate the connec using the arc_id field. After that you will can customize the link''s geometry. connec_id: %' ,NEW.feature_id;
+				PERFORM gw_fct_audit_function (3076,1116, NEW.feature_id);
 			ELSIF NEW.feature_type = 'GULLY' THEN
-				RAISE EXCEPTION 'It is not possible to create the link. On inventory mode only one link it is enabled for each gully. On planning mode it is possible to create more than one links, one for each alternative, but it is mandatory to use the psector form and relate the connec using the arc_id field. After that you will can customize the link''s geometry. gully_id: %' ,NEW.feature_id;
+				PERFORM gw_fct_audit_function (3078,1116, NEW.feature_id);
 			END IF;		
 		END IF;
 
 		-- state control
 		IF v_connect.state=1 AND v_end_state=2 THEN
-			RAISE EXCEPTION 'It''s not possible to relate one connect with state=2 over feature with state=1';
+			PERFORM gw_fct_audit_function (3080,1116, NEW.feature_id);
 		END IF;
 		
 
@@ -345,7 +343,7 @@ BEGIN
 
 			-- control endfeature (only VNODE it is possible)
 			IF NEW.exit_type!='VNODE' THEN
-				RAISE EXCEPTION 'On planning mode working with alternatives, it''s not possible to relate connect over other connects or nodes. Only arcs are avaliable';
+				PERFORM gw_fct_audit_function (3082,1116, NEW.feature_id);
 			END IF;
 			
 			-- if geometry have changed by user 

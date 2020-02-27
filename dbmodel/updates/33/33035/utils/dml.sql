@@ -66,13 +66,13 @@ VALUES ('ext_district', 'table to external', 'Catalog of districts', 'role_edit'
 
 --2020/02/25
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3042,'Arc with state 2 cant be divided by node with state 1.', 'To divide an arc, the state of the node has to be the same', 2,true,NULL, false) ON CONFLICT (id) DO NOTHING;
+VALUES (3042,'Arc with state 2 cant be divided by node with state 1.', 'To divide an arc, the state of the node has to be the same', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3044,'Can''t detect any arc to divide.', null, 2,true,NULL, false) ON CONFLICT (id) DO NOTHING;
+VALUES (3044,'Can''t detect any arc to divide.', null, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3046,'Selected node type doesn''t divide arc. Node type: ', null, 2,true,NULL, false) ON CONFLICT (id) DO NOTHING;
+VALUES (3046,'Selected node type doesn''t divide arc. Node type: ', null, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3048,'Flow length is longer than length of exit arc feature', 'Please review your project!', 2,true,'ud', false) ON CONFLICT (id) DO NOTHING;
@@ -97,3 +97,64 @@ INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_use
 VALUES (3054,'Connect2network tool is not enabled for gullies with state=2. Gully_id:', 
 'For planned gullies you must create the link manually (one link for each alternative and one gully) by using the psector form and relate the gully using the arc_id field. After that you will be able to customize the link''s geometry.', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3056,'It is impossible to validate the arc without assigning value of arccat_id. Arc_id:', NULL, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3058,'It is impossible to validate the connec without assigning value of connecat_id. Connec_id:', NULL, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3060,'It is impossible to validate the node without assigning value of nodecat_id. Node_id:', NULL, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3062,'Selected gratecat_id has NULL width or length. Gratecat_id:', 'Check grate catalog or your custom config values before continue', 2,true,'ud', false) ON CONFLICT (id) DO NOTHING;
+ 
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3064,'There is a pattern with same name on inp_pattern table', 'Please check before continue.', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+ 
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3066,'The dma and period don''t exists yet on dma-period table (ext_rtc_scada_dma_period). It means there are no values for that dma or for that CRM period into GIS', 'Please check it before continue.', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+ 
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3068,'The dma/period defined on the dma-period table (ext_rtc_scada_dma_period) has a pattern_id defined', 'Please check it before continue.', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3070,'Link needs one connec/gully feature as start point. Geometry have been checked and there is no connec/gully feature as start/end point', NULL, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3072,'It is not possible to connect link closer than 0.25 meters from nod2arc features in order to prevent conflits if this node may be a nod2arc', 'Please check it before continue', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3074,'It is mandatory to connect as init point one connec or gully with link',NULL,  2,true,'ud', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3076,'It is not possible to create the link. On inventory mode only one link is enabled for each connec. Connec_id:',
+'On planning mode it is possible to create more than one link, one for each alternative, but it is mandatory to use the psector form and relate the connec using arc_id field. After that you will be able to customize the link''s geometry.',
+ 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3078,'It is not possible to create the link. On inventory mode only one link is enabled for each gully. Gully_id:',
+'On planning mode it is possible to create more than one link, one for each alternative, but it is mandatory to use the psector form and relate gully using arc_id field. After that you will be able to customize the link''s geometry.',
+ 2,true,'ud', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3080,'It''s not possible to relate connec with state=2 over feature with state=1. Connec_id:',NULL, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3082,'It''s not possible to relate connec over other connec or node while working with alternatives on planning mode. Only arcs are avaliable',NULL, 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3084,'It is not enabled to insert vnodes. if you are looking to join links you can use vconnec to join it',
+'You can create vconnec feature and simbolyze it as vnodes. By using vconnec as vnodes you will have all features in terms of propagation of arc_id', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3086,'It is not enabled to update vnodes','If you are looking to update endpoint of links use the link''s layer to do it', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3088,'It is not enabled to delete vnodes','Vnode will be automaticly deleted when link connected to vnode disappears', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3090,'Please enter a valid grafClass', NULL, 2,true,'ws', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3092,'Only arc is available as input feature to execute mincut', NULL, 2,true,'ws', false) ON CONFLICT (id) DO NOTHING;
