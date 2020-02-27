@@ -1979,9 +1979,9 @@ class MincutParent(ParentAction):
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM ext_address"
         if expl_id != -1:
-            sql += f" WHERE {self.street_field_expl[0]} = '{expl_id}'"
-        sql += " ORDER BY postcode"
-        rows = self.controller.get_rows(sql)
+            sql += f" WHERE {self.street_field_expl[0]} = '{expl_id}' AND postcode IS NOT NULL"
+        sql += " ORDER BY postcode;"
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return False
 
