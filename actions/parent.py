@@ -46,6 +46,7 @@ class ParentAction(object):
         self.rubber_polygon = QgsRubberBand(self.canvas, 2)
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
+        self.user_current_layer = None
     
     def set_controller(self, controller):
         """ Set controller class """
@@ -1122,3 +1123,11 @@ class ParentAction(object):
 
         self.rubber_point.reset(0)
         self.rubber_polygon.reset(2)
+
+
+    def restore_user_layer(self):
+        if self.user_current_layer:
+            self.iface.setActiveLayer(self.user_current_layer)
+        else:
+            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            if layer: self.iface.setActiveLayer(layer)
