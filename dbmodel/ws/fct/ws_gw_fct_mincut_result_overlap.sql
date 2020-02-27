@@ -6,10 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2244
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_result_overlap(integer, text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_result_overlap(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_overlap(p_data json)
-RETURNS json AS
-
+  RETURNS json AS
 $BODY$
 
 /*
@@ -203,7 +202,7 @@ BEGIN
 
 				IF v_addaffconnecs > 0 THEN -- there is a overlap (temporal & spatial intersection) with additional connecs affected
 
-					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,
+					v_message = concat ('"level":2, "Text":"Mincut ', v_mincutid,
 					' overlaps with other mincuts and has conflicts at least with one. Additional pipes are involved but and there are more connecs affected'
 					,v_conflictmsg,'"');	
 								
@@ -224,7 +223,7 @@ BEGIN
 					
 				ELSE -- there is a overlap (temporal & spatial intersection) with additional network but without connecs affected
 
-					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,
+					v_message = concat ('"level":2, "Text":"Mincut ', v_mincutid,
 					' overlaps with other mincuts and has conflicts at least with one. Additional pipes are involved but no more connecs affected'
 					,v_conflictmsg,'"');		
 
@@ -272,7 +271,7 @@ BEGIN
 
 					v_signal ='Conflict';
 					
-					v_message = concat ('"Priority":2, "Text":"Mincut ', v_mincutid,
+					v_message = concat ('"level":2, "Text":"Mincut ', v_mincutid,
 					' overlaps with other mincuts and has conflicts at least with one but no additional pipes are involved and no more connecs are affected.'
 					,v_conflictmsg,'"');
 					
@@ -370,18 +369,18 @@ BEGIN
 		v_result_line := COALESCE(v_result_line, '{}'); 
 		v_result_pol := COALESCE(v_result_pol, '{}'); 
 		v_geometry := COALESCE(v_geometry, '{}'); 
+		v_message := COALESCE(v_message, ''); 
 
 		--  Return
-		RETURN ('{"status":"Accepted", "message":{'||v_message||'}, "version":"'||v_version.giswater||'", "signal":"'||v_signal||'"'||
+		RETURN ('{"status":"Accepted", "message":{'||v_message||'}, "version":"'||v_version.giswater||'"'||
 			',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||','||
 				'"geometry":"'||v_geometry||'",'|| 			
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_pol||','||
-				'"setVisibleLayers":['||v_visiblelayer||']'||
-			'}}'||
-		'}')::json;
+				'"setVisibleLayers":['||v_visiblelayer||']}'||
+			', "actions":{"overlap":"' || v_signal || '"}}}')::json;
 		
 	ELSIF v_step  = 'continue' THEN
 	
@@ -460,7 +459,7 @@ BEGIN
 		v_geometry := COALESCE(v_geometry, '{}'); 
 	
 		-- return
-		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version.giswater||'"'||
+		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version.giswater||'"'||
 			',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||','||
 				  '"geometry":"'||v_geometry||'",'|| 			
