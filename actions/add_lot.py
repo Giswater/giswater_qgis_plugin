@@ -339,6 +339,12 @@ class AddNewLot(ParentManage):
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
+
+        # Rename widgets labels
+        self.dlg_basic_table.btn_add_row.setText('Afegir')
+        self.dlg_basic_table.btn_accept.setText('Acceptar')
+        self.dlg_basic_table.btn_cancel.setText('Cancel·lar')
+
         self.open_dialog(self.dlg_basic_table)
 
 
@@ -2377,6 +2383,11 @@ class AddNewLot(ParentManage):
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
+
+        # Rename widgets labels
+        self.dlg_basic_table.btn_add_row.setText('Afegir')
+        self.dlg_basic_table.btn_accept.setText('Acceptar')
+        self.dlg_basic_table.btn_cancel.setText('Cancel·lar')
 
         if not add_vehicle:
             self.dlg_basic_table.btn_add_row.setVisible(False)
