@@ -2883,7 +2883,7 @@ class UpdateSQL(ApiParent):
 
         # Populate widgetfunction combo
         sql = ("SELECT null as id, null as idval UNION ALL "
-               " SELECT id, idval FROM " + schema_name + "config_api_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+               " SELECT id, idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
