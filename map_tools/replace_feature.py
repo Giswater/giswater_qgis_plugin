@@ -294,7 +294,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
-            sql = f"SELECT {function_name}($${{{body}}}$$)::text"
+            sql = f"SELECT {function_name}({body})::text"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row:
                 message = "Error replacing feature"

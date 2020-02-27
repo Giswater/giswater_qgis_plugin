@@ -780,16 +780,16 @@ class ParentAction(object):
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
-
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        # f'$${{{body}}}$$'
+        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = f'"feature":{{{feature}}}, '
         filter_fields = f'"filterFields":{{{filter_fields}}}'
-        page_info = '"pageInfo":{}'
+        page_info = f'"pageInfo":{{}}'
         data = f'"data":{{{filter_fields}, {page_info}'
         if extras is not None:
             data += ', ' + extras
-        data += '}'
+        data += f'}}}}$$'
         body = "" + client + form + feature + data
 
         return body

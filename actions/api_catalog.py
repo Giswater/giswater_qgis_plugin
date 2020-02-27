@@ -41,7 +41,7 @@ class ApiCatalog(ApiParent):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         body = self.create_body(form, feature)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -111,7 +111,7 @@ class ApiCatalog(ApiParent):
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
@@ -129,7 +129,7 @@ class ApiCatalog(ApiParent):
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']

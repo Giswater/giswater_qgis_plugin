@@ -67,7 +67,7 @@ class ApiCF(ApiParent, QObject):
         extras += f'"zoomScale":{scale_zoom}, '
         extras += '"srid":' + str(srid)
         body = self.create_body(extras=extras)
-        complet_list = self.controller.get_json('gw_api_getlayersfromcoordinates', f'$${{{body}}}$$', log_sql=True)
+        complet_list = self.controller.get_json('gw_api_getlayersfromcoordinates', body, log_sql=True)
         if not complet_list: return False
 
         # hide QMenu identify if no feature under mouse
@@ -241,7 +241,7 @@ class ApiCF(ApiParent, QObject):
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_api_getinfofromid'
-        row = [self.controller.get_json(function_name, f'$${{{body}}}$$')]
+        row = [self.controller.get_json(function_name, body, log_sql=True)]
         if not row: return False, None
         # When something is wrong
         if row[0]['message']:
@@ -782,7 +782,7 @@ class ApiCF(ApiParent, QObject):
         self.load_settings(dlg_sections)
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
-        section_result = self.controller.get_json('gw_api_getinfocrossection', f'$${{{body}}}$$')
+        section_result = self.controller.get_json('gw_api_getinfocrossection', body)
         if not section_result: return False
         # Set image
         img = section_result['body']['data']['shapepng']
@@ -860,7 +860,7 @@ class ApiCF(ApiParent, QObject):
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_api_setfields', f'$${{{body}}}$$', log_sql=True)
+        result = self.controller.get_json('gw_api_setfields', body, log_sql=True)
         if not result: return
 
         if clear_json:
@@ -2248,7 +2248,7 @@ class ApiCF(ApiParent, QObject):
         id_name = complet_result[0]['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = self.create_body(form, feature,  filter_fields)
-        complet_list = [self.controller.get_json('gw_api_getlist', f'$${{{body}}}$$')]
+        complet_list = [self.controller.get_json('gw_api_getlist', body)]
         if not complet_list: return False
         return complet_list
 
@@ -2336,7 +2336,7 @@ class ApiCF(ApiParent, QObject):
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
             body = self.create_body(form, feature, filter_fields='')
-            complet_list = self.controller.get_json('gw_api_getinfoplan', f'$${{{body}}}$$')
+            complet_list = self.controller.get_json('gw_api_getinfoplan', body)
             if not complet_list: return False
             result = complet_list['body']['data']
             if 'fields' not in result:
@@ -2374,7 +2374,7 @@ class ApiCF(ApiParent, QObject):
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
         body += '"feature":{}, '
         body += '"data":{}'
-        complet_list = [self.controller.get_json('gw_api_getcatalog', f'$${{{body}}}$$')]
+        complet_list = [self.controller.get_json('gw_api_getcatalog', body)]
         if not complet_list: return
 
         self.dlg_new_workcat = ApiBasicInfo()

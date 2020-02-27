@@ -69,7 +69,7 @@ class ApiDimensioning(ApiParent):
         self.create_map_tips()
         body = self.create_body()
         # Get layers under mouse clicked
-        complet_result = [self.controller.get_json('gw_api_getdimensioning', f'$${{{body}}}$$', log_sql=True)]
+        complet_result = [self.controller.get_json('gw_api_getdimensioning', body, log_sql=True)]
         if not complet_result: return False
 
         layout_list = []
@@ -127,7 +127,7 @@ class ApiDimensioning(ApiParent):
 
         feature = '"tableName":"v_edit_dimensions"'
         body = self.create_body(feature=feature, filter_fields=fields)
-        row = self.controller.get_json('gw_api_setdimensioning', f'$${{{body}}}$$', log_sql=True)
+        row = self.controller.get_json('gw_api_setdimensioning', body, log_sql=True)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)

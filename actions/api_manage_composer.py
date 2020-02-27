@@ -49,7 +49,7 @@ class ApiManageComposer(ApiParent):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_getprint', f'$${{{body}}}$$', log_sql=True)
+        complet_result = self.controller.get_json('gw_api_getprint', body, log_sql=True)
         if not complet_result: return False
 
         if complet_result['formTabs']:
@@ -296,7 +296,7 @@ class ApiManageComposer(ApiParent):
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "" + client + form + feature + data
-        complet_result = self.controller.get_json('gw_api_setprint', f'$${{{body}}}$$', log_sql=True)
+        complet_result = self.controller.get_json('gw_api_setprint', body, log_sql=True)
         if not complet_result: return False
 
         result = complet_result['data']

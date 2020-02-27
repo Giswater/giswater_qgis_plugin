@@ -1143,7 +1143,7 @@ class Giswater(QObject):
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_audit_check_project', f'$${{{body}}}$$', log_sql=True)
+        result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:
             if not result or (result['body']['actions']['hideForm'] == True): return True
         except KeyError as e:
@@ -1389,7 +1389,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', f'$${{{body}}}$$')
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:
@@ -1464,7 +1464,7 @@ class Giswater(QObject):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = '"form":{' + form + '}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
@@ -1472,7 +1472,7 @@ class Giswater(QObject):
         data = '"data":{' + filter_fields + ', ' + page_info
         if extras is not None:
             data += ', ' + extras
-        data += '}'
+        data += f'}}}}$$'
         body = "" + client + form + feature + data
 
         return body

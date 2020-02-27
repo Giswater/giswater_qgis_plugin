@@ -54,7 +54,7 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
         if not complet_result:
             return False
 
@@ -67,7 +67,7 @@ class GwToolBox(ApiParent):
 
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
         if not complet_result :
             return False
 
@@ -96,7 +96,7 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$', log_sql=True)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body, log_sql=True)
         if not complet_result: return False
 
         status = self.populate_functions_dlg(self.dlg_functions, complet_result['body']['data'])
@@ -342,7 +342,7 @@ class GwToolBox(ApiParent):
             extras += '}'
 
         body = self.create_body(feature=feature_field, extras=extras)
-        sql = f"SELECT {function_name}($${{{body}}}$$)::text"
+        sql = f"SELECT {function_name}({body})::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message(f"Function : {function_name} executed with no result ", 3)

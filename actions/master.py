@@ -315,7 +315,7 @@ class Master(ParentAction):
                   f'", "resultType":"{result_type}", "resultId":"{result_id}"}}')
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_plan_result', f'$${{{body}}}$$', log_sql=True)
+        result = self.controller.get_json('gw_fct_plan_result', body, log_sql=True)
         if not result: return False
 
         if result['status'] == "Accepted":

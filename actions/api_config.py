@@ -51,7 +51,7 @@ class ApiConfig(ApiParent):
         body += '"feature":{}, '
         body += '"data":{}'
 
-        complet_list = self.controller.get_json('gw_api_getconfig', f'$${{{body}}}$$', log_sql=True)
+        complet_list = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
         if not complet_list: return False
 
         self.dlg_config = ApiConfigUi()
@@ -569,7 +569,7 @@ class ApiConfig(ApiParent):
         body += '"form":{"formName":"config"}, '
         body += '"feature":{}, '
         body += f'"data":{{"fields":{my_json}}}'
-        result = self.controller.get_json('gw_api_setconfig', f'$${{{body}}}$$')
+        result = self.controller.get_json('gw_api_setconfig', body)
         if not result: return False
 
         message = "Values has been updated"
