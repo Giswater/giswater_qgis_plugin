@@ -158,3 +158,7 @@ VALUES (3090,'Please enter a valid grafClass', NULL, 2,true,'ws', false) ON CONF
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3092,'Only arc is available as input feature to execute mincut', NULL, 2,true,'ws', false) ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_param_user SET vdefault = 'TRUE' WHERE  id = 'qgis_form_initproject_hidden';
+
+
