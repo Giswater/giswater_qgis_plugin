@@ -5,68 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
---FUNCTION CODE: XXXX
-
-
-DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_audit_cat_function_id integer, p_audit_cat_error_id integer) RETURNS "pg_catalog"."int2" AS $BODY$
-BEGIN
-    SET search_path = "SCHEMA_NAME", public;
-    RETURN audit_function($1, $2, null); 
-END;
-$BODY$
-LANGUAGE plpgsql VOLATILE COST 100;
-  
+--FUNCTION CODE: 2116
 
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(    p_audit_cat_error_id integer,    p_audit_cat_function_id integer,    p_debug_text text)
-  RETURNS smallint AS
-$BODY$
-DECLARE
-    function_rec record;
-    cat_error_rec record;
-
-BEGIN
-    
-    SET search_path = "SCHEMA_NAME", public; 
-    SELECT * INTO cat_error_rec FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id; 
-	
-		IF cat_error_rec IS NULL THEN
-			RAISE EXCEPTION 'The process has returned and error code, but this error code is not present on the audit_cat_error table. Please contact with your system administrator in order to update your audit_cat_error table';
-		END IF;
-            
-        -- log_level of type 'INFO' or 'SUCCESS'
-        IF cat_error_rec.log_level = 0 OR cat_error_rec.log_level = 3 THEN 
-            RETURN p_audit_cat_error_id;
-
-        -- log_level of type 'WARNING' (mostly applied to functions)
-        ELSIF cat_error_rec.log_level = 1 THEN
-            SELECT * INTO function_rec 
-            FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE WARNING 'Function: [%] - %. HINT: %', function_rec.function_name, cat_error_rec.error_message, cat_error_rec.hint_message ;
-            RETURN p_audit_cat_error_id;
-        
-        -- log_level of type 'ERROR' (mostly applied to trigger functions) 
-        ELSIF cat_error_rec.log_level = 2 THEN
-            SELECT * INTO function_rec 
-            FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE EXCEPTION 'Function: [%] - %. HINT: %', function_rec.function_name, concat(cat_error_rec.error_message, ' ',p_debug_text), cat_error_rec.hint_message ;
-        
-        END IF;
-        
-		RETURN 1;
-    
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-  
-
-
--- drop function gw_fct_audit_function(integer, integer, text)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer);
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_function(
@@ -117,8 +61,13 @@ BEGIN
         -- log_level of type 'ERROR' (mostly applied to trigger functions) 
         ELSIF rec_cat_error.log_level = 2 THEN
 
-            SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message, ' ',p_debug_text,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
-            FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
+            IF p_debug_text IS NOT NULL THEN
+                SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message, ' ',p_debug_text,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
+                FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
+            ELSE
+                SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
+                FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
+            END IF;
 
             v_level = 2;
             v_status = 'Failed';
@@ -143,7 +92,12 @@ BEGIN
             SELECT * INTO rec_function 
             FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
 
-            RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, concat(rec_cat_error.error_message, ' ',p_debug_text), rec_cat_error.hint_message ;
+             IF p_debug_text IS NOT NULL THEN
+                RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, concat(rec_cat_error.error_message, ' ',p_debug_text), rec_cat_error.hint_message ;
+            ELSE
+                RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
+            END IF;
+
     RETURN NULL;
         END IF;
 
@@ -154,8 +108,6 @@ BEGIN
         'level', v_level,
         'status', v_status,
         'message', v_return_text) INTO v_result_info;
-
-        RAISE NOTICE 'v_result_info,%',v_result_info;
 
         --    Control nulls
         v_result_info := COALESCE(v_result_info, '{}'); 
