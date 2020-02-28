@@ -595,10 +595,8 @@ class MincutParent(ParentAction):
 
         if result['body']['actions']['overlap'] == 'Conflict':
             result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut overlap', False)
-            layers = result_layer['temp_layers_added']
-
-            for layer in layers:
-                self.add_layer.set_layer_symbology(layer,QColor(255, 112, 40, 125), None)
+            for layer in result_layer['temp_layers_added']:
+                self.add_layer.set_layer_symbology(layer, QColor(255, 112, 40), 0.5, None)
             self.dlg_binfo = BasicInfo()
             self.load_settings(self.dlg_binfo)
             self.dlg_binfo.btn_close.setText('Cancel')

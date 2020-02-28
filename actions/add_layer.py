@@ -163,6 +163,7 @@ class AddLayer(object):
                     counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+
                     #TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
                     if key=='values':
@@ -177,6 +178,7 @@ class AddLayer(object):
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                         self.categoryze_layer(v_layer, cat_field, size)
                     temp_layers_added.append(v_layer)
+                    v_layer.setOpacity(0.5)
                     self.iface.setActiveLayer(v_layer)
         return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
 
@@ -250,7 +252,7 @@ class AddLayer(object):
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
-    def set_layer_symbology(self, layer, color=QColor(255, 0, 0, 255), size=None):
+    def set_layer_symbology(self, layer, color=QColor(255, 0, 0), opacity=0.5, size=None):
         renderer = layer.renderer()
         symbol = renderer.symbol()
         symbol.setColor(color)
@@ -265,7 +267,7 @@ class AddLayer(object):
             symbol.setSize(size['QgsMarkerSymbol'])
         elif type(symbol) == QgsFillSymbol:
             pass
-
+        layer.setOpacity(opacity)
         layer.triggerRepaint()
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
