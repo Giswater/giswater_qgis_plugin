@@ -238,7 +238,7 @@ class ParentAction(object):
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         schema_name = self.schema_name.replace('"', '')
         query_left = f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
-        query_left += f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+        query_left += f"(SELECT {schema_name}.{tableleft}.{name} FROM {schema_name}.{tableleft}"
         query_left += f" RIGHT JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
         query_left += f" WHERE cur_user = current_user)"
         query_left += f" AND  {field_id_left} > -1"
