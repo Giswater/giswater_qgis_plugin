@@ -45,12 +45,7 @@ class ApiConfig(ApiParent):
         cur_user = self.controller.get_current_user()
 
         self.list_update = []
-
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        body += '"form":{"formName":"config"}, '
-        body += '"feature":{}, '
-        body += '"data":{}'
-
+        body = self.create_body(form='"formName":"config"')
         complet_list = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
         if not complet_list: return False
 
