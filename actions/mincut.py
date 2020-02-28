@@ -6,8 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils, QgsFeatureRequest, QgsPrintLayout, \
-    QgsProject, QgsReadWriteContext, QgsVectorLayer
+from qgis.core import QgsApplication, QgsCategorizedSymbolRenderer, QgsExpression, QgsExpressionContextUtils, \
+    QgsFeatureRequest, QgsFillSymbol, QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
+    QgsSymbol, QgsVectorLayer
+
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
@@ -590,8 +592,25 @@ class MincutParent(ParentAction):
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
         if not result: return
+
         if result['body']['actions']['overlap'] == 'Conflict':
-            self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut overlap', False)
+            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut overlap', False)
+            layers = result_layer['temp_layers_added']
+            polygon = result['body']['data']['geometry']
+            polygon = polygon[9:len(polygon) - 2]
+            polygon = polygon.split(',')
+            if polygon[0] == '':
+                message = "Error on create auto mincut, you need to review data"
+                self.controller.show_warning(message)
+                self.set_cursor_restore()
+                self.task1.setProgress(100)
+                return
+            x1, y1 = polygon[0].split(' ')
+            x2, y2 = polygon[2].split(' ')
+            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+
+            for layer in layers:
+                self.set_layer_symbology(layer)
             self.dlg_binfo = BasicInfo()
             self.load_settings(self.dlg_binfo)
             self.dlg_binfo.btn_close.setText('Cancel')
@@ -599,6 +618,7 @@ class MincutParent(ParentAction):
             self.dlg_binfo.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
             self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
             self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+
             self.add_layer.populate_info_text(self.dlg_binfo, result['body']['data'], False)
             self.open_dialog(self.dlg_binfo)
 
@@ -617,14 +637,27 @@ class MincutParent(ParentAction):
         self.mincut_ok(result)
 
 
+    def set_layer_symbology(self, layer, color=QColor(194, 106, 12, 125), size=None):
+        renderer = layer.renderer()
+        symbol = renderer.symbol()
+        symbol.setColor(color)
+
+        if type(symbol) in (QgsLineSymbol,):
+            symbol.setWidth(0.8)
+        elif type(symbol) in (QgsMarkerSymbol,):
+            symbol.setSize(2.6)
+        elif type(symbol) in (QgsFillSymbol,):
+            pass
+
+        layer.triggerRepaint()
+        self.iface.layerTreeView().refreshLayerSymbology(layer.id())
+
+
     def mincut_ok(self, result):
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
-        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut result')
-        list_coord =  re.search('\(\((.*)\)\)', str(result['body']['data']['geometry']))
-        if list_coord:
-            points = self.get_points(list_coord)
-            self.draw_polyline(points)
+
+
         self.dlg_mincut.btn_accept.hide()
         self.dlg_mincut.btn_cancel.setText('Close')
         self.dlg_mincut.btn_cancel.disconnect()

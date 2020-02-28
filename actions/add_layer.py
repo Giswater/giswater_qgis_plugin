@@ -8,7 +8,7 @@ or (at your option) any later version.
 import json
 from collections import OrderedDict
 
-from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
     QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
     QgsVectorLayer, QgsVectorLayerExporter
 
@@ -249,6 +249,24 @@ class AddLayer(object):
         layer.triggerRepaint()
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
+    def set_layer_symbology(self, layer, color=QColor(194, 106, 12, 125), size=None):
+        renderer = layer.renderer()
+        symbol = renderer.symbol()
+        symbol.setColor(color)
+        if not size:
+            size = {'QgsLineSymbol':8.8, 'QgsMarkerSymbol':2.6}
+        else:
+            size[f"{type(symbol)}"] = size
+
+        if type(symbol) in (QgsLineSymbol,):
+            symbol.setWidth(size[f"{type(symbol)}"])
+        elif type(symbol) in (QgsMarkerSymbol,):
+            symbol.setSize(size[f"{type(symbol)}"])
+        elif type(symbol) in (QgsFillSymbol,):
+            pass
+
+        layer.triggerRepaint()
+        self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
         """ Populate txt_infolog QTextEdit widget
