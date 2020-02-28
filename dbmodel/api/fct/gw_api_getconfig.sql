@@ -100,12 +100,11 @@ BEGIN
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_id, layout_order, layoutname, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, reg_exp,
+		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, widgetcontrols->>''regexpControl'' as "regexpcontrol"
 		(CASE WHEN value IS NOT NULL AND value != ''false'' THEN ''True'' ELSE ''False'' END) AS checked,
 		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
 		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue,
-		placeholder,
-		description AS tooltip, editability,
+		placeholder, description AS tooltip, 
 		dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
@@ -122,10 +121,7 @@ BEGIN
 	LOOP
 		-- setting the typeahead widgets
 		IF (aux_json->>'typeahead') IS NOT NULL THEN
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', COALESCE(((aux_json->>'typeahead')::json->>'fieldToSearch'), ''));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'threshold', ((aux_json->>'typeahead')::json->>'threshold'));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'noresultsMsg', ((aux_json->>'typeahead')::json->>'noresultsMsg'));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'loadingMsg', ((aux_json->>'typeahead')::json->>'loadingMsg'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', COALESCE(((aux_json->>'widgetcontrols')::json->>'typeaheadSearchField'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryText', COALESCE((aux_json->>'dv_querytext'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryTextFilter', COALESCE((aux_json->>'dv_querytext_filterc'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', COALESCE((aux_json->>'dv_parent_id'), ''));
@@ -194,20 +190,6 @@ BEGIN
 
 			END IF;
 
-			/*
-
-			IF field_value_parent IS NULL THEN
-				IF p_filterfield is not null THEN
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', p_filterfield);
-				ELSE
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', v_combo_id->0);
-				END IF;
-			ELSE
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', field_value_parent);
-			END IF;
-
-			*/
-
 			-- looking for childs 
 			IF (aux_json->>'isparent')::boolean IS TRUE THEN
 			
@@ -227,10 +209,8 @@ BEGIN
 							END IF;	
 
 							-- set false the editability
-							v_editability = replace (((aux_json_child->>'editability')::json->>'trueWhenParentIn'), '[', '{');
+							v_editability = replace (((aux_json_child->>'widgetcontrols')::json->>'enableWhenParent'), '[', '{');
 							v_editability = replace (v_editability, ']', '}');
-
-							raise notice 'parent % v_selected_id % v_editability %', (aux_json->>'widgetname'), v_selected_id, v_editability;
 
 							IF v_selected_id::text != ANY (v_editability::text[]) THEN
 								fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'iseditable', false);

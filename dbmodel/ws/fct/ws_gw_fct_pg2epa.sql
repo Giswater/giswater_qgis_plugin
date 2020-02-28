@@ -6,18 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2314
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(p_data json)  
+DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa(character varying, boolean, boolean);
+DROP FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa(character varying, boolean);
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
+SELECT ws_sample.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{},"data":{"resultId":"t1", "useNetworkGeom":"false", "useNetworkDemand":"false", "checkData":"false", "export":"false"}}$$)
+SELECT ws_sample.gw_fct_pg2epa($${"client":{},"data":{"resultId":"t1", "useNetworkGeom":"false", "useNetworkDemand":"false", "checkData":"false", "export":"false"}}$$)
 
 select * from rpt_cat_result
 
@@ -47,7 +47,7 @@ BEGIN
 
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 	
 	--  Get input data
 	v_result = (p_data->>'data')::json->>'resultId';

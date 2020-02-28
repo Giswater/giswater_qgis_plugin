@@ -103,7 +103,7 @@ BEGIN
 	FOR rec IN  EXECUTE v_man_fields LOOP
 
 		--capture max layout_id for the view
-		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layout_name=''layout_data_1'';'
+		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''layout_data_1'';'
 		INTO v_orderby;
 
 		--transform data and widget types
@@ -128,18 +128,11 @@ BEGIN
 		END IF;
 
 		--insert into config_api_form_fields
-		IF v_datatype='double' THEN
-			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, 
-				isenabled, label, ismandatory,isparent,
-			iseditable,isautoupdate,field_length,num_decimals) 
-			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, 
-				true,rec.column_name, false, false,true,false,rec.numeric_precision, rec.numeric_scale);
-		ELSE
-			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, 
-				isenabled, label, ismandatory,isparent,iseditable,isautoupdate) 
-			VALUES (v_view_name,'feature',rec.column_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, 
-				true,rec.column_name, false, false,true,false);
-		END IF;
+		INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname,layout_order, 
+			label, ismandatory, isparent, iseditable, isautoupdate) 
+		VALUES (v_view_name,'feature', rec.column_name, v_datatype, v_widgettype, 'layout_data_1',v_orderby, 
+			rec.column_name, false, false,true,false);
+
 	END LOOP;
 
 	--select all already created addfields
@@ -148,7 +141,7 @@ BEGIN
 	--insert configuration for the addfields of the feature type
 	FOR rec IN EXECUTE v_man_addfields LOOP
 		--capture max layout_id for the view
-		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layout_name=''layout_data_1'';'
+		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''layout_data_1'';'
 		INTO v_orderby;
 		
 		--transform data and widget types
@@ -167,18 +160,11 @@ BEGIN
 		END IF;
 		
 		--insert into config_api_form_fields
-		IF v_datatype='double' THEN
-			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
-				label, ismandatory,isparent,iseditable,isautoupdate,field_length,num_decimals) 
-			VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,
-				rec.param_name, rec.is_mandatory, false,rec.iseditable,false,rec.field_length, rec.num_decimals);
-		ELSE
-			INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layout_id, layout_name,layout_order, isenabled, 
-				label, ismandatory,isparent,iseditable,isautoupdate) 
-			VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype,1,'layout_data_1',v_orderby, true,
-				rec.param_name, rec.is_mandatory, false,rec.iseditable,false);
-		END IF;
-		
+		INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname,layout_order, 
+			label, ismandatory,isparent,iseditable,isautoupdate) 
+		VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype, 'layout_data_1',v_orderby,
+			rec.param_name, rec.is_mandatory, false,rec.iseditable,false);
+				
 	END LOOP;
 	
 END;

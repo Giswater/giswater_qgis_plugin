@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2788
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetcontrols(p_data json)
-  RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetvalues(p_data json)
+  RETURNS float AS
 $BODY$
 
 /*EXAMPLE
@@ -23,12 +23,13 @@ v_return json;
 v_apiversion json;
 v_min double precision;
 v_max double precision;
-v_widgetcontrols json;
+v_return json;
 v_id text;
 v_node_1 text;
 v_node_2 text;
 v_json json;
 v_tgop text;
+v_key text;
 
 BEGIN
 
@@ -37,10 +38,6 @@ BEGIN
 
 	--  get schema name
 	schemas_array := current_schemas(FALSE);
-
-	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-	INTO v_apiversion;
 
 	--  get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
@@ -51,6 +48,7 @@ BEGIN
 	v_node_2 = ((p_data ->>'data')::json->>'node2');
 	v_json = ((p_data ->>'data')::json->>'json');
 	v_tgop = ((p_data ->>'data')::json->>'tgOp');
+	v_key = ((p_data ->>'data')::json->>'key');
 
 	IF v_project_type = 'UD' THEN
 
@@ -65,32 +63,27 @@ BEGIN
 		IF (v_json->>'column_id') = 'y1' OR (v_json->>'column_id') = 'custom_y1' THEN
 			v_min = 0;
 			v_max = v_noderecord1.sys_ymax;
-			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
 			
 		ELSIF (v_json->>'column_id') = 'y2'  OR (v_json->>'column_id') = 'custom_y2' THEN
 			v_min = 0;
 			v_max = v_noderecord2.sys_ymax;
-			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":'||v_max||'}';
 				
 		ELSIF (v_json->>'column_id') = 'ymax'  OR (v_json->>'column_id') = 'custom_ymax' THEN
 			v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=v_id UNION SELECT y2 FROM arc WHERE node_2=v_id)a);
-			v_widgetcontrols = '{"minValue":'||v_min||', "maxValue":999}';
+			v_max = 999;
 		END IF;
-	END IF;	
-   
---    Control NULL's
-      v_apiversion := COALESCE(v_apiversion, '[]');
-      v_widgetcontrols := COALESCE(v_widgetcontrols, '{}');
-    
---    Return
-      RETURN v_widgetcontrols;
-   
+
+		IF v_key = 'minValue' THEN
+			v_return = v_min;
+		ELSIF v_key = 'minValue' THEN
+			v_return = v_max;
+		END IF;
 		
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
-
+	END IF;	
+         
+--    Return
+      RETURN v_return;
+   
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

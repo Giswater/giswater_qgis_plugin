@@ -27,74 +27,75 @@ SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,
 
 DECLARE
 
-	v_columntype character varying;
-	v_fields json;
-	v_fields_array json[];
-	aux_json json;    
-	combo_json json;
-	schemas_array name[];
-	array_index integer DEFAULT 0;
-	field_value character varying;
-	v_apiversion json;
-	v_selected_id text;
-	v_vdefault text;
-	v_id int8;
-	v_numnodes integer;
-	v_idname text;
-	v_feature_type text;
-	count_aux integer;
-	v_sector_id integer;
-	v_macrosector_id integer;
-	v_expl_id integer;
-	v_dma_id integer;
-	v_macrodma_id integer;
-	v_muni_id integer;
-	v_project_type varchar;
-	v_cat_feature_id varchar;
-	v_code int8;
-	v_node_proximity double precision;
-	v_node_proximity_control boolean;
-	v_connec_proximity double precision;
-	v_connec_proximity_control boolean;
-	v_gully_proximity double precision;
-	v_gully_proximity_control boolean;
-	v_arc_searchnodes double precision;
-	v_samenode_init_end_control boolean;
-	v_arc_searchnodes_control boolean;
-	v_tabname text = 'data';
-	v_formname text;
-	v_tablename text;
-	v_visit_tablename text;
-	v_topocontrol boolean = TRUE;
-	v_status boolean = true;
-	v_message text;
-	v_catfeature record;
-	v_codeautofill boolean=true;
-	v_values_array json;
-	v_values_array_aux json;
-	v_values_array_json json[];
-	v_record record;
-	v_gislength float;
-	v_catalog text;
-	v_dnom text;
-	v_pnom text;
-	v_geom1 text;
-	v_geom2 text;
-	v_shape text;
-	v_matcat_id text;
-	v_catalogtype varchar;
-	v_min double precision;
-	v_max double precision;
-	v_widgetcontrols json;
-	v_type text;
-	v_active_feature text;
-	v_promixity_buffer double precision;
-	v_sys_raster_dem boolean=false;
-	v_edit_upsert_elevation_from_dem boolean=false;
-	v_noderecord1 record;
-	v_noderecord2 record;
-        v_input json;
-        v_presszone_id text;
+v_columntype character varying;
+v_fields json;
+v_fields_array json[];
+aux_json json;    
+combo_json json;
+schemas_array name[];
+array_index integer DEFAULT 0;
+field_value character varying;
+v_apiversion json;
+v_selected_id text;
+v_vdefault text;
+v_id int8;
+v_numnodes integer;
+v_idname text;
+v_feature_type text;
+count_aux integer;
+v_sector_id integer;
+v_macrosector_id integer;
+v_expl_id integer;
+v_dma_id integer;
+v_macrodma_id integer;
+v_muni_id integer;
+v_project_type varchar;
+v_cat_feature_id varchar;
+v_code int8;
+v_node_proximity double precision;
+v_node_proximity_control boolean;
+v_connec_proximity double precision;
+v_connec_proximity_control boolean;
+v_gully_proximity double precision;
+v_gully_proximity_control boolean;
+v_arc_searchnodes double precision;
+v_samenode_init_end_control boolean;
+v_arc_searchnodes_control boolean;
+v_tabname text = 'data';
+v_formname text;
+v_tablename text;
+v_visit_tablename text;
+v_topocontrol boolean = TRUE;
+v_status boolean = true;
+v_message text;
+v_catfeature record;
+v_codeautofill boolean=true;
+v_values_array json;
+v_values_array_aux json;
+v_values_array_json json[];
+v_record record;
+v_gislength float;
+v_catalog text;
+v_dnom text;
+v_pnom text;
+v_geom1 text;
+v_geom2 text;
+v_shape text;
+v_matcat_id text;
+v_catalogtype varchar;
+v_min double precision;
+v_max double precision;
+v_widgetcontrols json;
+v_type text;
+v_active_feature text;
+v_promixity_buffer double precision;
+v_sys_raster_dem boolean=false;
+v_edit_upsert_elevation_from_dem boolean=false;
+v_noderecord1 record;
+v_noderecord2 record;
+v_input json;
+v_presszone_id text;
+v_widgetvalue float;
 
 BEGIN
 
@@ -525,12 +526,25 @@ BEGIN
 			END IF;
 
 			-- setting widgetcontrols when null (user has not configurated form fields table).
-			IF (aux_json->>'widgetcontrols') IS NULL THEN
+			IF (aux_json->>'widgetcontrols')::json->>'minValue' IS NULL THEN
 				v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||v_tablename||'", "idName":"'||v_idname||'", "id":"'||p_id||
-					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'"}}';
-				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetcontrols;
+					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'", "key":"minValue"}}';
+				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetvalue;
+				v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'minValue', v_widgetvalue);
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 			END IF;
+
+			IF (aux_json->>'widgetcontrols')::json->>'maxValue' IS NULL THEN
+				v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||v_tablename||'", "idName":"'||v_idname||'", "id":"'||p_id||
+					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'", "key":"maxValue"}}';
+				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetvalue;
+				v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'maxValue', v_widgetvalue);
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
+			END IF;
+
+
+
+			
 			
 		ELSIF  p_tg_op ='UPDATE' THEN 
 				

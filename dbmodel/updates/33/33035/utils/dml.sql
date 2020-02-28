@@ -16,8 +16,8 @@ INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (115, 'Test functions', 'admin', 'utils') ON CONFLICT (id) DO NOTHING;
 
 UPDATE audit_cat_function
-set sample_query = '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}},
-"UD":{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"start", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}}'
+set sample_query = '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}},
+"UD":{"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"iterative":"off", "resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}}'
 where function_name='gw_fct_pg2epa_main';
 
 UPDATE audit_cat_function

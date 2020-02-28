@@ -69,7 +69,7 @@ BEGIN
 
 		--  Combo rows child CATALOG
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_id, widgettype, column_id as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
 		FROM config_api_form_fields WHERE formname = '''||v_parameter||''' AND dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
@@ -78,7 +78,7 @@ BEGIN
 	ELSE
 		--  Combo rows child
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, column_id, widgettype, datatype, concat(''data_'',column_id) as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
 		FROM config_api_form_fields WHERE formname = $1 AND dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child
 		USING p_table_id;

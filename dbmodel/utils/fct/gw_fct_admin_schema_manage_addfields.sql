@@ -26,7 +26,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 "parameters":{"label": "pump1", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
 "datatype": "boolean", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "check", "dv_isnullvalue": false, 
 "isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
-"isnotupdate": false, "isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
+"isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
 "stylesheet": null, "widgetdim": null}}}$$)::text
 
 	SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoType":100, "lang":"ES"}, 
@@ -36,7 +36,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 	"parameters":{"label": "pump111", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
 	"datatype": "integer", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "text", "dv_isnullvalue": false, 
 	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
-	"isnotupdate": false, "isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
+	"isparent": false, "typeahead": null, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "action_function": null, 
 	"stylesheet": null, "widgetdim": null}}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
@@ -83,12 +83,10 @@ DECLARE
 	v_isenabled boolean;
 	v_dv_parent_id text;
 	v_dv_querytext text;
-	v_isnotupdate boolean;
 	v_dv_isnullvalue boolean;
 	v_stylesheet json;
 	v_multi_create boolean;
 	v_dv_querytext_filterc text;
-	v_reload_field json;
 	v_widgetfunction text;
 	v_widgetdim integer;
 	v_isautoupdate boolean;
@@ -136,14 +134,12 @@ BEGIN
 	v_isenabled = (((p_data ->>'data')::json->>'parameters')::json ->>'isenabled')::text;
 	v_dv_parent_id = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_parent_id')::text;
 	v_dv_querytext = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext')::text;
-	v_isnotupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isnotupdate')::text;
 	v_dv_isnullvalue = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_isnullvalue')::text;
 	v_action_function = (((p_data ->>'data')::json->>'parameters')::json ->>'action_function')::text;
 	v_editability = (((p_data ->>'data')::json->>'parameters')::json ->>'editability')::json;
 	v_stylesheet = (((p_data ->>'data')::json->>'parameters')::json ->>'stylesheet')::json;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
 	v_dv_querytext_filterc = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext_filterc')::text;
-	v_reload_field = (((p_data ->>'data')::json->>'parameters')::json ->>'reload_field')::json;
 	v_widgetfunction = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetfunction')::text;
 	v_widgetdim = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetdim')::integer;
 	v_isautoupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isautoupdate')::text;
@@ -308,29 +304,30 @@ IF v_multi_create IS TRUE THEN
 	IF v_action = 'CREATE' THEN
 
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-		AND layout_name = ''layout_data_1'';'
+		AND layoutname = ''layout_data_1'';'
 		INTO v_layout_order;
 
 		--EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields;'
 		--INTO v_form_fields_id;
 
-		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, 
-		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
-		isautoupdate, reload_field, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
-		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
-		VALUES (v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
-		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_reload_field, 'layout_data_1',
-		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
-		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
+		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, 
+		label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
+		placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
+		dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction)
+		
+		VALUES (v_viewname, v_formtype, v_param_name, v_layout_order, v_config_datatype, v_config_widgettype,
+		v_label, v_field_length, v_isparent, v_iseditable, v_isautoupdate, 'layout_data_1',
+		v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
+		v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function);
 
 	ELSIF v_action = 'UPDATE' THEN
-		UPDATE config_api_form_fields SET isenabled=v_isenabled,datatype=v_config_datatype,
-		widgettype=v_config_widgettype, label=v_label,field_length=v_field_length, num_decimals=v_num_decimals, 
+		UPDATE config_api_form_fields SET datatype=v_config_datatype,
+		widgettype=v_config_widgettype, label=v_label,
 		ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
-		reload_field=v_reload_field, placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
+		placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
 		widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
-		dv_parent_id=v_dv_parent_id, isnotupdate=v_isnotupdate, dv_querytext_filterc=v_dv_querytext_filterc, 
-		dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,action_function=v_action_function,editability=v_editability 
+		dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
+		dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_action_function
 		WHERE column_id=v_param_name AND formname=v_viewname;
 
 	END IF;
@@ -521,20 +518,20 @@ ELSE
 		v_active, v_orderby, v_iseditable);
 	
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-		AND layout_name = ''layout_data_1'';'
+		AND layoutname = ''layout_data_1'';'
 		INTO v_layout_order;
 
 		EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields'
 		INTO v_form_fields_id;
 
-		INSERT INTO config_api_form_fields (id, formname, formtype, column_id, layout_id, layout_order, isenabled, 
-		datatype, widgettype, label,field_length, num_decimals, ismandatory, isparent, iseditable, 
-		isautoupdate, reload_field, layout_name, placeholder, stylesheet, typeahead, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
-		dv_parent_id, isnotupdate, dv_querytext_filterc, dv_querytext, listfilterparam,action_function,editability)
-		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, 1,v_layout_order,v_isenabled, v_config_datatype, v_config_widgettype,
-		v_label, v_field_length, v_num_decimals, v_ismandatory, v_isparent, v_iseditable, v_isautoupdate, v_reload_field, 'layout_data_1',
-		v_placeholder, v_stylesheet, v_typeahead, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
-		v_dv_parent_id, v_isnotupdate, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function, v_editability);
+		INSERT INTO config_api_form_fields (id, formname, formtype, column_id, layout_order,  
+		datatype, widgettype, label, ismandatory, isparent, iseditable, 
+		layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
+		dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction)
+		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, v_layout_order,v_config_datatype, v_config_widgettype,
+		v_label, v_ismandatory, v_isparent, v_iseditable, 'layout_data_1',
+		v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
+		v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_action_function);
 
 
 		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
@@ -556,13 +553,13 @@ ELSE
 		WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
 		
 		IF (SELECT cat_feature_id FROM man_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
-			UPDATE config_api_form_fields SET isenabled=v_isenabled,datatype=v_config_datatype,
-			widgettype=v_config_widgettype, label=v_label,field_length=v_field_length, num_decimals=v_num_decimals, 
+			UPDATE config_api_form_fields SET datatype=v_config_datatype,
+			widgettype=v_config_widgettype, label=v_label,
 			ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
-			reload_field=v_reload_field, placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
+			placeholder=v_placeholder, stylesheet=v_stylesheet, typeahead=v_typeahead, tooltip=v_tooltip, 
 			widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
-			dv_parent_id=v_dv_parent_id, isnotupdate=v_isnotupdate, dv_querytext_filterc=v_dv_querytext_filterc, 
-			dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,action_function=v_action_function,editability=v_editability 
+			dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
+			dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_action_function
 			WHERE column_id=v_param_name AND formname=v_viewname;
 		END IF;
 

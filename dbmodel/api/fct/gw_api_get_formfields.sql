@@ -63,10 +63,13 @@ DECLARE
     v_array_child text[];
     v_min float;
     v_max float;
-    v_widgetcontrols json;
+    v_widgetvalue json;
     v_noderecord1 record;
     v_noderecord2 record;
     v_input json;
+    v_widgetcontrols json;
+    v_editability text;
+    
        
 BEGIN
 
@@ -93,30 +96,34 @@ BEGIN
 	IF p_formname!='infoplan' THEN 
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
 
-			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction", widgetfunction,
-			(CASE WHEN layout_id=0 THEN ''header'' WHEN layout_id=9 THEN ''footer'' ELSE ''body'' END) AS "position",
-			(CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled, hidden,
+			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as 
+			"changeAction", widgetfunction,	layoutname AS "position", (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled, hidden,
 
-			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
-			layout_name as layoutname, layout_order, dv_parent_id, isparent, ismandatory, action_function, dv_querytext, dv_querytext_filterc, 
-			isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, reload_field, stylesheet, typeahead, widgetcontrols, reload_field FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 
-			AND isenabled IS TRUE ORDER BY orderby) a'
+			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname layout_order) AS orderby, 
+			layoutname, layout_order, dv_parent_id, isparent, ismandatory, linkedaction, dv_querytext, dv_querytext_filterc, 
+			isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, widgetcontrols->>''autoupdateReloadFields'' as "reloadfields", 
+			widgetcontrols->>''regexpControl'' as "regexpcontrol"
+			FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 
+			ORDER BY orderby) a'
 				INTO fields_array
 				USING p_formname, p_formtype;
 
 	ELSE
 		EXECUTE 'SELECT array_agg(row_to_json(b)) FROM (
-			SELECT (row_number()over(ORDER BY 1)) AS layout_order, (row_number()over(ORDER BY 1)) AS orderby,* FROM 
-			(SELECT ''individual'' as widtget_context, concat(unit, ''. '', descript) AS label, identif AS column_id, ''label'' AS widgettype, concat ('||quote_literal(p_tabname)||',''_'',identif) AS widgetname, ''string'' AS datatype, 
-			NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as ordby, 1 AS layout_id,  NULL AS dv_parent_id, NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
-			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , '' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet,
+			SELECT (row_number()over(ORDER BY 1)) AS layout_order, (row_number()over(ORDER BY 1)) AS orderby, * FROM 
+			(SELECT ''individual'' as widtget_context, concat(unit, ''. '', descript) AS label, identif AS column_id, ''label'' AS widgettype, 
+			concat ('||quote_literal(p_tabname)||',''_'',identif) AS widgetname, ''string'' AS datatype, 
+			NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layout_order, 1 AS layoutname,  NULL AS dv_parent_id, 
+			NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
+			NULL AS dv_querytext_filterc, NULL AS linkedaction, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , 
+			'' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet,
 			null as widgetcontrols, null as hidden
 			FROM ' ||p_tablename|| ' WHERE ' ||p_idname|| ' = $2
 			UNION
 			SELECT ''resumen'' as widtget_context, label AS form_label, column_id, widgettype, concat ('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, datatype, 
-			tooltip, placeholder, iseditable, layout_order AS ordby, layout_id,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,  NULL AS widgetfunction, NULL AS dv_querytext, 
-			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols::text, hidden
-			FROM config_api_form_fields WHERE formname  = ''infoplan'' AND isenabled IS TRUE ORDER BY 1,ordby) a
+			tooltip, placeholder, iseditable, layout_order, layoutname,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,  NULL AS widgetfunction, NULL AS dv_querytext, 
+			NULL AS dv_querytext_filterc, NULL AS linkedaction, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols::text, hidden
+			FROM config_api_form_fields WHERE formname  = ''infoplan'' ORDER BY 1,ordby) a
 			ORDER BY 1) b'
 				INTO fields_array
 				USING p_formname, p_id ;
@@ -129,10 +136,7 @@ BEGIN
 	
 		-- setting the typeahead widgets
 		IF (aux_json->>'typeahead') IS NOT NULL THEN
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', COALESCE(((aux_json->>'typeahead')::json->>'fieldToSearch'), ''));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'threshold', ((aux_json->>'typeahead')::json->>'threshold'));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'noresultsMsg', ((aux_json->>'typeahead')::json->>'noresultsMsg'));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'loadingMsg', ((aux_json->>'typeahead')::json->>'loadingMsg'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', COALESCE(((aux_json->>'widgetcontrols')::json->>'typeaheadSearchField'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryText', COALESCE((aux_json->>'dv_querytext'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryTextFilter', COALESCE((aux_json->>'dv_querytext_filterc'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', COALESCE((aux_json->>'dv_parent_id'), ''));
@@ -153,19 +157,20 @@ BEGIN
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 		END IF;
 
-		--setting widgetcontrols when null (user has not configurated form fields table)
-		IF (aux_json->>'widgetcontrols') IS NULL THEN
-			v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||p_tablename||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tgop||'","json":'||aux_json||'}}';		
-			SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetcontrols;
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetcontrols, '{}'));
+		-- setting minvalue on widgetcontrol when is null (user has not configurated form fields table). When insert is used featureupsert. Rest of cases is used here
+		IF (aux_json->>'widgetcontrols')::json->>'minValue' IS NULL THEN
+			v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||p_tablename||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tgop||'","json":'||aux_json||', "key":"minValue"}}';		
+			SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalue;
+			v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'minValue', v_widgetvalue);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetvalue, '{}'));
 		END IF;
 
-		IF p_tgop ='UPDATE' THEN
-
-			-- setting the not updateable fields
-			IF (aux_json->>'isnotupdate')::boolean IS TRUE THEN
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isEditable','False');
-			END IF;		
+		--setting maxvalue on widgetcontrol when is null  (user has not configurated form fields table). When insert is used featureupsert. Rest of cases is used here
+		IF (aux_json->>'widgetcontrols')::json->>'maxValue' IS NULL THEN
+			v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||p_tablename||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tgop||'","json":'||aux_json||', "key":"maxValue"}}';		
+			SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalue;
+			v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'maxValue', v_widgetvalue);
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetcontrols, '{}'));
 		END IF;
 
 	
@@ -277,13 +282,22 @@ BEGIN
 						v_dv_querytext_child=(aux_json_child->>'dv_querytext');
 						
 						-- Get combo id's
-						
 						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL AND p_id != '' AND (field_value_parent IS NOT NULL /*AND p_filterfield IS NOT NULL*/) THEN	
 							query_text= 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext_child || (aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY '||v_orderby_child||') a';
 							execute query_text INTO v_array_child;	
 						ELSE 	
 							EXECUTE 'SELECT (array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY '||v_orderby_child||')a' INTO v_array_child;
 							
+						END IF;
+
+						-- set false the editability
+						v_editability = replace (((aux_json_child->>'widgetcontrols')::json->>'enableWhenParent'), '[', '{');
+						v_editability = replace (v_editability, ']', '}');
+
+						raise notice 'parent % v_selected_id % v_editability %', (aux_json->>'widgetname'), v_selected_id, v_editability;
+
+						IF v_selected_id::text != ANY (v_editability::text[]) THEN
+							fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'iseditable', false);
 						END IF;
 						
 						-- Enable null values
@@ -348,7 +362,7 @@ BEGIN
 
 						--removing the not used fields
 						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json_child->>'orderby')::INT],
-						'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead');
+						'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc');
 
 						RAISE NOTICE ' SD %', v_vdefault;
 

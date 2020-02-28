@@ -7,5 +7,3 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---14/11/2019
-UPDATE audit_cat_param_user SET isparent=True, editability='{"trueWhenParentIn":[11]}' WHERE id ='inp_options_pattern';
