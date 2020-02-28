@@ -560,11 +560,9 @@ class ApiConfig(ApiParent):
     def update_values(self):
 
         my_json = json.dumps(self.list_update)
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        body += '"form":{"formName":"config"}, '
-        body += '"feature":{}, '
-        body += f'"data":{{"fields":{my_json}}}'
-        result = self.controller.get_json('gw_api_setconfig', body)
+        extras = f'"fields":{my_json}'
+        body = self.create_body(form='"formName":"config"', extras=extras)
+        result = self.controller.get_json('gw_api_setconfig', body, log_sql=True)
         if not result: return False
 
         message = "Values has been updated"
