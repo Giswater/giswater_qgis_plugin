@@ -596,21 +596,9 @@ class MincutParent(ParentAction):
         if result['body']['actions']['overlap'] == 'Conflict':
             result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut overlap', False)
             layers = result_layer['temp_layers_added']
-            polygon = result['body']['data']['geometry']
-            polygon = polygon[9:len(polygon) - 2]
-            polygon = polygon.split(',')
-            if polygon[0] == '':
-                message = "Error on create auto mincut, you need to review data"
-                self.controller.show_warning(message)
-                self.set_cursor_restore()
-                self.task1.setProgress(100)
-                return
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
             for layer in layers:
-                self.set_layer_symbology(layer)
+                self.add_layer.set_layer_symbology(layer,QColor(255, 112, 40, 125), None)
             self.dlg_binfo = BasicInfo()
             self.load_settings(self.dlg_binfo)
             self.dlg_binfo.btn_close.setText('Cancel')
@@ -637,25 +625,25 @@ class MincutParent(ParentAction):
         self.mincut_ok(result)
 
 
-    def set_layer_symbology(self, layer, color=QColor(194, 106, 12, 125), size=None):
-        renderer = layer.renderer()
-        symbol = renderer.symbol()
-        symbol.setColor(color)
-
-        if type(symbol) in (QgsLineSymbol,):
-            symbol.setWidth(0.8)
-        elif type(symbol) in (QgsMarkerSymbol,):
-            symbol.setSize(2.6)
-        elif type(symbol) in (QgsFillSymbol,):
-            pass
-
-        layer.triggerRepaint()
-        self.iface.layerTreeView().refreshLayerSymbology(layer.id())
-
-
     def mincut_ok(self, result):
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
+        # result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], 'Mincut overlap', del_old_layers=False)
+
+
+        polygon = result['body']['data']['geometry']
+        polygon = polygon[9:len(polygon) - 2]
+        polygon = polygon.split(',')
+        if polygon[0] == '':
+            message = "Error on create auto mincut, you need to review data"
+            self.controller.show_warning(message)
+            self.set_cursor_restore()
+            self.task1.setProgress(100)
+            return
+        x1, y1 = polygon[0].split(' ')
+        x2, y2 = polygon[2].split(' ')
+        self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+
 
 
         self.dlg_mincut.btn_accept.hide()
