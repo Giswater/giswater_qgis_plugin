@@ -68,3 +68,8 @@ USING btree (epa_type COLLATE pg_catalog."default");
 -- create index on temp_go2epa
 CREATE INDEX temp_go2epa_arc_id ON temp_go2epa
 USING btree (arc_id COLLATE pg_catalog."default");
+
+--2020/02/24
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"length", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"cost", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"value", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
