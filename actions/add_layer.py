@@ -390,7 +390,17 @@ class AddLayer(object):
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
           """
-        return self.get_multi_coordinates(feature)
+        coordinates = "("
+        for coords in feature['geometry']['coordinates']:
+            coordinates += "("
+            for cc in coords:
+                coordinates += "("
+                for c in cc:
+                    coordinates += f"{c[0]} {c[1]}, "
+                coordinates = coordinates[:-2] + "), "
+            coordinates = coordinates[:-2] + "), "
+        coordinates = coordinates[:-2] + ")"
+        return coordinates
 
 
     def get_coordinates(self, feature):
