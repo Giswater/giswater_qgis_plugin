@@ -6,10 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2806
 
---DROP FUNCTION SCHEMA_NAME.gw_fct_admin_test_ci();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_test_ci()
+
+--DROP FUNCTION ws_sample.gw_fct_admin_test_ci();
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_admin_test_ci()
   RETURNS json AS
 $BODY$
+
+
+/*
+SELECT ws_sample.gw_fct_admin_test_ci()
+*/
+
 DECLARE 
 
 	rec_role record;
@@ -37,9 +44,9 @@ DECLARE
 DECLARE
 
 BEGIN
-	SET search_path = SCHEMA_NAME, public;
+	SET search_path = ws_sample, public;
 	
-	v_schemaname = 'SCHEMA_NAME';
+	v_schemaname = 'ws_sample';
 	
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
 
@@ -65,7 +72,7 @@ BEGIN
 					
 	END IF;
 
-	FOR rec_role IN (SELECT * FROM sys_role ) LOOP
+	FOR rec_role IN (SELECT * FROM sys_role WHERE id !='role_crm') LOOP
 
 		--set role and insert values into exploitation selector
 		EXECUTE 'SET ROLE '||rec_role.id||';';
@@ -262,8 +269,8 @@ GRANT SELECT ON TABLE audit_check_data TO role_basic;
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	-- GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	-- RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
