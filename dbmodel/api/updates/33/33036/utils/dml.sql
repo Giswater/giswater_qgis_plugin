@@ -80,9 +80,10 @@ INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_config_sys_fields', 'form', 'widgetcontrols', 9, 'text', 'text', 'Widget controls:', NULL, 
 'widgetcontrols - Advanced options to control the widget.
-If you uses text widget, you can force values using "minValue" or "maxValue" or "regexpControl". In addition you can enable multiline widget using "setQgisMultiline"
-If you uses combo widget , you can only make editable combo for specific values of child using comboEnableWhenParent
-If you uses typeahead widget, it is mandatory to use "typeaheadSearchField" to define search to be used',
+If widgettype=''text'', you can force values using "minValue" or "maxValue" or "regexpControl". In addition you can enable multiline widget using "setQgisMultiline"
+If widgettype=''combo'', you can only make editable combo for specific values of child using comboEnableWhenParent
+If widgettype=''typeahead'', it is mandatory to use "typeaheadSearchField" to define search to be used
+If isautoupdate=true, you can use autoupdateReloadFields to identify fields must be reloaded with updated values',
 '{"setQgisMultiline":true, "minValue":0.001, "maxValue":100, "autoupdateReloadFields":['a', 'b'], "typeaheadSearchField":"id", "comboEnableWhenParent":['a', 'b'], "regexpControl":"[]"}', 
 FALSE, NULL, TRUE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -121,9 +122,9 @@ INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_config_sys_fields', 'form', 'widgettype', 15, 'text', 'combo', 'Widgettype:', NULL, 
 'widgettype - Widget of the field. Must match with the data type. Advanced configuration on widgetcontrols field is possible
-If you uses text, you can force values using "minValue" or "maxValue" or "regexpControl". In addition you can enable multiline widget using "setQgisMultiline"
-If you uses combo, you can only make editable combo for specific values of child using comboEnableWhenParent
-If you uses typeahead, it is mandatory to use "typeaheadSearchField" to define search to be used', 
+If widgettype=''text'', you can force values using "minValue" or "maxValue" or "regexpControl". In addition you can enable multiline widget using "setQgisMultiline"
+If widgettype=''combo'', you can only make editable combo for specific values of child using comboEnableWhenParent
+If widgettype=''typeahead'', it is mandatory to use "typeaheadSearchField" to define search to be used', 
 NULL, TRUE, NULL, TRUE, NULL, 'SELECT id, idval FROM config_api_typevalue WHERE typevalue=''widgettype_typevalue'' AND addparam->>''createAddfield''=''TRUE''', 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
@@ -136,7 +137,10 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_config_sys_fields', 'form', 'isautoupdate', 17, 'boolean', 'check', 'Isautoupdate:', NULL, 'isautoupdate - Force update of feature (not valid for typeahead widget)', NULL,  TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_config_sys_fields', 'form', 'isautoupdate', 17, 'boolean', 'check', 'Isautoupdate:', NULL, 
+'isautoupdate - Force update of feature. If is true, you can use the key autoupdateReloadFields of widgetcontrols to identify fields must be reloaded with updated values.
+Warning: It is dangerous for typeahead widget. It crashes!'
+, NULL,  TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 
