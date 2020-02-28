@@ -7,14 +7,14 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2806
 
 
---DROP FUNCTION ws_sample.gw_fct_admin_test_ci();
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_admin_test_ci()
+--DROP FUNCTION SCHEMA_NAME.gw_fct_admin_test_ci();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_test_ci()
   RETURNS json AS
 $BODY$
 
 
 /*
-SELECT ws_sample.gw_fct_admin_test_ci()
+SELECT SCHEMA_NAME.gw_fct_admin_test_ci()
 */
 
 DECLARE 
@@ -44,9 +44,9 @@ DECLARE
 DECLARE
 
 BEGIN
-	SET search_path = ws_sample, public;
+	SET search_path = SCHEMA_NAME, public;
 	
-	v_schemaname = 'ws_sample';
+	v_schemaname = 'SCHEMA_NAME';
 	
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
 
