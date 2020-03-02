@@ -270,7 +270,7 @@ class ParentAction(object):
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
 
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
 
         # Order control
         tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
@@ -448,15 +448,18 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())  
             
 
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name'):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
-        
+
+        schema_name = self.schema_name.replace('"', '')
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
-        sql = (f"SELECT * FROM {tableleft} WHERE {name} NOT IN "
-               f"(SELECT {tableleft}.{name} FROM {tableleft}"
-               f" RIGHT JOIN {tableright}"
+        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
+               f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+               f" RIGHT JOIN {schema_name}.{tableright}"
                f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
-               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'")
+               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'"
+               f"  AND  {field_id_l} > -1")
+        sql += aql
         self.fill_table_by_query(qtable, sql)
         
         
