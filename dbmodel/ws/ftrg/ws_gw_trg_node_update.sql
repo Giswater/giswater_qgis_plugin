@@ -11,7 +11,7 @@ $BODY$
 DECLARE 
 
     rec_node record;
-    rec_arcRecord; 
+    rec_arc Record; 
     rec_node1 Record; 
     rec_node2 Record; 
     v_numNodes numeric; 
@@ -152,7 +152,7 @@ BEGIN
 							
 		-- Select arcs with start-end on the updated node
 			v_querystring := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
-			FOR rec_arcIN EXECUTE v_querystring
+			FOR rec_arc IN EXECUTE v_querystring
 			LOOP
 
 			-- Initial and final node of the arc
