@@ -526,7 +526,7 @@ BEGIN
 			END IF;
 
 			-- setting widgetcontrols when null (user has not configurated form fields table).
-			IF (aux_json->>'widgetcontrols')::json->>'minValue' IS NULL THEN
+			IF (aux_json->>'widgetcontrols')::json->>'minValue' IS NULL AND p_id IS NOT NULL AND aux_json->>'widgetcontrols' IN ('double', 'integer', 'float') THEN
 				v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||v_tablename||'", "idName":"'||v_idname||'", "id":"'||p_id||
 					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'", "key":"minValue"}}';
 				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetvalue;
@@ -534,7 +534,7 @@ BEGIN
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 			END IF;
 
-			IF (aux_json->>'widgetcontrols')::json->>'maxValue' IS NULL THEN
+			IF (aux_json->>'widgetcontrols')::json->>'maxValue' IS NULL AND p_id IS NOT NULL AND aux_json->>'widgetcontrols' IN ('double', 'integer', 'float') THEN
 				v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||v_tablename||'", "idName":"'||v_idname||'", "id":"'||p_id||
 					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'", "key":"maxValue"}}';
 				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetvalue;

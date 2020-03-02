@@ -131,13 +131,13 @@ BEGIN
 	
 	fields_array := COALESCE(fields_array, '{}');  
 	
-	FOREACH aux_json IN ARRAY fields_array
+	FOREACH aux_json IN ARRAY fields_array	
 	LOOP
 	
 		-- setting the typeahead widgets
-		IF (aux_json->>'typeahead') IS NOT NULL THEN
+		IF (aux_json->>'widgettype') = 'typeahead' THEN
 		
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', COALESCE(((aux_json->>'widgetcontrols')::json->>'typeaheadSearchField')));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', 'idval'::text);
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryText', COALESCE((aux_json->>'dv_querytext')));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryTextFilter', COALESCE((aux_json->>'dv_querytext_filterc')));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', COALESCE((aux_json->>'dv_parent_id')));
@@ -159,21 +159,21 @@ BEGIN
 		END IF;
 
 		-- setting minvalue on widgetcontrol when is null (user has not configurated form fields table). When insert is used featureupsert. Rest of cases is used here
-		IF (aux_json->>'widgetcontrols')::json->>'minValue' IS NULL AND p_id IS NOT NULL THEN
+		IF (aux_json->>'widgetcontrols')::json->>'minValue' IS NULL AND p_id IS NOT NULL AND aux_json->>'widgetcontrols' IN ('double', 'integer', 'float') THEN
 			v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||p_tablename||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tgop||'","json":'||aux_json||', "key":"minValue"}}';	
 			SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalue;
-			v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'minValue', v_widgetvalue);
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetvalue, '{}'));
+			v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'minValue', COALESCE(v_widgetvalue, '{}'));
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetvalue, '[]'));
 		END IF;
 
 		--setting maxvalue on widgetcontrol when is null  (user has not configurated form fields table). When insert is used featureupsert. Rest of cases is used here
-		IF (aux_json->>'widgetcontrols')::json->>'maxValue' IS NULL AND p_id IS NOT NULL THEN
+		IF (aux_json->>'widgetcontrols')::json->>'maxValue' IS NULL AND p_id IS NOT NULL AND aux_json->>'widgetcontrols' IN ('double', 'integer', 'float') THEN
 			v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||p_tablename||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tgop||'","json":'||aux_json||', "key":"maxValue"}}';		
 			SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalue;
 			v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'maxValue', v_widgetvalue);
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetcontrols, '{}'));
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'widgetcontrols', COALESCE(v_widgetcontrols, '[]'));
 		END IF;
-
+		
 	
 		-- looking for parents and for combo not parent
 		IF (aux_json->>'isparent')::boolean IS TRUE OR ((aux_json->>'widgettype') = 'combo' AND (aux_json->>'dv_parent_id') IS NULL) THEN
