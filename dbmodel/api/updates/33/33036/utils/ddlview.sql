@@ -38,6 +38,7 @@ CREATE OR REPLACE VIEW ve_config_sysfields AS
     config_api_form_fields.widgetcontrols,
     config_api_form_fields.widgetfunction,
     config_api_form_fields.linkedaction,
+    config_api_form_fields.listfilterparam,
     cat_feature.id AS cat_feature_id
    FROM config_api_form_fields
     LEFT JOIN cat_feature ON cat_feature.child_layer::text = config_api_form_fields.formname::text

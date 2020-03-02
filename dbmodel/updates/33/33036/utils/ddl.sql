@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
+--mandatory update on ddl to save value of editability, typeahead, reg_exp columns
 UPDATE audit_cat_param_user SET isparent=True, editability='{"trueWhenParentIn":[11]}' WHERE id ='inp_options_pattern';-- (audit_cat_param_user)
 UPDATE audit_cat_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'comboEnableWhenParent', editability->>'trueWhenParentIn') where editability is not null; --editability (enableWhenParent)
 UPDATE audit_cat_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'regexpControl', reg_exp) where reg_exp is not null; --reg_exp
@@ -18,8 +18,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"reg_exp"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"qgis_message"}}$$);
 
-UPDATE audit_cat_table SET id = 've_config_sysfields' WHERE id = 've_config_sys_fields';
-UPDATE audit_cat_function SET function_name = 'gw_api_get_widgetvalues' WHERE function_name = 'gw_api_get_widgetcontrols';
 
 
 --2020/02/24
