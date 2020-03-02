@@ -252,20 +252,6 @@ END IF;
 		VALUES (95, 1, 'INFO: All feature form fields with widget type combo or typeahead have dv_querytext defined.');
 	END IF;
 
-	--check if all the fields defined as  typeahead have field typeahead defined
-	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list  FROM config_api_form_fields 
-	WHERE widgettype ='typeahead' and typeahead is null AND formtype='feature';
-
-	IF v_count > 0 THEN
-		v_errortext=concat('ERROR: There is/are ',v_count,'feature form fields in config_api_form_fields that are typeahead but don''t have typeahead defined. 
-		Fields: ',v_view_list,'.');
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (95, 3, v_errortext);
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (95, 1, 'INFO: All feature form fields with widget type typeahead have typeahead defined.');
-	END IF;
-
 	--check if all addfields are defined in config_api_form_fields
 	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM man_addfields_parameter 
 	JOIN cat_feature ON cat_feature.id=man_addfields_parameter.cat_feature_id
