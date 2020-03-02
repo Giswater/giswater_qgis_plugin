@@ -494,8 +494,8 @@ CREATE OR REPLACE VIEW ve_node AS
 
    
    
-DROP VIEW SCHEMA_NAME.v_edit_inp_virtualvalve;
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_virtualvalve AS 
+DROP VIEW v_edit_inp_virtualvalve;
+CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
  SELECT v_arc.arc_id,
     v_arc.node_1,
     v_arc.node_2,
@@ -515,9 +515,105 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_inp_virtualvalve AS
     inp_virtualvalve.minorloss,
     inp_virtualvalve.to_arc,
     inp_virtualvalve.status
-   FROM SCHEMA_NAME.inp_selector_sector,
-    SCHEMA_NAME.v_arc
-     JOIN SCHEMA_NAME.inp_virtualvalve USING (arc_id)
-     JOIN SCHEMA_NAME.value_state_type ON v_arc.state_type = value_state_type.id
+   FROM inp_selector_sector,
+    v_arc
+     JOIN inp_virtualvalve USING (arc_id)
+     JOIN value_state_type ON v_arc.state_type = value_state_type.id
   WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text AND value_state_type.is_operative IS TRUE;
+
+
+
+CREATE OR REPLACE VIEW vi_patterns AS 
+ SELECT a.pattern_id,
+    a.factor_1,
+    a.factor_2,
+    a.factor_3,
+    a.factor_4,
+    a.factor_5,
+    a.factor_6,
+    a.factor_7,
+    a.factor_8,
+    a.factor_9,
+    a.factor_10,
+    a.factor_11,
+    a.factor_12,
+    a.factor_13,
+    a.factor_14,
+    a.factor_15,
+    a.factor_16,
+    a.factor_17,
+    a.factor_18
+   FROM ( SELECT a_1.id,
+            a_1.pattern_id,
+            a_1.factor_1,
+            a_1.factor_2,
+            a_1.factor_3,
+            a_1.factor_4,
+            a_1.factor_5,
+            a_1.factor_6,
+            a_1.factor_7,
+            a_1.factor_8,
+            a_1.factor_9,
+            a_1.factor_10,
+            a_1.factor_11,
+            a_1.factor_12,
+            a_1.factor_13,
+            a_1.factor_14,
+            a_1.factor_15,
+            a_1.factor_16,
+            a_1.factor_17,
+            a_1.factor_18
+           FROM inp_selector_result, inp_pattern_value a_1
+             JOIN rpt_inp_node b ON a_1.pattern_id::text = b.pattern_id::text 
+             WHERE b.result_id = inp_selector_result.result_id AND inp_selector_result.cur_user = current_user 
+        UNION
+         SELECT a_1.id,
+            a_1.pattern_id,
+            a_1.factor_1,
+            a_1.factor_2,
+            a_1.factor_3,
+            a_1.factor_4,
+            a_1.factor_5,
+            a_1.factor_6,
+            a_1.factor_7,
+            a_1.factor_8,
+            a_1.factor_9,
+            a_1.factor_10,
+            a_1.factor_11,
+            a_1.factor_12,
+            a_1.factor_13,
+            a_1.factor_14,
+            a_1.factor_15,
+            a_1.factor_16,
+            a_1.factor_17,
+            a_1.factor_18
+           FROM inp_selector_result,inp_pattern_value a_1
+             JOIN (SELECT value as pattern_id FROM config_param_user 
+		WHERE parameter = 'inp_options_pattern' and cur_user = current_user) a USING (pattern_id)
+        UNION
+         SELECT rpt_inp_pattern_value.id + 1000000,
+            rpt_inp_pattern_value.pattern_id,
+            rpt_inp_pattern_value.factor_1,
+            rpt_inp_pattern_value.factor_2,
+            rpt_inp_pattern_value.factor_3,
+            rpt_inp_pattern_value.factor_4,
+            rpt_inp_pattern_value.factor_5,
+            rpt_inp_pattern_value.factor_6,
+            rpt_inp_pattern_value.factor_7,
+            rpt_inp_pattern_value.factor_8,
+            rpt_inp_pattern_value.factor_9,
+            rpt_inp_pattern_value.factor_10,
+            rpt_inp_pattern_value.factor_11,
+            rpt_inp_pattern_value.factor_12,
+            rpt_inp_pattern_value.factor_13,
+            rpt_inp_pattern_value.factor_14,
+            rpt_inp_pattern_value.factor_15,
+            rpt_inp_pattern_value.factor_16,
+            rpt_inp_pattern_value.factor_17,
+            rpt_inp_pattern_value.factor_18
+           FROM rpt_inp_pattern_value
+          WHERE rpt_inp_pattern_value.result_id::text = ((( SELECT inp_selector_result.result_id
+                   FROM inp_selector_result
+                  WHERE inp_selector_result.cur_user = "current_user"()::text))::text)          
+	ORDER BY 1) a;
   
