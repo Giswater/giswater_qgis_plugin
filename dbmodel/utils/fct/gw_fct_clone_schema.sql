@@ -49,7 +49,7 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
+    SELECT giswater INTO v_version FROM version order by id desc limit 1;
 
     -- get input data   
     v_source_schema := ((p_data ->>'data')::json->>'parameters')::json->>'source_schema'::text;
@@ -118,14 +118,12 @@ BEGIN
         from information_schema.triggers where event_object_schema = v_source_schema group by 1,2,3,4,6,7,8 order by table_schema, table_name
     LOOP
 
-        raise notice 'rec_trg,%',rec_trg;
         SELECT string_agg(event_object_column, ',') INTO v_trg_fields FROM information_schema.triggered_update_columns 
         WHERE event_object_schema = v_source_schema and event_object_table=rec_trg.table_name AND trigger_name = rec_trg.trigger_name;
 
-        raise notice 'v_trg_fields,%',v_trg_fields;
 
-    EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
-        into v_replace_query;
+        EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
+        INTO v_replace_query;
         
         IF v_trg_fields IS NULL THEN 
 
@@ -135,7 +133,7 @@ BEGIN
         ELSE   
 
         EXECUTE 'select replace('''||v_replace_query||''', ''UPDATE'', '' UPDATE  OF '||v_trg_fields||''')'
-        into v_replace_query; 
+        INTO v_replace_query; 
        
 
             EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 
@@ -173,13 +171,15 @@ BEGIN
         join   information_schema.table_constraints tc ON conname=constraint_name WHERE contype =''p'' 
         AND nspname = '''||v_source_schema||''' AND table_name = '''||rec_seq.related_table||''';'
         INTO v_id_field;
-        
-        EXECUTE 'SELECT setval('''||v_dest_schema||'.'||rec_seq.sequence_name||''', 
-        (SELECT max('||v_id_field||')+1 FROM '||rec_seq.related_table||'), true);';
+         
+        IF v_id_field is not null THEN
+            EXECUTE 'SELECT setval('''||v_dest_schema||'.'||rec_seq.sequence_name||''', 
+            (SELECT max('||v_id_field||')+1 FROM '||rec_seq.related_table||'), true);';
+        END IF;
 
     END LOOP;
-        
-        EXECUTE 'SELECT setval('''||v_dest_schema||'.urn_id_seq'', gw_fct_setvalurn(),true);';
+
+    EXECUTE 'SELECT setval('''||v_dest_schema||'.urn_id_seq'', gw_fct_setvalurn(),true);';
 
 
 
