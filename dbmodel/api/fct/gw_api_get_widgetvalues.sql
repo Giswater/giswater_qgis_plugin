@@ -23,7 +23,6 @@ v_return json;
 v_apiversion json;
 v_min double precision;
 v_max double precision;
-v_return json;
 v_id text;
 v_node_1 text;
 v_node_2 text;
