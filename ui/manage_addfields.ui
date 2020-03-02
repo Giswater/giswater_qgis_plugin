@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>577</width>
-            <height>960</height>
+            <width>565</width>
+            <height>978</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -78,22 +78,17 @@
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <layout class="QGridLayout" name="gridLayout_6">
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="label"/>
-                </item>
                 <item row="6" column="1">
-                 <widget class="QComboBox" name="widgettype"/>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QComboBox" name="datatype"/>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="lbl_71">
-                  <property name="toolTip">
-                   <string>widgettype - Widget of the field. Must match with the data type</string>
-                  </property>
+                 <widget class="QCheckBox" name="iseditable">
                   <property name="text">
-                   <string>Widget type:</string>
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QCheckBox" name="ismandatory">
+                  <property name="text">
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -117,39 +112,11 @@
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="1">
-                 <widget class="QCheckBox" name="ismandatory">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="lbl_60">
-                  <property name="toolTip">
-                   <string>field_length - Maximum number of characters of the field in case of datatype is integer or numeric</string>
-                  </property>
-                  <property name="text">
-                   <string>Field length:</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="1">
                  <widget class="QLineEdit" name="column_id"/>
                 </item>
-                <item row="9" column="1">
-                 <widget class="QCheckBox" name="iseditable">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="lbl_70">
-                  <property name="text">
-                   <string>Form type:</string>
-                  </property>
-                 </widget>
+                <item row="4" column="1">
+                 <widget class="QComboBox" name="widgettype"/>
                 </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="lbl_73">
@@ -158,40 +125,6 @@
                   </property>
                   <property name="text">
                    <string>Data type:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QSpinBox" name="num_decimals">
-                  <property name="maximum">
-                   <number>999999999</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="lbl_58">
-                  <property name="toolTip">
-                   <string>num_decimals - Number of decimals in case of datatype is numeric</string>
-                  </property>
-                  <property name="text">
-                   <string>Num. Decimals:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="10" column="0">
-                 <widget class="QLabel" name="lbl_59">
-                  <property name="toolTip">
-                   <string>ismandatory - Field is mandatory or not</string>
-                  </property>
-                  <property name="text">
-                   <string>Mandatory:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QSpinBox" name="field_length">
-                  <property name="maximum">
-                   <number>999999999</number>
                   </property>
                  </widget>
                 </item>
@@ -205,13 +138,60 @@
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="0">
+                <item row="4" column="0">
+                 <widget class="QLabel" name="lbl_71">
+                  <property name="toolTip">
+                   <string>widgettype - Widget of the field. Must match with the data type</string>
+                  </property>
+                  <property name="text">
+                   <string>Widget type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
                  <widget class="QLabel" name="lbl_56">
                   <property name="toolTip">
                    <string>iseditable - Field is editable or not</string>
                   </property>
                   <property name="text">
                    <string>Editable:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QComboBox" name="datatype"/>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="lbl_59">
+                  <property name="toolTip">
+                   <string>ismandatory - Field is mandatory or not</string>
+                  </property>
+                  <property name="text">
+                   <string>Mandatory:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLineEdit" name="label"/>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="lbl_70">
+                  <property name="text">
+                   <string>Form type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Hidden:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="1">
+                 <widget class="QCheckBox" name="hidden">
+                  <property name="text">
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -235,20 +215,30 @@
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
                <layout class="QGridLayout" name="gridLayout_7">
-                <item row="2" column="1">
-                 <widget class="QCheckBox" name="isautoupdate">
-                  <property name="text">
-                   <string/>
+                <item row="13" column="1">
+                 <widget class="QTextEdit" name="widgetcontrols">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;setQgisMultiline&amp;quot;:true, &amp;quot;minValue&amp;quot;:0.001, &amp;quot;maxValue&amp;quot;:100, &amp;quot;autoupdateReloadFields&amp;quot;:['a', 'b'], &amp;quot;comboEnableWhenParent&amp;quot;:['a', 'b'], &amp;quot;regexpControl&amp;quot;:&amp;quot;[]&amp;quot;}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="whatsThis">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="1">
-                 <widget class="QLineEdit" name="dv_parent_id"/>
+                <item row="7" column="1">
+                 <widget class="QSpinBox" name="widgetdim">
+                  <property name="maximum">
+                   <number>999999999</number>
+                  </property>
+                 </widget>
                 </item>
-                <item row="3" column="1">
-                 <widget class="QCheckBox" name="dv_isnullvalue">
+                <item row="7" column="0">
+                 <widget class="QLabel" name="lbl_61">
+                  <property name="toolTip">
+                   <string>widgetdim - Dimension of the widget (may affect all widgets on same layout)</string>
+                  </property>
                   <property name="text">
-                   <string/>
+                   <string>Widget dim:</string>
                   </property>
                  </widget>
                 </item>
@@ -262,27 +252,24 @@
                   </property>
                  </widget>
                 </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="lbl_55">
-                  <property name="toolTip">
-                   <string>tooltip - Tooltip shown when mouse passes over the label</string>
-                  </property>
+                <item row="5" column="1">
+                 <widget class="QLineEdit" name="dv_parent_id"/>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="dv_isnullvalue">
                   <property name="text">
-                   <string>Tooltip:</string>
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="isautoupdate">
+                  <property name="text">
+                   <string/>
                   </property>
                  </widget>
                 </item>
                 <item row="4" column="0">
-                 <widget class="QLabel" name="lbl_75">
-                  <property name="toolTip">
-                   <string>reload_field - When auto update is TRUE, columns to reload values</string>
-                  </property>
-                  <property name="text">
-                   <string>Reload field:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
                  <widget class="QLabel" name="lbl_62">
                   <property name="toolTip">
                    <string>isparent - Is parent of another field</string>
@@ -293,6 +280,16 @@
                  </widget>
                 </item>
                 <item row="6" column="0">
+                 <widget class="QLabel" name="lbl_55">
+                  <property name="toolTip">
+                   <string>tooltip - Tooltip shown when mouse passes over the label</string>
+                  </property>
+                  <property name="text">
+                   <string>Tooltip:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
                  <widget class="QLabel" name="lbl_68">
                   <property name="toolTip">
                    <string>dv_parent_id - Id of the related parent table</string>
@@ -302,17 +299,17 @@
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="1">
+                <item row="8" column="1">
                  <widget class="QLineEdit" name="placeholder"/>
                 </item>
-                <item row="5" column="1">
+                <item row="4" column="1">
                  <widget class="QCheckBox" name="isparent">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="0">
+                <item row="10" column="0">
                  <widget class="QLabel" name="lbl_64">
                   <property name="toolTip">
                    <string>dv_querytext_filterc - Filter related to the parent table</string>
@@ -322,7 +319,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="0">
+                <item row="8" column="0">
                  <widget class="QLabel" name="lbl_57">
                   <property name="toolTip">
                    <string>placeholder - Sample value for textedit widgets</string>
@@ -332,8 +329,38 @@
                   </property>
                  </widget>
                 </item>
-                <item row="7" column="1">
+                <item row="6" column="1">
                  <widget class="QPlainTextEdit" name="tooltip"/>
+                </item>
+                <item row="9" column="0">
+                 <widget class="QLabel" name="lbl_65">
+                  <property name="toolTip">
+                   <string>dv_querytext - For combos, query which fill the values of the combo. Must have id, idval column structure</string>
+                  </property>
+                  <property name="text">
+                   <string>Query text:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="1">
+                 <widget class="QPlainTextEdit" name="dv_querytext"/>
+                </item>
+                <item row="11" column="1">
+                 <widget class="QComboBox" name="widgetfunction"/>
+                </item>
+                <item row="13" column="0">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Widgetcontrols:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="12" column="1">
+                 <widget class="QPlainTextEdit" name="stylesheet">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;label&amp;quot;:&amp;quot;color:green; font-weight:bold;&amp;quot;,&amp;quot;widget&amp;quot;:{&amp;quot;enabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;,&amp;quot;disabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="lbl_69">
@@ -345,50 +372,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="0">
-                 <widget class="QLabel" name="lbl_65">
-                  <property name="toolTip">
-                   <string>dv_querytext - For combos, query which fill the values of the combo. Must have id, idval column structure</string>
-                  </property>
-                  <property name="text">
-                   <string>Query text:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="10" column="1">
-                 <widget class="QPlainTextEdit" name="dv_querytext"/>
-                </item>
-                <item row="14" column="0">
-                 <widget class="QLabel" name="lbl_76">
-                  <property name="toolTip">
-                   <string>typeahead - Json which define properties of typeahed</string>
-                  </property>
-                  <property name="text">
-                   <string>Typeahead:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="13" column="0">
-                 <widget class="QLabel" name="lbl_78">
-                  <property name="toolTip">
-                   <string>stylesheet - Style of the label in the form. CSS styles are allowed</string>
-                  </property>
-                  <property name="text">
-                   <string>Stylesheet:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="reload_field">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;reload&amp;quot;:[&amp;quot;cat_pnom&amp;quot;, &amp;quot;cat_matcat_id&amp;quot;]}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="11" column="1">
-                 <widget class="QPlainTextEdit" name="dv_querytext_filterc"/>
-                </item>
-                <item row="12" column="0">
+                <item row="11" column="0">
                  <widget class="QLabel" name="lbl_67">
                   <property name="toolTip">
                    <string>widgetfunction - Python action triggered by users click on widget</string>
@@ -398,47 +382,16 @@
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="1">
-                 <widget class="QPlainTextEdit" name="stylesheet">
+                <item row="10" column="1">
+                 <widget class="QPlainTextEdit" name="dv_querytext_filterc"/>
+                </item>
+                <item row="12" column="0">
+                 <widget class="QLabel" name="lbl_78">
                   <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;label&amp;quot;:&amp;quot;color:green; font-weight:bold;&amp;quot;,&amp;quot;widget&amp;quot;:{&amp;quot;enabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;,&amp;quot;disabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="12" column="1">
-                 <widget class="QComboBox" name="widgetfunction"/>
-                </item>
-                <item row="15" column="1">
-                 <widget class="QTextEdit" name="widgetcontrols"/>
-                </item>
-                <item row="15" column="0">
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>Widgetcontrols:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="14" column="1">
-                 <widget class="QPlainTextEdit" name="typeahead">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;fieldToSearch&amp;quot;: &amp;quot;arc_id&amp;quot;, &amp;quot;threshold&amp;quot;: 3, &amp;quot;noresultsMsg&amp;quot;: &amp;quot;No results&amp;quot;, &amp;quot;loadingMsg&amp;quot;: &amp;quot;Searching&amp;quot;}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="1">
-                 <widget class="QSpinBox" name="widgetdim">
-                  <property name="maximum">
-                   <number>999999999</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="0">
-                 <widget class="QLabel" name="lbl_61">
-                  <property name="toolTip">
-                   <string>widgetdim - Dimension of the widget (may affect all widgets on same layout)</string>
+                   <string>stylesheet - Style of the label in the form. CSS styles are allowed</string>
                   </property>
                   <property name="text">
-                   <string>Widget dim:</string>
+                   <string>Stylesheet:</string>
                   </property>
                  </widget>
                 </item>
@@ -560,14 +513,9 @@
   <tabstop>formtype</tabstop>
   <tabstop>label</tabstop>
   <tabstop>datatype</tabstop>
-  <tabstop>field_length</tabstop>
-  <tabstop>num_decimals</tabstop>
   <tabstop>widgettype</tabstop>
-  <tabstop>iseditable</tabstop>
-  <tabstop>ismandatory</tabstop>
   <tabstop>isautoupdate</tabstop>
   <tabstop>dv_isnullvalue</tabstop>
-  <tabstop>reload_field</tabstop>
   <tabstop>isparent</tabstop>
   <tabstop>dv_parent_id</tabstop>
   <tabstop>tooltip</tabstop>
@@ -577,7 +525,6 @@
   <tabstop>dv_querytext_filterc</tabstop>
   <tabstop>widgetfunction</tabstop>
   <tabstop>stylesheet</tabstop>
-  <tabstop>typeahead</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
   <tabstop>tab_add_fields</tabstop>
