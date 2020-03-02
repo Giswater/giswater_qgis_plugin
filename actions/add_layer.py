@@ -252,22 +252,17 @@ class AddLayer(object):
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
-    def set_layer_symbology(self, layer, color=QColor(255, 0, 0), opacity=0.5, size=None):
+    def set_layer_symbology(self, layer, properties=None):
         renderer = layer.renderer()
         symbol = renderer.symbol()
-        symbol.setColor(color)
-        if not size:
-            size = {"QgsLineSymbol": 2.6, "QgsMarkerSymbol": 2.6}
-        else:
-            size[f"{type(symbol)}"] = size
 
         if type(symbol) == QgsLineSymbol:
-            symbol.setWidth(size['QgsLineSymbol'])
+            layer.renderer().setSymbol(QgsLineSymbol.createSimple(properties))
         elif type(symbol) == QgsMarkerSymbol:
-            symbol.setSize(size['QgsMarkerSymbol'])
+            layer.renderer().setSymbol(QgsMarkerSymbol.createSimple(properties))
         elif type(symbol) == QgsFillSymbol:
-            pass
-        layer.setOpacity(opacity)
+            layer.renderer().setSymbol(QgsFillSymbol.createSimple(properties))
+
         layer.triggerRepaint()
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
