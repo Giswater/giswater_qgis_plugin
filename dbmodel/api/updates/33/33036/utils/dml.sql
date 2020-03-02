@@ -84,7 +84,8 @@ If widgettype=''text'', you can force values using "minValue" or "maxValue" or "
 If widgettype=''combo'', you can only make editable combo for specific values of child using comboEnableWhenParent
 If widgettype=''typeahead'', it is mandatory to use "typeaheadSearchField" to define search to be used
 If isautoupdate=true, you can use autoupdateReloadFields to identify fields must be reloaded with updated values',
-'{"setQgisMultiline":true, "minValue":0.001, "maxValue":100, "autoupdateReloadFields":['a', 'b'], "typeaheadSearchField":"id", "comboEnableWhenParent":['a', 'b'], "regexpControl":"[]"}', 
+'{"setQgisMultiline":true, "minValue":0.001, "maxValue":100, "autoupdateReloadFields":["a", "b"], "typeaheadSearchField":"id", 
+"comboEnableWhenParent":["a", "b"], "regexpControl":"[]"}', 
 FALSE, NULL, TRUE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
 
