@@ -608,9 +608,6 @@ class MincutParent(ParentAction):
 
                 layer_style = {}
                 symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-                print(f"L -> {layer} --> {type(symbol)}")
-                print(layer.renderer().symbol().symbolLayers()[0].properties())
-
                 if type(symbol) == QgsLineSymbol:
                     props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
                              'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
