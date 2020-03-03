@@ -334,7 +334,7 @@ BEGIN
 		FROM (SELECT connec_id, descript, the_geom
 		FROM  anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=116) row) features;
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}');
+		v_result_point = concat ('{"geometryType":"Point", "layerName":"overlap affected connecs", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}');
 	
 		-- lines
 		v_result = null;
@@ -348,7 +348,7 @@ BEGIN
 		FROM (SELECT arc_id, descript, the_geom
 		FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=116) row) features;
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
+		v_result_line = concat ('{"geometryType":"LineString", "layerName":"other mincuts which overlaps", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
 
 		-- polygon
 		SELECT jsonb_agg(features.feature) INTO v_result
@@ -361,7 +361,7 @@ BEGIN
 		FROM (SELECT pol_id, descript, the_geom
 		FROM  anl_polygon WHERE cur_user="current_user"() AND fprocesscat_id=116) row) features;
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_pol = concat ('{"geometryType":"MultiPolygon", "qmlPath":"',v_qmlpolygonpath,'", "features":',v_result, '}'); 
+		v_result_pol = concat ('{"geometryType":"MultiPolygon", "layerName":"overlap affected arcs", "qmlPath":"',v_qmlpolygonpath,'", "features":',v_result, '}'); 
 
 		-- geometry (the boundary of mincut using arcs and valves)
 		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||v_mincutid||
