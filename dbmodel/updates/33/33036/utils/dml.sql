@@ -23,3 +23,7 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 
 
 
 UPDATE audit_cat_table SET isdeprecated = TRUE where id IN ('v_ui_workcat_polygon_all','v_ui_workcat_polygon_aux');
+
+--2020/03/03
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (117,'Connect to network','edit','utils') ON CONFLICT (id) DO NOTHING;

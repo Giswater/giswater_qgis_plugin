@@ -21,7 +21,7 @@ set sample_query = '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"d
 where function_name='gw_fct_pg2epa_main';
 
 UPDATE audit_cat_function
-set sample_query = 'gw_fct_arc_divide(''node_id'')'
+set sample_query = '{"client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":["node_id"]},"data":{}}'
 where function_name='gw_fct_arc_divide';
 
 UPDATE audit_cat_function
@@ -158,6 +158,9 @@ VALUES (3090,'Please enter a valid grafClass', NULL, 2,true,'ws', false) ON CONF
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3092,'Only arc is available as input feature to execute mincut', NULL, 2,true,'ws', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3094,'One of new arcs has no length', 'The selected node may be its final.', 2,true,'utils', false) ON CONFLICT (id) DO NOTHING;
 
 UPDATE audit_cat_param_user SET vdefault = 'TRUE' WHERE  id = 'qgis_form_initproject_hidden';
 
