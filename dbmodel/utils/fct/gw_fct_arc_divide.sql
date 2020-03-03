@@ -8,12 +8,16 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(p_data json)
   RETURNS json AS
 
 $BODY$
 /*
-SELECT "SCHEMA_NAME".gw_fct_arc_divide('1079');
+
+SELECT SCHEMA_NAME.gw_fct_arc_divide($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"id":["1007"]},
+"data":{}}$$)
 */
 DECLARE
 v_node_geom	geometry;
@@ -75,6 +79,8 @@ v_level integer;
 v_status text;
 v_message text;
 v_hide_form boolean;
+v_array_node_id text;
+v_node_id text;
 
 BEGIN
 
@@ -87,23 +93,27 @@ BEGIN
 
     INSERT INTO config_param_user (value, parameter, cur_user)
     VALUES (txid_current(),'cur_trans',current_user );
+   
+    -- Get parameters from input json
+    v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
+    v_node_id =  replace(replace (v_array_node_id::text, '"]', ''), '["', '');
 
 	-- Get project type
 	SELECT wsoftware, epsg, giswater INTO v_project_type, v_srid,v_version FROM version LIMIT 1;
     
     -- Get node values
-    SELECT the_geom INTO v_node_geom FROM node WHERE node_id = node_id_arg;
-	SELECT state INTO v_state_node FROM node WHERE node_id=node_id_arg;
+    SELECT the_geom INTO v_node_geom FROM node WHERE node_id = v_node_id;
+	SELECT state INTO v_state_node FROM node WHERE node_id=v_node_id;
 	
 	IF v_project_type = 'WS' THEN
 		SELECT isarcdivide, node_type.id INTO v_isarcdivide, v_node_type 
 		FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id 
-		JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=node_id_arg;
+		JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=v_node_id;
 	ELSE
 		SELECT isarcdivide, node_type.id INTO v_isarcdivide, v_node_type 
-		FROM node_type JOIN node ON node.node_type = node_type.id WHERE node.node_id=node_id_arg;
+		FROM node_type JOIN node ON node.node_type = node_type.id WHERE node.node_id=v_node_id;
 	END IF;
-
+raise notice 'v_isarcdivide,%',v_isarcdivide;
     -- Get parameters from configs table
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
 	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user;
@@ -117,14 +127,6 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 4, 'ARC DIVIDE');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 3, 'CRITICAL ERRORS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 3, '----------------------');	
-
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 2, 'WARNINGS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 2, '--------------');	
-
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 1, '-------');
 	
 	-- State control
 	IF v_state=0 THEN
@@ -149,7 +151,7 @@ BEGIN
 
 		-- Find closest arc inside tolerance
 		SELECT arc_id, state, the_geom INTO v_arc_id, v_state, v_arc_geom  FROM v_edit_arc AS a 
-		WHERE ST_DWithin(v_node_geom, a.the_geom, v_arc_divide_tolerance) AND node_1 != node_id_arg AND node_2 != node_id_arg
+		WHERE ST_DWithin(v_node_geom, a.the_geom, v_arc_divide_tolerance) AND node_1 != v_node_id AND node_2 != v_node_id
 		ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
 
 		IF v_arc_id IS NOT NULL THEN 
@@ -166,9 +168,8 @@ BEGIN
 		
 			-- Check if any of the 'lines' are in fact a point
 			IF (ST_GeometryType(v_line1) = 'ST_Point') OR (ST_GeometryType(v_line2) = 'ST_Point') THEN
-				--RETURN 1;
-				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-				VALUES (112, 3, concat('One of the new arcs has no length. The selected node may be its final.'));
+
+				EXECUTE 'SELECT gw_fct_audit_function(3094,2114, NULL)' INTO v_audit_result;
 			END IF;
 		
 			-- Get arc data
@@ -178,13 +179,13 @@ BEGIN
 			-- Update values of new arc_id (1)
 			rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 			rec_aux1.code := rec_aux1.arc_id;
-			rec_aux1.node_2 := node_id_arg ;-- rec_aux1.node_1 take values from original arc
+			rec_aux1.node_2 := v_node_id ;-- rec_aux1.node_1 take values from original arc
 			rec_aux1.the_geom := v_line1;
 
 			-- Update values of new arc_id (2)
 			rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 			rec_aux2.code := rec_aux2.arc_id;
-			rec_aux2.node_1 := node_id_arg; -- rec_aux2.node_2 take values from original arc
+			rec_aux2.node_1 := v_node_id; -- rec_aux2.node_2 take values from original arc
 			rec_aux2.the_geom := v_line2;
 
 			-- getting table child information (man_table)
@@ -274,7 +275,9 @@ BEGIN
 
 				-- Capture linked feature information to redraw (later on this function)
 				-- connec
-				FOR v_connec_id IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id
+				FOR v_connec_id IN 
+				SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id AND 
+				connec.state=1
 				LOOP
 					v_array_connec:= array_append(v_array_connec, v_connec_id);
 				END LOOP;
@@ -286,7 +289,8 @@ BEGIN
 				-- gully
 				IF v_project_type='UD' THEN
 
-					FOR v_gully_id IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id
+					FOR v_gully_id IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id  AND 
+						gully.state=1
 					LOOP
 						v_array_gully:= array_append(v_array_gully, v_gully_id);
 					END LOOP;
@@ -298,7 +302,7 @@ BEGIN
 						
 				-- Insert data into traceability table
 				INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
-				VALUES ('DIVIDE ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
+				VALUES ('DIVIDE ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 			
 				-- Update elements from old arc to new arcs
 				SELECT count(id) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;
@@ -420,13 +424,13 @@ BEGIN
 					PERFORM gw_fct_connect_to_network(v_array_connec, 'CONNEC');
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs.'));
+					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 				END IF;
 				IF v_count_gully > 0 THEN
 					PERFORM gw_fct_connect_to_network(v_array_gully, 'GULLY');
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies.'));
+					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
 				END IF;
 
 				-- delete old arc
@@ -497,7 +501,7 @@ BEGIN
 				
 				-- Insert data into traceability table
 				INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
-				VALUES ('DIVIDE WITH PLANIFIED NODE',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
+				VALUES ('DIVIDE WITH PLANIFIED NODE',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 
 				-- Set addparam (parent/child)
 				UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"parent"}' WHERE  psector_id=v_psector AND arc_id=v_arc_id;
@@ -583,7 +587,8 @@ BEGIN
 
 				-- Capture linked feature information to redraw (later on this function)
 				-- connec
-				FOR v_connec_id IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id
+				FOR v_connec_id IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=v_arc_id  AND 
+				connec.state=1
 				LOOP
 					v_array_connec:= array_append(v_array_connec, v_connec_id);
 				END LOOP;
@@ -595,7 +600,8 @@ BEGIN
 				-- gully
 				IF v_project_type='UD' THEN
 
-					FOR v_gully_id IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id
+					FOR v_gully_id IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=v_arc_id AND 
+						gully.state=1
 					LOOP
 						v_array_gully:= array_append(v_array_gully, v_gully_id);
 					END LOOP;
@@ -607,7 +613,7 @@ BEGIN
 							
 				-- Insert data into traceability table
 				INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
-				VALUES ('DIVIDE PLANIFIED ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
+				VALUES ('DIVIDE PLANIFIED ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 			
 				-- Update elements from old arc to new arcs
 				SELECT count(id) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;
@@ -669,13 +675,13 @@ BEGIN
 					PERFORM gw_fct_connect_to_network(v_array_connec, 'CONNEC');
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs.'));
+					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 				END IF;
 				IF v_count_gully > 0 THEN
 					PERFORM gw_fct_connect_to_network(v_array_gully, 'GULLY');
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies.'));
+					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
 				END IF;
                 
                 -- update arc_id for linked features in psector after reconnect
