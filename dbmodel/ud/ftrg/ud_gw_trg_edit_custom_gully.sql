@@ -212,7 +212,9 @@ BEGIN
 		-- Control of automatic insert of link and vnode
 		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
-			PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
+			
+			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+			"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 		END IF;
 
 		-- man addfields insert
@@ -244,9 +246,13 @@ BEGIN
 			UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.gully_id AND exit_type='VNODE' LIMIT 1)::int8;
-				PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
+
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
+				
 			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' AND cur_user=current_user LIMIT 1) IS TRUE THEN
-				PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 			END IF;
 		END IF;
 		
@@ -333,8 +339,9 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 	
-		PERFORM gw_fct_check_delete(OLD.gully_id, 'GULLY');
-	
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		"feature":{"id":"'||OLD.gully_id||'","featureType":"GULLY"}, "data":{}}$$)';
+
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
         RETURN NULL;

@@ -341,14 +341,18 @@ BEGIN
 			-- Control of automatic insert of link and vnode
 			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN
-				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 				SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
 			END IF;
 
 		ELSIF NEW.state=2 THEN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
-			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
-			
+
+			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+			"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+
 			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
 			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
 			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"());
@@ -402,9 +406,14 @@ BEGIN
 			UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.connec_id AND exit_type='VNODE' LIMIT 1)::int8;
-				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+				
 			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' AND cur_user=current_user LIMIT 1) IS TRUE THEN
-				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+				
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 			END IF;
 		ELSIF (OLD.arc_id != (SELECT arc_id FROM connec WHERE connec_id=NEW.connec_id)) THEN -- case when arc_id comes from plan psector tables
 			UPDATE plan_psector_x_connec SET arc_id= NEW.arc_id WHERE connec_id=NEW.connec_id AND arc_id = OLD.arc_id;		
@@ -551,8 +560,9 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN
 	
-		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
-		
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		"feature":{"id":"'||OLD.connec_id||'","featureType":"CONNEC"}, "data":{}}$$)';
+
 		IF v_man_table ='man_fountain'  THEN
 			DELETE FROM connec WHERE connec_id=OLD.connec_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_fountain WHERE connec_id=OLD.connec_id );
