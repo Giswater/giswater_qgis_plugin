@@ -1,3 +1,4 @@
 3.3.036
 *************
 - Deep refactor config_api_form_fields & audit_cat_param_user
+- Refactor workcat search dropping views (('v_ui_workcat_polygon_all','v_ui_workcat_polygon_aux')  and using 'on the fly' workcat geometry built-up.
