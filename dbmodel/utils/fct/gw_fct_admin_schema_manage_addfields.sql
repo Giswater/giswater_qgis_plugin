@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2690
 
---drop function SCHEMA_NAME.gw_fct_admin_manage_addfields(json)
+drop function if exists SCHEMA_NAME.gw_fct_admin_manage_addfields(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_addfields(p_data json)
-  RETURNS void AS
+  RETURNS json AS
 $BODY$
 
 
@@ -98,13 +98,34 @@ DECLARE
 	v_unaccent_id text;
 	v_hidden boolean;
 
+	v_result text;
+	v_result_info text;
+	v_result_point text;
+	v_result_line text;
+	v_result_polygon text;
+	v_error_context text;
+	v_audit_result text;
+	v_level integer;
+	v_status text;
+	v_message text;
+	v_hide_form boolean;	
+	v_version text;		
+
 BEGIN
 
 	
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
- 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+ 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version LIMIT 1;
+
+ 	--set current process as users parameter
+    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+
+    INSERT INTO config_param_user (value, parameter, cur_user)
+    VALUES (txid_current(),'cur_trans',current_user );
+    
+	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- get input parameters -,man_addfields
 	v_schemaname = 'SCHEMA_NAME';
@@ -139,6 +160,13 @@ BEGIN
 	v_listfilterparam = (((p_data ->>'data')::json->>'parameters')::json ->>'listfilterparam')::json;
 	v_hidden = COALESCE(v_hidden, FALSE);
 
+	-- delete old values on result table
+	DELETE FROM audit_check_data WHERE fprocesscat_id=118 AND user_name=current_user;
+	
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (118, null, 4, 'CREATE ADDFIELDS');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (118, null, 4, '-------------------------------------------------------------');
+	
 
 	--Assign config widget types 
 	IF v_config_datatype='string' THEN
@@ -165,9 +193,11 @@ BEGIN
 		v_audit_widgettype = v_config_widgettype;
 	END IF;
 
-raise notice 'v_multi_create,%',v_multi_create;
 
 PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+
+INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+VALUES (118, null, 4, concat('Create addfield ',v_param_name,'.'));
 
 --check if the new field doesnt have accents and fix it
 IF v_action='CREATE' THEN
@@ -175,10 +205,15 @@ IF v_action='CREATE' THEN
 
 	IF v_unaccent_id IS NOT NULL THEN
 		v_param_name = v_unaccent_id;
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Remove accents from addfield name.');
+
 	END IF;
 
 	IF v_param_name ilike '%-%' OR v_param_name ilike '%.%' THEN
 	 	v_param_name=replace(replace(replace(v_param_name, ' ','_'),'-','_'),'.','_');
+	 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Remove unwanted characters from addfield name.');
 	END IF;
 
 END IF;
@@ -187,6 +222,8 @@ IF v_multi_create IS TRUE THEN
 	
 	IF v_action='UPDATE' THEN
 		v_update_old_datatype = (SELECT datatype_id FROM man_addfields_parameter WHERE param_name=v_param_name);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Update old parameter name.');
 	END IF;
 
 	IF  v_project_type='WS' THEN
@@ -213,7 +250,12 @@ IF v_multi_create IS TRUE THEN
 		--remove spaces and dashs from view name
 		IF (SELECT child_layer FROM cat_feature WHERE id=rec.id AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
 			OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Remove unwanted characters from child view name: ',rec.id));
+
 			UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=rec.id;
+			
 		END IF;
 	
 		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
@@ -263,6 +305,9 @@ IF v_multi_create IS TRUE THEN
 		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype,
 		v_active, v_orderby, v_iseditable);
 		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
+
 		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
 
 		IF v_param_user_id IS NULL THEN
@@ -275,6 +320,9 @@ IF v_multi_create IS TRUE THEN
 			VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 			 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
 			v_dv_querytext, v_dv_querytext_filterc,v_param_name );
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_vdefault')));
 		
 		END IF;
 
@@ -283,14 +331,27 @@ IF v_multi_create IS TRUE THEN
 		active=v_active, orderby=v_orderby, iseditable=v_iseditable 
 		WHERE param_name=v_param_name and cat_feature_id IS NULL;
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
+
 		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
 		dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_vdefault');
+
+		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_vdefault')));
 
 	ELSIF v_action = 'DELETE' THEN
 
 		DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
+
 		DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_vdefault');
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
 
 	END IF;
 
@@ -306,12 +367,14 @@ IF v_multi_create IS TRUE THEN
 		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, 
 		label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
 		placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
-		dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)
-		
+		dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)	
 		VALUES (v_viewname, v_formtype, v_param_name, v_layout_order, v_config_datatype, v_config_widgettype,
-		v_label, v_isparent, v_iseditable, v_isautoupdate, 'layout_data_1',
+		v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, 'layout_data_1',
 		v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Insert parameter into config_api_form_fields.');
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE config_api_form_fields SET datatype=v_config_datatype,
@@ -323,6 +386,8 @@ IF v_multi_create IS TRUE THEN
 		dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction, hidden = v_hidden
 		WHERE column_id=v_param_name AND formname=v_viewname;
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Update parameter in config_api_form_fields.');
 	END IF;
 	
 		--get new values of addfields
@@ -387,6 +452,8 @@ IF v_multi_create IS TRUE THEN
 			
 		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));
 	--CREATE VIEW when the addfields don't exist (after delete)
 	ELSIF v_new_parameters is null THEN 
 
@@ -419,6 +486,8 @@ IF v_multi_create IS TRUE THEN
 		"id_param":null,"datatype":null}}';
 			
 		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));
 
 	ELSE	
 
@@ -432,9 +501,11 @@ IF v_multi_create IS TRUE THEN
 		v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
 		v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
 
-		--replace the existing view and create the trigger
+		--replace the existing view
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));	
 	END IF;
 
 	--create trigger on view 
@@ -444,15 +515,28 @@ IF v_multi_create IS TRUE THEN
 	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
 
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+	VALUES (118, null, 4, concat('Recreate edition trigger for view ',rec.child_layer,'.'));
+
 	END LOOP;
 
 	IF v_action='DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''';';
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Delete values from man_addfields_parameter related to parameter.');
+
 		EXECUTE 'DELETE FROM config_api_form_fields WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
-	
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
+
 	ELSIF v_action='UPDATE' THEN 
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
 		active=v_active, orderby=v_orderby WHERE param_name=v_param_name;		
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Update values of man_addfields_parameter related to parameter.');
 	END IF;
 
 --SIMPLE ADDFIELDS
@@ -467,7 +551,7 @@ ELSE
 
 	--check if field order will overlap the existing field	
 	IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
-		PERFORM gw_fct_audit_function(3016,2690, NULL);
+		EXECUTE 'SELECT gw_fct_audit_function(3016,2690, NULL)' INTO v_audit_result;
 	END IF;
 
 	-- get view definition
@@ -478,7 +562,13 @@ ELSE
 	--remove spaces and dashes from view name
 	IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
 		OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
+
+		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Remove unwanted characters from child view name: ',v_viewname, '.'));
+
 		UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=v_cat_feature;
+		
 	END IF;
 	
 	v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
@@ -509,7 +599,10 @@ ELSE
 		active, orderby, iseditable)
 		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype,
 		v_active, v_orderby, v_iseditable);
-	
+		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
+
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
 		AND layoutname = ''layout_data_1'';'
 		INTO v_layout_order;
@@ -526,6 +619,9 @@ ELSE
 		v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 		v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
 
+		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Insert parameter definition into config_api_form_fields.');
 
 		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
 		
@@ -539,11 +635,18 @@ ELSE
 		concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
 		'role_edit', v_param_name,  22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
 		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name);
+		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
+		
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
 		active=v_active, orderby=v_orderby,iseditable=v_iseditable 
 		WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
 		
 		IF (SELECT cat_feature_id FROM man_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
 			UPDATE config_api_form_fields SET datatype=v_config_datatype,
@@ -555,17 +658,30 @@ ELSE
 			dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction,
 			hidden = v_hidden
 			WHERE column_id=v_param_name AND formname=v_viewname;
+	
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Update parameter definition in config_api_form_fields.');
+
 		END IF;
 
 		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
 		dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
 
 	ELSIF v_action = 'DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
 
 		DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
+
 		DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
 
 	END IF;
 
@@ -611,7 +727,6 @@ ELSE
 
 		END IF;
 
-		RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
 
 		v_man_fields := COALESCE(v_man_fields, 'null');
 
@@ -621,6 +736,9 @@ ELSE
 		"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
 			
 		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));	
 
 	--CREATE VIEW when the addfields don't exist (after delete)
 	ELSIF v_new_parameters is null THEN 
@@ -652,8 +770,10 @@ ELSE
 		"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,
 		"id_param":null,"datatype":null}}';
 			
-		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);	
+		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));
 	ELSE	
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
@@ -668,6 +788,8 @@ ELSE
 		--replace the existing view and create the trigger
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));	
 	END IF;
 
 	--create trigger on view 
@@ -677,15 +799,60 @@ ELSE
 	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
 
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+	VALUES (118, null, 4, concat('Recreate edition trigger for view ',v_viewname,'.'));
+
+
 END IF;
 
 PERFORM SCHEMA_NAME.gw_fct_admin_role_permissions();
-	--    Control NULL's
-	--v_message := COALESCE(v_message, '');
+
+INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+VALUES (118, null, 4, 'Set role permissions.');
+
+-- get results
+	-- info
+
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data 
+	WHERE user_name="current_user"() AND fprocesscat_id=118 ORDER BY criticity desc, id asc) row; 
 	
-	-- Return
-	--RETURN ('{"message":{"priority":"'||v_priority||'", "text":"'||v_message||'"}}');	
-	
+IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'Process done successfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
+	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+
+	v_result_point = '{"geometryType":"", "features":[]}';
+	v_result_line = '{"geometryType":"", "features":[]}';
+	v_result_polygon = '{"geometryType":"", "features":[]}';
+
+--  Return
+     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+		     	'"setVisibleLayers":[]'||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||'}'||
+				', "actions":{"hideForm":' || v_hide_form || '}'||
+		       '}'||
+	    '}')::json;
+
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+ 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

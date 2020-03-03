@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2746
 
---drop function SCHEMA_NAME.gw_fct_admin_manage_visit(json)
+drop function if exists SCHEMA_NAME.gw_fct_admin_manage_visit(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_visit(p_data json)
-  RETURNS void AS
+  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -106,14 +106,36 @@ DECLARE
 	v_dv_querytext text;
 	v_ismandatory boolean;
 	v_iseditable boolean;
-	
+
+
+	v_result text;
+	v_result_info text;
+	v_result_point text;
+	v_result_line text;
+	v_result_polygon text;
+	v_error_context text;
+	v_audit_result text;
+	v_level integer;
+	v_status text;
+	v_message text;
+	v_hide_form boolean;	
+	v_version text;		
+
 BEGIN
 
 	
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
- 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+ 	SELECT wsoftware, giswater INTO v_project_type,v_version FROM version LIMIT 1;
+
+ 	--set current process as users parameter
+    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+
+    INSERT INTO config_param_user (value, parameter, cur_user)
+    VALUES (txid_current(),'cur_trans',current_user );
+    
+	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- get input parameters -,man_addfields
 	v_schemaname = 'SCHEMA_NAME';
@@ -150,10 +172,20 @@ BEGIN
 	IF v_data_type = 'text' THEN 
 		v_config_data_type = 'string';
 	END IF;
+
+	-- delete old values on result table
+	DELETE FROM audit_check_data WHERE fprocesscat_id=119 AND user_name=current_user;
 	
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (119, null, 4, 'CREATE VISIT');
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (119, null, 4, '-------------------------------------------------------------');
+
 	--capture the id of the class
 	IF v_class_id IS NULL AND  v_action_type = 'parameter' THEN
 		SELECT id INTO v_class_id FROM om_visit_class WHERE idval = v_class_name;
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Update class ', v_class_id,' - ',v_class_name,'.'));
 	END IF;
 	
 	--capture current parameters related to the class
@@ -180,6 +212,9 @@ IF v_action = 'CREATE' THEN
 		VALUES (v_class_name, v_descript, v_active, v_ismultifeature, v_ismultievent,upper(v_feature_system_id), 'role_om', v_visit_type, v_param_options::json)
 		RETURNING id INTO v_class_id;
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Create new class ', v_class_id,' - ',v_class_name,'.'));
+
 		--insert values into api config
 		IF (SELECT visitclass_id FROM config_api_visit WHERE visitclass_id = v_class_id) IS NULL THEN
 			IF v_ismultievent = TRUE THEN
@@ -188,10 +223,16 @@ IF v_action = 'CREATE' THEN
 				INSERT INTO config_api_visit (visitclass_id, formname, tablename) 
 				VALUES (v_class_id, v_viewname, concat('ve_visit_',v_feature_system_id,'_singlevent'));
 			END IF;
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert values into config_api_visit.'));
 		END IF;
 		
 		IF (SELECT visitclass_id FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id) IS NULL THEN
 			INSERT INTO config_api_visit_x_featuretable (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert values into config_api_visit_x_featuretable.'));
 		END IF;
 		
 		IF (SELECT formname FROM config_api_form_fields WHERE formname = v_viewname) IS NULL THEN
@@ -222,6 +263,9 @@ IF v_action = 'CREATE' THEN
 			UPDATE config_api_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') 
 			WHERE column_id = 'feature_id' and formname = v_viewname;
 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert definition of common visit fields into config_api_form_fields.'));
+
 			--rename dv_querytext for class_id in order to look for defined feature_type
 			IF v_feature_system_id = 'connec' THEN
 				UPDATE config_api_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND 
@@ -243,6 +287,9 @@ IF v_action = 'CREATE' THEN
 		IF v_viewname NOT IN (SELECT id FROM audit_cat_table) AND v_ismultievent iS TRUE THEN
 			INSERT INTO audit_cat_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
 			VALUES (v_viewname, 'O&M', 'Editable view that saves visits', 'role_om', 0, 0, false);
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert view name into audit_cat_table.'));
 		END IF;
 
 		--insert new parameter
@@ -253,7 +300,10 @@ IF v_action = 'CREATE' THEN
 		--relate new parameters with new class
 		INSERT INTO om_visit_class_x_parameter (class_id, parameter_id)
 		VALUES (v_class_id, v_param_name);
-	    
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Insert parameter ',v_param_name,' into om_visit_parameter and relate it with class ',v_class_id,' in om_visit_class_x_parameter.'));
+
 	    --add configuration of new parameters to config_api_form_fields
 		IF v_ismultievent = TRUE THEN
 			EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
@@ -264,6 +314,9 @@ IF v_action = 'CREATE' THEN
 			iseditable, ismandatory, dv_querytext)
 			VALUES (v_viewname, 'visit', v_param_name,1,v_layout_order, true, v_data_type, v_widgettype, v_param_name, 'data_1',
 			v_iseditable, v_ismandatory, v_dv_querytext);
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert new parameter definition into config_api_form_fields.'));
 		END IF;
 
     END IF;	
@@ -281,6 +334,10 @@ IF v_action = 'CREATE' THEN
 				raise notice 'v_data_view,%',v_data_view;
 				PERFORM gw_fct_admin_manage_visit_view(v_data_view);			
 
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (119, null, 4, concat('Create view ',v_viewname,' for class ',v_class_id,'.'));
+
 			ELSE
 
 				--if the view doesn't exist and there are parameters defined for the class or add new parameter to the class
@@ -290,6 +347,8 @@ IF v_action = 'CREATE' THEN
 
 				PERFORM gw_fct_admin_manage_visit_view(v_data_view);	
 
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (119, null, 4, concat('Recreate view ',v_viewname,' for class ',v_class_id,'.'));
 			END IF;
 
 	END IF;
@@ -304,6 +363,9 @@ IF v_action = 'UPDATE' AND v_action_type = 'class' THEN
 
  	SELECT tablename INTO v_old_viewname FROM config_api_visit WHERE visitclass_id = v_class_id;
 
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+	VALUES (119, null, 4, concat('Update class definition in om_visit_class and config_api_visit.'));
+
 	RAISE NOTICE 'v_old_viewname,v_viewname,%,%',v_old_viewname, v_viewname;
 	
  	IF v_old_viewname != v_viewname THEN
@@ -316,6 +378,8 @@ IF v_action = 'UPDATE' AND v_action_type = 'class' THEN
 
  		UPDATE audit_cat_table SET id = v_viewname WHERE id = v_old_viewname;
 
+ 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Change visit view name to ',v_viewname,' for class ',v_class_id,'.'));
  	
  	END IF;
 
@@ -338,7 +402,10 @@ IF v_action = 'UPDATE' AND v_action_type = 'parameter' THEN
 		UPDATE om_visit_parameter SET code = v_code, parameter_type = v_parameter_type, feature_type = upper(v_feature_system_id), data_type = v_data_type, 
   	 	descript = v_descript, form_type = v_form_type, vdefault = v_vdefault, short_descript = v_short_descript
   	 	WHERE id = v_param_name;
-		
+	
+	 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Update parameter definition in om_visit_parameter.'));
+ 		
 		IF v_ismultievent = TRUE THEN
 			
 			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
@@ -347,12 +414,19 @@ IF v_action = 'UPDATE' AND v_action_type = 'parameter' THEN
 
 			PERFORM gw_fct_admin_manage_visit_view(v_data_view);
 			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Recreate view ',v_viewname,' for class ',v_class_id,'.'));
+		
 		END IF;
 
 		UPDATE config_api_form_fields SET formname = v_viewname, layout_order = v_layout_order, isenabled = v_isenabled, 
 		datatype = v_data_type, widgettype = v_widgettype, label = v_param_name, iseditable = v_iseditable, ismandatory = v_ismandatory,
 		dv_querytext = v_dv_querytext 
 		WHERE formname = v_viewname and formtype='visit' and column_id = v_param_name;
+
+	
+	 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Update parameter definition in config_api_form_fields.'));
 
 ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 	
@@ -361,6 +435,8 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 			DELETE FROM om_visit_class_x_parameter WHERE parameter_id = v_param_name;
 			DELETE FROM om_visit_parameter WHERE id = v_param_name;
 
+		 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Delete parameter definition from om_visit_class_x_parameter and om_visit_parameter.'));
 
 			IF v_ismultievent = TRUE THEN
 			raise notice 'multi_delete';
@@ -369,11 +445,13 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 				"old_ct_param":"'||v_old_parameters.ct_param||'", "old_id_param":"'||v_old_parameters.id_param||'","old_datatype":"'||v_old_parameters.datatype||'"}}';
 
 				PERFORM gw_fct_admin_manage_visit_view(v_data_view);
-
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (119, null, 4, concat('Recreate view ',v_viewname,' for class ',v_class_id,'.'));
 			END IF;
 
 		ELSE
-			 PERFORM gw_fct_audit_function(3024,2746, NULL);
+			EXECUTE 'SELECT gw_fct_audit_function(3024,2746, NULL)' INTO v_audit_result;
+
 		END IF;
 
 ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
@@ -394,32 +472,51 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 		ELSE
 			UPDATE om_visit_class SET active = FALSE WHERE id = v_class_id;
 			
-			PERFORM gw_fct_audit_function(3026,2746, NULL);
+			EXECUTE 'SELECT gw_fct_audit_function(3026,2746, NULL)' INTO v_audit_result;
 		END IF;
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Delete class definition from configuration tables.'));
+
 		EXECUTE 'DROP VIEW IF EXISTS '||v_viewname||';';
+
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Drop view ',v_viewname,'.'));
 
 ELSIF v_action = 'CONFIGURATION' THEN
 	
 		v_ismultievent = (SELECT ismultievent FROM om_visit_class WHERE id=v_class_id);
 		v_feature_system_id = (SELECT lower(feature_type) FROM om_visit_class WHERE id=v_class_id);
 
-		--create configuration and views for the alread defined classes and parameters
+		--create configuration and views for the already defined classes and parameters
 		IF  v_ismultievent = TRUE THEN
 			INSERT INTO config_api_visit (visitclass_id, formname, tablename) VALUES (v_class_id, v_viewname, v_viewname);
-
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert visit configuration into config_api_visit. Class: ',v_class_id, ', view: ',v_viewname, '.'));
+			
 			IF v_viewname NOT IN (SELECT id FROM audit_cat_table) AND v_ismultievent iS TRUE THEN
 				INSERT INTO audit_cat_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
 				VALUES (v_viewname, 'O&M', 'Editable view that saves visits', 'role_om', 0, 0, false);
 				raise notice 'multi -  audit_cat_table';
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (119, null, 4, concat('Insert view name into audit_cat_table.'));
 			END IF;
+
 
 		ELSE 
 			INSERT INTO config_api_visit (visitclass_id, formname, tablename) VALUES (v_class_id, v_viewname, concat('ve_visit_',v_feature_system_id,'_singlevent'));
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert visit configuration into config_api_visit. Class: ',v_class_id, ', view: ',concat('ve_visit_',v_feature_system_id,'_singlevent'), '.'));
 		END IF;
 
 		INSERT INTO config_api_visit_x_featuretable (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
-	
+		
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (119, null, 4, concat('Insert view name into config_api_visit_x_featuretable.'));
+		
 		IF (SELECT formname FROM config_api_form_fields WHERE formname = v_viewname) IS NULL THEN
 			--capture common fields names that need to be copied for the specific visit form
 			EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
@@ -460,6 +557,9 @@ ELSIF v_action = 'CONFIGURATION' THEN
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
 				WHERE formname=v_viewname AND column_id='class_id';
 			END IF;
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert fields definition into config_api_form_fields.'));
 		END IF;
 
 		--add configuration of parameters related to the class to config_api_form_fields
@@ -489,18 +589,70 @@ ELSIF v_action = 'CONFIGURATION' THEN
 				true, false);
 			END LOOP;
 			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Insert fields definition into config_api_form_fields.'));
+
 			--create a new class view
 			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
 			"feature_system_id":"'||v_feature_system_id||'","class_id":"'||v_class_id||'","old_a_param":"null", "old_ct_param":"null",
 			"old_id_param":"null","old_datatype":"null"}}';
 			
 			PERFORM gw_fct_admin_manage_visit_view(v_data_view);	
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (119, null, 4, concat('Create view ',v_viewname,' for class ',v_class_id,'.'));
+	
 		
 		END IF;
 
 END IF;
 
 PERFORM gw_fct_admin_role_permissions();
+
+INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+VALUES (118, null, 4, 'Set role permissions.');
+
+-- get results
+	-- info
+
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data 
+	WHERE user_name="current_user"() AND fprocesscat_id=119 ORDER BY criticity desc, id asc) row; 
+	
+IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'Process done successfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
+	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
+
+	v_result_point = '{"geometryType":"", "features":[]}';
+	v_result_line = '{"geometryType":"", "features":[]}';
+	v_result_polygon = '{"geometryType":"", "features":[]}';
+
+--  Return
+     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+		     	'"setVisibleLayers":[]'||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||'}'||
+				', "actions":{"hideForm":' || v_hide_form || '}'||
+		       '}'||
+	    '}')::json;
+
+	--EXCEPTION WHEN OTHERS THEN
+	 --GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 --RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 
 END;

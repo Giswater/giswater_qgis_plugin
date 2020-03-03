@@ -27,3 +27,9 @@ UPDATE audit_cat_table SET isdeprecated = TRUE where id IN ('v_ui_workcat_polygo
 --2020/03/03
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (117,'Connect to network','edit','utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (118,'Define addfields','edit','utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (119,'Define visit class','edit','utils') ON CONFLICT (id) DO NOTHING;
