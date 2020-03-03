@@ -46,7 +46,7 @@ INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater
 INSERT INTO doc VALUES ('Demo document 3', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762257', current_user, '2018-03-14 17:09:59.762257');
 INSERT INTO doc VALUES ('Demo document 2', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Readme.txt', NULL, '2018-03-14 17:09:19.852804', current_user, '2018-03-14 17:09:19.852804');
 
-select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'CONNEC');
+--select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'CONNEC');
 
 -- for connec 3014 that stays outside the selectors and doesn't connect to network with fct
 INSERT INTO vnode VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', NULL, 3, 2, 1, 1, '0101000020E7640000198F5EB77093194113A8AB6482755141');
