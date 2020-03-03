@@ -137,7 +137,7 @@ BEGIN
 	v_widgetdim = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetdim')::integer;
 	v_isautoupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isautoupdate')::text;
 	v_listfilterparam = (((p_data ->>'data')::json->>'parameters')::json ->>'listfilterparam')::json;
-
+	v_hidden = COALESCE(v_hidden, FALSE);
 
 
 	--Assign config widget types 
