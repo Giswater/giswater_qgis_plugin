@@ -25,6 +25,9 @@ SELECT SCHEMA_NAME.gw_api_setsearch($${
 		"data":{"add_muni": {"id": 1, "name": "Sant Boi del Llobregat"}, "add_street": {"text": "Calle de Francesc Layret"}}}$$)
 
 
+SELECT SCHEMA_NAME.gw_api_setsearch($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{"tabName":"workcat"}, 
+		"feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"work2 - descript"}}}$$)
+
 */
 
 DECLARE
@@ -44,7 +47,7 @@ DECLARE
     catid varchar;
     states varchar[];
     api_version json;
-    project_type_aux character varying;
+    v_projecttype character varying;
     v_count integer;
     query_text text;
 
@@ -139,10 +142,9 @@ DECLARE
     v_feature_type_connec varchar;
     v_feature_type_gully varchar;
     v_feature_type_element varchar;
-    v_feature_type_visit varchar;
-
-    
+    v_feature_type_visit varchar;  
     qt2 text;
+    v_querytext text;
 
 
 BEGIN
@@ -155,7 +157,7 @@ BEGIN
         INTO api_version;
 
 --   Get project type
-     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+     SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 
 --   Get tab
      tab_arg := ((p_data->>'form')::json)->>'tabName';
@@ -401,26 +403,57 @@ ELSIF tab_arg = 'address' THEN
 --------------
     ELSIF tab_arg = 'workcat' THEN
 
-        -- Parameters of the workcat layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_workcat_layer FROM config_param_system WHERE parameter='api_search_workcat';
-    SELECT ((value::json)->>'sys_id_field') INTO v_workcat_id_field FROM config_param_system WHERE parameter='api_search_workcat';
-    SELECT ((value::json)->>'sys_search_field') INTO v_workcat_display_field FROM config_param_system WHERE parameter='api_search_workcat';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_workcat_geom_field FROM config_param_system WHERE parameter='api_search_workcat';
-    SELECT ((value::json)->>'filter_text') INTO v_filter_text FROM config_param_system WHERE parameter='api_search_workcat';
+	-- Parameters of the workcat layer
+	SELECT ((value::json)->>'sys_table_id') INTO v_workcat_layer FROM config_param_system WHERE parameter='api_search_workcat';
+	SELECT ((value::json)->>'sys_id_field') INTO v_workcat_id_field FROM config_param_system WHERE parameter='api_search_workcat';
+	SELECT ((value::json)->>'sys_search_field') INTO v_workcat_display_field FROM config_param_system WHERE parameter='api_search_workcat';
+	SELECT ((value::json)->>'sys_geom_field') INTO v_workcat_geom_field FROM config_param_system WHERE parameter='api_search_workcat';
+	SELECT ((value::json)->>'filter_text') INTO v_filter_text FROM config_param_system WHERE parameter='api_search_workcat';
     
-    
-    -- Text to search
-    edit1 := ((p_data->>'data')::json)->>'workcat_search';
-    text_arg := concat('%', edit1->>'text' ,'%');
+    	-- Text to search
+	edit1 := ((p_data->>'data')::json)->>'workcat_search';
+	text_arg := concat('%', edit1->>'text' ,'%');
 
-    --  Search in the workcat
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||quote_ident(v_workcat_display_field)||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
-        '||quote_ident((v_workcat_id_field))||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
-        AS sys_idname, '||quote_literal(v_filter_text)||' AS filter_text, st_astext(the_geom) AS sys_geometry
-		FROM '||quote_ident(v_workcat_layer)|| '
-        WHERE '||quote_ident(v_workcat_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
+	v_querytext = ' SELECT node.workcat_id, node.the_geom FROM SCHEMA_NAME.node WHERE node.state = 1
+                UNION
+                 SELECT arc.workcat_id, arc.the_geom FROM SCHEMA_NAME.arc WHERE arc.state = 1
+                UNION
+                 SELECT connec.workcat_id, connec.the_geom FROM SCHEMA_NAME.connec WHERE connec.state = 1
+                UNION
+                 SELECT element.workcat_id, element.the_geom FROM SCHEMA_NAME.element WHERE element.state = 1
+                UNION
+                  SELECT node.workcat_id_end AS workcat_id,node.the_geom FROM SCHEMA_NAME.node WHERE node.state = 0
+                UNION
+                  SELECT arc.workcat_id_end AS workcat_id, arc.the_geom FROM SCHEMA_NAME.arc WHERE arc.state = 0
+                UNION
+                 SELECT connec.workcat_id_end AS workcat_id,connec.the_geom FROM SCHEMA_NAME.connec WHERE connec.state = 0
+                UNION  
+                 SELECT element.workcat_id_end AS workcat_id, element.the_geom FROM SCHEMA_NAME.element WHERE element.state = 0';
+
+        IF v_projecttype = 'UD' THEN
+		v_querytext = concat (v_querytext, ' UNION SELECT gully.workcat_id,gully.the_geom FROM SCHEMA_NAME.gully WHERE gully.state = 1 
+				UNION SELECT gully.workcat_id,gully.the_geom FROM SCHEMA_NAME.gully WHERE gully.state = 0');
+        END IF;
+
+	--  Search in the workcat
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(c))) 
+		FROM (SELECT '||quote_ident(v_workcat_display_field)||' as display_name, '
+		||quote_literal(v_workcat_layer)||' AS sys_table_id ,'
+		||quote_ident((v_workcat_id_field))||' AS sys_id, '
+		||quote_literal(v_workcat_layer)||' AS sys_idname,'
+		||quote_literal(v_filter_text)||' AS filter_text,
+		CASE
+		WHEN st_geometrytype(st_concavehull(d.the_geom, 0.99::double precision)) = ''ST_Polygon''::text THEN st_astext(st_buffer(st_concavehull(d.the_geom, 0.99::double precision), 10::double precision)::geometry(Polygon,25831))
+		ELSE st_astext(st_expand(st_buffer(d.the_geom, 10::double precision), 1::double precision)::geometry(Polygon,25831))
+		END AS sys_geometry
+
+		FROM (SELECT st_collect(a.the_geom) AS the_geom, a.workcat_id FROM ( '||v_querytext||') a GROUP BY a.workcat_id ) d 
+
+		JOIN '||quote_ident(v_workcat_layer)||' AS b ON d.workcat_id = b.'||quote_ident(v_workcat_id_field)||
+
+		' WHERE b.'||quote_ident(v_workcat_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 ) c'
         INTO response_json;
+
 
 -- Visit tab
 --------------
