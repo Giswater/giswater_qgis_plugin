@@ -17,8 +17,7 @@ SELECT SCHEMA_NAME.gw_api_gettypeahead($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
-"data":{"queryText":"SELECT id FROM cat_arc WHERE id IS NOT NULL",
-        "fieldToSearch":"id",
+"data":{"queryText":"SELECT id AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL",
 	"queryTextFilter":" AND arctype_id = ", 
 	"parentId":"arc_type",
 	"parentValue":"PIPE", 
@@ -29,8 +28,7 @@ SELECT SCHEMA_NAME.gw_api_gettypeahead($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
-"data":{"queryText":"SELECT id FROM cat_arc WHERE id IS NOT NULL",
-        "fieldToSearch":"id",
+"data":{"queryText":"SELECT id AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL",
 	"textToSearch":"FC"}}$$)
 */
 
@@ -68,7 +66,7 @@ BEGIN
 	ELSE
 		v_querytext = concat (v_querytext, v_querytextparent, quote_literal(v_parentvalue)); 
 	END IF;
-	v_querytext = concat ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ((', (v_querytext), ' AND ', (v_fieldtosearch) , ' ILIKE ''%', v_textosearch, '%'' LIMIT 10)) a');
+	v_querytext = concat ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT * FROM (', (v_querytext), ')a WHERE idval ILIKE ''%', v_textosearch, '%'' LIMIT 10)a');
 
 	-- execute query text
 	EXECUTE v_querytext INTO v_response;
