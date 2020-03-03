@@ -641,9 +641,10 @@ BEGIN
         RETURN NEW;
 			
     ELSIF TG_OP = 'DELETE' THEN
-	
-		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
-	
+
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		"feature":{"id":"'||OLD.node_id||'","featureType":"NODE"}, "data":{}}$$)';
+
 		-- delete from polygon table (before the deletion of node)
 		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
 		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );

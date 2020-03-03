@@ -526,9 +526,10 @@ BEGIN
 		RETURN NEW;
 
 	 ELSIF TG_OP = 'DELETE' THEN
-		 
-	 	PERFORM gw_fct_check_delete(OLD.arc_id, 'ARC');
-		 
+
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		"feature":{"id":"'||OLD.arc_id||'","featureType":"ARC"}, "data":{}}$$)';
+
 		DELETE FROM arc WHERE arc_id = OLD.arc_id;
 
 		--Delete addfields

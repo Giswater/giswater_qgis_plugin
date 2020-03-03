@@ -1320,8 +1320,9 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 
-	PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
-	
+	EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+	"feature":{"id":"'||OLD.node_id||'","featureType":"NODE"}, "data":{}}$$)';
+
    	
 	IF man_table='man_tank_pol' THEN
 		DELETE FROM polygon WHERE pol_id=OLD.tank_pol_id;
