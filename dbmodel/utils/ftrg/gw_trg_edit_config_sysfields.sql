@@ -29,7 +29,7 @@ BEGIN
 	ismandatory = NEW.ismandatory,
 	tooltip = NEW.tooltip,
 	placeholder = NEW.placeholder,
-	stylesheet = NEW.stylesheet,
+	stylesheet = NEW.stylesheet::json,
 	datatype = NEW.datatype,
 	widgettype = NEW.widgettype,
 	widgetdim = NEW.widgetdim,
@@ -40,9 +40,10 @@ BEGIN
 	dv_isnullvalue = NEW.dv_isnullvalue,
 	dv_parent_id = NEW.dv_parent_id,
 	dv_querytext_filterc = NEW.dv_querytext_filterc,
-	widgetcontrols = NEW.widgetcontrols,
+	widgetcontrols = NEW.widgetcontrols::json,
 	widgetfunction = NEW.widgetfunction,
-	linkedaction = NEW.linkedaction	
+	linkedaction = NEW.linkedaction,
+    listfilterparam = NEW.listfilterparam::json
 	WHERE formname = OLD.formname AND column_id=OLD.column_id;
 
 	RETURN NEW;

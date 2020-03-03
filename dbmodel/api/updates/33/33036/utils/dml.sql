@@ -32,7 +32,7 @@ INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_config_sysfields', 'form', 'formname', 2, 'text', 'text', 'Formname:',
+VALUES ('ve_config_sysfields', 'form', 'formname', 2, 'text', 'text', 'Formname',
 NULL, NULL, NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);

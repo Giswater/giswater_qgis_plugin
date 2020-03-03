@@ -27,7 +27,7 @@ CREATE OR REPLACE VIEW ve_config_sysfields AS
     config_api_form_fields.widgetdim,
     config_api_form_fields.tooltip,
     config_api_form_fields.placeholder,
-    config_api_form_fields.stylesheet,
+    config_api_form_fields.stylesheet::text,
     config_api_form_fields.isparent,
     config_api_form_fields.isautoupdate,
     config_api_form_fields.dv_querytext,
@@ -35,10 +35,10 @@ CREATE OR REPLACE VIEW ve_config_sysfields AS
     config_api_form_fields.dv_isnullvalue,
     config_api_form_fields.dv_parent_id,
     config_api_form_fields.dv_querytext_filterc,
-    config_api_form_fields.widgetcontrols,
+    config_api_form_fields.widgetcontrols::text,
     config_api_form_fields.widgetfunction,
     config_api_form_fields.linkedaction,
-    config_api_form_fields.listfilterparam,
+    config_api_form_fields.listfilterparam::text,
     cat_feature.id AS cat_feature_id
    FROM config_api_form_fields
     LEFT JOIN cat_feature ON cat_feature.child_layer::text = config_api_form_fields.formname::text
