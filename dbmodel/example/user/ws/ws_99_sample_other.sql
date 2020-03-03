@@ -249,3 +249,29 @@ WHERE connec_id ='3024';
 
 UPDATE inp_valve SET diameter = 100;
 
+--move closed and broken to the top of layout_data_2
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=0 WHERE column_id = 'closed' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=1 WHERE column_id = 'broken' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=2 WHERE column_id = 'arc_id' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=3 WHERE column_id = 'parent_id' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=4 WHERE column_id = 'soilcat_id' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=5 WHERE column_id = 'fluid_type' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=6 WHERE column_id = 'function_type' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=7 WHERE column_id = 'category_type' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=8 WHERE column_id = 'location_type' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=9 WHERE column_id = 'annotation' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=10 WHERE column_id = 'observ' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=11 WHERE column_id = 'descript' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=12 WHERE column_id = 'comment' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=13 WHERE column_id = 'num_value' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=14 WHERE column_id = 'svg' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=15 WHERE column_id = 'rotation' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=16 WHERE column_id = 'hemisphere' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=17 WHERE column_id = 'label' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=18 WHERE column_id = 'label_y' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=19 WHERE column_id = 'label_x' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=20 WHERE column_id = 'label_rotation' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=21 WHERE column_id = 'publish' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=22 WHERE column_id = 'undelete' AND formname like '%_valve';
+UPDATE config_api_form_fields SET layoutname='layout_data_2', layout_order=23 WHERE column_id = 'inventory' AND formname like '%_valve';
+

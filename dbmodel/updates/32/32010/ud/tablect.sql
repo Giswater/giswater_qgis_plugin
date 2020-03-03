@@ -8,5 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_node_id_fkey;
-ALTER TABLE subcatchment  ADD CONSTRAINT subcatchment_node_id_fkey FOREIGN KEY (node_id)   REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE subcatchment DROP CONSTRAINT IF EXISTS subcatchment_node_id_fkey;
+ALTER TABLE subcatchment ADD CONSTRAINT subcatchment_node_id_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
