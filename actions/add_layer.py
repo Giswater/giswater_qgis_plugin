@@ -162,6 +162,10 @@ class AddLayer(object):
                 if counter > 0:
                     counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
+                    try:
+                        if not layer_name: layer_name = data[k]['layerName']
+                    except KeyError:
+                        layer_name = 'Temporal layer'
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
 
                     #TODO This if controls if the function already works with GeoJson or is still to be refactored
@@ -178,7 +182,7 @@ class AddLayer(object):
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                         self.categoryze_layer(v_layer, cat_field, size)
                     temp_layers_added.append(v_layer)
-                    v_layer.setOpacity(0.5)
+                    v_layer.setOpacity(0.7)
                     self.iface.setActiveLayer(v_layer)
         return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
 

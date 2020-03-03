@@ -66,7 +66,7 @@
       </property>
       <widget class="QWidget" name="tab_config">
        <attribute name="title">
-        <string>Config</string>
+        <string>Data</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
@@ -816,6 +816,20 @@
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QTextEdit" name="txt_infolog"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_hydro">
+       <attribute name="title">
+        <string>Hydrometer</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QTableView" name="tbl_hydro">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
