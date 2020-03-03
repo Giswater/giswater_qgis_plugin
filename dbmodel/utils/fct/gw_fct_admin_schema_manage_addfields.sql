@@ -280,7 +280,7 @@ IF v_multi_create IS TRUE THEN
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals, iseditable=v_iseditable 
+		active=v_active, orderby=v_orderby, iseditable=v_iseditable 
 		WHERE param_name=v_param_name and cat_feature_id IS NULL;
 
 		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
@@ -452,7 +452,7 @@ IF v_multi_create IS TRUE THEN
 	
 	ELSIF v_action='UPDATE' THEN 
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals WHERE param_name=v_param_name;		
+		active=v_active, orderby=v_orderby WHERE param_name=v_param_name;		
 	END IF;
 
 --SIMPLE ADDFIELDS
@@ -505,9 +505,9 @@ ELSE
 
 	--modify the configuration of the parameters and fields in config_api_form_fields
 	IF v_action = 'CREATE' THEN
-		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, num_decimals,
+		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id,
 		active, orderby, iseditable)
-		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype, v_num_decimals,
+		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype,
 		v_active, v_orderby, v_iseditable);
 	
 		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
@@ -542,7 +542,7 @@ ELSE
 
 	ELSIF v_action = 'UPDATE' THEN
 		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		active=v_active, orderby=v_orderby, num_decimals=v_num_decimals,iseditable=v_iseditable 
+		active=v_active, orderby=v_orderby,iseditable=v_iseditable 
 		WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
 		
 		IF (SELECT cat_feature_id FROM man_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
