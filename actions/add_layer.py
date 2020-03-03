@@ -144,8 +144,6 @@ class AddLayer(object):
         colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
         text_result = None
         temp_layers_added = []
-        if del_old_layers:
-            self.delete_layer_from_toc(layer_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == 'setVisibleLayers':
@@ -163,11 +161,14 @@ class AddLayer(object):
                     counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
                     try:
-                        if not layer_name: layer_name = data[k]['layerName']
+                        if not layer_name:
+                            layer_name = data[k]['layerName']
                     except KeyError:
                         layer_name = 'Temporal layer'
+                    if del_old_layers:
+                        self.delete_layer_from_toc(layer_name)
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-
+                    layer_name = None
                     #TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
                     if key=='values':
