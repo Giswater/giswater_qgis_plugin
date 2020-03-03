@@ -348,7 +348,7 @@ class ParentMapTool(QgsMapTool):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
@@ -356,7 +356,7 @@ class ParentMapTool(QgsMapTool):
         data = '"data":{' + filter_fields + ', ' + page_info
         if extras:
             data += ', ' + extras
-        data += '}'
+        data += f'}}}}$$'
         body = "" + client + form + feature + data
 
         return body

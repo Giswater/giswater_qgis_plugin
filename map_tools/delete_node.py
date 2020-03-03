@@ -86,9 +86,11 @@ class DeleteNodeMapTool(ParentMapTool):
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
         enddate = self.dlg_fusion.enddate.date()
         enddate_str = enddate.toString('yyyy-MM-dd')
-
+        feature_id = f'"id":["{self.node_id}"]'
+        extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
+        body = self.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
-        result = self.controller.get_json('gw_fct_arc_fusion', f"'{self.node_id}', '{workcat_id_end}', '{enddate_str}'", log_sql=True)
+        result = self.controller.get_json('gw_fct_arc_fusion', body)
         if not result: return
 
         text_result = self.populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)

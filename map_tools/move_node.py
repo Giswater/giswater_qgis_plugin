@@ -48,7 +48,9 @@ class MoveNodeMapTool(ParentMapTool):
                f"WHERE node_id = '{node_id}'")
         status = self.controller.execute_sql(sql)
         if status:
-            result = self.controller.get_json('gw_fct_arc_divide', f"'{node_id}'", log_sql=True)
+            feature_id = f'"id":["{node_id}"]'
+            body = self.create_body(feature=feature_id)
+            result = self.controller.get_json('gw_fct_arc_divide', body)
             if not result: return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
                 self.dlg_binfo = BasicInfo()
