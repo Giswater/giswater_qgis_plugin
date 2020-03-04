@@ -59,20 +59,24 @@ class I18NGenerator(ParentAction):
     def init_dialog(self):
         self.dlg_qm = QmGenerator()
         self.load_settings(self.dlg_qm)
+        self.load_user_values()
+
         self.dlg_qm.btn_translate.setEnabled(False)
 
-        values = self.load_user_values()
-        utils_giswater.setWidgetText(self.dlg_qm, 'txt_host', values['host'])
-        utils_giswater.setWidgetText(self.dlg_qm, 'txt_port', values['port'])
-        utils_giswater.setWidgetText(self.dlg_qm, 'txt_db', values['db'])
-        utils_giswater.setWidgetText(self.dlg_qm, 'txt_user', values['user'])
-
         self.dlg_qm.btn_connection.clicked.connect(self.check_connection)
-        self.dlg_qm.btn_translate.clicked.connect(self.create_pymessage)
+        self.dlg_qm.btn_translate.clicked.connect(self.check_translate_options)
         self.dlg_qm.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
         self.open_dialog(self.dlg_qm)
+
+    def check_translate_options(self):
+        py_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+        db_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
+        if py_msg:
+            self.create_files_py_message()
+        if db_msg:
+            self.create_files_db_message()
 
 
     def check_connection(self):
@@ -113,12 +117,16 @@ class I18NGenerator(ParentAction):
         db = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
         user = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
         language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        py_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+        db_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value('qm_lang_host' + cur_user, host)
         self.controller.plugin_settings_set_value('qm_lang_port' + cur_user, port)
         self.controller.plugin_settings_set_value('qm_lang_db' + cur_user, db)
         self.controller.plugin_settings_set_value('qm_lang_user' + cur_user, user)
         self.controller.plugin_settings_set_value('qm_lang_language' + cur_user, language)
+        self.controller.plugin_settings_set_value('qm_lang_py_msg' + cur_user, py_msg)
+        self.controller.plugin_settings_set_value('qm_lang_db_msg' + cur_user, db_msg)
 
 
     def load_user_values(self):
@@ -130,10 +138,17 @@ class I18NGenerator(ParentAction):
         port = self.controller.plugin_settings_value('qm_lang_port' + cur_user)
         db = self.controller.plugin_settings_value('qm_lang_db' + cur_user)
         user = self.controller.plugin_settings_value('qm_lang_user' + cur_user)
-        return {'host':host, 'port':port, 'db':db, 'user':user}
+        py_msg = self.controller.plugin_settings_value('qm_lang_py_msg' + cur_user)
+        db_msg = self.controller.plugin_settings_value('qm_lang_db_msg' + cur_user)
+        utils_giswater.setWidgetText(self.dlg_qm, 'txt_host', host)
+        utils_giswater.setWidgetText(self.dlg_qm, 'txt_port', port)
+        utils_giswater.setWidgetText(self.dlg_qm, 'txt_db', db)
+        utils_giswater.setWidgetText(self.dlg_qm, 'txt_user', user)
+        utils_giswater.setChecked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
+        utils_giswater.setChecked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
 
 
-    def create_pymessage(self):
+    def create_files_py_message(self):
         """ Read the values of the database and generate the ts and qm files """
         py_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
@@ -174,7 +189,8 @@ class I18NGenerator(ParentAction):
         utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', 'Translation successful')
 
 
-
+    def create_files_db_message(self):
+        print("TEST")
     def get_rows(self, sql, commit=True):
         """ Get multiple rows from selected query """
 
