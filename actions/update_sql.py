@@ -33,6 +33,7 @@ from time import sleep
 from .. import utils_giswater
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
+from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
     ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
 from .gw_task import GwTask
@@ -233,6 +234,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
+        self.dlg_readsql.btn_translation.clicked.connect(partial(self.manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
         self.dlg_readsql.btn_path.clicked.connect(partial(self.select_file_ui))
         self.dlg_readsql.btn_import_ui.clicked.connect(partial(self.execute_import_ui))
@@ -244,6 +246,11 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
         self.dlg_readsql.btn_create_view.clicked.connect(partial(self.create_child_view))
         self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self.update_sys_fields))
+
+
+    def manage_translations(self):
+        qm_gen = I18NGenerator(self.iface, self.settings, self.controller, self.plugin_dir)
+        qm_gen.init_dialog()
 
 
     def info_show_database(self, connection_status=True):

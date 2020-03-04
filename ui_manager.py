@@ -474,6 +474,35 @@ class Psector_rapport(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('qm_generator.ui')
+class QmGenerator(GwDialog, FORM_CLASS):
+    def __init__(self, subtag=None):
+        super().__init__()
+        self.txt_pass.setClearButtonEnabled(True)
+        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+        self.action = QAction("show")
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action = QAction(icon, "show")
+        self.action.triggered.connect(self.show_pass)
+        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+
+
+    def show_pass(self):
+        if self.txt_pass.echoMode() == 0:
+            self.txt_pass.setEchoMode(QLineEdit.Password)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+            text = "Show password"
+        elif self.txt_pass.echoMode() == 2:
+            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.svg'
+            text = "Hide password"
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action.setIcon(icon)
+            self.action.setText(text)
+
+
 FORM_CLASS = get_ui_class('readsql.ui')
 class Readsql(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
