@@ -36,7 +36,7 @@ DECLARE
     v_id_field text;
     rec_seq  record;
     rec_trg record;
-    v_trg_fields text;
+    v_trg_fields text;  
     v_replace_query text;
     v_result json;
     v_result_info json;
@@ -87,68 +87,15 @@ BEGIN
         EXECUTE 'INSERT INTO ' || v_tablename || ' SELECT * FROM ' || v_source_schema || '.' || rec_table;  
         
     END LOOP;
-        
-    -- Views
-    FOR rec_view IN
-        SELECT table_name, REPLACE(view_definition, v_source_schema, v_dest_schema) as definition FROM information_schema.VIEWS WHERE table_schema = v_source_schema
-    LOOP
-        EXECUTE 'CREATE VIEW ' || v_dest_schema || '.' || rec_view.table_name || ' AS ' || rec_view.definition;
-    END LOOP;
+    
 
-
-    --Functions
-    FOR rec_fct IN 
-        SELECT routine_name,concat(routine_name,'(',string_agg(parameters.data_type,', '),')') FROM information_schema.routines
-       LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
-        WHERE routines.specific_schema='SCHEMA_NAME' and routine_name!='audit_function' and routine_name!='gw_fct_repair_arc'
-        group by routine_name
-    LOOP
-        EXECUTE 'select * from pg_get_functiondef('''|| rec_fct.routine_name||'''::regproc)'
-        INTO v_fct_definition;
-        v_fct_definition = REPLACE (v_fct_definition,v_source_schema, v_dest_schema);
-        EXECUTE v_fct_definition;
-
- 
-    END LOOP;
-
-    --trg
-    FOR rec_trg IN 
-        select event_object_schema as table_schema, event_object_table as table_name, trigger_schema, trigger_name,
-        string_agg(event_manipulation, ',') as event, action_timing as activation, action_condition as condition, action_statement as definition
-        from information_schema.triggers where event_object_schema = v_source_schema group by 1,2,3,4,6,7,8 order by table_schema, table_name
-    LOOP
-
-        SELECT string_agg(event_object_column, ',') INTO v_trg_fields FROM information_schema.triggered_update_columns 
-        WHERE event_object_schema = v_source_schema and event_object_table=rec_trg.table_name AND trigger_name = rec_trg.trigger_name;
-
-
-        EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
-        INTO v_replace_query;
-        
-        IF v_trg_fields IS NULL THEN 
-
-            EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||'
-            ON '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
-          
-        ELSE   
-
-        EXECUTE 'select replace('''||v_replace_query||''', ''UPDATE'', '' UPDATE  OF '||v_trg_fields||''')'
-        INTO v_replace_query; 
-       
-
-            EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 
-            '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
-
-        END IF;
-
-    END LOOP;
-
-    -- fk,check
+-- fk,check
     FOR rec_fk IN
-        SELECT distinct on (conname) conrelid::regclass AS tablename, conname AS constraintname, pg_get_constraintdef(c.oid) AS definition
+        EXECUTE 'SELECT distinct on (conname) conrelid::regclass AS tablename, conname AS constraintname, pg_get_constraintdef(c.oid),
+        replace(pg_get_constraintdef(c.oid),''REFERENCES'',concat(''REFERENCES '','''||v_dest_schema||''',''.'')) AS definition
         FROM   pg_constraint c JOIN   pg_namespace n ON n.oid = c.connamespace
-        join   information_schema.table_constraints tc ON conname=constraint_name WHERE contype IN ('f','c','u')
-        AND nspname =v_source_schema
+        join   information_schema.table_constraints tc ON conname=constraint_name WHERE contype IN (''f'',''c'',''u'')
+        AND nspname = '''||v_source_schema||''''
     LOOP
         v_query_text:=  'ALTER TABLE '||v_dest_schema || '.' || rec_fk.tablename||' DROP CONSTRAINT IF EXISTS '|| rec_fk.constraintname||';';
         EXECUTE v_query_text;
@@ -181,7 +128,79 @@ BEGIN
 
     EXECUTE 'SELECT setval('''||v_dest_schema||'.urn_id_seq'', gw_fct_setvalurn(),true);';
 
+    -- Views
+    FOR rec_view IN
+        EXECUTE 'SELECT table_name, view_definition as definition 
+        FROM information_schema.VIEWS WHERE table_schema = '''||v_source_schema||''''
+    LOOP
+        EXECUTE 'CREATE VIEW ' || v_dest_schema || '.' || rec_view.table_name || ' AS  
+        '||rec_view.definition||';';
+    END LOOP;
 
+    FOR rec_view IN 
+        EXECUTE 'SELECT schemaname, matviewname, replace(definition, '||quote_literal(v_source_schema)||','||quote_literal(v_dest_schema)||') AS definition 
+        from pg_matviews WHERE schemaname='''||v_source_schema||''''
+    LOOP
+        EXECUTE 'CREATE MATERIALIZED VIEW ' || v_dest_schema || '.' || rec_view.matviewname || ' AS  
+        '||rec_view.definition||';';
+    END LOOP;
+
+    EXECUTE 'SELECT gw_fct_admin_manage_schema($${"client":{"lang":"ES"}, 
+    "data":{"action":"RENAMESCHEMA","source":"'||v_source_schema||'", "target":"'||v_dest_schema||'"}}$$);';
+
+    --Functions
+    FOR rec_fct IN 
+        EXECUTE 'SELECT routine_name,concat(routine_name,''('',string_agg(parameters.data_type,'', ''),'')'') FROM information_schema.routines
+       LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
+        WHERE routines.specific_schema='''||v_source_schema||''' and routine_name!=''audit_function'' and routine_name!=''gw_fct_repair_arc''
+        group by routine_name'
+    LOOP
+
+        EXECUTE 'select * from pg_get_functiondef('''||v_source_schema||'.'|| rec_fct.routine_name||'''::regproc)'
+        INTO v_fct_definition;
+        v_fct_definition = REPLACE (v_fct_definition,v_source_schema, v_dest_schema);
+        EXECUTE v_fct_definition;
+
+ 
+    END LOOP;
+
+    --trg
+    FOR rec_trg IN 
+        select event_object_schema as table_schema, event_object_table as table_name, trigger_schema, trigger_name,
+        string_agg(event_manipulation, ',') as event, action_timing as activation, action_condition as condition, action_statement as definition
+        from information_schema.triggers where event_object_schema = v_source_schema group by 1,2,3,4,6,7,8 order by table_schema, table_name
+    LOOP
+
+        SELECT string_agg(event_object_column, ',') INTO v_trg_fields FROM information_schema.triggered_update_columns 
+        WHERE event_object_schema = v_source_schema and event_object_table=rec_trg.table_name AND trigger_name = rec_trg.trigger_name;
+
+
+        EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
+        INTO v_replace_query;
+        
+        IF v_trg_fields IS NULL THEN 
+
+            rec_trg.definition = replace(replace(rec_trg.definition,'EXECUTE PROCEDURE',''),v_source_schema,v_dest_schema);
+
+            EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||'
+            ON '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW EXECUTE PROCEDURE '|| rec_trg.definition||';';
+          
+        ELSE   
+
+        EXECUTE 'select replace('''||v_replace_query||''', ''UPDATE'', '' UPDATE  OF '||v_trg_fields||''')'
+        INTO v_replace_query; 
+       
+
+            EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 
+            '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
+
+        END IF;
+
+    END LOOP;
+
+
+    -- admin role permissions
+    PERFORM gw_fct_admin_role_permissions();
 
     v_result_info := COALESCE(v_result, '{}'); 
     v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
@@ -204,8 +223,8 @@ BEGIN
         '}')::json;
 
     EXCEPTION WHEN OTHERS THEN
-     GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+        GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+        RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
  
 END;
