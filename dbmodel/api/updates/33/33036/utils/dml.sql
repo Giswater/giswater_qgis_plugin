@@ -202,3 +202,26 @@ INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_config_sysfields', 'form', 'listfilterparam', 27, 'text', 'text', 'Listfilterparam', NULL, 'listfilterparam - Parameters of the filters for lists', '{"sign":">","vdefault":"2014-01-01"}', FALSE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
+
+
+INSERT INTO config_api_form_actions ('actionEdit');
+INSERT INTO config_api_form_actions ('actionCopyPaste');
+INSERT INTO config_api_form_actions ('actionCatalog');
+INSERT INTO config_api_form_actions ('actionWorkcat');
+INSERT INTO config_api_form_actions ('actionRotation');
+INSERT INTO config_api_form_actions ('actionZoomIn');
+INSERT INTO config_api_form_actions ('actionZoomOut');
+INSERT INTO config_api_form_actions ('actionCentered');
+INSERT INTO config_api_form_actions ('actionLink');
+INSERT INTO config_api_form_actions ('actionHelp');
+INSERT INTO config_api_form_actions ('actionGetArcId');
+INSERT INTO config_api_form_actions ('actionAddPhoto');
+INSERT INTO config_api_form_actions ('actionAddFile');
+INSERT INTO config_api_form_actions ('actionDelete');
+INSERT INTO config_api_form_actions ('actionGetParentId');
+INSERT INTO config_api_form_actions ('actionSection');
+INSERT INTO config_api_form_actions ('actionInterpolate');
+INSERT INTO config_api_form_actions ('visit_start');
+INSERT INTO config_api_form_actions ('visit_end');
+INSERT INTO config_api_form_actions ('actionZoom');
+INSERT INTO config_api_form_actions ('getInfoFromId');

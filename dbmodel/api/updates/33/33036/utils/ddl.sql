@@ -29,3 +29,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api
 --rename fields
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_fields", "column":"action_function", "newName":"linkedaction"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_fields", "column":"layout_name", "newName":"layoutname"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"tooltip", "dataType":"text"}}$$);
+
+
+CREATE TABLE config_api_form_actions
+(
+  actionname text primary key,
+  label text,
+  tooltip text  );
