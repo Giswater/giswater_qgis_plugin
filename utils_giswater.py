@@ -74,7 +74,7 @@ def getText(dialog, widget, return_string_null=True):
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
-        elif type(widget) is QTextEdit:
+        elif type(widget) is QTextEdit or type(widget) is QPlainTextEdit:
             text = widget.toPlainText()
         if text:
             elem_text = text
@@ -191,7 +191,8 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
 
     text = None
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is HyperLinkLabel \
-            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton:
+            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton \
+            or type(widget) is QPlainTextEdit:
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)

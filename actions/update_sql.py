@@ -3026,6 +3026,12 @@ class UpdateSQL(ApiParent):
                 self.controller.show_info_box(msg, "Info")
                 return
 
+            elif utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.widgettype) == 'combo' and \
+                    utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext) in ('null', None):
+                msg = "Parameter 'Query text:' is mandatory for 'combo' widgets. Please set value."
+                self.controller.show_info_box(msg, "Info")
+                return
+
             list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
 
             _json = {}

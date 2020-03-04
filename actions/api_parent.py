@@ -506,6 +506,7 @@ class ApiParent(ParentAction):
 
         if schema_name is not None:
             self.schema_name = schema_name
+            self.controller.set_search_path('', self.schema_name)
 
         # Set width and alias of visible columns
         columns_to_delete = []
