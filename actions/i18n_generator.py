@@ -96,6 +96,8 @@ class I18NGenerator(ParentAction):
     def populate_cmb_language(self):
         """ Populate combo with languages values """
         self.dlg_qm.btn_translate.setEnabled(True)
+        host = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
+        utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', f'Connected to {host}')
         sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
         rows = self.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_qm.cmb_language, rows, 0)
@@ -141,6 +143,12 @@ class I18NGenerator(ParentAction):
         if not rows: return False
 
         ts_path = self.plugin_dir + os.sep + 'actions' + os.sep + f'giswater_{py_file}.ts'
+        # Check if file exist
+        if os.path.exists(ts_path):
+            msg = "Are you sure you want to overwrite this file?"
+            answer = self.controller.ask_question(msg, "Overwrite")
+            if not answer:
+                return
         ts_file = open(ts_path, "w")
         line = '<?xml version="1.0" encoding="utf-8"?>\n'
         line += '<!DOCTYPE TS>\n'
@@ -163,6 +171,7 @@ class I18NGenerator(ParentAction):
         del ts_file
         lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep +'lrelease.exe'
         s = subprocess.call([lrelease_path, ts_path], shell=False)
+        utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', 'Translation successful')
 
 
 
