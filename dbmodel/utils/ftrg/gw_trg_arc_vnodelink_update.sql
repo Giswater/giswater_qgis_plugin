@@ -30,24 +30,27 @@ BEGIN
 		FOR connec_id_aux IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id 
 		WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=NEW.arc_id
 		LOOP
-			array_connec_agg:= array_append(array_connec_agg, connec_id_aux);
+
+			array_connec_agg:= array_append(array_connec_agg,connec_id_aux);
 			UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
-						
+				
 		END LOOP;
 
-		PERFORM gw_fct_connect_to_network(array_connec_agg, 'CONNEC');
-		
+		EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		"feature":{"id":'|| array_to_json(array_connec_agg)||'},"data":{"feature_type":"CONNEC"}}$$)';
+
 		IF (select wsoftware FROM version LIMIT 1)='UD' THEN 
 
 			FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id 
 			WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=NEW.arc_id
 			LOOP
-				array_gully_agg:= array_append(array_gully_agg, gully_id_aux);
+
+				array_gully_agg:= array_append(array_gully_agg,gully_id_aux);
 				UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
 			END LOOP;
 
-			PERFORM gw_fct_connect_to_network(array_gully_agg, 'GULLY');
-		
+			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+			"feature":{"id":'|| array_to_json(array_gully_agg)||'},"data":{"feature_type":"GULLY"}}$$)';		
 		END IF;
     END IF;
 
