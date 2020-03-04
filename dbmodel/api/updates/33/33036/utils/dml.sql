@@ -14,6 +14,8 @@ UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN
 
 UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN ('gw_api_open_url') AND typevalue = 'widgetfunction_typevalue';
 
+UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN ('bot_layout_1', 'bot_layout_2', 'layout_data_1', 'layout_data_2', 'layout_data_3', 'top_layout') AND typevalue = 'layout_name_typevalue';
+
 
 SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
 
@@ -67,7 +69,7 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_config_sysfields', 'form', 'layoutname', 7, 'text', 'text', 'Layout name', NULL, 'layoutname - Name of the layout which field will be located', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_config_sysfields', 'form', 'layoutname', 7, 'text', 'combo', 'Layout name', NULL, 'layoutname - Name of the layout which field will be located', NULL, TRUE, NULL, TRUE, NULL, 'SELECT id, idval FROM config_api_typevalue WHERE typevalue= ''layout_name_typevalue'' AND  addparam->>''createAddfield''=''TRUE''', 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
 
