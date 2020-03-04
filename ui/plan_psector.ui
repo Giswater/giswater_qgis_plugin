@@ -16,8 +16,11 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="toolTip">
+      <string>test1</string>
+     </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -46,6 +49,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="toolTip">
+            <string>tooltip original name puesto en el ui</string>
+           </property>
            <property name="text">
             <string>Name:</string>
            </property>
@@ -122,6 +128,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QLabel" name="label_4">
+           <property name="toolTip">
+            <string>tooltip original ext code puesto en el ui</string>
+           </property>
            <property name="text">
             <string>Ext code:</string>
            </property>
@@ -600,6 +609,9 @@
      <widget class="QWidget" name="tab_rel">
       <attribute name="title">
        <string>Relations</string>
+      </attribute>
+      <attribute name="toolTip">
+       <string>test2</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>

@@ -107,7 +107,7 @@ class DaoController(object):
                 
     def tr(self, message, context_name=None):
         """ Translate @message looking it in @context_name """
-        
+        #text = self.tr('title', context_name)
         if context_name is None:
             context_name = self.plugin_name
 
@@ -1048,7 +1048,7 @@ class DaoController(object):
                 self.log_info("Locale not found", parameter=locale_path)
             
                     
-    def manage_translation(self, locale_name, dialog=None, log_info=False):  
+    def manage_translation(self, qm_file, dialog=None, log_info=False):
         """ Manage locale and corresponding 'i18n' file """ 
         
         # Get locale of QGIS application
@@ -1061,12 +1061,12 @@ class DaoController(object):
             locale = 'en'
             
         # If user locale file not found, set English one by default
-        locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
+        locale_path = os.path.join(self.plugin_dir, 'i18n', f'{qm_file}_.qm')
         if not os.path.exists(locale_path):
             if log_info:
                 self.log_info("Locale not found", parameter=locale_path)
             locale_default = 'en'
-            locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale_default))
+            locale_path = os.path.join(self.plugin_dir, 'i18n', f'{qm_file}_{locale_default}.qm')
             # If English locale file not found, exit function
             # It means that probably that form has not been translated yet
             if not os.path.exists(locale_path):
@@ -1079,7 +1079,7 @@ class DaoController(object):
         
         # If dialog is set, then translate form
         if dialog:
-            self.translate_form(dialog, locale_name)                              
+            self.translate_form(dialog, dialog.objectName())
       
       
     def get_project_type(self, schemaname=None):

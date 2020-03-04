@@ -220,7 +220,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_path_rel.clicked.connect(partial(self.select_path, self.dlg_lot, 'txt_path_rel'))
 
         # Open the dialog
-        self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+        self.open_dialog(self.dlg_lot)
 
 
     def manage_cmb_status(self):
@@ -1380,7 +1380,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.date_event_to.dateChanged.connect(self.filter_lot)
 
         # Open form
-        self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
+        self.open_dialog(self.dlg_lot_man)
 
 
     def open_vehicle_manage(self):

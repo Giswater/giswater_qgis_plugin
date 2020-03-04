@@ -143,7 +143,7 @@ class ChangeElemType(ParentMapTool):
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
-        self.open_dialog(self.dlg_chg_node_type, dlg_name='change_node_type', maximize_button=False)
+        self.open_dialog(self.dlg_chg_node_type, maximize_button=False)
 
 
     def filter_catalog(self):
