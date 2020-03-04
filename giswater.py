@@ -79,11 +79,7 @@ class Giswater(QObject):
         self.plugin_name = self.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
-        # Initialize svg giswater directory
-        svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
-            
-        # Check if config file exists    
+        # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
             message = "Config file not found at: " + setting_file
@@ -103,8 +99,6 @@ class Giswater(QObject):
         self.qgis_settings = QSettings()
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
-        # if 'toolbars_position' not in self.qgis_settings:
-        #     self.controller.plugin_settings_set_value()
         # Define signals
         self.set_signals()
 
@@ -573,9 +567,6 @@ class Giswater(QObject):
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
-        # Delete python compiled files
-        self.delete_pyc_files()  
-        
         # Force project read (to work with PluginReloader)
         self.project_read(False)
 
@@ -1117,16 +1108,7 @@ class Giswater(QObject):
         except AttributeError as e:
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
-            self.controller.show_warning("KeyError: "+str(e))              
-       
-        
-    def delete_pyc_files(self):
-        """ Delete python compiled files """
-        
-        filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
-        for f in filelist:
-            os.remove(f)
-
+            self.controller.show_warning("KeyError: "+str(e))
 
     def manage_expl_id(self):
         """ Manage project variable 'expl_id' """
