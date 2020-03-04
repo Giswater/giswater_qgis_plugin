@@ -22,6 +22,7 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
+from . import global_vars
 from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
@@ -206,7 +207,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.master, function_name)
                 action.triggered.connect(callback_function)
             # Utils toolbar actions
-            elif int(index_action) in (206, 58, 83, 99):
+            elif int(index_action) in (206, 58, 83, 99, 59):
                 callback_function = getattr(self.utils, function_name)
                 action.triggered.connect(callback_function)
             # Tm Basic toolbar actions
@@ -322,7 +323,7 @@ class Giswater(QObject):
             return None
 
         # Buttons NOT checkable (normally because they open a form)
-        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 86, 64, 65, 66, 67, 68, 69,
+        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 59, 86, 64, 65, 66, 67, 68, 69,
                         74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305)
 
         if int(index_action) in list_actions:
@@ -407,7 +408,7 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
         if self.controller.get_project_type() in ('ws', 'ud'):
-            list_actions = ['206', '99', '83', '58']
+            list_actions = ['206', '99', '83', '58', '59']
         elif self.controller.get_project_type() in ('tm', 'pl'):
             list_actions = ['206', '99', '83', '58']
         self.manage_toolbar(toolbar_id, list_actions)
@@ -895,6 +896,7 @@ class Giswater(QObject):
 
 
     def get_buttons_to_hide(self):
+
         self.list_to_hide = []
         try:
             #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
@@ -1139,16 +1141,37 @@ class Giswater(QObject):
         if not status:
             return False
 
+        # Execute function 'gw_fct_audit_check_project'
+        self.execute_audit_check_project()
+
+        return True
+
+
+    def execute_audit_check_project(self):
+        """ Execute function 'gw_fct_audit_check_project' """
+
         version = self.parent.get_plugin_version()
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
+        # Save project result in a global variable
+        global_vars.init_settings()
+        global_vars.project_result = result
         try:
             if not result or (result['body']['actions']['hideForm'] == True): return True
         except KeyError as e:
             self.controller.log_info(f"EXCEPTION: {type(e).__name__}, {e}")
             return True
+
+        # Show dialog with audit check project result
+        self.show_check_project_result(result)
+
+        return True
+
+
+    def show_check_project_result(self, result):
+        """ Show dialog with audit check project result """
 
         self.dlg_audit_project = AuditCheckProjectResult()
         self.parent.load_settings(self.dlg_audit_project)
@@ -1171,8 +1194,6 @@ class Giswater(QObject):
                 self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
                 self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
                 self.parent.open_dialog(self.dlg_audit_project)
-
-        return True
 
 
     def update_config(self, state):

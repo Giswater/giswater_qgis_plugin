@@ -5,9 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
+from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBar, QToolButton
 
 import csv
 import json
@@ -16,6 +16,7 @@ from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
 
+from .. import global_vars
 from .. import utils_giswater
 from .api_config import ApiConfig
 from .api_manage_composer import ApiManageComposer
@@ -23,6 +24,7 @@ from .gw_toolbox import GwToolBox
 from .parent import ParentAction
 from .manage_visit import ManageVisit
 from ..ui_manager import Csv2Pg
+from ..ui_manager import AuditCheckProjectResult
 
 
 class Utils(ParentAction):
@@ -31,7 +33,6 @@ class Utils(ParentAction):
         """ Class to control toolbar 'om_ws' """
 
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.toolbox = GwToolBox(iface, settings, controller, plugin_dir)
 
@@ -374,4 +375,109 @@ class Utils(ParentAction):
 
         self.api_composer = ApiManageComposer(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_composer.composer()
+
+
+    def utils_show_check_project_result(self):
+        """ Show dialog with audit check project result """
+
+        # Get project result from global variable
+        result = global_vars.project_result
+        if result is None:
+            self.controller.log_info("Project result is None")
+            return
+
+        self.dlg_audit_project = AuditCheckProjectResult()
+        self.load_settings(self.dlg_audit_project)
+        self.dlg_audit_project.rejected.connect(partial(self.save_settings, self.dlg_audit_project))
+
+        # Populate info_log and missing layers
+        critical_level = 0
+        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
+            'gw_fct_audit_check_project_result', True, False, 0, True)
+
+        if 'missingLayers' in result['body']['data']:
+            critical_level = self.get_missing_layers(self.dlg_audit_project,
+                result['body']['data']['missingLayers'], critical_level)
+
+        self.hide_void_groupbox(self.dlg_audit_project)
+
+        if int(critical_level) > 0 or text_result:
+            row = self.controller.get_config('qgis_form_initproject_hidden')
+            if row and row[0].lower() == 'false':
+                self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+                self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
+                self.open_dialog(self.dlg_audit_project)
+
+
+    def update_config(self, state):
+        """ Set qgis_form_initproject_hidden True or False into config_param_user """
+
+        value = {0:"False", 2:"True"}
+        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
+               f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
+               f" ON CONFLICT  (parameter, cur_user) "
+               f" DO UPDATE SET value='{value[state]}'")
+        self.controller.execute_sql(sql, log_sql=True)
+
+
+    def get_missing_layers(self, dialog, m_layers, critical_level):
+
+            grl_critical = dialog.findChild(QGridLayout, "grl_critical")
+            grl_others = dialog.findChild(QGridLayout, "grl_others")
+            for pos, item in enumerate(m_layers):
+                try:
+                    if not item:
+                        continue
+                    widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+                    # If it is the case that a layer is necessary for two functions,
+                    # and the widget has already been put in another iteration
+                    if widget:
+                        continue
+                    label = QLabel()
+                    label.setObjectName(f"lbl_{item['layer']}")
+                    label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
+
+                    critical_level = int(item['criticity']) if int(
+                        item['criticity']) > critical_level else critical_level
+                    widget = QCheckBox()
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    widget.setObjectName(f"{item['layer']}")
+                    widget.setProperty('field_id', item['id'])
+                    widget.setProperty('field_the_geom', item['field_the_geom'])
+
+                    if int(item['criticity']) == 3:
+                        grl_critical.addWidget(label, pos, 0)
+                        grl_critical.addWidget(widget, pos, 1)
+                    else:
+                        grl_others.addWidget(label, pos, 0)
+                        grl_others.addWidget(widget, pos, 1)
+                except KeyError as e:
+                    description = "Key on returned json from ddbb is missed"
+                    self.controller.manage_exception(None, description)
+
+            return critical_level
+
+
+    def add_selected_layers(self):
+
+        checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
+        schemaname = self.schema_name.replace('"', '')
+        for check in checks:
+            if check.isChecked():
+                try:
+                    the_geom = check.property('field_the_geom')
+                except KeyError as e:
+                    sql = (f"SELECT attname FROM pg_attribute a "
+                           f" JOIN pg_class t on a.attrelid = t.oid "
+                           f" JOIN pg_namespace s on t.relnamespace = s.oid "
+                           f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
+                           f" AND s.nspname = '{schemaname}' "
+                           f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
+                           f" ORDER BY a.attnum limit 1")
+                    the_geom = self.controller.get_row(sql, commit=True)
+                if not the_geom:
+                    the_geom = None
+                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom, check.property('field_id'), None)
+
+        self.close_dialog(self.dlg_audit_project)
 
