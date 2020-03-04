@@ -423,14 +423,14 @@ raise notice 'v_isarcdivide,%',v_isarcdivide;
 				IF v_count_connec > 0 THEN
 
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(v_array_connec))||'},"data":{"feature_type":"CONNEC"}}$$)';
+					"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 				END IF;
 				IF v_count_gully > 0 THEN
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(v_array_gully))||'},"data":{"feature_type":"GULLY"}}$$)';
+					"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
@@ -677,7 +677,7 @@ raise notice 'v_isarcdivide,%',v_isarcdivide;
 				IF v_count_connec > 0 THEN
 
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(v_array_connec))||'},"data":{"feature_type":"CONNEC"}}$$)';
+					"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
@@ -685,7 +685,7 @@ raise notice 'v_isarcdivide,%',v_isarcdivide;
 				IF v_count_gully > 0 THEN
 
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(v_array_gully))||'},"data":{"feature_type":"GULLY"}}$$)';
+					"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 					VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
