@@ -15,7 +15,7 @@ DECLARE
 	v_rev_node_ymax_tol double precision;
 	v_rev_node_geom1_tol double precision;
 	v_rev_node_geom2_tol double precision;
-	v_v_tol_filter_bool boolean;
+	v_tol_filter_bool boolean;
 	v_review_status smallint;
 	v_status_new integer;
 
@@ -94,7 +94,7 @@ BEGIN
 			rec_node.observ != NEW.observ	OR  (rec_node.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_node.shape != NEW.shape	OR  (rec_node.shape IS NULL AND NEW.shape IS NOT NULL) OR
 			rec_node.the_geom::text<>NEW.the_geom::text THEN
-			v_v_tol_filter_bool=TRUE;
+			v_tol_filter_bool=TRUE;
 		ELSE
 			v_tol_filter_bool=FALSE;
 		END IF;
