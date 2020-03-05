@@ -1226,13 +1226,9 @@ class UpdateSQL(ApiParent):
 
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=False)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
-            return False
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        status = self.populate_functions_dlg(self.dlg_import_inp, complet_result[0]['body']['data'])
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body, schema_name=self.schema)
+        if not complet_result: return False
+        self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
         # Set listeners
         self.dlg_import_inp.btn_run.clicked.connect(partial(self.execute_import_inp, accepted=True, schema_type=schema_type))
@@ -1272,9 +1268,8 @@ class UpdateSQL(ApiParent):
 
         client = '"client":{"device":9, "lang":"'+locale+'"}, '
         data = '"data":{' + extras + '}'
-        body = "" + client + data
-        sql = ("SELECT gw_fct_admin_schema_lastprocess($${" + body + "}$$)::text")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=False)
+        body = "$${" + client + data + "}$$"
+        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name)
         if status is False:
             self.error_count = self.error_count + 1
 
@@ -2407,7 +2402,7 @@ class UpdateSQL(ApiParent):
             self.dlg_import_inp.progressBar.setFormat("")
 
             body = self.create_body(extras=extras)
-            sql = ("SELECT " + str(function_name) + "($${" + body + "}$$)::text")
+            sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2695,9 +2690,9 @@ class UpdateSQL(ApiParent):
         body = body.replace('""', 'null')
 
         # Execute query
-        sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_child_views($${" + body + "}$$)::text")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.get_json('gw_fct_admin_manage_child_views', body, schema_name=schema_name)
         self.manage_result_message(status, parameter="Created child view")
+
 
 
     def update_sys_fields(self):
@@ -3021,7 +3016,6 @@ class UpdateSQL(ApiParent):
                 return
 
             elif row is not None:
-
                 msg = "The column id value is already exists."
                 self.controller.show_info_box(msg, "Info")
                 return
@@ -3062,8 +3056,7 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
             self.manage_result_message(status, parameter="Created field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3103,8 +3096,7 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
             self.manage_result_message(status, parameter="Update field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3120,8 +3112,7 @@ class UpdateSQL(ApiParent):
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
             self.manage_result_message(status, parameter="Delete function")
 
         # Close dialog

@@ -675,7 +675,7 @@ class DaoController(object):
         return result
 
 
-    def get_json(self, function_name, parameters=None, commit=True, log_sql=False):
+    def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param body: Parameter for function (json)
@@ -685,7 +685,7 @@ class DaoController(object):
         """
 
         # Check if function exists
-        row = self.check_function(function_name)
+        row = self.check_function(function_name, schema_name)
         if not row:
             self.show_warning("Function not found in database", parameter=function_name)
             return None
@@ -1143,17 +1143,17 @@ class DaoController(object):
         return row
     
     
-    def check_function(self, functionname, schemaname=None):
+    def check_function(self, function_name, schema_name=None):
         """ Check if @function_name exists in selected schema """
 
-        if schemaname is None:
-            schemaname = self.schema_name
+        if schema_name is None:
+            schema_name = self.schema_name
 
-        schemaname = schemaname.replace('"', '')
+        schema_name = schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines "
                "WHERE lower(routine_schema) = %s "
                "AND lower(routine_name) = %s ")
-        params = [schemaname, functionname]
+        params = [schema_name, function_name]
         row = self.get_row(sql, commit=True, params=params)
         return row
     
