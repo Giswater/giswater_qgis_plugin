@@ -1623,7 +1623,7 @@ class UpdateSQL(ApiParent):
         # Get current schema selected
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         self.schema = None
-
+        self.locale = self.project_data_language
 
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
