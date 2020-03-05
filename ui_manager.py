@@ -107,11 +107,6 @@ def get_ui_class(ui_file_name, subfolder=None):
     return uic.loadUiType(ui_file_path)[0]
 
 
-FORM_CLASS = get_ui_class('add_doc.ui')
-class AddDoc(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('add_element.ui')
 class AddElement(GwDialog, FORM_CLASS):
     pass
@@ -279,6 +274,11 @@ class Csv2Pg(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('delete_feature.ui')
 class DelFeature(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('doc.ui')
+class AddDoc(GwDialog, FORM_CLASS):
     pass
 
 
