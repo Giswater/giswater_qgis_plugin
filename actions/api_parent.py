@@ -1327,9 +1327,9 @@ class ApiParent(ParentAction):
                     else:
                         widget.setProperty('is_mandatory', True)
                     widget.setText(field['value'])
-                    if 'reg_exp' in field:
-                        if field['reg_exp'] is not None:
-                            reg_exp = QRegExp(str(field['reg_exp']))
+                    if 'regexpcontrol' in field:
+                        if field['regexpcontrol'] is not None:
+                            reg_exp = QRegExp(str(field['regexpcontrol']))
                             widget.setValidator(QRegExpValidator(reg_exp))
                     widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -1553,7 +1553,7 @@ class ApiParent(ParentAction):
         widget = None
         function_name = 'no_function_associated'
         for field in result['fields']:
-            if field['action_function'] == 'action_link':
+            if field['linkedaction'] == 'action_link':
                 function_name = field['widgetfunction']
                 widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
                 break
