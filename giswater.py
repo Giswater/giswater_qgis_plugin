@@ -1152,12 +1152,13 @@ class Giswater(QObject):
         version = self.parent.get_plugin_version()
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
+        extras += f', "initProject":true'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:
             if not result or (result['body']['actions']['hideForm'] == True): return True
         except KeyError as e:
-            self.controller.log_info(f"EXCEPTION: {type(e).__name__}, {e}")
+            self.controller.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
             return True
 
         # Show dialog with audit check project result
@@ -1185,11 +1186,9 @@ class Giswater(QObject):
         self.parent.hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
-            row = self.controller.get_config('qgis_form_initproject_hidden')
-            if row and row[0].lower() == 'false':
-                self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
-                self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
-                self.parent.open_dialog(self.dlg_audit_project)
+            self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+            self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
+            self.parent.open_dialog(self.dlg_audit_project)
 
 
     def update_config(self, state):

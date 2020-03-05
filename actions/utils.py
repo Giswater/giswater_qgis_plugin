@@ -429,12 +429,13 @@ class Utils(ParentAction):
         version = self.get_plugin_version()
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
+        extras += f', "initProject":false'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:
             if not result or (result['body']['actions']['hideForm'] == True): return True
         except KeyError as e:
-            self.controller.log_info(f"EXCEPTION: {type(e).__name__}, {e}")
+            self.controller.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
             return True
 
         # Show dialog with audit check project result
