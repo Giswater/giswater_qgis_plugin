@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS plan_psector_x_gully(
 );
 
 
-ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_node_id_fkey;
+ALTER TABLE subcatchment DROP CONSTRAINT IF EXISTS subcatchment_node_id_fkey;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"vnode", "column":"top_elev", "dataType":"numeric(12,3)"}}$$);
 
