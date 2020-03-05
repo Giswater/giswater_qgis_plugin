@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>447</width>
-    <height>704</height>
+    <height>734</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>273</x>
-     <y>675</y>
+     <y>695</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>358</x>
-     <y>675</y>
+     <y>695</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -45,7 +45,7 @@
      <x>0</x>
      <y>0</y>
      <width>439</width>
-     <height>667</height>
+     <height>686</height>
     </rect>
    </property>
    <property name="font">
@@ -271,7 +271,7 @@
        <x>0</x>
        <y>0</y>
        <width>433</width>
-       <height>633</height>
+       <height>656</height>
       </rect>
      </property>
      <property name="font">
@@ -1200,7 +1200,7 @@
          <x>6</x>
          <y>474</y>
          <width>418</width>
-         <height>119</height>
+         <height>151</height>
         </rect>
        </property>
        <property name="title">
@@ -1406,6 +1406,55 @@
           <y>91</y>
           <width>17</width>
           <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_edit_connect_force_automatic_connect2network">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>115</y>
+          <width>236</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Automatic connect to network:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="chk_edit_connect_force_automatic_connect2network">
+        <property name="geometry">
+         <rect>
+          <x>177</x>
+          <y>115</y>
+          <width>15</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="text">
