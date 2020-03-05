@@ -5,22 +5,24 @@ This version of Giswater is provided by Giswater Association
 */
 -- The code of this inundation function have been provided by Enric Amat (FISERSA)
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: v_fprocesscat_idv_fprocesscat_id
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_lrs(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_lrs(p_data json)
 RETURNS json AS
 $BODY$
 
+
 /*
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitation":"[1,2]"}}}');
+
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitation":"[2]"}}}');
 
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
 
-SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocess	cat_id=34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
 
@@ -28,8 +30,11 @@ SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=c
 */
 
 DECLARE
-v_affectedrows numeric; 
-v_cont1 integer default 0;
+v_acc_value numeric;
+v_affectroSCHEMA_NAME integer;
+v_nodeid text;
+v_affectedroSCHEMA_NAME numeric; 
+v_count integer default 0;
 v_class text = 'LRS';
 v_feature record;
 v_expl json;
@@ -38,7 +43,7 @@ v_querytext text;
 v_result_info json; -- provides info about how have been done function
 v_result_point json; -- nice to show as log all nodes with pk
 v_result text;
-v_count	integer;
+
 v_version text;
 v_srid integer;
 v_input json;
@@ -49,7 +54,24 @@ v_queryarc text;
 v_costfield text;
 v_valuefield text;
 v_headerfield text;
-v_layer record;
+rec_layer record;
+v_query text;
+rec_query record;
+v_featureid text;
+v_header_arc text;
+v_last_arc text;
+v_current_value numeric;
+rec_arcs record;
+v_to_arc text;
+v_current_arc text;
+v_header_node TEXT;
+v_end_node TEXT;
+v_node_list text[];
+v_bifurcation integer;
+v_bif_header_arc text;
+v_bif_header_node text;
+v_count_feature integer;
+v_bif_acc_value numeric;
 
 BEGIN
 
@@ -61,19 +83,19 @@ BEGIN
 
 	-- get variables (from config_param_system)
 	v_costfield = (SELECT (value::json->>'arc')::json->>'costField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
-	v_valuefield = (SELECT (value::json->>'nodeChild')::json->>'valueField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
-	v_headerfield = (SELECT (value::json->>'nodeChild')::json->>'headerField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
+	v_valuefield = (SELECT (value::json->>'nodeChild')::json->>'valueField' FROM config_param_system WHERE parameter='grafanalytics_lrs_feature');
+	v_headerfield = (SELECT (value::json->>'nodeChild')::json->>'headerField' FROM config_param_system WHERE parameter='grafanalytics_lrs_feature');
 	
 	-- setting cost field when has not configure value
 	IF v_costfield IS NULL THEN
 		v_costfield =  '1::float';
 	END IF;
-	
+
 	-- get variables (from version)
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
 
 	-- set variables
-	v_fprocesscat_id=XX;  
+	v_fprocesscat_id=116;  
 
 	-- data quality analysis
 	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
@@ -89,9 +111,10 @@ BEGIN
 	-- reset tables (graf & audit_log)
 	DELETE FROM temp_anlgraf;
 	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
-	DELETE FROM anl_node WHERE fprocesscat_id=XX AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fprocesscat_id=XX AND cur_user=current_user;
-	DELETE FROM audit_check_data WHERE fprocesscat_id=XX AND user_name=current_user;
+	--DELETE FROM anl_node WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
+	DELETE FROM anl_node;
+	DELETE FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
 
 	-- reset user's state
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -134,71 +157,198 @@ BEGIN
 			      json_array_elements_text(((json_array_elements_text((value::json->>''headers'')::json))::json->>''toArc'')::json) as to_arc 
 				  FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'' order by 1,2';
 
+	
+	EXECUTE 'select array_agg(a.node_id) from(
+	SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
+	FROM SCHEMA_NAME.config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
+	into v_node_list;
+			
+
+	raise notice 'v_node_list,%',v_node_list;
+	raise notice 'v_querynode,%',v_querynode;
+
+	EXECUTE v_queryarc INTO rec_arcs;
 	-- close boundary conditions, setting flag=1 for all nodes that fits on graf delimiters
-	EXECUTE 'UPDATE temp_anlgraf SET flag=1 WHERE node_1 IN ('||v_querynode||') OR  node_2 IN ('||v_querynode||')';
-		
+	EXECUTE 'UPDATE temp_anlgraf SET flag=1 WHERE node_1::text IN ('||v_querynode||') OR  node_2::text IN ('||v_querynode||')';
+	
 	-- open boundary conditions, setting again flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
 	EXECUTE 'UPDATE temp_anlgraf SET flag=0 WHERE id IN (SELECT id FROM temp_anlgraf 
 								JOIN ('||v_queryarc||') a ON to_arc::integer=arc_id::integer 
 								WHERE node_id::integer=node_1::integer)';
-					
+	--list only to_arc
+	v_queryarc =  'select json_array_elements_text(((json_array_elements_text((value::json->>''headers'')::json))::json->>''toArc'')::json) as to_arc 
+		FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'' order by 1';
+
 	-- starting process
 	LOOP
+	raise notice '6';
+		
+		EXIT WHEN v_count = -1;
+		v_count = v_count+1;
+
+		IF v_nodeid IS NULL THEN
+			-- looking to pick one graf header
+			--select header node and correct to_arc direction
+			v_querytext = 'SELECT * FROM temp_anlgraf WHERE node_1::text IN ('||v_querynode||') AND checkf = 0 
+			AND arc_id::TEXT IN ('||v_queryarc||')  LIMIT 1';
+			RAISE NOTICE 'v_querytext,%',v_querytext;
+			IF v_querytext IS NOT NULL THEN
+				RAISE NOTICE 'v_querytext %', v_querytext;
+				EXECUTE v_querytext INTO v_feature;
+				-- select other arcs that left from same node
+				/*IF v_feature.id IS NULL THEN
+						EXECUTE 'select * from temp_anlgraf WHERE value = 0 AND node_1::text = any ('||v_querynode||') AND
+						arc_id IN (SELECT arc_id FROM temp_anlgraf WHERE value = 0 GROUP BY arc_id
+						HAVING count(arc_id) > 1)'
+						INTO v_feature;
+						RAISE NOTICE 'v_feature_left,%',v_feature;
+				END IF;*/
+				--set value of accumulation sum
+				v_acc_value = 0;
+				RAISE NOTICE 'v_acc_value_BEGIN,%',v_acc_value;
+				
+			END IF;
+			
+			v_header_arc = v_feature.arc_id::text;
+			v_header_node = v_feature.node_1::text;
+
+			raise notice 'v_header_arc,v_last_arc,%,%',v_header_arc,v_last_arc;
+
+			v_featureid = v_feature.node_1;
+			-- finish process when graf header is not found
+			EXIT WHEN v_featureid IS NULL;
 	
-		-- looking for pick one graf header
-		v_querytext = 'SELECT * FROM temp_anlgraf WHERE node_id IN ('||v_querynode||') AND checkf = 0 LIMIT 1 ) a';
-		IF v_querytext IS NOT NULL THEN
-			RAISE NOTICE 'v_querytext %', v_querytext;
-			EXECUTE v_querytext INTO v_feature;
+		ELSIF v_nodeid IS NOT NULL THEN
+			v_featureid = v_nodeid::integer;
+			v_count = -1;
 		END IF;
-
-		-- finish process when graf header is not found
-		EXIT WHEN v_feature.id IS NULL;
-
+	
 		-- reset water flag
 		UPDATE temp_anlgraf SET water=0;
-				
+
+		raise notice 'v_feature,%',v_feature.node_1;
+		
 		-- set the starting element
-		v_querytext = 'UPDATE temp_anlgraf SET water=1 WHERE node_1='||quote_literal(v_feature.node_id)||' AND flag=0'; 
+		v_querytext = 'UPDATE temp_anlgraf SET water=1 WHERE node_1='||quote_literal(v_feature.node_1)||' AND flag=0'; 
 		EXECUTE v_querytext;
 
+		-- set the starting element (check)
+		v_querytext = 'UPDATE temp_anlgraf SET checkf=1 WHERE arc_id='||quote_literal(v_feature.arc_id)||''; 
+
+		--RAISE NOTICE 'v_querytext %', v_querytext;
+		EXECUTE v_querytext;
+
+		v_count = 0;
 		-- inundation process
 		LOOP	
-			v_cont1 = v_cont1+1;
-			EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = length*cost + a.value
-			FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id';
 
-			-- todo: possible update of anl_node values here
-
-			GET DIAGNOSTICS v_affectedrows =row_count;
-			EXIT WHEN v_affectedrows = 0;
-			EXIT WHEN v_cont1 = 200;
-		END LOOP;
 		
-		-- insert arc results into anl table
-		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
-			SELECT DISTINCT ON (arc_id)'||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, concat (''{"value":'',value,'', "header":'''||v_feature.node_id||'}'') 
-			FROM (SELECT arc_id, max(water) as water, value FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a 
-			JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer';
+			raise notice 'check_v_header_arc,%',v_header_arc;
+			raise notice 'check_v_header_node,%',v_header_node;
+			raise notice 'v_acc_value,%',v_acc_value;
+			IF v_feature.node_1::text = v_header_node then
+				v_acc_value=0;
+				v_current_value=0;
+			end if;
+
+			SELECT node_2::text INTO v_end_node FROM temp_anlgraf WHERE arc_id::text=v_header_arc AND node_1::text = v_header_node limit 1;
+
+			SELECT length * cost INTO v_current_value FROM temp_anlgraf WHERE arc_id::text = v_header_arc LIMIT 1;
+
+			raise notice 'v_current_value,%',v_current_value;
+			
+			v_acc_value = v_acc_value + v_current_value;
+			
+		IF v_header_arc IS NOT NULL THEN
+			EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
+			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, '||v_end_node::text||', the_geom, 
+			concat (''{"value":"'','||v_acc_value||',''", "header":"'||v_feature.node_1||'"}'')
+			FROM v_edit_node WHERE node_id= '''||v_end_node||''';';
 	
-		-- todo: possible update of anl_node values here
-		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, concat (''{"value":'',value,'', "header":'''||
-			v_feature.node_id||'}'')
-			FROM (SELECT min(value), node_id FROM (SELECT node_1 as node_id, water, value FROM temp_anlgraf UNION SELECT node_2, water, value FROM temp_anlgraf)a
-			GROUP BY node_id, water HAVING water=1)b JOIN v_edit_node c ON c.node_id::integer=b.node_id::integer';
+			EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = '||v_acc_value||'
+			FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id and a.arc_id='''||v_header_arc::text||'''
+			and a.node_1::text='''||v_header_node||''' and a.node_2::text = '''||v_end_node||''';';
+			
+			EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = '||v_acc_value||'
+			FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id and a.arc_id='''||v_header_arc::text||''';';
+			
+		ELSE
+			EXIT;
+END IF;
+			SELECT count(arc_id) INTO v_count_feature FROM temp_anlgraf WHERE node_1::text = v_end_node AND arc_id::text !=v_header_arc;
+			IF v_count_feature >1 THEN		
+				raise notice 'v_bifurcation,%',v_bifurcation;
+				--case when bifurcation node is also the beginning of new branch, and arcs depend to 2 different branches
+				IF v_end_node = ANY(v_node_list) THEN
+					v_bifurcation = 0;
+					EXECUTE 'SELECT arc_id::text FROM temp_anlgraf WHERE checkf= 0 AND node_1::text = '||v_end_node||'::text 
+					AND arc_id::text !='||v_header_arc||'::text and arc_id::TEXT not in ('||v_queryarc||') limit 1'
+					INTO v_header_arc;
+					v_bif_header_arc = null;
+					raise notice 'bif_set2-v_header_arc,%,v_bif_header_arc,%',v_header_arc,v_bif_header_arc;				
+					v_header_node = v_end_node::text;
+					v_bif_header_node = null;
+
+					raise notice 'bif_set2-v_header_node,%,v_bif_header_node,%',v_header_node,v_bif_header_node;
+				ELSE 
+				--case when bifurcation node and arcs belong to the same branch
+					v_bifurcation = 1;
+					v_header_arc = (SELECT arc_id::text FROM temp_anlgraf WHERE checkf= 0 AND node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
+					v_bif_header_arc = (SELECT arc_id::text FROM temp_anlgraf WHERE checkf= 0 AND node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
+					raise notice 'bif_set-v_header_arc,%,v_bif_header_arc,%',v_header_arc,v_bif_header_arc;				
+					v_header_node = v_end_node::text;
+					v_bif_header_node = v_end_node::text;
+					v_bif_acc_value = v_acc_value;
+					raise notice 'bif_set-v_header_node,%,v_bif_header_node,%',v_header_node,v_bif_header_node;
+				END IF;
+
+			ELSIF v_count_feature = 0 and v_bifurcation= 1 THEN
+				--calculation on one branch came to an end, setting back the header node and arc to calculte the second branch
+				v_bifurcation = 0;
+				raise notice 'v_bifurcation,%',v_bifurcation;
+				v_header_node = v_bif_header_node;
+				v_header_arc = v_bif_header_arc;
+				v_acc_value = v_bif_acc_value;
+				raise notice 'bif_finish-v_header_node,%,v_header_arc,%',v_header_node,v_header_arc;
+
+			ELSE 
+				-- setting the header node of the next arc in order of spreading
+				v_bifurcation = 0;
+				v_header_arc = (SELECT arc_id::text FROM temp_anlgraf WHERE node_1::text = v_end_node AND arc_id::text !=v_header_arc limit 1);
+				raise notice 'header_arc_finish%',v_header_arc;
+				v_header_node = v_end_node::text;
+				raise notice 'header,%,end,%',v_header_node,v_end_node;
+
+				--in case of one no bifurcation finish the process if end node is on the ist of header nodes
+				EXIT WHEN v_end_node = ANY(v_node_list);
+			END IF;
+		
+					
+			GET DIAGNOSTICS v_affectedroSCHEMA_NAME =row_count;	
+			EXIT WHEN v_header_arc = NULL;
+			EXIT WHEN v_affectedroSCHEMA_NAME = 0;
+			EXIT WHEN v_count = 200;
+			v_count = v_count + v_affectroSCHEMA_NAME;
+
+			raise notice 'Counter % Feature_id % Affected roSCHEMA_NAME % ', v_count, v_featureid, v_affectroSCHEMA_NAME;
+		END LOOP;
+			
 
 	END LOOP;
-		
+
 	-- update fields for node layers (value and header)
-	FOR v_layer IN SELECT child_layer FROM cat_feature
+	FOR rec_layer IN execute 'SELECT * FROM cat_feature JOIN man_addfields_parameter on cat_feature_id=cat_feature.id 
+ 	WHERE param_name ='''|| v_valuefield||''''
 	LOOP
-		EXECUTE 'UPDATE '||v_layer||' SET '||v_valuefield||' = a.descript::json->>''value'', '||v_headerfield||
-		' = a.descript::json->>''header'' FROM anl_node a WHERE fprocesscat_id=XX AND a.node_id=node.node_id AND cur_user=current_user';
+		v_query =  'UPDATE '||rec_layer.child_layer||' SET '||v_valuefield||' = a.descript::json->>''value'', '||v_headerfield||
+		' = a.descript::json->>''header'' FROM anl_node a WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.node_id='||rec_layer.child_layer||'.node_id AND cur_user=current_user';
+		raise notice 'v_query,%',v_query;
+		EXECUTE v_query;
 	END LOOP;
+	
+	
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 	VALUES (v_fprocesscat_id, concat('WARNING: LRS attributes on node features have been updated by this process'));
-		
 
 	-- get results
 	-- info
@@ -218,19 +368,20 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+   /* RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"setVisibleLayers":["'||v_visible_layer||'"],'||
 				'"point":'||v_result_point||','||
 		       '}'||
 	    '}')::json;
-
+*/
+return ('{"status":"Accepted"}')::json;
 	
 --  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	-- GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+--	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
