@@ -396,6 +396,8 @@ class ParentManage(ParentAction, object):
         elif tab_position == 2:
             self.geom_type = "connec"
         elif tab_position == 3:
+            self.geom_type = "element"
+        elif tab_position == 4:
             self.geom_type = "gully"
 
         self.hide_generic_layers()                  
