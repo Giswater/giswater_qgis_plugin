@@ -380,12 +380,74 @@ class Utils(ParentAction):
     def utils_show_check_project_result(self):
         """ Show dialog with audit check project result """
 
-        # Get project result from global variable
-        result = global_vars.project_result
-        if result is None:
-            self.controller.log_info("Project result is None")
-            return
+        # Return layers in the same order as listed in TOC
+        layers = self.controller.get_layers()
 
+        # Fill table 'audit_check_project' with layers data
+        self.populate_audit_check_project(layers)
+
+
+    def populate_audit_check_project(self, layers):
+        """ Fill table 'audit_check_project' with layers data """
+
+        sql = ("DELETE FROM audit_check_project"
+               " WHERE user_name = current_user AND fprocesscat_id = 1")
+        self.controller.execute_sql(sql)
+        sql = ""
+        for layer in layers:
+            if layer is None: continue
+            if layer.providerType() != 'postgres': continue
+            layer_source = self.controller.get_layer_source(layer)
+            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
+            # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
+            uri = layer.dataProvider().dataSourceUri()
+            if 'SELECT row_number() over ()' in str(uri): continue
+            schema_name = layer_source['schema']
+            if schema_name is not None:
+                schema_name = schema_name.replace('"', '')
+                table_name = layer_source['table']
+                db_name = layer_source['db']
+                host_name = layer_source['host']
+                table_user = layer_source['user']
+                sql += ("\nINSERT INTO audit_check_project "
+                        "(table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user) "
+                        "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(
+                    db_name) + "', '" + str(host_name) + "', 1, '" + str(table_user) + "');")
+
+        status = self.controller.execute_sql(sql)
+        if not status:
+            return False
+
+        # Execute function 'gw_fct_audit_check_project'
+        self.execute_audit_check_project()
+
+        return True
+
+
+    def execute_audit_check_project(self):
+        """ Execute function 'gw_fct_audit_check_project' """
+
+        version = self.get_plugin_version()
+        extras = f'"version":"{version}"'
+        extras += f', "fprocesscat_id":1'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
+        try:
+            if not result or (result['body']['actions']['hideForm'] == True): return True
+        except KeyError as e:
+            self.controller.log_info(f"EXCEPTION: {type(e).__name__}, {e}")
+            return True
+
+        # Show dialog with audit check project result
+        self.show_check_project_result(result)
+
+        return True
+
+
+    def show_check_project_result(self, result):
+        """ Show dialog with audit check project result """
+
+        # Create dialog
         self.dlg_audit_project = AuditCheckProjectResult()
         self.load_settings(self.dlg_audit_project)
         self.dlg_audit_project.rejected.connect(partial(self.save_settings, self.dlg_audit_project))
@@ -402,11 +464,9 @@ class Utils(ParentAction):
         self.hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
-            row = self.controller.get_config('qgis_form_initproject_hidden')
-            if row and row[0].lower() == 'false':
-                self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
-                self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
-                self.open_dialog(self.dlg_audit_project)
+            self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+            self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
+            self.open_dialog(self.dlg_audit_project)
 
 
     def update_config(self, state):
@@ -422,40 +482,40 @@ class Utils(ParentAction):
 
     def get_missing_layers(self, dialog, m_layers, critical_level):
 
-            grl_critical = dialog.findChild(QGridLayout, "grl_critical")
-            grl_others = dialog.findChild(QGridLayout, "grl_others")
-            for pos, item in enumerate(m_layers):
-                try:
-                    if not item:
-                        continue
-                    widget = dialog.findChild(QCheckBox, f"{item['layer']}")
-                    # If it is the case that a layer is necessary for two functions,
-                    # and the widget has already been put in another iteration
-                    if widget:
-                        continue
-                    label = QLabel()
-                    label.setObjectName(f"lbl_{item['layer']}")
-                    label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
+        grl_critical = dialog.findChild(QGridLayout, "grl_critical")
+        grl_others = dialog.findChild(QGridLayout, "grl_others")
+        for pos, item in enumerate(m_layers):
+            try:
+                if not item:
+                    continue
+                widget = dialog.findChild(QCheckBox, f"{item['layer']}")
+                # If it is the case that a layer is necessary for two functions,
+                # and the widget has already been put in another iteration
+                if widget:
+                    continue
+                label = QLabel()
+                label.setObjectName(f"lbl_{item['layer']}")
+                label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
 
-                    critical_level = int(item['criticity']) if int(
-                        item['criticity']) > critical_level else critical_level
-                    widget = QCheckBox()
-                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                    widget.setObjectName(f"{item['layer']}")
-                    widget.setProperty('field_id', item['id'])
-                    widget.setProperty('field_the_geom', item['field_the_geom'])
+                critical_level = int(item['criticity']) if int(
+                    item['criticity']) > critical_level else critical_level
+                widget = QCheckBox()
+                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                widget.setObjectName(f"{item['layer']}")
+                widget.setProperty('field_id', item['id'])
+                widget.setProperty('field_the_geom', item['field_the_geom'])
 
-                    if int(item['criticity']) == 3:
-                        grl_critical.addWidget(label, pos, 0)
-                        grl_critical.addWidget(widget, pos, 1)
-                    else:
-                        grl_others.addWidget(label, pos, 0)
-                        grl_others.addWidget(widget, pos, 1)
-                except KeyError as e:
-                    description = "Key on returned json from ddbb is missed"
-                    self.controller.manage_exception(None, description)
+                if int(item['criticity']) == 3:
+                    grl_critical.addWidget(label, pos, 0)
+                    grl_critical.addWidget(widget, pos, 1)
+                else:
+                    grl_others.addWidget(label, pos, 0)
+                    grl_others.addWidget(widget, pos, 1)
+            except KeyError as e:
+                description = "Key on returned json from ddbb is missed"
+                self.controller.manage_exception(None, description)
 
-            return critical_level
+        return critical_level
 
 
     def add_selected_layers(self):
