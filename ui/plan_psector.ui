@@ -20,7 +20,7 @@
       <string>test1</string>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -30,7 +30,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_10">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lbl_psector_id">
            <property name="text">
             <string>psector_id:</string>
            </property>
@@ -720,8 +720,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>620</width>
-              <height>484</height>
+              <width>146</width>
+              <height>122</height>
              </rect>
             </property>
             <attribute name="label">

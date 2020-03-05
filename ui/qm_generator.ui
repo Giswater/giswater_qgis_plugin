@@ -35,6 +35,9 @@
       </item>
       <item row="4" column="1">
        <widget class="QLineEdit" name="txt_pass">
+        <property name="text">
+         <string>uo2ohNiecuoc</string>
+        </property>
         <property name="echoMode">
          <enum>QLineEdit::Password</enum>
         </property>
@@ -161,7 +164,7 @@
       <item row="0" column="0">
        <widget class="QCheckBox" name="chk_py_msg">
         <property name="text">
-         <string>Translate py messages</string>
+         <string>Translate ui and py messages</string>
         </property>
        </widget>
       </item>

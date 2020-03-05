@@ -780,7 +780,7 @@ class DaoController(object):
             
     def translate_widget(self, context_name, widget):
         """ Translate widget text """
-        
+        print(f'context_name --> {context_name}')
         if not widget:
             return
 
@@ -789,7 +789,9 @@ class DaoController(object):
                 num_tabs = widget.count()
                 for i in range(0, num_tabs):
                     widget_name = widget.widget(i).objectName()
+                    print(f'widget_name --> {widget_name}')
                     text = self.tr(widget_name, context_name)
+                    print(f'text --> {text}')
                     if text != widget_name:
                         widget.setTabText(i, text)
                     else:
@@ -1079,6 +1081,7 @@ class DaoController(object):
         
         # If dialog is set, then translate form
         if dialog:
+            self.translate_form(dialog, locale_name)
             self.translate_form(dialog, dialog.objectName())
       
       

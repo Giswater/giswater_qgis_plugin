@@ -153,11 +153,21 @@ class I18NGenerator(ParentAction):
         py_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
         py_file = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-        sql = f"SELECT source, {py_language} FROM i18n.pymessage;"
-        rows = self.get_rows(sql)
-        if not rows: return False
+        key_lbl = f'lb_{py_language}'
+        key_tooltip = f'tt_{py_language}'
 
-        ts_path = self.plugin_dir + os.sep + 'actions' + os.sep + f'giswater_{py_file}.ts'
+        # Get python messages values
+        sql = f"SELECT source, {py_language} FROM i18n.pymessage;"
+        py_messages = self.get_rows(sql)
+
+        # Get ui messages values
+        sql = (f"SELECT dialog_name, source, lb_enen, {key_lbl}, tt_eses, {key_tooltip} "
+               f" FROM i18n.pydialog "
+               f" ORDER BY dialog_name;")
+        py_dialogs = self.get_rows(sql)
+
+
+        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{py_file}.ts'
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
@@ -165,22 +175,64 @@ class I18NGenerator(ParentAction):
             if not answer:
                 return
         ts_file = open(ts_path, "w")
+
+        # Create header
         line = '<?xml version="1.0" encoding="utf-8"?>\n'
         line += '<!DOCTYPE TS>\n'
-        line += f'<TS version="2.0" language="{xml_language}">\n\n'
-        line += '<context>\n'
-        line += '<name>ui_message</name>\n'
+        line += f'<TS version="2.0" language="{xml_language}">\n'
+        line += '\t<!-- PYTHON MESSAGES -->\n'
+        # Create children for message
+        line += '\t<context>\n'
+        line += '\t\t<name>ui_message</name>\n'
         ts_file.write(line)
-        for row in rows:
-            line = f"\t<message>\n"
-            line += f"\t\t<source>{row['source'].rstrip()}</source>\n"
-            if row[py_language] is None:
-                row[py_language] = row['source']
-            line += f"\t\t<translation>{row[py_language].rstrip()}</translation>\n"
-            line += f"\t</message>\n"
+        for py_msg in py_messages:
+            line = f"\t\t<message>\n"
+            line += f"\t\t\t<source>{py_msg['source'].rstrip()}</source>\n"
+            if py_msg[py_language] is None:
+                py_msg[py_language] = py_msg['source']
+            line += f"\t\t\t<translation>{py_msg[py_language].rstrip()}</translation>\n"
+            line += f"\t\t</message>\n"
             ts_file.write(line)
-        line = '\t</context>\n'
-        line += '</TS>\n\n'
+        line = '\t</context>\n\n'
+        line += '\t<!-- UI TRANSLATION -->\n'
+        ts_file.write(line)
+        # Create children for ui
+        name = None
+        for py_dlg in py_dialogs:
+            print(f"NAME --> {name}, DN --> {py_dlg['dialog_name']}")
+            # Create child <context> (ui's name)
+            if name and name != py_dlg['dialog_name']:
+                print("TEST 20")
+                line += '\t</context>\n'
+                ts_file.write(line)
+            if name != py_dlg['dialog_name']:
+                print("TEST 10")
+                name = py_dlg['dialog_name']
+                line = '\t<context>\n'
+                line += f'\t\t<name>{name}</name>\n'
+                line += f'\t\t<message>\n'
+                line += f'\t\t\t<source>title</source>\n'
+                line += f'\t\t\t<translation>{py_dlg[key_lbl]}</translation>\n'
+                line += f'\t\t</message>\n'
+            # Create child for labels
+            line += f"\t\t<message>\n"
+            line += f"\t\t\t<source>{py_dlg['source'].rstrip()}</source>\n"
+            if py_dlg[key_lbl] is None:
+                py_dlg[key_lbl] = py_dlg['lb_enen']
+            line += f"\t\t\t<translation>{py_dlg[key_lbl].rstrip()}</translation>\n"
+            line += f"\t\t</message>\n"
+
+            # Create child for tooltip
+            line += f"\t\t<message>\n"
+            line += f"\t\t\t<source>tooltip_{py_dlg['source'].rstrip()}</source>\n"
+            if py_dlg[key_lbl] is None:
+                py_dlg[key_tooltip] = py_dlg['lb_enen']
+            line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
+            line += f"\t\t</message>\n"
+
+
+            # select dialog_name, source, lb_enen, lb_eses, tt_eses from i18n.pydialog;
+        line = '</TS>\n\n'
         ts_file.write(line)
         ts_file.close()
         del ts_file
