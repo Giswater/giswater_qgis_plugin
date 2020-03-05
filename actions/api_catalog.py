@@ -64,7 +64,7 @@ class ApiCatalog(ApiParent):
             label.setText(field['label'].capitalize())
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
-            if field['layout_id'] == 1:
+            if field['position'] == 'layout_data_1':
                 self.filter_form.addWidget(label, field['layout_order'], 0)
                 self.filter_form.addWidget(widget, field['layout_order'], 1)
 

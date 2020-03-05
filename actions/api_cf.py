@@ -541,7 +541,7 @@ class ApiCF(ApiParent, QObject):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
-        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
+        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
         self.dlg_cf.dlg_closed.connect(self.roll_back)
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
@@ -584,7 +584,7 @@ class ApiCF(ApiParent, QObject):
         if self.my_json == '' or str(self.my_json) == '{}':
             return
         elif action_is_checked:
-            self.accept(self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json, close_dialog=False)
+            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
 
 
     def roll_back(self):
@@ -799,18 +799,16 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, feature_id, _json, p_widget=None, clear_json=False, close_dialog=True):
+    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True):
         """
         :param dialog:
         :param complet_result:
-        :param feature_id:
         :param _json:
         :param p_widget:
         :param clear_json:
         :param close_dialog:
         :return:
         """
-
         if _json == '' or str(_json) == '{}':
             self.close_dialog(dialog)
             return
@@ -855,7 +853,7 @@ class ApiCF(ApiParent, QObject):
         # If we make an info
         else:
             my_json = json.dumps(_json)
-            feature = f'"id":"{feature_id}", '
+            feature = f'"id":"{self.feature_id}", '
         feature += f'"featureType":"{self.feature_type}", '
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
@@ -993,7 +991,7 @@ class ApiCF(ApiParent, QObject):
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
-                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, widget, True, False))
+                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1038,7 +1036,7 @@ class ApiCF(ApiParent, QObject):
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1053,7 +1051,7 @@ class ApiCF(ApiParent, QObject):
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1068,7 +1066,7 @@ class ApiCF(ApiParent, QObject):
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1083,7 +1081,7 @@ class ApiCF(ApiParent, QObject):
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], self.feature_id, _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
@@ -2370,10 +2368,10 @@ class ApiCF(ApiParent, QObject):
     """ NEW WORKCAT"""
     def cf_new_workcat(self, tab_type):
 
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        body = '$${"client":{"device":3, "infoType":100, "lang":"ES"}, '
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
         body += '"feature":{}, '
-        body += '"data":{}'
+        body += '"data":{}}$$'
         complet_list = [self.controller.get_json('gw_api_getcatalog', body)]
         if not complet_list: return
 
