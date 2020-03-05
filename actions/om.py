@@ -81,7 +81,7 @@ class Om(ParentAction):
 
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_psector_mng)
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
 
 
     def charge_psector(self, qtbl_psm):
@@ -234,7 +234,7 @@ class Om(ParentAction):
         self.get_default_dates()
         utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
         utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
-        self.open_dialog(self.dlg_selector_date)
+        self.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
     def update_dates_into_db(self):

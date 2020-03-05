@@ -163,17 +163,17 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x()+8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
-        
-        
-    def open_dialog(self, dlg=None, qm_file='giswater', info=True, maximize_button=True, stay_on_top=True):
+
+
+    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
             
         # Manage i18n of the dialog                  
-
-        self.controller.manage_translation(qm_file, dlg)
+        if dlg_name:
+            self.controller.manage_translation(dlg_name, dlg)
 
         # Manage stay on top, maximize/minimize button and information button
         # if info is True maximize flag will be ignored

@@ -2457,14 +2457,15 @@ class ApiCF(ApiParent, QObject):
                     self.controller.show_info_box(msg, "Warning")
 
 
-    def cf_open_dialog(self, dlg=None, qm_file='giswater', maximize_button=True, stay_on_top=True):
+    def cf_open_dialog(self, dlg=None, dlg_name='giswater', maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
 
         # Manage i18n of the dialog
-        self.controller.manage_translation(qm_file, dlg)
+        if dlg_name:
+            self.controller.manage_translation(dlg_name, dlg)
 
         # Manage stay on top and maximize button
         if maximize_button and stay_on_top:

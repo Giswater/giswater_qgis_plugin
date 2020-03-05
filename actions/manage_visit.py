@@ -180,7 +180,7 @@ class ManageVisit(ParentManage, QObject):
             self.set_locked_relation()
 
         # Open the dialog
-        self.open_dialog(self.dlg_add_visit)
+        self.open_dialog(self.dlg_add_visit, dlg_name="add_visit")
 
 
     def set_locked_relation(self):
@@ -588,7 +588,7 @@ class ManageVisit(ParentManage, QObject):
 
 
         # Open form
-        self.open_dialog(self.dlg_man)
+        self.open_dialog(self.dlg_man, dlg_name="visit_management")
 
 
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):

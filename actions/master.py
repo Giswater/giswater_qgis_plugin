@@ -73,7 +73,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_psector_mng)
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
 
 
     def update_current_psector(self, dialog, qtbl_psm):
@@ -228,7 +228,7 @@ class Master(ParentAction):
         field_id_left = "psector_id"
         field_id_right = "psector_id"
         self.multi_row_selector(self.dlg_psector_selector, tableleft, tableright, field_id_left, field_id_right)
-        self.open_dialog(self.dlg_psector_selector, maximize_button=False)
+        self.open_dialog(self.dlg_psector_selector, dlg_name="multirow_selector", maximize_button=False)
 
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
@@ -269,7 +269,7 @@ class Master(ParentAction):
         # Manage i18n of the form and open it
         # self.controller.translate_form(dlg_estimate_result_new, 'estimate_result_new')
 
-        self.open_dialog(dlg_estimate_result_new, maximize_button=False)
+        self.open_dialog(dlg_estimate_result_new, dlg_name="plan_estimate_result_new", maximize_button=False)
 
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
@@ -351,7 +351,7 @@ class Master(ParentAction):
         # TODO pending translation
         # Manage i18n of the form and open it
         # self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
-        self.open_dialog(self.dlg_estimate_result_selector, maximize_button=False)
+        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector",  maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
@@ -442,7 +442,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_merm)
+        self.open_dialog(self.dlg_merm, dlg_name="plan_estimate_result_manager")
 
 
     def charge_plan_estimate_result(self, dialog):
