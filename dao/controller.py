@@ -1081,7 +1081,6 @@ class DaoController(object):
         
         # If dialog is set, then translate form
         if dialog:
-            self.translate_form(dialog, locale_name)
             self.translate_form(dialog, dialog.objectName())
       
       
