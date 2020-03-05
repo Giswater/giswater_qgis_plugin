@@ -1,14 +1,12 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: latin-1 -*-
 from qgis.core import Qgis, QgsGeometry, QgsMapToPixel, QgsPointXY
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
-
 from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt, pyqtSignal, QObject
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel

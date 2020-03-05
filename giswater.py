@@ -5,9 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-from json import JSONDecodeError
-
 from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
 from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
@@ -15,6 +12,8 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QAppli
 from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 
+import json
+from json import JSONDecodeError
 import configparser
 import os.path
 import sys
