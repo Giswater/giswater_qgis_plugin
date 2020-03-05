@@ -1059,20 +1059,35 @@ class DaoController(object):
             locale = 'ca'
         elif locale == 'en_us':
             locale = 'en'
-            
-        # If user locale file not found, set English one by default
-        locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale}.qm')
-        if not os.path.exists(locale_path):
-            if log_info:
-                self.log_info("Locale not found", parameter=locale_path)
-            locale_default = 'en'
-            locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater__{locale_default}.qm')
-            # If English locale file not found, exit function
-            # It means that probably that form has not been translated yet
+        if locale_name == self.plugin_name:
+            # If user locale file not found, set English one by default
+            locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale}.qm')
             if not os.path.exists(locale_path):
-                if log_info:            
+                if log_info:
                     self.log_info("Locale not found", parameter=locale_path)
-                return            
+                locale_default = 'en'
+                locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale_default}.qm')
+                # If English locale file not found, exit function
+                # It means that probably that form has not been translated yet
+                if not os.path.exists(locale_path):
+                    if log_info:
+                        self.log_info("Locale not found", parameter=locale_path)
+                    return
+        else:
+            # If user locale file not found, set English one by default
+            locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_ui_{locale}.qm')
+            if not os.path.exists(locale_path):
+                if log_info:
+                    self.log_info("Locale not found", parameter=locale_path)
+                locale_default = 'en'
+                locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_ui_{locale_default}.qm')
+                # If English locale file not found, exit function
+                # It means that probably that form has not been translated yet
+                if not os.path.exists(locale_path):
+                    if log_info:
+                        self.log_info("Locale not found", parameter=locale_path)
+                    return
+
         
         # Add translation file
         self.add_translator(locale_path) 

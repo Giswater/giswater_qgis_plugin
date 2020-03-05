@@ -167,7 +167,7 @@ class I18NGenerator(ParentAction):
         py_dialogs = self.get_rows(sql)
 
 
-        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{py_file}.ts'
+        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_ui_{py_file}.ts'
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
@@ -199,21 +199,20 @@ class I18NGenerator(ParentAction):
         # Create children for ui
         name = None
         for py_dlg in py_dialogs:
-            print(f"NAME --> {name}, DN --> {py_dlg['dialog_name']}")
             # Create child <context> (ui's name)
             if name and name != py_dlg['dialog_name']:
-                print("TEST 20")
                 line += '\t</context>\n'
                 ts_file.write(line)
             if name != py_dlg['dialog_name']:
-                print("TEST 10")
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
-                line += f'\t\t<message>\n'
-                line += f'\t\t\t<source>title</source>\n'
-                line += f'\t\t\t<translation>{py_dlg[key_lbl]}</translation>\n'
-                line += f'\t\t</message>\n'
+                title =  self.get_title(py_dialogs, name, key_lbl)
+                if title:
+                    line += f'\t\t<message>\n'
+                    line += f'\t\t\t<source>title</source>\n'
+                    line += f'\t\t\t<translation>{title}</translation>\n'
+                    line += f'\t\t</message>\n'
             # Create child for labels
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source'].rstrip()}</source>\n"
@@ -239,6 +238,17 @@ class I18NGenerator(ParentAction):
         lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep +'lrelease.exe'
         s = subprocess.call([lrelease_path, ts_path], shell=False)
         utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', 'Translation successful')
+
+
+    def get_title(self, py_dialogs, name, key_lbl):
+        title = None
+        for py in py_dialogs:
+            if py['source'] == f'dlg_{name}':
+                title = py[key_lbl]
+                if not title:
+                    title = py['lb_enen']
+                return title
+        return title
 
 
     def create_files_db_message(self):

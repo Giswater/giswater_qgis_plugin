@@ -106,9 +106,8 @@ class ManageDocument(ParentManage):
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
-
         # Open the dialog
-        self.open_dialog(self.dlg_add_doc, maximize_button=False)
+        self.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
         return self.dlg_add_doc
 
 
