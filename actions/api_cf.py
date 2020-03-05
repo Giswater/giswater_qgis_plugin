@@ -817,8 +817,8 @@ class ApiCF(ApiParent, QObject):
         fields_reload = ""
         list_mandatory = []
         for field in complet_result['body']['data']['fields']:
-            if p_widget and field['widgetname'] == p_widget.objectName() and field['reload_field']:
-                fields_reload = field['reload_field']['reload']
+            if p_widget and field['widgetname'] == p_widget.objectName() and field['reloadfields']:
+                fields_reload = field['reloadfields']
 
             if field['ismandatory'] == True:
                 widget_name = 'data_' + field['column_id']
