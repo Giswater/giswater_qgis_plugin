@@ -138,9 +138,9 @@ BEGIN
 		IF (aux_json->>'widgettype') = 'typeahead' THEN
 		
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', 'idval'::text);
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryText', COALESCE((aux_json->>'dv_querytext')));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryTextFilter', COALESCE((aux_json->>'dv_querytext_filterc')));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', COALESCE((aux_json->>'dv_parent_id')));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryText', COALESCE((aux_json->>'dv_querytext'), ''));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryTextFilter', COALESCE((aux_json->>'dv_querytext_filterc'), ''));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', COALESCE((aux_json->>'dv_parent_id'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isNullValue', (aux_json->>'dv_isnullvalue'));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'orderById', (aux_json->>'dv_orderby_id'));
 		END IF;
