@@ -202,10 +202,10 @@ class I18NGenerator(ParentAction):
             # Create child <context> (ui's name)
             if name and name != py_dlg['dialog_name']:
                 line += '\t</context>\n'
-                ts_file.write(line)
+
             if name != py_dlg['dialog_name']:
                 name = py_dlg['dialog_name']
-                line = '\t<context>\n'
+                line += '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
                 title =  self.get_title(py_dialogs, name, key_lbl)
                 if title:
@@ -213,12 +213,13 @@ class I18NGenerator(ParentAction):
                     line += f'\t\t\t<source>title</source>\n'
                     line += f'\t\t\t<translation>{title}</translation>\n'
                     line += f'\t\t</message>\n'
+
             # Create child for labels
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source'].rstrip()}</source>\n"
             if py_dlg[key_lbl] is None:
                 py_dlg[key_lbl] = py_dlg['lb_enen']
-            line += f"\t\t\t<translation>{py_dlg[key_lbl].rstrip()}</translation>\n"
+            line += f"\t\t\t<translation>{py_dlg[key_lbl].rstrip()}:</translation>\n"
             line += f"\t\t</message>\n"
 
             # Create child for tooltip
@@ -229,9 +230,10 @@ class I18NGenerator(ParentAction):
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
 
+        # Close last context and TS
+        line += '\t</context>\n'
+        line += '</TS>\n\n'
 
-            # select dialog_name, source, lb_enen, lb_eses, tt_eses from i18n.pydialog;
-        line = '</TS>\n\n'
         ts_file.write(line)
         ts_file.close()
         del ts_file
