@@ -148,6 +148,12 @@ class Giswater(QObject):
         self.action_info = None
 
 
+    def set_info_button_visible(self, visible=True):
+
+        if self.action:
+            self.action.setVisible(visible)
+
+
     def enable_python_console(self):
         """ Enable Python console and Log Messages panel if parameter 'enable_python_console' = True """
 
@@ -688,6 +694,9 @@ class Giswater(QObject):
                         if self.plugin_dir in mod.__file__:
                             del sys.modules[mod_name]
 
+            else:
+                self.set_info_button_visible()
+
         except Exception as e:
             print(str(e))
         finally:
@@ -888,6 +897,10 @@ class Giswater(QObject):
 
         # Put add layers button into toc
         self.add_layers_button()
+
+        # Hide info button if giswater project is loaded
+        if show_warning:
+            self.set_info_button_visible(False)
 
         # Log it
         message = "Project read successfully"
