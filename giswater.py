@@ -22,7 +22,6 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-from . import global_vars
 from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
@@ -1155,9 +1154,6 @@ class Giswater(QObject):
         extras += f', "fprocesscat_id":1'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
-        # Save project result in a global variable
-        global_vars.init_settings()
-        global_vars.project_result = result
         try:
             if not result or (result['body']['actions']['hideForm'] == True): return True
         except KeyError as e:

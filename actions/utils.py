@@ -16,7 +16,6 @@ from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
 
-from .. import global_vars
 from .. import utils_giswater
 from .api_config import ApiConfig
 from .api_manage_composer import ApiManageComposer
