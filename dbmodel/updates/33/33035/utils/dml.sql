@@ -21,7 +21,8 @@ set sample_query = '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"d
 where function_name='gw_fct_pg2epa_main';
 
 UPDATE audit_cat_function
-set sample_query = '{"client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":["node_id"]},"data":{}}'
+set sample_query = '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":["node_id"]},"data":{}},
+"UD":{"client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":["node_id"]},"data":{}}}'
 where function_name='gw_fct_arc_divide';
 
 UPDATE audit_cat_function

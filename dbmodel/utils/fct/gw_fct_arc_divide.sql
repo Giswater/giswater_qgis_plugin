@@ -113,7 +113,7 @@ BEGIN
 		SELECT isarcdivide, node_type.id INTO v_isarcdivide, v_node_type 
 		FROM node_type JOIN node ON node.node_type = node_type.id WHERE node.node_id=v_node_id;
 	END IF;
-raise notice 'v_isarcdivide,%',v_isarcdivide;
+
     -- Get parameters from configs table
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
 	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user;
@@ -716,8 +716,11 @@ raise notice 'v_isarcdivide,%',v_isarcdivide;
 
 		END IF;
 	ELSE
-
-		EXECUTE 'SELECT gw_fct_audit_function(3046,2114, '''||v_node_type||''')' INTO v_audit_result; 
+		IF v_node_type IS NOT NULL THEN
+			EXECUTE 'SELECT gw_fct_audit_function(3046,2114, '''||v_node_type||''')' INTO v_audit_result; 
+		ELSE 
+			EXECUTE 'SELECT gw_fct_audit_function(3046,2114,NULL)' INTO v_audit_result; 
+		END IF;
 
 	END IF;
 

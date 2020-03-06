@@ -184,9 +184,9 @@ BEGIN
 								END IF;
 
 								-- replace 'node_id' for id of the feature calling arc divide function
-								select replace(rec_fct.sample_query::text,'node_id'::text,v_feature_id::text)
-								INTO v_function;
-						
+								select replace(concat(rec_fct.function_name,'($$',rec_fct.sample_query::json ->>v_project_type,'$$)')::TEXT,'node_id'::text,v_feature_id::text) 
+								INTO v_function; 
+												
 
 								IF v_function IS NOT NULL THEN
 									v_query = 'SELECT '||v_schemaname||'.'||v_function||';';
@@ -199,8 +199,10 @@ BEGIN
 
 								--fusion arcs or delete node if it's not connected to arcs (not arc divide)
 								IF rec_node_type.isarcdivide is true AND rec_state = 1 then
-										
-									EXECUTE 'SELECT gw_fct_arc_fusion ('||v_feature_id||'::text, ''work1''::text, ''2020-02-13''::date);'
+									
+									EXECUTE 'SELECT gw_fct_arc_fusion ($${"client":{"device":3, "infoType":100, "lang":"ES"},
+									"feature":{"id":["'||v_feature_id||'::text,"data":{"workcat_id_end":"work1",
+									"enddate":"2020-02-05"}}$$);'
 									INTO v_query_result;
 										
 									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
