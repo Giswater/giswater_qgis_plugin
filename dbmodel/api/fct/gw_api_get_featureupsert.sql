@@ -96,6 +96,7 @@ v_noderecord2 record;
 v_input json;
 v_presszone_id text;
 v_widgetvalue float;
+v_automatic_ccode boolean;
 
 BEGIN
 
@@ -128,8 +129,8 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
 
     SELECT value INTO v_samenode_init_end_control FROM config_param_system WHERE parameter = 'samenode_init_end_control';
-
-	SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='proximity_buffer';
+    SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='proximity_buffer';
+    SELECT value INTO v_automatic_ccode FROM config_param_system WHERE parameter='edit_automatic_customercode';
 
     -- get tablename and formname
     -- Common
@@ -439,6 +440,9 @@ BEGIN
 			ELSIF (aux_json->>'column_id') = 'code' THEN
 				field_value = v_code;
 				
+			ELSIF (aux_json->>'column_id') = 'customer_code' AND v_automatic_ccode THEN
+				field_value = v_id;
+
 			ELSIF (aux_json->>'column_id') = 'node_1' THEN
 				field_value = v_noderecord1.node_id;
 				
@@ -541,10 +545,7 @@ BEGIN
 				v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'maxValue', v_widgetvalue);
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 			END IF;
-
-
-
-			
+		
 			
 		ELSIF  p_tg_op ='UPDATE' THEN 
 				
