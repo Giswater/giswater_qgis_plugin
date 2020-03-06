@@ -33,3 +33,15 @@ VALUES (118,'Define addfields','edit','utils') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (119,'Define visit class','edit','utils') ON CONFLICT (id) DO NOTHING;
+
+
+--2020/03/06
+INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, isenabled, project_type, datatype, widgettype, ismandatory, isdeprecated) 
+VALUES ('i18n_update_mode', '0', 'integer', 'system', 'Manage updates of i18n labels and tooltips. (0: update always owerwriting current values, 1: update only when value is null, 2:newer update}', 
+'Update label & tooltips mode:', '0', 'utils', 'integer', 'linetext', true, false) 
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2810, 'gw_fct_admin_schema_i18n', 'utils', 'function', null, null, null,'Function to manage how the updates of tooltips and labels must be executed (overwrting old values, only when null or never', 'role_admin',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
