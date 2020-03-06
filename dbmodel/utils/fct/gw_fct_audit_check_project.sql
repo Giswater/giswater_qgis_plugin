@@ -35,7 +35,7 @@ v_project_type text;
 v_psector_vdef integer;
 v_errortext text;
 v_result_id text;
-rec_table record;
+v_rectable record;
 v_version text;
 v_srid integer;
 v_result_layers_criticity3 json;
@@ -82,8 +82,8 @@ BEGIN
 	SELECT value INTO v_layer_log FROM config_param_user where parameter='audit_project_layer_log' AND cur_user=current_user;
 	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
 
-	
-	IF v_init_project IS FALSE THEN -- when funcion gw_fct_audit_check_project is called by click on utils button, force to show user dialog and user control
+	-- when funcion gw_fct_audit_check_project is called by click on utils button, force to show user dialog and user control
+	IF v_init_project IS FALSE THEN
 		v_user_control = TRUE;
 		v_hidden_form = FALSE;
 	END IF;
@@ -162,12 +162,12 @@ BEGIN
 	END IF;
 
 	--Reset the rest of sequences
-	FOR rec_table IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq' AND isdeprecated IS NOT TRUE
+	FOR v_rectable IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq' AND isdeprecated IS NOT TRUE
 	LOOP 
-		v_query_string:= 'SELECT max('||rec_table.sys_sequence_field||') FROM '||rec_table.id||';' ;
+		v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
 		EXECUTE v_query_string INTO v_max_seq_id;	
 		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||rec_table.sys_sequence||' '','||v_max_seq_id||', true)';			
+			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sys_sequence||' '','||v_max_seq_id||', true)';			
 		END IF;
 	END LOOP;
 
@@ -175,13 +175,13 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
-	FOR rec_table IN SELECT * FROM audit_cat_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
+	FOR v_rectable IN SELECT * FROM audit_cat_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
 	LOOP
-		IF rec_table.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user) THEN
+		IF v_rectable.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user) THEN
 			INSERT INTO config_param_user (parameter, value, cur_user) 
-			SELECT audit_cat_param_user.id, vdefault, current_user FROM audit_cat_param_user WHERE audit_cat_param_user.id = rec_table.id;	
+			SELECT audit_cat_param_user.id, vdefault, current_user FROM audit_cat_param_user WHERE audit_cat_param_user.id = v_rectable.id;	
 
-			v_errortext=concat('Set value for new variable in config param user: ',rec_table.id,'.');
+			v_errortext=concat('Set value for new variable in config param user: ',v_rectable.id,'.');
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
@@ -375,15 +375,15 @@ BEGIN
 			END IF;
 
 			-- start process
-			FOR rec_table IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN 
+			FOR v_rectable IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN 
 			(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') AND isdeprecated IS FALSE)
 			LOOP
 			
-				--RAISE NOTICE 'v_count % id % ', v_count, rec_table.id;
-				IF rec_table.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=v_fprocesscat_id_aux) THEN
-					INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) VALUES (rec_table.id, 1, rec_table.qgis_criticity, FALSE, rec_table.qgis_message);
+				--RAISE NOTICE 'v_count % id % ', v_count, v_rectable.id;
+				IF v_rectable.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=v_fprocesscat_id_aux) THEN
+					INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) VALUES (v_rectable.id, 1, v_rectable.qgis_criticity, FALSE, v_rectable.qgis_message);
 				--ELSE 
-				--	UPDATE audit_check_project SET criticity=rec_table.qgis_criticity, enabled=TRUE WHERE table_id=rec_table.id;
+				--	UPDATE audit_check_project SET criticity=v_rectable.qgis_criticity, enabled=TRUE WHERE table_id=v_rectable.id;
 				END IF;	
 				v_count=v_count+1;
 			END LOOP;
