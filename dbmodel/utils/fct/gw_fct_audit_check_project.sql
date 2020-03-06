@@ -12,7 +12,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(p_data json)
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.3.019", "fprocesscat_id":1}}$$);
+SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+"feature":{}, "data":{"filterFields":{}, "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fprocesscat_id":1}}$$);
 */
 
 DECLARE 
@@ -57,6 +58,7 @@ v_user_control boolean = false;
 v_layer_log boolean = false;
 v_error_context text;
 v_hidden_form boolean;
+v_init_project boolean;
 
 BEGIN 
 
@@ -69,7 +71,9 @@ BEGIN
 	-- Get input parameters
 	v_fprocesscat_id_aux := (p_data ->> 'data')::json->> 'fprocesscat_id';
 	v_qgis_version := (p_data ->> 'data')::json->> 'version';
+	v_init_project := (p_data ->> 'data')::json->> 'initProject';
 
+	
 	-- get user parameters
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
@@ -78,6 +82,11 @@ BEGIN
 	SELECT value INTO v_layer_log FROM config_param_user where parameter='audit_project_layer_log' AND cur_user=current_user;
 	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
 
+	
+	IF v_init_project IS FALSE THEN -- when funcion gw_fct_audit_check_project is called by click on utils button, force to show user dialog and user control
+		v_user_control = TRUE;
+		v_hidden_form = FALSE;
+	END IF;
 	
 	-- init process
 	v_isenabled:=FALSE;

@@ -6,20 +6,20 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2810
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_admin_schema_i18n(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_i18n(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 set
-SELECT ws_sample.gw_fct_admin_schema_i18n($${"data":{"table":"config_api_form_fields", "clause":"WHERE formname = 've_arc' AND column_id = 'arc_id'", "label":{"column":"label", "value":"test"}, "tooltip":{"column":"tooltip", "value":"test"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_schema_i18n($${"data":{"table":"config_api_form_fields", "clause":"WHERE formname = 've_arc' AND column_id = 'arc_id'", 
+"label":{"column":"label", "value":"test"}, "tooltip":{"column":"tooltip", "value":"test"}}}$$)
 check 
-SELECT * FROM ws_sample.config_api_form_fields WHERE formname = 've_arc' AND column_id = 'arc_id'
+SELECT * FROM SCHEMA_NAME.config_api_form_fields WHERE formname = 've_arc' AND column_id = 'arc_id'
 */
 
 
 DECLARE 
-v_language varchar;
 v_mode int2 = 0;  -- 0 alvays label and tooltips will be updated, 1 update only when null, 2 never will be updated
 v_table text;
 v_clause text;
@@ -35,12 +35,10 @@ v_querytext text;
 	
 BEGIN 
 	-- search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system parameters
-	SELECT language INTO v_language FROM version LIMIT 1;
 	SELECT value INTO v_mode FROM config_param_system WHERE parameter = 'i18n_update_mode';
-
 
 	-- get input parameters
 	v_table := (p_data ->> 'data')::json->> 'table';
