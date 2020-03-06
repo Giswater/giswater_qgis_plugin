@@ -147,6 +147,7 @@ class I18NGenerator(ParentAction):
         line = '\t</context>\n\n'
         line += '\t<!-- UI TRANSLATION -->\n'
         ts_file.write(line)
+
         # Create children for ui
         name = None
         for py_dlg in py_dialogs:
@@ -227,8 +228,6 @@ class I18NGenerator(ParentAction):
         # if not rows: return
 
         path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' +''
-                + os.sep + 'i18n'  + os.sep + f'{file_lng}' + os.sep + f"{plugin_release}" + os.sep + '')
-        path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' +''
                 + os.sep + f"{plugin_release}"  + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'i18n_{file_lng}.sql'
 
@@ -242,22 +241,58 @@ class I18NGenerator(ParentAction):
             os.makedirs(path, exist_ok=True)
 
         db_file = open(path + file_name, "w")
-        line = ''
+
         for row in rows:
+            table = row['context']
+            formn_ame = row['formname']
+            form_type = row['formtype']
+            source = row['source']
+            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['source']
+            tt_value = row[f'tt_{db_lang}'] if row[f'tt_{db_lang}'] is not None else row['source']
+            line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] == 'config_api_form_fields':
-                print(row)
-                label = row[f'lb_{db_lang}']
-                tooltip = row[f'tt_{db_lang}']
-                line += (f"UPDATE i18n.{row['context']}"
-                        f" SET label ='{label}', tooltip='{tooltip}' "
-                        f" WHERE column_id = '{row['source']}' " 
-                        f"AND formname = '{row['formname']}' AND formtype = '{row['formtype']}';\n")
-        db_file.write(line)
+                 line +=(f'{{"data":'
+                            f'{{"table":"{table}", '
+                            f'"clause":"WHERE formname = \'{formn_ame}\' '
+                            f'AND column_id = \'{source}\' AND formtype = \'{form_type}\'", '
+                            f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
+                            f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}'
+                            f'}}'
+                        f'}}$$);\n')
+            elif row['context'] == 'config_api_form_tabs':
+                line +=(f'{{"data":'
+                            f'{{"table":"{table}", '
+                                f'"clause":"WHERE formname = \'{formn_ame}\' AND tabname = \'{source}\'", '
+                                f'"label":{{"column":"tabtext", "value":"{lbl_value}"}}, '
+                                f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}'
+                            f'}}'
+                        f'}}$$);\n')
+            elif row['context'] == 'config_api_form_groupbox':
+                line +=(f'{{"data":'
+                            f'{{"table":"{table}", '
+                                f'"clause":"WHERE formname = \'{formn_ame}\' AND layout_id = \'{source}\'", '
+                                f'"label":{{"column":"tabtext", "value":"{tt_value}"}}'                                
+                            f'}}'
+                        f'}}$$);\n')
+            elif row['context'] == 'config_api_form_actions':
+                line +=(f'{{"data":'
+                            f'{{"table":"{table}", '
+                                f'"clause":"WHERE actioname = \'{source}\' ", '
+                                f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}'                                
+                            f'}}'
+                        f'}}$$);\n')
+            elif row['context'] in ('config_param_system', 'audit_cat_param_user '):
+                line +=(f'{{"data":'
+                            f'{{"table":"{table}", '
+                                f'"clause":"WHERE parameter = \'{source}\' ", '
+                                f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
+                                f'"tooltip":{{"column":"description", "value":"{tt_value}"}}'                            
+                            f'}}'
+                        f'}}$$);\n')
+            db_file.write(line)
         db_file.close()
         del db_file
         utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', 'Translation successful')
-
-
 
 
     def save_user_values(self):
