@@ -282,7 +282,7 @@ BEGIN
 					v_array_connec:= array_append(v_array_connec, v_connec_id);
 				END LOOP;
 
-				SELECT count(connec_id) INTO v_count_connec FROM connec WHERE arc_id=v_arc_id;
+				SELECT count(connec_id) INTO v_count_connec FROM connec WHERE arc_id=v_arc_id AND state=1;
 
 				UPDATE connec SET arc_id=NULL WHERE arc_id=v_arc_id;
 
@@ -295,7 +295,7 @@ BEGIN
 						v_array_gully:= array_append(v_array_gully, v_gully_id);
 					END LOOP;
 
-					SELECT count(gully_id) INTO v_count_gully FROM gully WHERE arc_id=v_arc_id;
+					SELECT count(gully_id) INTO v_count_gully FROM gully WHERE arc_id=v_arc_id AND state=1;
 
 					UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id;
 				END IF;
@@ -596,7 +596,7 @@ BEGIN
 					v_array_connec:= array_append(v_array_connec, v_connec_id);
 				END LOOP;
 
-				SELECT count(connec_id) INTO v_count_connec FROM connec WHERE arc_id=v_arc_id;
+				SELECT count(connec_id) INTO v_count_connec FROM connec WHERE arc_id=v_arc_id AND state=1;
 
 				UPDATE connec SET arc_id=NULL WHERE arc_id=v_arc_id;
 
@@ -609,7 +609,7 @@ BEGIN
 						v_array_gully:= array_append(v_array_gully, v_gully_id);
 					END LOOP;
 
-					SELECT count(gully_id) INTO v_count_gully FROM gully WHERE arc_id=v_arc_id;
+					SELECT count(gully_id) INTO v_count_gully FROM gully WHERE arc_id=v_arc_id AND state=1;
 
 					UPDATE gully SET arc_id=NULL WHERE arc_id=v_arc_id;
 				END IF;
