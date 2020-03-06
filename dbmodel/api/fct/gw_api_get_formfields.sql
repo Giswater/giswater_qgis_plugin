@@ -35,6 +35,7 @@ DECLARE
 --    Variables
     fields json;
     fields_array json[];
+    _fields_array json[];
     aux_json json;    
     aux_json_child json;    
     combo_json json;
@@ -130,7 +131,7 @@ BEGIN
 	END IF;
 	
 	fields_array := COALESCE(fields_array, '{}');  
-	
+	_fields_array = fields_array;
 	FOREACH aux_json IN ARRAY fields_array	
 	LOOP
 	
@@ -264,7 +265,7 @@ BEGIN
 			-- looking for childs 
 			IF (aux_json->>'isparent')::boolean IS TRUE THEN
 			
-				FOREACH aux_json_child IN ARRAY fields_array
+				FOREACH aux_json_child IN ARRAY _fields_array
 				LOOP	
 					IF (aux_json_child->>'dv_parent_id') = (aux_json->>'column_id') THEN
 
