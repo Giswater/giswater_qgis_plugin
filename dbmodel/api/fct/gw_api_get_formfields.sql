@@ -35,7 +35,6 @@ DECLARE
 --    Variables
     fields json;
     fields_array json[];
-    _fields_array json[];
     aux_json json;    
     aux_json_child json;    
     combo_json json;
@@ -70,7 +69,9 @@ DECLARE
     v_input json;
     v_widgetcontrols json;
     v_editability text;
-    v_label text;  
+    v_label text;     
+	v_featurevalues json;
+
        
 BEGIN
 
@@ -88,6 +89,10 @@ BEGIN
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
 
+    -- raise notice 'p_formname % p_formtype % p_tabname % p_tablename %  p_idname %  p_id % p_columntype %  p_tgop %  p_filterfield % p_device %',
+	-- p_formname , p_formtype , p_tabname , p_tablename ,  p_idname ,  p_id , p_columntype ,  p_tgop ,  p_filterfield , p_device;
+
+	
 	-- setting tabname
 	IF p_tabname IS NULL THEN
 		p_tabname = 'tabname';
@@ -138,7 +143,12 @@ BEGIN
 	END IF;
 	
 	fields_array := COALESCE(fields_array, '{}');  
-	_fields_array = fields_array;
+	
+	IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') AND aux_json->>'column_id' IS NOT NULL AND p_tablename IS NOT NULL AND p_idname IS NOT NULL AND p_id IS NOT NULL AND p_columntype IS NOT NULL THEN
+		EXECUTE 'SELECT (row_to_json(a)) FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' || quote_literal(p_id) || ' AS ' || COALESCE(p_columntype, 'character varying') || ')a' 
+		INTO v_featurevalues;
+	END IF;
+	
 	FOREACH aux_json IN ARRAY fields_array	
 	LOOP
 	
@@ -235,11 +245,11 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
 				-- Get selected value
-				IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') AND aux_json->>'column_id' IS NOT NULL AND p_tablename IS NOT NULL 
-									   AND p_idname IS NOT NULL AND p_id IS NOT NULL AND p_columntype IS NOT NULL THEN
-					EXECUTE 'SELECT ' || quote_ident(aux_json->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) ||
-					 ' = CAST(' || quote_literal(p_id) || ' AS ' || COALESCE(p_columntype, 'character varying') || ')' 
-						INTO field_value_parent; 
+				
+				IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') THEN
+
+					field_value := v_featurevalues->>(aux_json->>'column_id');
+									
 				ELSIF p_tgop ='INSERT' OR p_tgop = 'SELECT' THEN
 					v_vdefault:=quote_ident(aux_json->>'column_id');
 					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
@@ -272,7 +282,7 @@ BEGIN
 			-- looking for childs 
 			IF (aux_json->>'isparent')::boolean IS TRUE THEN
 			
-				FOREACH aux_json_child IN ARRAY _fields_array
+				FOREACH aux_json_child IN ARRAY fields_array
 				LOOP	
 					IF (aux_json_child->>'dv_parent_id') = (aux_json->>'column_id') THEN
 
@@ -334,13 +344,13 @@ BEGIN
 
 
 						combo_json_child := COALESCE(combo_json_child, '[]');
-						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);								
+						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);		
+						
 						-- Get selected value
-						IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') AND aux_json->>'column_id' IS NOT NULL AND p_tablename IS NOT NULL 
-									   AND p_idname IS NOT NULL AND p_id IS NOT NULL AND p_columntype IS NOT NULL THEN
-							EXECUTE 'SELECT ' || quote_ident(aux_json_child->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' ||
-							 quote_literal(p_id) || ' AS ' || p_columntype || ')' 
-							INTO v_vdefault; 
+						IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') THEN
+		
+							v_vdefault := v_featurevalues->>(aux_json_child->>'column_id');		
+							
 						ELSIF p_tgop ='INSERT' OR p_tgop = 'SELECT' THEN
 							IF quote_ident(aux_json_child->>'column_id') = 'state_type' AND field_value_parent  = '0' THEN
 								EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_end_vdefault'''
