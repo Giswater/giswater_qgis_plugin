@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"},
-"data":{"isNewProject":"FALSE", "gwVersion":"3.1.105", "projectType":"WS", "epsg":25831}}$$)
+"data":{"isNewProject":"FALSE", "gwVersion":"3.3.031", "projectType":"UD", "epsg":25831}}$$)
 */
 
 
@@ -131,14 +131,14 @@ BEGIN
 
         -- create child views for users from 3.2 to 3.3 updates
 		IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
-            PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
+			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
 		END IF;
 	
 		-- check project consistency
 		IF v_projecttype = 'WS' THEN
 	
 			-- look for inp_pattern_value bug (+18 values are not possible)
-			IF 	(SELECT id FROM SCHEMA_NAME.inp_pattern_value where 
+			IF 	(SELECT id FROM inp_pattern_value where 
 				(factor_19 is not null or factor_20 is not null or factor_21 is not null or factor_22 is not null or factor_23 is not null or factor_24 is not null) LIMIT 1) THEN
 					INSERT INTO audit_log_project (fprocesscat_id, table_id, log_message) 
 					VALUES (33, 'inp_pattern_value', '{"version":"'||v_gwversion||'", "message":"There are some values on columns form 19 to 24. It must be deleted because it causes a bug on EPANET"}');
@@ -157,7 +157,8 @@ BEGIN
 		IF v_priority=0 THEN
 			v_message='Project sucessfully updated';
 		ELSIF v_priority=1 THEN
-			v_message=concat($$'Project updated but there are some warnings. Take a look on audit_log_project table: SELECT (log_message::json->>'message') FROM audit_log_project WHERE fprocesscat_id=33 and (log_message::json->>'version')='$$, v_gwversion, '''');
+			v_message=concat($$'Project updated but there are some warnings. Take a look on audit_log_project table: SELECT (log_message::json->>'message') 
+			FROM audit_log_project WHERE fprocesscat_id=33 and (log_message::json->>'version')='$$, v_gwversion, '''');
 		ELSIF v_priority=2 THEN
 			v_message='Project is not updated. There are one or more errors';
 		END IF;

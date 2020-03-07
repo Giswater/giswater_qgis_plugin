@@ -15,13 +15,17 @@ $BODY$
 EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk',null);
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk','ALL');
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk','CHECK');
 */
+
 DECLARE
 
 	rec record;
 	v_version text;
 	v_notify_action json;
-	rec_json record;  
+	rec_json record; 
+	v_table record;
 
 BEGIN
 	
@@ -55,17 +59,32 @@ BEGIN
 							FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('''||rec.id||''');';
 					
 				END IF;
-			
 			END LOOP;
-			
 	 	END LOOP;
 
+	ELSIF p_action = 'fk' AND p_table IS NOT NULL AND p_table NOT IN ('ALL', 'CHECK') THEN
 
-	ELSIF p_action = 'fk' AND p_table IS NOT NULL THEN
+		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||p_table||';';
+		EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||p_table||'
+		FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('''||p_table||''');';
+				
+	ELSIF p_action = 'fk' AND p_table IS NOT NULL AND p_table ='ALL' THEN
 
-				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||p_table||';';
-				EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||p_table||'
-				FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('''||p_table||''');';
+		FOR v_table IN SELECT * FROM typevalue_fk
+		LOOP
+			RAISE NOTICE ' v_table %', v_table;
+			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||v_table.target_table||';';
+			EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||v_table.target_table||'
+			FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('''||v_table.target_table||''');';
+		END LOOP;
+
+	ELSIF p_action = 'fk' AND p_table IS NOT NULL AND p_table ='CHECK' THEN
+
+		FOR v_table IN SELECT * FROM typevalue_fk
+		LOOP
+			RAISE NOTICE ' v_table %', v_table;
+			EXECUTE 'UPDATE '||v_table.target_table||' SET '||v_table.target_field||' = '||v_table.target_field;
+		END LOOP;
 
 	END IF;
 END;
