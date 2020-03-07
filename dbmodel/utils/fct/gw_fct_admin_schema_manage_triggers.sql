@@ -4,9 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2818
 
---drop function SCHEMA_NAME.gw_fct_admin_schema_manage_triggers();
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_triggers(p_action text, p_table text)
  RETURNS void AS

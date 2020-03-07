@@ -65,3 +65,8 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2816, 'gw_trg_config_control', 'utils', 'trigger function', null, null, null,'Trigger to control and manage config_api_form_fields table', 'role_admin',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2818, 'gw_fct_admin_schema_manage_triggers', 'utils', 'function', null, null, null,'Function to activate custom foreign keys of bbdd', 'role_admin',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
