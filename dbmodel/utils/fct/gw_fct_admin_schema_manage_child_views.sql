@@ -20,7 +20,8 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "inf
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
 
-
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 */
 
 
@@ -41,6 +42,8 @@ DECLARE
 	rec_orderby record;
 	v_data_view json;
 	v_view_type text;
+	v_action text;
+	v_childview text;
 	
 BEGIN
 
@@ -56,16 +59,31 @@ BEGIN
 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
+	v_action = ((p_data ->>'data')::json->>'action')::text;
+
 
 	IF v_cat_feature IS NULL THEN
 
-	v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
+		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
 
 	END IF;
 
+raise notice 'v_action %',v_action;
+
+	IF v_action = 'MULTI-DELETE' THEN
+
+		FOR v_childview IN SELECT child_layer FROM cat_feature
+		LOOP
+			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
+
+		END LOOP;
+	END IF;
+
+
+
 --if the view should be created for all the features loop over the cat_features
 IF v_multi_create IS TRUE THEN
-raise notice 'MULTI';
+	raise notice 'MULTI';
 	IF v_project_type ='WS' THEN
 		v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
 						UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
@@ -209,14 +227,14 @@ raise notice 'MULTI';
 		END IF;
 
 		IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
-			EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 			"feature":{"catFeature":"'||v_cat_feature||'"}, 
 			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 		END IF;
 	
 	END LOOP;
 ELSE
-raise notice 'SIMPLE';
+	raise notice 'SIMPLE';
 	--get the system type and system_id of the feature and view name
 	v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
@@ -336,7 +354,7 @@ raise notice 'SIMPLE';
 
 
 	IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
-		EXECUTE 'SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+		EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 		"feature":{"catFeature":"'||v_cat_feature||'"}, 
 		"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 	END IF;
