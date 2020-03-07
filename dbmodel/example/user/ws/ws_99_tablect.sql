@@ -172,3 +172,6 @@ WHERE node_id = '113766';
 
 UPDATE anl_mincut_inlet_x_exploitation SET config = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
+
+
+UPDATE config_api_form_fields SET label = 'Presszone' WHERE column_id = 'presszonecat_id';

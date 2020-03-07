@@ -18,9 +18,17 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"reg_exp"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"qgis_message"}}$$);
 
-
-
 --2020/02/24
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox,isparametric)
 VALUES (2808, 'gw_trg_edit_config_addfields', 'utils','trigger function', 'Trigger to manage the editability of ve_config_addfields', 
 'role_admin', FALSE, FALSE, FALSE) ON CONFLICT (id) DO NOTHING;
+
+--2020/03/07
+INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, idval, label, dv_querytext, dv_parent_id, isenabled, layout_id, layout_order, project_type, 
+isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, 
+ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, isdeprecated) 
+VALUES ('api_form_show_columname_on_label', 'config', 'Use column_id in spite of label to see the widget on api forms', 'role_edit', NULL, 'Label with column_id on api forms', NULL, NULL, true, 1,6, 'utils', 
+false, NULL, NULL, NULL, false, 'boolean', 'check', 
+true, NULL, 'false', NULL, NULL, NULL, NULL, NULL, NULL, false)
+ON conflict (id) DO NOTHING;
+

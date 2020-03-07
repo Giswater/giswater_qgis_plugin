@@ -8,3 +8,4 @@
 - Enhance peformance and bug fix for import inp files (EPANET and SWMM)
 - New trigger function to control proximity againts gullys
 - New trigger function to control values on config tables
+- New variable to control label on api forms overwriting label with column_id

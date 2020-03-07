@@ -70,32 +70,39 @@ DECLARE
     v_input json;
     v_widgetcontrols json;
     v_editability text;
-    
+    v_label text;  
        
 BEGIN
 
---   Set search path to local schema
-     SET search_path = "SCHEMA_NAME", public;
+	-- Set search path to local schema
+	SET search_path = "SCHEMA_NAME", public;
 
---   Get schema name
-     schemas_array := current_schemas(FALSE);
+	-- Get schema name
+	schemas_array := current_schemas(FALSE);
 
---   get api version
-     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	-- get api version
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 	INTO api_version;
 
---   get project type
-     SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
-     SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
+	-- get project type
+	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
 
---   setting tabname
-     IF p_tabname IS NULL THEN
-	p_tabname = 'tabname';
-     END IF;
+	-- setting tabname
+	IF p_tabname IS NULL THEN
+		p_tabname = 'tabname';
+	END IF;
 
---   Get fields	
+	-- get user variable to show label as column id or not
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'api_form_show_columname_on_label' AND cur_user =  current_user) THEN
+		v_label = 'column_id AS label';
+	ELSE
+		v_label = 'label';
+	END IF;
+	
+	-- starting process - get fields	
 	IF p_formname!='infoplan' THEN 
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT '||v_label||', column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
 
 			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as 
 			"changeAction", widgetfunction,	layoutname AS "position", (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled, hidden,
