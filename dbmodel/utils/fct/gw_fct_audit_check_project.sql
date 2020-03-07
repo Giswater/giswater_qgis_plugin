@@ -13,7 +13,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
-"feature":{}, "data":{"filterFields":{}, "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fprocesscat_id":1}}$$);
+"feature":{}, "data":{"filterFields":{}, "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fprocesscat_id":1}}$$);
 */
 
 DECLARE 
@@ -59,6 +59,8 @@ v_layer_log boolean = false;
 v_error_context text;
 v_hidden_form boolean;
 v_init_project boolean;
+v_qgisversion text;
+v_osversion text;
 
 BEGIN 
 
@@ -72,6 +74,8 @@ BEGIN
 	v_fprocesscat_id_aux := (p_data ->> 'data')::json->> 'fprocesscat_id';
 	v_qgis_version := (p_data ->> 'data')::json->> 'version';
 	v_init_project := (p_data ->> 'data')::json->> 'initProject';
+	v_qgisversion := (p_data ->> 'data')::json->> 'qgisVersion';
+	v_osversion := (p_data ->> 'data')::json->> 'osVersion';
 
 	
 	-- get user parameters
@@ -120,6 +124,12 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (101, 3, v_errortext);
 	END IF;
+
+	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL versión: ',(SELECT version())));
+	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, concat ('PostGIS versión: ',(SELECT postgis_version())));
+	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, concat ('QGIS versión: ', v_qgisversion));
+	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, concat ('O/S versión: ', v_osversion));
+		
 	
 	-- Reset urn sequence
 	IF v_project_type='WS' THEN
