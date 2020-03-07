@@ -5,10 +5,10 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- FUNCTION NUMBER : XXXX
+-- FUNCTION NUMBER : 2812
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_vi()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION ud1.gw_trg_vi()  RETURNS trigger AS
 $BODY$
 
 /* 
@@ -75,10 +75,6 @@ BEGIN
 			
 			INSERT INTO cat_hydrology (hydrology_id,name, infiltration) SELECT DISTINCT hydrology_id, 'Default scenario','CURVE_NUMBER' FROM subcatchment 
 			WHERE hydrology_id NOT IN (SELECT hydrology_id FROM cat_hydrology);
-
-
-			INSERT INTO inp_snowpack_id (snow_id) 
-			SELECT NEW.snow_id FROM subcatchment WHERE NEW.snow_id not in (select snow_id FROM inp_snowpack_id);
 
 		ELSIF v_view='vi_subareas' THEN
 			UPDATE subcatchment SET nimp=NEW.nimp, nperv=NEW.nperv, simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted WHERE subc_id=NEW.subc_id;

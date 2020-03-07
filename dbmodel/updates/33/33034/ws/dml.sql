@@ -12,7 +12,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE audit_cat_function SET return_type = 
 '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"DMA"}, 
-{"widgetname":"exploitation", "label":"Exploitation id's:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":2, 
+{"widgetname":"exploitation", "label":"Exploitation id''s:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":2, 
 "dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"1"},
 {"widgetname":"updateMapZone", "label":"Update mapzone geometry method","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layout_order":8,
 "comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":"2"}, 

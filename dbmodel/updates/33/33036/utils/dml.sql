@@ -50,3 +50,9 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript,
 VALUES ('edit_automatic_customercode', 'TRUE', 'boolean', 'system', 'Automatic fill values of customercode when insert using connec_id', 
 'Automatic customercode values:', 'TRUE', 'utils', 'boolean', 'check', true, false, 'FALSE') 
 ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2812, 'gw_trg_vi', 'utils', 'trigger function', null, null, null,'Trigger function to import inp files from temp_table to inp tables, 'role_admin',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
