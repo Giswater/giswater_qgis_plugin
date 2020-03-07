@@ -40,7 +40,11 @@ BEGIN
 			EXECUTE v_querytext;
 		END IF;
 		
-		RETURN NEW;		
+		RETURN NEW;
+
+	ELSIF TG_OP = 'DELETE' THEN
+		RETURN NULL;
+
 	END IF;
 END;
 $BODY$

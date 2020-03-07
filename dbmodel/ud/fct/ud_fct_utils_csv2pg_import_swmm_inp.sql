@@ -405,7 +405,7 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 
--- 	Return
+	-- 	Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -414,10 +414,10 @@ BEGIN
 		       '}'||
 	    '}')::json;
 
---  Exception handling
-    --EXCEPTION WHEN OTHERS THEN
-	--	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	--	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--  Exception handling
+    EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	  
 END;
 $BODY$

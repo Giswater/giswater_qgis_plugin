@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 -- FUNCTION NUMBER : 2812
 
 
-CREATE OR REPLACE FUNCTION ud1.gw_trg_vi()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_vi()  RETURNS trigger AS
 $BODY$
 
 /* 

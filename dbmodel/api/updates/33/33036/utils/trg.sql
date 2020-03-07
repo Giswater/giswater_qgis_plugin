@@ -10,14 +10,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/02/28
-CREATE TRIGGER gw_trg_edit_config_sysfields
-  INSTEAD OF UPDATE
-  ON ve_config_sysfields
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_config_sysfields();
+DROP TRIGGER IF EXISTS gw_trg_config_control ON config_api_form_fields;
+CREATE TRIGGER gw_trg_edit_config_sysfields INSTEAD OF UPDATE
+ON ve_config_sysfields  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_config_sysfields();
 
-  CREATE TRIGGER gw_trg_edit_config_addfields
-  INSTEAD OF UPDATE
-  ON ve_config_addfields
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_config_addfields();
+CREATE TRIGGER gw_trg_edit_config_addfields INSTEAD OF UPDATE
+ON ve_config_addfields FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_config_addfields();
+  
+  
+-- 2020/03/07
+DROP TRIGGER IF EXISTS gw_trg_config_control ON config_api_form_fields;
+CREATE TRIGGER gw_trg_config_control BEFORE INSERT OR UPDATE OR DELETE
+ON config_api_form_fields FOR EACH ROW EXECUTE PROCEDURE gw_trg_config_control('config_api_form_fields');

@@ -339,6 +339,21 @@ BEGIN
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
 
+	-- improve velocity for junctions using directy tables in spite of vi_junctions view
+	INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
+	SELECT csv1, csv2::numeric(12,3), 'EPAJUN-CAT', 'JUNCTION', 1, 1, 1, 1, 2 
+	FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
+	INSERT INTO inp_junction SELECT csv1, csv3::numeric(12,6), csv4::varchar(16) FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
+	INSERT INTO man_junction SELECT csv1 FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
+
+	-- improve velocity for pipes using directy tables in spite of vi_pipes view
+	INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
+	SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',csv5), 'PIPE', 1, 1, 1, 1, 2 
+	FROM temp_csv2pg where source='[PIPES]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
+	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), csv8 FROM temp_csv2pg where source='[PIPES]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
+	INSERT INTO man_pipe SELECT csv1 FROM temp_csv2pg where source='[PIPES]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
+
+
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id AND tablename NOT IN ('vi_pipes', 'vi_junctions') order by id
 	LOOP
@@ -368,20 +383,6 @@ BEGIN
 		EXECUTE v_sql;
 		
 	END LOOP;
-
-	-- improve velocity for junctions using directy tables in spite of vi_junctions view
-	INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-	SELECT csv1, csv2, 'EPAJUN-CAT', 'JUNCTION', 1, 1, 1, 1, 2 
-	select * FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
-	INSERT INTO inp_junction SELECT csv1, csv3::numeric(12,6), csv4::varchar(16) FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
-	INSERT INTO man_junction SELECT csv1 FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
-
-	-- improve velocity for pipes using directy tables in spite of vi_pipes view
-	INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-	SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',csv5), 'PIPE', 1, 1, 1, 1, 2 
-	FROM temp_csv2pg where source='[PIPES]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
-	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), csv8 FROM temp_csv2pg where source='[PIPES]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
-	INSERT INTO man_pipe SELECT csv1 FROM temp_csv2pg where source='[PIPES]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND user_name=current_user; 
 
 	-- disable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
@@ -600,9 +601,9 @@ BEGIN
 	    '}}')::json;
 	
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	 --GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 --RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
