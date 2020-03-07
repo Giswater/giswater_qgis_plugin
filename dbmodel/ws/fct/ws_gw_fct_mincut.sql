@@ -342,7 +342,7 @@ BEGIN
      v_return = ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-		     	'"setVisibleLayers":[]'||','||
+		     	'"setVisibleLayers":["v_anl_mincut_init_point", "v_anl_mincut_result_arc", "v_anl_mincut_result_node", "v_anl_mincut_result_valve", "v_anl_mincut_result_connec"]'||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
