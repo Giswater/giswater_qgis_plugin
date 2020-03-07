@@ -166,3 +166,9 @@ UPDATE config_param_system SET value = '{"SECTOR":true, "DMA":true, "PRESSZONE":
 WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
+
+UPDATE anl_mincut_inlet_x_exploitation SET config = '{"inletArc":["113907", "113905"]}'
+WHERE node_id = '113766';
+
+UPDATE anl_mincut_inlet_x_exploitation SET config = '{"inletArc":["114145"]}'
+WHERE node_id = '113952';
