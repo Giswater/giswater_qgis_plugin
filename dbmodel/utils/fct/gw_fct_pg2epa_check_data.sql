@@ -14,7 +14,8 @@ $BODY$
 /*EXAMPLE
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
+"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
+
 
 SELECT gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -781,17 +782,32 @@ BEGIN
 			
 
 			RAISE NOTICE '13 - Node2arcs with less than two arcs (67)';
-			
-			INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
-			SELECT 67, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs' FROM (
-				SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
-				WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
-				UNION ALL
-				SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_2
-				WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
-			GROUP by node_id, nodecat_id, the_geom
-			HAVING count(*) < 2;
 
+			IF v_networkmode = 1 OR v_networkmode = 3 THEN -- only mandatory nodarc
+			
+				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
+				SELECT 67, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs' FROM (
+					SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
+					WHERE v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+					UNION ALL
+					SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_2
+					WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+				GROUP by node_id, nodecat_id, the_geom
+				HAVING count(*) < 2;
+
+			ELSE
+				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
+				SELECT 67, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs' FROM (
+					SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_1
+					WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+					UNION ALL
+					SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_2
+					WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+				GROUP by node_id, nodecat_id, the_geom
+				HAVING count(*) < 2;
+
+			END IF;
+	
 			SELECT count(*) INTO v_count FROM anl_node WHERE fprocesscat_id=67 AND cur_user=current_user;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 

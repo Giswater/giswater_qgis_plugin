@@ -12,7 +12,7 @@ RETURNS integer
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_buildup_supply($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{"resultId":"t12", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_buildup_supply('t1')
 */
 
 DECLARE
@@ -37,7 +37,12 @@ v_diameter float;
 v_defaultdemand float;
 v_demandtype int2;
 v_switch2junction text;
-v_defaultcurve text;
+v_defaultcurve1 text;
+v_defaultcurve2 text;
+v_pressureprv float;
+v_pressurepsv float;
+v_statuspsv text;
+v_forcestatuspsv text;
 
 BEGIN
 
@@ -59,16 +64,32 @@ BEGIN
 	SELECT (value::json->>'pumpStation')::json->>'forceStatus' INTO v_forcestatusps FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'PRV')::json->>'status' INTO v_statusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'PRV')::json->>'forceStatus' INTO v_forcestatusprv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT ((value::json->>'PRV')::json->>'pressure')::float INTO v_pressureprv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'PSV')::json->>'status' INTO v_statuspsv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'PSV')::json->>'forceStatus' INTO v_forcestatuspsv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT ((value::json->>'PSV')::json->>'pressure')::float INTO v_pressurepsv FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'reservoir')::json->>'switch2Junction' INTO v_switch2junction FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
-	SELECT (value::json->>'pressGroup')::json->>'defaultCurve' INTO v_defaultcurve FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pressGroup')::json->>'defaultCurve' INTO v_defaultcurve1 FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
+	SELECT (value::json->>'pumpStation')::json->>'defaultCurve' INTO v_defaultcurve2 FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	
 	RAISE NOTICE 'switch to junction an specific list of RESERVOIRS';
 	UPDATE rpt_inp_node SET epa_type = 'JUNCTION' WHERE node_id IN (select node_id FROM v_edit_node
 	JOIN (select unnest((replace (replace((v_switch2junction::text),'[','{'),']','}'))::text[]) as type)a ON a.type = node_type) AND result_id = p_result;
 
-	RAISE NOTICE 'setting pump curves where curve_id is null';
-	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve) WHERE addparam::json->>'curve_id' IS NULL AND addparam::json->>'pump_type'='1' AND result_id = p_result ;
+	RAISE NOTICE 'setting pump curves (pump_type = 1) where curve_id is null';
+	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve1) WHERE addparam::json->>'curve_id'='' AND addparam::json->>'pump_type'='1' AND result_id = p_result ;
+
+	RAISE NOTICE 'setting pump curves (pump_type = 2) where curve_id is null';
+	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id', v_defaultcurve2) WHERE addparam::json->>'curve_id'='' AND addparam::json->>'pump_type'='2' AND result_id = p_result ;
+
+	RAISE NOTICE 'setting pressure for PRV valves';
+	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', v_pressureprv) 
+	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PRV') AND addparam::json->>'pressure'='' AND result_id  = p_result;
+
+	RAISE NOTICE 'setting pressure for PSV valves';
+	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', v_pressurepsv) 
+	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PSV') AND addparam::json->>'pressure'='' AND result_id  = p_result;
 
 	RAISE NOTICE 'setting roughness for null values';
 	SELECT avg(roughness) INTO v_roughness FROM rpt_inp_arc WHERE result_id=p_result;
@@ -154,11 +175,18 @@ BEGIN
 		UPDATE rpt_inp_arc SET status= v_forcestatusps WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_pump WHERE pump_type = '2'); 
 	END IF;
 		
-	RAISE NOTICE 'set valves';
+	RAISE NOTICE 'set prv valves';
 	UPDATE rpt_inp_arc SET status=v_statusprv WHERE status IS NULL AND result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve);
 	
 	IF v_forcestatusprv IS NOT NULL THEN
 		UPDATE rpt_inp_arc SET status= v_forcestatusprv WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve); 
+	END IF;
+
+	RAISE NOTICE 'set psv valves';
+	UPDATE rpt_inp_arc SET status=v_statuspsv WHERE status IS NULL AND result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'PRV');
+	
+	IF v_forcestatusprv IS NOT NULL THEN
+		UPDATE rpt_inp_arc SET status= v_forcestatuspsv WHERE result_id = p_result AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'PRV'); 
 	END IF;
 
     RETURN 1;

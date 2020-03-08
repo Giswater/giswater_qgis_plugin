@@ -84,11 +84,29 @@ BEGIN
 		WHERE vnode_id ilike 'VN%'
 		AND result_id=result_id_var;
 
+	RAISE NOTICE 'update temp_table to work with next process';
+	UPDATE temp_go2epa SET idmin = c.idmin FROM
+	(SELECT min(id) as idmin, arc_id FROM (
+		SELECT  a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
+			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
+			FROM temp_go2epa a
+			JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
+			ORDER by arc_id)
+			a group by arc_id) c
+		WHERE temp_go2epa.arc_id = c.arc_id;
+
+		
 	RAISE NOTICE 'new arcs on rpt_inp_arc table';
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, flw_code, minorloss, addparam)
+
+	WITH a AS (SELECT  a.idmin, a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
+			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
+			FROM temp_go2epa a
+			JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
+			ORDER by arc_id)
 	SELECT
 		result_id_var,
-		concat(arc_id,'P',a.id-min) as arc_id, 
+		concat(arc_id,'P',a.id-a.idmin) as arc_id, 
 		a.node_1,
 		a.node_2,
 		rpt_inp_arc.arc_type,
@@ -108,21 +126,11 @@ BEGIN
 		rpt_inp_arc.flw_code,
 		rpt_inp_arc.minorloss,
 		gw_fct_json_object_set_key (rpt_inp_arc.addparam::json, 'parentArc', a.arc_id)		
-		FROM (
-			SELECT  a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
-			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
-			FROM temp_go2epa a
-			JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
-			ORDER by arc_id			
-			) a
-		JOIN (SELECT min(id), arc_id
-			FROM(	SELECT a.id, a.arc_id 
-				FROM temp_go2epa a
-				JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
-				ORDER BY a.id) a group by arc_id) b USING (arc_id)
+		FROM a
 		JOIN rpt_inp_arc USING (arc_id)
-		WHERE result_id=result_id_var AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
+		WHERE result_id='t1' AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
 		ORDER BY arc_id, a.id;
+
 	
 	RAISE NOTICE 'delete only trimmed arc on rpt_inp_arc table  - step 1';
 	UPDATE rpt_inp_arc SET epa_type ='PIPENOTUSED' 
@@ -135,7 +143,7 @@ BEGIN
 	RAISE NOTICE 'set minimum value of arcs';
 	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id=result_id_var;
 
-	
+
 RETURN v_result;
 END;
 $BODY$

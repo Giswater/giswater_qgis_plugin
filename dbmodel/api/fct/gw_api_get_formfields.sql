@@ -92,28 +92,27 @@ BEGIN
 
     -- raise notice 'p_formname % p_formtype % p_tabname % p_tablename %  p_idname %  p_id % p_columntype %  p_tgop %  p_filterfield % p_device %',
 	-- p_formname , p_formtype , p_tabname , p_tablename ,  p_idname ,  p_id , p_columntype ,  p_tgop ,  p_filterfield , p_device;
-
 	
 	-- setting tabname
 	IF p_tabname IS NULL THEN
 		p_tabname = 'tabname';
 	END IF;
 	
-	 setting v_clause in function of info type
-     IF p_id IS NULL THEN -- used when geinfofromid is called on initproject to shape all widgets on table of attributes (id is null)
+	--setting v_clause in function of info type
+    IF p_id IS NULL THEN -- used when geinfofromid is called on initproject to shape all widgets on table of attributes (id is null)
 		v_clause = '';
-     ELSE  -- used always for each feature when geinfofromid is called feature by feature
+    ELSE  -- used always for each feature when geinfofromid is called feature by feature
 		v_clause = 'AND hidden IS NOT TRUE';
-     END IF;
+    END IF;
 
---   setting device
-     IF p_device < 9 THEN 
+	-- setting device
+    IF p_device < 9 THEN 
 		v_device = ' widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction",
 		     (CASE WHEN layout_id=0 THEN ''header'' WHEN layout_id=9 THEN ''footer'' ELSE ''body'' END) AS "position",
 		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';
-     ELSE  
+    ELSE  
 		v_device = '';
-     END IF;
+    END IF;
 
 	-- get user variable to show label as column id or not
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'api_form_show_columname_on_label' AND cur_user =  current_user) THEN

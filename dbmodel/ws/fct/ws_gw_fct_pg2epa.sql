@@ -16,11 +16,6 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
-
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{},"data":{"resultId":"t1", "useNetworkGeom":"false", "useNetworkDemand":"false", "checkData":"false", "export":"false"}}$$)
-
-select * from rpt_cat_result
-
 */
 
 DECLARE
@@ -109,16 +104,18 @@ BEGIN
 			END IF;
 		END IF;
 
-		RAISE NOTICE '7-profilactic issue to repair topology when length has no longitude';
+		RAISE NOTICE '7 - profilactic issue to repair topology when length has no longitude';
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 
 		IF v_checkdata IS NOT FALSE THEN
 				
-			RAISE NOTICE '6 - Calling gw_fct_pg2epa_check_data';
+			RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
 			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
 			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
 			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;			
 		ELSE
+
+			RAISE NOTICE '8 - Igonring gw_fct_pg2epa_check_data';
 			SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
 			"data":{"parameters":{"text":"Inp export done succesfully"}}}'::json) INTO v_return;
 
@@ -126,17 +123,17 @@ BEGIN
 		
 		IF v_buildupmode = 1 THEN
 	
-			RAISE NOTICE '7 - Use supply buildup model (modifying values in order to force buildupmode 1)';
+			RAISE NOTICE '9 - Use supply buildup model (modifying values in order to force buildupmode 1)';
 			PERFORM gw_fct_pg2epa_buildup_supply(v_result);
 		ELSIF v_buildupmode = 2 THEN
 		
-			RAISE NOTICE '8 - Use transport buildup model (modifying values in order to force buildupmode 2)';
+			RAISE NOTICE '9 - Use transport buildup model (modifying values in order to force buildupmode 2)';
 			PERFORM gw_fct_pg2epa_buildup_transport(v_result);
 		END IF;
 
 		IF v_advancedsettings THEN
 		
-			RAISE NOTICE '9 - Fixing advanced settings';
+			RAISE NOTICE '10 - Fixing advanced settings';
 			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
 		END IF;
 		
@@ -155,7 +152,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '10 - update demands & patterns';
+	RAISE NOTICE '11 - update demands & patterns';
 	IF v_usenetworkdemand IS NOT FALSE THEN
 	
 		-- set demand and patterns in function of demand type and pattern method choosed
@@ -165,7 +162,7 @@ BEGIN
 		PERFORM gw_fct_pg2epa_dscenario(v_result);	
 	END IF;
 
-	RAISE NOTICE '11 - Calling for modify the valve status';
+	RAISE NOTICE '12 - Calling for modify the valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
 	
 
@@ -175,7 +172,7 @@ BEGIN
 	
 	IF v_export IS NOT FALSE THEN
 	
-		RAISE NOTICE '12 - Calling for the export function';
+		RAISE NOTICE '13 - Calling for the export function';
 		SELECT gw_fct_utils_csv2pg_export_epanet_inp(v_result, null) INTO v_file;
 	END IF;
 	

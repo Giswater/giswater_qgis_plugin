@@ -45,12 +45,13 @@ BEGIN
 	END IF;
 								
 	-- check number of times each node appears in terms of identify nodearcs <> 2
-	v_query_number = 'SELECT count(*)as numarcs, node_id FROM node n JOIN (SELECT node_1 as node_id FROM v_edit_inp_pipe 
+	v_query_number = 'SELECT count(*)as numarcs, node_id FROM node n JOIN 
+						      (SELECT node_1 as node_id FROM v_edit_inp_pipe 
 							UNION ALL SELECT node_2 FROM v_edit_inp_pipe 
 							UNION ALL SELECT node_1 FROM v_edit_inp_virtualvalve
 							UNION ALL SELECT node_2 FROM v_edit_inp_virtualvalve) a using (node_id) group by n.node_id';
 
-	-- query text to make easy later sql senteces (in fucntion of all nod2arcs have been choosed or not
+	-- query text to make easy later sql senteces (in fucntion of all nod2arcs have been choosed or not)
 	v_querytext = 'SELECT a.*, inp_valve.to_arc FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
 				UNION  
 				SELECT a.*, inp_pump.to_arc FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var);
@@ -73,41 +74,37 @@ BEGIN
 		FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
 		WHERE arc_id != to_arc AND to_arc IS NOT NULL )b )';
 
-
-	IF p_only_mandatory_nodarc IS FALSE THEN -- managing inconsistent nodarcs (due the possibility to have this scenario working with sectors is high)
-	
-		RAISE NOTICE 'new nodes when numarcs = 1';
-		EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
-				nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-				the_geom, addparam) 
-				SELECT n.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'',
-				nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
-				ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/length)) AS the_geom,
-				(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
-				FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_1 = node_id
-				WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
-			UNION
-				SELECT 	n.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
-				nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
-				ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
-				(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
-				FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
-				WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
-			UNION
-				SELECT 	n.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
-				nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
-				ST_startpoint(c.the_geom) AS the_geom,
-				(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
-				FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_1 = node_id
-				WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
-			UNION
-				SELECT 	n.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'', 
-				nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
-				ST_endpoint(c.the_geom) AS the_geom,
-				(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
-				FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
-				WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var);
-	END IF;
+	RAISE NOTICE 'new nodes when numarcs = 1';
+	EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
+			nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
+			the_geom, addparam) 
+			SELECT n.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'',
+			nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
+			ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/length)) AS the_geom,
+			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
+			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_1 = node_id
+			WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
+		UNION
+			SELECT 	n.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
+			nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
+			ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
+			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
+			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
+			WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
+		UNION
+			SELECT 	n.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
+			nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
+			ST_startpoint(c.the_geom) AS the_geom,
+			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
+			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_1 = node_id
+			WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
+		UNION
+			SELECT 	n.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'', 
+			nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
+			ST_endpoint(c.the_geom) AS the_geom,
+			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
+			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
+			WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var);
 
 	RAISE NOTICE ' new nodes when numarcs = 2';
 	EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 

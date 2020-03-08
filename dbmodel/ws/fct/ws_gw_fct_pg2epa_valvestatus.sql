@@ -80,6 +80,10 @@ BEGIN
 		UPDATE rpt_inp_node SET demand=0 WHERE rpt_inp_node.node_id IN (SELECT node_id FROM anl_mincut_result_node WHERE result_id=v_mincutresult) AND result_id=result_id_var;
     END IF; 
 
+    -- all that not are closed are open
+    UPDATE rpt_inp_arc SET status='OPEN' WHERE status IS NULL AND result_id=result_id_var;
+
+
     RETURN 1;
 		
 END;
