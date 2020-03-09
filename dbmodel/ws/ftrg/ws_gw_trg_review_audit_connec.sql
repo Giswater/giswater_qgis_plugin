@@ -30,7 +30,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF NEW.is_validated = 1 THEN
 
 			IF NEW.new_connecat_id IS NULL THEN
-				PERFORM gw_fct_audit_function (3058,2476, NEW.connec_id);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        			"data":{"error":"3058", "function":"2476","debug_msg":"'||NEW.connec_id'"}}$$);';
 			END IF;
 			
 			UPDATE review_audit_connec SET new_connecat_id=NEW.new_connecat_id, is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;

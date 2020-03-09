@@ -210,7 +210,9 @@ BEGIN
 		v_fieldmp = 'sector_id';
 		v_visible_layer ='v_edit_sector';
 	ELSE
-		EXECUTE 'SELECT gw_fct_audit_function(3090,2710, NULL)' INTO v_audit_result;
+		
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"3090", "function":"2710","debug_msg":null}}$$);'  INTO v_audit_result;
 	END IF;
 
 	IF v_audit_result IS NULL THEN

@@ -38,7 +38,8 @@ BEGIN
         
         --Control nulls
         IF node_id_arg IS NULL THEN
-		  PERFORM gw_fct_audit_function(3006,2306,NULL);
+          EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+            "data":{"error":"3006", "function":"2306","debug_msg":null}}$$);';
         END IF;
 
         -- Get node public.geometry

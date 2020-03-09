@@ -25,7 +25,8 @@ BEGIN
         				
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                PERFORM gw_fct_audit_function(1110,1312, NULL);
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        		"data":{"error":"1110", "function":"1312","debug_msg":null}}$$);';
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -49,7 +50,8 @@ BEGIN
 			WHERE macrodqa_id=NEW.macrodqa_id;
 			
 	
-        PERFORM gw_fct_audit_function(2,1312, NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        		"data":{"error":"2", "function":"1312","debug_msg":null}}$$);';
         RETURN NEW;
 
 		 ELSIF TG_OP = 'DELETE' THEN  		
@@ -57,7 +59,8 @@ BEGIN
 				DELETE FROM macrodqa WHERE macrodqa_id=OLD.macrodqa_id;
 		
 		
-        PERFORM gw_fct_audit_function(3,1312, NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"3", "function":"1312","debug_msg":null}}$$);'; 
         RETURN NULL;
      
      END IF;

@@ -152,7 +152,8 @@ BEGIN
 		-- Control of same node initial and final
 		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
 			IF v_dsbl_error IS NOT TRUE THEN
-				PERFORM gw_fct_audit_function (1040,1344, nodeRecord1.node_id);	
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        			"data":{"error":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id'"}}$$);';
 			ELSE
 				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
 			END IF;
@@ -191,7 +192,8 @@ BEGIN
 	--Error, no existing nodes
 	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
 		IF v_dsbl_error IS NOT TRUE THEN
-			PERFORM gw_fct_audit_function (1042,1344, NEW.arc_id);	
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        			"data":{"error":"1042", "function":"1344","debug_msg":"'||NEW.arc_id'"}}$$);';
 		ELSE
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
@@ -202,7 +204,8 @@ BEGIN
 		
 	ELSE		
 		IF v_dsbl_error IS NOT TRUE THEN
-			PERFORM gw_fct_audit_function (1042,1344, nodeRecord1.node_id);	
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        			"data":{"error":"1042", "function":"1344","debug_msg":"'||nodeRecord1.node_id'"}}$$);';
 		ELSE
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;

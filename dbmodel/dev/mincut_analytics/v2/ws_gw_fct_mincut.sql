@@ -144,7 +144,8 @@ BEGIN
     IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
 	
 		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
-			PERFORM audit_function(3002,2304,element_id_arg);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       		"data":{"error":"3002", "function":"2304","debug_msg":"'||element_id_arg||'"}}$$);';
 		END IF;
 		
         -- Check an existing arc
@@ -162,7 +163,8 @@ BEGIN
             SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 
             IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
-		PERFORM audit_function(3006,2304);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	       		"data":{"error":"3006", "function":"2304","debug_msg":null}}$$);';
             END IF;
             
 
@@ -216,13 +218,15 @@ BEGIN
 		
 		-- The arc_id was not found
 		ELSE 
-				PERFORM audit_function(1082,2304,element_id_arg);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			"data":{"error":"1082", "function":"2304","debug_msg":"'||element_id_arg||'"}}$$);';
 		END IF;
 
     ELSE
 
 		IF (SELECT state FROM node WHERE (node_id = element_id_arg))=0 THEN
-            PERFORM audit_function(3004,2304,element_id_arg);
+            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       		"data":{"error":"3004", "function":"2304","debug_msg":"'||element_id_arg||'"}}$$);';
 		END IF;
 	
 		-- Check an existing node
@@ -233,7 +237,8 @@ BEGIN
             PERFORM gw_fct_mincut_engine(element_id_arg, result_id_arg);
         -- The arc_id was not found
         ELSE 
-            PERFORM audit_function(1084,2304);
+            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       		"data":{"error":"1084", "function":"2304","debug_msg":"'||element_id_arg||'"}}$$);';
         END IF;
 
     END IF;

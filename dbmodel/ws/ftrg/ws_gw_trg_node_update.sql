@@ -53,7 +53,8 @@ BEGIN
 			
 			IF (v_numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
 				IF v_dsbl_error IS NOT TRUE THEN
-					PERFORM gw_fct_audit_function (1096,1334, NEW.node_id);	
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        			"data":{"error":"1096", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
 				ELSE
 					INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state 1 or 2)');
 				END IF;
@@ -124,7 +125,8 @@ BEGIN
 				ELSIF (NEW.state=2 AND rec_node.state=2) THEN
 				
 					IF v_dsbl_error IS NOT TRUE THEN
-						PERFORM gw_fct_audit_function (1100,1334, NEW.node_id);	
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        				"data":{"error":"1100", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
 					ELSE
 						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state = 2)');
 					END IF;
