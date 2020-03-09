@@ -51,7 +51,7 @@ INSERT INTO om_visit_parameter VALUES ('clean_gully', NULL, 'INSPECTION', 'GULLY
 INSERT INTO om_visit_parameter VALUES ('smells_gully', NULL, 'INSPECTION', 'GULLY', 'TEXT', NULL, 'Smells of gully', 'event_standard', 'defaultvalue', FALSE, 'smells_gully');
 
 
-INSERT INTO om_visit_class_x_parameter VALUES (1, 5	, 'sediments_node');
+INSERT INTO om_visit_class_x_parameter VALUES (1, 5 , 'sediments_node');
 INSERT INTO om_visit_class_x_parameter VALUES (2, 2, 'clean_connec');
 INSERT INTO om_visit_class_x_parameter VALUES (4, 6, 'clean_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (5, 2, 'sediments_connec');
@@ -536,7 +536,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_arc_insp', 'visit', 'lot_id', 5, 'integer', 'combo', 'Lot id:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , idval FROM om_visit_lot WHERE active IS TRUE',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , id as idval FROM om_visit_lot WHERE active IS TRUE',
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -862,7 +862,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_arc_leak', 'visit', 'lot_id', 4, 'integer', 'combo', 'Lot id:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , idval FROM om_visit_lot WHERE active IS TRUE',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , id as idval FROM om_visit_lot WHERE active IS TRUE',
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -898,7 +898,8 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_arc_leak', 'visit', 'position_id', 8, 'string', 'combo', 'Position id:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM (SELECT node_1 AS id, node_1 AS idval FROM arc UNION SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc) WHERE id IS NOT NULL',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT a.id, a.idval FROM (SELECT node_1 AS id, node_1 AS idval FROM arc UNION 
+SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc) a WHERE id IS NOT NULL',
 NULL, NULL, 'arc_id', ' AND arc.arc_id.arc_id=', 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -1206,7 +1207,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_visit_arc_rehabit', 'visit', 'lot_id', 5, 'integer', 'combo', 'Lot id:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , idval FROM om_visit_lot WHERE active IS TRUE',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , id as idval FROM om_visit_lot WHERE active IS TRUE',
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
