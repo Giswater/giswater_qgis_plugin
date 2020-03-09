@@ -11,3 +11,4 @@
 - New variable to control label on api forms overwriting label with column_id
 - New constraint unique on man_addields_parameter (param_name, cat_feature_id)
 - Huge enhancement for go2epa - ws
+- New function to manage error messages

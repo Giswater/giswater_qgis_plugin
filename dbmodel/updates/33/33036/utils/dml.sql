@@ -70,3 +70,8 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2818, 'gw_fct_admin_schema_manage_triggers', 'utils', 'function', null, null, null,'Function to activate custom foreign keys of bbdd', 'role_admin',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+--2002/03/09
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2820, 'gw_fct_getmessage', 'utils', 'function', null, null, null,'Function that manages error messages', 'role_basic',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
