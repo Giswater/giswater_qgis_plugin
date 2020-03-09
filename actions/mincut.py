@@ -105,6 +105,9 @@ class MincutParent(ParentAction):
         """ Custom form initial configuration """
         self.user_current_layer = self.iface.activeLayer()
         self.init_map_tool()
+        self.add_layer.delete_layer_from_toc('Overlap affected arcs')
+        self.add_layer.delete_layer_from_toc('Other mincuts which overlaps')
+        self.add_layer.delete_layer_from_toc('Overlap affected connecs')
 
         self.dlg_mincut = Mincut()
         self.load_settings(self.dlg_mincut)

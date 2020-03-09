@@ -503,8 +503,19 @@ class AddLayer(object):
                 layer = lyr
                 break
         if layer is not None:
+            # Remove layer
             QgsProject.instance().removeMapLayer(layer)
+
+            #Remove group if is void
+            root = QgsProject.instance().layerTreeRoot()
+            group = root.findGroup('GW Temporal Layers')
+            if group:
+                layers = group.findLayers()
+                if not layers:
+                    root.removeChildNode(group)
             self.delete_layer_from_toc(layer_name)
+
+
 
 
     def load_qml(self, layer, qml_path):
