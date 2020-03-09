@@ -230,6 +230,8 @@ class MincutParent(ParentAction):
         expr_filter = f"result_id={result_mincut_id}"
         utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
         self.fill_table(self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer', expr_filter=expr_filter)
+        self.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer')
+
 
     def check_dates_coherence(self, date_from, date_to, time_from, time_to):
         """
@@ -606,7 +608,7 @@ class MincutParent(ParentAction):
         if not result: return
 
         if result['body']['actions']['overlap'] == 'Conflict':
-            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False)
+            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
             for layer in result_layer['temp_layers_added']:
 
                 layer_style = {}
@@ -660,6 +662,7 @@ class MincutParent(ParentAction):
             self.dlg_binfo = BasicInfo()
             self.load_settings(self.dlg_binfo)
             self.dlg_binfo.btn_close.setText('Cancel')
+            self.dlg_binfo.btn_accept.setText('Continue')
             self.dlg_binfo.setWindowTitle('Mincut conflict')
             self.dlg_binfo.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
             self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
@@ -709,6 +712,7 @@ class MincutParent(ParentAction):
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.resetRubberbands))
         self.refresh_tab_hydro()
+
         self.action_mincut.setEnabled(False)
 
 

@@ -809,16 +809,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_loginfo">
-       <attribute name="title">
-        <string>Info Log</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QTextEdit" name="txt_infolog"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tab_hydro">
        <attribute name="title">
         <string>Hydrometer</string>
@@ -830,6 +820,16 @@
            <bool>true</bool>
           </property>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_loginfo">
+       <attribute name="title">
+        <string>Info Log</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QTextEdit" name="txt_infolog"/>
         </item>
        </layout>
       </widget>
