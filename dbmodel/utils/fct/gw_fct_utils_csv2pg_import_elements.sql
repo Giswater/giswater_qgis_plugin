@@ -52,22 +52,22 @@ BEGIN
 	FOR v_element IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=3
 	LOOP 
 		IF v_featuretype='node' THEN
-			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements, state_type) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_node (element_id, node_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='arc' THEN 
-			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements, state_type) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_arc (element_id, arc_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='connec' THEN	
-			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements, state_type) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_connec (element_id, connec_id) VALUES (v_idlast, v_element.csv1);
 			
 		ELSIF v_featuretype='gully' THEN
-			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements, state_type) VALUES
 			((SELECT nextval('urn_id_seq')),v_element.csv2, v_element.csv3, v_element.csv4, v_element.csv5::integer, v_element.csv6::integer) RETURNING element_id INTO v_idlast;
 			INSERT INTO element_x_gully (element_id, gully_id) VALUES (v_idlast, v_element.csv1);
 		END IF;	
