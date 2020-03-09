@@ -35,20 +35,23 @@ BEGIN
             v_expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (v_expl_id_int IS NULL) THEN
 				v_expl_id_int := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
-				RETURN gw_fct_audit_function(2012,1122,NEW.sample_id);  
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"2012", "function":"1122","debug_msg":"'||NEW.sample_id::text||'"}}$$);';
             END IF;
 			
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN gw_fct_audit_function(1012,1122, NULL);  
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"2012", "function":"1122","debug_msg":null}}$$);';
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN gw_fct_audit_function(1014,1122,NEW.sample_id);  
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"2014", "function":"1122","debug_msg":"'||NEW.sample_id::text||'"}}$$);';
             END IF;            
         END IF;
 		

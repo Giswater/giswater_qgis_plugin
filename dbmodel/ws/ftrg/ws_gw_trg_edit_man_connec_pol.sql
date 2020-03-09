@@ -32,12 +32,14 @@ BEGIN
 		IF (NEW.connec_id IS NULL) THEN
 			NEW.connec_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
 			IF (NEW.connec_id IS NULL) THEN
-				RETURN gw_fct_audit_function(2094,2460, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        		"data":{"error":"2094", "function":"2460","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 		
 		IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id) IS NULL THEN
-				RETURN gw_fct_audit_function(2096,2460, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        		"data":{"error":"2096", "function":"2460","debug_msg":null}}$$);';
 		END IF;
 		
 		-- Insert into polygon table
@@ -56,7 +58,8 @@ BEGIN
 		
 		IF (NEW.connec_id != OLD.connec_id) THEN
 			IF (SELECT connec_id FROM man_fountain WHERE connec_id=NEW.connec_id) iS NULL THEN
-					RETURN gw_fct_audit_function(2098,2460, NULL);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        			"data":{"error":"2098", "function":"2460","debug_msg":null}}$$);';
 			END IF;
 			UPDATE man_fountain SET pol_id=NULL WHERE connec_id=OLD.connec_id;
 			UPDATE man_fountain SET pol_id=NEW.pol_id WHERE connec_id=NEW.connec_id;

@@ -107,7 +107,8 @@ BEGIN
 		
 		END IF;
 		
-        PERFORM gw_fct_audit_function(2,1302); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"2", "function":"1302","debug_msg":null}}$$);';
         RETURN NEW;
 
 		 ELSIF TG_OP = 'DELETE' THEN  
