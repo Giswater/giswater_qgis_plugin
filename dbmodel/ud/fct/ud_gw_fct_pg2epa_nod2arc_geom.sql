@@ -67,7 +67,9 @@ BEGIN
 		ELSE
 
 			IF v_node_2=rec_flowreg.node_id THEN
-				RETURN gw_fct_audit_function(2038,2240, v_arc);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"2038", "function":"2240","debug_msg":"'||v_arc||'"}}$$);';
+				
 			ELSE 
 				-- Create the extrem nodes of the new nodarc
 				v_nodarc_node_1_geom := ST_StartPoint(v_geom);
@@ -77,7 +79,8 @@ BEGIN
 				v_arc_reduced_geom := ST_LineSubstring(v_geom, (rec_flowreg.flwreg_length / ST_Length(v_geom)),1);
 				
 				IF ST_GeometryType(v_arc_reduced_geom) != 'ST_LineString' THEN
-					RETURN gw_fct_audit_function(2040,2240,concat(rec_arc1.arc_id,',',ST_GeometryType(v_arc_reduced_geom)));
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"2040", "function":"2240","debug_msg":"'||concat(rec_arc1.arc_id,',',ST_GeometryType(v_arc_reduced_geom))||'"}}$$);';
 				END IF;
   
 				-- Create new arc geometry
