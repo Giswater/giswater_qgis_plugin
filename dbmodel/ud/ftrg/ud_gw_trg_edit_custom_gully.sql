@@ -65,7 +65,8 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN gw_fct_audit_function(1008,1216, NULL);  
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1008", "function":"1216","debug_msg":null}}$$);';
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -78,14 +79,16 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                RETURN gw_fct_audit_function(1010,1216,NEW.gully_id);          
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1010", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
             END IF;            
         END IF;
         
 	-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN gw_fct_audit_function(1012,1216, NULL);  
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1012", "function":"1216","debug_msg":null}}$$);';
             END IF;
 				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -98,7 +101,8 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN gw_fct_audit_function(1014,1216,NEW.gully_id);  
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1014", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
             END IF;            
         END IF;
 
@@ -152,7 +156,8 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM gw_fct_audit_function(2012,1216,NEW.gully_id);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"2012", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
 				END IF;		
 			END IF;
 		END IF;	
@@ -163,7 +168,8 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM gw_fct_audit_function(2024,1216,NEW.gully_id);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"2024", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
 				END IF;	
 			END IF;
 		END IF;
@@ -263,7 +269,8 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					RETURN gw_fct_audit_function(2110,1318);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"2110", "function":"1318","debug_msg":null}}$$);';
 					END IF;
 				END IF;
 			END IF;

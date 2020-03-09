@@ -36,31 +36,36 @@ BEGIN
 			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
-				RETURN gw_fct_audit_function(2052,2418, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 	"data":{"error":"2052", "function":"2418","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 		
 		IF v_man_table='man_netgully_pol' THEN
 			IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN gw_fct_audit_function(2054,2418, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 	"data":{"error":"2054", "function":"2418","debug_msg":null}}$$);';
 			END  IF;
 			v_sys_type='NETGULLY';
 			
 		ELSIF v_man_table='man_storage_pol' THEN
 			IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN gw_fct_audit_function(2056,2418, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 	"data":{"error":"2056", "function":"2418","debug_msg":null}}$$);';
 			END  IF;
 			v_sys_type='STORAGE';
 			
 		ELSIF v_man_table='man_chamber_pol' THEN
 			IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN gw_fct_audit_function(2058,2418, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 	"data":{"error":"2058", "function":"2418","debug_msg":null}}$$);';
 			END  IF;
 			v_sys_type='CHAMBER';
 			
 		ELSIF v_man_table='man_wwtp_pol' THEN
 			IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
-				RETURN gw_fct_audit_function(2060,2418, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 	"data":{"error":"2060", "function":"2418","debug_msg":null}}$$);';
 			END  IF;
 			v_sys_type='WWTP';
 
@@ -96,28 +101,32 @@ BEGIN
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF v_man_table ='man_netgully_pol' THEN
 				IF (SELECT node_id FROM man_netgully WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN gw_fct_audit_function(2062,2418, NULL);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 		"data":{"error":"2062", "function":"2418","debug_msg":null}}$$);';
 				END  IF;
 				UPDATE man_netgully SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_netgully SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 			
 			ELSIF v_man_table ='man_storage_pol' THEN
 				IF (SELECT node_id FROM man_storage WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN gw_fct_audit_function(2064,2418, NULL);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 		"data":{"error":"2064", "function":"2418","debug_msg":null}}$$);';
 				END  IF;
 				UPDATE man_storage SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_storage SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF v_man_table ='man_chamber_pol' THEN
 				IF (SELECT node_id FROM man_chamber WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN gw_fct_audit_function(2066,2418, NULL);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 		"data":{"error":"2066", "function":"2418","debug_msg":null}}$$);';
 				END  IF;
 				UPDATE man_chamber SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_chamber SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;
 
 			ELSIF v_man_table ='man_wwtp_pol' THEN
 				IF (SELECT node_id FROM man_wwtp WHERE node_id=NEW.node_id) IS NULL THEN
-					RETURN gw_fct_audit_function(2068,2418, NULL);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+      		 		"data":{"error":"2068", "function":"2418","debug_msg":null}}$$);';
 				END  IF;
 				UPDATE man_wwtp SET pol_id=NULL WHERE node_id=OLD.node_id;
 				UPDATE man_wwtp SET pol_id=NEW.pol_id WHERE node_id=NEW.node_id;	
