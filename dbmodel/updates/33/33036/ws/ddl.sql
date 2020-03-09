@@ -7,4 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE inp_pump_importinp ADD COLUMN to_arc character varying(16);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"to_arc", "dataType":"character varying(16)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_go2epa", "column":"idmin", "dataType":"integer", "isUtils":"False"}}$$);
