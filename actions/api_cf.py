@@ -483,6 +483,13 @@ class ApiCF(ApiParent, QObject):
             else:
                 self.put_widgets(self.dlg_cf, field, label, widget)
 
+        # Get current QgsFeature
+        widget_field_id = self.dlg_cf.findChild(QLineEdit, f'{tab_type}_{self.field_id}')
+        self.feature_id = widget_field_id.text()
+        expr_filter = f"{self.field_id} = '{self.feature_id}'"
+        self.feature = self.get_feature_by_expr(self.layer, expr_filter)
+
+
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -633,12 +640,6 @@ class ApiCF(ApiParent, QObject):
             self.controller.show_message(msg, 2)
             return label, widget
 
-
-        if widget.property('column_id') == self.field_id:
-            self.feature_id = widget.text()
-            # Set filter expression
-            expr_filter = f"{self.field_id} = '{self.feature_id}'"
-            self.feature = self.get_feature_by_expr(self.layer, expr_filter)
         return label, widget
 
 
