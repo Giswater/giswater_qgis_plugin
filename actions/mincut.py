@@ -1527,9 +1527,10 @@ class MincutParent(ParentAction):
             # Get the point. Leave selection
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
             feature_id = self.snapper_manager.get_snapped_feature_id(result)
+            snapped_point = self.snapper_manager.get_snapped_point(result)
             element_id = snapped_feat.attribute(elem_type + '_id')
             layer.select([feature_id])
-            self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
+            self.auto_mincut_execute(element_id, elem_type, snapped_point.x(), snapped_point.y())
             self.set_visible_mincut_layers()
             self.snapper_manager.recover_snapping_options()
 
