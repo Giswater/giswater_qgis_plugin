@@ -8,9 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/03/07
-DELETE FROM typevalue_fk WHERE target_table = 'man_addfields_parameter' AND target_field='widgettype_id';
-DELETE FROM edit_typevalue WHERE typevalue = 'man_addfields_cat_widgettype';
-
 
 CREATE INDEX man_addfields_parameter_cat_feature_id_index
 ON man_addfields_parameter USING btree  (cat_feature_id);
