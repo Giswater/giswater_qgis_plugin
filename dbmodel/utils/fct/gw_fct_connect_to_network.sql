@@ -108,11 +108,13 @@ BEGIN
 		-- exception control. It's no possible to create another link when already exists for the connect
 		IF v_connect.state=2 AND v_link.exit_id IS NOT NULL THEN
 			IF v_feature_type = 'CONNEC' THEN
-				EXECUTE 'SELECT gw_fct_audit_function(3052,2124, '||v_connect_id||'::text)' INTO v_audit_result;
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"3052", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 
 			ELSIF v_feature_type = 'GULLY' THEN
 		
-				EXECUTE 'SELECT gw_fct_audit_function(3054,2124, '||v_connect_id||'::text)' INTO v_audit_result;
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"3054", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 			END IF;
 		END IF;
 
@@ -139,7 +141,8 @@ BEGIN
 
 		-- state control
 		IF v_arc.state=2 AND v_connect.state=1 THEN
-			EXECUTE 'SELECT gw_fct_audit_function(3050,2124,NULL)' INTO v_audit_result;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"3050", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
 
 		-- compute link
@@ -270,7 +273,9 @@ BEGIN
 
     END IF;
 
-    --PERFORM gw_fct_audit_function(0,2124,NULL);
+   
+  --  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+  --"data":{"error":"0", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
 -- get results
 	-- info
 

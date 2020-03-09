@@ -65,7 +65,8 @@ BEGIN
 		SELECT csv1 INTO v_units FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		IF v_units IS NULL THEN
-			EXECUTE 'SELECT gw_fct_audit_function(2086,2440, NULL)' INTO v_audit_result;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"2086", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	
 		-- control of price units (csv2)
@@ -73,21 +74,24 @@ BEGIN
 		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT id FROM price_value_unit);
 
 		IF v_units IS NOT NULL THEN
-			EXECUTE 'SELECT gw_fct_audit_function(2088,2440,('||v_units||')::text)' INTO v_audit_result;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"2088", "function":"2440","debug_msg":"'||v_units||'"}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of price descript (csv3)
 		SELECT csv3 INTO v_units FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		IF v_units IS NULL THEN
-			EXECUTE 'SELECT gw_fct_audit_function(2090,2440, NULL)' INTO v_audit_result;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"2090", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of null prices(csv5)
 		SELECT csv5 INTO v_units FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		IF v_units IS NULL THEN
-			EXECUTE 'SELECT gw_fct_audit_function(2092,2440, NULL)' INTO v_audit_result;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"2092", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	
 		-- Insert into audit table

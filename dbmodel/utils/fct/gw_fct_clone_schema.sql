@@ -69,7 +69,7 @@ BEGIN
     FOR rec_table IN
         SELECT table_name FROM information_schema.TABLES WHERE table_schema = v_source_schema AND table_type = 'BASE TABLE' ORDER BY table_name
     LOOP
-      
+              raise notice 'rec_table,%',rec_table;
         -- Create table in destination schema
         v_tablename := v_dest_schema || '.' || rec_table;
         EXECUTE 'CREATE TABLE ' || v_tablename || ' (LIKE ' || v_source_schema || '.' || rec_table || ' INCLUDING CONSTRAINTS INCLUDING INDEXES INCLUDING DEFAULTS)';
@@ -90,6 +90,7 @@ BEGIN
     
 
 -- fk,check
+
     FOR rec_fk IN
         EXECUTE 'SELECT distinct on (conname) conrelid::regclass AS tablename, conname AS constraintname, pg_get_constraintdef(c.oid),
         replace(pg_get_constraintdef(c.oid),''REFERENCES'',concat(''REFERENCES '','''||v_dest_schema||''',''.'')) AS definition
@@ -97,6 +98,7 @@ BEGIN
         join   information_schema.table_constraints tc ON conname=constraint_name WHERE contype IN (''f'',''c'',''u'')
         AND nspname = '''||v_source_schema||''''
     LOOP
+            raise notice 'rec_fk,%',rec_fk.constraintname;
         v_query_text:=  'ALTER TABLE '||v_dest_schema || '.' || rec_fk.tablename||' DROP CONSTRAINT IF EXISTS '|| rec_fk.constraintname||';';
         EXECUTE v_query_text;
         v_query_text:=  'ALTER TABLE '||v_dest_schema || '.' || rec_fk.tablename||' ADD CONSTRAINT '|| rec_fk.constraintname|| ' '||rec_fk.definition||';';
@@ -112,7 +114,7 @@ BEGIN
         JOIN pg_class tab ON d.objid = seq.oid AND d.refobjid = tab.oid
         WHERE seq.relkind = 'S' AND seq_ns.nspname = v_source_schema)
     LOOP
-
+        raise notice 'rec_seq,%',rec_seq.sequence_name;
         EXECUTE 'SELECT distinct on (conname) replace(replace(pg_get_constraintdef(c.oid), ''PRIMARY KEY ('',''''),'')'','''') 
         FROM   pg_constraint c JOIN   pg_namespace n ON n.oid = c.connamespace
         join   information_schema.table_constraints tc ON conname=constraint_name WHERE contype =''p'' 
@@ -121,7 +123,7 @@ BEGIN
          
         IF v_id_field is not null THEN
             EXECUTE 'SELECT setval('''||v_dest_schema||'.'||rec_seq.sequence_name||''', 
-            (SELECT max('||v_id_field||')+1 FROM '||rec_seq.related_table||'), true);';
+            (SELECT max('||v_id_field::INTEGER||')+1 FROM '||rec_seq.related_table||'), true);';
         END IF;
 
     END LOOP;
@@ -133,6 +135,7 @@ BEGIN
         EXECUTE 'SELECT table_name, view_definition as definition 
         FROM information_schema.VIEWS WHERE table_schema = '''||v_source_schema||''''
     LOOP
+        raise notice 'rec_view,%',rec_view.table_name;
         EXECUTE 'CREATE VIEW ' || v_dest_schema || '.' || rec_view.table_name || ' AS  
         '||rec_view.definition||';';
     END LOOP;
@@ -155,7 +158,7 @@ BEGIN
         WHERE routines.specific_schema='''||v_source_schema||''' and routine_name!=''audit_function'' and routine_name!=''gw_fct_repair_arc''
         group by routine_name'
     LOOP
-
+raise notice 'rec_fct,%',rec_fct.routine_name;
         EXECUTE 'select * from pg_get_functiondef('''||v_source_schema||'.'|| rec_fct.routine_name||'''::regproc)'
         INTO v_fct_definition;
         v_fct_definition = REPLACE (v_fct_definition,v_source_schema, v_dest_schema);
@@ -170,7 +173,7 @@ BEGIN
         string_agg(event_manipulation, ',') as event, action_timing as activation, action_condition as condition, action_statement as definition
         from information_schema.triggers where event_object_schema = v_source_schema group by 1,2,3,4,6,7,8 order by table_schema, table_name
     LOOP
-
+    raise notice 'rec_trg,%',rec_trg.trigger_name;
         SELECT string_agg(event_object_column, ',') INTO v_trg_fields FROM information_schema.triggered_update_columns 
         WHERE event_object_schema = v_source_schema and event_object_table=rec_trg.table_name AND trigger_name = rec_trg.trigger_name;
 
@@ -187,8 +190,8 @@ BEGIN
           
         ELSE   
 
-        EXECUTE 'select replace('''||v_replace_query||''', ''UPDATE'', '' UPDATE  OF '||v_trg_fields||''')'
-        INTO v_replace_query; 
+            EXECUTE 'select replace('''||v_replace_query||''', ''UPDATE'', '' UPDATE  OF '||v_trg_fields||''')'
+            INTO v_replace_query; 
        
 
             EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 

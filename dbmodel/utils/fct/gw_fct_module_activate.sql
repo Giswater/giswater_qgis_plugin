@@ -34,7 +34,8 @@ BEGIN
 			-- to do
 	
 		ELSE 
-			RETURN gw_fct_audit_function (2082,2432,extension_id_var);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"2082", "function":"2432","debug_msg":"'||extension_id_var||'"}}$$);';
 	  	
 		END IF;
 	
@@ -44,7 +45,8 @@ BEGIN
 				
 		
 		ELSE 
-			RETURN gw_fct_audit_function(2084,2432,extension_id_var);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"2084", "function":"2432","debug_msg":"'||extension_id_var||'"}}$$);';
 	  	
 		END IF;
 

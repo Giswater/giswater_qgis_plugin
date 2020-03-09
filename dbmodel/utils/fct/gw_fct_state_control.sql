@@ -41,13 +41,15 @@ BEGIN
 				-- arcs control
 				SELECT count(arc.arc_id) INTO v_num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
 				IF v_num_feature > 0 THEN 
-					PERFORM gw_fct_audit_function(1072,2130,feature_id_aux);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 				END IF;
 
 				--link feature control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN 
-					PERFORM gw_fct_audit_function(1072,2130,feature_id_aux);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 				END IF;
 				
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
@@ -108,21 +110,24 @@ BEGIN
 				--connec's control
 				SELECT count(arc_id) INTO v_num_feature FROM connec WHERE arc_id=feature_id_aux AND connec.state>0;
 				IF v_num_feature > 0 THEN 
-					PERFORM gw_fct_audit_function(1074,2130,feature_id_aux);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 				END IF;
 
 				--node's control (only WS)
 				IF v_project_type='WS' THEN
 					SELECT count(arc_id) INTO v_num_feature FROM node WHERE arc_id=feature_id_aux AND node.state>0;
 					IF v_num_feature > 0 THEN
-						PERFORM gw_fct_audit_function(1074,2130,feature_id_aux);
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+						"data":{"error":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 					END IF;
 				
 				--gully's control (only UD)
 				ELSIF v_project_type='UD' THEN
 					SELECT count(arc_id) INTO v_num_feature FROM gully WHERE arc_id=feature_id_aux AND gully.state>0;
 					IF v_num_feature > 0 THEN
-						PERFORM gw_fct_audit_function(1074,2130,feature_id_aux);
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+						"data":{"error":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 					END IF;	
 				END IF;
 				
@@ -137,7 +142,8 @@ BEGIN
 				--link feature control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN 
-					PERFORM gw_fct_audit_function(1072,2130,feature_id_aux);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 				END IF;
 				
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
@@ -162,7 +168,8 @@ BEGIN
 				--link feature control
 				SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
 				IF v_num_feature > 0 THEN 
-					PERFORM gw_fct_audit_function(1072,2130,feature_id_aux);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 				END IF;
 				
 			ELSIF state_aux!=v_old_state AND (v_downgrade_force IS TRUE) THEN
@@ -195,18 +202,21 @@ BEGIN
 		
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
 			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
-				PERFORM gw_fct_audit_function(1080,2130, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1080", "function":"2130","debug_msg":null}}$$);';
 			END IF;
 
 			-- check at least one psector defined
 			IF (SELECT psector_id FROM plan_psector LIMIT 1) IS NULL THEN
-				PERFORM gw_fct_audit_function(1081,2130, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1081", "function":"2130","debug_msg":null}}$$);';
 			END IF;
 
 			-- check user's variable
 			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN	
-				PERFORM gw_fct_audit_function(1083,2130, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1083", "function":"2130","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 	
@@ -216,13 +226,15 @@ BEGIN
 			-- check user's role
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
 			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
-				PERFORM gw_fct_audit_function(1080,2130, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1080", "function":"2130","debug_msg":null}}$$);';
 			END IF;
 
 			-- check user's variable
 			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN	
-				PERFORM gw_fct_audit_function(1083,2130, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1083", "function":"2130","debug_msg":null}}$$);';
 			END IF;
 
 			-- TODO: check for nodes in order to disconnect arcs
@@ -234,7 +246,8 @@ BEGIN
 			-- check user's role
 			IF ('role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member'))) AND
 			   (current_user NOT IN (SELECT json_array_elements_text(value::json) FROM config_param_system WHERE parameter = 'admin_superusers')) THEN
-				PERFORM gw_fct_audit_function(1080,2130, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1080", "function":"2130","debug_msg":null}}$$);';
 			END IF;
 
 		END IF;	

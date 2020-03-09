@@ -71,7 +71,8 @@ BEGIN
 
 	-- Control of state(1)
 	IF (state_aux=0 OR state_aux=2 OR state_aux IS NULL) THEN
-		PERFORM gw_fct_audit_function(1070,2126,state_aux::text);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"1070", "function":"2126","debug_msg":"'||state_aux::TEXT||'"}}$$);';
 	ELSE
 
 		-- node_id

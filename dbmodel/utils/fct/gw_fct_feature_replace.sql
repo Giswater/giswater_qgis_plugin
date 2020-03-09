@@ -165,7 +165,8 @@ BEGIN
 
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
-		EXECUTE 'SELECT gw_fct_audit_function(1070,2126,'||v_state||'::text)' INTO v_audit_result;
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1070", "function":"2126","debug_msg":"'||v_state||'"}}$$);' INTO v_audit_result;
 	ELSE
 
 		-- new feature_id
@@ -330,8 +331,9 @@ BEGIN
 		EXECUTE 'UPDATE '||v_feature_type||' SET state=0, workcat_id_end='''||v_workcat_id_end||''', enddate='''||v_enddate||''', state_type='||v_state_type||'
 		WHERE '||v_id_column||'='''||v_old_feature_id||''';';
 
-		
-		EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
+		IF v_id IS NOT NULL THEN
+			EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
+		END IF;
 		
 		--reconect existing link to the new feature
 		IF v_feature_type='connec' OR v_feature_type='gully' THEN

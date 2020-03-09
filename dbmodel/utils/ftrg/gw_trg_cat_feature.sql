@@ -46,13 +46,15 @@ BEGIN
 		v_id = array_to_string(ts_lexize('unaccent',NEW.id),',','*');
 		
 		IF v_id IS NOT NULL OR NEW.id ilike '%.%' OR NEW.id ilike '%-%' THEN
-			PERFORM gw_fct_audit_function(3038,2758,NEW.id);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"3038", "function":"2758","debug_msg":"'||NEW.id||'"}}$$);';
 		END IF;
 
 		v_id = array_to_string(ts_lexize('unaccent',NEW.child_layer),',','*');
 		
 		IF v_id IS NOT NULL OR NEW.child_layer ilike '%-%' OR NEW.child_layer ilike '%.%' THEN
-		 	PERFORM gw_fct_audit_function(3038,2758,NEW.child_layer);
+		 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"3038", "function":"2758","debug_msg":"'||NEW.child_layer||'"}}$$);';
 		END IF;	
 
 		-- set v_id

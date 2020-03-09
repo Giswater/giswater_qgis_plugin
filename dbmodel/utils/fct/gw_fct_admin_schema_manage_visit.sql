@@ -450,8 +450,8 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 			END IF;
 
 		ELSE
-			EXECUTE 'SELECT gw_fct_audit_function(3024,2746, NULL)' INTO v_audit_result;
-
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"3024", "function":"2746","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
 
 ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
@@ -472,7 +472,8 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 		ELSE
 			UPDATE om_visit_class SET active = FALSE WHERE id = v_class_id;
 			
-			EXECUTE 'SELECT gw_fct_audit_function(3026,2746, NULL)' INTO v_audit_result;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"3026", "function":"2746","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 

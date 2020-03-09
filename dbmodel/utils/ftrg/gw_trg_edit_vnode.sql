@@ -26,17 +26,20 @@ BEGIN
 
 	-- Insert
 	IF TG_OP = 'INSERT' THEN
-		PERFORM gw_fct_audit_function (3084,1126, NULL);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       	"data":{"error":"3084", "function":"1126","debug_msg":null}}$$);';
 		RETURN NEW;
 
 	-- Update
 	ELSIF TG_OP = 'UPDATE' THEN
-		PERFORM gw_fct_audit_function (3086,1126, NULL);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       	"data":{"error":"3086", "function":"1126","debug_msg":null}}$$);';
 		RETURN NEW;
 		
 	-- Delete
 	ELSIF TG_OP = 'DELETE' THEN
-		PERFORM gw_fct_audit_function (3088,1126, NULL);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       	"data":{"error":"3088", "function":"1126","debug_msg":null}}$$);';
 		RETURN NULL;
    
 	END IF;

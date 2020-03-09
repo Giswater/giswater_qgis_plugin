@@ -197,11 +197,24 @@ BEGIN
 									VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 								END IF;
 
+
+								v_query_result =  'SELECT gw_fct_feature_replace($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+								"feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{}, "old_feature_id":"'||v_feature_id||'", 
+								"workcat_id_end":"work1", "enddate":"2017-12-06", "keep_elements":"False"}}$$)';
+								RAISE NOTICE 'v_query_result,%',v_query_result;
+								EXECUTE v_query_result
+								INTO v_query_result;
+										
+								INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
+								VALUES (115, 'gw_fct_feature_replace',rec_role.id,v_query_result);
+
+								v_feature_id =(v_feature_id::integer + 1)::text;
+
 								--fusion arcs or delete node if it's not connected to arcs (not arc divide)
 								IF rec_node_type.isarcdivide is true AND rec_state = 1 then
-									
+									raise notice 'FUSION';
 									EXECUTE 'SELECT gw_fct_arc_fusion ($${"client":{"device":3, "infoType":100, "lang":"ES"},
-									"feature":{"id":["'||v_feature_id||'::text,"data":{"workcat_id_end":"work1",
+									"feature":{"id":["'||v_feature_id||'"]},"data":{"workcat_id_end":"work1",
 									"enddate":"2020-02-05"}}$$);'
 									INTO v_query_result;
 										
@@ -209,7 +222,7 @@ BEGIN
 									VALUES (115, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
 									
 								ELSE
-								
+								raise notice 'DELETE';
 									EXECUTE 'SELECT gw_fct_set_delete_feature($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"type":"NODE"}, 
 									"data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_feature_id||'"}}$$)::text;'
 									INTO v_query_result;
@@ -259,7 +272,7 @@ GRANT SELECT ON TABLE audit_check_data TO role_basic;
   	) AS feature INTO v_result
   	FROM (SELECT result_id, table_id, criticity,error_message::json
   	FROM  audit_check_data WHERE  fprocesscat_id=115) row;
-  	RAISE NOTICE 'v_result,%',v_result;
+
 
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');

@@ -51,28 +51,32 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN gw_fct_audit_function(1008,1116, NULL); 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			 "data":{"error":"1008", "function":"1116","debug_msg":null}}$$);';
             END IF;
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
 			END IF;
             IF (NEW.sector_id IS NULL) THEN
-                RETURN gw_fct_audit_function(1010,1116,NEW.link_id::text); 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			 "data":{"error":"1010", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN gw_fct_audit_function(1012,1116, NULL); 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			 "data":{"error":"1012", "function":"1116","debug_msg":null}}$$);';
             END IF;
 			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN gw_fct_audit_function(1014,1116,NEW.link_id::text); 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			 "data":{"error":"1014", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
             END IF;
         END IF;
 
@@ -90,7 +94,8 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM gw_fct_audit_function(2012,1116,NEW.link_id::text);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       				"data":{"error":"2012", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
 				END IF;		
 			END IF;
 		END IF;	
@@ -122,7 +127,8 @@ BEGIN
 			END IF;
 			
 			IF v_connect IS NULL THEN
-				PERFORM gw_fct_audit_function (3070,1116, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			"data":{"error":"3070", "function":"1116","debug_msg":null}}$$);';
 			END IF;		
 		END IF;
 
@@ -138,7 +144,8 @@ BEGIN
 		-- for ws projects control of link related to nodarc
 		IF v_projectype = 'WS' AND v_node IS NOT NULL THEN
 			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION SELECT node_id FROM inp_pump) THEN
-				PERFORM gw_fct_audit_function (3072,1116, NULL);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			"data":{"error":"3072", "function":"1116","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 		
@@ -173,7 +180,8 @@ BEGIN
 
 		-- feature control
 		IF NEW.feature_type IS NULL THEN
-			PERFORM gw_fct_audit_function (3074,1116, NULL);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       		"data":{"error":"3074", "function":"1116","debug_msg":null}}$$);';
 		END IF;	
 
 		-- end control
@@ -298,7 +306,8 @@ BEGIN
 		
 		-- control of null exit_type
 		IF NEW.exit_type IS NULL THEN
-			PERFORM gw_fct_audit_function(2015,1116, NULL);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       		"data":{"error":"2015", "function":"1116","debug_msg":null}}$$);';
 		END IF;
 		
 		-- upsert link
@@ -313,15 +322,18 @@ BEGIN
 		-- exception control. It's no possible to create another link when already exists for the connect
 		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id) IS NOT NULL THEN
 			IF NEW.feature_type = 'CONNEC' THEN
-				PERFORM gw_fct_audit_function (3076,1116, NEW.feature_id);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			"data":{"error":"3076", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			ELSIF NEW.feature_type = 'GULLY' THEN
-				PERFORM gw_fct_audit_function (3078,1116, NEW.feature_id);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			"data":{"error":"3078", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;		
 		END IF;
 
 		-- state control
 		IF v_connect.state=1 AND v_end_state=2 THEN
-			PERFORM gw_fct_audit_function (3080,1116, NEW.feature_id);
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       		"data":{"error":"3080", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 		END IF;
 		
 
@@ -343,7 +355,8 @@ BEGIN
 
 			-- control endfeature (only VNODE it is possible)
 			IF NEW.exit_type!='VNODE' THEN
-				PERFORM gw_fct_audit_function (3082,1116, NEW.feature_id);
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			"data":{"error":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;
 			
 			-- if geometry have changed by user 

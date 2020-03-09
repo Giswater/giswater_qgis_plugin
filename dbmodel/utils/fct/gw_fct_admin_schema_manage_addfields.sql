@@ -551,7 +551,8 @@ ELSE
 
 	--check if field order will overlap the existing field	
 	IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
-		EXECUTE 'SELECT gw_fct_audit_function(3016,2690, NULL)' INTO v_audit_result;
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"3016", "function":"2690","debug_msg":null}}$$);' INTO v_audit_result;
 	END IF;
 
 	-- get view definition

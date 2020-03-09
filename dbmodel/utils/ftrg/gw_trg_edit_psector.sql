@@ -172,7 +172,9 @@ BEGIN
 				--reestablish topology control
 				UPDATE config_param_system set value = 'true' WHERE parameter='state_topocontrol';	
 				--show information about performed state update
-				PERFORM gw_fct_audit_function(3034,2446, NULL);
+
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       			"data":{"error":"3034", "function":"2446","debug_msg":null}}$$);';
 			END LOOP;
 			
 		END IF;

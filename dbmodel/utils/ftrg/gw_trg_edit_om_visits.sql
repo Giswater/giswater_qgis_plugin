@@ -31,14 +31,16 @@ BEGIN
 	--Exploitation ID
 		IF (NEW.expl_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-					RETURN gw_fct_audit_function(1110,1118, NULL);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       				"data":{"error":"1110", "function":"1118","debug_msg":null}}$$);';
 				END IF;
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
 				END IF;
 				IF (NEW.expl_id IS NULL) THEN
-					RETURN gw_fct_audit_function(2012,1118,NEW.id);  
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+       				"data":{"error":"2012", "function":"1118","debug_msg":"'||NEW.id||'"}}$$);';
 				END IF;            
 			END IF;
 					
