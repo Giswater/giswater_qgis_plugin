@@ -35,6 +35,7 @@ DECLARE
 --    Variables
     fields json;
     fields_array json[];
+    aux_fields_array json[];
     aux_json json;    
     aux_json_child json;    
     combo_json json;
@@ -70,8 +71,8 @@ DECLARE
     v_widgetcontrols json;
     v_editability text;
     v_label text;     
-	v_featurevalues json;
-	v_clause text;
+    v_featurevalues json;
+    v_clause text;
     v_device text;
        
 BEGIN
@@ -153,6 +154,9 @@ BEGIN
 	END IF;
 	
 	fields_array := COALESCE(fields_array, '{}');  
+
+	-- Declare aux_fields_array
+	aux_fields_array = fields_array;
 	
 	-- getting values for feature
 	IF (p_tgop ='UPDATE' OR p_tgop = 'SELECT') AND aux_json->>'column_id' IS NOT NULL AND p_tablename IS NOT NULL AND p_idname IS NOT NULL AND p_id IS NOT NULL THEN
@@ -294,7 +298,7 @@ BEGIN
 			-- looking for childs 
 			IF (aux_json->>'isparent')::boolean IS TRUE THEN
 			
-				FOREACH aux_json_child IN ARRAY fields_array
+				FOREACH aux_json_child IN ARRAY aux_fields_array
 				LOOP	
 					IF (aux_json_child->>'dv_parent_id') = (aux_json->>'column_id') THEN
 
