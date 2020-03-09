@@ -77,13 +77,13 @@
 			END IF;
 
 	--Append the element to the corresponding layout
-			IF rec.layout_name= 'layout_data_1' THEN
+			IF rec.layoutname= 'layout_data_1' THEN
 				v_sql_layout_1=concat(v_sql_layout_1,' ',v_sql);
 
-			ELSIF rec.layout_name= 'layout_data_2' THEN
+			ELSIF rec.layoutname= 'layout_data_2' THEN
 				v_sql_layout_2=concat(v_sql_layout_2,' ',v_sql);
 
-			ELSIF rec.layout_name= 'layout_data_3' THEN
+			ELSIF rec.layoutname= 'layout_data_3' THEN
 				v_sql_layout_3=concat(v_sql_layout_3,' ',v_sql);
 			END IF;
 
