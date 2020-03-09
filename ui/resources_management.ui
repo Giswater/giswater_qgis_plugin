@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>543</width>
+    <width>376</width>
     <height>486</height>
    </rect>
   </property>
@@ -26,17 +26,16 @@
          <string>Equips</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
+         <item row="5" column="1">
+          <widget class="QTableView" name="tbl_view_team_vehicle"/>
+         </item>
          <item row="5" column="0">
-          <widget class="QTableView" name="tbl_view_team"/>
+          <widget class="QTableView" name="tbl_view_team_user"/>
          </item>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="btn_team_create">
-           <property name="text">
-            <string>Crear</string>
-           </property>
-          </widget>
+         <item row="5" column="2">
+          <widget class="QTableView" name="tbl_view_team_visitclass"/>
          </item>
-         <item row="1" column="0">
+         <item row="1" column="0" colspan="3">
           <widget class="QGroupBox" name="groupBox">
            <property name="title">
             <string>Gestió:</string>
@@ -61,10 +60,15 @@
             </item>
            </layout>
            <zorder>cmb_team</zorder>
-           <zorder>cmb_team</zorder>
-           <zorder>cmb_team</zorder>
            <zorder>btn_team_selector</zorder>
            <zorder>btn_team_delete</zorder>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="3">
+          <widget class="QPushButton" name="btn_team_create">
+           <property name="text">
+            <string>Crear</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -149,7 +153,7 @@
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>tbl_view_team</tabstop>
+  <tabstop>tbl_view_team_user</tabstop>
   <tabstop>tbl_view_vehicle</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>
