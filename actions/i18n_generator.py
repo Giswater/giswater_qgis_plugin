@@ -117,7 +117,7 @@ class I18NGenerator(ParentAction):
         # Create children for toolbars and actions
         line = '\t<!-- TOOLBARS AND ACTIONS -->\n'
         line += '\t<context>\n'
-        line += '\t\t<name>Giswater</name>\n'
+        line += '\t\t<name>giswater</name>\n'
         ts_file.write(line)
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
@@ -229,7 +229,7 @@ class I18NGenerator(ParentAction):
 
         path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' +''
                 + os.sep + f"{plugin_release}"  + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
-        file_name = f'i18n_{file_lng}.sql'
+        file_name = f'dml.sql'
 
         # Check if file exist
         if os.path.exists(path + file_name):
@@ -242,6 +242,16 @@ class I18NGenerator(ParentAction):
 
         db_file = open(path + file_name, "w")
 
+        line = (f'/*\n'
+                f'This file is part of Giswater 3\n'
+                f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
+                f'General Public License as published by the Free Software Foundation, either version 3 of the '
+                f'License, or (at your option) any later version.\n'
+                f'This version of Giswater is provided by Giswater Association,\n'
+                f'*/\n\n\n'
+                f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
+        db_file.write(line)
+
         for row in rows:
             table = row['context']
             formn_ame = row['formname']
@@ -249,6 +259,7 @@ class I18NGenerator(ParentAction):
             source = row['source']
             lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['source']
             tt_value = row[f'tt_{db_lang}'] if row[f'tt_{db_lang}'] is not None else row['source']
+
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] == 'config_api_form_fields':
                  line +=(f'{{"data":'
@@ -339,8 +350,7 @@ class I18NGenerator(ParentAction):
         self.conn = None
         self.cursor = None
         try:
-            self.conn = psycopg2.connect(database=db, user=user, port=port, password=password,
-                                    host=host)
+            self.conn = psycopg2.connect(database=db, user=user, port=port, password=password, host=host)
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
         except psycopg2.DatabaseError as e:
