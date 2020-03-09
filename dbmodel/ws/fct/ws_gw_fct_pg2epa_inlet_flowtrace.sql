@@ -17,7 +17,8 @@ $BODY$
 SELECT gw_fct_pg2epa_inlet_flowtrace('testbgeo11')
 
 --RESULTS
-SELECT * FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
+SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
+SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user
 SELECT * FROM anl_mincut_arc_x_node  where user_name=current_user;
 */
 
@@ -37,6 +38,7 @@ BEGIN
 
 	delete FROM anl_mincut_arc_x_node where user_name=current_user;
 	delete FROM anl_arc where cur_user=current_user AND fprocesscat_id=39;
+	delete FROM anl_node where cur_user=current_user AND fprocesscat_id=39;
 
 
 	-- fill the graf table
@@ -89,18 +91,19 @@ BEGIN
 	INSERT INTO anl_arc (fprocesscat_id, result_id, arc_id, the_geom, descript)
 	SELECT DISTINCT ON (a.arc_id) 39, p_result_id, a.arc_id, the_geom, 'Arc disconnected from any reservoir'  
 		FROM anl_mincut_arc_x_node a
-		JOIN arc b ON a.arc_id=b.arc_id
+		JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
 		GROUP BY a.arc_id, user_name, the_geom
 		having max(water) = 0 and user_name=current_user;
 		
-	-- insert into result table the dry arcs (water=0)
+	-- insert into result table the dry nodes (as they are extremal nodes from disconnected arcs, all it's ok
 	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
-	SELECT 39, p_result_id, node_1, n.the_geom, 'Node disconnected from any reservoir' FROM arc JOIN anl_arc USING (arc_id) 
-	JOIN node n ON node_1=node_id WHERE fprocesscat_id=39 AND result_id = p_result_id AND cur_user=current_user UNION
-	SELECT 39, p_result_id, node_2, n.the_geom, 'Node disconnected from any reservoir' FROM arc JOIN anl_arc USING (arc_id) 
-	JOIN node n ON node_2=node_id WHERE fprocesscat_id=39 AND result_id = p_result_id AND cur_user=current_user;
+	SELECT 39, p_result_id, node_1, n.the_geom, 'Node disconnected from any reservoir' FROM rpt_inp_arc JOIN anl_arc USING (arc_id) 
+		JOIN rpt_inp_node n ON node_1=node_id WHERE fprocesscat_id=39 AND n.result_id = p_result_id AND cur_user=current_user UNION
+		SELECT 39, p_result_id, node_2, n.the_geom, 'Node disconnected from any reservoir' FROM rpt_inp_arc JOIN anl_arc USING (arc_id) 
+		JOIN rpt_inp_node n ON node_2=node_id WHERE fprocesscat_id=39 AND n.result_id = p_result_id AND cur_user=current_user;
 
 RETURN v_cont;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

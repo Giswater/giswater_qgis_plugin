@@ -88,14 +88,14 @@ BEGIN
 			SELECT 	n.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
 			nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
 			ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
-			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
+			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"2-1"}''))
 			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
 			WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
 		UNION
 			SELECT 	n.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
 			nodecat_id, ''JUNCTION'', n.sector_id, n.state, n.state_type, n.annotation, demand,
 			ST_startpoint(c.the_geom) AS the_geom,
-			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"1-2"}''))
+			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"2-1"}''))
 			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_1 = node_id
 			WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
 		UNION
@@ -123,6 +123,35 @@ BEGIN
 			(concat(''{"nodeParent":"'', n.node_id ,''","arcPosition":"2"}''))
 			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
 			WHERE n.numarcs = 2 AND c.result_id = '||quote_literal(result_id_var);
+
+	RAISE NOTICE 'new arcs when numarcs = 1';
+	EXECUTE 'INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, status, the_geom, minorloss, addparam)
+			SELECT DISTINCT ON (a.addparam::json->>''nodeParent'')
+			a.result_id,
+			concat (a.addparam::json->>''nodeParent'', ''_n2a'') as arc_id,
+			a.node_id,
+			b.node_id,
+			''NODE2ARC'', 
+			a.nodecat_id as arccat_id, 
+			n.epa_type,
+			n.sector_id, 
+			n.expl_id,
+			a.state,
+			a.state_type,
+			case when (n.addparam::json->>''diameter'')::text !='''' then  (n.addparam::json->>''diameter'')::numeric else 0 end as diameter,
+			case when (n.addparam::json->>''roughness'')::text !='''' then  (n.addparam::json->>''roughness'')::numeric else 0 end as roughness,
+			a.annotation,
+			st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
+			n.addparam::json->>''status'' status,
+			st_makeline(a.the_geom, b.the_geom) AS the_geom,
+			case when (n.addparam::json->>''minorloss'')::text !='''' then  (n.addparam::json->>''minorloss'')::numeric else 0 end as minorloss,
+			n.addparam
+			FROM 	(SELECT * FROM rpt_inp_node WHERE result_id = '||quote_literal(result_id_var)||' AND node_type = ''NODE2ARC'' AND addparam::json->>''arcPosition''=''1-2'') a,
+				(SELECT * FROM rpt_inp_node WHERE result_id = '||quote_literal(result_id_var)||' AND node_type = ''NODE2ARC'' AND addparam::json->>''arcPosition''=''2-1'') b
+				JOIN rpt_inp_node n ON n.node_id = b.addparam::json->>''nodeParent''
+				WHERE a.addparam::json->>''nodeParent'' = b.addparam::json->>''nodeParent''
+				AND n.result_id = '||quote_literal(result_id_var);
+
 	
 	RAISE NOTICE 'new arcs when numarcs = 2';
 	EXECUTE 'INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, status, the_geom, minorloss, addparam)

@@ -30,7 +30,6 @@ v_message text;
 v_usenetworkdemand boolean;
 v_buildupmode integer;
 v_usenetworkgeom boolean;
-v_checkdata boolean;
 v_inpoptions json;
 v_advancedsettings boolean;
 v_file json;
@@ -50,7 +49,6 @@ BEGIN
 	-- get controls to make faster this function
 	v_usenetworkgeom = (p_data->>'data')::json->>'useNetworkGeom';  -- use network previously defined
 	v_usenetworkdemand = (p_data->>'data')::json->>'useNetworkDemand'; -- use demand previuously defined
-	v_checkdata = (p_data->>'data')::json->>'checkData'; -- don't check data
 	v_export = (p_data->>'data')::json->>'export'; -- don't export
 
 	-- Getting user parameteres
@@ -107,24 +105,31 @@ BEGIN
 		RAISE NOTICE '7 - profilactic issue to repair topology when length has no longitude';
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 
-		IF v_checkdata IS NOT FALSE THEN
-				
+
+		IF v_buildupmode = 1 THEN -- no check data, go...go...
+
+			-- checking all arcs/node disconnected from any reservoir
+			PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result);
+			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+
+			-- setting the minimun expression of return json
+			RAISE NOTICE '8 - Ignoring gw_fct_pg2epa_check_data';
+			SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+			"data":{"parameters":{"text":"Inp export done succesfully"}}}'::json) INTO v_return;
+		ELSE	
+
 			RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
 			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
 			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
 			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;			
-		ELSE
-
-			RAISE NOTICE '8 - Igonring gw_fct_pg2epa_check_data';
-			SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-			"data":{"parameters":{"text":"Inp export done succesfully"}}}'::json) INTO v_return;
-
 		END IF;
 		
 		IF v_buildupmode = 1 THEN
 	
 			RAISE NOTICE '9 - Use supply buildup model (modifying values in order to force buildupmode 1)';
 			PERFORM gw_fct_pg2epa_buildup_supply(v_result);
+			
 		ELSIF v_buildupmode = 2 THEN
 		
 			RAISE NOTICE '9 - Use transport buildup model (modifying values in order to force buildupmode 2)';
@@ -150,7 +155,6 @@ BEGIN
 		"data":{"parameters":{"text":"Inp export using existing gesometry from previous result done succesfully"}}}'::json) INTO v_return;
 		
 	END IF;
-
 
 	RAISE NOTICE '11 - update demands & patterns';
 	IF v_usenetworkdemand IS NOT FALSE THEN

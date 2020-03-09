@@ -519,6 +519,34 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- links without feature_id
+	v_querytext = 'SELECT link_id, the_geom FROM link where feature_id is null and state > 0';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' links with state > 0 without feature_id.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: All links state > 0 have feature_id.');
+	END IF;
+
+	-- links without exit_id
+	v_querytext = 'SELECT link_id, the_geom FROM link where exit_id is null and state > 0';
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 3, concat('ERROR: There is/are ',v_count,' links with state > 0 without exit_id. To repair it you can query:'));
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 3, 'UPDATE link SET exit_id = a.vnode_id FROM (SELECT link_id, vnode_id FROM link, vnode WHERE st_dwithin(st_endpoint(link.the_geom), vnode.the_geom, 0.01) AND exit_id IS NULL)a WHERE link.link_id = a.link_id');
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: All links state > 0 have exit_id.');
+	END IF;
+
 	--Chained connecs/gullies which has different arc_id than the final connec/gully.
 	IF v_project_type = 'WS' THEN 
 		v_querytext = 'with c as (

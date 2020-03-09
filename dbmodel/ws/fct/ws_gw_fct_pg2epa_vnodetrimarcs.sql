@@ -10,6 +10,9 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs(result_id_var character varying)  RETURNS json AS 
 $BODY$
 
+--SELECT link_id, vnode_id FROM SCHEMA_NAME.link, SCHEMA_NAME.vnode where st_dwithin(st_endpoint(link.the_geom), vnode.the_geom, 0.01) and vnode.state = 0 and link.state > 0
+
+
 
 /*
 SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('t1')
@@ -22,7 +25,6 @@ DECLARE
 	v_record record;
       
 BEGIN
-
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -35,20 +37,20 @@ BEGIN
 	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
 	(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3) as depth
 	FROM (
-		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, 
-		arc_id, 
-		case 	
-			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom)=1 then 0.9900 
-			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom)=0 then 0.0100 
-			else (st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
-		FROM rpt_inp_arc , vnode
-		JOIN v_edit_link a ON vnode_id=exit_id::integer
-		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id = result_id_var
-		union
 		SELECT  vnode_id, arc_id, locate
 		FROM (
 			SELECT node_1 as vnode_id, arc_id,  0 as locate FROM rpt_inp_arc WHERE result_id = result_id_var AND arc_type != 'NODE2ARC'
 			)z
+		UNION	
+		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, 
+		arc_id, 
+		case 	
+			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom) > 0.99 then 0.99 
+			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom) < 0.1 then 0.1
+			else (st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
+		FROM rpt_inp_arc , vnode
+		JOIN v_edit_link a ON vnode_id=exit_id::integer
+		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.001) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id = result_id_var
 		union
 		SELECT  vnode_id, arc_id, locate
 		FROM (
@@ -80,7 +82,7 @@ BEGIN
 		addparam
 		FROM temp_go2epa t
 		JOIN rpt_inp_arc a USING (arc_id)
-		JOIN connec ON concat('VN',pjoint_id)=vnode_id
+		LEFT JOIN connec ON concat('VN',pjoint_id)=vnode_id
 		WHERE vnode_id ilike 'VN%'
 		AND result_id=result_id_var;
 
@@ -102,7 +104,7 @@ BEGIN
 	WITH a AS (SELECT  a.idmin, a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
 			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
 			FROM temp_go2epa a
-			JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
+			LEFT JOIN temp_go2epa b ON a.id=b.id-1 WHERE a.arc_id=b.arc_id 
 			ORDER by arc_id)
 	SELECT
 		result_id_var,
