@@ -141,6 +141,11 @@ BEGIN
 	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'addfield_active')::text;
 	v_iseditable = (((p_data ->>'data')::json->>'parameters')::json ->>'iseditable')::text;
 
+	--set new addfield as active if it wasnt defined
+	IF v_active IS NULL THEN
+		v_active = TRUE;
+	END IF;
+	
 -- get input parameters - config_api_form_fields
 	v_formtype = 'feature';
 	v_placeholder = (((p_data ->>'data')::json->>'parameters')::json->>'placeholder')::text;
@@ -302,8 +307,7 @@ IF v_multi_create IS TRUE THEN
 		
 		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, 
 		active, orderby, iseditable)
-		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype,
-		v_active, v_orderby, v_iseditable);
+		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable);
 		
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
