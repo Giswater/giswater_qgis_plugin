@@ -83,9 +83,9 @@ raise notice 'v_old_ct_param,%',v_old_ct_param;
 		    '||v_new_parameters.ct_param||'
 			    FROM crosstab(''SELECT visit_id, om_visit_event.parameter_id, value 
 			    FROM '||v_schemaname||'.om_visit 
-			    JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
-			    JOIN '||v_schemaname||'.om_visit_class on om_visit_class.id=om_visit.class_id
-			    JOIN '||v_schemaname||'.om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
+			    LEFT JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
+			    LEFT JOIN '||v_schemaname||'.om_visit_class on om_visit_class.id=om_visit.class_id
+			    LEFT JOIN '||v_schemaname||'.om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
 			    where om_visit_class.ismultievent = TRUE ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
 			      ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
 				WHERE om_visit_class.ismultievent = true AND om_visit_class.id='||v_class_id||';';
