@@ -227,3 +227,7 @@ INSERT INTO config_api_form_actions (actionname) VALUES ('visit_start');
 INSERT INTO config_api_form_actions (actionname) VALUES ('visit_end');
 INSERT INTO config_api_form_actions (actionname) VALUES ('actionZoom');
 INSERT INTO config_api_form_actions (actionname) VALUES ('getInfoFromId');
+
+--2020/03/10
+UPDATE config_api_form_fields SET isautoupdate = FALSE WHERE widgettype='typeahead';
+UPDATE config_api_form_fields SET widgetcontrols = gw_fct_json_object_delete_keys(widgetcontrols,'autoupdateReloadFields', 'typeaheadSearchField') WHERE widgettype='typeahead';

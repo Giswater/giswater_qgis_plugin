@@ -23,22 +23,32 @@ BEGIN
 	v_configtable:= TG_ARGV[0];	 -- not used yet. Ready to enhance this trigger control
 	
 	IF TG_OP = 'INSERT' THEN
-
+        --check dv_querytext is correct
 		IF (NEW.widgettype = 'combo' OR NEW.widgettype = 'typeahead') AND NEW.dv_querytext IS NOT NULL THEN
 
 			v_querytext = NEW.dv_querytext;
 			EXECUTE v_querytext;
 		END IF;
+        
+        --check isautoupdate is FALSE when typeahead
+        IF NEW.widgettype = 'typeahead' AND NEW.isautoupdate = TRUE THEN
+            SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3096", "function":"2816","debug":null}}$$);	
+        END IF;
 		
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-
+        --check dv_querytext is correct
 		IF (NEW.widgettype = 'combo' OR NEW.widgettype = 'typeahead') AND (NEW.dv_querytext != OLD.dv_querytext) AND NEW.dv_querytext IS NOT NULL THEN
 
 			v_querytext = NEW.dv_querytext;
 			EXECUTE v_querytext;
 		END IF;
+        
+        --check isautoupdate is FALSE when typeahead
+        IF NEW.widgettype = 'typeahead' AND NEW.isautoupdate = TRUE THEN
+            SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3096", "function":"2816","debug":null}}$$);	
+        END IF;
 		
 		RETURN NEW;
 
