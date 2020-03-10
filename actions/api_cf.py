@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import Qgis, QgsGeometry, QgsMapToPixel, QgsPointXY
+from qgis.core import Qgis, QgsExpressionContextUtils, QgsGeometry, QgsMapToPixel, QgsPointXY, QgsProject
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
 from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt, pyqtSignal, QObject
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
@@ -204,16 +204,13 @@ class ApiCF(ApiParent, QObject):
         last_click = self.canvas.mouseLastXY()
         self.last_point = QgsMapToPixel.toMapCoordinates(
             self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
-
-        visible_layers = self.get_visible_layers()
-        is_project_editable = self.get_editable_project()
-
         if tab_type == 'inp':
             extras = '"toolBar":"epa"'
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
-        role = self.controller.get_restriction()
-        extras += f', "rolePermissions":"{role}"'
+
+        project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
+        extras += f', "rolePermissions":"{project_role}"'
 
         # IF insert new feature
         if point and feature_cat:
@@ -365,8 +362,6 @@ class ApiCF(ApiParent, QObject):
         self.tablename = complet_result[0]['body']['feature']['tableName']
 
         # Get feature type (Junction, manhole, valve, fountain...)
-        pos_ini = complet_result[0]['body']['feature']['tableName'].rfind("_")
-        pos_fi = len(str(complet_result[0]['body']['feature']['tableName']))
         self.feature_type = complet_result[0]['body']['feature']['childType']
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 

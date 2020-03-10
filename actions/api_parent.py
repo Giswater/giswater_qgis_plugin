@@ -45,20 +45,6 @@ class ApiParent(ParentAction):
         self.temp_layers_added = []
 
 
-    def get_editable_project(self):
-        """ Get variable 'editable_project' from qgis project variables """
-        
-        editable_project = False
-        try:
-            editable_project = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('editable_project')
-            if editable_project is None:
-                return False
-        except:
-            pass
-        finally:
-            return editable_project
-
-
     def get_visible_layers(self, as_list=False):
         """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
         
@@ -644,8 +630,7 @@ class ApiParent(ParentAction):
         if 'iseditable' in field:
             widget.setReadOnly(not field['iseditable'])
             if not field['iseditable']:
-                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                     " color: rgb(100, 100, 100)}")
+                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
         return widget
 
 
@@ -660,7 +645,6 @@ class ApiParent(ParentAction):
             if 'queryText' not in field or 'fieldToSearch' not in field or 'queryTextFilter' not in field or 'parentId' not in field:
                 return widget
             model = QStringListModel()
-            self.populate_lineedit(completer, model, field, dialog, widget)
             widget.textChanged.connect(partial(self.populate_lineedit, completer, model, field, dialog, widget))
 
         return widget
@@ -669,7 +653,7 @@ class ApiParent(ParentAction):
     def populate_lineedit(self, completer, model, field, dialog, widget):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object.
-            WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
+            WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
         """
 
         if not widget:
