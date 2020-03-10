@@ -85,9 +85,9 @@ CREATE OR REPLACE VIEW ve_visit_noinfra AS
             ct.param_1,
             ct.param_2
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
+      FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''incident_type''),(''incident_comment'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
@@ -122,9 +122,9 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
             ct.param_2,
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
+      FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''defect_arc''),(''clean_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
@@ -158,9 +158,9 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
             ct.param_2,
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
+      FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_node''),(''defect_node''),(''clean_node'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
@@ -194,9 +194,9 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
             ct.param_2,
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
+      FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
+      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_connec''),(''defect_connec''),(''clean_connec'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
