@@ -203,29 +203,6 @@ class ApiParent(ParentAction):
         action.setChecked(enabled)
 
 
-    def api_action_centered(self, feature, canvas, layer):
-        """ Center map to current feature """
-
-        layer.selectByIds([feature.id()])
-        canvas.zoomToSelected(layer)
-
-
-    def api_action_zoom_in(self, feature, canvas, layer):
-        """ Zoom in """
-
-        layer.selectByIds([feature.id()])
-        canvas.zoomToSelected(layer)
-        canvas.zoomIn()
-
-
-    def api_action_zoom_out(self, feature, canvas, layer):
-        """ Zoom out """
-
-        layer.selectByIds([feature.id()])
-        canvas.zoomToSelected(layer)
-        canvas.zoomOut()
-
-
     def api_action_help(self, geom_type):
         """ Open PDF file with selected @wsoftware and @geom_type """
 

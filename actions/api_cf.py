@@ -188,6 +188,7 @@ class ApiCF(ApiParent, QObject):
         self.layer = None
         self.feature = None
         self.my_json = {}
+        self.tab_type = tab_type
 
         # Get srid
         self.srid = self.controller.plugin_settings_value('srid')
@@ -478,12 +479,9 @@ class ApiCF(ApiParent, QObject):
             else:
                 self.put_widgets(self.dlg_cf, field, label, widget)
 
-        # Get current QgsFeature
+        # Get current feature id
         widget_field_id = self.dlg_cf.findChild(QLineEdit, f'{tab_type}_{self.field_id}')
         self.feature_id = widget_field_id.text()
-        expr_filter = f"{self.field_id} = '{self.feature_id}'"
-        self.feature = self.get_feature_by_expr(self.layer, expr_filter)
-
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -525,9 +523,9 @@ class ApiCF(ApiParent, QObject):
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
-        action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
-        action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
-        action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
+        action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
+        action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
+        action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
         action_rotation.triggered.connect(partial(self.action_rotation, self.dlg_cf))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
@@ -551,6 +549,39 @@ class ApiCF(ApiParent, QObject):
         # Open dialog
         self.open_dialog(self.dlg_cf)
         return self.complet_result, self.dlg_cf
+
+
+    def get_feature(self, tab_type):
+        # Get current QgsFeature
+        expr_filter = f"{self.field_id} = '{self.feature_id}'"
+        self.feature = self.get_feature_by_expr(self.layer, expr_filter)
+        return self.feature
+
+
+    def api_action_zoom_in(self, canvas, layer):
+        """ Zoom in """
+        if not self.feature:
+            self.get_feature(self.tab_type)
+        layer.selectByIds([self.feature.id()])
+        canvas.zoomToSelected(layer)
+        canvas.zoomIn()
+
+
+    def api_action_centered(self, canvas, layer):
+        """ Center map to current feature """
+
+        if not self.feature:
+            self.get_feature(self.tab_type)
+        layer.selectByIds([self.feature.id()])
+        canvas.zoomToSelected(layer)
+
+    def api_action_zoom_out(self, canvas, layer):
+        """ Zoom out """
+        if not self.feature:
+            self.get_feature(self.tab_type)
+        layer.selectByIds([self.feature.id()])
+        canvas.zoomToSelected(layer)
+        canvas.zoomOut()
 
 
     def roll_back(self):
@@ -1081,12 +1112,6 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-
-
-
-
-
-
     def open_catalog(self, tab_type, feature_type):
 
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -1178,7 +1203,8 @@ class ApiCF(ApiParent, QObject):
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show elements """
-
+        if not self.feature:
+            self.get_feature(self.tab_type)
         # Get widgets
         self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
         btn_open_element = self.dlg_cf.findChild(QPushButton, "btn_open_element")
@@ -2041,7 +2067,8 @@ class ApiCF(ApiParent, QObject):
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
-
+        if not self.feature:
+            self.get_feature(self.tab_type)
         # Get widgets
         txt_doc_id = self.dlg_cf.findChild(QLineEdit, "txt_doc_id")
         doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
