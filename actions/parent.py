@@ -650,14 +650,17 @@ class ParentAction(object):
 
 
     def hide_void_groupbox(self, dialog):
-        """ Hide empty grupbox """
-
+        """ Hide empty groupbox """
+        grb_list = {}
         grbox_list = dialog.findChildren(QGroupBox)
         for grbox in grbox_list:
+
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
+                grb_list[grbox.objectName()] = 0
                 grbox.setVisible(False)
 
+        return grb_list
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """

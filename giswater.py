@@ -1178,7 +1178,18 @@ class Giswater(QObject):
             critical_level = self.get_missing_layers(self.dlg_audit_project,
                 result['body']['data']['missingLayers'], critical_level)
 
-        self.parent.hide_void_groupbox(self.dlg_audit_project)
+        grb_list = self.parent.hide_void_groupbox(self.dlg_audit_project)
+
+        # Hide labels if don't miss layers
+        hide_lbls = True
+        for k, v in grb_list.items():
+            if v != 0:
+                hide_lbls = False
+                break
+
+        if hide_lbls:
+            self.dlg_audit_project.lbl_layers.hide()
+            self.dlg_audit_project.lbl_checks.hide()
 
         if int(critical_level) > 0 or text_result:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
