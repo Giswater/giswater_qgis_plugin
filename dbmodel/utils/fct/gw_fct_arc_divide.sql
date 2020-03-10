@@ -79,7 +79,7 @@ v_level integer;
 v_status text;
 v_message text;
 v_hide_form boolean;
-v_array_node_id text;
+v_array_node_id json;
 v_node_id text;
 
 BEGIN
@@ -96,11 +96,11 @@ BEGIN
    
     -- Get parameters from input json
     v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
-    v_node_id =  replace(replace (v_array_node_id::text, '"]', ''), '["', '');
 
+    v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
 	-- Get project type
 	SELECT wsoftware, epsg, giswater INTO v_project_type, v_srid,v_version FROM version LIMIT 1;
-    
+
     -- Get node values
     SELECT the_geom INTO v_node_geom FROM node WHERE node_id = v_node_id;
 	SELECT state INTO v_state_node FROM node WHERE node_id=v_node_id;
@@ -136,8 +136,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 		"data":{"error":"1052", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 	END IF;
-RAISE NOTICE 'v_isarcdivide,%',v_isarcdivide;
-RAISE NOTICE 'v_node_type,%',v_node_type;
+
 	-- Control if node divides arc
 	IF v_isarcdivide=TRUE THEN 
 
@@ -156,7 +155,7 @@ RAISE NOTICE 'v_node_type,%',v_node_type;
 		SELECT arc_id, state, the_geom INTO v_arc_id, v_state, v_arc_geom  FROM v_edit_arc AS a 
 		WHERE ST_DWithin(v_node_geom, a.the_geom, v_arc_divide_tolerance) AND node_1 != v_node_id AND node_2 != v_node_id
 		ORDER BY ST_Distance(v_node_geom, a.the_geom) LIMIT 1;
-RAISE NOTICE 'v_arc_id,%',v_arc_id;
+
 		IF v_arc_id IS NOT NULL THEN 
 
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
@@ -214,7 +213,7 @@ RAISE NOTICE 'v_arc_id,%',v_arc_id;
 
 			-- In function of states and user's variables proceed.....
 			IF (v_state=1 AND v_state_node=1) THEN 
-			
+
 				-- Insert new records into arc table
 				INSERT INTO arc SELECT rec_aux1.*;
 				INSERT INTO arc SELECT rec_aux2.*;
@@ -262,7 +261,7 @@ RAISE NOTICE 'v_arc_id,%',v_arc_id;
 				parameter_id,
 				value_param
 				FROM man_addfields_value WHERE feature_id=v_arc_id;
-				
+
 				INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 				VALUES (112, 1,'Copy addfields from old to new arcs.');
 
@@ -307,7 +306,7 @@ RAISE NOTICE 'v_arc_id,%',v_arc_id;
 				-- Insert data into traceability table
 				INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 				VALUES ('DIVIDE ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
-			
+
 				-- Update elements from old arc to new arcs
 				SELECT count(id) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;
 
@@ -407,6 +406,7 @@ RAISE NOTICE 'v_arc_id,%',v_arc_id;
 
 				END IF;
 				-- Update arc_id on node
+
 				FOR rec_aux IN SELECT * FROM node WHERE arc_id=v_arc_id  LOOP
 
 					-- find the new arc id
@@ -424,15 +424,14 @@ RAISE NOTICE 'v_arc_id,%',v_arc_id;
 				-- reconnect links
 				UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
 
-				IF v_count_connec > 0 THEN
-
+				IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
 
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 				END IF;
-				IF v_count_gully > 0 THEN
+				IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
 
@@ -678,7 +677,7 @@ RAISE NOTICE 'v_arc_id,%',v_arc_id;
 				-- reconnect links
 				UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
 				
-				IF v_count_connec > 0 THEN
+				IF v_count_connec > 0 AND v_array_connec IS NOT NULL THEN
 
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
@@ -686,7 +685,7 @@ RAISE NOTICE 'v_arc_id,%',v_arc_id;
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 					VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 				END IF;
-				IF v_count_gully > 0 THEN
+				IF v_count_gully > 0 AND v_count_gully IS NOT NULL THEN
 
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';

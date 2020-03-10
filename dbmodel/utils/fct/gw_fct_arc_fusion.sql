@@ -51,7 +51,7 @@ DECLARE
     v_message text;
     v_hide_form boolean;
     v_array_addfields text[];
-    v_array_node_id text;
+    v_array_node_id json;
     v_node_id text;
     v_workcat_id_end text;
     v_enddate date;
@@ -74,7 +74,7 @@ BEGIN
    
    -- Get parameters from input json
    v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
-   v_node_id =  replace(replace (v_array_node_id::text, '"]', ''), '["', '');
+   v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
    v_workcat_id_end = lower(((p_data ->>'data')::json->>'workcat_id_end')::text);
    v_enddate = ((p_data ->>'data')::json->>'enddate')::date;
 
