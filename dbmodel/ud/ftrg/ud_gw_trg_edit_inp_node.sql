@@ -6,7 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1210
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_node() 
+RETURNS trigger AS 
+$BODY$
 DECLARE 
     v_node_table varchar;
     v_man_table varchar;
@@ -25,7 +27,8 @@ BEGIN
     
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        RETURN gw_fct_audit_function(1030,1210, NULL);
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1030", "function":"1210","debug_msg":null}}$$);'; 
 
     ELSIF TG_OP = 'UPDATE' THEN
 	
@@ -76,11 +79,13 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
-        RETURN gw_fct_audit_function(1032,1210, NULL);
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1032", "function":"1210","debug_msg":null}}$$);'; 
         
     END IF;
        
 END;
-$$;
- 
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
   

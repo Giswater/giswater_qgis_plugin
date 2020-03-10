@@ -6,7 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2420
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_flw_regulator() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_flw_regulator() 
+RETURNS trigger AS 
+$BODY$
 DECLARE 
 flw_type_aux text;
 
@@ -19,16 +21,19 @@ BEGIN
 	
 	-- check to_arc only to that arcs that have node_1 as the flowregulator node
 	IF NEW.to_arc IS NULL THEN
-		RETURN gw_fct_audit_function(2070,2420, NULL);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"2070", "function":"2420","debug_msg":null}}$$);';
 	END IF;
 
 	-- flwreg_length
 	IF NEW.flwreg_length IS NULL THEN
-		RETURN gw_fct_audit_function(2074,2420, NULL);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"2074", "function":"2420","debug_msg":null}}$$);';
 	END IF;
 	
 	IF (NEW.flwreg_length)>(SELECT st_length(v_edit_arc.the_geom) FROM v_edit_arc WHERE arc_id=NEW.to_arc) THEN
-		RETURN gw_fct_audit_function(3048,2420, NULL);
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"3048", "function":"2420","debug_msg":null}}$$);';
 	END IF;
 	
 	-- flowreg_id
@@ -39,5 +44,7 @@ BEGIN
 
 RETURN NEW;
     
-END; 
-$$;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

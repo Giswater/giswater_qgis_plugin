@@ -6,7 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1208
    
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_arc() 
+RETURNS trigger AS 
+$BODY$
 DECLARE 
     v_arc_table varchar;
     v_man_table varchar;
@@ -22,8 +24,8 @@ BEGIN
     v_epa_type:= TG_ARGV[1];
     
     IF TG_OP = 'INSERT' THEN
- 		RETURN gw_fct_audit_function(1026,1208, NULL);
-
+ 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"1026", "function":"1208","debug_msg":null}}$$);'; 
     ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- State
@@ -101,11 +103,13 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
-    	RETURN gw_fct_audit_function(1028,1208, NULL);
+    	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"1028", "function":"1208","debug_msg":null}}$$);'; 
 
     END IF;
     
 END;
-$$;
-   
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
    

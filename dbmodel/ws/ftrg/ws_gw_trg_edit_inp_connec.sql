@@ -7,7 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NODE: 2730
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_connec() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_connec() 
+RETURNS trigger AS 
+$BODY$
 DECLARE 
 
 BEGIN
@@ -16,7 +18,8 @@ BEGIN
        
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        PERFORM gw_fct_audit_function(1030,1310, NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1030", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
 		
 
@@ -43,11 +46,14 @@ BEGIN
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        PERFORM gw_fct_audit_function(1032,1310, NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1032", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
     
     END IF;
-       
+
 END;
-$$;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
   

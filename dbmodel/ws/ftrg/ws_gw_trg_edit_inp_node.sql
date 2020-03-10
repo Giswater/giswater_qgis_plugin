@@ -11,7 +11,9 @@ This version of Giswater is provided by Giswater Association
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_node() 
+RETURNS trigger AS 
+$BODY$
 DECLARE 
     v_node_table varchar;
     v_man_table varchar;
@@ -32,7 +34,8 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        PERFORM gw_fct_audit_function(1030,1310,NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1030", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -76,7 +79,8 @@ BEGIN
             v_old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             v_new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
             IF (quote_literal(v_old_nodetype)::text <> quote_literal(v_new_nodetype)::text) THEN
-                PERFORM gw_fct_audit_function(1016,1310,NULL); 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                 "data":{"error":"1016", "function":"1310","debug_msg":null}}$$);';
                 RETURN NULL;
             END IF;
         END IF;
@@ -105,15 +109,18 @@ BEGIN
             annotation=NEW.annotation, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
 
-        PERFORM gw_fct_audit_function(2,1310,NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"2", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        PERFORM gw_fct_audit_function(1032,1310,NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1032", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
     
     END IF;
        
 END;
-$$;
-  
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

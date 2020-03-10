@@ -6,7 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2814
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_gully_proximity() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_gully_proximity() 
+RETURNS trigger AS 
+$BODY$
 DECLARE 
     v_numConnecs numeric;
     v_gully_proximity double precision;
@@ -32,13 +34,14 @@ BEGIN
 
     -- If there is an existing gully closer than 'rec.gully_tolerance' meters --> error
     IF (v_numConnecs > 0) AND (v_gully_proximity_control IS TRUE) THEN
-        RETURN gw_fct_audit_function(1044,2814, NEW.gully_id);
-
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1044", "function":"2814","debug_msg":"'||NEW.gully_id||'"}}$$);';
     END IF;
 
     RETURN NEW;
 
      
-END; 
-$$;
-
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

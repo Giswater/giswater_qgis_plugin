@@ -7,7 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1306
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc()  RETURNS trigger AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc() 
+RETURNS trigger AS 
+$BODY$
 DECLARE 
     v_arc_table varchar;
     v_man_table varchar;
@@ -19,7 +21,8 @@ BEGIN
     v_arc_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
-        PERFORM gw_fct_audit_function(1026,1306,NULL);
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1026", "function":"1306","debug_msg":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -49,11 +52,13 @@ BEGIN
 
         END IF;
 
-        PERFORM gw_fct_audit_function(2,1306,NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"2", "function":"1306","debug_msg":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        PERFORM gw_fct_audit_function(1028,1306,NULL); 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        "data":{"error":"1028", "function":"1306","debug_msg":null}}$$);';
         RETURN NEW;
     
     END IF;
@@ -62,4 +67,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-   
