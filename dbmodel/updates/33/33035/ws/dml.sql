@@ -53,3 +53,9 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox)
 VALUES (2800, 'gw_fct_pg2epa_buildup_transport', 'utils', 'function','Function to generate supply models oriented to manage olumes of water and water quality', 'role_epa', false, false)
 ON CONFLICT (id) DO NOTHING;
+
+
+--2020/03/05
+INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type,  isdeprecated) 
+VALUES ('use_fire_code_seq', 'FALSE', 'boolean', 'system', 'If TRUE, when insert a new hydrant with fire_code=NULL this field will be filled with next val of sequence', 'ws', false) ON CONFLICT (parameter) DO NOTHING;
+

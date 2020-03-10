@@ -97,6 +97,8 @@ v_input json;
 v_presszone_id text;
 v_widgetvalue float;
 v_automatic_ccode boolean;
+v_automatic_ccode_field text;
+v_use_fire_code_seq boolean;
 
 BEGIN
 
@@ -130,7 +132,14 @@ BEGIN
 
     SELECT value INTO v_samenode_init_end_control FROM config_param_system WHERE parameter = 'samenode_init_end_control';
     SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='proximity_buffer';
-    SELECT value INTO v_automatic_ccode FROM config_param_system WHERE parameter='edit_automatic_customercode';
+    SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='use_fire_code_seq';
+    SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='customer_code_autofill';
+    SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='customer_code_autofill';
+    
+    IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field ='connec_id' THEN
+        v_automatic_ccode = TRUE;
+    ELSE v_automatic_ccode = FALSE;
+    END IF;
 
     -- get tablename and formname
     -- Common
@@ -501,7 +510,11 @@ BEGIN
 			ELSIF (aux_json->>'column_id') =  'fluid_type' OR  (aux_json->>'column_id') =  'function_type' OR (aux_json->>'column_id') =  'location_type' OR (aux_json->>'column_id') =  'category_type' THEN
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
 					WHERE ((a->>'param') = (aux_json->>'column_id') AND left ((a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
-
+                    
+            -- child special values
+            ELSIF (aux_json->>'column_id')='fire_code' AND v_use_fire_code_seq THEN	
+				field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
+            
 			-- rest (including addfields)
 			ELSE 
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id');

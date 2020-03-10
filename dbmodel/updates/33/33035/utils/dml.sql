@@ -165,4 +165,7 @@ VALUES (3094,'One of new arcs has no length', 'The selected node may be its fina
 
 UPDATE audit_cat_param_user SET vdefault = 'TRUE' WHERE  id = 'qgis_form_initproject_hidden';
 
+UPDATE config_param_system SET descript = 'If status is TRUE, when insert a new connec, customer_code will be the same as field (connec_id or code). If you choose connec_id you can previously visualize it on form, but if you choose code you will see customer_code after inserting'
+WHEN parameter = 'customer_code_autofill';
+
 
