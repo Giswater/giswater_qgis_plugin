@@ -11,7 +11,8 @@ from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils, 
 
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
-from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLineEdit, \
+    QTableView, QTextEdit, QTimeEdit, QWidget
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
@@ -674,6 +675,7 @@ class MincutParent(ParentAction):
 
         elif result['body']['actions']['overlap'] == 'Ok':
             self.mincut_ok(result)
+            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
         self.iface.actionPan().trigger()
 
 
@@ -688,6 +690,12 @@ class MincutParent(ParentAction):
 
 
     def mincut_ok(self, result):
+        # Set all widgets of the data tab enabled(False)
+        widget_list = self.dlg_mincut.mainTab.widget(0).findChildren(QWidget)
+        for widget in widget_list:
+            if type(widget) in (QCheckBox, QComboBox, QDateEdit, QLineEdit, QTextEdit, QTimeEdit):
+                widget.setEnabled(False)
+
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
 
