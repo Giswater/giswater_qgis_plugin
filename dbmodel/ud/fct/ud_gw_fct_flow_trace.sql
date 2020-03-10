@@ -35,7 +35,7 @@ DECLARE
   v_level integer;
   v_message text;
   v_audit_result text;
-  
+
 BEGIN
   
     -- Search path
@@ -45,8 +45,10 @@ BEGIN
     DELETE FROM anl_flow_node WHERE cur_user="current_user"() AND context='Flow trace';
     DELETE FROM anl_flow_arc WHERE cur_user="current_user"() AND context='Flow trace' ; 
     DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id = 120; 
+    
     -- select version
     SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+
     --select default geometry style
     SELECT regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmllinepath FROM config_param_user 
     WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
