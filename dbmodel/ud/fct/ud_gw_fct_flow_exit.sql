@@ -12,7 +12,7 @@ RETURNS json AS $BODY$
 
 /*
 example:
-SELECT SCHEMA_NAME.gw_fct_flow_trace($${
+SELECT SCHEMA_NAME.gw_fct_flow_exit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"id":["20607"]},
 "data":{}}$$)
@@ -32,7 +32,7 @@ DECLARE
   v_level integer;
   v_message text;
   v_audit_result text;
-  
+
 BEGIN
 
     -- Search path
