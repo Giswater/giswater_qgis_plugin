@@ -1560,7 +1560,7 @@ class AddNewLot(ParentManage):
 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_work_register.tbl_work, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_work_register, self.dlg_work_register.tbl_work, table_object)
+        # self.set_table_columns(self.dlg_work_register, self.dlg_work_register.tbl_work, table_object, sort_order=1)
 
         # Set filter events
         self.dlg_work_register.txt_team_filter.textChanged.connect(self.filter_team)
