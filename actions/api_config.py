@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-
+from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
@@ -252,11 +252,17 @@ class ApiConfig(ApiParent):
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, chk, chk, field))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datepickertime':
-                    widget = QDateEdit()
+                    widget = QgsDateTimeEdit()
+                    widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
+                    widget.setDisplayFormat('dd/MM/yyyy')
+
                     if field['value']: field['value'] = field['value'].replace('/', '-')
-                    date = QDate.fromString(field['value'], 'yyyy-MM-dd')
-                    widget.setDate(date)
+                    date = QDate.fromString(field['value'], 'YYYY-MM-dd')
+                    if date:
+                        widget.setDate(date)
+                    else:
+                        widget.clear()
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
