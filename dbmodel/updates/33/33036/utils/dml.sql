@@ -75,3 +75,9 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2820, 'gw_fct_getmessage', 'utils', 'function', null, null, null,'Function that manages error messages', 'role_basic',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (120,'Flow trace','om','ud') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (121,'Flow exit','om','ud') ON CONFLICT (id) DO NOTHING;
