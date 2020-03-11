@@ -181,7 +181,9 @@ class AddLayer(object):
                     elif 'category_field' in data[k] and data[k]['category_field']:
                         cat_field = data[k]['category_field']
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
-                        self.categoryze_layer(v_layer, cat_field, size)
+                        color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
+                                        'EXISTS': QColor(240, 150, 0)}
+                        self.categoryze_layer(v_layer, cat_field, size, color_values)
                     temp_layers_added.append(v_layer)
                     v_layer.setOpacity(0.7)
                     self.iface.setActiveLayer(v_layer)
@@ -195,7 +197,7 @@ class AddLayer(object):
                 self.controller.set_layer_visible(lyr)
 
 
-    def categoryze_layer(self, layer, cat_field, size):
+    def categoryze_layer(self, layer, cat_field, size, color_values, unique_values=None):
         """
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
         :param cat_field: Field to categorize (string)
@@ -205,9 +207,10 @@ class AddLayer(object):
         # get unique values
         fields = layer.fields()
         fni = fields.indexOf(cat_field)
-        unique_values = layer.dataProvider().uniqueValues(fni)
+        if not unique_values:
+            unique_values = layer.dataProvider().uniqueValues(fni)
         categories = []
-        color_values={'NEW':QColor(0, 255, 0), 'DUPLICATED':QColor(255, 0, 0), 'EXISTS':QColor(240, 150, 0)}
+
         for unique_value in unique_values:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
