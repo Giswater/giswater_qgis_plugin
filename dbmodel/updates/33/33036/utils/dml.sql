@@ -65,6 +65,7 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2818, 'gw_fct_admin_schema_manage_triggers', 'utils', 'function', null, null, null,'Function to activate custom foreign keys of bbdd', 'role_admin',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
 --2002/03/09
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
 isdeprecated, istoolbox, alias, isparametric)
@@ -76,3 +77,9 @@ VALUES (120,'Flow trace','om','ud') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (121,'Flow exit','om','ud') ON CONFLICT (id) DO NOTHING;
+
+--2002/03/11
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2822, 'gw_fct_manage_roles', 'utils', 'function', null, null, null,'Function to manage system roles', 'role_admin',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
