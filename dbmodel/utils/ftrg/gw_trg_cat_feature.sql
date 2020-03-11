@@ -107,7 +107,7 @@ BEGIN
             DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
         END IF;
 
-		INSERT INTO audit_cat_param_user(id, formname, description, sys_role_id, label, isenabled, layout_id, layout_order, 
+		INSERT INTO audit_cat_param_user(id, formname, descript, sys_role_id, label, isenabled, layout_id, layout_order, 
 		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated)
 		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layout_order,
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo',true,false)

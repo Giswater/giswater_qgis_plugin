@@ -34,12 +34,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_a
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"tooltip", "dataType":"text"}}$$);
 
 
-CREATE TABLE config_api_form_actions
-(
+CREATE TABLE config_api_form_actions(
   actionname text primary key,
   label text,
-  tooltip text  );  tooltip text  );  tooltip text  );
-
+  tooltip text); 
 
   
 --2020/03/11

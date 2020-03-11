@@ -12,3 +12,4 @@
 - New constraint unique on man_addields_parameter (param_name, cat_feature_id)
 - Huge enhancement for go2epa - ws
 - New function to manage error messages
+- Harmonize tabLabel and tooltip for the whole functions and tables of ddbb-api

@@ -71,7 +71,7 @@ BEGIN
 		--untill 3.2.004 is not possible
 		--PERFORM gw_fct_admin_schema_dropdeprecated_rel();	
 		
-		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
+		INSERT INTO config_param_system (parameter, value, datatype, context, descript, project_type, label, isdeprecated) 
 		VALUES ('admin_superusers', v_superusers ,'json','system', 'Basic information about superusers for this schema','utils', 'Schema manager:', false);
 		
 		
@@ -118,7 +118,7 @@ BEGIN
 		
 		
 		-- inserting on config_param_system table
-		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
+		INSERT INTO config_param_system (parameter, value, datatype, context, descript, project_type, label, isdeprecated) 
 		VALUES ('schema_manager', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
 
 		-- fk from utils schema

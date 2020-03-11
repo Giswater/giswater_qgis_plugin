@@ -319,7 +319,7 @@ IF v_multi_create IS TRUE THEN
 		END IF;
 
 		IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM audit_cat_param_user) THEN
-			INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  layout_id, layout_order, 
+			INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layout_id, layout_order, 
 	      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id )
 			VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 			 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
@@ -634,7 +634,7 @@ ELSE
 			v_param_user_id=1;
 		END IF;
 
-		INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, label,  layout_id, layout_order, 
+		INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layout_id, layout_order, 
       	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id)
 		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
 		concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 

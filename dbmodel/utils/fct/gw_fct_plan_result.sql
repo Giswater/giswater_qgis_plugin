@@ -20,20 +20,20 @@ SELECT SCHEMA_NAME.gw_fct_plan_result($${
 */
 
 DECLARE 
-project_type_aux 	text;
-v_project_type		text;
-v_version		text;
-id_last 		integer;
-v_saveondatabase	boolean;
-v_result_id		text;
-v_result_type		integer;
-v_coefficient		float;
-v_descript		text;
-v_return		json;
+project_type_aux text;
+v_project_type text;
+v_version text;
+id_last integer;
+v_saveondatabase boolean;
+v_result_id text;
+v_result_type integer;
+v_coefficient float;
+v_descript text;
+v_return json;
+
 BEGIN 
 
     SET search_path = "SCHEMA_NAME", public;
-
 
 	-- getting input data 	
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
