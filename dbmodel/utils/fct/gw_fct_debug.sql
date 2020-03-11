@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2824
 
-CREATE OR REPLACE FUNCTION ws.gw_fct_debug( p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_debug( p_data json)
   RETURNS json AS
 $BODY$
 
+
 /*
-SELECT ws.gw_fct_debug($${"data":{"message":"The values for arc, node, connec are:", "variables":"value"}}$$)
-SELECT ws.gw_fct_debug($${"data":{"message":"The values for arc, node, connec are:", "variables":"value"}}$$)
+SELECT SCHEMA_NAME.gw_fct_debug($${"data":{"debug":{"status":false, "mode":"NOTICE"}, "message":"The values for arc, node, connec are:", "variables":"value"}}$$)
 */
 
 DECLARE
@@ -20,29 +20,28 @@ DECLARE
     v_type text;
     v_message text;
     v_variables text;
-    v_debug boolean;
+    v_debug json;
 
 BEGIN
     
-	SET search_path = "ws", public; 
+	SET search_path = "SCHEMA_NAME", public; 
     
 	-- Get parameters from input json
    	v_type = (SELECT (p_data::json->>'data')::json->>'type');
 	v_message = (SELECT (p_data::json->>'data')::json->>'message');
 	v_variables = (SELECT (p_data::json->>'data')::json->>'variables');
+	v_debug = (SELECT (p_data::json->>'data')::json->>'debug');
 
-	-- Get parameters from config table
-	v_debug = (SELECT value FROM config_param_user WHERE parameter = 'edit_grafanalytics_lrs_debug' AND cur_user = current_user);
-	v_debug =  true;
-
-	IF v_debug THEN
+	-- todo: implement diferent status of debug ('NOTICE', 'NOTIFY', 'ONTRANSCTION'). Last one using another database to commit steps intro one transaction in order to enhance debug
+	
+	-- start process
+	IF (v_debug ->>'status')::boolean IS TRUE THEN
 	    	RAISE NOTICE ' % ', concat(v_message,' ',v_variables);
 	END IF;
 
         --  Return
-        RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Debug passed successfully"}, "version":"'||v_version||'","body":{"form":{}}}}')::json;
+        RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Debug passed successfully"}}')::json;
             
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

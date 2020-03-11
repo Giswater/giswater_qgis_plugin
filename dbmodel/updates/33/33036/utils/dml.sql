@@ -91,3 +91,14 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, i
 isdeprecated, istoolbox, alias, isparametric)
 VALUES (2824, 'gw_fct_debug', 'utils', 'function', null, null, null,'Function to manage debugs', 'role_edit',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2826, 'gw_fct_grafanalytics_lrs', 'utils', 'function', null, null, null,'Grafanalytics using LRS', 'role_edit',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_param_user(id, formname, descript, sys_role_id, label, isenabled, layoutname, layout_order, 
+project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, vdefault)
+VALUES ('debug_mode',null,'Variable to configure the debug mode of user',
+'role_basic', 'Debug mode:', true, null, null,'utils',false, false, 'json','text',true, false, '{"status":FALSE, "mode":"NOTICE"}');
+
