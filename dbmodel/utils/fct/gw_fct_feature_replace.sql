@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2714
 
-
 --DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_feature_replace(json);
 
 
@@ -72,6 +71,8 @@ DECLARE
 	v_level integer;
 	v_status text;
 	v_message text;
+	rec_addfields record;
+	v_count integer;
 
 BEGIN
 
@@ -192,6 +193,9 @@ BEGIN
 				0, v_state_type, v_the_geom);
 			END IF;
 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (43, v_result_id, concat('Insert new feature into node table.'));
+
 		ELSIF v_feature_type ='connec' THEN
 
 			IF v_project_type='WS' then
@@ -206,9 +210,15 @@ BEGIN
 				v_state_type, v_the_geom,v_workcat_id_end, v_verified_id, v_inventory);
 			END IF;	
 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (43, v_result_id, concat('Insert new feature into connec table.'));
+
 		ELSIF v_feature_type = 'gully' THEN
 			INSERT INTO gully (gully_id, code, gully_type,gratecat_id, sector_id, dma_id, expl_id, state, state_type, the_geom,workcat_id, verified, inventory) 
 			VALUES (v_id, v_code, v_old_featuretype, v_old_featurecat, v_sector_id, v_dma_id,v_expl_id, 0, v_state_type, v_the_geom, v_workcat_id_end, v_verified_id, v_inventory);
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (43, v_result_id, concat('Insert new feature into gully table.'));
 		END IF;
 
 		-- inserting new feature on table man_table
@@ -219,6 +229,9 @@ BEGIN
 			v_query_string_insert='INSERT INTO '||v_man_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (43, v_result_id, concat('Insert new feature id into ',v_man_table,'.'));
+
 		END IF;
 		
 		-- inserting new feature on table epa_table
@@ -226,6 +239,10 @@ BEGIN
 			SELECT epa_table INTO v_epa_table FROM node_type WHERE id=v_old_featuretype;		
 			v_query_string_insert='INSERT INTO '||v_epa_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (43, v_result_id, concat('Insert new feature id into ',v_epa_table,'.'));
+
 		END IF;
 		
 		-- updating values on feature parent table from values of old feature
@@ -246,7 +263,9 @@ BEGIN
 			v_query_string_update= 'UPDATE '||v_feature_type||' set '||v_column||'='||quote_literal(v_value)||' where '||v_id_column||'='||quote_literal(v_id)||';';
 			IF v_query_string_update IS NOT NULL THEN
 				EXECUTE v_query_string_update; 
-				raise notice 'v_query_string_update--> parent,%',v_query_string_update;
+	
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (43, v_result_id, concat('Copy value of ',v_column,' from old feature into new one: ',v_value,'.'));
 			END IF;
 		END LOOP;
 
@@ -266,8 +285,11 @@ BEGIN
 				v_query_string_update= 'UPDATE '||v_man_table||' set '||v_column||'='||quote_literal(v_value)||' where node_id='||quote_literal(v_id)||';';
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update; 
-					raise notice 'v_query_string_update --> man_table,%',v_query_string_update;
+
+					INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+					VALUES (43, v_result_id, concat('Copy value of ',v_column,' from old feature into new one: ',v_value,'.'));
 				END IF;
+				
 			END LOOP;
 		END IF;
 		
@@ -286,11 +308,13 @@ BEGIN
 				v_query_string_update= 'UPDATE '||v_epa_table||' set '||v_column||'='||quote_literal(v_value)||' where '||v_id_column||'='||quote_literal(v_id)||';';
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update; 
-					raise notice 'v_query_string_update --> epa,%',v_query_string_update;
+
+					INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+					VALUES (43, v_result_id, concat('Copy value of ', v_column,' from old feature into new one: ',v_value,'.'));
 				END IF;
 			END LOOP;
 		END IF;
-	
+		
 		-- taking values from old feature (from man_addfields table)
 		INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 		SELECT 
@@ -299,11 +323,25 @@ BEGIN
 		value_param
 		FROM man_addfields_value WHERE feature_id=v_old_feature_id;
 
+		IF (SELECT count(parameter_id) FROM man_addfields_value WHERE feature_id = v_id::text) > 0THEN
+			FOR rec_addfields IN (SELECT parameter_id, value_param FROM man_addfields_value WHERE feature_id = v_id)
+			LOOP
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (43, v_result_id, concat('Copy value of addfield ',rec_addfields.parameter_id,' old feature into new one: ',rec_addfields.value_param,'.'));
+			END LOOP;
+		END IF;
 
 		--Moving elements from old feature to new feature
 		IF v_keep_elements IS TRUE THEN
 			v_element_table:=concat('element_x_',v_feature_type);
-			EXECUTE 'UPDATE '||v_element_table||' SET '||v_id_column||'='''||v_id||''' WHERE '||v_id_column||'='''||v_old_feature_id||''';';		
+			EXECUTE 'SELECT count(element_id) FROM '||v_element_table||' WHERE '||v_id_column||'='''||v_old_feature_id||''';'
+			INTO v_count;
+			IF v_count > 0 THEN
+				v_element_table:=concat('element_x_',v_feature_type);
+				EXECUTE 'UPDATE '||v_element_table||' SET '||v_id_column||'='''||v_id||''' WHERE '||v_id_column||'='''||v_old_feature_id||''';';	
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (43, v_result_id, concat('Assign ',v_count,' elements to the new feature.'));
+			END IF;	
 		END IF;
 	
 	
@@ -312,16 +350,21 @@ BEGIN
 		IF v_feature_type='node' THEN
 			UPDATE config_param_system SET value =concat('{"activated":','false',', "value":',v_arc_searchnodes_value,'}') 
 			WHERE parameter='arc_searchnodes';
+
 		END IF;
 
 			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=v_old_feature_id
 			LOOP
 				UPDATE arc SET node_1=v_id where arc_id=rec_arc.arc_id;
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (43, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
 			END LOOP;
 		
 			FOR rec_arc IN SELECT arc_id FROM arc WHERE node_2=v_old_feature_id
 			LOOP
 				UPDATE arc SET node_2=v_id where arc_id=rec_arc.arc_id;
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (43, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
 			END LOOP;
 		END IF;
 		
@@ -331,16 +374,32 @@ BEGIN
 		EXECUTE 'UPDATE '||v_feature_type||' SET state=0, workcat_id_end='''||v_workcat_id_end||''', enddate='''||v_enddate||''', state_type='||v_state_type||'
 		WHERE '||v_id_column||'='''||v_old_feature_id||''';';
 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+		VALUES (43, v_result_id, concat('Downgrade old feature, set state: 0, workcat_id_end:  ',v_workcat_id_end,', v_enddate: ',v_enddate,'.'));
+
 		IF v_id IS NOT NULL THEN
 			EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (43, v_result_id, concat('Update new feature, set state: 1, workcat_id:  ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
 		END IF;
 		
 		--reconect existing link to the new feature
 		IF v_feature_type='connec' OR v_feature_type='gully' THEN
-			UPDATE link SET feature_id = v_id WHERE feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1;
-			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+			SELECT count(link_id) INTO v_count FROM link WHERE (eature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1) OR
+			(exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1);
+			IF v_count > 0 THEN
+				UPDATE link SET feature_id = v_id WHERE feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1;
+				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (43, v_result_id, concat('Reconnect ',v_count,' links.'));
+			END IF;
 		ELSIF v_feature_type='node' THEN
-			UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+			SELECT count(link_id) INTO v_count FROM link WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+			IF v_count > 0 THEN
+				UPDATE link SET exit_id = v_id WHERE exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1;
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (43, v_result_id, concat('Reconnect ',v_count,' links.'));
+			END IF;
 		END IF;
 
 		-- enable config parameter arc_searchnodes AND connec proximity
@@ -349,19 +408,6 @@ BEGIN
 			UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') 
 			WHERE parameter='connec_proximity';
 		END IF;
-
-
-	-- manage log (fprocesscat 43)
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Insert new feature into parent table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Copy parent, man_table and epa information -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Manage feature addfields -> Done'));
-	IF v_keep_elements IS TRUE THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Assign elements to the new feature -> Done'));
-	END IF;
-	IF v_feature_type = 'node' THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Reconnect arcs -> Done'));
-	END IF;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('Process finished'));
 
 -- get log (fprocesscat 43)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
