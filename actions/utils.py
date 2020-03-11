@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import Qgis
+
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBar, QToolButton
@@ -12,6 +14,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy, QTo
 import csv
 import json
 import os
+import platform
 from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
@@ -430,6 +433,8 @@ class Utils(ParentAction):
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
         extras += f', "initProject":false'
+        extras += f',"qgisVersion":"{Qgis.QGIS_VERSION}"'
+        extras += f',"osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:

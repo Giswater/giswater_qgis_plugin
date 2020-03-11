@@ -12,14 +12,16 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QAppli
 from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 
-import json
-from json import JSONDecodeError
+
 import configparser
+import json
 import os.path
+import platform
 import sys
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+from json import JSONDecodeError
 
 from . import utils_giswater
 from .actions.add_layer import AddLayer
@@ -1148,6 +1150,8 @@ class Giswater(QObject):
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
         extras += f', "initProject":true'
+        extras += f',"qgisVersion":"{Qgis.QGIS_VERSION}"'
+        extras += f',"osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:
