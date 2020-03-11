@@ -22,7 +22,7 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitatio
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
 
-SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocess	cat_id=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
 
@@ -31,7 +31,7 @@ SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=c
 
 DECLARE
 v_acc_value numeric;
-v_affectedroSCHEMA_NAME numeric; 
+v_affectedrows numeric; 
 v_feature record;
 v_expl json;
 v_fprocesscat_id integer;
@@ -67,6 +67,8 @@ v_result_fields json;
 v_result_polygon json;
 v_result text;
 v_version text;
+
+v_debug json;
 
 BEGIN
 
@@ -126,7 +128,7 @@ BEGIN
 	IF v_expl IS NOT NULL THEN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN
-		(SELECT distinct(macroexpl_id) FROM SCHEMA_NAME.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
+		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
 	-- water:  dry (0) wet (1)
@@ -155,7 +157,7 @@ BEGIN
 	
 	EXECUTE 'select array_agg(a.node_id) from(
 	SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
-	FROM SCHEMA_NAME.config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
+	FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
 	into v_node_list;
 			
 	-- close boundary conditions, setting flag=1 for all nodes that fits on graf delimiters
@@ -190,7 +192,12 @@ BEGIN
 		v_header_arc = v_feature.arc_id::text;
 		v_header_node = v_feature.node_1::text;
 
+		-------------------- original mode
 		raise notice 'v_header_arc,v_last_arc,%,%',v_header_arc,v_last_arc;
+
+		-------------------- proposed mode
+		PERFORM gw_fct_debug((concat('{"data":{"message":"The values header_arc and last_arc are:", "variables":"',quote_nullable(v_header_arc),',',quote_nullable(v_last_arc),'"}}'))::json);
+				
 
 		EXIT WHEN v_feature.node_1 IS NULL;
 	
@@ -228,18 +235,19 @@ BEGIN
 			
 			v_acc_value = v_acc_value + v_current_value;
 			
-		IF v_header_arc IS NOT NULL THEN
-			EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, '||v_end_node::text||', the_geom, 
-			concat (''{"value":"'','||v_acc_value||',''", "header":"'||v_feature.node_1||'"}'')
-			FROM v_edit_node WHERE node_id= '''||v_end_node||''';';
-	
-			EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = '||v_acc_value||'
-			FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id and a.arc_id='''||v_header_arc::text||''';';
-			
-		ELSE
-			EXIT;
-END IF;
+			IF v_header_arc IS NOT NULL THEN
+				EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
+				SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, '||v_end_node::text||', the_geom, 
+				concat (''{"value":"'','||v_acc_value||',''", "header":"'||v_feature.node_1||'"}'')
+				FROM v_edit_node WHERE node_id= '''||v_end_node||''';';
+		
+				EXECUTE 'UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1, value = '||v_acc_value||'
+				FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id and a.arc_id='''||v_header_arc::text||''';';
+				
+			ELSE
+				EXIT;
+			END IF;
+
 			SELECT count(arc_id) INTO v_count_feature FROM temp_anlgraf WHERE node_1::text = v_end_node AND arc_id::text !=v_header_arc;
 			IF v_count_feature >1 THEN		
 				raise notice 'v_bifurcation,%',v_bifurcation;
@@ -292,9 +300,9 @@ END IF;
 			END IF;
 		
 					
-			GET DIAGNOSTICS v_affectedroSCHEMA_NAME =row_count;	
+			GET DIAGNOSTICS v_affectedrows =row_count;	
 			EXIT WHEN v_header_arc = NULL;
-			EXIT WHEN v_affectedroSCHEMA_NAME = 0;
+			EXIT WHEN v_affectedrows = 0;
 
 		END LOOP;
 			
@@ -304,7 +312,7 @@ END IF;
 	--set header nodes value to 0, insert missing headers into anl_node
 	EXECUTE 'select string_agg(quote_literal(a.node_id),'','') from(
 	SELECT json_array_elements_text((value::json->>''headers'')::json)::json->>''node'' AS node_id 
-	FROM SCHEMA_NAME.config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
+	FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
 	into v_node_string;
 	
 	EXECUTE 'DELETE FROM anl_node WHERE fprocesscat_id = '||v_fprocesscat_id||' AND node_id::text IN ('||v_node_string||');';
@@ -375,9 +383,9 @@ END IF;
 return ('{"status":"Accepted"}')::json;
 
  --Exception handling
- EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+ --EXCEPTION WHEN OTHERS THEN
+--	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+--	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
