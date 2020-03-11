@@ -54,12 +54,6 @@ class ChangeElemType(ParentMapTool):
         if node_node_type_new != "null":
                     
             if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (project_type == 'ud'):
-                sql = (f"SELECT man_table FROM node_type "
-                       f"WHERE id = '{old_node_type}'")
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-
                 # Update field 'nodecat_id'
                 sql = (f"UPDATE v_edit_node SET nodecat_id = '{node_nodecat_id}' "
                        f"WHERE node_id = '{self.node_id}'")
@@ -71,8 +65,7 @@ class ChangeElemType(ParentMapTool):
                     self.controller.execute_sql(sql)
                     
                 # Set active layer
-                viewname = f"v_edit_{row[0]}"
-                layer = self.controller.get_layer_by_tablename(viewname)
+                layer = self.controller.get_layer_by_tablename('v_edit_node')
                 if layer:
                     self.iface.setActiveLayer(layer)
                 message = "Values has been updated"
