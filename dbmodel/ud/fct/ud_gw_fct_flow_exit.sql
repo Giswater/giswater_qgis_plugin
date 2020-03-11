@@ -47,13 +47,6 @@ BEGIN
     -- select version
     SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
-    --select default geometry style
-    SELECT regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmllinepath FROM config_param_user 
-    WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
-
-    SELECT regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmlpointpath FROM config_param_user 
-    WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
-
      -- Compute the tributary area using recursive function
     EXECUTE 'SELECT gw_fct_flow_exit_recursive($$'||p_data||'$$);'
     INTO v_result_json;
@@ -63,7 +56,7 @@ BEGIN
 IF v_audit_result is null THEN
         v_status = 'Accepted';
         v_level = 3;
-        v_message = 'Arc fusion done successfully';
+        v_message = 'Flow exit done successfully';
     ELSE
 
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
@@ -74,46 +67,16 @@ IF v_audit_result is null THEN
 
       v_result_info := COALESCE(v_result, '{}'); 
       v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
-
-      --points
-      v_result = null;
-      SELECT jsonb_agg(features.feature)  INTO v_result
-      FROM (
-      SELECT jsonb_build_object(
-       'type',       'Feature',
-      'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-      'properties', to_jsonb(row) - 'the_geom'
-      ) AS feature
-      FROM (SELECT id, node_id, node_type, expl_id, context, cur_user, the_geom
-      FROM  anl_flow_node WHERE cur_user="current_user"() AND context='Flow exit'
-      UNION
-      SELECT id, node_id, nodecat_id, expl_id, 'Flow exit', cur_user, the_geom
-      FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id = 121) row) features;
-      
-      v_result := COALESCE(v_result, '{}'); 
-      v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result,',"category_field":"node_type","size":2}'); 
-
-      v_result = null;
-      
-      SELECT jsonb_agg(features.feature) INTO v_result
-      FROM (
-      SELECT jsonb_build_object(
-       'type',       'Feature',
-      'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-      'properties', to_jsonb(row) - 'the_geom'
-      ) AS feature
-      FROM (SELECT id, arc_id, arc_type, expl_id, context, cur_user, the_geom
-      FROM  anl_flow_arc WHERE cur_user="current_user"() AND context='Flow exit' ) row) features;
-
-      v_result := COALESCE(v_result, '{}'); 
-      v_result_line = concat ('{"geometryType":"Point", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
+    
       v_result_polygon = '{"geometryType":"", "features":[]}';
+      v_result_line = '{"geometryType":"", "features":[]}';
+      v_result_point = '{"geometryType":"", "features":[]}';
 
   --  Return
       RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||
                ',"data":{ "info":'||v_result_info||','||
-                  '"setVisibleLayers":[]'||','||
+                  '"setVisibleLayers":["v_anl_flow_arc","v_anl_flow_node","v_anl_flow_connec","v_anl_flow_gully"]'||','||
                   '"point":'||v_result_point||','||
                   '"line":'||v_result_line||','||
                   '"polygon":'||v_result_polygon||'}'||
