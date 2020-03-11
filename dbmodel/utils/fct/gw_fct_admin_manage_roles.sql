@@ -4,8 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2810
-
+--FUNCTION CODE: 2822
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_manage_roles(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_roles(p_data json)
   RETURNS json AS

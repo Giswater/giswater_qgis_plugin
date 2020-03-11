@@ -9,6 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --11/03/2020
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
-VALUES (2810, 'gw_fct_admin_manage_roles', 'utils', 'function', 'Function to system roles of giswater: role_basic, role_om, role_edit, role_epa, role_master, role_admin',
+VALUES (2822, 'gw_fct_admin_manage_roles', 'utils', 'function', 'Function to system roles of giswater: role_basic, role_om, role_edit, role_epa, role_master, role_admin',
 'role_admin',FALSE, FALSE,FALSE)
 ON CONFLICT (id) DO NOTHING;
