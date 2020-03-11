@@ -296,7 +296,8 @@ BEGIN
          
 --        Get tabs for form
 --------------------------------
-        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabLabel", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tabactions as tabActions 
+		FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
             INTO form_tabs
             USING v_tablename;
 
@@ -304,11 +305,17 @@ BEGIN
         IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
 		-- Get form_tabs
 		IF v_role = 'role_basic' OR v_role = 'role_om' THEN
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", ''[{"actionName":"actionZoom", "actionTooltip":"actionZoom",  "disabled":false},{"actionName":"actionCentered", "actionTooltip":"actionCentered",  "disabled":false},{"actionName":"actionZoomOut", "actionTooltip":"actionZoomOut",  "disabled":false},{"actionName":"actionSection", "actionTooltip":"actionSection",  "disabled":false},{"actionName":"actionLink", "actionTooltip":"actionLink",  "disabled":false},{"actionName":"actionHelp", "actionTooltip":"actionHelp",  "disabled":false}]''::json as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+			''[{"actionName":"actionZoom", "actionTooltip":"actionZoom",  "disabled":false},{"actionName":"actionCentered", "actionTooltip":"actionCentered", 
+			"disabled":false},{"actionName":"actionZoomOut", "actionTooltip":"actionZoomOut",  "disabled":false},{"actionName":"actionSection", "actionTooltip":"actionSection",  
+			"disabled":false},{"actionName":"actionLink", "actionTooltip":"actionLink",  "disabled":false},{"actionName":"actionHelp", "actionTooltip":"actionHelp", ç
+			"disabled":false}]''::json as tabActions 
+			FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
 				INTO form_tabs
 				USING v_table_parent;
 		ELSE
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+			tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
 				INTO form_tabs
 				USING v_table_parent;
 		END IF;

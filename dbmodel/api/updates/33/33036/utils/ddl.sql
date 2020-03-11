@@ -38,4 +38,22 @@ CREATE TABLE config_api_form_actions
 (
   actionname text primary key,
   label text,
-  tooltip text  );
+  tooltip text  );  tooltip text  );  tooltip text  );
+
+
+  
+--2020/03/11
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_tabs", "column":"tooltip"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_tabs", "column":"tabtext", "newName":"tooltip"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_tabs", "column":"tablabel", "newName":"label"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_groupbox", "column":"label", "newName":"label_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"layoutname", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"label", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"tooltip", "dataType":"text"}}$$);
+
+UPDATE config_api_form_groupbox SET layoutname = layout_id;
+UPDATE config_api_form_groupbox SET label = label_;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_groupbox", "column":"layout_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_groupbox", "column":"label_"}}$$);

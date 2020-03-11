@@ -636,7 +636,7 @@ BEGIN
 			v_tab.tabactions = '{}';
 		END IF;
 
-		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction',v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
+		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 'tabFunction',v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs || v_tabaux::text;
 
@@ -700,7 +700,7 @@ BEGIN
 				v_tab.tabactions = '{}';
 			END IF;
 
-			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active', v_activefilestab);
+			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active', v_activefilestab);
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 
 

@@ -104,7 +104,8 @@ BEGIN
 
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabName', rec_tab.tabname::TEXT);
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tableName', v_selector);
-		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabLabel', rec_tab.tablabel::TEXT);
+		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabLabel', rec_tab.label::TEXT);
+		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tooltip', rec_tab.tooltip::TEXT);
 		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'selectorType', rec_tab.formname::TEXT);
 
 		-- Create tabs array

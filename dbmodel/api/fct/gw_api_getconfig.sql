@@ -281,7 +281,8 @@ BEGIN
         -- Add tab name to json
         tabUser := ('{"fields":' || fields || '}')::json;
         tabUser := gw_fct_json_object_set_key(tabUser, 'tabName', 'tabUser'::TEXT);
-        tabUser := gw_fct_json_object_set_key(tabUser, 'tabLabel', rec_tab.tablabel);
+        tabUser := gw_fct_json_object_set_key(tabUser, 'tabLabel', rec_tab.label);
+        tabUser := gw_fct_json_object_set_key(tabUser, 'tooltip', rec_tab.label);
         tabUser := gw_fct_json_object_set_key(tabUser, 'active', v_active::TEXT);
 
         -- Create tabs array
@@ -326,8 +327,10 @@ BEGIN
         -- Add tab name to json
         v_tabadmin := ('{"fields":' || fields || '}')::json;
         v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabName', 'tabAdmin'::TEXT);
-        v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabLabel', rec_tab.tablabel);
+        v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabLabel', rec_tab.label);
+        v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tooltip', rec_tab.tooltip);
 
+		
         v_formtabs := v_formtabs ||','|| v_tabadmin::text;
         
     END IF;
