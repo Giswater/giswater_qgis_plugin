@@ -104,9 +104,11 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                         values = self.needed_layers[layer.name()]
                         self.add_layer.categoryze_layer(layer, values['field_cat'], values['size'], values['color_values'])
 
+            self.layers_added = []
+
             # Refresh map canvas
             self.refresh_map_canvas()
-             
+
             # Set action pan   
             self.set_action_pan()
 
