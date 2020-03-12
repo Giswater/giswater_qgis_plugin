@@ -970,22 +970,22 @@ class ParentDialog(QDialog):
         # Enable/Disable buttons
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
         btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
-        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
         btn_open_gallery.setEnabled(False)
         btn_open_visit_doc.setEnabled(False)
-        btn_open_visit_event.setEnabled(True)
 
         # Get selected row
-        selected_list = self.tbl_event.selectionModel().selectedRows()
+        selected_list = self.tbl_visit.selectionModel().selectedRows()
         selected_row = selected_list[0].row()
-        self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
-        self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
-        self.parameter_id = self.tbl_event.model().record(selected_row).value("parameter_id")
+        self.visit_id = self.tbl_visit.model().record(selected_row).value("visit_id")
+        self.event_id = self.tbl_visit.model().record(selected_row).value("emb_imatge")
+        self.parameter_id = self.tbl_visit.model().record(selected_row).value("parameter_id")
 
-        sql = ("SELECT gallery, document"
+        sql = ("SELECT emb_imatge"
                " FROM " + table_name + ""
-               " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+               " WHERE emb_imatge IS TRUE AND visit_id = '" + str(self.visit_id) + "'")
         row = self.controller.get_row(sql)
+        self.controller.log_info(str(sql))
+        self.controller.log_info(str(row))
         if not row:
             return
 
@@ -994,8 +994,8 @@ class ParentDialog(QDialog):
             btn_open_gallery.setEnabled(True)
 
         # If document 'True' or 'False'
-        if str(row[1]) == 'True':
-            btn_open_visit_doc.setEnabled(True)
+        # if str(row[1]) == 'True':
+        #     btn_open_visit_doc.setEnabled(True)
 
 
     def open_gallery(self):
@@ -1318,35 +1318,26 @@ class ParentDialog(QDialog):
         
         # Get widgets
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        event_type = self.dialog.findChild(QComboBox, "event_type")
-        event_id = self.dialog.findChild(QComboBox, "event_id")
+        self.cmb_visit_class = self.dialog.findChild(QComboBox, "cmb_visit_class")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
         date = QDate.currentDate()
         self.date_event_to.setDate(date)
 
-        btn_open_visit = self.dialog.findChild(QPushButton, "btn_open_visit")
-        btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
         btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
-        btn_open_visit_event = self.dialog.findChild(QPushButton, "btn_open_visit_event")
 
         btn_open_gallery.setEnabled(False)
         btn_open_visit_doc.setEnabled(False)
-        btn_open_visit_event.setEnabled(False)
-        
+
         # Set signals
         widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
-        event_type.activated.connect(partial(self.set_filter_table_event, widget))
-        event_id.activated.connect(partial(self.set_filter_table_event2, widget))
+        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
 
-        btn_open_visit.clicked.connect(self.open_visit)
-        btn_new_visit.clicked.connect(partial(self.new_visit, table_name))
         btn_open_gallery.clicked.connect(self.open_gallery)
         btn_open_visit_doc.clicked.connect(self.open_visit_doc)
-        btn_open_visit_event.clicked.connect(self.open_visit_event)
 
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
@@ -1358,23 +1349,14 @@ class ParentDialog(QDialog):
         if feature_key == 'gully_id':
             feature_type = 'GULLY'
 
-        table_name_event_id = "om_visit_parameter"
-        
-        # Fill ComboBox event_id
-        sql = ("SELECT DISTINCT(id)"
-               " FROM " + self.schema_name + "." + table_name_event_id + ""
-               " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
-               " ORDER BY id")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dialog, "event_id", rows)
 
-        # Fill ComboBox event_type
-        sql = ("SELECT DISTINCT(parameter_type)"
-               " FROM " + self.schema_name + "." + table_name_event_id + ""
-               " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
-               " ORDER BY parameter_type")
+        # Fill ComboBox cmb_visit_class
+        sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type.lower() + ""
+               " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_gully.class_id"
+               " WHERE " + feature_key + " IS NOT NULL")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dialog, "event_type", rows)
+        utils_giswater.set_item_data(self.cmb_visit_class, rows, 1)
 
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
@@ -1383,11 +1365,13 @@ class ParentDialog(QDialog):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
             return
-        filter_ += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
+        # filter_ += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
+        filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
-        self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
+        # self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
+        self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
 
     def set_filter_table_event(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
@@ -1401,44 +1385,15 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message)
             return
 
-        # Cascade filter
-        table_name_event_id = "om_visit_parameter"
-        event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
-        
-        # Get type of feature
-        feature_key = self.controller.get_layer_primary_key()
-        if feature_key == 'node_id':
-            feature_type = 'NODE'
-        if feature_key == 'connec_id':
-            feature_type = 'CONNEC'
-        if feature_key == 'arc_id':
-            feature_type = 'ARC'
-        if feature_key == 'gully_id':
-            feature_type = 'GULLY'
-
-        # Fill ComboBox event_id
-        sql = ("SELECT DISTINCT(id)"
-               " FROM " + self.schema_name + "." + table_name_event_id + ""
-               " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')")
-        if event_type_value != 'null':
-            sql += " AND parameter_type = '" + event_type_value + "'"
-        sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dialog, "event_id", rows)
-        # End cascading filter
-
         # Set filter to model
         expr = self.field_id + " = '" + self.id + "'"
-        expr += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
+        # expr += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
+        expr += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
 
         # Get selected values in Comboboxes
-        event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
-        if event_type_value != 'null':
-            expr+= " AND parameter_type = '" + event_type_value + "'"
-        event_id = utils_giswater.getWidgetText(self.dialog, "event_id")
-        if event_id != 'null': 
-            expr += " AND parameter_id = '" + event_id + "'"
-            
+        visit_class_value = utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)
+        if str(visit_class_value) != 'null':
+            expr += " AND class_id::text = '" + str(visit_class_value) + "'"
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
@@ -1460,13 +1415,9 @@ class ParentDialog(QDialog):
         expr += " AND tstamp >= '" + date_from + "' AND tstamp <= '" + date_to + "'"
 
         # Get selected values in Comboboxes
-        event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
-        if event_type_value != 'null':
-            expr += " AND parameter_type = '" + event_type_value + "'"
-        event_id = utils_giswater.getWidgetText(self.dialog, "event_id")
-        if event_id != 'null':
-            expr+= " AND parameter_id = '" + event_id + "'"
-
+        visit_class_value = utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)
+        if str(visit_class_value) != 'null':
+            expr += " AND class_id::text = '" + str(visit_class_value) + "'"
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()

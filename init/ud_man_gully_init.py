@@ -64,7 +64,7 @@ class ManGullyDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_gully") 
+        self.tbl_visit = self.dialog.findChild(QTableView, "tbl_visit_gully")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
@@ -151,10 +151,10 @@ class ManGullyDialog(ParentDialog):
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
         
-        table_event_gully = "v_ui_om_visit_x_gully"    
-        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_gully, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_visit_event)
-        self.set_configuration(self.tbl_event, table_event_gully)
+        table_event_gully = "ve_visit_emb_neteja"
+        self.fill_tbl_event(self.tbl_visit, self.schema_name + "." + table_event_gully, self.filter)
+        self.tbl_visit.doubleClicked.connect(self.open_visit_event)
+        self.set_configuration(self.tbl_visit, table_event_gully)
 
 
     def fill_tab_custom_fields(self):
