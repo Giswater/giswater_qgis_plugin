@@ -135,7 +135,7 @@ BEGIN
 	ELSIF v_state_node=0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 		"data":{"error":"1052", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
-	END IF;
+	ELSE
 
 	-- Control if node divides arc
 	IF v_isarcdivide=TRUE THEN 
@@ -733,7 +733,7 @@ BEGIN
 		END IF;
 
 	END IF;
-
+END IF;
 	
 -- get results
 	-- info
