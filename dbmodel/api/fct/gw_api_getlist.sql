@@ -428,7 +428,7 @@ BEGIN
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 
 	-- getting filter fields
-	SELECT gw_api_get_formfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device)
+	SELECT gw_api_get_formfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;
 
 		--  setting values of filter fields
@@ -487,7 +487,7 @@ BEGIN
 	END IF;
 
 	-- getting footer buttons
-	SELECT gw_api_get_formfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device)
+	SELECT gw_api_get_formfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_footer_fields;
 
 	FOREACH aux_json IN ARRAY v_footer_fields
@@ -499,7 +499,7 @@ BEGIN
 
 
 	raise notice 'v_tablename -->> %',v_tablename;
-   	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
+   	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields_;
 		
 		

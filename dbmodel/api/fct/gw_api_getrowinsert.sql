@@ -82,7 +82,7 @@ BEGIN
 		raise notice 'Configuration fields are defined on config_api_layer_field';
 		
 		-- Call the function of feature fields generation
-		SELECT gw_api_get_formfields( v_tablename, 'listrow', null, null, null, null, null, 'INSERT', null, v_device) INTO v_fields; 
+		SELECT gw_api_get_formfields( v_tablename, 'listrow', null, null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields; 
 		
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_api_layer_field. System values will be used';

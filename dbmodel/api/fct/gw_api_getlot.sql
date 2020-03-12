@@ -81,7 +81,7 @@ BEGIN
        
 		-- Data tab
 		-----------
-		SELECT gw_api_get_formfields( 'lot', 'lot', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+		SELECT gw_api_get_formfields( 'lot', 'lot', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 		raise notice '-> %', v_idname;
 		-- getting values from feature
 		IF v_id IS NOT NULL THEN
