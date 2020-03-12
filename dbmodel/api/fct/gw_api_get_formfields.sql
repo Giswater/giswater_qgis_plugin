@@ -109,7 +109,7 @@ BEGIN
 	-- setting device
     IF p_device < 9 THEN 
 		v_device = ' widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction",
-		     (CASE WHEN layout_id=0 THEN ''header'' WHEN layout_id=9 THEN ''footer'' ELSE ''body'' END) AS "position",
+		     (CASE WHEN layoutname=''top_layout'' THEN ''header'' WHEN layoutname IN (''bot_layout1'', ''bot_layout2'') THEN ''footer'' ELSE ''body'' END) AS "position",
 		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';
     ELSE  
 		v_device = '';
