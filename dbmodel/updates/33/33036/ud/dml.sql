@@ -13,3 +13,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, qgis_criticity, qgis_message, isdeprecated)
 VALUES ('v_anl_flow_gully', 'Analysis', 'View with the result of flow trace and flow exit results (gully)','role_om',0,'role_om',2,
 'Cannot view the results of flowtrace analytics tool related to gullies', false);
+
+-- 2020/03/12
+UPDATE audit_cat_table  SET isdeprecated=TRUE WHERE id = 'anl_flow_arc' OR id = 'anl_flow_node';
