@@ -247,7 +247,7 @@ BEGIN
             END IF;
     
             IF v_project_type='UD' THEN
-                SELECT count(gully_id) INTO v_count FROM node WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+                SELECT count(gully_id) INTO v_count FROM gully WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
                 IF v_count > 0 THEN
                     UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
