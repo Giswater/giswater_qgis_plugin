@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2788
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetvalues(p_data json)
-  RETURNS float AS
+  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -21,14 +21,17 @@ v_noderecord1 record;
 v_noderecord2 record;
 v_return json;
 v_apiversion json;
-v_min double precision;
-v_max double precision;
+v_min double precision = 0;
+v_max double precision = 999;
+v_min1 double precision = 0;
+v_max1 double precision = 0;
+v_min2 double precision = 0;
+v_max2 double precision = 0;
 v_id text;
 v_node_1 text;
 v_node_2 text;
 v_json json;
 v_tgop text;
-v_key text;
 
 BEGIN
 
@@ -43,45 +46,32 @@ BEGIN
 
 	--  get parameters from input
 	v_id = ((p_data ->>'feature')::json->>'id')::text;
-	v_node_1 = ((p_data ->>'data')::json->>'node1');
-	v_node_2 = ((p_data ->>'data')::json->>'node2');
-	v_json = ((p_data ->>'data')::json->>'json');
+	v_featuretype = ((p_data ->>'feature')::json->>'featureType')::text;
+	v_node_1 = ((p_data ->>'data')::json->>'node1')::text;
+	v_node_2 = ((p_data ->>'data')::json->>'node2')::text;
 	v_tgop = ((p_data ->>'data')::json->>'tgOp');
-	v_key = ((p_data ->>'data')::json->>'key');
 
-	IF v_project_type = 'UD' THEN
-
-		IF v_tgop = 'SELECT' THEN 
-			SELECT node_1 INTO v_node_1 FROM arc WHERE arc_id = v_id;
-			SELECT node_2 INTO v_node_2 FROM arc WHERE arc_id = v_id;
-		END IF;
-
-		SELECT * INTO v_noderecord1 FROM v_edit_node WHERE node_id=v_node_1;
-		SELECT * INTO v_noderecord2 FROM v_edit_node WHERE node_id=v_node_2;
- 
-		IF (v_json->>'column_id') = 'y1' OR (v_json->>'column_id') = 'custom_y1' THEN
-			v_min = 0;
-			v_max = v_noderecord1.sys_ymax;
-			
-		ELSIF (v_json->>'column_id') = 'y2'  OR (v_json->>'column_id') = 'custom_y2' THEN
-			v_min = 0;
-			v_max = v_noderecord2.sys_ymax;
-				
-		ELSIF (v_json->>'column_id') = 'ymax'  OR (v_json->>'column_id') = 'custom_ymax' THEN
-			v_min = (SELECT max(y) FROM (SELECT y1 as y FROM arc WHERE node_1=v_id UNION SELECT y2 FROM arc WHERE node_2=v_id)a);
-			v_max = 999;
-		END IF;
-
-		IF v_key = 'minValue' THEN
-			v_return = v_min;
-		ELSIF v_key = 'minValue' THEN
-			v_return = v_max;
-		END IF;
+	IF v_featuretype ='NODE' THEN
+	
+		v_min = (SELECT max(y) FROM (SELECT sys_y1 as y FROM v_arc_x_node WHERE node_1=v_id UNION SELECT sys_y2 FROM v_arc_x_node WHERE node_2=v_id)a);
 		
-	END IF;	
-         
---    Return
-      RETURN v_return;
+	ELSIF v_featuretype ='ARC' THEN
+			
+		SELECT * INTO v_noderecord1 FROM v_node WHERE node_id=v_node_1;
+		v_max1 = v_noderecord1.sys_ymax;
+		
+		SELECT * INTO v_noderecord2 FROM v_node WHERE node_id=v_node_2;
+		v_max2 = v_noderecord2.sys_ymax;
+					
+	END IF;
+		         
+	-- Return
+    RETURN ('{"ymax":{"minValue":"'||v_min||'","maxValue":"'||v_max||'"},'||
+	  '"custom_ymax":{"minValue":"'||v_min||'","maxValue":"'||v_max||'"},'||
+			   '"y1":{"minValue":"'||v_min1||'","maxValue":'||v_max1||'"},'||
+		'"custom_y1":{"minValue":"'||v_min1||'","maxValue":'||v_max1||'"},'||
+			   '"y2":{"minValue":"'||v_min2||'","maxValue":'||v_max2||'"},'||
+		'"custom_y2":{"minValue":"'||v_min2||'","maxValue":'||v_max2||'"}}'::json)
    
 END;
 $BODY$

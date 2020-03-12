@@ -95,115 +95,103 @@ v_noderecord1 record;
 v_noderecord2 record;
 v_input json;
 v_presszone_id text;
-v_widgetvalue float;
+v_widgetvalues json;
 v_automatic_ccode boolean;
 v_automatic_ccode_field text;
 v_use_fire_code_seq boolean;
+v_node1 text;
+v_node2 text;
 
 BEGIN
 
--- get basic parameters
------------------------
-     --  set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+	-- get basic parameters
+	-----------------------
+	--  set search path to local schema
+	SET search_path = "SCHEMA_NAME", public;
 
-     --  get schema name
-    schemas_array := current_schemas(FALSE);
+	--  get schema name
+	schemas_array := current_schemas(FALSE);
 
-     --  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-	INTO v_apiversion;
+	--  get api version
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	iNTO v_apiversion;
 
-     --  get project type
-    SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
-    
-     --  get config parameters   
-    SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
+	--  get project type
+	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	    
+	--  get config parameters   
+	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
 	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
-
-    SELECT ((value::json)->>'activated') INTO v_connec_proximity_control FROM config_param_system WHERE parameter='connec_proximity';
-	SELECT ((value::json)->>'value') INTO v_connec_proximity FROM config_param_system WHERE parameter='connec_proximity';
-    
-    SELECT ((value::json)->>'activated') INTO v_gully_proximity_control FROM config_param_system WHERE parameter='gully_proximity';
+	SELECT ((value::json)->>'activated') INTO v_connec_proximity_control FROM config_param_system WHERE parameter='connec_proximity';
+	SELECT ((value::json)->>'value') INTO v_connec_proximity FROM config_param_system WHERE parameter='connec_proximity';   
+	SELECT ((value::json)->>'activated') INTO v_gully_proximity_control FROM config_param_system WHERE parameter='gully_proximity';
 	SELECT ((value::json)->>'value') INTO v_gully_proximity FROM config_param_system WHERE parameter='gully_proximity';
-
-    SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='arc_searchnodes';
+	SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='arc_searchnodes';
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
+	SELECT value INTO v_samenode_init_end_control FROM config_param_system WHERE parameter = 'samenode_init_end_control';
+	SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='proximity_buffer';
+	SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='use_fire_code_seq';
+	SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='customer_code_autofill';
+	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='customer_code_autofill';
+	    
+	IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field ='connec_id' THEN v_automatic_ccode = TRUE; ELSE v_automatic_ccode = FALSE; END IF;
 
-    SELECT value INTO v_samenode_init_end_control FROM config_param_system WHERE parameter = 'samenode_init_end_control';
-    SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='proximity_buffer';
-    SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='use_fire_code_seq';
-    SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='customer_code_autofill';
-    SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='customer_code_autofill';
-    
-    IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field ='connec_id' THEN
-        v_automatic_ccode = TRUE;
-    ELSE v_automatic_ccode = FALSE;
-    END IF;
-
-    -- get tablename and formname
-    -- Common
-     v_tablename = p_table_id;
-     v_formname = p_table_id;
-
-    -- Special case of visits
-    SELECT tablename INTO v_visit_tablename FROM config_api_visit WHERE formname=p_table_id;
-     IF v_visit_tablename IS NOT NULL THEN
-	v_tablename = v_visit_tablename;
+	-- get tablename and formname
+	-- Common
+	v_tablename = p_table_id;
 	v_formname = p_table_id;
-     END IF;
+
+	-- Special case of visits
+	SELECT tablename INTO v_visit_tablename FROM config_api_visit WHERE formname=p_table_id;
+	IF v_visit_tablename IS NOT NULL THEN v_tablename = v_visit_tablename; v_formname = p_table_id;	END IF;
 
 
---  get feature propierties
----------------------------
-
-    IF  v_project_type='WS' THEN
-		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN (SELECT id, active, code_autofill FROM node_type 
-															UNION SELECT id, active, code_autofill FROM arc_type 
-															UNION SELECT id, active, code_autofill FROM connec_type) a 
-															USING (id) WHERE a.active IS TRUE 
-															AND child_layer = '''|| p_table_id ||''' ORDER BY cat_feature.id';
+	--  get feature propierties
+	---------------------------
+	IF  v_project_type='WS' THEN
+		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN 
+				(SELECT id, active, code_autofill FROM node_type UNION SELECT id, active, code_autofill FROM arc_type 
+				UNION SELECT id, active, code_autofill FROM connec_type) a USING (id) WHERE a.active IS TRUE 
+				AND child_layer = '''|| p_table_id ||''' ORDER BY cat_feature.id';
 	ELSE 
-		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN (SELECT id,active, code_autofill FROM node_type 
-															UNION SELECT id,active, code_autofill FROM arc_type 
-															UNION SELECT id,active, code_autofill FROM connec_type 
-															UNION SELECT id,active, code_autofill FROM gully_type) a 
-															USING (id) WHERE a.active IS TRUE 
-															AND child_layer =  '''|| p_table_id ||''' ORDER BY cat_feature.id';
+		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN 
+				(SELECT id,active, code_autofill FROM node_type UNION SELECT id,active, code_autofill FROM arc_type 
+				UNION SELECT id,active, code_autofill FROM connec_type UNION SELECT id,active, code_autofill FROM gully_type) a 
+				USING (id) WHERE a.active IS TRUE AND child_layer =  '''|| p_table_id ||''' ORDER BY cat_feature.id';
 	END IF;
 
 	EXECUTE v_active_feature INTO v_catfeature;
 
-    -- Get id column
-    EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-        INTO v_idname
-        USING v_tablename;
+	-- Get id column
+	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+		INTO v_idname
+		USING v_tablename;
         
-    -- For views it suposse pk is the first column
-    IF v_idname ISNULL THEN
-        EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+	-- For views it suposse pk is the first column
+	IF v_idname ISNULL THEN
+		EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
 		AND t.relname = $1 
 		AND s.nspname = $2
 		ORDER BY a.attnum LIMIT 1'
 		INTO v_idname
 		USING v_tablename, schemas_array[1];
-    END IF;
+	END IF;
 
-    -- get id column type
-    EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-	    JOIN pg_class t on a.attrelid = t.oid
-	    JOIN pg_namespace s on t.relnamespace = s.oid
-	    WHERE a.attnum > 0 
-	    AND NOT a.attisdropped
-	    AND a.attname = $3
-	    AND t.relname = $2 
-	    AND s.nspname = $1
-	    ORDER BY a.attnum'
-            USING schemas_array[1], v_tablename, v_idname
-            INTO v_columntype;
+	-- get id column type
+	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+		JOIN pg_class t on a.attrelid = t.oid
+		JOIN pg_namespace s on t.relnamespace = s.oid
+		WHERE a.attnum > 0 
+		AND NOT a.attisdropped
+		AND a.attname = $3
+		AND t.relname = $2 
+		AND s.nspname = $1
+		ORDER BY a.attnum'
+		USING schemas_array[1], v_tablename, v_idname
+		INTO v_columntype;
 
---  Starting control process
-----------------------------
+	--  Starting control process
+	----------------------------
 	IF p_tg_op = 'INSERT' THEN 
 
 		-- urn_id assingment
@@ -223,6 +211,7 @@ BEGIN
 					v_message = (SELECT concat('Error[1096]:',error_message, v_id,'. ',hint_message) FROM audit_cat_error WHERE id=1096);
 					v_status = false;
 				END IF;
+				
 			ELSIF upper(v_catfeature.feature_type) ='ARC' THEN
 			
 				SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
@@ -257,6 +246,10 @@ BEGIN
 					IF v_noderecord1.expl_id = v_noderecord2.expl_id THEN
 						v_expl_id = v_noderecord1.expl_id;
 					END IF;
+
+					-- getting node values in case of arcs (insert)
+					v_node1 = v_noderecord1.node_id;
+					v_node2 = v_noderecord2.node_id; 
 					
 				--Error, no existing nodes
 				ELSIF ((v_noderecord1.node_id IS NULL) OR (v_noderecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
@@ -349,11 +342,19 @@ BEGIN
 	
 		-- Municipality 
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) LIMIT 1); 
+		
+		-- upsert parent expl_id values for user
+		DELETE FROM config_param_user WHERE parameter = 'exploitation_vdefault' AND cur_user = current_user;
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('exploitation_vdefault', v_expl_id, current_user);
+	
+		-- upsert parent muni_id values for user
+		DELETE FROM config_param_user WHERE parameter = 'municipality_vdefault' AND cur_user = current_user;
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('municipality_vdefault', v_muni_id, current_user);
 	
 	END IF;
 	
--- building the form widgets
-----------------------------
+	-- building the form widgets
+	----------------------------
 	IF  p_configtable is TRUE THEN 
 		raise notice 'Configuration fields are defined on config_api_layer_field';
 		
@@ -385,8 +386,8 @@ BEGIN
 				USING v_tablename, schemas_array[1]; 
 	END IF;
 	
--- Filling the form widgets with values
----------------------------------------
+	-- Filling the form widgets with values
+	---------------------------------------
 	-- getting values on insert from vdefault values
 	IF p_tg_op ='INSERT' THEN 
 	
@@ -417,26 +418,37 @@ BEGIN
 			END IF;
 		END IF;
 
-	-- getting values on insert from feature
-	ELSIF p_tg_op ='UPDATE' THEN	
+	-- getting values from feature
+	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN	
 		EXECUTE 'SELECT (row_to_json(a)) FROM 
 			(SELECT * FROM '||p_table_id||' WHERE '||quote_ident(v_idname)||' = CAST($1 AS '||(v_columntype)||'))a'
 			INTO v_values_array
 			USING p_id;
+		
+			-- getting node values in case of arcs (update)
+			v_node1 := (v_values_array->>(aux_json->>'node_1'));
+			v_node2 := (v_values_array->>(aux_json->>'node_2'));
+					
 	END IF;
 	
+	v_node1 = COALESCE (v_node1, '');
+	v_node2 = COALESCE (v_node2, '');
+	
+	-- gettingf minvalue & maxvalues for widgetcontrols
+	IF v_project_type = 'UD' THEN
+	
+		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||
+		p_id||'"}, "data":{"tgOp":"'||p_tgop||'", "node1":"||v_node1||", "node2":"||v_node2||"}';	
+		SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalues;
+		
+	END IF;	
+		
 	-- looping the array setting values and widgetcontrols
 	FOREACH aux_json IN ARRAY v_fields_array 
         LOOP          
 		array_index := array_index + 1;
 
 		IF p_tg_op='INSERT' THEN 
-
-			-- getting values from config_param_user
-			EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text 
-				FROM (SELECT feature_field_id as param, value::text AS vdef, parameter as parameter FROM audit_cat_param_user 
-				JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL)a'
-				INTO v_values_array_aux;
 
 			-- setting special values
 			IF (aux_json->>'column_id') = quote_ident(v_idname) THEN
@@ -499,8 +511,7 @@ BEGIN
 				field_value = v_shape;
 			ELSIF (aux_json->>'column_id')='matcat_id' THEN	
 				field_value = v_matcat_id;
-			ELSIF (aux_json->>'column_id')='state_type' THEN	
-				field_value = (aux_json->>'selectedId'); -- using value defined on get_formfields function. This operation should be done for the rest of the combochilds
+			
 			-- catalog
 			ELSIF (aux_json->>'column_id') = 'arccat_id' OR (aux_json->>'column_id') = 'nodecat_id' OR  (aux_json->>'column_id') = 'connecat_id'  THEN	
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
@@ -511,10 +522,28 @@ BEGIN
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
 					WHERE ((a->>'param') = (aux_json->>'column_id') AND left ((a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
                     
-            -- child special values
-            ELSIF (aux_json->>'column_id')='fire_code' AND v_use_fire_code_seq THEN	
+			-- child special values
+			ELSIF (aux_json->>'column_id')='fire_code' AND v_use_fire_code_seq THEN	
 				field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
-            
+
+            		-- state type
+			ELSIF (aux_json->>'column_id') = 'state_type' THEN
+				/*
+				IF state = 0 THEN
+					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_end_vdefault'''
+					INTO v_vdefault;													
+			
+				ELSIF state = 1 THEN
+					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_vdefault'''
+					INTO v_vdefault;
+			
+				ELSIF state = 2 THEN
+					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_plan_vdefault'''
+					INTO v_vdefault;
+
+				END IF;
+				*/									
+							
 			-- rest (including addfields)
 			ELSE 
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id');
@@ -538,52 +567,44 @@ BEGIN
 				ELSIF (aux_json->>'column_id') = 'gratecat_id' THEN
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
 					WHERE (a->>'param') = 'gratecat_id';
+					
 				END IF;
 				
-			END IF;
-
-			-- setting widgetcontrols when null (user has not configurated form fields table).
-			IF (aux_json->>'widgetcontrols')::json->>'minValue' IS NULL AND p_id IS NOT NULL AND aux_json->>'widgetcontrols' IN ('double', 'integer', 'float') THEN
-				v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||v_tablename||'", "idName":"'||v_idname||'", "id":"'||p_id||
-					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'", "key":"minValue"}}';
-				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetvalue;
-				v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'minValue', v_widgetvalue);
-				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
-			END IF;
-
-			IF (aux_json->>'widgetcontrols')::json->>'maxValue' IS NULL AND p_id IS NOT NULL AND aux_json->>'widgetcontrols' IN ('double', 'integer', 'float') THEN
-				v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"'||v_tablename||'", "idName":"'||v_idname||'", "id":"'||p_id||
-					'"}, "data":{"tgOp":"'||p_tg_op||'", "json":'||aux_json||', "node1":"'||v_noderecord1.node_id||'", "node2":"'||v_noderecord2.node_id||'", "key":"maxValue"}}';
-				SELECT gw_api_get_widgetcontrols (v_input) INTO v_widgetvalue;
-				v_widgetcontrols = gw_fct_json_object_set_key (aux_json->>'widgetcontrols', 'maxValue', v_widgetvalue);
-				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
-			END IF;
-		
+			END IF;	
 			
 		ELSIF  p_tg_op ='UPDATE' THEN 
 				
 			field_value := (v_values_array->>(aux_json->>'column_id'));
+				
 		END IF;
-
-		-- setting the array
+		
+		-- setting values
 		IF (aux_json->>'widgettype')='combo' THEN 
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
 		ELSE 
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
 		END IF;	
-	
-        END LOOP;  
+		
+		-- setting widgetcontrols
+		IF (aux_json->>'widgetcontrols') = '' THEN 
+			v_widgetcontrols = (v_widgetvalues->>(aux_json->>'column_id'));
+			v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', COALESCE(v_widgetcontrols, ''));
+			
+		END IF;
+		
+		
+    END LOOP;  
   
---    Convert to json
+	-- Convert to json
     v_fields := array_to_json(v_fields_array);
 
---    Control NULL's
+	-- Control NULL's
       v_apiversion := COALESCE(v_apiversion, '[]');
       v_fields := COALESCE(v_fields, '[]');    
       v_message := COALESCE(v_message, '[]');    
 
     
---    Return
+	-- Return
       IF v_status IS TRUE THEN
 		RETURN v_fields;
       ELSE 

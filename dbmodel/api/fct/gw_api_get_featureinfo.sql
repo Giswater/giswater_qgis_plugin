@@ -82,7 +82,7 @@ BEGIN
     SELECT formtype INTO v_formtype FROM config_api_form_fields WHERE formname = p_table_id;
 
        	-- Call the function of feature fields generation      	
-	SELECT gw_api_get_formfields( p_table_id, v_formtype, 'data', p_table_id, null, p_id, null, 'SELECT',null, p_device) INTO fields_array;
+	SELECT gw_api_get_formfields( p_table_id, v_formtype, 'data', p_table_id, v_idname, p_id, null, 'SELECT',null, p_device) INTO fields_array;
 	
     ELSE
 
