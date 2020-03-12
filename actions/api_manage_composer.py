@@ -295,7 +295,7 @@ class ApiManageComposer(ApiParent):
         form = '"form":{''}, '
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
-        body = "" + client + form + feature + data
+        body = "$${" + client + form + feature + data + "}$$"
         complet_result = self.controller.get_json('gw_api_setprint', body, log_sql=True)
         if not complet_result: return False
 
