@@ -98,9 +98,9 @@ BEGIN
 
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_id, layout_order, layoutname, 
+		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_order, layoutname, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, widgetcontrols->>''regexpControl'' as "regexpcontrol",
+		row_number()over(ORDER BY layoutname, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, widgetcontrols->>''regexpControl'' as "regexpcontrol",
 		(CASE WHEN value IS NOT NULL AND value != ''false'' THEN ''True'' ELSE ''False'' END) AS checked,
 		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
 		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue,
@@ -305,7 +305,7 @@ BEGIN
 
 		-- Get fields for admin enabled
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-			widgettype, datatype, layout_id, layout_order, row_number() over (order by layout_id, layout_order) as orderby, descript as tooltip, 
+			widgettype, datatype, layoutname, layout_order, row_number() over (order by layoutname, layout_order) as orderby, descript as tooltip, 
 			(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 			placeholder
 			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
@@ -314,7 +314,7 @@ BEGIN
 	ELSE 
 		-- Get fields for admin disabled (only to show)
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-			widgettype, datatype, layout_id, layout_order, row_number() over (order by layout_id, layout_order) as orderby, tooltip, FALSE AS iseditable,
+			widgettype, datatype, layoutname, layout_order, row_number() over (order by layoutname, layout_order) as orderby, tooltip, FALSE AS iseditable,
 			placeholder
 			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
 			INTO fields_array;
@@ -339,10 +339,10 @@ BEGIN
     v_formtabs := v_formtabs ||']';
 
 --  Construction of groupbox - formlayouts
-    EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layout_id AS "layout", label FROM config_api_form_groupbox WHERE formname=$1 AND layout_id IN 
-			(SELECT layout_id FROM audit_cat_param_user WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
-			UNION SELECT layout_id FROM config_param_system WHERE ''role_admin'' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member'')))
-		ORDER BY layout_id) a'
+    EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layoutname AS "layout", label FROM config_api_form_groupbox WHERE formname=$1 AND layoutname IN 
+			(SELECT layoutname FROM audit_cat_param_user WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
+			UNION SELECT layoutname FROM config_param_system WHERE ''role_admin'' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member'')))
+		ORDER BY layoutname) a'
 		INTO v_formgroupbox
 		USING v_formname;
 

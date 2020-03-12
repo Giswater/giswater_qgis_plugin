@@ -38,3 +38,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_par
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"tooltip"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_cat_param_user", "column":"description","newName":"descript"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_cat_table", "column":"description","newName":"descript"}}$$);
+
+--2020/03/12
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_param_system", "column":"layoutname", "dataType":"text"}}$$);
