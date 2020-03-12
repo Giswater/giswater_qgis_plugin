@@ -1,3 +1,4 @@
 3.3.033
 *************
 - New function to manage system roles of giswater
+- Add fluid_type (from arc) to v_edit_link
