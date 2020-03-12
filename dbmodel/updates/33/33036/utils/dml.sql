@@ -102,3 +102,26 @@ project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdepre
 VALUES ('debug_mode',null,'Variable to configure the debug mode of user',
 'role_basic', 'Debug mode:', true, null, null,'utils',false, false, 'json','text',true, false, '{"status":FALSE, "mode":"NOTICE"}');
 
+-- 2020/03/12
+UPDATE audit_cat_param_user SET layoutname = 'lyt_basic' WHERE layout_id = 1;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_om' WHERE layout_id = 2;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' WHERE layout_id = 3;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_mapzones' WHERE layout_id = 4;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_edit' WHERE layout_id = 5;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_epa' WHERE layout_id = 6;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_masterplan' WHERE layout_id = 7;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_other' WHERE layout_id = 8;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_node_vdef' WHERE layout_id = 9;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_arc_vdef' WHERE layout_id = 10;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_utils_vdef' WHERE layout_id = 11;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_connec_gully_vdef' WHERE layout_id = 12;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_topology' WHERE layout_id = 13;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_builder' WHERE layout_id = 14;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_review' WHERE layout_id = 15;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_analysis' WHERE layout_id = 16;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_system' WHERE layout_id = 17;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_fluid_type' WHERE layout_id = 18;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_location_type' WHERE layout_id = 19;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_category_type' WHERE layout_id = 20;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_function_type' WHERE layout_id = 21;
+UPDATE audit_cat_param_user SET layoutname = 'lyt_addfields' WHERE layout_id = 22;
