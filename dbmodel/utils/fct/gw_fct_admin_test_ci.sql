@@ -195,20 +195,7 @@ BEGIN
 
 									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
 									VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
-								END IF;
-
-
-								v_query_result =  'SELECT gw_fct_feature_replace($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
-								"feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{}, "old_feature_id":"'||v_feature_id||'", 
-								"workcat_id_end":"work1", "enddate":"2017-12-06", "keep_elements":"False"}}$$)';
-								RAISE NOTICE 'v_query_result,%',v_query_result;
-								EXECUTE v_query_result
-								INTO v_query_result;
-										
-								INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
-								VALUES (115, 'gw_fct_feature_replace',rec_role.id,v_query_result);
-
-								v_feature_id =(v_feature_id::integer + 1)::text;
+								END IF;					
 
 								--fusion arcs or delete node if it's not connected to arcs (not arc divide)
 								IF rec_node_type.isarcdivide is true AND rec_state = 1 then
@@ -242,6 +229,22 @@ BEGIN
 						END LOOP;
 					END IF;
 				END LOOP;
+
+			ELSIF rec_fct.function_name = 'gw_fct_feature_replace' THEN
+				SELECT node_id INTO v_feature_id FROM v_edit_node LIMIT 1;
+				-- replace 'node_id' for id of the feature calling arc divide function
+				select replace(concat(rec_fct.function_name,'($$',rec_fct.sample_query::json ->>v_project_type,'$$)')::TEXT,'node_id'::text,v_feature_id::text) 
+				INTO v_function; 
+												
+
+				IF v_function IS NOT NULL THEN
+					v_query = 'SELECT '||v_schemaname||'.'||v_function||';';
+					EXECUTE v_query
+					INTO v_query_result;
+
+					INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
+					VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
+				END IF;
 			ELSE
 				--concatenate fct with json input parameter
 				select concat(rec_fct.function_name,'($$',rec_fct.sample_query::json ->>v_project_type,'$$)')::TEXT INTO v_function; 
