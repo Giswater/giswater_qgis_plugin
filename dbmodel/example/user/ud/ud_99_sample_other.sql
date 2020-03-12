@@ -82,8 +82,13 @@ DELETE FROM selector_psector;
 UPDATE connec SET state=2, state_type=3 WHERE connec_id='3080';
 UPDATE gully SET state=2, state_type=3 WHERE gully_id IN ('30070','30072','30110');
 
---select gw_fct_connect_to_network((select array_agg(connec_id)from connec ), 'CONNEC');
---select gw_fct_connect_to_network((select array_agg(gully_id)from gully ), 'GULLY');
+SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
+"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
+"data":{"feature_type":"CONNEC"}}$$);
+
+SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
+"SELECT array_to_json(array_agg(gully_id::text)) FROM v_edit_gullyWHERE gully_id IS NOT NULL AND state=1"},
+"data":{"feature_type":"GULLY"}}$$);
 
 -- rotate vnodes and connec labels
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);

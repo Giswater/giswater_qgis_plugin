@@ -17,6 +17,8 @@ $BODY$
 GOAL:
 This function have been refactorized on 2019/04/24 changing the full strategy of vnode and links (according with the trigger of v_edit_vnode)
 
+	
+
 MAIN CHANGES
 - Vnode_type = 'CUSTOM' dissapears. Only 'AUTO' is possible. 
 - Vnode geometry is only updateable. It's no posible to create a new one using ToC layer
@@ -26,8 +28,13 @@ MAIN CHANGES
 SELECT SCHEMA_NAME.gw_fct_connect_to_network($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"id":["3201","3200"]},
-"data":{"feature_type":"CONNEC"}}$$)
+"data":{"feature_type":"CONNEC"}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
+"SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
+"data":{"feature_type":"CONNEC"}}$$);
 */
+
 
 DECLARE
 	v_connect record;
@@ -44,10 +51,10 @@ DECLARE
 	v_endfeature_geom public.geometry;
 	v_pjointtype text;
 	v_pjointid text;
-	v_feature_json json;
+	v_feature_text text;
 	v_feature_array text[];
 	v_feature_type text;
-
+	
 	v_result text;
 	v_result_info text;
 	v_result_point text;
@@ -74,9 +81,15 @@ BEGIN
     SELECT wsoftware, giswater INTO v_projecttype, v_version FROM version LIMIT 1;
 
     -- Get parameters from input json
-     v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
-     v_feature_json = ((p_data ->>'feature')::json->>'id'::text);
-     v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_json)); 
+    v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);
+    v_feature_text = ((p_data ->>'feature')::json->>'id'::text);
+
+    IF v_feature_text ILIKE '[%]' THEN
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)); 		
+    ELSE 
+		EXECUTE v_feature_text INTO v_feature_text;
+		v_feature_array = ARRAY(SELECT json_array_elements_text(v_feature_text::json)); 
+    END IF;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fprocesscat_id=117 AND user_name=current_user;
