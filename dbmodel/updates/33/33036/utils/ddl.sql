@@ -37,3 +37,4 @@ UPDATE config_param_system SET datatype = data_type where datatype IS NULL;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"data_type"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"tooltip"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_cat_param_user", "column":"description","newName":"descript"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_cat_table", "column":"description","newName":"descript"}}$$);
