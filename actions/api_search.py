@@ -73,7 +73,7 @@ class ApiSearch(ApiParent):
                 first_tab = tab['tabName']
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(tab['tabName'])
-            main_tab.addTab(tab_widget, tab['tabtext'])
+            main_tab.addTab(tab_widget, tab['tabLabel'])
             gridlayout = QGridLayout()
             tab_widget.setLayout(gridlayout)
             x = 0
