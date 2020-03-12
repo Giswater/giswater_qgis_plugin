@@ -23,3 +23,9 @@ INSERT INTO config_client_forms (location_type, project_type, table_id, column_i
 VALUES ('mincut form', 'ws', 'v_anl_mincut_result_hydrometer', 'result_id', 2, false);
 INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) 
 VALUES ('mincut form', 'ws', 'v_anl_mincut_result_hydrometer', 'work_order', 3, false);
+
+
+-- 12/03/2020
+UPDATE audit_cat_param_user 
+SET widgetcontrols = (replace (widgetcontrols::text, '{"minValue":0.001, "maxValue":100}', '{"values":{"min":0.001, "max":100}}'))::json 
+WHERE widgetcontrols is not null;

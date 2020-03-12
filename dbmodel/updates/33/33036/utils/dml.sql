@@ -136,3 +136,16 @@ UPDATE audit_cat_function set sample_query =
 '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }},
 "UD":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }}}'
 where function_name = 'gw_fct_feature_replace';
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
+isdeprecated, istoolbox, alias, isparametric)
+VALUES (2828, 'gw_api_getdimensioning', 'utils', 'function', null, null, null,'Function to show dimensioning form of api', 'role_basic',
+false, false, null, false) ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_param_user SET id = 'statetype_0_vdefault' WHERE id = 'statetype_end_vdefault';
+UPDATE audit_cat_param_user SET id = 'statetype_1_vdefault' WHERE id = 'statetype_vdefault';
+UPDATE audit_cat_param_user SET id = 'statetype_2_vdefault' WHERE id = 'statetype_plan_vdefault';
+
+UPDATE config_param_user SET parameter = 'statetype_0_vdefault' WHERE parameter = 'statetype_end_vdefault';
+UPDATE config_param_user SET parameter = 'statetype_1_vdefault' WHERE parameter = 'statetype_vdefault';
+UPDATE config_param_user SET parameter = 'statetype_2_vdefault' WHERE parameter = 'statetype_plan_vdefault';

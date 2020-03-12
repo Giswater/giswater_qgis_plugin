@@ -231,3 +231,10 @@ INSERT INTO config_api_form_actions (actionname) VALUES ('getInfoFromId');
 --2020/03/10
 UPDATE config_api_form_fields SET isautoupdate = FALSE WHERE widgettype='typeahead';
 UPDATE config_api_form_fields SET widgetcontrols = gw_fct_json_object_delete_keys(widgetcontrols,'autoupdateReloadFields', 'typeaheadSearchField') WHERE widgettype='typeahead';
+
+
+UPDATE config_api_form_fields SET dv_parent_id = null, dv_querytext_filterc = null where column_id = 'category_type'
+
+UPDATE config_api_form_fields SET widgettype = 'text' WHERE column_id = 'macrodma_id';
+UPDATE config_api_form_fields SET widgettype = 'text' WHERE column_id = 'macroexpl_id';
+UPDATE config_api_form_fields SET widgettype = 'text' WHERE column_id = 'macrosector_id';
