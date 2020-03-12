@@ -13,7 +13,7 @@ UPDATE audit_cat_param_user SET vdefault =
 WHERE id = 'inp_options_buildup_supply';
 
 UPDATE audit_cat_param_user SET vdefault = 
-'{"status":"true", "parameters":{"valve":{"length:"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}, "reservoir":{"addElevation":1}, "pipe":{}, "tank":{"addElevation":1}, "pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}}}'
+'{"status":"true", "parameters":{"valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}, "reservoir":{"addElevation":1}, "pipe":{}, "tank":{"addElevation":1}, "pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}}}'
 WHERE  id = 'inp_options_advancedsettings';
 
 -- 09/03/2020
