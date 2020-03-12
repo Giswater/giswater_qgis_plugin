@@ -7,12 +7,57 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2020/03/11
 
-
+DROP VIEW IF EXISTS v_anl_flow_gully;
 CREATE OR REPLACE VIEW v_anl_flow_gully AS 
  SELECT v_edit_gully.gully_id,
-    anl_flow_arc.context,
-    anl_flow_arc.expl_id,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_arc.expl_id,
     v_edit_gully.the_geom
-   FROM anl_flow_arc
-     JOIN v_edit_gully ON anl_flow_arc.arc_id::text = v_edit_gully.arc_id::text
-     JOIN selector_expl ON anl_flow_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_flow_arc.cur_user::name = "current_user"();
+   FROM anl_arc
+     JOIN v_edit_gully ON anl_arc.arc_id::text = v_edit_gully.arc_id::text
+     JOIN selector_expl ON anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
+     AND anl_arc.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);
+
+
+DROP VIEW IF EXISTS v_anl_flow_connec;
+CREATE OR REPLACE VIEW v_anl_flow_connec AS 
+ SELECT v_edit_connec.connec_id,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_arc.expl_id,
+    v_edit_connec.the_geom
+   FROM anl_arc
+     JOIN v_edit_connec ON anl_arc.arc_id::text = v_edit_connec.arc_id::text
+     JOIN selector_expl ON anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
+     AND anl_arc.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);
+
+
+DROP VIEW IF EXISTS v_anl_flow_arc;
+CREATE OR REPLACE VIEW v_anl_flow_arc AS 
+ SELECT anl_arc.id,
+    anl_arc.arc_id,
+    anl_arc.arccat_id as arc_type,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_arc.expl_id,
+    anl_arc.the_geom
+   FROM selector_expl,
+    anl_arc
+  WHERE anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
+  AND anl_arc.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);
+
+
+DROP VIEW IF EXISTS v_anl_flow_node;
+CREATE OR REPLACE VIEW v_anl_flow_node AS 
+ SELECT anl_node.id ,
+    anl_node.node_id,
+    anl_node.nodecat_id as node_type,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_node.expl_id,
+    anl_node.the_geom
+   FROM selector_expl,
+    anl_node
+  WHERE anl_node.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND 
+  anl_node.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);

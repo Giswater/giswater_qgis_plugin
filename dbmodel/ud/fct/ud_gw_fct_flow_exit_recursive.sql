@@ -34,28 +34,21 @@ BEGIN
     v_node_id = (SELECT json_array_elements_text(v_node_json)); 
 
     -- Check if the node is already computed
-    SELECT node_id INTO v_exists_id FROM anl_flow_node WHERE node_id = v_node_id AND cur_user="current_user"() AND context='Flow exit';
+    SELECT node_id INTO v_exists_id FROM anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fprocesscat_id=121;
 
     -- Compute proceed
     IF NOT FOUND THEN
 
         -- Update value
-        INSERT INTO anl_flow_node (node_id, expl_id, context, the_geom) VALUES
-        (v_node_id, (SELECT expl_id FROM v_edit_node WHERE node_id = v_node_id), 'Flow exit', (SELECT the_geom FROM v_edit_node WHERE node_id = v_node_id));
+        INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, the_geom) 
+        SELECT node_id, expl_id, 121, the_geom FROM v_edit_node WHERE node_id = v_node_id;
         
         -- Loop for all the upstream nodes
         FOR rec_table IN SELECT arc_id, arc_type, node_2, the_geom, expl_id FROM v_edit_arc WHERE node_1 = v_node_id
         LOOP
-
             -- Insert into tables
-            INSERT INTO anl_flow_arc (arc_id, arc_type, expl_id, context, the_geom) VALUES
-            (rec_table.arc_id, rec_table.arc_type, rec_table.expl_id, 'Flow exit', rec_table.the_geom);
-
-            INSERT INTO anl_node (node_id, nodecat_id, expl_id, fprocesscat_id, the_geom) 
-            SELECT connec_id, connec_type, expl_id, 121, the_geom FROM v_edit_connec WHERE arc_id=rec_table.arc_id;
-
-            INSERT INTO anl_node (node_id, nodecat_id, expl_id, fprocesscat_id, the_geom) 
-            SELECT gully_id, gully_type, expl_id, 121, the_geom FROM v_edit_gully WHERE arc_id=rec_table.arc_id;
+            INSERT INTO anl_arc (arc_id, arccat_id, expl_id, fprocesscat_id, the_geom) VALUES
+            (rec_table.arc_id, rec_table.arc_type, rec_table.expl_id, 121, rec_table.the_geom);
 
            -- Call recursive function weighting with the pipe capacity
            EXECUTE 'SELECT gw_fct_flow_exit_recursive($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"id":["'||rec_table.node_2||'"]},"data":{}}$$);';

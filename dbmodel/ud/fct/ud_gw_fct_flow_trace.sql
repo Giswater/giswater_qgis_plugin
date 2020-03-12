@@ -42,8 +42,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
   
       -- Reset values
-    DELETE FROM anl_flow_node WHERE cur_user="current_user"() AND context='Flow trace';
-    DELETE FROM anl_flow_arc WHERE cur_user="current_user"() AND context='Flow trace' ; 
+    DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id = 120; 
     DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id = 120; 
     
     -- select version
