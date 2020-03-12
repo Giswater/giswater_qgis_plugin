@@ -57,7 +57,8 @@ class DuplicatePsector(ParentManage, QObject):
         body = body.replace('""', 'null')
         complet_result = self.controller.get_json('gw_fct_duplicate_psector', body)
         if not complet_result:
-            self.controller.show_message("Function gw_fct_duplicate_psector executed with no result ", 3)
+            message = 'Function gw_fct_duplicate_psector executed with no result'
+            self.controller.show_message(message, 3)
             return
 
         # Populate tab info

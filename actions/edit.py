@@ -48,7 +48,7 @@ class Edit(ParentAction):
             self.iface.actionAddFeature().trigger()
             self.layer.featureAdded.connect(self.open_new_feature)
         else:
-            message = "Selected layer name not found"
+            message = "Layer not found"
             self.controller.show_warning(message, parameter=feature_cat.parent_layer)
 
 

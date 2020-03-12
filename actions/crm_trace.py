@@ -123,9 +123,9 @@ class CrmTrace(ApiParent):
             self.controller.log_info("result: " + str(result))
             if result != 0:
                 # Show warning message with button to open script log file
-                msg = "Process finished with some errors"
+                message = "Process finished with some errors"
                 inf_msg = "Open script .log file to get more details"
-                self.controller.show_warning_open_file(msg, inf_msg, log_path)
+                self.controller.show_warning_open_file(message, inf_msg, log_path)
                 status = False
         except Exception as e:
             self.controller.show_warning(str(e))

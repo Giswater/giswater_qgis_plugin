@@ -255,8 +255,8 @@ class Utils(ParentAction):
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             if complet_result[0]['status'] == "Accepted":
                 self.add_layer.populate_info_text(dialog, complet_result[0]['body']['data'])
-            message = complet_result[0]['message']['text']
-            self.controller.show_info_box(message)
+            msg = complet_result[0]['message']['text']
+            self.controller.show_info_box(msg)
 
 
     def insert_into_db(self, dialog, csvfile, delimiter, _unicode):

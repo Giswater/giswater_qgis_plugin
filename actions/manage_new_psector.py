@@ -652,7 +652,7 @@ class ManageNewPsector(ParentManage):
         columns = []
 
         if not rows or rows is None or rows == '':
-            message = "CSV not generated. Check fields from table or view: "
+            message = "CSV not generated. Check fields from table or view"
             self.controller.show_warning(message, parameter=viewname)
             return
         for i in range(0, len(rows)):

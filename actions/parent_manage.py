@@ -536,8 +536,8 @@ class ParentManage(ParentAction, object):
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            message = "Table_object is not a table name or QTableView"
-            self.controller.log_info(message)
+            msg = "Table_object is not a table name or QTableView"
+            self.controller.log_info(msg)
             return None
 
         expr = self.set_table_model(dialog, widget, geom_type, expr_filter)
@@ -580,8 +580,8 @@ class ParentManage(ParentAction, object):
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            message = "Table_object is not a table name or QTableView"
-            self.controller.log_info(message)
+            msg = "Table_object is not a table name or QTableView"
+            self.controller.log_info(msg)
             return expr
 
         if expr_filter:
@@ -647,8 +647,8 @@ class ParentManage(ParentAction, object):
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            message = "Table_object is not a table name or QTableView"
-            self.controller.log_info(message)
+            msg = "Table_object is not a table name or QTableView"
+            self.controller.log_info(msg)
             return
 
         # Control when QTableView is void or has no model

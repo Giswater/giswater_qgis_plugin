@@ -1660,7 +1660,7 @@ class AddNewLot(ParentManage):
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        message = "El fitxer csv ha estat exportat correctament"
+        message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 
 
@@ -1832,7 +1832,7 @@ class AddNewLot(ParentManage):
 
         selected_list = self.tbl_load.selectionModel().selectedRows(0)
         if selected_list == 0 or str(selected_list) == '[]':
-            message = "Any load selected"
+            message = "Any record selected"
             self.controller.show_info_box(message)
             return
 

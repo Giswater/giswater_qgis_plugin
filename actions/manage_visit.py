@@ -1165,7 +1165,7 @@ class ManageVisit(ParentManage, QObject):
         # ask for deletion
         message = "Are you sure you want to delete these records?"
         if any_docs:
-            message += "\nSome events have documents:"
+            message += "\nSome events have documents"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, list_id)
         if not answer:
@@ -1245,7 +1245,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def document_insert(self):
-        """Insert a docmet related to the current visit."""
+        """Insert a document related to the current visit."""
         
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()

@@ -400,7 +400,7 @@ class ApiParent(ParentAction):
         # Select only first element of the feature list
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.geom_type) + '_id')
-        message = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
+        msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
                    f"Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
@@ -421,10 +421,10 @@ class ApiParent(ParentAction):
                     fields_aux.append(fields[i].name())
 
         for i in range(0, len(fields_aux)):
-            message += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
+            msg += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
 
         # Ask confirmation question showing fields that will be copied
-        answer = self.controller.ask_question(message, "Update records", None)
+        answer = self.controller.ask_question(msg, "Update records", None)
         if answer:
             for i in range(0, len(fields)):
                 for x in range(0, len(fields_aux)):
@@ -564,7 +564,7 @@ class ApiParent(ParentAction):
                     self.controller.show_message(msg, 2)
                     return widget
             else:
-                message = "Parameter button_function is null for button "
+                message = "Parameter button_function is null for button"
                 self.controller.show_message(message, 2, parameter=widget.objectName())
         # Call def gw_api_open_node(self, dialog, widget) of the class ApiCf
         # or def no_function_associated(self, widget=None, message_level=1)
@@ -879,7 +879,7 @@ class ApiParent(ParentAction):
                 message = "Parameter widgetfunction is null for widget"
                 self.controller.show_message(message, 2, parameter=real_name)
         else:
-            message = "parameter not found"
+            message = "Parameter not found"
             self.controller.show_message(message, 2, parameter='widgetfunction')
         # Call def gw_api_open_url(self, widget) or def no_function_associated(self, widget=None, message_level=1)
         widget.clicked.connect(partial(getattr(self, func_name), widget))
@@ -1473,7 +1473,7 @@ class ApiParent(ParentAction):
                 if not exist:
                     return widget
         else:
-            message = "parameter not found"
+            message = "Parameter not found"
             self.controller.show_message(message, 2, parameter='button_function')
 
         if type(widget) == QLineEdit:

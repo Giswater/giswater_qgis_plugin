@@ -508,7 +508,7 @@ class MincutParent(ParentAction):
                       str(forecast_start_predict), str(forecast_end_predict)]
         for data in check_data:
             if data == '':
-                message = "Some mandatory field is missing. Please, review your data"
+                message = "Mandatory field is missing. Please, set a value"
                 self.controller.show_warning(message)
                 return
 
@@ -1237,7 +1237,7 @@ class MincutParent(ParentAction):
                f" WHERE customer_code = '{customer_code}'")
         row = self.controller.get_row(sql)
         if not row:
-            message = "Any 'connec_id' found with this 'customer_code'"
+            message = "Any connec_id found with this customer_code"
             self.controller.show_info_box(message, parameter=customer_code)
             return None
         else:
@@ -2318,13 +2318,13 @@ class MincutParent(ParentAction):
 
         self.street_field_expl = self.controller.get_config('street_field_expl', 'value', 'config_param_system')
         if not self.street_field_expl:
-            message = "Param street_field_expl not found"
-            self.controller.show_warning(message)
+            message = "Parameter not found"
+            self.controller.show_warning(message, parameter='street_field_expl')
             return
         portal_field_postal = self.controller.get_config('portal_field_postal', 'value', 'config_param_system')
         if not portal_field_postal:
-            message = "Param portal_field_postal not found"
-            self.controller.show_warning(message)
+            message = "Param not found"
+            self.controller.show_warning(message, parameter='portal_field_postal')
             return
 
         # Get project variable 'expl_id'
