@@ -272,8 +272,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         # Check null values
         if self.workcat_id_end_aux in (None, 'null'):
-            message = "Workcat_id field is mandatory."
-            self.controller.show_warning(message)
+            message = "Mandatory field is missing. Please, set a value"
+            self.controller.show_warning(message, parameter='Workcat_id')
             return
 
         feature_type_new = utils_giswater.getWidgetText(dialog, dialog.feature_type_new)

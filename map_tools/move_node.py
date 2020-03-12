@@ -231,8 +231,8 @@ class MoveNodeMapTool(ParentMapTool):
 
                 # Move selected node to the released point
                 # Show message before executing
-                message = ("The procedure will delete features on database unless it is a node that doesn't divide arc. "
-                           "Please ensure that features has no undelete value on true. "
+                message = ("The procedure will delete features on database unless it is a node that doesn't divide arcs.\n"
+                           "Please ensure that features has no undelete value on true.\n"
                            "On the other hand you must know that traceability table will storage precedent information.")
                 title = "Info"
                 answer = self.controller.ask_question(message, title)

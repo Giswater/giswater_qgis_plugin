@@ -78,7 +78,7 @@ class ChangeElemType(ParentMapTool):
                 return
                 
         else:
-            message = "The node has not been updated because no catalog has been selected!"
+            message = "The node has not been updated because no catalog has been selected"
             self.controller.show_warning(message)
 
 

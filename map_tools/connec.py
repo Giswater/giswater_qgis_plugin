@@ -144,9 +144,9 @@ class ConnecMapTool(ParentMapTool):
                 number_features += layer.selectedFeatureCount()
 
             if number_features > 0:
-                message = "Number of features selected in the 'connec' group"
+                message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
-                answer = self.controller.ask_question(message, title, parameter=str(number_features))
+                answer = self.controller.ask_question(message, title, parameter='connec: '+str(number_features))
                 if answer:
                     # Create link
                     self.link_selected_features('connec', layer)
@@ -158,9 +158,9 @@ class ConnecMapTool(ParentMapTool):
                 number_features += layer.selectedFeatureCount()
     
                 if number_features > 0:
-                    message = "Number of features selected in the 'gully' group"
+                    message = "Number of features selected in the group of"
                     title = "Interpolate value - Do you want to update values"
-                    answer = self.controller.ask_question(message, title, parameter=str(number_features))
+                    answer = self.controller.ask_question(message, title, parameter='gully: '+str(number_features))
                     if answer:
                         # Create link
                         self.link_selected_features('gully', layer)
