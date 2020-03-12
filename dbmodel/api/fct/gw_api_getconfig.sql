@@ -100,11 +100,8 @@ BEGIN
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_order, layoutname, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		row_number()over(ORDER BY layoutname, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, widgetcontrols->>''regexpControl'' as "regexpcontrol",
-		(CASE WHEN value IS NOT NULL AND value != ''false'' THEN ''True'' ELSE ''False'' END) AS checked,
-		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
-		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue,
-		placeholder, descript AS tooltip, 
+		row_number()over(ORDER BY layoutname, layout_order) AS orderby, isparent, sys_role_id, project_type, ismandatory, widgetcontrols,
+		(CASE WHEN value IS NOT NULL AND value != ''false'' THEN ''True'' ELSE ''False'' END) AS checked, placeholder, descript AS tooltip, 
 		dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	

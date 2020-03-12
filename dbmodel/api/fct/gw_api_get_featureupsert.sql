@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 2560
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureupsert(character varying, character varying, public.geometry, integer, integer, character varying, boolean);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_featureupsert(
     p_table_id character varying,
     p_id character varying,
@@ -13,7 +13,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_featureupsert(
     p_device integer,
     p_info_type integer,
     p_tg_op character varying,
-    p_configtable boolean)
+    p_configtable boolean,
+    p_idname text,
+    p_columntype text)
   RETURNS json AS
 $BODY$
 
@@ -26,8 +28,7 @@ SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,
 */
 
 DECLARE
-
-v_columntype character varying;
+v_state_value integer;
 v_fields json;
 v_fields_array json[];
 aux_json json;    
@@ -40,7 +41,6 @@ v_selected_id text;
 v_vdefault text;
 v_id int8;
 v_numnodes integer;
-v_idname text;
 v_feature_type text;
 count_aux integer;
 v_sector_id integer;
@@ -71,8 +71,6 @@ v_message text;
 v_catfeature record;
 v_codeautofill boolean=true;
 v_values_array json;
-v_values_array_aux json;
-v_values_array_json json[];
 v_record record;
 v_gislength float;
 v_catalog text;
@@ -162,33 +160,6 @@ BEGIN
 
 	EXECUTE v_active_feature INTO v_catfeature;
 
-	-- Get id column
-	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-		INTO v_idname
-		USING v_tablename;
-        
-	-- For views it suposse pk is the first column
-	IF v_idname ISNULL THEN
-		EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = $1 
-		AND s.nspname = $2
-		ORDER BY a.attnum LIMIT 1'
-		INTO v_idname
-		USING v_tablename, schemas_array[1];
-	END IF;
-
-	-- get id column type
-	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-		JOIN pg_class t on a.attrelid = t.oid
-		JOIN pg_namespace s on t.relnamespace = s.oid
-		WHERE a.attnum > 0 
-		AND NOT a.attisdropped
-		AND a.attname = $3
-		AND t.relname = $2 
-		AND s.nspname = $1
-		ORDER BY a.attnum'
-		USING schemas_array[1], v_tablename, v_idname
-		INTO v_columntype;
 
 	--  Starting control process
 	----------------------------
@@ -350,7 +321,18 @@ BEGIN
 		-- upsert parent muni_id values for user
 		DELETE FROM config_param_user WHERE parameter = 'municipality_vdefault' AND cur_user = current_user;
 		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('municipality_vdefault', v_muni_id, current_user);
-	
+
+	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
+
+		-- getting values from feature
+		EXECUTE 'SELECT (row_to_json(a)) FROM 
+			(SELECT * FROM '||p_table_id||' WHERE '||quote_ident(p_idname)||' = CAST($1 AS '||(p_columntype)||'))a'
+			INTO v_values_array
+			USING p_id;
+		
+			-- getting node values in case of arcs (update)
+			v_node1 := (v_values_array->>(aux_json->>'node_1'));
+			v_node2 := (v_values_array->>(aux_json->>'node_2'));	
 	END IF;
 	
 	-- building the form widgets
@@ -359,7 +341,7 @@ BEGIN
 		raise notice 'Configuration fields are defined on config_api_layer_field';
 		
 		-- Call the function of feature fields generation
-		SELECT gw_api_get_formfields( v_formname, 'feature', v_tabname, v_tablename, v_idname, p_id, v_columntype, p_tg_op, null,p_device) INTO v_fields_array; 
+		SELECT gw_api_get_formfields( v_formname, 'feature', v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
 		
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_api_layer_field. System values will be used';
@@ -392,10 +374,11 @@ BEGIN
 	IF p_tg_op ='INSERT' THEN 
 	
 		-- getting vdefault values
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT feature_field_id as param, value::text AS vdef FROM audit_cat_param_user 
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT audit_cat_param_user.id as parameter, feature_field_id as param, value::text AS vdef FROM audit_cat_param_user 
 			JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL AND 
 			config_param_user.parameter NOT IN (''enddate_vdefault'', ''statetype_plan_vdefault'', ''statetype_end_vdefault''))a'
 			INTO v_values_array;
+
 
 		-- getting propierties from feature catalog value
 		SELECT (a->>'vdef'), (a->>'param') INTO v_catalog, v_catalogtype FROM json_array_elements(v_values_array) AS a 
@@ -416,19 +399,7 @@ BEGIN
 					USING v_catalog
 					INTO v_shape, v_geom1, v_geom2, v_matcat_id;
 			END IF;
-		END IF;
-
-	-- getting values from feature
-	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN	
-		EXECUTE 'SELECT (row_to_json(a)) FROM 
-			(SELECT * FROM '||p_table_id||' WHERE '||quote_ident(v_idname)||' = CAST($1 AS '||(v_columntype)||'))a'
-			INTO v_values_array
-			USING p_id;
-		
-			-- getting node values in case of arcs (update)
-			v_node1 := (v_values_array->>(aux_json->>'node_1'));
-			v_node2 := (v_values_array->>(aux_json->>'node_2'));
-					
+		END IF;					
 	END IF;
 	
 	v_node1 = COALESCE (v_node1, '');
@@ -437,8 +408,7 @@ BEGIN
 	-- gettingf minvalue & maxvalues for widgetcontrols
 	IF v_project_type = 'UD' THEN
 	
-		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||
-		p_id||'"}, "data":{"tgOp":"'||p_tgop||'", "node1":"||v_node1||", "node2":"||v_node2||"}';	
+		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"||v_node1||", "node2":"||v_node2||"}}';	
 		SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalues;
 		
 	END IF;	
@@ -450,132 +420,107 @@ BEGIN
 
 		IF p_tg_op='INSERT' THEN 
 
-			-- setting special values
-			IF (aux_json->>'column_id') = quote_ident(v_idname) THEN
+			CASE (aux_json->>'column_id')
+			
+			-- special values
+			WHEN quote_ident(p_idname) THEN
 				field_value = v_id;
-				
-			ELSIF (aux_json->>'column_id') = concat(lower(v_catfeature.feature_type),'_type')  THEN
+			WHEN concat(lower(v_catfeature.feature_type),'_type') THEN 
 				EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
-				v_type = field_value;
-								
-			ELSIF (aux_json->>'column_id') = 'code' THEN
+			WHEN 'code' THEN 
 				field_value = v_code;
-				
-			ELSIF (aux_json->>'column_id') = 'customer_code' AND v_automatic_ccode THEN
+			WHEN 'customer_code' THEN 
 				field_value = v_id;
-
-			ELSIF (aux_json->>'column_id') = 'node_1' THEN
+			WHEN 'node_1' THEN 
 				field_value = v_noderecord1.node_id;
-				
-			ELSIF (aux_json->>'column_id') = 'node_2' THEN
+			WHEN 'node_2' THEN 
 				field_value = v_noderecord2.node_id;
-				
-			ELSIF (aux_json->>'column_id') = 'gis_length' THEN
+			WHEN 'gis_length' THEN 
 				field_value = v_gislength;
-				
-			ELSIF  (aux_json->>'column_id')='epa_type' THEN
-				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'
-					INTO field_value
-					USING v_catfeature.id;
+			WHEN 'epa_type' THEN 
+				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'INTO field_value USING v_catfeature.id;
+			WHEN 'fire_code' THEN
+				IF v_use_fire_code_seq THEN	
+					field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
+				END IF;
 
-			-- mapzones values
-			ELSIF (aux_json->>'column_id') = 'presszonecat_id' THEN
-				field_value = v_presszone_id;
-			ELSIF (aux_json->>'column_id') = 'sector_id' THEN
+			-- mapzones
+			WHEN 'presszonecat_id' THEN 
+				field_value = v_presszone_id;			
+			WHEN 'sector_id' THEN 
 				field_value = v_sector_id;
-			ELSIF (aux_json->>'column_id') = 'macrosector_id' THEN
+			WHEN 'macrosector_id' THEN 
 				field_value = v_macrosector_id;
-			ELSIF (aux_json->>'column_id') = 'dma_id' THEN
+			WHEN 'dma_id' THEN 
 				field_value = v_dma_id;
-			ELSIF (aux_json->>'column_id') = 'macrodma_id' THEN
+			WHEN 'macrodma_id' THEN 
 				field_value = v_macrodma_id;
-			ELSIF (aux_json->>'column_id') = 'expl_id' THEN
+			WHEN 'expl_id' THEN 
 				field_value = v_expl_id;
-			ELSIF (aux_json->>'column_id') = 'muni_id' THEN
+			WHEN 'muni_id' THEN 
 				field_value = v_muni_id;
 
 			-- elevation from raster
-			ELSIF ((aux_json->>'column_id') = 'elevation' OR (aux_json->>'column_id') = 'top_elev') AND v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
-				field_value = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id = (SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+			WHEN 'elevation', 'top_elev' THEN 
+				IF v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
+					field_value = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE 
+					id = (SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+				END IF;
 							
 			-- catalog values
-			ELSIF (aux_json->>'column_id')='cat_dnom' THEN
+			WHEN 'cat_dnom' THEN
 				field_value = v_dnom;
-			ELSIF (aux_json->>'column_id')='cat_pnom' THEN
+			WHEN 'cat_pnom' THEN
 				field_value = v_pnom;
-			ELSIF (aux_json->>'column_id')='cat_geom1' THEN
+			WHEN 'cat_geom1' THEN
 				field_value = v_geom1;
-			ELSIF (aux_json->>'column_id')='cat_geom2' THEN
+			WHEN 'cat_geom2' THEN
 				field_value = v_geom2;
-			ELSIF (aux_json->>'column_id')='cat_shape' THEN
+			WHEN 'cat_shape' THEN
 				field_value = v_shape;
-			ELSIF (aux_json->>'column_id')='matcat_id' THEN	
+			WHEN 'matcat_id' THEN	
 				field_value = v_matcat_id;
-			
-			-- catalog
-			ELSIF (aux_json->>'column_id') = 'arccat_id' OR (aux_json->>'column_id') = 'nodecat_id' OR  (aux_json->>'column_id') = 'connecat_id'  THEN	
-				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
-					WHERE (reverse(substring(reverse(a->>'parameter'),10)) = lower(v_catfeature.id)); -- 10 = '_vefault'
-			
+			WHEN concat(lower(v_catfeature.feature_type),'cat_id') THEN	
+				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
+				WHERE (reverse(substring(reverse(a->>'parameter'),10)) = lower(v_catfeature.id));
+
 			-- *_type
-			ELSIF (aux_json->>'column_id') =  'fluid_type' OR  (aux_json->>'column_id') =  'function_type' OR (aux_json->>'column_id') =  'location_type' OR (aux_json->>'column_id') =  'category_type' THEN
-				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
-					WHERE ((a->>'param') = (aux_json->>'column_id') AND left ((a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
+			WHEN 'fluid_type','function_type','location_type','category_type' THEN
+				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
+				WHERE ((a->>'param') = (aux_json->>'column_id') AND left(lower(a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
                     
-			-- child special values
-			ELSIF (aux_json->>'column_id')='fire_code' AND v_use_fire_code_seq THEN	
-				field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
-
-            		-- state type
-			ELSIF (aux_json->>'column_id') = 'state_type' THEN
-				/*
-				IF state = 0 THEN
-					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_end_vdefault'''
-					INTO v_vdefault;													
-			
-				ELSIF state = 1 THEN
-					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_vdefault'''
-					INTO v_vdefault;
-			
-				ELSIF state = 2 THEN
-					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND parameter = ''statetype_plan_vdefault'''
-					INTO v_vdefault;
-
-				END IF;
-				*/									
-							
+			-- state type
+			WHEN 'state_type' THEN
+				-- getting parent value
+				SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';
+				
+				EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
+				WHERE cur_user=current_user AND parameter = concat(''statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
+						
 			-- rest (including addfields)
-			ELSE 
-				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id');
-			END IF;
-
+			ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id'); 
+			END CASE;
+		
 			--specific values for ud
 			IF v_project_type = 'UD' THEN
-									
-				IF (aux_json->>'column_id') = 'sys_y1' THEN
+
+				CASE (aux_json->>'column_id')		
+				WHEN 'sys_y1' THEN
 					field_value =v_noderecord1.sys_ymax;
-
-				ELSIF (aux_json->>'column_id') = 'sys_elev1' THEN
+				WHEN 'sys_elev1' THEN
 					field_value =v_noderecord1.sys_elev;
-				
-				ELSIF (aux_json->>'column_id') = 'sys_y2' THEN
+				WHEN 'sys_y2' THEN
 					field_value =v_noderecord2.sys_ymax;
-
-				ELSIF (aux_json->>'column_id') = 'sys_elev2' THEN
+				WHEN 'sys_elev2' THEN
 					field_value =v_noderecord2.sys_elev;	
-					
-				ELSIF (aux_json->>'column_id') = 'gratecat_id' THEN
-					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 
-					WHERE (a->>'param') = 'gratecat_id';
-					
-				END IF;
-				
+				WHEN 'gratecat_id' THEN
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 	WHERE (a->>'param') = 'gratecat_id';
+				ELSE
+				END CASE;
 			END IF;	
 			
 		ELSIF  p_tg_op ='UPDATE' THEN 
-				
 			field_value := (v_values_array->>(aux_json->>'column_id'));
-				
 		END IF;
 		
 		-- setting values
@@ -586,28 +531,25 @@ BEGIN
 		END IF;	
 		
 		-- setting widgetcontrols
-		IF (aux_json->>'widgetcontrols') = '' THEN 
-			v_widgetcontrols = (v_widgetvalues->>(aux_json->>'column_id'));
-			v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'widgetcontrols', COALESCE(v_widgetcontrols, ''));
-			
+		IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN 
+			v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'values' ,(v_widgetvalues->>(aux_json->>'column_id'))::json);
+			v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 		END IF;
-		
-		
-    END LOOP;  
+	END LOOP;  
   
 	-- Convert to json
-    v_fields := array_to_json(v_fields_array);
+	v_fields := array_to_json(v_fields_array);
 
 	-- Control NULL's
-      v_apiversion := COALESCE(v_apiversion, '[]');
-      v_fields := COALESCE(v_fields, '[]');    
-      v_message := COALESCE(v_message, '[]');    
+	v_apiversion := COALESCE(v_apiversion, '[]');
+	v_fields := COALESCE(v_fields, '[]');    
+	v_message := COALESCE(v_message, '[]');    
 
     
 	-- Return
-      IF v_status IS TRUE THEN
+	IF v_status IS TRUE THEN
 		RETURN v_fields;
-      ELSE 
+	ELSE 
 		RETURN ('{"status":"Failed" '||
 			',"message":{"priority":2, "text":"'||v_message||'"}'||
 			',"apiVersion":'||v_apiversion||
@@ -617,11 +559,11 @@ BEGIN
 				',"data":{}'||
 				'}'||
 			'}')::json;
-      END IF;
+	END IF;
 		
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	-- EXCEPTION WHEN OTHERS THEN 
+	-- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

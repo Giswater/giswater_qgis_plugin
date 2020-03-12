@@ -70,7 +70,7 @@ DECLARE
 	v_tablename_original character varying;
 	v_id character varying;
 	v_inputgeometry public.geometry;
-	v_editable boolean;
+	v_editable boolean = true;
 	v_device integer;
 	v_infotype integer;
 	v_forminfo json;
@@ -127,25 +127,22 @@ DECLARE
 	v_errcontext text;
 	v_toggledition boolean;
 
-
 BEGIN
-
---  Get,check and set parameteres
-----------------------------
---    	Set search path to local schema
+	--  Get,check and set parameteres
+	----------------------------
+	
+	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
 
--- 	get input parameters
+	-- fet input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
-	v_editable := (p_data ->> 'form')::json->> 'editable';
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
-	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
-
+	
 	if v_toolbar is NULL THEN
 		v_toolbar := 'basic';
 	END IF;
@@ -154,14 +151,14 @@ BEGIN
 		v_id = NULL;
 	END IF;
 	
---      Get values from config
+	-- Get values from config
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
 		
---  	Get project type
+	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
--- 	Check layer if it's child layer 
+	-- check layer if it's child layer 
         IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename)IS NOT NULL THEN
 		v_table_parent := (SELECT parent_layer FROM cat_feature WHERE child_layer=v_tablename);	
 	ELSE 
@@ -180,8 +177,8 @@ BEGIN
 	v_parentfields = replace (v_parentfields::text, '{', '[');
 	v_parentfields = replace (v_parentfields::text, '}', ']');
 
---      Get form (if exists) for the layer 
-------------------------------------------
+	--      Get form (if exists) for the layer 
+	------------------------------------------
         -- to build json
         EXECUTE 'SELECT row_to_json(row) FROM (SELECT formtemplate AS template, headertext AS "headerText"
             FROM config_api_layer WHERE layer_id = $1 LIMIT 1) row'
@@ -199,14 +196,14 @@ BEGIN
             
 	RAISE NOTICE 'Form number: %', v_forminfo;
 
--- Get feature type
+	-- Get feature type
 	EXECUTE 'SELECT lower(feature_type) FROM cat_feature WHERE  parent_layer = $1 LIMIT 1'
 		INTO v_featuretype
 		USING v_tablename;
 	v_featuretype := LOWER(v_featuretype); 
 	v_featuretype := COALESCE(v_featuretype, ''); 
 
--- Get vdefault values
+	-- Get vdefault values
 	-- Create List
 	list_values = ARRAY['from_date_vdefault','to_date_vdefault','parameter_vdefault','om_param_type_vdefault','document_type_vdefault'];
 
@@ -218,7 +215,7 @@ BEGIN
 		v_vdefault_array := gw_fct_json_object_set_key(v_vdefault_array, v_value, COALESCE(v_vdefault_values));
 	END LOOP;
 
-	--    Control NULL's
+	-- Control NULL's
 	v_vdefault_array := COALESCE(v_vdefault_array, '[]'); 
 	
 	-- Get id column
@@ -226,32 +223,32 @@ BEGIN
 		INTO v_idname
 		USING v_tablename;
 	
-    -- For views it suposse pk is the first column
-    IF v_idname ISNULL THEN
-        EXECUTE '
-        SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-        AND t.relname = $1 
-        AND s.nspname = $2
-        ORDER BY a.attnum LIMIT 1'
-        INTO v_idname
-        USING v_tablename, schemas_array[1];
-    END IF;
+	-- For views it suposse pk is the first column
+	IF v_idname ISNULL THEN
+		EXECUTE '
+		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+		AND t.relname = $1 
+		AND s.nspname = $2
+		ORDER BY a.attnum LIMIT 1'
+		INTO v_idname
+		USING v_tablename, schemas_array[1];
+	END IF;
 
-    -- Get id column type
-    EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-	JOIN pg_class t on a.attrelid = t.oid
-	JOIN pg_namespace s on t.relnamespace = s.oid
-	WHERE a.attnum > 0 
-	AND NOT a.attisdropped
-	AND a.attname = $3
-	AND t.relname = $2 
-	AND s.nspname = $1
-	ORDER BY a.attnum'
-		USING schemas_array[1], v_tablename, v_idname
-		INTO column_type;
+	-- Get id column type
+	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+		JOIN pg_class t on a.attrelid = t.oid
+		JOIN pg_namespace s on t.relnamespace = s.oid
+		WHERE a.attnum > 0 
+		AND NOT a.attisdropped
+		AND a.attname = $3
+		AND t.relname = $2 
+		AND s.nspname = $1
+		ORDER BY a.attnum'
+			USING schemas_array[1], v_tablename, v_idname
+			INTO column_type;
 
---     Get geometry_column
-------------------------------------------
+	-- Get geometry_column
+	------------------------------------------
         EXECUTE 'SELECT attname FROM pg_attribute a        
             JOIN pg_class t on a.attrelid = t.oid
             JOIN pg_namespace s on t.relnamespace = s.oid
@@ -265,20 +262,19 @@ BEGIN
             INTO v_the_geom
             USING v_tablename, schemas_array[1];
            
---     Get geometry (to feature response)
-------------------------------------------
+	-- Get geometry (to feature response)
+	------------------------------------------
 	IF v_the_geom IS NOT NULL AND v_id IS NOT NULL THEN
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 		INTO v_geometry;
 	END IF;
-
-	RAISE NOTICE 'Feature geometry: % ', v_geometry;
-
---      Get link (if exists) for the layer
-------------------------------------------
+	
+	-- Get link (if exists) for the layer
+	------------------------------------------
 	link_id_aux := (SELECT link_id FROM config_api_layer WHERE layer_id=v_tablename);
 
 	IF  link_id_aux IS NOT NULL THEN 
+
 		-- Get link field value
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 		INTO v_linkpath;
@@ -290,12 +286,9 @@ BEGIN
 			INTO v_linkpath;
 		END IF;
 	END IF;
-
-	RAISE NOTICE 'Layer link path: % ', v_linkpath;
-            
-         
---        Get tabs for form
---------------------------------
+  
+	-- Get tabs for form
+	--------------------------------
         EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tabactions as tabActions 
 		FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
             INTO form_tabs
@@ -303,28 +296,16 @@ BEGIN
 
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
         IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
+        
 		-- Get form_tabs
-		IF v_role = 'role_basic' OR v_role = 'role_om' THEN
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-			''[{"actionName":"actionZoom", "actionTooltip":"actionZoom",  "disabled":false},{"actionName":"actionCentered", "actionTooltip":"actionCentered", 
-			"disabled":false},{"actionName":"actionZoomOut", "actionTooltip":"actionZoomOut",  "disabled":false},{"actionName":"actionSection", "actionTooltip":"actionSection",  
-			"disabled":false},{"actionName":"actionLink", "actionTooltip":"actionLink",  "disabled":false},{"actionName":"actionHelp", "actionTooltip":"actionHelp", ç
-			"disabled":false}]''::json as tabActions 
-			FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
-				INTO form_tabs
-				USING v_table_parent;
-		ELSE
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-			tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
-				INTO form_tabs
-				USING v_table_parent;
-		END IF;
-		
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+		tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+			INTO form_tabs
+			USING v_table_parent;	
 	END IF;
 
-
---        Getting actions and layer manager
-------------------------------------------
+	-- Getting actions and layer manager
+	------------------------------------------
         EXECUTE 'SELECT actions,  layermanager FROM config_api_form WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
 		INTO v_formactions, v_layermanager
 		USING v_tablename;
@@ -336,11 +317,8 @@ BEGIN
 			USING v_table_parent;
 		END IF;
 
-
---        Check if it is parent table 
--------------------------------------
-
-
+	-- Check if it is parent table 
+	-------------------------------------
         IF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
 
 		parent_child_relation:=true;
@@ -374,8 +352,7 @@ BEGIN
 		EXECUTE 'SELECT tableparentepa_id from config_api_layer WHERE layer_id=$1'
 			INTO tableparent_id_arg
 			USING v_tablename;
-
-			
+	
 		-- Identify tableinfo
 		EXECUTE' SELECT epatable FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1'
 			INTO v_tablename
@@ -385,7 +362,6 @@ BEGIN
 
 		IF v_tablename IS NULL THEN
 
-
 			v_message  = '{"level":1, "text":"Epa type is not defined for this feature. Basic values are used"}';
 
 			-- check parent_view
@@ -393,22 +369,17 @@ BEGIN
 				INTO tableparent_id_arg
 				USING v_tablename_original;
 
-
-                
-				-- Identify tableinfotype_id		
+			-- Identify tableinfotype_id		
 			EXECUTE' SELECT tableinfotype_id FROM cat_feature
 				JOIN config_api_tableinfo_x_infotype ON child_layer.tableinfo_id 
 				WHERE cat_feature.id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 				AND infotype_id=$2'
 				INTO v_tablename
 				USING v_id, v_infotype;	
-
-			raise notice'Parent-Child with epa table. Table child: %' , v_tablename;
-
 		END IF;
 					
 	-- not parent, not editable and has tableinfo_id
-        ELSIF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NOT NULL) THEN
+	ELSIF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NOT NULL) THEN
 
 		-- Identify tableinfotype_id 
 		EXECUTE 'SELECT tableinfotype_id FROM config_api_layer
@@ -424,125 +395,118 @@ BEGIN
 		raise notice 'NO parent-child, NO editable NO informable: %' , v_tablename;
         END IF;
 
--- Get child type
+	-- Get child type
 	EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = $1 LIMIT 1'
 		INTO v_childtype
 		USING v_tablename;
 	v_childtype := COALESCE(v_childtype, ''); 
 	
--- Propierties of info layer's
-------------------------------
-    IF v_tablename IS NULL THEN 
+	-- Propierties of info layer's
+	------------------------------
+	IF v_tablename IS NULL THEN 
 
-	v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_api_tableinfo_x_infotype or config_api_layer)", "results":0}';
+		v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_api_tableinfo_x_infotype or config_api_layer)", "results":0}';
 	
+	ELSIF v_tablename IS NOT NULL THEN 
 
-    ELSIF v_tablename IS NOT NULL THEN 
-
-	--    Check generic
-	-------------------
-	IF v_forminfo ISNULL THEN
-		v_forminfo := json_build_object('formName','F16','template','GENERIC');
-		formid_arg := 'F16';
-	END IF;
-
-	--    Add default tab
-	---------------------
-	form_tabs_json := array_to_json(form_tabs);
-	
-    
-	-- General info
-	
-	-- Get message
-
-	-- Form info
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'actions', v_formactions);
-	
-	-- Form Tabs info
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'visibleTabs', form_tabs_json);
-
-	-- Zoom to feature margin values
-	-- get margin values (The goal of this part is pass margin values to client. As bigger is feature less is margin. For point features, maxcanvasmargin configuration is used)
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''api_canvasmargin'') row'
-		INTO v_canvasmargin_text;
-	v_maxcanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'maxcanvasmargin')::json->>'mts')::numeric(12,2);
-	v_mincanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'mincanvasmargin')::json->>'mts')::numeric(12,2);
-
-	-- control of null values from config
-	IF v_maxcanvasmargin IS NULL then v_maxcanvasmargin=50; END IF;
-	IF v_mincanvasmargin IS NULL then v_mincanvasmargin=5; END IF;
-
-	-- Margin calulate
-	v_canvasmargin = (SELECT max(c) FROM (SELECT (v_maxcanvasmargin*2-(st_xmax(st_envelope((v_geometry->>'st_astext')::geometry))-st_xmin(st_envelope((v_geometry->>'st_astext')::geometry))))/2 AS c 
-			   UNION SELECT (v_maxcanvasmargin*2-(st_ymax(st_envelope((v_geometry->>'st_astext')::geometry))-st_ymin(st_envelope((v_geometry->>'st_astext')::geometry))))/2)a)::numeric(12,2);
-	IF v_canvasmargin <= v_mincanvasmargin THEN 
-		v_canvasmargin = v_mincanvasmargin;
-	END IF;
-		
-	-- Feature info
-	v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',null,
-					    'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'tableName', v_tablename, 
-					    'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
-     
-	IF v_id IS NULL THEN
-		v_tg_op = 'INSERT';
-	ELSE 
-		v_tg_op = 'UPDATE';
-	END IF;
-
-	--   Get editability
-	------------------------
-	IF v_editable THEN 
-		EXECUTE 'SELECT gw_api_getpermissions($${"tableName":"'||quote_ident(v_tablename)||'"}$$::json)'
-			INTO v_permissions;
-			v_editable := v_permissions->>'isEditable';
-	ELSE
-		v_editable := FALSE;
-	END IF;
- 
-	--  Get if field's table are configured on config_api_layer_field
-	------------------------------------------------------------------
-	IF (SELECT distinct formname from config_api_form_fields WHERE formname=v_tablename) IS NOT NULL THEN 
-		v_configtabledefined  = TRUE;
-	ELSE 
-		v_configtabledefined  = FALSE;
-	END IF;
-
-
-	-- Get form type
-	IF v_editable = TRUE AND v_configtabledefined = TRUE THEN
-		v_formtype := 'custom_feature';
-	ELSIF v_editable = TRUE AND v_configtabledefined = FALSE THEN
-		v_formtype := 'default';
-	ELSIF v_editable = FALSE AND v_configtabledefined = TRUE THEN
-		v_formtype := 'custom_feature';
-	ELSIF v_editable = FALSE AND v_configtabledefined = FALSE THEN
-		v_formtype := 'default';
-	END IF;
-
-	-- call fields function
-	-------------------
-	IF v_editable THEN
-		RAISE NOTICE 'User has permissions to edit table and table';
-		-- call edit form function
-		EXECUTE 'SELECT gw_api_get_featureupsert($1, $2, $3, $4, $5, $6, $7)'
-		INTO v_fields
-		USING v_tablename, v_id, v_inputgeometry, v_device, v_infotype, v_tg_op, v_configtabledefined;
-
-		-- in case of insert status must be failed when topocontrol fails
-		IF (v_fields->>'status')='Failed' THEN
-			v_message = (v_fields->>'message');
-			v_status = 'Failed';
+		-- Check generic
+		-------------------
+		IF v_forminfo ISNULL THEN
+			v_forminfo := json_build_object('formName','F16','template','GENERIC');
+			formid_arg := 'F16';
 		END IF;
-					
-	ELSIF v_editable = FALSE OR v_id IS NULL THEN 
+
+		-- Add default tab
+		---------------------
+		form_tabs_json := array_to_json(form_tabs);
 	
-		RAISE NOTICE 'User has NOT permissions to edit table';
-		-- call info form function
-		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5)'
-		INTO v_fields
-		USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined;
-	END IF;
+		-- Form info
+		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'actions', v_formactions);
+	
+		-- Form Tabs info
+		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'visibleTabs', form_tabs_json);
+
+		-- Zoom to feature margin values
+		-- get margin values (The goal of this part is pass margin values to client. As bigger is feature less is margin. For point features, maxcanvasmargin configuration is used)
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''api_canvasmargin'') row'
+			INTO v_canvasmargin_text;
+		v_maxcanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'maxcanvasmargin')::json->>'mts')::numeric(12,2);
+		v_mincanvasmargin = (((v_canvasmargin_text::json->>'value')::json->>'mincanvasmargin')::json->>'mts')::numeric(12,2);
+
+		-- control of null values from config
+		IF v_maxcanvasmargin IS NULL then v_maxcanvasmargin=50; END IF;
+		IF v_mincanvasmargin IS NULL then v_mincanvasmargin=5; END IF;
+
+		-- Margin calulate
+		v_canvasmargin = (SELECT max(c) FROM (SELECT (v_maxcanvasmargin*2-(st_xmax(st_envelope((v_geometry->>'st_astext')::geometry))-st_xmin(st_envelope((v_geometry->>'st_astext')::geometry))))/2 AS c 
+			   UNION SELECT (v_maxcanvasmargin*2-(st_ymax(st_envelope((v_geometry->>'st_astext')::geometry))-st_ymin(st_envelope((v_geometry->>'st_astext')::geometry))))/2)a)::numeric(12,2);
+		IF v_canvasmargin <= v_mincanvasmargin THEN 
+			v_canvasmargin = v_mincanvasmargin;
+		END IF;
+	
+		-- Feature info
+		v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',null,
+			'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'tableName', v_tablename, 
+			'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
+     
+		IF v_id IS NULL THEN
+			v_tg_op = 'INSERT';
+		ELSE 
+			v_tg_op = 'UPDATE';
+		END IF;
+
+		-- Get editability
+		------------------------
+		IF v_editable THEN 
+			EXECUTE 'SELECT gw_api_getpermissions($${"tableName":"'||quote_ident(v_tablename)||'"}$$::json)'
+				INTO v_permissions;
+				v_editable := v_permissions->>'isEditable';
+		ELSE
+			v_editable := FALSE;
+		END IF;
+	
+		--  Get if field's table are configured on config_api_layer_field
+		------------------------------------------------------------------
+		IF (SELECT distinct formname from config_api_form_fields WHERE formname=v_tablename) IS NOT NULL THEN 
+			v_configtabledefined  = TRUE;
+		ELSE 
+			v_configtabledefined  = FALSE;
+		END IF;
+	
+		-- Get form type
+		IF v_editable = TRUE AND v_configtabledefined = TRUE THEN
+			v_formtype := 'custom_feature';
+		ELSIF v_editable = TRUE AND v_configtabledefined = FALSE THEN
+			v_formtype := 'default';
+		ELSIF v_editable = FALSE AND v_configtabledefined = TRUE THEN
+			v_formtype := 'custom_feature';
+		ELSIF v_editable = FALSE AND v_configtabledefined = FALSE THEN
+			v_formtype := 'default';
+		END IF;
+	
+		-- call fields function
+		-------------------
+		IF v_editable THEN
+			RAISE NOTICE 'User has permissions to edit table and table';
+			-- call edit form function
+			EXECUTE 'SELECT gw_api_get_featureupsert($1, $2, $3, $4, $5, $6, $7, $8, $9)'
+			INTO v_fields
+			USING v_tablename, v_id, v_inputgeometry, v_device, v_infotype, v_tg_op, v_configtabledefined, v_idname, column_type;
+	
+			-- in case of insert status must be failed when topocontrol fails
+			IF (v_fields->>'status')='Failed' THEN
+				v_message = (v_fields->>'message');
+				v_status = 'Failed';
+			END IF;
+						
+		ELSIF v_editable = FALSE OR v_id IS NULL THEN 
+		
+			RAISE NOTICE 'User has NOT permissions to edit table';
+			-- call info form function
+			EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7)'
+			INTO v_fields
+			USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type;
+		END IF;
 
 	ELSE
 		IF (SELECT distinct formname from config_api_form_fields WHERE formname=v_table_parent) IS NOT NULL THEN 
@@ -552,47 +516,46 @@ BEGIN
 		END IF;
 		
 		-- call info form function for parent layer
-		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5)'
+		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7)'
 		INTO v_fields
-		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined;
+		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type;
+
 		IF v_configtabledefined IS FALSE  THEN
-            v_forminfo := json_build_object('formName','F16','template','GENERIC');
-        END IF;
-    END IF;
+			v_forminfo := json_build_object('formName','F16','template','GENERIC');
+		END IF;
+        
+	END IF;
 
-    -- Get toggledition parameter
-    EXECUTE 'SELECT value::boolean FROM config_param_user WHERE parameter = ''qgis_toggledition_forceopen''' INTO v_toggledition;
+	-- Get toggledition parameter
+	EXECUTE 'SELECT value::boolean FROM config_param_user WHERE parameter = ''qgis_toggledition_forceopen''' INTO v_toggledition;
 
-    v_tablename:= (to_json(v_tablename));
-    v_table_parent:= (to_json(v_table_parent));
+	v_tablename:= (to_json(v_tablename));
+	v_table_parent:= (to_json(v_table_parent));
 
-    --    Hydrometer 'id' fix
-    ------------------------
-    IF v_idname = 'sys_hydrometer_id' THEN
-	v_idname = 'hydrometer_id';
-    END IF;
-	
-	
+	--    Hydrometer 'id' fix
+	------------------------
+	IF v_idname = 'sys_hydrometer_id' THEN
+		v_idname = 'hydrometer_id';
+	END IF;
+		
 	-- message for null
 	IF v_tablename IS NULL THEN
 		v_message='{"level":0, "text":"No feature found", "results":0}';
 	END IF;
 
-    
+    	--    Control NULL's
+	----------------------
+	v_forminfo := COALESCE(v_forminfo, '{}');
+	v_featureinfo := COALESCE(v_featureinfo, '{}');
+	v_linkpath := COALESCE(v_linkpath, '{}');
+	v_parentfields := COALESCE(v_parentfields, '{}');
+	v_fields := COALESCE(v_fields, '{}');
+	v_message := COALESCE(v_message, '{}');
+	v_toggledition := COALESCE(v_toggledition, FALSE);
 
---    Control NULL's
-----------------------
-    v_forminfo := COALESCE(v_forminfo, '{}');
-    v_featureinfo := COALESCE(v_featureinfo, '{}');
-    v_linkpath := COALESCE(v_linkpath, '{}');
-    v_parentfields := COALESCE(v_parentfields, '{}');
-    v_fields := COALESCE(v_fields, '{}');
-    v_message := COALESCE(v_message, '{}');
-    v_toggledition := COALESCE(v_toggledition, FALSE);
-
---    Return
------------------------
-     RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_apiversion ||
+	--    Return
+	-----------------------
+	RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_apiversion ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "toggledition":'|| v_toggledition ||
 		     ', "feature":'|| v_featureinfo ||
@@ -603,13 +566,12 @@ BEGIN
 			'}'||
 		'}')::json;
 
-   --  Exception handling
-    EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
-		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	-- EXCEPTION WHEN OTHERS THEN
+	-- GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	-- RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

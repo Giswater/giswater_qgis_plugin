@@ -7,10 +7,11 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2788
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetvalues(p_data json)
-  RETURNS json AS
+  RETURNS text AS
 $BODY$
 
 /*EXAMPLE
+SELECT gw_api_get_widgetvalues
 */
 
 DECLARE
@@ -32,6 +33,8 @@ v_node_1 text;
 v_node_2 text;
 v_json json;
 v_tgop text;
+v_featuretype text;
+v_text text;
 
 BEGIN
 
@@ -54,24 +57,28 @@ BEGIN
 	IF v_featuretype ='NODE' THEN
 	
 		v_min = (SELECT max(y) FROM (SELECT sys_y1 as y FROM v_arc_x_node WHERE node_1=v_id UNION SELECT sys_y2 FROM v_arc_x_node WHERE node_2=v_id)a);
+		IF v_min IS NULL THEN v_min = 0; END IF;
 		
 	ELSIF v_featuretype ='ARC' THEN
 			
 		SELECT * INTO v_noderecord1 FROM v_node WHERE node_id=v_node_1;
 		v_max1 = v_noderecord1.sys_ymax;
+		IF v_max1 IS NULL THEN v_max1 = 999; END IF;
+
 		
 		SELECT * INTO v_noderecord2 FROM v_node WHERE node_id=v_node_2;
 		v_max2 = v_noderecord2.sys_ymax;
+		IF v_max2 IS NULL THEN v_max2 = 999; END IF;
 					
 	END IF;
 		         
 	-- Return
-    RETURN ('{"ymax":{"minValue":"'||v_min||'","maxValue":"'||v_max||'"},'||
-	  '"custom_ymax":{"minValue":"'||v_min||'","maxValue":"'||v_max||'"},'||
-			   '"y1":{"minValue":"'||v_min1||'","maxValue":'||v_max1||'"},'||
-		'"custom_y1":{"minValue":"'||v_min1||'","maxValue":'||v_max1||'"},'||
-			   '"y2":{"minValue":"'||v_min2||'","maxValue":'||v_max2||'"},'||
-		'"custom_y2":{"minValue":"'||v_min2||'","maxValue":'||v_max2||'"}}'::json)
+	RETURN ('{"ymax":{"min":'||v_min||',"max":'||v_max||'},'||
+	  '"custom_ymax":{"min":'||v_min||',"max":'||v_max||'},'||
+			   '"y1":{"min":'||v_min1||',"max":'||v_max1||'},'||
+		'"custom_y1":{"min":'||v_min1||',"max":'||v_max1||'},'||
+			   '"y2":{"min":'||v_min2||',"max":'||v_max2||'},'||
+		'"custom_y2":{"min":'||v_min2||',"max":'||v_max2||'}}');
    
 END;
 $BODY$
