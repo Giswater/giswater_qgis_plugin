@@ -375,15 +375,15 @@ class ApiConfig(ApiParent):
                     pass
 
                 # Order Widgets
-                if field['layout_id'] == 13:
+                if field['layoutname'] == 'lyt_topology':
                     self.order_widgets_system(field, self.topology_form, lbl,  widget)
-                elif field['layout_id'] == 14:
+                elif field['layoutname'] == 'lyt_builder':
                     self.order_widgets_system(field, self.builder_form, lbl,  widget)
-                elif field['layout_id'] == 15:
+                elif field['layoutname'] == 'lyt_review':
                     self.order_widgets_system(field, self.review_form, lbl,  widget)
-                elif field['layout_id'] == 16:
+                elif field['layoutname'] == 'lyt_analysis':
                     self.order_widgets_system(field, self.analysis_form, lbl,  widget)
-                elif field['layout_id'] == 17:
+                elif field['layoutname'] == 'lyt_system':
                     self.order_widgets_system(field, self.system_form, lbl,  widget)
 
 
