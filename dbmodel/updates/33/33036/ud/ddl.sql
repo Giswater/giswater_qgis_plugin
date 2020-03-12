@@ -6,5 +6,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2020/03/12
-ALTER TABLE anl_graf RENAME TO _anl_flow_arc_;
-ALTER TABLE anl_graf RENAME TO _anl_flow_node_;
+ALTER TABLE anl_flow_arc RENAME TO _anl_flow_arc_;
+ALTER TABLE anl_flow_node RENAME TO _anl_flow_node_;
