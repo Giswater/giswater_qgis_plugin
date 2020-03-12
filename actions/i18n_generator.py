@@ -70,15 +70,37 @@ class I18NGenerator(ParentAction):
     def check_translate_options(self):
         py_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
-        message = ''
+        self.dlg_qm.lbl_info.clear()
+        msg = ''
+
         if py_msg:
             status_py_msg = self.create_files_py_message()
-            if status_py_msg: message += "Python translation successful\n"
+            if status_py_msg is True:
+                msg += "Python translation successful\n"
+            elif status_py_msg is False:
+                msg += "Python translation failed\n"
+            elif status_py_msg is None:
+                msg += "Python translation canceled\n"
+
         if db_msg:
-            status_db_msg = self.create_files_db_message()
-            if status_db_msg: message += "Data base translation successful"
-        if message != '':
-            utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', message)
+            status_db_msg = self.get_files_db_messages()
+            if status_db_msg is True:
+                msg += "Data base translation successful\n"
+            elif status_db_msg is False:
+                msg += "Data base translation failed\n"
+            elif status_db_msg is None:
+                msg += "Data base translation canceled\n"
+
+            status_cfg_msg = self.get_files_config_messages()
+            if status_cfg_msg is True:
+                msg += "Data base config translation successful\n"
+            elif status_cfg_msg is False:
+                msg += "Data base config translation failed\n"
+            elif status_cfg_msg is None:
+                msg += "Data base config translation canceled\n"
+
+        if msg != '':
+            utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', msg)
 
 
     def create_files_py_message(self):
@@ -110,7 +132,7 @@ class I18NGenerator(ParentAction):
             msg = "Are you sure you want to overwrite this file?"
             answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{ts_path}")
             if not answer:
-                return False
+                return None
         ts_file = open(ts_path, "w")
 
         # Create header
@@ -126,13 +148,13 @@ class I18NGenerator(ParentAction):
         ts_file.write(line)
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
-            line += f"\t\t\t<source>{py_tlb['source'].rstrip()}</source>\n"
+            line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
             if py_tlb[py_language] is None:
                 py_tlb[py_language] = py_tlb['enen']
                 if py_tlb['enen'] is None:
                     py_tlb[py_language] = py_tlb['source']
 
-            line += f"\t\t\t<translation>{py_tlb[py_language].rstrip()}</translation>\n"
+            line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
             ts_file.write(line)
         line = '\t</context>\n\n'
@@ -143,10 +165,10 @@ class I18NGenerator(ParentAction):
         # Create children for message
         for py_msg in py_messages:
             line = f"\t\t<message>\n"
-            line += f"\t\t\t<source>{py_msg['source'].rstrip()}</source>\n"
+            line += f"\t\t\t<source>{py_msg['source']}</source>\n"
             if py_msg[py_language] is None:
                 py_msg[py_language] = py_msg['source']
-            line += f"\t\t\t<translation>{py_msg[py_language].rstrip()}</translation>\n"
+            line += f"\t\t\t<translation>{py_msg[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
             ts_file.write(line)
         line = '\t</context>\n\n'
@@ -174,20 +196,21 @@ class I18NGenerator(ParentAction):
 
             # Create child for labels
             line += f"\t\t<message>\n"
-            line += f"\t\t\t<source>{py_dlg['source'].rstrip()}</source>\n"
+            line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
             if py_dlg[key_lbl] is None:
                 py_dlg[key_lbl] = py_dlg['lb_enen']
 
-            line += f"\t\t\t<translation>{py_dlg[key_lbl].rstrip()}</translation>\n"
+            line += f"\t\t\t<translation>{py_dlg[key_lbl]}</translation>\n"
             line += f"\t\t</message>\n"
 
             # Create child for tooltip
             line += f"\t\t<message>\n"
-            line += f"\t\t\t<source>tooltip_{py_dlg['source'].rstrip()}</source>\n"
+            line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
             if py_dlg[key_lbl] is None:
                 py_dlg[key_tooltip] = py_dlg['lb_enen']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
+            
         # Close last context and TS
         line += '\t</context>\n'
         line += '</TS>\n\n'
@@ -211,7 +234,40 @@ class I18NGenerator(ParentAction):
         return title
 
 
-    def create_files_db_message(self):
+    def get_files_config_messages(self):
+        """ Read the values of the database and update the i18n files """
+        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        file_lng = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
+
+        version_metadata = self.get_plugin_version()
+        ver = version_metadata.split('.')
+        plugin_version = f'{ver[0]}{ver[1]}'
+        plugin_release = version_metadata.replace('.', '')
+        # Get db messages values
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
+               f" FROM i18n.dbdialog "
+               f" WHERE context in ('config_param_system', 'audit_cat_param_user')"
+               f" ORDER BY formname;")
+        rows = self.get_rows(sql)
+        if not rows: return False
+        cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
+                    + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
+        file_name = f'dml.sql'
+        # Check if file exist
+        if os.path.exists(cfg_path + file_name):
+            msg = "Are you sure you want to overwrite this file?"
+            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{os.sep}{file_name}")
+            if not answer:
+                return
+        else:
+            os.makedirs(cfg_path, exist_ok=True)      
+
+        status = self.write_values(rows, cfg_path + file_name)
+        return status
+
+
+
+    def get_files_db_messages(self):
         """ Read the values of the database and update the i18n api files """
         db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         file_lng = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
@@ -224,26 +280,37 @@ class I18NGenerator(ParentAction):
         # Get db messages values
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
                f" FROM i18n.dbdialog "
+               f" WHERE context not in ('config_param_system', 'audit_cat_param_user')"
                f" ORDER BY formname;")
         rows = self.get_rows(sql)
-        # if not rows: return
+        if not rows: return
 
-        path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' +''
+        db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' +''
                 + os.sep + f"{plugin_release}"  + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'dml.sql'
 
         # Check if file exist
-        if os.path.exists(path + file_name):
+        if os.path.exists(db_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{path}{os.sep}{file_name}")
+            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{db_path}{os.sep}{file_name}")
             if not answer:
                 return False
         else:
-            os.makedirs(path, exist_ok=True)
+            os.makedirs(db_path, exist_ok=True)
 
-        db_file = open(path + file_name, "w")
+        status = self.write_values(rows, db_path + file_name)
+        return status
 
-        line = (f'/*\n'
+
+    def write_values(self, rows, path):
+        """ Generate a string and write into file
+        :param rows: List of values ([List][list])
+        :param path: Full destination path (String)
+        :return: (Boolean)
+        """
+        file = open(path, "w")
+        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        header = (f'/*\n'
                 f'This file is part of Giswater 3\n'
                 f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
                 f'General Public License as published by the Free Software Foundation, either version 3 of the '
@@ -251,8 +318,7 @@ class I18NGenerator(ParentAction):
                 f'This version of Giswater is provided by Giswater Association,\n'
                 f'*/\n\n\n'
                 f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
-        db_file.write(line)
-
+        file.write(header)
         for row in rows:
             table = row['context']
             form_name = row['formname']
@@ -268,62 +334,39 @@ class I18NGenerator(ParentAction):
                 tt_value = row['lb_enen']
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'
-            if row['context'] == 'config_api_form_fields':
-                 line +=(f'{{"data":'
-                            f'{{"table":"{table}", '
-                            f'"clause":"WHERE formname = \'{form_name}\' '
-                            f'AND column_id = \'{source}\' AND formtype = \'{form_type}\'", '
-                            f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                            f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}'
-                            f'}}'
-                        f'}}$$);\n')
-            elif row['context'] == 'config_api_form_tabs':
+            if row['context'] in ('config_param_system', 'audit_cat_param_user'):
                 line +=(f'{{"data":'
-                            f'{{"table":"{table}", '
-                                f'"clause":"WHERE formname = \'{form_name}\' AND tabname = \'{source}\'", '
-                                f'"label":{{"column":"tabtext", "value":"{lbl_value}"}}, '
-                                f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}'
-                            f'}}'
-                        f'}}$$);\n')
-            elif row['context'] == 'config_api_form_groupbox':
-                line +=(f'{{"data":'
-                            f'{{"table":"{table}", '
-                                f'"clause":"WHERE formname = \'{form_name}\' AND layout_id = \'{source}\'", '
-                                f'"label":{{"column":"label", "value":"{lbl_value}"}},'
-                                f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}'
-                            f'}}'
-                        f'}}$$);\n')
-            elif row['context'] == 'config_api_form_actions':
-                line +=(f'{{"data":'
-                            f'{{"table":"{table}", '
-                                f'"clause":"WHERE actioname = \'{source}\' ", '
-                                f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}'                                
-                            f'}}'
-                        f'}}$$);\n')
-            elif row['context'] == 'config_param_system':
-                line +=(f'{{"data":'
-                            f'{{"table":"{table}", '
-                                f'"clause":"WHERE parameter = \'{source}\' ", '
+                            f'{{"table":"{table}", '                                
                                 f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                                f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}'                            
-                            f'}}'
-                        f'}}$$);\n')
-            elif row['context'] == 'audit_cat_param_user':
+                                f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
+            elif row['context'] not in ('config_param_system', 'audit_cat_param_user'):
                 line += (f'{{"data":'
-                         f'{{"table":"{table}", '
-                         f'"clause":"WHERE parameter = \'{source}\' ", '
+                         f'{{"table":"{table}", '                         
                          f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                         f'"tooltip":{{"column":"description", "value":"{tt_value}"}}'
-                         f'}}'
-                         f'}}$$);\n')
-            else:
-                print(row)
-            db_file.write(line)
-        db_file.close()
-        del db_file
+                         f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
+
+            # Clause WHERE for each context
+            if row['context'] == 'config_api_form_fields':
+                line += (f', "clause":"WHERE column_id = \'{source}\' '
+                         f'AND formname = \'{form_name}\' AND formtype = \'{form_type}\'"')
+            elif row['context'] == 'config_api_form_tabs':
+                line += (f', "clause":"WHERE formname = \'{form_name}\' '
+                         f'AND column_id = \'{source}\' AND formtype = \'{form_type}\'"')
+            elif row['context'] == 'config_api_form_groupbox':
+                line += (f', "clause":"WHERE formname = \'{form_name}\' '
+                         f'AND layout_id  = \'{source}\'"')
+            elif row['context'] == 'config_api_form_actions':
+                line += f', "clause":"WHERE actioname  = \'{source}\''
+            elif row['context'] in ('config_param_system', 'audit_cat_param_user'):
+                line += f', "clause":"WHERE parameter = \'{source}\'"'
+
+            line += f'}}}}$$);\n'
+            file.write(line)
+        file.close()
+        del file
         return True
-
-
+    
+    
     def save_user_values(self):
         """ Save selected user values """
         host = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)
