@@ -87,7 +87,7 @@ SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":
 "data":{"feature_type":"CONNEC"}}$$);
 
 SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
-"SELECT array_to_json(array_agg(gully_id::text)) FROM v_edit_gullyWHERE gully_id IS NOT NULL AND state=1"},
+"SELECT array_to_json(array_agg(gully_id::text)) FROM v_edit_gully WHERE gully_id IS NOT NULL AND state=1"},
 "data":{"feature_type":"GULLY"}}$$);
 
 -- rotate vnodes and connec labels
