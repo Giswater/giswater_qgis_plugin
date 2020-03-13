@@ -451,7 +451,9 @@ BEGIN
      
 		IF v_id IS NULL THEN
 			v_tg_op = 'INSERT';
-		ELSE 
+		ELSIF  v_id = 'LAYER' THEN
+			v_tg_op = 'LAYER';
+		ELSE
 			v_tg_op = 'UPDATE';
 		END IF;
 
