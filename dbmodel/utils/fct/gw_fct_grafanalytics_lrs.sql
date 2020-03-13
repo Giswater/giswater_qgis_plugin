@@ -75,12 +75,6 @@ BEGIN
 	-- init path
 	SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-	SELECT value::json INTO v_debug FROM config_param_user WHERE parameter = 'debug_mode' AND cur_user = current_user;
-
-	IF v_debug IS NULL THEN
-		v_debug = '{"status":true}';
-	END IF;
-
 	-- get variables (from input)
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
@@ -201,7 +195,8 @@ BEGIN
 		raise notice 'v_header_arc,v_last_arc,%,%',v_header_arc,v_last_arc;
 
 		-------------------- proposed mode
-		PERFORM gw_fct_debug((concat('{"data":{"debug":',v_debug,',"message":"The values header_arc and last_arc are:", "variables":"',quote_nullable(v_header_arc),',',quote_nullable(v_last_arc),'"}}'))::json);
+		PERFORM gw_fct_getmessage((concat(
+		'{"data":{"debug_msg":"The values header_arc and last_arc are:", "variables":"',quote_nullable(v_header_arc),',',quote_nullable(v_last_arc),'"}}'))::json);
 				
 
 		EXIT WHEN v_feature.node_1 IS NULL;

@@ -1,0 +1,3 @@
+3.3.037
+*************
+- Enhance gw_fct_message managing also debug issues

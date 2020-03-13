@@ -87,10 +87,6 @@ false, false, null, false) ON CONFLICT (id) DO NOTHING;
 --update audit_cat_param_user with cat_feature vdefaults
 UPDATE cat_feature SET id=id;
 
-INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
-isdeprecated, istoolbox, alias, isparametric)
-VALUES (2824, 'gw_fct_debug', 'utils', 'function', null, null, null,'Function to manage debugs', 'role_edit',
-false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
 isdeprecated, istoolbox, alias, isparametric)
@@ -132,11 +128,6 @@ UPDATE config_param_system SET layoutname = 'lyt_review' WHERE layout_id = 15;
 UPDATE config_param_system SET layoutname = 'lyt_analysis' WHERE layout_id = 16;
 UPDATE config_param_system SET layoutname = 'lyt_system' WHERE layout_id = 17;
 
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"layout_id"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"layout_id"}}$$);
-
-
 UPDATE audit_cat_function set sample_query =
 '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }},
 "UD":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }}}'
@@ -144,7 +135,7 @@ where function_name = 'gw_fct_feature_replace';
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
 isdeprecated, istoolbox, alias, isparametric)
-VALUES (2828, 'gw_api_getdimensioning', 'utils', 'function', null, null, null,'Function to show dimensioning form of api', 'role_basic',
+VALUES (2824, 'gw_api_getdimensioning', 'utils', 'function', null, null, null,'Function to show dimensioning form of api', 'role_basic',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
 UPDATE audit_cat_param_user SET id = 'statetype_0_vdefault' WHERE id = 'statetype_end_vdefault';
