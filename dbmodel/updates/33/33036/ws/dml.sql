@@ -27,5 +27,5 @@ VALUES ('mincut form', 'ws', 'v_anl_mincut_result_hydrometer', 'work_order', 3, 
 
 -- 12/03/2020
 UPDATE audit_cat_param_user 
-SET widgetcontrols = (replace (widgetcontrols::text, '{"minValue":0.001, "maxValue":100}', '{"values":{"min":0.001, "max":100}}'))::json 
+SET widgetcontrols = (replace (widgetcontrols::text, '{"minValue":0.001, "maxValue":100}', '{"controlValues":{"min":0.001, "max":100}}'))::json 
 WHERE widgetcontrols is not null;
