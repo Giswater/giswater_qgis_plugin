@@ -1413,7 +1413,7 @@ class Giswater(QObject):
                 # self.controller.show_warning(msg)
                 continue
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":""'
+            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
             complet_result = self.controller.get_json('gw_api_getinfofromid', body)
             if not complet_result: continue
