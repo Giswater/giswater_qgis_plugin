@@ -312,14 +312,14 @@ IF v_multi_create IS TRUE THEN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
 
-		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_name=22;
+		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layoutname=22;
 
 		IF v_param_user_id IS NULL THEN
 			v_param_user_id=1;
 		END IF;
 
 		IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM audit_cat_param_user) THEN
-			INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layout_name, layout_order, 
+			INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order, 
 	      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id )
 			VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 			 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
@@ -628,13 +628,13 @@ ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (118, null, 4, 'Insert parameter definition into config_api_form_fields.');
 
-		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_name=22;
+		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layoutname=22;
 		
 		IF v_param_user_id IS NULL THEN
 			v_param_user_id=1;
 		END IF;
 
-		INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layout_name, layout_order, 
+		INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order, 
       	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id)
 		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
 		concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
