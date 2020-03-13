@@ -104,3 +104,27 @@ SELECT DISTINCT ON (a.link_id) a.link_id,
              left JOIN dma ON dma.dma_id::text = arc.dma_id::text
              LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)) a
   WHERE a.state < 2;
+  
+  
+CREATE OR REPLACE VIEW v_edit_man_gully_pol AS
+SELECT
+gully.pol_id,
+gully.gully_id,
+polygon.the_geom,
+gully.fluid_type
+FROM gully
+	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
+	JOIN polygon ON polygon.pol_id = gully.pol_id;
+	
+	
+CREATE OR REPLACE VIEW v_edit_man_netgully_pol AS 
+SELECT 
+man_netgully.pol_id,
+v_node.node_id,
+polygon.the_geom,
+v_node.fluid_type
+FROM v_node
+	JOIN man_netgully ON man_netgully.node_id = v_node.node_id
+	JOIN polygon ON polygon.pol_id = man_netgully.pol_id;
+	
+	

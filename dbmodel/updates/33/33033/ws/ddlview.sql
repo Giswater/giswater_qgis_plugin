@@ -65,3 +65,18 @@ SELECT a.link_id,
              LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
              LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)) a
   WHERE a.state < 2;
+
+
+  
+DROP VIEW IF EXISTS v_edit_sector;
+CREATE OR REPLACE VIEW v_edit_sector AS 
+ SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.the_geom,
+    sector.undelete,
+    sector.grafconfig::text AS grafconfig
+   FROM inp_selector_sector,
+    sector
+  WHERE sector.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;

@@ -7,10 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2020/03/10
-SELECT gw_fct_admin_manage_roles($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "data":{"action":"CREATE"}}$$);
-
 --2020/03/13
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_users", "column":"active", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_users", "column":"external", "dataType":"boolean"}}$$);
-
+-- in order to prevent NULL values in code (used in python)
+UPDATE ext_cat_period SET code=id WHERE code IS NULL;

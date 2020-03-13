@@ -7,10 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2020/03/10
-SELECT gw_fct_admin_manage_roles($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "data":{"action":"CREATE"}}$$);
 
 --2020/03/13
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_users", "column":"active", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_users", "column":"external", "dataType":"boolean"}}$$);
+ALTER TABLE ext_rtc_hydrometer_x_data DROP CONSTRAINT IF EXISTS cat_period_id_fk;
 
+ALTER TABLE ext_rtc_hydrometer_x_data ADD CONSTRAINT cat_period_id_fk FOREIGN KEY (cat_period_id)
+REFERENCES ext_cat_period (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
