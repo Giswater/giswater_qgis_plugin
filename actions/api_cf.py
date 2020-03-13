@@ -683,11 +683,13 @@ class ApiCF(ApiParent, QObject):
 
     def set_min_max_values(self, widget, field):
         # Set max and min values allowed
-        if field['widgetcontrols'] and 'minValue' in field['widgetcontrols']:
-            widget.setProperty('minValue', field['widgetcontrols']['minValue'])
+        if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
+            if 'min' in field['widgetcontrols']['maxMinValues']:
+                widget.setProperty('minValue', field['widgetcontrols']['maxMinValues']['min'])
 
-        if field['widgetcontrols'] and ('maxValue' in field['widgetcontrols']):
-            widget.setProperty('maxValue', field['widgetcontrols']['maxValue'])
+        if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
+            if 'max' in field['widgetcontrols']['maxMinValues']:
+                widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
         return widget
 
 
@@ -844,8 +846,9 @@ class ApiCF(ApiParent, QObject):
         fields_reload = ""
         list_mandatory = []
         for field in complet_result['body']['data']['fields']:
-            if p_widget and field['widgetname'] == p_widget.objectName() and field['reloadfields']:
-                fields_reload = field['reloadfields']
+            if p_widget and field['widgetname'] == p_widget.objectName():
+                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                    fields_reload == field['widgetcontrols']['autoupdateReloadFields']
 
             if field['ismandatory'] == True:
                 widget_name = 'data_' + field['column_id']

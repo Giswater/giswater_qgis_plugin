@@ -1288,9 +1288,9 @@ class ApiParent(ParentAction):
                     else:
                         widget.setProperty('is_mandatory', True)
                     widget.setText(field['value'])
-                    if 'regexpcontrol' in field:
-                        if field['regexpcontrol'] is not None:
-                            reg_exp = QRegExp(str(field['regexpcontrol']))
+                    if 'regexpControl' in field['widgetcontrols']:
+                        if field['regexpControl'] is not None:
+                            reg_exp = QRegExp(str(field['regexpControl']))
                             widget.setValidator(QRegExpValidator(reg_exp))
                     widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
