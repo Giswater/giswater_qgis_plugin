@@ -297,7 +297,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 		
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) from connec where connec_id=NEW.connec_id));
+				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'FOUNTAIN', (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer))) from connec where connec_id=NEW.connec_id));
 					
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
 				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
