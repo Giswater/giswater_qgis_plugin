@@ -183,8 +183,6 @@ BEGIN
 
 	END LOOP;
 
-
-
 	-- combo childs
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo' AND  a->>'parentId' IS NOT NULL
 	LOOP
@@ -206,9 +204,7 @@ BEGIN
 			v_selected_id := p_values_array->>(aux_json->>'parentId');	
 			
 		END IF;	
-
-		--raise notice ' % -------------------XXXXXXXXXXXXXXXXXX------------> %', v_selected_id , aux_json;
-		
+	
 		-- Define the order by column
 		IF (aux_json->>'orderById')::boolean IS TRUE THEN
 			v_orderby='id';
@@ -218,9 +214,8 @@ BEGIN
 
 		-- Get combo id's
 		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN	
-			query_text= 'SELECT (array_agg(id)) FROM ('|| (aux_json->>'queryText') || (aux_json->>'queryTextFilter')||' '|| v_selected_id ||' ORDER BY '||v_orderby||') a';
-			raise notice 'query_text %', query_text;
-			execute query_text INTO v_array;	
+			EXECUTE 'SELECT (array_agg(id)) FROM ('|| (aux_json->>'queryText') ||(aux_json->>'queryTextFilter')||'::text = '||quote_literal(v_selected_id)
+			||' ORDER BY '||v_orderby||') a';
 		ELSE 	
 			EXECUTE 'SELECT (array_agg(id)) FROM ('||(aux_json->>'queryText')||' ORDER BY '||v_orderby||')a' INTO v_array;
 			
@@ -244,10 +239,8 @@ BEGIN
 		
 		-- Get combo values
 		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN
-			query_text= 'SELECT (array_agg(idval)) FROM ('|| (aux_json->>'queryText') ||(aux_json->>'queryTextFilter')||' '||v_selected_id||' ORDER BY '||v_orderby||') a';
-
-			raise notice 'queryText %', query_text;
-			execute query_text INTO v_array;
+			EXECUTE 'SELECT (array_agg(idval)) FROM ('|| (aux_json->>'queryText') ||(aux_json->>'queryTextFilter')||'::text = '||quote_literal(v_selected_id)
+			||' ORDER BY '||v_orderby||') a';
 		ELSE 	
 			EXECUTE 'SELECT (array_agg(idval)) FROM ('||(aux_json->>'queryText')||' ORDER BY '||v_orderby||')a'
 				INTO v_array;
@@ -282,10 +275,6 @@ BEGIN
   
 	-- Return
 	RETURN (fields_array);
-
-	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
