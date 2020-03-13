@@ -44,7 +44,7 @@ BEGIN
 	-- update values for valves
 	UPDATE rpt_inp_arc SET minorloss = (v_valve->>'minorloss')::float WHERE epa_type='VALVE' AND (minorloss = 0 OR minorloss is null) AND result_id  = p_result;
 	UPDATE rpt_inp_arc SET roughness = ((v_valve->>'roughness')::json->>v_headloss)::float	WHERE epa_type='VALVE' AND (roughness = 0 OR roughness is null) AND result_id  = p_result;
-	UPDATE rpt_inp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE' WHERE result_id  = p_result;
+	UPDATE rpt_inp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE' AND result_id  = p_result;
 	UPDATE rpt_inp_arc SET diameter = (v_valve->>'diameter')::float WHERE epa_type='VALVE' AND (diameter = 0 OR diameter is null) AND result_id  = p_result;
 
 	
