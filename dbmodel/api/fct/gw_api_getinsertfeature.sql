@@ -25,22 +25,23 @@ SELECT SCHEMA_NAME.gw_api_getinsertfeature($${
 */
 
 DECLARE
-	v_apiversion text;
-	v_rows json;
-	v_geometrytype text;
+v_apiversion text;
+v_rows json;
+v_geometrytype text;
+v_errcontext text;
 	
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO v_apiversion;
 
 
- --  Creating the list elements
-----------------------------
+	--  Creating the list elements
+	----------------------------
 	-- Get input parameters:
 	v_geometrytype := (p_data ->> 'feature')::json->> 'geometryType';
 
@@ -62,11 +63,11 @@ BEGIN
 
 	RAISE NOTICE 'v_rows %', v_rows;
 
---    Control NULL's
+	-- Control NULL's	
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_rows := COALESCE(v_rows, '{}');
     
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "apiVersion":'||v_apiversion||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
@@ -75,9 +76,10 @@ BEGIN
 		     '}}'||
 	    '}')::json;
     
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

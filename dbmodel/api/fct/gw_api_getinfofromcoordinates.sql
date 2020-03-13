@@ -58,18 +58,19 @@ DECLARE
     v_config_layer text;
     v_toolbar text;
     v_role text;
+	v_errcontext text;
 
 BEGIN
 
---  Set search path to local schema
+	--  Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
--- 	get input parameters
+	-- 	get input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
 	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
@@ -77,7 +78,6 @@ BEGIN
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_toolbar := ((p_data ->> 'data')::json->> 'toolBar');
 	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
-
 
 	v_activelayer := (p_data ->> 'data')::json->> 'activeLayer';
 	v_visiblelayer := (p_data ->> 'data')::json->> 'visibleLayer';
@@ -87,7 +87,7 @@ BEGIN
 	v_visiblelayer = concat('}',substring(reverse(v_visiblelayer) from 2 for LENGTH(v_visiblelayer)));
 	v_visiblelayer := reverse(v_visiblelayer);
 
--- Sensibility factor
+	-- Sensibility factor
     IF v_device=1 OR v_device=2 THEN
         EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_web'''
 		INTO v_sensibility_f;
@@ -112,11 +112,10 @@ BEGIN
 
 	END IF;
 
---   Make point
+	-- Make point
      SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
-
-
---  Get element
+	
+	-- Get element
      v_sql := 'SELECT layer_id, 0 as orderby, add_param->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '||quote_literal(v_activelayer)||' UNION
               SELECT layer_id, orderby , add_param->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) UNION 
               SELECT DISTINCT ON (layer_id) layer_id, orderby+100, add_param->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' JOIN cat_feature ON parent_layer=layer_id 
@@ -124,9 +123,7 @@ BEGIN
 
     FOR v_layer IN EXECUTE v_sql     
     LOOP
-
-	--  Indentify geometry type   
-    
+		-- Indentify geometry type   
         v_count=v_count+1;
             --    Get id column
         EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
@@ -171,9 +168,7 @@ BEGIN
 		    ORDER BY  ST_Distance('||v_layer.layer_id||'.'||v_the_geom||', $1) asc LIMIT 1'
                     INTO v_id
                     USING v_point, v_sensibility;
-        END IF;
-
-        
+        END IF;      
 
         IF v_id IS NOT NULL THEN 
             exit;
@@ -183,9 +178,7 @@ BEGIN
 
     END LOOP;
 
-  --  RAISE NOTICE 'Found (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
-    
---    Control NULL's
+	-- Control NULL's
     IF v_id IS NULL THEN
 	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "apiVersion":'|| api_version ||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
     END IF;
@@ -194,17 +187,20 @@ BEGIN
 	v_toolbar = 'basic';
     END IF;
     
---   Get editability of layer
+	-- Get editability of layer
     EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) THEN ''True'' ELSE ''False'' END) 
             FROM  '||quote_ident(v_config_layer)||' WHERE layer_id='||quote_literal(v_layer.layer_id)||';'
             INTO v_iseditable;
 	RAISE NOTICE '----------------%',v_toolbar;
---   Call and return gw_api_getinfofromid
+	
+	--   Call and return gw_api_getinfofromid
 	RETURN gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
 	'"},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json);
-
---    Exception handling
- --     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

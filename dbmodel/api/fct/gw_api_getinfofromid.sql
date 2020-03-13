@@ -573,9 +573,9 @@ BEGIN
 		'}')::json;
 
 	-- Exception handling
-	-- EXCEPTION WHEN OTHERS THEN
-	-- GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
-	-- RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	 EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	 RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
