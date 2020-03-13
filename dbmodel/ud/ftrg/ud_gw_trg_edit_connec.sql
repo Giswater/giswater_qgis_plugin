@@ -92,7 +92,7 @@ BEGIN
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN 
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1012", "function":"1214","debug_msg":null}}$$);' 
+				"data":{"error":"1012", "function":"1214","debug_msg":null}}$$);';
             END IF;
 				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
