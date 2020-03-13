@@ -43,6 +43,7 @@ DECLARE
     v_result_point json;
     v_result_polygon json;
     v_result_line json;
+    v_count integer;
     
 BEGIN
 
@@ -122,8 +123,13 @@ BEGIN
         INTO v_id_field;
          
         IF v_id_field is not null THEN
-            EXECUTE 'SELECT setval('''||v_dest_schema||'.'||rec_seq.sequence_name||''', 
-            (SELECT max('||v_id_field::INTEGER||')+1 FROM '||rec_seq.related_table||'), true);';
+            EXECUTE 'SELECT count('||v_id_field||') FROM '||rec_seq.related_table||';'
+            INTO v_count;
+            
+            IF v_count > 0 THEN
+                EXECUTE 'SELECT setval('''||v_dest_schema||'.'||rec_seq.sequence_name||''', 
+                (SELECT max('||v_id_field||')+1 FROM '||rec_seq.related_table||'), true);';
+            END IF;
         END IF;
 
     END LOOP;
