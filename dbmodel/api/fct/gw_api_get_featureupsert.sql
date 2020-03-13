@@ -411,130 +411,133 @@ BEGIN
 		SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalues;
 		
 	END IF;	
+
+	IF p_tg_op != 'LAYER' THEN 
 		
-	-- looping the array setting values and widgetcontrols
-	FOREACH aux_json IN ARRAY v_fields_array 
-        LOOP          
-		array_index := array_index + 1;
+		-- looping the array setting values and widgetcontrols
+		FOREACH aux_json IN ARRAY v_fields_array 
+		LOOP          
+			array_index := array_index + 1;
 
-		IF p_tg_op='INSERT' THEN 
+			IF p_tg_op='INSERT' THEN 
 
-			CASE (aux_json->>'column_id')
-			
-			-- special values
-			WHEN quote_ident(p_idname) THEN
-				field_value = v_id;
-			WHEN concat(lower(v_catfeature.feature_type),'_type') THEN 
-				EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
-			WHEN 'code' THEN 
-				field_value = v_code;
-			WHEN 'customer_code' THEN 
-				field_value = v_id;
-			WHEN 'node_1' THEN 
-				field_value = v_noderecord1.node_id;
-			WHEN 'node_2' THEN 
-				field_value = v_noderecord2.node_id;
-			WHEN 'gis_length' THEN 
-				field_value = v_gislength;
-			WHEN 'epa_type' THEN 
-				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'INTO field_value USING v_catfeature.id;
-			WHEN 'fire_code' THEN
-				IF v_use_fire_code_seq THEN	
-					field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
-				END IF;
-
-			-- mapzones
-			WHEN 'presszonecat_id' THEN 
-				field_value = v_presszone_id;			
-			WHEN 'sector_id' THEN 
-				field_value = v_sector_id;
-			WHEN 'macrosector_id' THEN 
-				field_value = v_macrosector_id;
-			WHEN 'dma_id' THEN 
-				field_value = v_dma_id;
-			WHEN 'macrodma_id' THEN 
-				field_value = v_macrodma_id;
-			WHEN 'expl_id' THEN 
-				field_value = v_expl_id;
-			WHEN 'muni_id' THEN 
-				field_value = v_muni_id;
-
-			-- elevation from raster
-			WHEN 'elevation', 'top_elev' THEN 
-				IF v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
-					field_value = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE 
-					id = (SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-				END IF;
-							
-			-- catalog values
-			WHEN 'cat_dnom' THEN
-				field_value = v_dnom;
-			WHEN 'cat_pnom' THEN
-				field_value = v_pnom;
-			WHEN 'cat_geom1' THEN
-				field_value = v_geom1;
-			WHEN 'cat_geom2' THEN
-				field_value = v_geom2;
-			WHEN 'cat_shape' THEN
-				field_value = v_shape;
-			WHEN 'matcat_id' THEN	
-				field_value = v_matcat_id;
-			WHEN concat(lower(v_catfeature.feature_type),'cat_id') THEN	
-				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-				WHERE (reverse(substring(reverse(a->>'parameter'),10)) = lower(v_catfeature.id));
-
-			-- *_type
-			WHEN 'fluid_type','function_type','location_type','category_type' THEN
-				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-				WHERE ((a->>'param') = (aux_json->>'column_id') AND left(lower(a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
-                    
-			-- state type
-			WHEN 'state_type' THEN
-				-- getting parent value
-				SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';
+				CASE (aux_json->>'column_id')
 				
-				EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
-				WHERE cur_user=current_user AND parameter = concat(''statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
-						
-			-- rest (including addfields)
-			ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id'); 
-			END CASE;
-		
-			--specific values for ud
-			IF v_project_type = 'UD' THEN
+				-- special values
+				WHEN quote_ident(p_idname) THEN
+					field_value = v_id;
+				WHEN concat(lower(v_catfeature.feature_type),'_type') THEN 
+					EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
+				WHEN 'code' THEN 
+					field_value = v_code;
+				WHEN 'customer_code' THEN 
+					field_value = v_id;
+				WHEN 'node_1' THEN 
+					field_value = v_noderecord1.node_id;
+				WHEN 'node_2' THEN 
+					field_value = v_noderecord2.node_id;
+				WHEN 'gis_length' THEN 
+					field_value = v_gislength;
+				WHEN 'epa_type' THEN 
+					EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'INTO field_value USING v_catfeature.id;
+				WHEN 'fire_code' THEN
+					IF v_use_fire_code_seq THEN	
+						field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
+					END IF;
 
-				CASE (aux_json->>'column_id')		
-				WHEN 'sys_y1' THEN
-					field_value =v_noderecord1.sys_ymax;
-				WHEN 'sys_elev1' THEN
-					field_value =v_noderecord1.sys_elev;
-				WHEN 'sys_y2' THEN
-					field_value =v_noderecord2.sys_ymax;
-				WHEN 'sys_elev2' THEN
-					field_value =v_noderecord2.sys_elev;	
-				WHEN 'gratecat_id' THEN
-					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 	WHERE (a->>'param') = 'gratecat_id';
-				ELSE
+				-- mapzones
+				WHEN 'presszonecat_id' THEN 
+					field_value = v_presszone_id;			
+				WHEN 'sector_id' THEN 
+					field_value = v_sector_id;
+				WHEN 'macrosector_id' THEN 
+					field_value = v_macrosector_id;
+				WHEN 'dma_id' THEN 
+					field_value = v_dma_id;
+				WHEN 'macrodma_id' THEN 
+					field_value = v_macrodma_id;
+				WHEN 'expl_id' THEN 
+					field_value = v_expl_id;
+				WHEN 'muni_id' THEN 
+					field_value = v_muni_id;
+
+				-- elevation from raster
+				WHEN 'elevation', 'top_elev' THEN 
+					IF v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
+						field_value = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE 
+						id = (SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+					END IF;
+								
+				-- catalog values
+				WHEN 'cat_dnom' THEN
+					field_value = v_dnom;
+				WHEN 'cat_pnom' THEN
+					field_value = v_pnom;
+				WHEN 'cat_geom1' THEN
+					field_value = v_geom1;
+				WHEN 'cat_geom2' THEN
+					field_value = v_geom2;
+				WHEN 'cat_shape' THEN
+					field_value = v_shape;
+				WHEN 'matcat_id' THEN	
+					field_value = v_matcat_id;
+				WHEN concat(lower(v_catfeature.feature_type),'cat_id') THEN	
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
+					WHERE (reverse(substring(reverse(a->>'parameter'),10)) = lower(v_catfeature.id));
+
+				-- *_type
+				WHEN 'fluid_type','function_type','location_type','category_type' THEN
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
+					WHERE ((a->>'param') = (aux_json->>'column_id') AND left(lower(a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
+			    
+				-- state type
+				WHEN 'state_type' THEN
+					-- getting parent value
+					SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';
+					
+					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
+					WHERE cur_user=current_user AND parameter = concat(''statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
+							
+				-- rest (including addfields)
+				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id'); 
 				END CASE;
+			
+				--specific values for ud
+				IF v_project_type = 'UD' THEN
+
+					CASE (aux_json->>'column_id')		
+					WHEN 'sys_y1' THEN
+						field_value =v_noderecord1.sys_ymax;
+					WHEN 'sys_elev1' THEN
+						field_value =v_noderecord1.sys_elev;
+					WHEN 'sys_y2' THEN
+						field_value =v_noderecord2.sys_ymax;
+					WHEN 'sys_elev2' THEN
+						field_value =v_noderecord2.sys_elev;	
+					WHEN 'gratecat_id' THEN
+						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 	WHERE (a->>'param') = 'gratecat_id';
+					ELSE
+					END CASE;
+				END IF;	
+				
+			ELSIF  p_tg_op ='UPDATE' THEN 
+				field_value := (v_values_array->>(aux_json->>'column_id'));
+			END IF;
+			
+			-- setting values
+			IF (aux_json->>'widgettype')='combo' THEN 
+					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
+			ELSE 
+					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
 			END IF;	
 			
-		ELSIF  p_tg_op ='UPDATE' THEN 
-			field_value := (v_values_array->>(aux_json->>'column_id'));
-		END IF;
-		
-		-- setting values
-		IF (aux_json->>'widgettype')='combo' THEN 
-				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
-		ELSE 
-				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
-		END IF;	
-		
-		-- setting widgetcontrols
-		IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN 
-			v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'column_id'))::json);
-			v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
-		END IF;
-	END LOOP;  
+			-- setting widgetcontrols
+			IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN 
+				v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'column_id'))::json);
+				v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
+			END IF;
+		END LOOP;  
+	END IF;
   
 	-- Convert to json
 	v_fields := array_to_json(v_fields_array);

@@ -509,9 +509,9 @@ BEGIN
 		
 			RAISE NOTICE 'User has NOT permissions to edit table';
 			-- call info form function
-			EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7)'
+			EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
 			INTO v_fields
-			USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type;
+			USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 		END IF;
 
 	ELSE
@@ -522,9 +522,9 @@ BEGIN
 		END IF;
 		
 		-- call info form function for parent layer
-		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7)'
+		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
 		INTO v_fields
-		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type;
+		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 
 		IF v_configtabledefined IS FALSE  THEN
 			v_forminfo := json_build_object('formName','F16','template','GENERIC');

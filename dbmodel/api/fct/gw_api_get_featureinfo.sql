@@ -14,7 +14,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_featureinfo(
     p_infotype integer,
     p_configtable boolean,
     p_idname text,
-    p_columntype text)
+    p_columntype text
+    p_tgop text)
   RETURNS json AS
 $BODY$
 
@@ -85,21 +86,25 @@ BEGIN
 			INTO fields_array
 			USING p_table_id, schemas_array[1]; 
 	END IF;
-    
-	-- Fill every value
-	FOREACH aux_json IN ARRAY fields_array
-	LOOP
-		array_index := array_index + 1;
-		field_value := (v_values_array->>(aux_json->>'column_id'));
-		field_value := COALESCE(field_value, '');
-        
-		-- Update array
-		IF (aux_json->>'widgettype')='combo' THEN
-			fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'selectedId', field_value);
-		ELSE
-			fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
-		END IF;   
-	END LOOP;
+
+	IF p_tgop !='LAYER' THEN
+	
+		-- Fill every value
+		FOREACH aux_json IN ARRAY fields_array
+		LOOP
+			array_index := array_index + 1;
+			field_value := (v_values_array->>(aux_json->>'column_id'));
+			field_value := COALESCE(field_value, '');
+		
+			-- Update array
+			IF (aux_json->>'widgettype')='combo' THEN
+				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'selectedId', field_value);
+			ELSE
+				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
+			END IF;   
+		END LOOP;
+		
+	END IF;
    
 	-- Convert to json
 	fields := array_to_json(fields_array);
