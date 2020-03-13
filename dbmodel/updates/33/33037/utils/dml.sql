@@ -16,3 +16,15 @@ INSERT INTO config_param_system (parameter, value, context, descript, label, ise
 VALUES ('sys_transaction_db', '{"status":false, "server":""}', 'system', 'Parameteres for use an additional database to scape transtaction logics of PostgreSQL in order to audit processes step by step', 
 'Additional transactional database:', TRUE, 'utils', 'json', 'linetext', false, false, 'false') 
 ON CONFLICT (parameter) DO NOTHING;
+
+
+UPDATE audit_cat_param_user SET layoutname = 'lyt_other', formname='config', iseditable = true, layout_order=19 WHERE id ='debug_mode';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=9 WHERE id ='verified_vdefault';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=9 WHERE id ='verified_vdefault';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=10 WHERE id ='cad_tools_base_layer_vdefault';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=11 WHERE id ='edit_gully_doublegeom';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_other' , layout_order=17 WHERE id ='edit_upsert_elevation_from_dem';
+UPDATE audit_cat_param_user SET formname ='hidden_param' WHERE id IN ('audit_project_epa_result', 'audit_project_plan_result');
+UPDATE audit_cat_param_user SET layoutname = 'lyt_other' , layout_order=18 WHERE id ='api_form_show_columname_on_label';
+
+UPDATE audit_cat_param_user SET formname ='hidden_param' , project_type = 'utils' WHERE id IN ('qgis_qml_linelayer_path', 'qgis_qml_pointlayer_path', 'qgis_qml_polygonlayer_path');
