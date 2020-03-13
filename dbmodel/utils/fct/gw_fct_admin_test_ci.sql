@@ -192,8 +192,6 @@ BEGIN
 									v_query = 'SELECT '||v_schemaname||'.'||v_function||';';
 									EXECUTE v_query
 									INTO v_query_result;
-									raise notice 'result divide, %, %, %',rec_fct.function_name,rec_role.id,v_query_result
-
 									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
 									VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 								END IF;					
@@ -205,7 +203,7 @@ BEGIN
 									"feature":{"id":["'||v_feature_id||'"]},"data":{"workcat_id_end":"work1",
 									"enddate":"2020-02-05"}}$$);'
 									INTO v_query_result;
-									raise notice 'result fusion, %, %, %',rec_fct.function_name,rec_role.id,v_query_result
+									
 									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
 									VALUES (115, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
 									
