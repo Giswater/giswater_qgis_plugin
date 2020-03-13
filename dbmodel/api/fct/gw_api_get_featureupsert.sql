@@ -328,11 +328,10 @@ BEGIN
 		EXECUTE 'SELECT (row_to_json(a)) FROM 
 			(SELECT * FROM '||p_table_id||' WHERE '||quote_ident(p_idname)||' = CAST($1 AS '||(p_columntype)||'))a'
 			INTO v_values_array
-			USING p_id;
-		
+			USING p_id;		
 			-- getting node values in case of arcs (update)
-			v_node1 := (v_values_array->>(aux_json->>'node_1'));
-			v_node2 := (v_values_array->>(aux_json->>'node_2'));	
+			v_node1 := (v_values_array->>'node_1');
+			v_node2 := (v_values_array->>'node_2');	
 	END IF;
 	
 	-- building the form widgets
@@ -407,8 +406,8 @@ BEGIN
 	
 	-- gettingf minvalue & maxvalues for widgetcontrols
 	IF v_project_type = 'UD' THEN
-	
-		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"||v_node1||", "node2":"||v_node2||"}}';	
+
+		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';	
 		SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalues;
 		
 	END IF;	
