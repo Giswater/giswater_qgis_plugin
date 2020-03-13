@@ -325,6 +325,11 @@ BEGIN
     v_result_line = '{"geometryType":"", "features":[]}';
     v_result_polygon = '{"geometryType":"", "features":[]}';
 
+    v_status := COALESCE(v_status, '{}'); 
+    v_level := COALESCE(v_level, '0'); 
+    v_message := COALESCE(v_message, '{}'); 
+    v_hide_form := COALESCE(v_hide_form, true); 
+
 --  Return
     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
