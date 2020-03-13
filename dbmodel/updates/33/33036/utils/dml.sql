@@ -132,6 +132,11 @@ UPDATE config_param_system SET layoutname = 'lyt_review' WHERE layout_id = 15;
 UPDATE config_param_system SET layoutname = 'lyt_analysis' WHERE layout_id = 16;
 UPDATE config_param_system SET layoutname = 'lyt_system' WHERE layout_id = 17;
 
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"layout_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"layout_id"}}$$);
+
+
 UPDATE audit_cat_function set sample_query =
 '{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }},
 "UD":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }}}'
