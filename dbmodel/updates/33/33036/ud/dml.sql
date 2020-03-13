@@ -16,3 +16,16 @@ VALUES ('v_anl_flow_gully', 'Analysis', 'View with the result of flow trace and 
 
 -- 2020/03/12
 UPDATE audit_cat_table  SET isdeprecated=TRUE WHERE id = 'anl_flow_arc' OR id = 'anl_flow_node';
+
+-- 2020/03/13
+UPDATE audit_cat_param_user SET layout_order = 31 where layout_order = 68 and layoutname = 'grl_general_1';
+UPDATE audit_cat_param_user SET formname = 'epaoptions', label = 'Default value q0 on Conduit:', layoutname = 'grl_general_1', 
+layout_order = 32, epaversion = '{"from":"5.0.022", "to":null,"language":"english"}' WHERE id = 'epa_conduit_q0_vdefault';
+UPDATE audit_cat_param_user SET formname = 'epaoptions', label = 'Default value q0 on Junction:', layoutname = 'grl_general_1', layout_order = 33,
+epaversion = '{"from":"5.0.022", "to":null,"language":"english"}' WHERE id = 'epa_junction_y0_vdefault';
+
+UPDATE audit_cat_param_user SET layout_order = 15 where layout_order = 90 and layoutname = 'grl_general_2';
+UPDATE audit_cat_param_user SET formname = 'epaoptions',  label = 'Default value for Outfall type:', layoutname = 'grl_general_2', layout_order = 16,
+epaversion = '{"from":"5.0.022", "to":null,"language":"english"}' WHERE id = 'epa_outfall_type_vdefault';
+UPDATE audit_cat_param_user SET formname = 'epaoptions',  label = 'Default value for Rgage SCF:', layoutname = 'grl_general_2', layout_order = 17, 
+epaversion = '{"from":"5.0.022", "to":null,"language":"english"}' WHERE id = 'epa_rgage_scf_vdefault';
