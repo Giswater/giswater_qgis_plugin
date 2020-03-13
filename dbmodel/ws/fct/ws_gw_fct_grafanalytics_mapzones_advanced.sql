@@ -27,9 +27,9 @@ SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass
 */
 
 DECLARE
-v_class	text;
+v_class text;
 v_expl integer;
-v_updatemapzone boolean;
+v_updatemapzone integer;
 v_data json;
 v_paramupdate float;
 
@@ -39,7 +39,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
-	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
+	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	
@@ -47,12 +47,10 @@ BEGIN
 		v_updatemapzone = 1;
 	END IF;
 
-	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": "[',v_expl,']", "updateFeature":"TRUE", "updateMapZone":'
-	||v_updatemapzone||', "geomParamUpdate":'||v_paramupdate||', "debug":"FALSE", "setVisibleLayers":[]}}}');
+	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": "[',v_expl,']", "updateFeature":"TRUE",
+	"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_paramupdate||', "debug":"FALSE", "setVisibleLayers":[]}}}');
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
-
-	
 
 END;
 $BODY$
