@@ -151,7 +151,7 @@ BEGIN
 		
 		IF v_arc_id IS NULL THEN
 			--delete node
-			EXECUTE 'DELETE FROM node WHERE node_id='''||v_feature_id||''';';
+			EXECUTE 'DELETE FROM v_edit_node WHERE node_id='''||v_feature_id||''';';
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
 			VALUES (52, v_result_id, concat('Delete node: ', v_feature_id));	
@@ -207,7 +207,7 @@ BEGIN
 		END IF;
 
 		--delete arc
-		EXECUTE 'DELETE FROM arc WHERE arc_id='''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM v_edit_arc WHERE arc_id='''||v_feature_id||''';';
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Delete arc: ',v_feature_id ));
 
 	ELSIF  v_feature_type='connec' OR v_feature_type='gully' THEN
@@ -252,7 +252,7 @@ BEGIN
 		END IF;
 
 		--delete feature
-	  	EXECUTE 'DELETE FROM '||(v_feature_type)||'  WHERE '||(v_feature_type)||'_id='''||v_feature_id||''';';
+	  	EXECUTE 'DELETE FROM v_edit_'||(v_feature_type)||'  WHERE '||(v_feature_type)||'_id='''||v_feature_id||''';';
 	  	
 	  	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Delete ',v_feature_type,': ',v_feature_id ));
 	  	
