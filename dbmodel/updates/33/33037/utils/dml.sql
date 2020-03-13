@@ -13,6 +13,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_
 
 
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, project_type, datatype, widgettype, ismandatory, isdeprecated, standardvalue) 
-VALUES ('sys_transaction_db', '{"status":"false", "server":""}', 'system', 'Parameteres for use an additional database to scape transtaction logics of PostgreSQL in order to audit processes step by step', 
+VALUES ('sys_transaction_db', '{"status":false, "server":""}', 'system', 'Parameteres for use an additional database to scape transtaction logics of PostgreSQL in order to audit processes step by step', 
 'Additional transactional database:', TRUE, 'utils', 'json', 'linetext', false, false, 'false') 
 ON CONFLICT (parameter) DO NOTHING;

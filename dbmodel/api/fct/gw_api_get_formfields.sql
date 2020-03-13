@@ -213,9 +213,11 @@ BEGIN
 		END IF;	
 
 		-- Get combo id's
-		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN	
+		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN
+			
 			EXECUTE 'SELECT (array_agg(id)) FROM ('|| (aux_json->>'queryText') ||(aux_json->>'queryTextFilter')||'::text = '||quote_literal(v_selected_id)
-			||' ORDER BY '||v_orderby||') a';
+			||' ORDER BY '||v_orderby||') a'
+			INTO v_array;
 		ELSE 	
 			EXECUTE 'SELECT (array_agg(id)) FROM ('||(aux_json->>'queryText')||' ORDER BY '||v_orderby||')a' INTO v_array;
 			
@@ -240,7 +242,8 @@ BEGIN
 		-- Get combo values
 		IF (aux_json->>'queryTextFilter') IS NOT NULL AND v_selected_id IS NOT NULL THEN
 			EXECUTE 'SELECT (array_agg(idval)) FROM ('|| (aux_json->>'queryText') ||(aux_json->>'queryTextFilter')||'::text = '||quote_literal(v_selected_id)
-			||' ORDER BY '||v_orderby||') a';
+			||' ORDER BY '||v_orderby||') a'
+			INTO v_array;
 		ELSE 	
 			EXECUTE 'SELECT (array_agg(idval)) FROM ('||(aux_json->>'queryText')||' ORDER BY '||v_orderby||')a'
 				INTO v_array;

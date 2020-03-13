@@ -40,25 +40,25 @@ DECLARE
 
 BEGIN
     
-    SET search_path = "SCHEMA_NAME", public; 
+	SET search_path = "SCHEMA_NAME", public; 
 	
 	v_schemaname = 'SCHEMA_NAME';
     
-     -- Get parameters from input json
-    v_error_id = lower(((p_data ->>'data')::json->>'error')::text);
-    v_function_id = lower(((p_data ->>'data')::json->>'function')::text);
-    v_message = lower(((p_data ->>'data')::json->>'debug_msg')::text);
+	-- Get parameters from input json
+	v_error_id = lower(((p_data ->>'data')::json->>'error')::text);
+	v_function_id = lower(((p_data ->>'data')::json->>'function')::text);
+	v_message = lower(((p_data ->>'data')::json->>'debug_msg')::text);
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	
 	-- get system parameters
-    v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'sys_transaction_db')::boolean;
-    SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
+	v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'sys_transaction_db')::boolean;
+	SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
 	
 	-- get parameters from user
-    v_debug = (SELECT value::json->>'status' FROM config_param_user WHERE parameter ='debug_mode' AND cur_user=current_user)::boolean;
+	v_debug = (SELECT value::json->>'status' FROM config_param_user WHERE parameter ='debug_mode' AND cur_user=current_user)::boolean;
 	
 	-- get flow parameters
-    SELECT * INTO rec_cat_error FROM audit_cat_error WHERE audit_cat_error.id=v_error_id; 
+	SELECT * INTO rec_cat_error FROM audit_cat_error WHERE audit_cat_error.id=v_error_id; 
 	SELECT txid_current() INTO v_txid;
 	
 	-- debug process
@@ -86,7 +86,7 @@ BEGIN
 	END IF;
 			
 	-- message process
-    IF v_txid = (SELECT value FROM config_param_user WHERE parameter = 'cur_trans' AND cur_user = current_user) THEN
+	IF v_txid = (SELECT value FROM config_param_user WHERE parameter = 'cur_trans' AND cur_user = current_user) THEN
     
 		RAISE NOTICE 'PID';
 		
@@ -120,39 +120,43 @@ BEGIN
 		END IF;
 		     	
 	ELSE
-        RAISE NOTICE 'RAISE';
-		
-        IF rec_cat_error IS NULL THEN
-            RAISE EXCEPTION 'The process has returned and error code, but this error code is not present on the audit_cat_error table. Please contact with your system administrator in order to update your audit_cat_error table';
-        END IF;
+		RAISE NOTICE 'RAISE';
+			
+		IF rec_cat_error IS NULL THEN
+		    RAISE EXCEPTION 'The process has returned and error code, but this error code is not present on the audit_cat_error table. Please contact with your system administrator in order to update your audit_cat_error table';
+		END IF;
 
-        -- log_level of type 'WARNING' (mostly applied to functions)
-        ELSIF rec_cat_error.log_level = 1 THEN
+		-- log_level of type 'WARNING' (mostly applied to functions)
+		IF rec_cat_error.log_level = 1 THEN
+
 			RAISE NOTICE 'log1';
-            SELECT * INTO rec_function 
-            FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
-            RAISE WARNING 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
-        
-        -- log_level of type 'ERROR' (mostly applied to trigger functions) 
-        ELSIF rec_cat_error.log_level = 2 THEN
-			RAISE NOTICE 'log2';
-            SELECT * INTO rec_function 
-            FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
 
-             IF v_message IS NOT NULL THEN
-                RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, concat(rec_cat_error.error_message, ' ',v_message), rec_cat_error.hint_message ;
-            ELSE
-                RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
-            END IF;
+			SELECT * INTO rec_function 
+			FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
+			RAISE WARNING 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
+		
+		-- log_level of type 'ERROR' (mostly applied to trigger functions) 
+		ELSIF rec_cat_error.log_level = 2 THEN
+
+			RAISE NOTICE 'log2';
+
+			SELECT * INTO rec_function 
+			FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
+
+			IF v_message IS NOT NULL THEN
+				RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, concat(rec_cat_error.error_message, ' ',v_message), rec_cat_error.hint_message ;
+			ELSE
+				RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
+			END IF;
 
 			RETURN NULL;
-					
-        END IF;
-
-    END IF;
-      
-	SELECT jsonb_build_object(
-	level', v_level,
+						
+		END IF;
+		
+	END IF;
+	      
+	SELECT jsonb_build_object
+	('level', v_level,
 	'status', v_status,
 	'message', v_return_text) INTO v_result_info;
 
