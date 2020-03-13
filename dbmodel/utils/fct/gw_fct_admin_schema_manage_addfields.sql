@@ -146,7 +146,7 @@ BEGIN
 		v_active = TRUE;
 	END IF;
 	
--- get input parameters - config_api_form_fields
+	-- get input parameters - config_api_form_fields
 	v_formtype = 'feature';
 	v_placeholder = (((p_data ->>'data')::json->>'parameters')::json->>'placeholder')::text;
 	v_tooltip = (((p_data ->>'data')::json->>'parameters')::json ->>'tooltip')::text;
@@ -199,630 +199,631 @@ BEGIN
 	END IF;
 
 
-PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+	PERFORM setval('config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
 
-INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-VALUES (118, null, 4, concat('Create addfield ',v_param_name,'.'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+	VALUES (118, null, 4, concat('Create addfield ',v_param_name,'.'));
 
---check if the new field doesnt have accents and fix it
-IF v_action='CREATE' THEN
-	v_unaccent_id = array_to_string(ts_lexize('unaccent',v_param_name),',','*');
+	--check if the new field doesnt have accents and fix it
+	IF v_action='CREATE' THEN
+		v_unaccent_id = array_to_string(ts_lexize('unaccent',v_param_name),',','*');
 
-	IF v_unaccent_id IS NOT NULL THEN
-		v_param_name = v_unaccent_id;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Remove accents from addfield name.');
+		IF v_unaccent_id IS NOT NULL THEN
+			v_param_name = v_unaccent_id;
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Remove accents from addfield name.');
+
+		END IF;
+
+		IF v_param_name ilike '%-%' OR v_param_name ilike '%.%' THEN
+			v_param_name=replace(replace(replace(v_param_name, ' ','_'),'-','_'),'.','_');
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Remove unwanted characters from addfield name.');
+		END IF;
 
 	END IF;
 
-	IF v_param_name ilike '%-%' OR v_param_name ilike '%.%' THEN
-	 	v_param_name=replace(replace(replace(v_param_name, ' ','_'),'-','_'),'.','_');
-	 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Remove unwanted characters from addfield name.');
-	END IF;
-
-END IF;
-
-IF v_multi_create IS TRUE THEN
+	IF v_multi_create IS TRUE THEN
 	
-	IF v_action='UPDATE' THEN
-		v_update_old_datatype = (SELECT datatype_id FROM man_addfields_parameter WHERE param_name=v_param_name);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Update old parameter name.');
-	END IF;
+		IF v_action='UPDATE' THEN
+			v_update_old_datatype = (SELECT datatype_id FROM man_addfields_parameter WHERE param_name=v_param_name);
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Update old parameter name.');
+		END IF;
 
-	IF  v_project_type='WS' THEN
-		v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
+		IF  v_project_type='WS' THEN
+			v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
 															UNION SELECT id,active FROM arc_type 
 															UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
-	ELSE 
-		v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
+		ELSE 
+			v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
 															UNION SELECT id,active FROM arc_type 
 															UNION SELECT id,active FROM connec_type 
 															UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
-	END IF;
+		END IF;
 	
-	FOR rec IN EXECUTE v_active_feature LOOP
+		FOR rec IN EXECUTE v_active_feature LOOP
 
-		IF v_action='UPDATE' THEN
-			UPDATE man_addfields_parameter SET datatype_id=v_update_old_datatype where param_name=v_param_name AND cat_feature_id IS NULL;
-		END IF;
-		-- get view name
-		IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
-			UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=rec.id;
-		END IF;
+			IF v_action='UPDATE' THEN
+				UPDATE man_addfields_parameter SET datatype_id=v_update_old_datatype where param_name=v_param_name AND cat_feature_id IS NULL;
+			END IF;
+		
+			-- get view name
+			IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
+				UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=rec.id;
+			END IF;
 
-		--remove spaces and dashs from view name
-		IF (SELECT child_layer FROM cat_feature WHERE id=rec.id AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
-			OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
+			--remove spaces and dashs from view name
+			IF (SELECT child_layer FROM cat_feature WHERE id=rec.id AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
+				OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
 			
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, concat('Remove unwanted characters from child view name: ',rec.id));
+
+				UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=rec.id;
+			
+			END IF;
+	
+			v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
+
+			--get the current definition of the custom view if it exists
+			IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
+				EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
+				INTO v_definition;
+			END IF;
+		
+			--get the system type and system_id of the feature
+			v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=rec.id);
+			v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
+
+			--get old values of addfields
+			IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE) != 0 THEN
+				IF v_action='CREATE' THEN
+					SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
+					lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+					lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+					lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+					INTO v_old_parameters
+					FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE and param_name!=v_param_name ;
+	
+				ELSE
+					SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
+					lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+					lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+					lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+					INTO v_old_parameters
+					FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
+				END IF;
+			END IF;
+
+			--modify the configuration of the parameters and fields in config_api_form_fields
+			IF v_action = 'CREATE' AND v_param_name not in (select param_name FROM man_addfields_parameter WHERE cat_feature_id IS NULL) THEN
+
+				IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id IS NULL AND active IS TRUE) = 0 THEN
+					v_orderby = 10000;
+				ELSE 
+					EXECUTE 'SELECT max(orderby) + 1 FROM man_addfields_parameter'
+					INTO v_orderby;
+				END IF;
+			
+				INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, 
+				active, orderby, iseditable)
+				VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable);
+			
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
+
+				SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layoutname='lyt_addfields';
+
+				IF v_param_user_id IS NULL THEN
+					v_param_user_id=1;
+				END IF;
+
+				IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM audit_cat_param_user) THEN
+					INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order,
+					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
+					VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
+					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
+					v_dv_querytext, v_dv_querytext_filterc,v_param_name, true);
+		
+					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+					VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_vdefault')));
+			
+				END IF;
+
+			ELSIF v_action = 'UPDATE' THEN
+				UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+				active=v_active, orderby=v_orderby, iseditable=v_iseditable 
+				WHERE param_name=v_param_name and cat_feature_id IS NULL;
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
+
+				UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
+				dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_vdefault');
+
+			
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_vdefault')));
+
+			ELSIF v_action = 'DELETE' THEN
+
+				DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
+
+				DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_vdefault');
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
+
+			END IF;
+
+			IF v_action = 'CREATE' THEN
+
+				EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
+				AND layoutname = ''layout_data_1'';'
+				INTO v_layout_order;
+
+				--EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields;'
+				--INTO v_form_fields_id;
+
+				INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, 
+				label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
+				placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
+				dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)	
+				VALUES (v_viewname, v_formtype, v_param_name, v_layout_order, v_config_datatype, v_config_widgettype,
+				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, 'layout_data_1',
+				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
+				v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, 'Insert parameter into config_api_form_fields.');
+
+			ELSIF v_action = 'UPDATE' THEN
+				UPDATE config_api_form_fields SET datatype=v_config_datatype,
+				widgettype=v_config_widgettype, label=v_label,
+				ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
+				placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
+				widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
+				dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
+				dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction, hidden = v_hidden
+				WHERE column_id=v_param_name AND formname=v_viewname;
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, 'Update parameter in config_api_form_fields.');
+			END IF;
+			
+				--get new values of addfields
+			IF v_action='DELETE' THEN
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
+			ELSE
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+				INTO v_new_parameters
+				FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
+				
+			END IF;
+
+				--select columns from man_* table without repeating the identifier
+				EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
+				FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+				and column_name!='''||v_feature_type||'_id'''
+				INTO v_man_fields;
+				
+
+				--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
+			IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
+
+					SELECT lower(string_agg(concat('a.',param_name),',' order by orderby)) as a_param,
+						lower(string_agg(concat('ct.',param_name),',' order by orderby)) as ct_param,
+						lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+						lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+						INTO v_created_addfields
+						FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+						
+					IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+						( v_feature_type='arc' OR v_feature_type='node')) THEN
+					
+					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+					v_view_type = 4;
+
+				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+
+					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+					v_view_type = 5;
+				ELSE
+					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+					v_view_type = 6;
+
+				END IF;
+
+				RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
+
+				v_man_fields := COALESCE(v_man_fields, 'null');
+
+				v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'","view_type":"'||v_view_type||'",
+				"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
+				"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+					
+				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));
+				
+			--CREATE VIEW when the addfields don't exist (after delete)
+			ELSIF v_new_parameters is null THEN 
+
+
+				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+					( v_feature_type='arc' OR v_feature_type='node')) THEN
+					
+					EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+					v_view_type = 1;
+
+				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+					
+					EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+					v_view_type = 2;
+
+				ELSE
+				
+					EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+					v_view_type = 3;
+
+				END IF;
+
+				RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
+
+				v_man_fields := COALESCE(v_man_fields, 'null');
+
+				v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'","view_type":"'||v_view_type||'",
+				"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,
+				"id_param":null,"datatype":null}}';
+					
+				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));
+
+			ELSE	
+
+				IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
+					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+				END IF;
+
+				--update the current view defintion
+				v_definition = replace(v_definition,v_old_parameters.ct_param,v_new_parameters.ct_param);
+				v_definition = replace(v_definition,v_old_parameters.a_param,v_new_parameters.a_param);
+				v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
+				v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
+
+				--replace the existing view
+				EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
+				
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));	
+			END IF;
+
+			--create trigger on view 
+			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+
+			EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||'
+			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
+			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
+
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, concat('Remove unwanted characters from child view name: ',rec.id));
+			VALUES (118, null, 4, concat('Recreate edition trigger for view ',rec.child_layer,'.'));
 
-			UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=rec.id;
+		END LOOP;
+
+		IF v_action='DELETE' THEN
+			EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''';';
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Delete values from man_addfields_parameter related to parameter.');
+
+			EXECUTE 'DELETE FROM config_api_form_fields WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
+
+		ELSIF v_action='UPDATE' THEN 
+			UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+			active=v_active, orderby=v_orderby WHERE param_name=v_param_name;		
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Update values of man_addfields_parameter related to parameter.');
+		END IF;
+
+	--SIMPLE ADDFIELDS
+	ELSE
+	
+		SELECT max(orderby) INTO v_orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature;
+		IF v_orderby IS NULL THEN
+			v_orderby = 1;
+		ELSE
+			v_orderby = v_orderby + 1;
+		END IF;
+
+		--check if field order will overlap the existing field	
+		IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"3016", "function":"2690","debug_msg":null}}$$);' INTO v_audit_result;
+		END IF;
+
+		-- get view definition
+		IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
+			UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=v_cat_feature;
+		END IF;
+
+		--remove spaces and dashes from view name
+		IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
+			OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
+
+			v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Remove unwanted characters from child view name: ',v_viewname, '.'));
+
+			UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=v_cat_feature;
 			
 		END IF;
-	
-		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
+		
+		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
 
 		--get the current definition of the custom view if it exists
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
 			EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
 			INTO v_definition;
 		END IF;
+
 		--get the system type and system_id of the feature
-		v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=rec.id);
-		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
+		v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
+		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 		--get old values of addfields
-		IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE) != 0 THEN
-			IF v_action='CREATE' THEN
-				SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
-				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-				INTO v_old_parameters
-				FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE and param_name!=v_param_name ;
+		IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) != 0 THEN
+			SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+			lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+			lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+			lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+			INTO v_old_parameters
+			FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE ;
+		END IF;
 
-			ELSE
-				SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
-				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-				INTO v_old_parameters
-				FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
+		--modify the configuration of the parameters and fields in config_api_form_fields
+		IF v_action = 'CREATE' THEN
+			INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id,
+			active, orderby, iseditable)
+			VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype,
+			v_active, v_orderby, v_iseditable);
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
+
+			EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
+			AND layoutname = ''layout_data_1'';'
+			INTO v_layout_order;
+
+			EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields'
+			INTO v_form_fields_id;
+
+			INSERT INTO config_api_form_fields (id, formname, formtype, column_id, layout_order,  
+			datatype, widgettype, label, ismandatory, isparent, iseditable, 
+			layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
+			dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)
+			VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, v_layout_order,v_config_datatype, v_config_widgettype,
+			v_label, v_ismandatory, v_isparent, v_iseditable, 'layout_data_1',
+			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
+			v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
+
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Insert parameter definition into config_api_form_fields.');
+
+			SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layoutname='lyt_addfields';
+			
+			IF v_param_user_id IS NULL THEN
+				v_param_user_id=1;
 			END IF;
-		
-		END IF;
 
-	--modify the configuration of the parameters and fields in config_api_form_fields
-	IF v_action = 'CREATE' AND v_param_name not in (select param_name FROM man_addfields_parameter WHERE cat_feature_id IS NULL) THEN
+			INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order, 
+			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
+			VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
+			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
+			'role_edit', v_param_name, 'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
+			v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name, true);
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
+			
 
-		IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id IS NULL AND active IS TRUE) = 0 THEN
-			v_orderby = 10000;
-		ELSE 
-			EXECUTE 'SELECT max(orderby) + 1 FROM man_addfields_parameter'
-			INTO v_orderby;
-		END IF;
-		
-		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, 
-		active, orderby, iseditable)
-		VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable);
-		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
-
-		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
-
-		IF v_param_user_id IS NULL THEN
-			v_param_user_id=1;
-		END IF;
-
-		IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM audit_cat_param_user) THEN
-			INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layout_id, layout_order, 
-	      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id )
-			VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
-			 22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
-			v_dv_querytext, v_dv_querytext_filterc,v_param_name );
+		ELSIF v_action = 'UPDATE' THEN
+			UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+			active=v_active, orderby=v_orderby,iseditable=v_iseditable 
+			WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_vdefault')));
+			VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
+			
+			IF (SELECT cat_feature_id FROM man_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
+				UPDATE config_api_form_fields SET datatype=v_config_datatype,
+				widgettype=v_config_widgettype, label=v_label,
+				ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
+				placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
+				widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
+				dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
+				dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction,
+				hidden = v_hidden
+				WHERE column_id=v_param_name AND formname=v_viewname;
 		
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (118, null, 4, 'Update parameter definition in config_api_form_fields.');
+
+			END IF;
+
+			UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
+			dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
+
+		ELSIF v_action = 'DELETE' THEN
+			EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
+
+			DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
+
+			DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
+
 		END IF;
 
-	ELSIF v_action = 'UPDATE' THEN
-		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		active=v_active, orderby=v_orderby, iseditable=v_iseditable 
-		WHERE param_name=v_param_name and cat_feature_id IS NULL;
+			--get new values of addfields
+			SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
+			lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+			lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+			lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+			INTO v_new_parameters
+			FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
+			
+			--select columns from man_* table without repeating the identifier
+			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
+			FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+			and column_name!='''||v_feature_type||'_id'''
+			INTO v_man_fields;
 
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
-
-		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
-		dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_vdefault');
-
-		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_vdefault')));
-
-	ELSIF v_action = 'DELETE' THEN
-
-		DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
-
-		DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_vdefault');
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
-
-	END IF;
-
-	IF v_action = 'CREATE' THEN
-
-		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-		AND layoutname = ''layout_data_1'';'
-		INTO v_layout_order;
-
-		--EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields;'
-		--INTO v_form_fields_id;
-
-		INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, 
-		label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
-		placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
-		dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)	
-		VALUES (v_viewname, v_formtype, v_param_name, v_layout_order, v_config_datatype, v_config_widgettype,
-		v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, 'layout_data_1',
-		v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
-		v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Insert parameter into config_api_form_fields.');
-
-	ELSIF v_action = 'UPDATE' THEN
-		UPDATE config_api_form_fields SET datatype=v_config_datatype,
-		widgettype=v_config_widgettype, label=v_label,
-		ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
-		placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
-		widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
-		dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
-		dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction, hidden = v_hidden
-		WHERE column_id=v_param_name AND formname=v_viewname;
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Update parameter in config_api_form_fields.');
-	END IF;
-	
-		--get new values of addfields
-	IF v_action='DELETE' THEN
-		SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
-		lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-		lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-		lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-		INTO v_new_parameters
-		FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
-	ELSE
-		SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
-		lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-		lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-		lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-		INTO v_new_parameters
-		FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
-		
-	END IF;
-
-		--select columns from man_* table without repeating the identifier
-		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
-		and column_name!='''||v_feature_type||'_id'''
-		INTO v_man_fields;
-		
-
-		--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
-	IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
-
-			SELECT lower(string_agg(concat('a.',param_name),',' order by orderby)) as a_param,
-				lower(string_agg(concat('ct.',param_name),',' order by orderby)) as ct_param,
-				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-				INTO v_created_addfields
-				FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+			--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
+		IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) = 1 
+		AND v_action = 'CREATE' THEN
 				
+				SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
+					lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
+					lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
+					lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
+					INTO v_created_addfields
+					FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+
 			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 				( v_feature_type='arc' OR v_feature_type='node')) THEN
-			
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 4;
 
-		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
+				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+				v_view_type = 4;
 
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 5;
-		ELSE
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 6;
-
-		END IF;
-
-		RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
-
-		v_man_fields := COALESCE(v_man_fields, 'null');
-
-		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'","view_type":"'||v_view_type||'",
-		"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
-		"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
-			
-		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));
-	--CREATE VIEW when the addfields don't exist (after delete)
-	ELSIF v_new_parameters is null THEN 
-
-
-		IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-			( v_feature_type='arc' OR v_feature_type='node')) THEN
-			
-			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 1;
-
-		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
-			
-			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 2;
-
-		ELSE
+			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN			
 		
-			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 3;
+				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+				v_view_type = 5;
 
-		END IF;
+			ELSE
+				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+				v_view_type = 6;
 
-		RAISE NOTICE 'MULTI - VIEW TYPE  ,%', v_view_type;
+			END IF;
 
-		v_man_fields := COALESCE(v_man_fields, 'null');
 
-		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||rec.id||'","view_type":"'||v_view_type||'",
-		"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,
-		"id_param":null,"datatype":null}}';
-			
-		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));
+			v_man_fields := COALESCE(v_man_fields, 'null');
 
-	ELSE	
+			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+			"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
+			"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
+			"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
+				
+			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
-		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-		END IF;
-
-		--update the current view defintion
-		v_definition = replace(v_definition,v_old_parameters.ct_param,v_new_parameters.ct_param);
-		v_definition = replace(v_definition,v_old_parameters.a_param,v_new_parameters.a_param);
-		v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
-		v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
-
-		--replace the existing view
-		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
-		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Recreate child view for ',rec.id,'.'));	
-	END IF;
-
-	--create trigger on view 
-	EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
-
-	EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||'
-	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||rec.id||''');';
-
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-	VALUES (118, null, 4, concat('Recreate edition trigger for view ',rec.child_layer,'.'));
-
-	END LOOP;
-
-	IF v_action='DELETE' THEN
-		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''';';
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Delete values from man_addfields_parameter related to parameter.');
-
-		EXECUTE 'DELETE FROM config_api_form_fields WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
-
-	ELSIF v_action='UPDATE' THEN 
-		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		active=v_active, orderby=v_orderby WHERE param_name=v_param_name;		
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Update values of man_addfields_parameter related to parameter.');
-	END IF;
-
---SIMPLE ADDFIELDS
-ELSE
-	
-	SELECT max(orderby) INTO v_orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature;
-	IF v_orderby IS NULL THEN
-		v_orderby = 1;
-	ELSE
-		v_orderby = v_orderby + 1;
-	END IF;
-
-	--check if field order will overlap the existing field	
-	IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		"data":{"error":"3016", "function":"2690","debug_msg":null}}$$);' INTO v_audit_result;
-	END IF;
-
-	-- get view definition
-	IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
-		UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=v_cat_feature;
-	END IF;
-
-	--remove spaces and dashes from view name
-	IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
-		OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
-
-		v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Remove unwanted characters from child view name: ',v_viewname, '.'));
-
-		UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=v_cat_feature;
-		
-	END IF;
-	
-	v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
-
-	--get the current definition of the custom view if it exists
-	IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
-		EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
-		INTO v_definition;
-	END IF;
-
-	--get the system type and system_id of the feature
-	v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
-	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
-
-	--get old values of addfields
-	IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) != 0 THEN
-		SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
-		lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-		lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-		lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-		INTO v_old_parameters
-		FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE ;
-	END IF;
-
-	--modify the configuration of the parameters and fields in config_api_form_fields
-	IF v_action = 'CREATE' THEN
-		INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id,
-		active, orderby, iseditable)
-		VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype,
-		v_active, v_orderby, v_iseditable);
-		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
-
-		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-		AND layoutname = ''layout_data_1'';'
-		INTO v_layout_order;
-
-		EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields'
-		INTO v_form_fields_id;
-
-		INSERT INTO config_api_form_fields (id, formname, formtype, column_id, layout_order,  
-		datatype, widgettype, label, ismandatory, isparent, iseditable, 
-		layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
-		dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)
-		VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, v_layout_order,v_config_datatype, v_config_widgettype,
-		v_label, v_ismandatory, v_isparent, v_iseditable, 'layout_data_1',
-		v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
-		v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
-
-		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Insert parameter definition into config_api_form_fields.');
-
-		SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layout_id=22;
-		
-		IF v_param_user_id IS NULL THEN
-			v_param_user_id=1;
-		END IF;
-
-		INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layout_id, layout_order, 
-      	project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id)
-		VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
-		concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
-		'role_edit', v_param_name,  22, v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
-		v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name);
-		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
-		
-
-	ELSIF v_action = 'UPDATE' THEN
-		UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
-		active=v_active, orderby=v_orderby,iseditable=v_iseditable 
-		WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
-		
-		IF (SELECT cat_feature_id FROM man_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
-			UPDATE config_api_form_fields SET datatype=v_config_datatype,
-			widgettype=v_config_widgettype, label=v_label,
-			ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
-			placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
-			widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
-			dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
-			dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction,
-			hidden = v_hidden
-			WHERE column_id=v_param_name AND formname=v_viewname;
-	
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, 'Update parameter definition in config_api_form_fields.');
+			VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));	
 
+		--CREATE VIEW when the addfields don't exist (after delete)
+		ELSIF v_new_parameters is null THEN 
+		
+			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+				( v_feature_type='arc' OR v_feature_type='node')) THEN
+				
+				EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+				v_view_type = 1;
+
+			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN	
+				
+				EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+				v_view_type = 2;
+
+			ELSE
+				
+				EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+				v_view_type = 3;
+
+			END IF;
+			
+			RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
+
+			v_man_fields := COALESCE(v_man_fields, 'null');
+			
+			v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
+			"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
+			"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,
+			"id_param":null,"datatype":null}}';
+				
+			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));
+		ELSE	
+			IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
+				EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			END IF;
+			
+			--update the current view defintion
+			v_definition = replace(v_definition,v_old_parameters.ct_param,v_new_parameters.ct_param);
+			v_definition = replace(v_definition,v_old_parameters.a_param,v_new_parameters.a_param);
+			v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
+			v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
+
+			--replace the existing view and create the trigger
+			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
+			
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));	
 		END IF;
 
-		UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
-		dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+		--create trigger on view 
+		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+
+		EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
+		INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
+		FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
+		VALUES (118, null, 4, concat('Recreate edition trigger for view ',v_viewname,'.'));
 
-	ELSIF v_action = 'DELETE' THEN
-		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
-
-		DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
-
-		DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
 
 	END IF;
 
-		--get new values of addfields
-		SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
-		lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-		lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-		lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-		INTO v_new_parameters
-		FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
-		
-		--select columns from man_* table without repeating the identifier
-		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
-		and column_name!='''||v_feature_type||'_id'''
-		INTO v_man_fields;
-
-		--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
-	IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) = 1 
-	AND v_action = 'CREATE' THEN
-			
-			SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
-				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
-				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
-				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
-				INTO v_created_addfields
-				FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
-
-		IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-			( v_feature_type='arc' OR v_feature_type='node')) THEN
-
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 4;
-
-		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN			
-	
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 5;
-
-		ELSE
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 6;
-
-		END IF;
-
-
-		v_man_fields := COALESCE(v_man_fields, 'null');
-
-		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
-		"man_fields":"'||v_man_fields||'","a_param":"'||v_created_addfields.a_param||'","ct_param":"'||v_created_addfields.ct_param||'",
-		"id_param":"'||v_created_addfields.id_param||'","datatype":"'||v_created_addfields.datatype||'"}}';
-			
-		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));	
-
-	--CREATE VIEW when the addfields don't exist (after delete)
-	ELSIF v_new_parameters is null THEN 
-	
-		IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
-			( v_feature_type='arc' OR v_feature_type='node')) THEN
-			
-			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 1;
-
-		ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN	
-			
-			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 2;
-
-		ELSE
-			
-			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-			v_view_type = 3;
-
-		END IF;
-		
-		RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
-
-		v_man_fields := COALESCE(v_man_fields, 'null');
-		
-		v_data_view = '{"schema":"'||v_schemaname ||'","body":{"viewname":"'||v_viewname||'",
-		"feature_type":"'||v_feature_type||'","feature_system_id":"'||v_feature_system_id||'","featurecat":"'||v_cat_feature||'","view_type":"'||v_view_type||'",
-		"man_fields":"'||v_man_fields||'","a_param":null,"ct_param":null,
-		"id_param":null,"datatype":null}}';
-			
-		PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));
-	ELSE	
-		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
-			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
-		END IF;
-		
-		--update the current view defintion
-		v_definition = replace(v_definition,v_old_parameters.ct_param,v_new_parameters.ct_param);
-		v_definition = replace(v_definition,v_old_parameters.a_param,v_new_parameters.a_param);
-		v_definition = replace(v_definition,v_old_parameters.id_param,v_new_parameters.id_param);
-		v_definition = replace(v_definition,v_old_parameters.datatype,v_new_parameters.datatype);
-
-		--replace the existing view and create the trigger
-		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
-		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (118, null, 4, concat('Recreate child view for ',v_cat_feature,'.'));	
-	END IF;
-
-	--create trigger on view 
-	EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
-
-	EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
-	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
+	PERFORM ud_sample.gw_fct_admin_role_permissions();
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-	VALUES (118, null, 4, concat('Recreate edition trigger for view ',v_viewname,'.'));
+	VALUES (118, null, 4, 'Set role permissions.');
 
-
-END IF;
-
-PERFORM SCHEMA_NAME.gw_fct_admin_role_permissions();
-
-INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-VALUES (118, null, 4, 'Set role permissions.');
-
--- get results
+	-- get results
 	-- info
-
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
 	WHERE user_name="current_user"() AND fprocesscat_id=118 ORDER BY criticity desc, id asc) row; 
 	
-IF v_audit_result is null THEN
+	IF v_audit_result is null THEN
         v_status = 'Accepted';
         v_level = 3;
         v_message = 'Process done successfully';
@@ -841,7 +842,7 @@ IF v_audit_result is null THEN
 	v_result_line = '{"geometryType":"", "features":[]}';
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
---  Return
+	--  Return
      RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -854,10 +855,9 @@ IF v_audit_result is null THEN
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
- 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
