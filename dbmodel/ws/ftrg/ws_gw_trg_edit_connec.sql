@@ -148,7 +148,7 @@ BEGIN
 		--check relation state - state_type
         IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
         	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      	  		"data":{"error":"3036", "function":"1318","debug_msg":"'||NEW.state:text||'"}}$$);';
+      	  		"data":{"error":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
        	END IF;
 
 		--Inventory	
