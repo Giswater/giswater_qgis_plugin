@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/03/13
-UPDATE config_api_form_fields SET dv_querytext_filterc = select replace(dv_querytext_filterc,'=','') WHERE dv_querytext_filterc is not null;
+UPDATE config_api_form_fields SET dv_querytext_filterc = replace(dv_querytext_filterc,'=','') WHERE dv_querytext_filterc is not null;

@@ -116,20 +116,20 @@ BEGIN
 	
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
  	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version LIMIT 1;
 
  	--set current process as users parameter
-    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+	DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
 
-    INSERT INTO config_param_user (value, parameter, cur_user)
-    VALUES (txid_current(),'cur_trans',current_user );
+	INSERT INTO config_param_user (value, parameter, cur_user)
+	VALUES (txid_current(),'cur_trans',current_user );
     
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- get input parameters -,man_addfields
-	v_schemaname = 'SCHEMA_NAME';
-	v_id = (SELECT nextval('man_addfields_parameter_id_seq') +1);
+	v_id = (SELECT nextval('SCHEMA_NAME.man_addfields_parameter_id_seq') +1);
 
 	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'column_id')::text; 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
@@ -812,7 +812,7 @@ BEGIN
 
 	END IF;
 
-	PERFORM ud_sample.gw_fct_admin_role_permissions();
+	PERFORM gw_fct_admin_role_permissions();
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 	VALUES (118, null, 4, 'Set role permissions.');
