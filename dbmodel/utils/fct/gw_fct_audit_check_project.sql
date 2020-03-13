@@ -493,7 +493,7 @@ BEGIN
 		v_result_line:=COALESCE(v_result_line,'{}');
 		v_result_polygon:=COALESCE(v_result_polygon,'{}');
 		v_missing_layers:=COALESCE(v_missing_layers,'{}');
-		v_missing_layers:=COALESCE(v_hidden_form, true);
+		v_hidden_form:=COALESCE(v_hidden_form, true);
 
 		--return definition for v_audit_check_result
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
