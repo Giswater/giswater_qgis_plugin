@@ -126,6 +126,7 @@ DECLARE
 	v_childtype text;
 	v_errcontext text;
 	v_toggledition boolean;
+	v_islayer boolean;
 
 BEGIN
 	--  Get,check and set parameteres
@@ -142,6 +143,7 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
+	v_islayer := (p_data ->> 'feature')::json->> 'isLayer';
 	
 	if v_toolbar is NULL THEN
 		v_toolbar := 'basic';
@@ -449,10 +451,12 @@ BEGIN
 			'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'tableName', v_tablename, 
 			'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
      
-		IF v_id IS NULL THEN
-			v_tg_op = 'INSERT';
-		ELSIF  v_id = 'LAYER' THEN
+
+
+		IF v_islayer THEN
 			v_tg_op = 'LAYER';
+		ELSIF  v_id IS NULL THEN
+			v_tg_op = 'INSERT';
 		ELSE
 			v_tg_op = 'UPDATE';
 		END IF;
@@ -577,3 +581,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+  
