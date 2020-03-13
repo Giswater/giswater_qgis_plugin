@@ -100,7 +100,7 @@ BEGIN
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_order, layoutname, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		row_number()over(ORDER BY layoutname, layout_order) AS orderby, isparent, sys_role_id, project_type, ismandatory, widgetcontrols,
+		row_number()over(ORDER BY layoutname, layout_order) AS orderby, isparent, sys_role_id, project_type, widgetcontrols,
 		(CASE WHEN value IS NOT NULL AND value != ''false'' THEN ''True'' ELSE ''False'' END) AS checked, placeholder, descript AS tooltip, 
 		dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
@@ -116,16 +116,7 @@ BEGIN
 
 	FOREACH aux_json IN ARRAY fields_array
 	LOOP
-		-- setting the typeahead widgets
-		IF (aux_json->>'typeahead') IS NOT NULL THEN
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', COALESCE(((aux_json->>'widgetcontrols')::json->>'typeaheadSearchField'), ''));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryText', COALESCE((aux_json->>'dv_querytext'), ''));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryTextFilter', COALESCE((aux_json->>'dv_querytext_filterc'), ''));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', COALESCE((aux_json->>'dv_parent_id'), ''));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isNullValue', (aux_json->>'dv_isnullvalue'));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'orderById', (aux_json->>'dv_orderby_id'));
-		END IF;
-
+		
 		-- Refactor widget
 		IF (aux_json->>'widgettype')='image' THEN
 		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
@@ -267,7 +258,7 @@ BEGIN
 		
 		--removing the not used fields
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-		'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead');
+		'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'sys_role_id', 'project_type');
 	
 	END LOOP;
 	 
