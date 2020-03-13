@@ -238,7 +238,7 @@ class ApiCF(ApiParent, QObject):
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_api_getinfofromid'
         row = [self.controller.get_json(function_name, body, log_sql=True)]
-        if not row: return False, None
+        if not row or row[0] is False: return False, None
         # When something is wrong
         if row[0]['message']:
             level = 1
