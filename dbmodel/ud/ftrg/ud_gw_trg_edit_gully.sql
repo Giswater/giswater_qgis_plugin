@@ -356,7 +356,7 @@ BEGIN
 				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
-				INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('GULLY', v_the_geom_pol,v_new_pol_id);
+				INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES ('GULLY', v_the_geom_pol, v_new_pol_id);
 
 			END IF;
 		END IF;
