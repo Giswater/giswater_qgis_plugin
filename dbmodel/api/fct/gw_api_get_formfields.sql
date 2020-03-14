@@ -83,7 +83,7 @@ BEGIN
 	END IF;
 	
 	--setting v_clause in function of info type
-	IF p_id IS NULL THEN -- used when geinfofromid is called on initproject to shape all widgets on table of attributes (id is null)
+	IF p_tgop = 'LAYER' THEN -- used when geinfofromid is called on initproject to shape all widgets on table of attributes (id is null)
 		v_clause = '';
 	ELSE  -- used always for each feature when geinfofromid is called feature by feature
 		v_clause = 'AND hidden IS NOT TRUE';
