@@ -352,7 +352,7 @@ class DaoController(object):
         return self.postgis_version           
         
     
-    def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None, title=""):
+    def show_message(self, text, message_level=1, duration=10, context_name=None, parameter=None, title=""):
         """ Show message to the user with selected message level
         message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
         
@@ -364,7 +364,7 @@ class DaoController(object):
         self.iface.messageBar().pushMessage(title, msg, message_level, duration)
             
 
-    def show_info(self, text, duration=5, context_name=None, parameter=None, logger_file=True, title=""):
+    def show_info(self, text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
         """ Show information message to the user """
 
         self.show_message(text, 0, duration, context_name, parameter, title)
@@ -372,7 +372,7 @@ class DaoController(object):
             self.logger.info(text)            
 
 
-    def show_warning(self, text, duration=5, context_name=None, parameter=None, logger_file=True, title=""):
+    def show_warning(self, text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
         """ Show warning message to the user """
 
         self.show_message(text, 1, duration, context_name, parameter, title)
@@ -380,7 +380,7 @@ class DaoController(object):
             self.logger.warning(text)
 
 
-    def show_critical(self, text, duration=5, context_name=None, parameter=None, logger_file=True, title=""):
+    def show_critical(self, text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
         """ Show warning message to the user """
 
         self.show_message(text, 2, duration, context_name, parameter, title)

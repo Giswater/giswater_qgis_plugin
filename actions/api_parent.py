@@ -1188,13 +1188,13 @@ class ApiParent(ParentAction):
                     rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
-                    self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
+                    self.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
-                    self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
+                    self.controller.show_message(message, message_level=0, parameter=self.node2)
 
         if self.node1 and self.node2:
             self.canvas.xyCoordinates.disconnect()

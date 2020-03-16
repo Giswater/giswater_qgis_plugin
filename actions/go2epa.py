@@ -864,7 +864,7 @@ class Go2Epa(ApiParent):
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
             message = "File created successfully"
-            self.controller.show_info(message, parameter=path, duration=10)
+            self.controller.show_info(message, parameter=path)
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=path)
