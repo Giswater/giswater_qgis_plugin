@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_featureinfo(
     p_infotype integer,
     p_configtable boolean,
     p_idname text,
-    p_columntype text
+    p_columntype text,
     p_tgop text)
   RETURNS json AS
 $BODY$
