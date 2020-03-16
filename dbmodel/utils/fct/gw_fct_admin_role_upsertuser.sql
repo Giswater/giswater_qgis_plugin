@@ -80,7 +80,7 @@ BEGIN
     INSERT INTO config_param_user (value, parameter, cur_user)
     VALUES (txid_current(),'cur_trans',current_user );
 
-	v_user_name = lower(((p_data ->>'data')::json->>'user_name')::text);
+	v_user_name = ((p_data ->>'data')::json->>'user_name')::text;
 	v_user_id = lower(((p_data ->>'data')::json->>'user_id')::text);
 	v_password = ((p_data ->>'data')::json->>'password')::text;
 	v_role = ((p_data ->>'data')::json->>'role')::text;
