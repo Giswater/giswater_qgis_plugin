@@ -77,14 +77,14 @@ class ApiDimensioning(ApiParent):
             if widget.objectName() == 'id':
                 utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature_id)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
-           # Take the QGridLayout with the intention of adding a QSpacerItem later
-            if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+            # Take the QGridLayout with the intention of adding a QSpacerItem later
+            if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                 layout_list.append(layout)
 
             # Add widgets into layout
-            if field['layoutname'] in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
                 layout.addWidget(label, 0, field['layout_order'])
                 layout.addWidget(widget, 1, field['layout_order'])
+            if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
             else:
                 self.put_widgets(self.dlg_dim, field, label, widget)
 

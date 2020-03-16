@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QGridLayout" name="top_layout"/>
+     <layout class="QGridLayout" name="lyt_top_1"/>
     </item>
     <item>
      <widget class="QTabWidget" name="tab_main">
@@ -60,10 +60,10 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <layout class="QGridLayout" name="layout_data_1"/>
+             <layout class="QGridLayout" name="lyt_data_1"/>
             </item>
             <item>
-             <layout class="QGridLayout" name="layout_data_2"/>
+             <layout class="QGridLayout" name="lyt_data_2"/>
             </item>
            </layout>
           </widget>
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>634</width>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -81,7 +81,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <layout class="QGridLayout" name="layout_data_3"/>
+             <layout class="QGridLayout" name="_2"/>
             </item>
            </layout>
           </widget>
@@ -784,10 +784,10 @@
      </widget>
     </item>
     <item>
-     <layout class="QGridLayout" name="bot_layout_1"/>
+     <layout class="QGridLayout" name="lyt_bot_1"/>
     </item>
     <item>
-     <layout class="QGridLayout" name="bot_layout_2"/>
+     <layout class="QGridLayout" name="lyt_bot_2"/>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
