@@ -219,8 +219,12 @@ class I18NGenerator(ParentAction):
         ts_file.close()
         del ts_file
         lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep +'lrelease.exe'
-        s = subprocess.call([lrelease_path, ts_path], shell=False)
-        return True
+        status = subprocess.call([lrelease_path, ts_path], shell=False)
+        if status == 0:
+            return True
+        else:
+            return False
+
 
 
     def get_title(self, py_dialogs, name, key_lbl):

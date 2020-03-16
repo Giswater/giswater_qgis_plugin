@@ -5,6 +5,14 @@
 	<context>
 		<name>giswater</name>
 		<message>
+			<source>toolbar_om_ud_name</source>
+			<translation>Giswater - OM</translation>
+		</message>
+		<message>
+			<source>toolbar_om_ws_name</source>
+			<translation>Giswater - OM</translation>
+		</message>
+		<message>
 			<source>41_text</source>
 			<translation>Selector d'explotació</translation>
 		</message>
@@ -95,14 +103,6 @@
 		<message>
 			<source>toolbar_basic_name</source>
 			<translation>Giswater - Basic</translation>
-		</message>
-		<message>
-			<source>toolbar_om_ud_name</source>
-			<translation>Giswater - O&M</translation>
-		</message>
-		<message>
-			<source>toolbar_om_ws_name</source>
-			<translation>Giswater - O&M</translation>
 		</message>
 		<message>
 			<source>toolbar_edit_name</source>
@@ -1798,7 +1798,7 @@
 		</message>
 		<message>
 			<source>tab_om</source>
-			<translation>O&M</translation>
+			<translation>OM</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_om</source>
