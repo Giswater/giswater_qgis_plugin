@@ -69,7 +69,7 @@ BEGIN
         IF (NEW.connecat_id IS NULL) THEN
 		IF ((SELECT COUNT(*) FROM cat_connec) = 0) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      	  "data":{"error":"1022", "function":"1304","debug_msg":null}}$$);';
+      	  "data":{"error":"1022", "function":"1304","debug_msg":null, "variables":null}}$$);';
 		END IF;
 
 		IF v_customfeature IS NOT NULL THEN
@@ -86,7 +86,7 @@ BEGIN
 
 		IF (NEW.connecat_id IS NULL) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      	 	 "data":{"error":"1086", "function":"1304","debug_msg":null}}$$);';
+      	 	 "data":{"error":"1086", "function":"1304","debug_msg":null, "variables":null}}$$);';
 		END IF;				
 
         END IF;
@@ -95,7 +95,7 @@ BEGIN
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      	  	"data":{"error":"1008", "function":"1304","debug_msg":null}}$$);'; 
+      	  	"data":{"error":"1008", "function":"1304","debug_msg":null, "variables":null}}$$);'; 
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -109,7 +109,7 @@ BEGIN
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      	  		"data":{"error":"1010", "function":"1304","debug_msg":"'||NEW.connec_id||'"}}$$);';
+      	  		"data":{"error":"1010", "function":"1304","debug_msg":"'||NEW.connec_id||'", "variables":null}}$$);';
             END IF;            
         END IF;
         
@@ -117,7 +117,7 @@ BEGIN
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      		  "data":{"error":"1012", "function":"1304","debug_msg":null}}$$);';
+      		  "data":{"error":"1012", "function":"1304","debug_msg":null, "variables":null}}$$);';
             END IF;
 				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -173,7 +173,8 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM gw_fct_audit_function(2012,1304,NEW.connec_id);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"2012", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
 				END IF;		
 			END IF;
 		END IF;
@@ -184,7 +185,8 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					PERFORM gw_fct_audit_function(2024,1304,NEW.connec_id);
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					"data":{"error":"20042", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
 				END IF;	
 			END IF;
 		END IF;

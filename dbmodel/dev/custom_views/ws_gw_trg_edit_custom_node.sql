@@ -794,7 +794,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;	
 		*/
-        --PERFORM gw_fct_audit_function(XXX,XXX); 
+        --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"XXX", "function":"XXX","debug_msg":null, "variables":null}}$$) 
         RETURN NEW;
 
 

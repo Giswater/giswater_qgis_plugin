@@ -17,7 +17,8 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        -- to do PERFORM gw_fct_audit_function(1030,1310, NULL); 
+       -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+         -- "data":{"error":"1030", "function":"1310","debug_msg":null, "variables":null}}$$); 
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -25,11 +26,13 @@ BEGIN
         UPDATE ext_rtc_hydrometer_x_data 
         SET custom_sum=NEW.custom_sum
         WHERE id=OLD.id;
-        -- to do PERFORM gw_fct_audit_function(2,1310, NULL); 
+        -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+         -- "data":{"error":"2", "function":"1310","debug_msg":null, "variables":null}}$$); 
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        --to do PERFORM gw_fct_audit_function(1032,1310, NULL); 
+        -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+         -- "data":{"error":"3", "function":"1310","debug_msg":null, "variables":null}}$$); 
         RETURN NEW;
     
     END IF;

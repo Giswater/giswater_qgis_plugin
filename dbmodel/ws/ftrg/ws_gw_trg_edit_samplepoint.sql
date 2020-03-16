@@ -29,7 +29,8 @@ BEGIN
     
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                PERFORM gw_fct_audit_function(1110,1122, NULL);
+                PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+              "data":{"error":"1110", "function":"1122","debug_msg":null, "variables":null}}$$); 
 				RETURN NULL;				
             END IF;
             v_expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);

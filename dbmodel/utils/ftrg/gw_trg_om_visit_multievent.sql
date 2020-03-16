@@ -103,7 +103,8 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
             DELETE FROM om_visit CASCADE WHERE id = OLD.visit_id ;
 
-    --  PERFORM gw_fct_audit_function(3); 
+     --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3", "function":"XXX","debug_msg":null, "variables":null}}$$) 
+
         RETURN NULL;
     
     END IF;

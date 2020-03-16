@@ -20,12 +20,14 @@ BEGIN
 		
 		--Exploitation ID
         IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-            --PERFORM gw_fct_audit_function(1012,1112, NULL);
+            -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+        	 -- "data":{"error":"1012", "function":"1112","debug_msg":null, "variables":null}}$$); 
 			RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                --PERFORM gw_fct_audit_function(1014,1112, NULL);
+                 -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+        	 -- "data":{"error":"1014", "function":"1112","debug_msg":null, "variables":null}}$$); 
 				RETURN NULL; 
             END IF;
 			

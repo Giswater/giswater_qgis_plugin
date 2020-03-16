@@ -22,7 +22,8 @@ BEGIN
         --IF NEW.hydrometer_id IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
         --ELSE
-            --PERFORM gw_fct_audit_function(1102,1342, NULL);
+            --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                --"data":{"error":"1102", "function":"1342","debug_msg":null, "variables":null}}$$);
         --END IF;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -34,7 +35,8 @@ BEGIN
         --IF OLD.hydrometer_id NOT IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN OLD;
         --ELSE
-            --PERFORM gw_fct_audit_function(1106,1342, NULL);
+            --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                --"data":{"error":"1106", "function":"1342","debug_msg":null, "variables":null}}$$);
         --END IF;
     
     END IF;
