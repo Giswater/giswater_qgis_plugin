@@ -476,6 +476,8 @@ class ApiCF(ApiParent, QObject):
                 layout.addWidget(label, 0, field['layout_order'])
                 layout.addWidget(widget, 1, field['layout_order'])
             if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                layout.addWidget(label, 0, field['layout_order'])
+                layout.addWidget(widget, 1, field['layout_order'])
             else:
                 self.put_widgets(self.dlg_cf, field, label, widget)
 
