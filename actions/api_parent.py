@@ -863,6 +863,8 @@ class ApiParent(ParentAction):
         widget.blockSignals(False)
         combolist = []
         if 'comboIds' in field:
+            if 'isNullValue' in field and field['isNullValue']:
+                combolist.append(['',''])
             for i in range(0, len(field['comboIds'])):
                 elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
