@@ -77,13 +77,13 @@
 			END IF;
 
 	--Append the element to the corresponding layout
-			IF rec.layoutname= 'layout_data_1' THEN
+			IF rec.layoutname= 'lyt_data_1' THEN
 				v_sql_layout_1=concat(v_sql_layout_1,' ',v_sql);
 
-			ELSIF rec.layoutname= 'layout_data_2' THEN
+			ELSIF rec.layoutname= 'lyt_data_2' THEN
 				v_sql_layout_2=concat(v_sql_layout_2,' ',v_sql);
 
-			ELSIF rec.layoutname= 'layout_data_3' THEN
+			ELSIF rec.layoutname= 'lyt_data_3' THEN
 				v_sql_layout_3=concat(v_sql_layout_3,' ',v_sql);
 			END IF;
 
@@ -107,7 +107,7 @@
 			  </property>
 			  <layout class="QGridLayout" name="gridLayout_1">
 			     <item row="0" column="0">
-			    <layout class="QGridLayout" name="layout_data_1">';
+			    <layout class="QGridLayout" name="lyt_data_1">';
 
 		v_xml=concat(v_xml,v_sql_layout_1);
 
@@ -115,7 +115,7 @@
 				</layout>
 				</item>
 	     <item row="0" column="1">
-	      <layout class="QGridLayout" name="layout_data_2">');
+	      <layout class="QGridLayout" name="lyt_data_2">');
 
 		v_xml=concat(v_xml,v_sql_layout_2);
 
@@ -124,7 +124,7 @@
 		</layout>
 		</item>
 	    <item row="1" column="0" colspan="2">
-	    <layout class="QGridLayout" name="layout_data_3">');
+	    <layout class="QGridLayout" name="lyt_data_3">');
 
 		v_xml=concat(v_xml,v_sql_layout_3);
 

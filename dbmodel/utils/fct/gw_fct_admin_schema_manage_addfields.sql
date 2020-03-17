@@ -363,7 +363,7 @@ BEGIN
 			IF v_action = 'CREATE' THEN
 
 				EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-				AND layoutname = ''layout_data_1'';'
+				AND layoutname = ''lyt_data_1'';'
 				INTO v_layout_order;
 
 				--EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields;'
@@ -374,7 +374,7 @@ BEGIN
 				placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 				dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)	
 				VALUES (v_viewname, v_formtype, v_param_name, v_layout_order, v_config_datatype, v_config_widgettype,
-				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, 'layout_data_1',
+				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, 'lyt_data_1',
 				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 				v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
 
@@ -611,7 +611,7 @@ BEGIN
 			VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
 
 			EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-			AND layoutname = ''layout_data_1'';'
+			AND layoutname = ''lyt_data_1'';'
 			INTO v_layout_order;
 
 			EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields'
@@ -622,7 +622,7 @@ BEGIN
 			layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 			dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)
 			VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, v_layout_order,v_config_datatype, v_config_widgettype,
-			v_label, v_ismandatory, v_isparent, v_iseditable, 'layout_data_1',
+			v_label, v_ismandatory, v_isparent, v_iseditable, 'lyt_data_1',
 			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 			v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
 
