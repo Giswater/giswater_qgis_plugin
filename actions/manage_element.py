@@ -91,7 +91,7 @@ class ManageElement(ParentManage):
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(self.tab_feature_changed, self.dlg_add_element, table_object))
+            partial(self.tab_feature_changed, self.dlg_add_element, table_object, []))
         self.dlg_add_element.element_id.textChanged.connect(
             partial(self.exist_object, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_insert.clicked.connect(
