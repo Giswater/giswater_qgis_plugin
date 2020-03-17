@@ -218,7 +218,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QTextEdit" name="path">
+             <widget class="QTextEdit" name="txt_path">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -251,7 +251,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="path_doc">
+             <widget class="QPushButton" name="btn_path_doc">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -270,7 +270,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="path_url">
+             <widget class="QPushButton" name="btn_path_url">
               <property name="maximumSize">
                <size>
                 <width>33</width>
