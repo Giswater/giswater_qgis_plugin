@@ -315,13 +315,13 @@ class I18NGenerator(ParentAction):
         file = open(path, "w")
         db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         header = (f'/*\n'
-                f'This file is part of Giswater 3\n'
-                f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
-                f'General Public License as published by the Free Software Foundation, either version 3 of the '
-                f'License, or (at your option) any later version.\n'
-                f'This version of Giswater is provided by Giswater Association,\n'
-                f'*/\n\n\n'
-                f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
+                  f'This file is part of Giswater 3\n'
+                  f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
+                  f'General Public License as published by the Free Software Foundation, either version 3 of the '
+                  f'License, or (at your option) any later version.\n'
+                  f'This version of Giswater is provided by Giswater Association,\n'
+                  f'*/\n\n\n'
+                  f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
         file.write(header)
         for row in rows:
             table = row['context']
