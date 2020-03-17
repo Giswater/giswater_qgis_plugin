@@ -90,7 +90,7 @@ BEGIN
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 		 row_number()over(ORDER BY layoutname, layout_order) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role_id,
 		 placeholder,
-		 dv_orderby_id,feature_dv_parent_value, descript AS tooltip
+		 dv_orderby_id,feature_dv_parent_value, descript AS tooltip, dv_isnullvalue AS "isNullValue"
 		 FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 		 AND dv_parent_id='||quote_literal(v_comboparent)||'
@@ -108,7 +108,7 @@ BEGIN
 
 		--  Combo rows child CATALOG
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_id, widgettype, column_id as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue"
 		FROM config_api_form_fields WHERE formname = '||quote_literal(v_parameter)||' AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
@@ -117,7 +117,7 @@ BEGIN
 	ELSE
 		--  Combo rows child
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, column_id, widgettype, datatype, concat(''data_'',column_id) as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue"
 		FROM config_api_form_fields WHERE formname = $1 AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child
 		USING v_tablename;
