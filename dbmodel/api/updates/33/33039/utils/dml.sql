@@ -24,3 +24,18 @@ UPDATE config_api_form_fields SET layoutname = 'lyt_distance' WHERE formtype='ca
 UPDATE config_api_form_fields SET layoutname = 'lyt_depth' WHERE formtype='catalog' AND layoutname = 'depth_layout';
 UPDATE config_api_form_fields SET layoutname = 'lyt_symbology' WHERE formtype='catalog' AND layoutname = 'symbology_layout';
 UPDATE config_api_form_fields SET layoutname = 'lyt_other' WHERE formtype='catalog' AND layoutname = 'other_layout';
+
+
+UPDATE config_api_form_fields SET widgettype ='typeahead',
+dv_querytext= 'select id as id, postnumber as idval from ext_address WHERE id IS NOT NULL ',
+dv_querytext_filterc = ' AND ext_address.streetaxis_id ',
+dv_parent_id = 'streetaxis_id'
+WHERE column_id = 'postnumber';
+
+
+UPDATE config_api_form_fields SET widgettype ='typeahead',
+dv_querytext= 'select id as id, postnumber as idval from ext_address WHERE id IS NOT NULL ',
+dv_querytext_filterc = ' AND ext_address2.streetaxis_id ',
+dv_parent_id = 'streetaxis_id'
+WHERE column_id = 'postnumber2';
+
