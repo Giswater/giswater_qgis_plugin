@@ -81,7 +81,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <layout class="QGridLayout" name="_2"/>
+             <layout class="QGridLayout" name="lyt_data_3"/>
             </item>
            </layout>
           </widget>
