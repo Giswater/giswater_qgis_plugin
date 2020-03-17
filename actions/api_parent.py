@@ -57,7 +57,7 @@ class ApiParent(ParentAction):
                 table_name = self.controller.get_layer_source_table_name(layer)
                 table = layer.dataProvider().dataSourceUri()
                 # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
-                if 'SELECT row_number() over ()' in str(table):
+                if 'SELECT row_number() over ()' in str(table) or 'srid' not in str(table):
                     continue
 
                 visible_layer += f'"{table_name}", '

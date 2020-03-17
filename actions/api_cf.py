@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import Qgis, QgsExpressionContextUtils, QgsGeometry, QgsMapToPixel, QgsPointXY, QgsProject
+from qgis.core import Qgis, QgsExpressionContextUtils, QgsGeometry, QgsMapToPixel, QgsPointXY, QgsProject, QgsVectorLayer
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
 from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt, pyqtSignal, QObject
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
@@ -193,12 +193,13 @@ class ApiCF(ApiParent, QObject):
         # Get srid
         self.srid = self.controller.plugin_settings_value('srid')
         self.new_feature = new_feature
-        if self.iface.activeLayer() is None:
+
+        if self.iface.activeLayer() is None or type(self.iface.activeLayer()) != QgsVectorLayer:
             active_layer = ""
         else:
             active_layer = self.controller.get_layer_source_table_name(self.iface.activeLayer())
 
-        if active_layer is None:
+        if active_layer is None or type(active_layer != 'test'):
             active_layer = ""
 
         # Used by action_interpolate
