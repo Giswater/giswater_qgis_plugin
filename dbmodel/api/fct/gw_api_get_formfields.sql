@@ -264,7 +264,7 @@ BEGIN
 	END LOOP;
 
 	-- for the rest of widgets removing the not used keys
-	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo')
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
 	LOOP
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
