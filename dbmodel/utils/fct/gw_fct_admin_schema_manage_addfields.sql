@@ -366,8 +366,9 @@ BEGIN
 				AND layoutname = ''lyt_data_1'';'
 				INTO v_layout_order;
 
-				--EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields;'
-				--INTO v_form_fields_id;
+				IF v_layout_order IS NULL THEN
+					v_layout_order = 1;
+				END IF;
 
 				INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, 
 				label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
@@ -613,6 +614,10 @@ BEGIN
 			EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
 			AND layoutname = ''lyt_data_1'';'
 			INTO v_layout_order;
+
+			IF v_layout_order IS NULL THEN
+				v_layout_order = 1;
+			END IF;
 
 			EXECUTE 'SELECT max(id) + 1 FROM config_api_form_fields'
 			INTO v_form_fields_id;
