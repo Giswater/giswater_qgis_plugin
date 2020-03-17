@@ -131,7 +131,7 @@ class ManageElement(ParentManage):
         utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, 1)
 
         if rows:
-            utils_giswater.setCurrentIndex(self.dlg_add_element, "location_type", 0)
+            utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1)
@@ -195,14 +195,14 @@ class ManageElement(ParentManage):
     def update_location_cmb(self):
 
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
-        sql = (f"SELECT location_type FROM man_type_location"
+        sql = (f"SELECT location_type, location_type FROM man_type_location"
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
-        utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
+        utils_giswater.set_item_data(self.dlg_add_element.location_type, rows)
         if rows:
-            utils_giswater.setCurrentIndex(self.dlg_add_element, "location_type", 0)
+            utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
 
 
     def fill_tbl_new_element(self, dialog, geom_type, feature_id):
