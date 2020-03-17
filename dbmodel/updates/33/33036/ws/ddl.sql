@@ -8,6 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"to_arc", "dataType":"character varying(16)", "isUtils":"False"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_go2epa", "column":"idmin", "dataType":"integer", "isUtils":"False"}}$$);
+-- 2020/02/06
+DROP VIEW v_minsector;
+ALTER TABLE minsector ALTER COLUMN the_geom TYPE geometry (multipolygon, SRID_VALUE) USING ST_Multi(the_geom);
