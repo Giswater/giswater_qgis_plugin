@@ -609,7 +609,7 @@ class MincutParent(ParentAction):
         if not result: return
 
         if result['body']['actions']['overlap'] == 'Conflict':
-            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
+            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
             for layer in result_layer['temp_layers_added']:
 
                 layer_style = {}
@@ -675,7 +675,6 @@ class MincutParent(ParentAction):
 
         elif result['body']['actions']['overlap'] == 'Ok':
             self.mincut_ok(result)
-            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
         self.iface.actionPan().trigger()
 
 
@@ -690,6 +689,7 @@ class MincutParent(ParentAction):
 
 
     def mincut_ok(self, result):
+        result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
         # Set all widgets of the data tab enabled(False)
         widget_list = self.dlg_mincut.mainTab.widget(0).findChildren(QWidget)
         for widget in widget_list:
