@@ -105,8 +105,8 @@ class Go2EpaOptions(ApiParent):
             self.populate_combo(child, combo_child)
             utils_giswater.set_combo_itemData(child, combo_child['selectedId'], 1)
             if 'editability' not in combo_child:
-                return
-            if str(utils_giswater.get_item_data(self.dlg_options, combo_parent, 0)) in str(combo_child['editability']) \
+                return				
+            if str(utils_giswater.get_item_data(self.dlg_options, combo_parent, 0)) in str(combo_child['widgetcontrols']['comboEnableWhenParent'] ]) \
                     and utils_giswater.get_item_data(self.dlg_options, combo_parent, 0) not in (None, ''):
                 child.setEnabled(True)
             else:
