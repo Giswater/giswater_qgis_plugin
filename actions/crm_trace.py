@@ -154,7 +154,9 @@ class CrmTrace(ApiParent):
             return False
 
         result = json.loads(row[0])
-        self.controller.log_info(str(result))
+        expl_id = None
+        year = None
+        period = None
         if 'expl_id' in result:
             expl_id = result['expl_id']
         if 'year' in result:
@@ -190,77 +192,11 @@ class CrmTrace(ApiParent):
             if 'body' in result[0]:
                 if 'data' in result[0]['body']:
                     data = result[0]['body']['data']
-                    tab_main = self.dlg_trace.tab_main
-                    txt_infolog = self.dlg_trace.txt_infolog
-                    self.add_temp_layer(self.dlg_trace, tab_main, txt_infolog, data, function_name)
+                    self.add_layer.add_temp_layer(self.dlg_trace, data, function_name)
 
         message = result[0]['message']['text']
         msg = "Process executed successfully. Read 'Info log' for more details"
         self.controller.show_info(msg, parameter=message, duration=20)
 
         return True
-
-
-    def add_temp_layer(self, dialog, tab_main, txt_infolog, data, function_name):
-        """ Manage parameter 'data' from JSON response """
-
-        self.delete_layer_from_toc(function_name)
-        srid = self.controller.plugin_settings_value('srid')
-        for k, v in list(data.items()):
-            if str(k) == "info":
-                self.controller.log_info("populate_info_text")
-                self.add_layer.populate_info_text(dialog, tab_main, txt_infolog, data)
-            else:
-                counter = len(data[k]['values'])
-                if counter > 0:
-                    geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
-                    self.controller.log_info("populate_vlayer")
-                    self.populate_vlayer(v_layer, data, k)
-                    if 'qmlPath' in data[k]:
-                        qml_path = data[k]['qmlPath']
-                        self.load_qml(v_layer, qml_path)
-                else:
-                    self.controller.log_info("No data found")
-
-
-    def populate_vlayer(self, virtual_layer, data, layer_type):
-        """ Populate @virtual_layer with contents get from JSON response """
-
-        # Enter editing mode
-        data_provider = virtual_layer.dataProvider()
-        virtual_layer.startEditing()
-        columns = data[layer_type]['values'][0]
-        for key, value in list(columns.items()):
-            # add columns
-            if str(key) != 'the_geom':
-                data_provider.addAttributes([QgsField(str(key), QVariant.String)])
-
-        # Add features
-        for item in data[layer_type]['values']:
-            attributes = []
-            fet = QgsFeature()
-            for k, v in list(item.items()):
-                if str(k) != 'the_geom':
-                    attributes.append(v)
-                if str(k) in 'the_geom':
-                    sql = f"SELECT St_AsText('{v}')"
-                    row = self.controller.get_row(sql, log_sql=False)
-                    if row:
-                        wkt = str(row[0])
-                        geometry = QgsGeometry.fromWkt(wkt)
-                        fet.setGeometry(geometry)
-            fet.setAttributes(attributes)
-            data_provider.addFeatures([fet])
-
-        # Commit changes
-        virtual_layer.commitChanges()
-        QgsProject.instance().addMapLayer(virtual_layer, False)
-
-        root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup('GW Functions results')
-        if my_group is None:
-            my_group = root.insertGroup(0, 'GW Functions results')
-
-        my_group.insertLayer(0, virtual_layer)
 
