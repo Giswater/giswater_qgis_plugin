@@ -132,25 +132,27 @@ class ManageElement(ParentManage):
 
         if rows:
             utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
-        sql = "SELECT DISTINCT(id), id FROM cat_work"
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1)
 
-        sql = "SELECT DISTINCT(id), id FROM cat_builder"
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.set_item_data(self.dlg_add_element.buildercat_id, rows, 1)
 
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
         rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.set_item_data(self.dlg_add_element.ownercat_id, rows, 1)
+        utils_giswater.set_item_data(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
 
-        sql = "SELECT DISTINCT(id), id FROM value_verified"
+        sql = "SELECT DISTINCT(id), id FROM cat_builder"
         rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1)
+        utils_giswater.set_item_data(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1)
+        utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
+
+        sql = "SELECT DISTINCT(id), id FROM cat_work"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
+
+        sql = "SELECT DISTINCT(id), id FROM value_verified"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
 
         # Set combo boxes
         self.set_combo(self.dlg_add_element, 'element_type', 'cat_element', 'elementtype_vdefault', field_id='elementtype_id', field_name='elementtype_id')
@@ -200,7 +202,7 @@ class ManageElement(ParentManage):
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
-        utils_giswater.set_item_data(self.dlg_add_element.location_type, rows)
+        utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
             utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
 
