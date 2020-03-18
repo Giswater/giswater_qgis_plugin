@@ -171,9 +171,9 @@ class AddLayer(object):
                     layer_name = None
                     #TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
-                    if key=='values':
+                    if key == 'values':
                         self.populate_vlayer_old(v_layer, data, k, counter, group)
-                    elif key=='features':
+                    elif key == 'features':
                         self.populate_vlayer(v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']
