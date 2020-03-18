@@ -356,10 +356,9 @@ ELSIF tab_arg = 'address' THEN
         FROM '||quote_ident(v_street_layer)||'
         JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field) ||'
         WHERE lower(unaccent('||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||')) = lower(unaccent('||quote_literal(name_arg)||'))
-        AND lower(unaccent('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||')) ILIKE lower(unaccent('||quote_literal(text_arg)||')) LIMIT 10 )a'
+        AND lower(unaccent('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||')) ILIKE lower(unaccent('||quote_literal(text_arg)||')) ORDER BY
+        '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' LIMIT 10 )a'
         INTO response_json;
-        
-    raise notice'response % % %', v_muni_layer, v_muni_display_field, name_arg;
 
 -- Hydro tab
 ------------
