@@ -14,7 +14,7 @@ from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSource
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QTabWidget
+from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 
 import os
 from random import randrange
@@ -141,7 +141,7 @@ class AddLayer(object):
         :param group:
         :return:
         """
-        colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
+        colors = {'rnd': QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
         text_result = None
         temp_layers_added = []
         srid = self.controller.plugin_settings_value('srid')
@@ -187,7 +187,7 @@ class AddLayer(object):
                     temp_layers_added.append(v_layer)
                     v_layer.setOpacity(0.7)
                     self.iface.setActiveLayer(v_layer)
-        return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
+        return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
     def set_layers_visible(self, layers):
@@ -298,11 +298,30 @@ class AddLayer(object):
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
-        qtabwidget = dialog.findChild(QTabWidget,'mainTab')
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
+            self.disable_tabs(dialog)
 
         return text
+
+
+    def disable_tabs(self, dialog):
+        """ Disable all tabs in the dialog except the log one and change the state of the buttons
+        :param dialog: Dialog where tabs are disabled (QDialog)
+        :return:
+        """
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        for x in range(0, qtabwidget.count()-1):
+            qtabwidget.widget(x).setEnabled(False)
+
+        btn_accept = dialog.findChild(QPushButton, 'btn_accept')
+        if btn_accept:
+            btn_accept.hide()
+
+        btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
+        if btn_cancel:
+            utils_giswater.setWidgetText(dialog, btn_accept, 'Close')
 
 
     def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
