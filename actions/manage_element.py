@@ -26,6 +26,7 @@ class ManageElement(ParentManage):
         """ Button 33: Add element """
 
         self.new_element_id = new_element_id
+
         # Create the dialog and signals
         self.dlg_add_element = AddElement()
         self.load_settings(self.dlg_add_element)
@@ -103,6 +104,8 @@ class ManageElement(ParentManage):
         self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
+        # Combo state type
+        self.filter_state_type()
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
@@ -120,9 +123,6 @@ class ManageElement(ParentManage):
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
-
-        # Combo state type
-        self.filter_state_type()
 
         sql = ("SELECT location_type, location_type FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
@@ -180,7 +180,11 @@ class ManageElement(ParentManage):
         # If is a new element dont need set enddate
         if self.new_element_id is True:
             utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
+
         self.update_location_cmb()
+        if not self.new_element_id:
+            self.exist_object(self.dlg_add_element, 'element')
+
         # Open the dialog    
         self.open_dialog(self.dlg_add_element, maximize_button=False)
         return self.dlg_add_element
@@ -346,7 +350,7 @@ class ManageElement(ParentManage):
                 return
             sql = (f"UPDATE element"
                    f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
-                   f", expl_id = '{expl_id}', rotation = '{rotation}'"
+                   f", state_type = '{state_type}', expl_id = '{expl_id}', rotation = '{rotation}'"
                    f", comment = '{comment}', observ = '{observ}'"
                    f", link = '{link}', undelete = '{undelete}'")
             if builtdate:

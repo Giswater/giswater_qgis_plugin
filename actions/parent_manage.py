@@ -174,6 +174,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
             utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
             utils_giswater.setWidgetText(dialog, "state", state)
+            utils_giswater.set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
             utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
