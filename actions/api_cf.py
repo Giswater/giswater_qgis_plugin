@@ -1578,7 +1578,7 @@ class ApiCF(ApiParent, QObject):
         # Populate combo filter hydrometer value
         sql = (f"SELECT DISTINCT(t1.code), t2.cat_period_id "
                f"FROM ext_cat_period as t1 "
-               f"join api_ws_sample.v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
+               f"join v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
                f"ORDER BY t1.code")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
