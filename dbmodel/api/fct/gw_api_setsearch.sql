@@ -436,9 +436,9 @@ ELSIF tab_arg = 'address' THEN
 
 	--  Search in the workcat
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(c))) 
-		FROM (SELECT '||quote_ident(v_workcat_display_field)||' as display_name, '
+		FROM (SELECT b.'||quote_ident(v_workcat_display_field)||' as display_name, '
 		||quote_literal(v_workcat_layer)||' AS sys_table_id ,'
-		||quote_ident((v_workcat_id_field))||' AS sys_id, '
+		'b.'||quote_ident((v_workcat_id_field))||' AS sys_id, '
 		||quote_literal(v_workcat_layer)||' AS sys_idname,'
 		||quote_literal(v_filter_text)||' AS filter_text,
 		CASE
