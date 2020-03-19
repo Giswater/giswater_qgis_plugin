@@ -1605,14 +1605,18 @@ class ApiCF(ApiParent, QObject):
     def fill_tbl_hydrometer_values(self, qtable, table_name):
         """ Fill the table control to show hydrometers values """
 
-        cat_period = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter)
+        filter_ = ""
+        cat_period = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
         customer_code = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
-        filter_ = f"connec_id ILIKE '%{self.feature_id}%' "
-        filter_ += f" AND cat_period_id ILIKE '%{cat_period}%'"
-        filter_ += f" AND hydrometer_id ILIKE '%{customer_code}%'"
+        filter_ = f"connec_id::text = '{self.feature_id}' "
+        if cat_period != '':
+            filter_ += f" AND cat_period_id::text = '{cat_period}'"
+        if customer_code != '':
+            filter_ += f" AND hydrometer_id::text = '{customer_code}'"
 
         # Set model of selected widget
         self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter_, QSqlTableModel.OnFieldChange)
+        self.set_columns_config(self.tbl_hydrometer_value, table_name)
 
 
     def set_filter_hydrometer_values(self, widget):
