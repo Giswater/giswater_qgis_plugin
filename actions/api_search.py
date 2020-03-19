@@ -543,7 +543,7 @@ class ApiSearch(ApiParent):
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
-
+        widget.setStyleSheet(None)
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
         else:
@@ -582,7 +582,9 @@ class ApiSearch(ApiParent):
 
         folder_path = utils_giswater.getWidgetText(dialog, path)
         if folder_path is None or folder_path == 'null':
+            path.setStyleSheet("border: 1px solid red")
             return
+        path.setStyleSheet(None)
         if folder_path.find('.csv') == -1:
             folder_path += '.csv'
         if qtable_1:
@@ -635,7 +637,7 @@ class ApiSearch(ApiParent):
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
         self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
-        message = "Values has been updated"
+        message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 
 
