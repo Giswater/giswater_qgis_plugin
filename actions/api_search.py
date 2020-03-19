@@ -576,6 +576,7 @@ class ApiSearch(ApiParent):
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
         self.refresh_map_canvas()
+        qtable.model().select()
 
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
