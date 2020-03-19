@@ -448,7 +448,7 @@ BEGIN
 	
 		-- Feature info
 		v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',null,
-			'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'tableName', v_tablename, 
+			'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent,
 			'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
      
 
