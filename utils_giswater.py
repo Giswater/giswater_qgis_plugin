@@ -408,7 +408,7 @@ def set_combo_itemData(combo, value, item1):
     return False
 
 
-def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1):
+def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1, add_empty=False):
     """ Populate @combo with list @rows and show field @index_to_show
     :param sort_by: sort combo by this element (column)
     """
@@ -416,7 +416,8 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     records = []
     if rows is None:
         rows = [['', '']]
-
+    if add_empty:
+        rows.extend([['', '']])
     if sort_by > len(rows[0])-1:
         sort_by = 1
 
