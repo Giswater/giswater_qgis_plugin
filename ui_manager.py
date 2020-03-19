@@ -519,8 +519,8 @@ class ReadsqlCreateGisProject(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_rename.ui')
-class ReadsqlRename(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('readsql_rename_copy.ui')
+class ReadsqlRenameCopy(GwMainWindow, FORM_CLASS):
     pass
 
 

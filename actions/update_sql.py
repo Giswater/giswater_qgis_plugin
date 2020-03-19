@@ -34,7 +34,7 @@ from .. import utils_giswater
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from .i18n_generator import I18NGenerator
-from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
+from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
     ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
 from .gw_task import GwTask
 
@@ -232,6 +232,7 @@ class UpdateSQL(ApiParent):
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
+        self.dlg_readsql.btn_copy.clicked.connect(partial(self.copy_schema))
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
         self.dlg_readsql.btn_translation.clicked.connect(partial(self.manage_translations))
@@ -1516,7 +1517,7 @@ class UpdateSQL(ApiParent):
 
         if create_project is None or create_project is False:
             close_dlg_rename = True
-            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
+            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
                 self.controller.show_info_box(msg, "Info")
@@ -2246,7 +2247,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Create dialog
-        self.dlg_readsql_rename = ReadsqlRename()
+        self.dlg_readsql_rename = ReadsqlRenameCopy()
         self.load_settings(self.dlg_readsql_rename)
 
         schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2345,6 +2346,62 @@ class UpdateSQL(ApiParent):
                 return False
 
         return True
+
+
+    def copy_schema(self):
+
+        # Create dialog
+        self.dlg_readsql_copy = ReadsqlRenameCopy()
+        self.load_settings(self.dlg_readsql_copy)
+
+        schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
+        # Set listeners
+        self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self.copy_project_data_schema, schema))
+        self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_copy))
+
+        # Open dialog
+        self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)
+        self.open_dialog(self.dlg_readsql_copy)
+
+
+    def copy_project_data_schema(self, schema):
+
+        new_schema_name = utils_giswater.getWidgetText(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
+        sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
+        rows = self.controller.get_rows(sql, commit=True)
+
+        for row in rows:
+            if str(new_schema_name) == str(row[0]):
+                msg = "This project name alredy exist."
+                self.controller.show_info_box(msg, "Info")
+                return
+            else:
+                continue
+
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(0)
+        extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
+        body = self.create_body(extras=extras)
+        self.task1.setProgress(50)
+        result = self.controller.get_json('gw_fct_clone_schema', body, schema_name=schema, log_sql=True)
+        if not result: return
+        self.task1.setProgress(100)
+
+        # Show message
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Copy project")
+        if status:
+            self.controller.dao.commit()
+            self.event_change_connection()
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
+            self.close_dialog(self.dlg_readsql_copy)
+        else:
+            self.controller.dao.rollback()
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
 
     def delete_schema(self):

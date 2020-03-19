@@ -689,7 +689,8 @@ class DaoController(object):
         if not row:
             self.show_warning("Function not found in database", parameter=function_name)
             return None
-        sql = f"SELECT {function_name}("
+        if schema_name: sql = sql = f"SELECT {schema_name}.{function_name}("
+        else: sql = f"SELECT {function_name}("
         if parameters: sql += f"{parameters}"
         sql += f");"
 
