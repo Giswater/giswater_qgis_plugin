@@ -1577,15 +1577,16 @@ class ApiCF(ApiParent, QObject):
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
 
         # Populate combo filter hydrometer value
-        sql = (f"SELECT DISTINCT cat_period_id, cat_period_id "
-               f"FROM {table_hydro_value} "
-               f"ORDER BY cat_period_id")
+        sql = (f"SELECT DISTINCT(t1.code), t2.cat_period_id "
+               f"FROM ext_cat_period as t1 "
+               f"join api_ws_sample.v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
+               f"ORDER BY t1.code")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return False
 
         rows.append(['', ''])
-        utils_giswater.set_item_data(cmb_cat_period_id_filter, rows)
+        utils_giswater.set_item_data(cmb_cat_period_id_filter, rows, 0)
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
         self.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
 
