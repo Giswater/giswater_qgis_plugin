@@ -479,10 +479,6 @@ class ApiConfig(ApiParent):
 
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
-        if 'sys_role_id' in field:
-            elem['sys_role_id'] = str(field['sys_role_id'])
-        else:
-            elem['sys_role_id'] = 'role_admin'
 
         self.list_update.append(elem)
 
@@ -504,7 +500,7 @@ class ApiConfig(ApiParent):
             elem['chk'] = str(chk.objectName())
             elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
             elem['value'] = value
-            elem['sys_role_id'] = str(field['sys_role_id'])
+
             self.list_update.append(elem)
 
 
@@ -525,7 +521,6 @@ class ApiConfig(ApiParent):
         elem['chk'] = str('')
         elem['isChecked'] = str('')
         elem['value'] = value
-        elem['sysRoleId'] = 'role_admin'
 
         self.list_update.append(elem)
 
