@@ -1207,10 +1207,10 @@ class DaoController(object):
         list_items = []        
         sql = ("SELECT child_layer "
                "FROM cat_feature "
-               "WHERE upper(feature_type) = '" + geom_type.upper() + "'"
-			   "UNION SELECT DISTINCT parent_layer "
+               "WHERE upper(feature_type) = '" + geom_type.upper() + "' "
+               "UNION SELECT DISTINCT parent_layer "
                "FROM cat_feature "
-               "WHERE upper(feature_type) = '" + geom_type.upper() + "'")
+               "WHERE upper(feature_type) = '" + geom_type.upper() + "';")
         rows = self.get_rows(sql, log_sql=True)
         if rows:
             for row in rows:

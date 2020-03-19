@@ -47,7 +47,7 @@ class ManageWorkcatEnd(ParentManage):
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
+        self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()

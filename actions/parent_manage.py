@@ -861,6 +861,15 @@ class ParentManage(ParentAction, object):
         field_id = self.geom_type + "_id"
 
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
+        expr_filter = f"{field_id} = '{feature_id}'"
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return None
+
+        # Select features of layers applying @expr
+        self.select_features_by_ids(self.geom_type, expr)
+
         if feature_id == 'null':
             message = "You need to enter a feature id"
             self.controller.show_info_box(message)
@@ -881,7 +890,7 @@ class ParentManage(ParentAction, object):
                 self.ids.append(str(feature_id))
 
         # Set expression filter with features in the list
-        expr_filter = f'"{field_id}" IN ('
+        expr_filter = f'"{field_id}" IN (  '
         for i in range(len(self.ids)):
             expr_filter += f"'{self.ids[i]}', "
         expr_filter = expr_filter[:-2] + ")"
