@@ -1,6 +1,6 @@
 from qgis.core import QgsApplication, QgsProviderRegistry
 
-from test_giswater import TestGiswater
+from test.test_giswater import TestGiswater
 
 
 # dummy instance to replace qgis.utils.iface
@@ -20,8 +20,10 @@ class TestQgis:
         """ Load main plugin class """
 
         self.init_config()
-        self.giswater_lite = TestGiswater(self.iface)
-        self.giswater_lite.init_plugin(False)
+        self.test_giswater = TestGiswater(self.iface)
+        self.test_giswater.init_plugin(False)
+
+        return True
 
 
     def init_config(self):
@@ -41,10 +43,10 @@ class TestQgis:
     def connect_to_database(self, service_name):
         """ Connect to a database providing a service_name set in .pg_service.conf """
 
-        status = self.giswater_lite.controller.connect_to_database_service(service_name)
-        self.giswater_lite.controller.logged = status
-        if self.giswater_lite.controller.last_error:
-            msg = self.giswater_lite.controller.last_error
+        status = self.test_giswater.controller.connect_to_database_service(service_name)
+        self.test_giswater.controller.logged = status
+        if self.test_giswater.controller.last_error:
+            msg = self.test_giswater.controller.last_error
             print(f"Database connection error: {msg}")
             return False
 
@@ -53,27 +55,31 @@ class TestQgis:
 
     def create_project(self):
 
-        print("\nStart create_project_lite")
+        print("\nStart create_project")
 
         # Load main plugin class
-        self.load_plugin()
+        if not self.load_plugin():
+            return False
 
         # Connect to a database providing a service_name set in .pg_service.conf
         service_name = "localhost_giswater"
         if not self.connect_to_database(service_name):
-            return
+            return False
 
         user = "gisadmin"
-        self.giswater_lite.update_sql.init_sql(False, user)
-        self.giswater_lite.update_sql.init_dialog_create_project()
-        self.giswater_lite.update_sql.create_project_data_schema('test_ws', 'test_ws_title', 'ws', '25831', 'EN', True)
+        self.test_giswater.update_sql.init_sql(False, user)
+        self.test_giswater.update_sql.init_dialog_create_project()
+        self.test_giswater.update_sql.create_project_data_schema('test_ws', 'test_ws_title', 'ws', '25831', 'EN', True)
 
         print("Finish create_project")
+
+        return True
 
 
 def test_create_project():
     test = TestQgis()
-    test.create_project()
+    status = test.create_project()
+    print(status)
 
 
 if __name__ == '__main__':
