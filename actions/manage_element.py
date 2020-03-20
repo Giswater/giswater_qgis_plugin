@@ -67,7 +67,7 @@ class ManageElement(ParentManage):
         # Manage i18n of the form
         # self.controller.translate_form(self.dlg, 'element')
 
-        utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept)
+        utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 3)
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
@@ -172,6 +172,7 @@ class ManageElement(ParentManage):
             utils_giswater.set_combo_itemData(self.dlg_add_element.ownercat_id, owner_vdef, 0)
 
             builtdate_vdef = self.controller.get_config('builtdate_vdefault')[0]
+            utils_giswater.setWidgetText(self.dlg_add_element, self.dlg_add_element.builtdate, builtdate_vdef)
 
             workcat_vdef = self.controller.get_config('workcat_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id, workcat_vdef, 0)
