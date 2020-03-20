@@ -104,8 +104,6 @@ class ManageElement(ParentManage):
         self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
-        # Combo state type
-        self.filter_state_type()
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
@@ -119,10 +117,11 @@ class ManageElement(ParentManage):
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.expl_id, rows, 1)
 
-        # Combo state
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
+
+        self.filter_state_type()
 
         sql = ("SELECT location_type, location_type FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
