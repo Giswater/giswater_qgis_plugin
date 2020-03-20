@@ -5,16 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis
-
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
-from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy, QToolBar, QToolButton
 
 import csv
 import json
 import os
-import platform
 from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
@@ -27,7 +23,6 @@ from .gw_toolbox import GwToolBox
 from .parent import ParentAction
 from .manage_visit import ManageVisit
 from ..ui_manager import Csv2Pg
-from ..ui_manager import AuditCheckProjectResult
 
 
 class Utils(ParentAction):

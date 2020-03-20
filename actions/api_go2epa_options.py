@@ -8,7 +8,6 @@ or (at your option) any later version.
 from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
 
 import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater

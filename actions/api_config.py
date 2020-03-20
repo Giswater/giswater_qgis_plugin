@@ -12,7 +12,6 @@ from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEd
 
 import json
 import operator
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater

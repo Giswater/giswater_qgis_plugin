@@ -6,9 +6,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 from qgis.core import QgsPointXY
-from qgis.PyQt.QtCore import QStringListModel
-
-from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime
+from qgis.PyQt.QtCore import QStringListModel, QDate, QSortFilterProxyModel, Qt, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout

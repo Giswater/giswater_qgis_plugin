@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
@@ -19,6 +18,7 @@ from .. import utils_giswater
 from .parent import ParentAction
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+
 
 class ParentManage(ParentAction, object):
 

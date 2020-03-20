@@ -5,16 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
-
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QLineEdit, QDialog
 
 import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater

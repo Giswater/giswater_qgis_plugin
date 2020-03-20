@@ -5,16 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
-from qgis.core import Qgis, QgsVectorLayer, QgsProject, QgsTask, QgsApplication
+from qgis.core import QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
 from qgis.PyQt.QtCore import QSettings, Qt, QDate
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
-    QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox, QAbstractButton, \
+from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
+    QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
 
 import os
@@ -29,14 +28,14 @@ from collections import OrderedDict
 from functools import partial
 from time import sleep
 
-
 from .. import utils_giswater
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
+from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
     ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
-from .gw_task import GwTask
+
 
 class UpdateSQL(ApiParent):
 
@@ -1760,7 +1759,6 @@ class UpdateSQL(ApiParent):
             self.username = self.get_user_connection(self.get_last_connection())
             role_admin = self.controller.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
-                self.controller.show_message("Connection Failed. You dont have permissions for this connection.", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text',
@@ -1822,11 +1820,11 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
-        sql = ("SELECT id, id as idval FROM sys_feature_type WHERE net_category=1")
+        sql = "SELECT id, id as idval FROM sys_feature_type WHERE net_category=1"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
-        sql = ("SELECT id, id as idval FROM om_visit_type")
+        sql = "SELECT id, id as idval FROM om_visit_type"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
 
@@ -1835,6 +1833,7 @@ class UpdateSQL(ApiParent):
         # Open dialog
         self.open_dialog(self.dlg_manage_visit_class)
         return
+
 
     def create_visit_param(self):
         return

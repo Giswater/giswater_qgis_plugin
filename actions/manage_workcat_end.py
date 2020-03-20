@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsExpression, QgsFeatureRequest
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -192,6 +191,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
+
         # Setting values
         self.workcat_id_end = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         self.enddate = utils_giswater.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
@@ -263,8 +263,8 @@ class ManageWorkcatEnd(ParentManage):
 
     def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
-        tablename = "v_edit_" + geom_type
 
+        tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return
 

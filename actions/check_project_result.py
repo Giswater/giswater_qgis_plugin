@@ -9,8 +9,6 @@ from qgis.core import Qgis
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
 
 import platform
-import json
-from collections import OrderedDict
 from functools import partial
 
 from .api_parent import ApiParent

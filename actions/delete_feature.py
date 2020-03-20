@@ -5,15 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtCore import QStringListModel
+from qgis.PyQt.QtWidgets import QCompleter
 
-from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog, \
-    QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox, QAbstractButton, \
-    QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
-
-import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -92,7 +86,6 @@ class DeleteFeature(ApiParent):
         self.set_completer_object_api(completer, model, widget, self.rows_typeahead)
 
 
-
     def show_feature_relation(self):
 
         # Get feature_type and feature_id
@@ -130,6 +123,7 @@ class DeleteFeature(ApiParent):
         if not complet_result:
             self.controller.show_message("Function gw_fct_set_delete_feature executed with no result ", 3)
             return
+
         # Populate tab info
         data = complet_result['body']['data']
         for k, v in list(data.items()):
@@ -137,6 +131,7 @@ class DeleteFeature(ApiParent):
                 change_tab = self.add_layer.populate_info_text(self.dlg_delete_feature, data)
 
         self.dlg_delete_feature.btn_cancel.setText('Accept')
+
         # Close dialog
         if not change_tab:
             self.close_dialog(self.dlg_delete_feature)
@@ -159,7 +154,6 @@ class DeleteFeature(ApiParent):
             pass
 
 
-
     def manage_selection(self):
         """ Slot function for signal 'canvas.selectionChanged' """
 
@@ -178,6 +172,7 @@ class DeleteFeature(ApiParent):
                 selected_id = feature.attribute(field_id)
             utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id, str(selected_id))
 
+
     def set_active_layer(self):
 
         #Get current layer and remove selection
@@ -192,3 +187,4 @@ class DeleteFeature(ApiParent):
 
         # Clear feature id field
         utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id, '')
+

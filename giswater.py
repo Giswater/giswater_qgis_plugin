@@ -5,18 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
+from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
 from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget
 from qgis.PyQt.QtWidgets import QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 
-
 import configparser
 import json
 import os.path
-import platform
 import sys
 import webbrowser
 from collections import OrderedDict
@@ -62,6 +60,7 @@ class Giswater(QObject):
             application at run time.
         :type iface: QgsInterface
         """
+
         super(Giswater, self).__init__()
 
         # Initialize instance attributes
@@ -85,7 +84,7 @@ class Giswater(QObject):
         # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
-            message = "Config file not found at: " + setting_file
+            message = f"Config file not found at: {setting_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return
 
@@ -178,6 +177,7 @@ class Giswater(QObject):
         if function_name is None:
             return
 
+        action = None
         try:
             action = self.actions[index_action]
 
@@ -383,6 +383,7 @@ class Giswater(QObject):
 
     def manage_toolbars_common(self):
         """ Manage actions of the common plugin toolbars """
+
         self.toolbar_basic("basic")
         self.toolbar_utils("utils")
 
@@ -391,6 +392,8 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
+        list_actions = None
         if self.controller.get_project_type() == 'ws':
             list_actions = ['37', '41', '48', '86', '32']
         elif self.controller.get_project_type() == 'ud':
@@ -406,6 +409,8 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
+        list_actions = None
         if self.controller.get_project_type() in ('ws', 'ud'):
             list_actions = ['206', '99', '83', '58', '59']
         elif self.controller.get_project_type() in ('tm', 'pl'):
@@ -424,6 +429,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -433,6 +439,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -452,6 +459,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['71', '72']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -461,6 +469,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -470,12 +479,14 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['45', '46', '47', '38', '49', '50']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
     def save_toolbars_position(self):
+
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
@@ -520,6 +531,7 @@ class Giswater(QObject):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
         """
+
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
@@ -606,6 +618,7 @@ class Giswater(QObject):
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
 
+        sql = None
         self.feature_cat = {}
         if self.wsoftware.upper() == 'WS':
             sql = ("SELECT cat_feature.* FROM cat_feature JOIN " 
@@ -1100,9 +1113,9 @@ class Giswater(QObject):
             return
 
         # Update table 'selector_expl' of current user (delete and insert)
-        sql = ("DELETE FROM selector_expl WHERE current_user = cur_user;"
-               "\nINSERT INTO selector_expl (expl_id, cur_user)"
-               " VALUES(" + expl_id + ", current_user);")
+        sql = (f"DELETE FROM selector_expl WHERE current_user = cur_user;"
+               f"\nINSERT INTO selector_expl (expl_id, cur_user) "
+               f"VALUES({expl_id}, current_user);")
         self.controller.execute_sql(sql)
 
 
@@ -1169,7 +1182,7 @@ class Giswater(QObject):
         # Check if metadata file exists
         metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
         if not os.path.exists(metadata_file):
-            message = "Metadata file not found: " + metadata_file
+            message = f"Metadata file not found: {metadata_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return default_value
 
@@ -1179,7 +1192,7 @@ class Giswater(QObject):
             metadata.read(metadata_file)
             value = metadata.get('general', parameter)
         except configparser.NoOptionError:
-            message = "Parameter not found: " + parameter
+            message = f"Parameter not found: {parameter}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
             value = default_value
         finally:
@@ -1246,8 +1259,6 @@ class Giswater(QObject):
         for layer_name in layers:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
-                # msg = f"Layer {layer_name} does not found, therefore, not configured."
-                # self.controller.show_warning(msg)
                 continue
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'

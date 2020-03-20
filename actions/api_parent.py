@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsPointXY, QgsVectorLayer
 from qgis.PyQt.QtCore import QStringListModel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager

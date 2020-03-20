@@ -5,14 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import Qgis, QgsPointXY
+from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
-    QSpacerItem, QWidget
+from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem
 
-import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater

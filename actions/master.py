@@ -10,9 +10,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
-import json
 import operator
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -485,5 +483,4 @@ class Master(ParentAction):
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
-
 

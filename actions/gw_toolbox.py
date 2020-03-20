@@ -10,7 +10,7 @@ from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
-from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView, QPushButton
+from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
 
 import os
 import json
@@ -75,6 +75,7 @@ class GwToolBox(ApiParent):
 
 
     def open_function(self, index):
+
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
         self.alias_function = index.sibling(index.row(), 0).data()
@@ -120,6 +121,7 @@ class GwToolBox(ApiParent):
 
 
     def remove_layers(self):
+
         root = QgsProject.instance().layerTreeRoot()
         for layer in reversed(self.temp_layers_added):
             self.temp_layers_added.remove(layer)
@@ -180,6 +182,7 @@ class GwToolBox(ApiParent):
 
     def load_parametric_values(self, dialog, function):
         """ Load QGIS settings related with parametric toolbox options """
+
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
@@ -214,6 +217,7 @@ class GwToolBox(ApiParent):
 
     def save_parametric_values(self, dialog, function):
         """ Save QGIS settings related with parametric toolbox options """
+
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
@@ -230,6 +234,7 @@ class GwToolBox(ApiParent):
 
 
     def execute_function(self, dialog, combo, result):
+
         dialog.btn_cancel.setEnabled(False)
         dialog.progressBar.setMaximum(0)
         dialog.progressBar.setMinimum(0)
@@ -374,6 +379,7 @@ class GwToolBox(ApiParent):
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
         self.remove_layers()
 
+
     def execute_no_parametric(self, dialog, function_name):
 
         dialog.progressBar.setMinimum(0)
@@ -434,7 +440,9 @@ class GwToolBox(ApiParent):
 
         return status
 
+
     def populate_cmb_type(self, feature_types):
+
         feat_types = []
         for item in feature_types:
             elem = []
@@ -490,6 +498,7 @@ class GwToolBox(ApiParent):
 
 
     def populate_layer_combo(self):
+
         geom_type = utils_giswater.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
         self.layers = self.get_all_group_layers(geom_type)
@@ -576,6 +585,4 @@ class GwToolBox(ApiParent):
             return json['alias'].upper()
         except KeyError:
             return 0
-
-
 

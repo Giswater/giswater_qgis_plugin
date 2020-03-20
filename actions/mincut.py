@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils,  QgsFeatureRequest, QgsFillSymbol, \
     QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
 
@@ -78,6 +77,7 @@ class MincutParent(ParentAction):
 
 
     def init_map_tool(self):
+
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -104,6 +104,7 @@ class MincutParent(ParentAction):
 
     def init_mincut_form(self):
         """ Custom form initial configuration """
+
         self.user_current_layer = self.iface.activeLayer()
         self.init_map_tool()
         self.add_layer.delete_layer_from_toc('Overlap affected arcs')
@@ -226,7 +227,9 @@ class MincutParent(ParentAction):
 
         self.open_dialog(self.dlg_mincut)
 
+
     def refresh_tab_hydro(self):
+
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
         utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
@@ -243,6 +246,7 @@ class MincutParent(ParentAction):
         :param widget_to_set: QDateEdit to set coherence date
         :return:
         """
+
         d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(), time_from.time().hour(), time_from.time().minute())
         d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(), time_to.time().hour(), time_to.time().minute())
 
@@ -252,6 +256,7 @@ class MincutParent(ParentAction):
 
 
     def show_notified_list(self):
+
         mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM anl_mincut_result_cat "
                f"WHERE id = '{mincut_id}'")
@@ -441,6 +446,7 @@ class MincutParent(ParentAction):
 
 
     def set_real_location(self):
+
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
@@ -937,6 +943,7 @@ class MincutParent(ParentAction):
 
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
+
         self.connec_list = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
@@ -1467,6 +1474,7 @@ class MincutParent(ParentAction):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
             Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
         """
+
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
@@ -1485,6 +1493,7 @@ class MincutParent(ParentAction):
 
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
+
         self.init_map_tool()
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
@@ -1608,6 +1617,7 @@ class MincutParent(ParentAction):
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
+
         self.task1 = GwTask('Calculating mincut')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
@@ -1697,8 +1707,10 @@ class MincutParent(ParentAction):
         self.disconnect_snapping(False)
         self.task1.setProgress(100)
 
+
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
+
         # Need this 3 lines here becouse if between one action and another we activate Pan, we cant open another valve
         # This is a safety measure
 

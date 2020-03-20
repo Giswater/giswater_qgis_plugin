@@ -5,9 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-from collections import OrderedDict
-
 from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
     QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
     QgsVectorLayer, QgsVectorLayerExporter
