@@ -84,7 +84,7 @@ class Go2EpaOptions(ApiParent):
             if field['isparent']:
                 widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, widget))
-
+                widget.currentIndexChanged.emit(widget.currentIndex())
 
     def fill_child(self, widget):
 
@@ -99,13 +99,16 @@ class Go2EpaOptions(ApiParent):
 
 
     def manage_child(self, combo_parent, combo_child):
+
         child = self.dlg_options.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
             child.setEnabled(True)
             self.populate_combo(child, combo_child)
             utils_giswater.set_combo_itemData(child, combo_child['selectedId'], 1)
-            if 'editability' not in combo_child:
-                return				
+            
+            if 'widgetcontrols' not in combo_child or 'comboEnableWhenParent' not in combo_child['widgetcontrols']:
+                return
+
             if str(utils_giswater.get_item_data(self.dlg_options, combo_parent, 0)) in str(combo_child['widgetcontrols']['comboEnableWhenParent']) \
                     and utils_giswater.get_item_data(self.dlg_options, combo_parent, 0) not in (None, ''):
                 child.setEnabled(True)
