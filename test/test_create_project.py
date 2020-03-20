@@ -1,7 +1,5 @@
 from qgis.core import QgsApplication, QgsProviderRegistry
 
-import os
-
 from test_giswater import TestGiswater
 
 
