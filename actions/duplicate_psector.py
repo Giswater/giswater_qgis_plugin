@@ -71,5 +71,5 @@ class DuplicatePsector(ParentManage, QObject):
             self.close_dialog(self.dlg_duplicate_psector)
         else:
             utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
-
+            self.dlg_duplicate_psector.setWindowTitle(f'SUCCESS IN DUPLICATING PSECTOR')
         self.is_duplicated.emit()
