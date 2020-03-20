@@ -257,8 +257,9 @@ class ApiConfig(ApiParent):
                     widget.setCalendarPopup(True)
                     widget.setDisplayFormat('dd/MM/yyyy')
 
-                    if field['value']: field['value'] = field['value'].replace('/', '-')
-                    date = QDate.fromString(field['value'], 'YYYY-MM-dd')
+                    if field['value']:
+                        field['value'] = field['value'].replace('/', '-')
+                    date = QDate.fromString(field['value'], 'yyyy-MM-dd')
                     if date:
                         widget.setDate(date)
                     else:
@@ -476,7 +477,10 @@ class ApiConfig(ApiParent):
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
             elem['widget_type'] = 'datepickertime'
-
+        elif type(widget) is QgsDateTimeEdit:
+            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+            elem['widget_type'] = 'datepickertime'
+            
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
 
@@ -494,7 +498,8 @@ class ApiConfig(ApiParent):
             value = utils_giswater.isChecked(self.dlg_config, chk)
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-
+        elif type(widget) is QgsDateTimeEdit:
+            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
         if chk.isChecked():
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
