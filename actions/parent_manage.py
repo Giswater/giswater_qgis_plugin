@@ -1082,7 +1082,7 @@ class ParentManage(ParentAction, object):
         dialog.close()
 
         if table_object == "doc":
-            self.manage_document()
+            self.manage_document(row=widget.model().record(row))
             utils_giswater.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
         elif table_object == "element":
             self.manage_element(new_element_id=False)

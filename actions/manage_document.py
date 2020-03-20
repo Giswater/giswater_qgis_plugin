@@ -30,7 +30,7 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None):
+    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None, row=None):
         """ Button 34: Add document """
 
         # Create the dialog and signals
@@ -76,8 +76,12 @@ class ManageDocument(ParentManage):
         # Fill combo boxes
         self.populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
 
-        # Set current date
-        utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', None)
+        # Set current/selected date and link
+        if row:
+            utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
+            utils_giswater.setWidgetText(self.dlg_add_doc, 'txt_path', row.value('path'))
+        else:
+            utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', None)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
