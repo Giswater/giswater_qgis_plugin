@@ -152,14 +152,36 @@ class ManageElement(ParentManage):
         sql = "SELECT DISTINCT(id), id FROM value_verified"
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
-
-        # Set combo boxes
-        self.set_combo(self.dlg_add_element, 'element_type', 'cat_element', 'elementtype_vdefault', field_id='elementtype_id', field_name='elementtype_id')
         self.filter_elementcat_id()
-        self.set_combo(self.dlg_add_element, 'state', 'value_state', 'state_vdefault', field_name='name')
-        self.set_combo(self.dlg_add_element, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
-        self.set_combo(self.dlg_add_element, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
-        self.set_combo(self.dlg_add_element, 'verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
+
+        if self.new_element_id:
+            # Set default values
+            elementtype_vdef = self.controller.get_config('elementcat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.element_type, elementtype_vdef, 0)
+
+            elementcat_vdef = self.controller.get_config('elementcat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.elementcat_id, elementcat_vdef, 0)
+
+            state_vdef = self.controller.get_config('state_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.state, state_vdef, 0)
+
+            statetype_vdef = self.controller.get_config('statetype_1_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.state_type, statetype_vdef, 0)
+
+            owner_vdef = self.controller.get_config('ownercat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.ownercat_id, owner_vdef, 0)
+
+            builtdate_vdef = self.controller.get_config('builtdate_vdefault')[0]
+
+            workcat_vdef = self.controller.get_config('workcat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id, workcat_vdef, 0)
+
+            workcatend_vdef = self.controller.get_config('workcat_id_end_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id_end, workcatend_vdef, 0)
+
+            verified_vdef = self.controller.get_config('verified_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.verified, verified_vdef, 0)
+
 
         # Adding auto-completion to a QLineEdit for default feature
         self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
