@@ -1106,7 +1106,7 @@ class ApiParent(ParentAction):
         self.load_settings(self.dlg_binfo)
 
         utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Select 2 nodes')
-        self.dlg_binfo.lbl_text.setText("Node1: \nNode2:")
+        self.dlg_binfo.lbl_title.setText("Node1: \nNode2:")
 
         self.dlg_binfo.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
         self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
@@ -1187,13 +1187,13 @@ class ApiParent(ParentAction):
                     self.node1 = str(element_id)                    
                     rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
-                    self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
+                    self.dlg_binfo.lbl_title.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
-                    self.dlg_binfo.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
+                    self.dlg_binfo.lbl_title.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, parameter=self.node2)
 
         if self.node1 and self.node2:
