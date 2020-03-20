@@ -56,7 +56,7 @@ BEGIN
 	--  Combo rows child CONFIG
 		
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as column_id, widgettype, datatype, id as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, widgetcontrols->>''comboEnableWhenParent'' as "editability"
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, widgetcontrols
 		FROM audit_cat_param_user WHERE dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
@@ -92,8 +92,8 @@ BEGIN
 		-- Get combo child name
 		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'widgetname', (v_aux_json_child->>'widgetname'));
 
-		-- Get combo editability
-		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'editability', (v_aux_json_child->>'editability')::json);
+		-- Get combo widgetcontrols
+		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'widgetcontrols', (v_aux_json_child->>'widgetcontrols')::json);
 		-- Get combo id's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND p_combovalue IS NOT NULL THEN
 			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(p_combovalue)||'
