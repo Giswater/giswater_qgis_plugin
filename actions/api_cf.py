@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 from qgis.core import Qgis, QgsExpressionContextUtils, QgsGeometry, QgsMapToPixel, QgsPointXY, QgsProject, QgsVectorLayer
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
-from qgis.PyQt.QtCore import QDate, QPoint, QStringListModel, Qt, pyqtSignal, QObject
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QPoint, QRegExp, QStringListModel, Qt
+from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit,QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
@@ -679,6 +679,7 @@ class ApiCF(ApiParent, QObject):
         widget = self.add_lineedit(field)
         widget = self.set_widget_size(widget, field)
         widget = self.set_min_max_values(widget, field)
+        widget = self.set_reg_exp(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
         widget = self.set_data_type(field, widget)
 
@@ -693,6 +694,15 @@ class ApiCF(ApiParent, QObject):
         if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
             if 'max' in field['widgetcontrols']['maxMinValues']:
                 widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
+        return widget
+
+
+    def set_reg_exp(self, widget, field):
+        """ Set regular expression """
+        if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
+            if field['widgetcontrols']['regexpControl'] is not None:
+                reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
+                widget.setValidator(QRegExpValidator(reg_exp))
         return widget
 
 
