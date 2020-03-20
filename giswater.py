@@ -5,11 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
-from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
+from qgis.core import Qgis, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
+from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QApplication, QCheckBox, QDockWidget
-from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget
+from qgis.PyQt.QtWidgets import QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 
 
@@ -23,9 +23,9 @@ from collections import OrderedDict
 from functools import partial
 from json import JSONDecodeError
 
-from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
+from .actions.check_project_result import CheckProjectResult
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
 from .actions.master import Master
@@ -51,7 +51,6 @@ from .map_tools.replace_feature import ReplaceFeatureMapTool
 from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
-from .ui_manager import AuditCheckProjectResult
 
 
 class Giswater(QObject):
@@ -1010,8 +1009,8 @@ class Giswater(QObject):
 
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            layers = self.controller.get_layers()
-            status = self.populate_audit_check_project(layers)
+            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+            status = self.check_project_result.populate_audit_check_project(layers)
             QApplication.restoreOverrideCursor()
             if not status:
                 return False
@@ -1105,168 +1104,6 @@ class Giswater(QObject):
                "\nINSERT INTO selector_expl (expl_id, cur_user)"
                " VALUES(" + expl_id + ", current_user);")
         self.controller.execute_sql(sql)
-
-
-    def populate_audit_check_project(self, layers):
-        """ Fill table 'audit_check_project' with layers data """
-
-        sql = ("DELETE FROM audit_check_project"
-               " WHERE user_name = current_user AND fprocesscat_id = 1")
-        self.controller.execute_sql(sql)
-        sql = ""
-        for layer in layers:
-            if layer is None: continue
-            if layer.providerType() != 'postgres': continue
-            layer_source = self.controller.get_layer_source(layer)
-            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
-            # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
-            uri = layer.dataProvider().dataSourceUri()
-            if 'SELECT row_number() over ()' in str(uri): continue
-            schema_name = layer_source['schema']
-            if schema_name is not None:
-                schema_name = schema_name.replace('"', '')
-                table_name = layer_source['table']
-                db_name = layer_source['db']
-                host_name = layer_source['host']
-                table_user = layer_source['user']
-                sql += ("\nINSERT INTO audit_check_project "
-                        "(table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user) "
-                        "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1, '"+str(table_user)+"');")
-
-        status = self.controller.execute_sql(sql)
-        if not status:
-            return False
-
-        # Execute function 'gw_fct_audit_check_project'
-        self.execute_audit_check_project()
-
-        return True
-
-
-    def execute_audit_check_project(self):
-        """ Execute function 'gw_fct_audit_check_project' """
-
-        version = self.parent.get_plugin_version()
-        extras = f'"version":"{version}"'
-        extras += f', "fprocesscat_id":1'
-        extras += f', "initProject":true'
-        extras += f',"qgisVersion":"{Qgis.QGIS_VERSION}"'
-        extras += f',"osVersion":"{platform.system()} {platform.release()}"'
-        body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
-        try:
-            if not result or (result['body']['actions']['hideForm'] == True): return True
-        except KeyError as e:
-            self.controller.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
-            return True
-
-        # Show dialog with audit check project result
-        self.show_check_project_result(result)
-
-        return True
-
-
-    def show_check_project_result(self, result):
-        """ Show dialog with audit check project result """
-
-        self.dlg_audit_project = AuditCheckProjectResult()
-        self.parent.load_settings(self.dlg_audit_project)
-        self.dlg_audit_project.rejected.connect(partial(self.parent.save_settings, self.dlg_audit_project))
-
-        # Populate info_log and missing layers
-        critical_level = 0
-        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
-            'gw_fct_audit_check_project_result', True, False, 0, True)
-
-        if 'missingLayers' in result['body']['data']:
-            critical_level = self.get_missing_layers(self.dlg_audit_project,
-                result['body']['data']['missingLayers'], critical_level)
-
-        grb_list = self.parent.hide_void_groupbox(self.dlg_audit_project)
-
-        # Hide labels if don't miss layers
-        hide_lbls = True
-        for k, v in grb_list.items():
-            if v != 0:
-                hide_lbls = False
-                break
-
-        if hide_lbls:
-            self.dlg_audit_project.lbl_layers.hide()
-            self.dlg_audit_project.lbl_checks.hide()
-
-        if int(critical_level) > 0 or text_result:
-            self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
-            self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
-            self.parent.open_dialog(self.dlg_audit_project)
-
-
-    def update_config(self, state):
-        """ Set qgis_form_initproject_hidden True or False into config_param_user """
-
-        value = {0:"False", 2:"True"}
-        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-               f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
-               f" ON CONFLICT  (parameter, cur_user) "
-               f" DO UPDATE SET value='{value[state]}'")
-        self.controller.execute_sql(sql, log_sql=True)
-
-
-    def get_missing_layers(self, dialog, m_layers, critical_level):
-
-        grl_critical = dialog.findChild(QGridLayout, "grl_critical")
-        grl_others = dialog.findChild(QGridLayout, "grl_others")
-        for pos, item in enumerate(m_layers):
-            try:
-                if not item: continue
-                widget = dialog.findChild(QCheckBox, f"{item['layer']}")
-                # If it is the case that a layer is necessary for two functions,
-                # and the widget has already been put in another iteration
-                if widget: continue
-                label = QLabel()
-                label.setObjectName(f"lbl_{item['layer']}")
-                label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
-
-                critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
-                widget = QCheckBox()
-                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                widget.setObjectName(f"{item['layer']}")
-                widget.setProperty('field_id', item['id'])
-                widget.setProperty('field_the_geom', item['field_the_geom'])
-
-                if int(item['criticity']) == 3:
-                    grl_critical.addWidget(label, pos, 0)
-                    grl_critical.addWidget(widget, pos, 1)
-                else:
-                    grl_others.addWidget(label, pos, 0)
-                    grl_others.addWidget(widget, pos, 1)
-            except KeyError as e:
-                description = "Key on returned json from ddbb is missed"
-                self.controller.manage_exception(None, description)
-
-        return critical_level
-
-
-    def add_selected_layers(self):
-
-        checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
-        schemaname = self.schema_name.replace('"','')
-        for check in checks:
-            if check.isChecked():
-                try:
-                    the_geom = check.property('field_the_geom')
-                except KeyError as e:
-                    sql = (f"SELECT attname FROM pg_attribute a "
-                           f" JOIN pg_class t on a.attrelid = t.oid "
-                           f" JOIN pg_namespace s on t.relnamespace = s.oid "
-                           f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
-                           f" AND s.nspname = '{schemaname}' "
-                           f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
-                           f" ORDER BY a.attnum limit 1")
-                    the_geom = self.controller.get_row(sql, commit=True)
-                if not the_geom: the_geom = None
-                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom, check.property('field_id'), None)
-        self.parent.close_dialog(self.dlg_audit_project)
 
 
     def project_read_pl(self, show_warning=True):
