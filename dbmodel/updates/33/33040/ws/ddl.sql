@@ -7,10 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 --2020/03/18
-CREATE INDEX gully_sector ON gully USING btree (sector_id);
-CREATE INDEX gully_gratecat ON gully USING btree (gratecat_id);
-CREATE INDEX gully_exploitation ON gully USING btree (expl_id);
-CREATE INDEX gully_dma ON gully USING btree (dma_id);
-CREATE INDEX gully_street1 ON gully USING btree (streetaxis_id);
-CREATE INDEX gully_street2 ON gully USING btree (streetaxis2_id);
+CREATE INDEX node_dqa ON node USING btree (dqa_id);
+CREATE INDEX arc_dqa ON arc USING btree (dqa_id);
+CREATE INDEX connec_dqa ON connec USING btree (dqa_id);

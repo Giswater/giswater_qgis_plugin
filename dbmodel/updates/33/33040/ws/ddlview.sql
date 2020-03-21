@@ -162,8 +162,8 @@ CREATE OR REPLACE VIEW vu_node AS
     cat_node.pnom AS cat_pnom,
     cat_node.dnom AS cat_dnom,
     node.epa_type,
-	node.expl_id,
-	exploitation.macroexpl_id,
+    node.expl_id,
+    exploitation.macroexpl_id,
     node.sector_id,
     sector.macrosector_id,
     node.arc_id,
@@ -204,7 +204,7 @@ CREATE OR REPLACE VIEW vu_node AS
     node.rotation,
     concat(node_type.link_path, node.link) AS link,
     node.verified,
-    node.undelete
+    node.undelete,
     node.the_geom,
     cat_node.label,
     node.label_x,
@@ -215,7 +215,7 @@ CREATE OR REPLACE VIEW vu_node AS
     node.hemisphere,
     node.num_value,
     cat_node.nodetype_id,	
-    date_trunc('second'::text, tstamp) AS tstamp,
+    date_trunc('second'::text, node.tstamp) AS tstamp,
     node.insert_user,
     date_trunc('second'::text, lastupdate) AS lastupdate,
     node.lastupdate_user
@@ -293,13 +293,13 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.publish,
     arc.inventory,   
     arc.num_value,
-    arc.the_geom
+    arc.the_geom,
     cat_arc.arctype_id as cat_arctype_id,
     a.nodetype_id AS nodetype_1,
     a.staticpressure AS staticpress1,
     b.nodetype_id AS nodetype_2,
     b.staticpressure AS staticpress2,
-    date_trunc('second'::text, tstamp) AS tstamp,
+    date_trunc('second'::text, arc.tstamp) AS tstamp,
     arc.insert_user,
     date_trunc('second'::text, arc.lastupdate) AS lastupdate,
     arc.lastupdate_user
@@ -386,7 +386,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.featurecat_id,
     connec.pjoint_id,
     connec.pjoint_type,
-    date_trunc('second'::text, tstamp) AS tstamp,
+    date_trunc('second'::text, connec.tstamp) AS tstamp,
     connec.insert_user,
     date_trunc('second'::text, lastupdate) AS lastupdate,
     connec.lastupdate_user
@@ -531,7 +531,7 @@ FROM v_connec;
 
 
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
 
 
 -- creacio de les pol

@@ -128,8 +128,7 @@ BEGIN
 			DROP VIEW IF EXISTS v_edit_man_wjoin;
 			DROP VIEW IF EXISTS v_edit_man_fountain_pol;
 			DROP VIEW IF EXISTS v_edit_man_register_pol;
-			DROP VIEW IF EXISTS v_edit_man_tank_pol;
-						
+			DROP VIEW IF EXISTS v_edit_man_tank_pol;					
 		
 		ELSIF v_projecttype = 'UD' THEN
 		

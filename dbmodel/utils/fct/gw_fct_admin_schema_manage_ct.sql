@@ -16,13 +16,12 @@ warning: it seems that NOT WORKS:
 ALTER TABLE gully_type DROP CONSTRAINT gully_type_id_fkey;
 ALTER TABLE gully_type  ADD CONSTRAINT gully_type_id_fkey FOREIGN KEY (id) REFERENCES SCHEMA_NAME.cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-
       
 SELECT gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"DROP"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+SELECT gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"ADD"}}$$)
 
@@ -199,14 +198,11 @@ BEGIN
 			v_37=v_37+1;
 		END LOOP;
 
-		
-		-- Disable custom foreing keys (to activate when bug solved)
-		
+
 		v_query_text =  'SELECT *  FROM typevalue_fk';
 		FOR v_tablerecord IN EXECUTE v_query_text LOOP				
 			EXECUTE 'ALTER TABLE '||v_tablerecord.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
 		END LOOP;
-		
 
 		-- Disable topocontrol triggers
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;

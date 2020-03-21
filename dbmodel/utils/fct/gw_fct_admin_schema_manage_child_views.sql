@@ -47,7 +47,6 @@ DECLARE
 	
 BEGIN
 
-	
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -78,24 +77,26 @@ BEGIN
 		END LOOP;
 
 	ELSE 
+
+		--RAISE exception 'rec.id,%', (SELECT count(*) FROM cat_feature);
+
 	
 		--if the view should be created for all the features loop over the cat_features
-		IF v_multi_create IS TRUE THEN
-			raise notice 'MULTI';
+		IF v_multi_create IS TRUE AND v_project_type IS NOT NULL THEN -- only for that existing projects (projecttype not null)
+				
 			IF v_project_type ='WS' THEN
 				v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
 							UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
 		
 			ELSIF v_project_type ='UD' THEN
 				v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
-																UNION SELECT id,active FROM arc_type 
-																UNION SELECT id,active FROM connec_type 
-																UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
+							UNION SELECT id,active FROM arc_type 
+							UNION SELECT id,active FROM connec_type 
+							UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
 			END IF;
-
-		
+	
 			FOR rec IN EXECUTE v_querytext LOOP
-				RAISE NOTICE 'rec.id,%',rec.id;
+						
 				--set view definition to null
 				v_definition = null;
 				
@@ -215,7 +216,8 @@ BEGIN
 					END IF;
 
 					--create trigger on view 
-					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||
+					v_schemaname||'.'||v_viewname||';';
 
 					EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||'
 					INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
@@ -229,9 +231,10 @@ BEGIN
 					"feature":{"catFeature":"'||v_cat_feature||'"}, 
 					"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 				END IF;
-			
 			END LOOP;
-		ELSE
+			
+		ELSIF v_multi_create IS NOT TRUE AND v_project_type IS NOT NULL THEN 
+		
 			raise notice 'SIMPLE';
 			--get the system type and system_id of the feature and view name
 			v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
@@ -357,7 +360,8 @@ BEGIN
 				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 			END IF;
 			--create trigger on view 
-			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||
+			v_schemaname||'.'||v_viewname||';';
 
 			EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
 			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'

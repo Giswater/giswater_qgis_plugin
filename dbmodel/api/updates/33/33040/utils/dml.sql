@@ -109,9 +109,9 @@ dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunctio
 VALUES ('ve_connec', 'feature', 'tstamp', null, 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
-UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'cat_arctype_id' and formname  like '%ve_arc% or formname  = 'v_edit_arc';
-UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'nodetype_id' and formname  like '%ve_node% or formname  = 'v_edit_node';
-UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'connectype_id' and formname  like '%ve_connec% or formname  = 'v_edit_connec';
+UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'cat_arctype_id' and formname  like '%ve_arc%' or formname  = 'v_edit_arc';
+UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'nodetype_id' and formname  like '%ve_node%' or formname  = 'v_edit_node';
+UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'connectype_id' and formname  like '%ve_connec%' or formname  = 'v_edit_connec';
 
 
 
