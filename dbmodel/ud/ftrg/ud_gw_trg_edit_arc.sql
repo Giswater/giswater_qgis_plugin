@@ -11,329 +11,334 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-	v_inp_table varchar;
-	v_man_table varchar;
-	v_new_man_table varchar;
-	v_old_man_table varchar;
-	v_sql varchar;
-	v_type_v_man_table varchar;
-	v_count integer;
-	v_promixity_buffer double precision;
-	v_edit_enable_arc_nodes_update boolean;
-	v_code_autofill_bool boolean;
-	v_link_path varchar;
-	v_addfields record;
-	v_new_value_param text;
-	v_old_value_param text;
-	v_customfeature text;
-	v_featurecat text;
+v_inp_table varchar;
+v_man_table varchar;
+v_new_man_table varchar;
+v_old_man_table varchar;
+v_sql varchar;
+v_type_v_man_table varchar;
+v_count integer;
+v_promixity_buffer double precision;
+v_edit_enable_arc_nodes_update boolean;
+v_code_autofill_bool boolean;
+v_link_path varchar;
+v_addfields record;
+v_new_value_param text;
+v_old_value_param text;
+v_customfeature text;
+v_featurecat text;
+v_streetaxis text;
+v_streetaxis2 text;
 
 BEGIN
-		EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-		v_man_table:= TG_ARGV[0];
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	v_man_table:= TG_ARGV[0];
 
-			--modify values for custom view inserts
-		IF v_man_table IN (SELECT id FROM arc_type) THEN
-			v_customfeature:=v_man_table;
-			v_man_table:=(SELECT man_table FROM arc_type WHERE id=v_man_table);
-		END IF;
+	--modify values for custom view inserts
+	IF v_man_table IN (SELECT id FROM arc_type) THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM arc_type WHERE id=v_man_table);
+	END IF;
 
-		v_type_v_man_table:=v_man_table;
+	v_type_v_man_table:=v_man_table;
 		
-		v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-		v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
 		
-		-- profilactic issue to keep to keep stable edit_disable_statetopocontrol
-		--UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;					
+	
+	-- transforming streetaxis name into id
+	v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
+	v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);				
 
-		IF TG_OP = 'INSERT' THEN   
-			-- Arc ID
-			IF (NEW.arc_id IS NULL) THEN
+	IF TG_OP = 'INSERT' THEN   
+
+		-- Arc ID
+		IF (NEW.arc_id IS NULL) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.arc_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+
+		 -- Arc type
+		IF (NEW.arc_type IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM arc_type) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"1018", "function":"1212","debug_msg":null}}$$);';
 			END IF;
 
-			 -- Arc type
-			IF (NEW.arc_type IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM arc_type) = 0) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"1018", "function":"1212","debug_msg":null}}$$);';
-				END IF;
-
-				IF v_customfeature IS NOT NULL THEN
-	 				NEW.arc_type:=v_customfeature;
-	 			END IF;
+			IF v_customfeature IS NOT NULL THEN
+				NEW.arc_type:=v_customfeature;
 			END IF;
+		END IF;
 
-			IF v_man_table='parent' THEN
-				IF NEW.arc_type IS NULL THEN 
-					NEW.arc_type:=(SELECT "value" FROM config_param_user WHERE "parameter"='arctype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					
-				END IF;
+		IF v_man_table='parent' THEN
+			IF NEW.arc_type IS NULL THEN 
+				NEW.arc_type:=(SELECT "value" FROM config_param_user WHERE "parameter"='arctype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 				
-			ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
-				NEW.arc_type:= (SELECT id FROM arc_type WHERE arc_type.man_table=v_type_v_man_table LIMIT 1);
-			END IF;
-
-			 -- Epa type
-			IF (NEW.epa_type IS NULL) THEN
-				NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
 			END IF;
 			
-			-- Arc catalog ID
+		ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
+			NEW.arc_type:= (SELECT id FROM arc_type WHERE arc_type.man_table=v_type_v_man_table LIMIT 1);
+		END IF;
+
+		 -- Epa type
+		IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
+		END IF;
+		
+		-- Arc catalog ID
+		IF (NEW.arccat_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"1020", "function":"1212","debug_msg":null}}$$);';
+			END IF; 
+				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.arccat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"1020", "function":"1212","debug_msg":null}}$$);';
-				END IF; 
-					NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				IF (NEW.arccat_id IS NULL) THEN
-					NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
-				END IF;
-				IF (NEW.arccat_id IS NULL) THEN
-						NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
-				END IF;       
+				NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			END IF;
-				
-			-- Sector ID
+			IF (NEW.arccat_id IS NULL) THEN
+					NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+			END IF;       
+		END IF;
+			
+		-- Sector ID
+		IF (NEW.sector_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"1008", "function":"1212","debug_msg":null}}$$);';
+			END IF;
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
+				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
+				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"1008", "function":"1212","debug_msg":null}}$$);';
-				END IF;
-					SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-				IF v_count = 1 THEN
-					NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-				ELSIF v_count > 1 THEN
-					NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
-					order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
-				END IF;	
-				IF (NEW.sector_id IS NULL) THEN
-					NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				END IF;
-				IF (NEW.sector_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"1010", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);';         
-				END IF;            
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
+			IF (NEW.sector_id IS NULL) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"1010", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);';         
+			END IF;            
+		END IF;
 			
 		-- Dma ID
+		IF (NEW.dma_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"1012", "function":"1212","debug_msg":null}}$$);';
+			END IF;
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
+				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
+			END IF;
 			IF (NEW.dma_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"1012", "function":"1212","debug_msg":null}}$$);';
-				END IF;
-					SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-				IF v_count = 1 THEN
-					NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-				ELSIF v_count > 1 THEN
-					NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
-					order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
-				END IF;
-				IF (NEW.dma_id IS NULL) THEN
-					NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				END IF; 
-				IF (NEW.dma_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"1014", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);'; 
-				END IF;            
-			END IF;
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF; 
+			IF (NEW.dma_id IS NULL) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"1014", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);'; 
+			END IF;            
+		END IF;
 				
-			-- Verified
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
+		-- Verified
+		IF (NEW.verified IS NULL) THEN
+			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
-			-- State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-			
-			-- State_type
-			IF (NEW.state_type IS NULL) THEN
-				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
+		-- State
+		IF (NEW.state IS NULL) THEN
+			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+		
+		-- State_type
+		IF (NEW.state_type IS NULL) THEN
+			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
-			--check relation state - state_type
+		--check relation state - state_type
 	        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 	        	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
        			"data":{"error":"3036", "function":"1212","debug_msg":"'||NEW.state::text||'"}}$$);'; 
 	       	END IF;			
    
-			-- Exploitation
+		-- Exploitation
+		IF (NEW.expl_id IS NULL) THEN
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.expl_id IS NULL) THEN
-				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-					IF (NEW.expl_id IS NULL) THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       					"data":{"error":"2012", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);'; 
-					END IF;		
-				END IF;
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"2012", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);'; 
+				END IF;		
 			END IF;
-			
-			-- Municipality 
+		END IF;
+		
+		-- Municipality 
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.muni_id IS NULL) THEN
-				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-					IF (NEW.muni_id IS NULL) THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"2024", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);'; 
-					END IF;	
-				END IF;
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"error":"2024", "function":"1212","debug_msg":"'||NEW.arc_id::text||'"}}$$);'; 
+				END IF;	
 			END IF;
-
-			--Inventory	
-			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
-
-			--Publish
-			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
-
-			--Uncertain
-			NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');	       	
-			
-			-- Workcat_id
-			IF (NEW.workcat_id IS NULL) THEN
-				NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-			
-			-- Ownercat_id
-			IF (NEW.ownercat_id IS NULL) THEN
-				NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-			
-			-- Soilcat_id
-			IF (NEW.soilcat_id IS NULL) THEN
-				NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-
-			--Builtdate
-			IF (NEW.builtdate IS NULL) THEN
-				NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-
-			
-			--Copy id to code field
-			SELECT code_autofill INTO v_code_autofill_bool FROM arc_type WHERE id=NEW.arc_type;
-			
-			IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
-				NEW.code=NEW.arc_id;
-			END IF;
-			
-			-- LINK
-			IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
-				NEW.link=NEW.arc_id;
-			END IF;
-			
-			v_featurecat = NEW.arc_type;
-
-			--Location type
-			IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-				NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
-			END IF;
-
-			IF NEW.location_type IS NULL THEN
-				NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_location_vdefault' AND cur_user = current_user);
-			END IF;
-
-			--Fluid type
-			IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-				NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_fluid_vdefault' AND cur_user = current_user);
-			END IF;
-
-			IF NEW.fluid_type IS NULL THEN
-				NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_fluid_vdefault' AND cur_user = current_user);
-			END IF;
-
-			--Category type
-			IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-				NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_category_vdefault' AND cur_user = current_user);
-			END IF;
-
-			IF NEW.category_type IS NULL THEN
-				NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_category_vdefault' AND cur_user = current_user);
-			END IF;	
-
-			--Function type
-			IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-				NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_function_vdefault' AND cur_user = current_user);
-			END IF;
-
-			IF NEW.function_type IS NULL THEN
-				NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_function_vdefault' AND cur_user = current_user);
-			END IF;
-			
-			-- FEATURE INSERT
-			INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
-			annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
-			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,
-			uncertain, num_value) 
-			VALUES (NEW.arc_id, NEW.code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
-			NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
-			NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
-			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end,NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
-			NEW.muni_id, NEW.streetaxis_id,  NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
-			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
-			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
-			
-			-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
-			IF v_edit_enable_arc_nodes_update IS TRUE THEN
-				IF NEW.node_1 IS NOT NULL THEN
-					UPDATE arc SET node_1=NEW.node_1 WHERE arc_id=NEW.arc_id;
-				END IF;
-				IF NEW.node_2 IS NOT NULL THEN
-					UPDATE arc SET node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
-				END IF;
-			END IF;
-				
-			IF v_man_table='man_conduit' THEN
-				
-				INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
-			
-			ELSIF v_man_table='man_siphon' THEN
-								
-				INSERT INTO man_siphon (arc_id,name) VALUES (NEW.arc_id,NEW.name);
-				
-			ELSIF v_man_table='man_waccel' THEN
-				
-				INSERT INTO man_waccel (arc_id, sander_length,sander_depth,prot_surface,accessibility, name) 
-				VALUES (NEW.arc_id, NEW.sander_length, NEW.sander_depth,NEW.prot_surface,NEW.accessibility, NEW.name);
-				
-			ELSIF v_man_table='man_varc' THEN
-						
-				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
-			
-			ELSIF v_man_table='parent' THEN
-		        v_man_table := (SELECT arc_type.man_table FROM arc_type WHERE arc_type.id=NEW.arc_type);
-		        v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
-		        EXECUTE v_sql;				
-		        
-			END IF;
-							
-							
-			-- EPA INSERT
-        IF (NEW.epa_type = 'CONDUIT') THEN 
-            INSERT INTO inp_conduit (arc_id, q0, qmax) VALUES (NEW.arc_id,0,0); 
-			
-        ELSIF (NEW.epa_type = 'PUMP') THEN 
-            INSERT INTO inp_pump (arc_id) VALUES (NEW.arc_id); 
-			
-		ELSIF (NEW.epa_type = 'ORIFICE') THEN 
-            INSERT INTO inp_orifice (arc_id, ori_type) VALUES (NEW.arc_id,'BOTTOM');
-			
-		ELSIF (NEW.epa_type = 'WEIR') THEN 
-            INSERT INTO inp_weir (arc_id, weir_type) VALUES (NEW.arc_id,'SIDEFLOW');
-			
-		ELSIF (NEW.epa_type = 'OUTLET') THEN 
-            INSERT INTO inp_outlet (arc_id, outlet_type) VALUES (NEW.arc_id,'TABULAR/HEAD');
-            
-		ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
-            INSERT INTO inp_virtual (arc_id, add_length) VALUES (NEW.arc_id, false);
-				
 		END IF;
 
-	-- man addfields insert
+		--Inventory	
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+
+		--Publish
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+
+		--Uncertain
+		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');	       	
+		
+		-- Workcat_id
+		IF (NEW.workcat_id IS NULL) THEN
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+		
+		-- Ownercat_id
+		IF (NEW.ownercat_id IS NULL) THEN
+			NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+		
+		-- Soilcat_id
+		IF (NEW.soilcat_id IS NULL) THEN
+			NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+
+		--Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+
+		
+		--Copy id to code field
+		SELECT code_autofill INTO v_code_autofill_bool FROM arc_type WHERE id=NEW.arc_type;
+		
+		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.arc_id;
+		END IF;
+		
+		-- LINK
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+			NEW.link=NEW.arc_id;
+		END IF;
+		
+		v_featurecat = NEW.arc_type;
+
+		--Location type
+		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.location_type IS NULL THEN
+			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_location_vdefault' AND cur_user = current_user);
+		END IF;
+
+		--Fluid type
+		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_fluid_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.fluid_type IS NULL THEN
+			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_fluid_vdefault' AND cur_user = current_user);
+		END IF;
+
+		--Category type
+		IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_category_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.category_type IS NULL THEN
+			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_category_vdefault' AND cur_user = current_user);
+		END IF;	
+
+		--Function type
+		IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_function_vdefault' AND cur_user = current_user);
+		END IF;
+
+		IF NEW.function_type IS NULL THEN
+			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_function_vdefault' AND cur_user = current_user);
+		END IF;
+			
+		-- FEATURE INSERT
+		INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
+		annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, 
+		builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified, 
+		the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value) 
+		VALUES (NEW.arc_id, NEW.code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2, 
+		NEW.custom_elev1, NEW.custom_elev2,NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
+		NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, 
+		NEW.location_type, NEW.workcat_id,NEW.workcat_id_end,NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
+		NEW.muni_id, v_streetaxis,  NEW.postcode, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
+		NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
+		NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
+		
+		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
+		IF v_edit_enable_arc_nodes_update IS TRUE THEN
+			IF NEW.node_1 IS NOT NULL THEN
+				UPDATE arc SET node_1=NEW.node_1 WHERE arc_id=NEW.arc_id;
+			END IF;
+			IF NEW.node_2 IS NOT NULL THEN
+				UPDATE arc SET node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
+			END IF;
+		END IF;
+			
+		IF v_man_table='man_conduit' THEN
+			
+			INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
+		
+		ELSIF v_man_table='man_siphon' THEN
+							
+			INSERT INTO man_siphon (arc_id,name) VALUES (NEW.arc_id,NEW.name);
+			
+		ELSIF v_man_table='man_waccel' THEN
+			
+			INSERT INTO man_waccel (arc_id, sander_length,sander_depth,prot_surface,accessibility, name) 
+			VALUES (NEW.arc_id, NEW.sander_length, NEW.sander_depth,NEW.prot_surface,NEW.accessibility, NEW.name);
+			
+		ELSIF v_man_table='man_varc' THEN
+					
+			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
+		
+		ELSIF v_man_table='parent' THEN
+		v_man_table := (SELECT arc_type.man_table FROM arc_type WHERE arc_type.id=NEW.arc_type);
+		v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
+		EXECUTE v_sql;				
+		
+		END IF;
+						
+							
+		-- EPA INSERT
+		IF (NEW.epa_type = 'CONDUIT') THEN 
+		    INSERT INTO inp_conduit (arc_id, q0, qmax) VALUES (NEW.arc_id,0,0); 
+				
+		ELSIF (NEW.epa_type = 'PUMP') THEN 
+		    INSERT INTO inp_pump (arc_id) VALUES (NEW.arc_id); 
+				
+			ELSIF (NEW.epa_type = 'ORIFICE') THEN 
+		    INSERT INTO inp_orifice (arc_id, ori_type) VALUES (NEW.arc_id,'BOTTOM');
+				
+			ELSIF (NEW.epa_type = 'WEIR') THEN 
+		    INSERT INTO inp_weir (arc_id, weir_type) VALUES (NEW.arc_id,'SIDEFLOW');
+				
+			ELSIF (NEW.epa_type = 'OUTLET') THEN 
+		    INSERT INTO inp_outlet (arc_id, outlet_type) VALUES (NEW.arc_id,'TABULAR/HEAD');
+		    
+			ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
+		    INSERT INTO inp_virtual (arc_id, add_length) VALUES (NEW.arc_id, false);
+					
+			END IF;
+
+		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter 
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
@@ -352,88 +357,88 @@ BEGIN
 		
 		RETURN NEW;
 			   
-		ELSIF TG_OP = 'UPDATE' THEN
+	ELSIF TG_OP = 'UPDATE' THEN
 		
-			-- State
-			IF (NEW.state != OLD.state) THEN
-				UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
-				IF NEW.state = 2 AND OLD.state=1 THEN
-					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
-					VALUES (NEW.arc_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-					= 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
-				END IF;
-				IF NEW.state = 1 AND OLD.state=2 THEN
-					DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;					
-				END IF;			
+		-- State
+		IF (NEW.state != OLD.state) THEN
+			UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
+			IF NEW.state = 2 AND OLD.state=1 THEN
+				INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
+				VALUES (NEW.arc_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
+				= 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
-			
-			-- State_type
-			IF NEW.state=0 AND OLD.state=1 THEN
-				IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-				NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF NEW.state = 1 AND OLD.state=2 THEN
+				DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;					
+			END IF;			
+		END IF;
+		
+		-- State_type
+		IF NEW.state=0 AND OLD.state=1 THEN
+			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
+			NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				IF NEW.state_type IS NULL THEN
+				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
-						IF NEW.state_type IS NULL THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       					"data":{"error":"2110", "function":"1318","debug_msg":null}}$$);';
-						END IF;
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"2110", "function":"1318","debug_msg":null}}$$);';
 					END IF;
 				END IF;
 			END IF;
+		END IF;
 
-			--check relation state - state_type
-			IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	        	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3036", "function":"1212","debug_msg":"'||NEW.state::text||'"}}$$);';
-	       	END IF;		
+		--check relation state - state_type
+		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"error":"3036", "function":"1212","debug_msg":"'||NEW.state::text||'"}}$$);';
+		END IF;		
 	       					
-			-- The geom
-			IF st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
-				UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
-			END IF;
+		-- The geom
+		IF st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
+			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
+		END IF;
 
-			IF (NEW.epa_type != OLD.epa_type) THEN    
-			 
-				IF (OLD.epa_type = 'CONDUIT') THEN 
-					v_inp_table:= 'inp_conduit';
-				ELSIF (OLD.epa_type = 'PUMP') THEN 
-					v_inp_table:= 'inp_pump';
-				ELSIF (OLD.epa_type = 'ORIFICE') THEN 
-					v_inp_table:= 'inp_orifice';
-				ELSIF (OLD.epa_type = 'WEIR') THEN 
-					v_inp_table:= 'inp_weir';
-				ELSIF (OLD.epa_type = 'OUTLET') THEN 
-					v_inp_table:= 'inp_outlet';
-				ELSIF (OLD.epa_type = 'VIRTUAL') THEN 
-					v_inp_table:= 'inp_virtual';
-				END IF;
-				
-				IF v_inp_table IS NOT NULL THEN
-					v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
-					EXECUTE v_sql;
-				END IF;
+		IF (NEW.epa_type != OLD.epa_type) THEN    
+		 
+			IF (OLD.epa_type = 'CONDUIT') THEN 
+				v_inp_table:= 'inp_conduit';
+			ELSIF (OLD.epa_type = 'PUMP') THEN 
+				v_inp_table:= 'inp_pump';
+			ELSIF (OLD.epa_type = 'ORIFICE') THEN 
+				v_inp_table:= 'inp_orifice';
+			ELSIF (OLD.epa_type = 'WEIR') THEN 
+				v_inp_table:= 'inp_weir';
+			ELSIF (OLD.epa_type = 'OUTLET') THEN 
+				v_inp_table:= 'inp_outlet';
+			ELSIF (OLD.epa_type = 'VIRTUAL') THEN 
+				v_inp_table:= 'inp_virtual';
+			END IF;
 			
-				v_inp_table := NULL;
-
-				IF (NEW.epa_type = 'CONDUIT') THEN 
-					v_inp_table:= 'inp_conduit';
-				ELSIF (NEW.epa_type = 'PUMP') THEN 
-					v_inp_table:= 'inp_pump';
-				ELSIF (NEW.epa_type = 'ORIFICE') THEN 
-					v_inp_table:= 'inp_orifice';
-				ELSIF (NEW.epa_type = 'WEIR') THEN 
-					v_inp_table:= 'inp_weir';
-				ELSIF (NEW.epa_type = 'OUTLET') THEN 
-					v_inp_table:= 'inp_outlet';
-				ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
-					v_inp_table:= 'inp_virtual';
-				END IF;
-				IF v_inp_table IS NOT NULL THEN
-					v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
-					EXECUTE v_sql;
-				END IF;
-
+			IF v_inp_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+				EXECUTE v_sql;
 			END IF;
+		
+			v_inp_table := NULL;
+
+			IF (NEW.epa_type = 'CONDUIT') THEN 
+				v_inp_table:= 'inp_conduit';
+			ELSIF (NEW.epa_type = 'PUMP') THEN 
+				v_inp_table:= 'inp_pump';
+			ELSIF (NEW.epa_type = 'ORIFICE') THEN 
+				v_inp_table:= 'inp_orifice';
+			ELSIF (NEW.epa_type = 'WEIR') THEN 
+				v_inp_table:= 'inp_weir';
+			ELSIF (NEW.epa_type = 'OUTLET') THEN 
+				v_inp_table:= 'inp_outlet';
+			ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
+				v_inp_table:= 'inp_virtual';
+			END IF;
+			IF v_inp_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+				EXECUTE v_sql;
+			END IF;
+
+		END IF;
 
 		 -- UPDATE management values
 		IF (NEW.arc_type <> OLD.arc_type) THEN 
@@ -473,8 +478,8 @@ BEGIN
 			SET  arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, 
-			workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,  
-			postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber, 
+			workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,  
+			postcode=NEW.postcode, streetaxis2_id=v_streetaxis2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber, 
 			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user

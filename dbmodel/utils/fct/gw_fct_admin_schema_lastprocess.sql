@@ -98,15 +98,71 @@ BEGIN
 			EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
 		END LOOP;
 		
-		-- drop deprecated columns
+		-- drop deprecated views
+		IF v_projecttype = 'WS' THEN 
+			DROP VIEW IF EXISTS v_edit_man_varc;
+			DROP VIEW IF EXISTS v_edit_man_pipe;
+			DROP VIEW IF EXISTS v_edit_man_expansiontank;
+			DROP VIEW IF EXISTS v_edit_man_filter;
+			DROP VIEW IF EXISTS v_edit_man_flexunion;
+			DROP VIEW IF EXISTS v_edit_man_hydrant;
+			DROP VIEW IF EXISTS v_edit_man_junction;
+			DROP VIEW IF EXISTS v_edit_man_meter;
+			DROP VIEW IF EXISTS v_edit_man_netelement;
+			DROP VIEW IF EXISTS v_edit_man_netsamplepoint;
+			DROP VIEW IF EXISTS v_edit_man_netwjoin;
+			DROP VIEW IF EXISTS v_edit_man_pump;
+			DROP VIEW IF EXISTS v_edit_man_reduction;
+			DROP VIEW IF EXISTS v_edit_man_register;
+			DROP VIEW IF EXISTS v_edit_man_source;
+			DROP VIEW IF EXISTS v_edit_man_tank;
+			DROP VIEW IF EXISTS v_edit_man_valve;
+			DROP VIEW IF EXISTS v_edit_man_waterwell;
+			DROP VIEW IF EXISTS v_edit_man_manhole;
+			DROP VIEW IF EXISTS v_edit_man_wtp;
+			DROP VIEW IF EXISTS v_edit_man_fountain;
+			DROP VIEW IF EXISTS v_edit_man_tap;
+			DROP VIEW IF EXISTS v_edit_man_greentap;
+			DROP VIEW IF EXISTS v_edit_man_wjoin;
+			DROP VIEW IF EXISTS v_edit_man_fountain_pol;
+			DROP VIEW IF EXISTS v_edit_man_register_pol;
+			DROP VIEW IF EXISTS v_edit_man_tank_pol;
+						
 		
+		ELSIF v_projecttype = 'UD' THEN
+		
+			DROP VIEW IF EXISTS v_edit_man_chamber;
+			DROP VIEW IF EXISTS v_edit_man_chamber_pol;
+			DROP VIEW IF EXISTS v_edit_man_conduit;
+			DROP VIEW IF EXISTS v_edit_man_connec;
+			DROP VIEW IF EXISTS v_edit_man_gully;
+			DROP VIEW IF EXISTS v_edit_man_gully_pol;
+			DROP VIEW IF EXISTS v_edit_man_junction;
+			DROP VIEW IF EXISTS v_edit_man_manhole;
+			DROP VIEW IF EXISTS v_edit_man_netgully;
+			DROP VIEW IF EXISTS v_edit_man_netgully_pol;
+			DROP VIEW IF EXISTS v_edit_man_netinit;
+			DROP VIEW IF EXISTS v_edit_man_outfall;
+			DROP VIEW IF EXISTS v_edit_man_siphon;
+			DROP VIEW IF EXISTS v_edit_man_storage;
+			DROP VIEW IF EXISTS v_edit_man_storage_pol;
+			DROP VIEW IF EXISTS v_edit_man_valve;
+			DROP VIEW IF EXISTS v_edit_man_varc;
+			DROP VIEW IF EXISTS v_edit_man_waccel;
+			DROP VIEW IF EXISTS v_edit_man_wjump;
+			DROP VIEW IF EXISTS v_edit_man_wwtp;
+			DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
+		
+		END IF;
+		
+		-- drop deprecated columns
 		IF v_projecttype = 'WS' THEN 
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_19;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_20;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_21;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_22;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
-			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;
+			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;		
 		END IF;
 
 		ALTER TABLE man_addfields_parameter DROP COLUMN if exists _default_value_;

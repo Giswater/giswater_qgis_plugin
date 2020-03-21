@@ -10,44 +10,46 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_gully()  RETURNS trigger AS $BODY$
 DECLARE 
-    v_sql varchar;
-	v_count integer;
-	v_promixity_buffer double precision;
-	v_code_autofill_bool boolean;
-	v_link_path varchar;
-	v_record_link record;
-	v_record_vnode record;
-	v_customfeature text;
-	v_addfields record;
-	v_new_value_param text;
-	v_old_value_param text;
-	v_arg text;
-	v_doublegeometry boolean;
-	v_length float;
-	v_width float;
-	v_rotation float;
-	v_unitsfactor float;
-	v_linelocatepoint float;
-	v_thegeom public.geometry;
-	v_the_geom_pol public.geometry;
-	p21x float; 
-	p02x float;
-	p21y float; 
-	p02y float;
-	p22x float;
-	p22y float;
-	p01x float;
-	p01y float;
-	dx float;
-	dy float;
-    v_x float;
-    v_y float;
-    v_new_pol_id varchar(16);
-    v_codeautofill boolean;
-    v_srid integer;
-    v_featurecat text;
-    v_psector_vdefault integer;
-	v_arc_id text;
+v_sql varchar;
+v_count integer;
+v_promixity_buffer double precision;
+v_code_autofill_bool boolean;
+v_link_path varchar;
+v_record_link record;
+v_record_vnode record;
+v_customfeature text;
+v_addfields record;
+v_new_value_param text;
+v_old_value_param text;
+v_arg text;
+v_doublegeometry boolean;
+v_length float;
+v_width float;
+v_rotation float;
+v_unitsfactor float;
+v_linelocatepoint float;
+v_thegeom public.geometry;
+v_the_geom_pol public.geometry;
+p21x float; 
+p02x float;
+p21y float; 
+p02y float;
+p22x float;
+p22y float;
+p01x float;
+p01y float;
+dx float;
+dy float;
+v_x float;
+v_y float;
+v_new_pol_id varchar(16);
+v_codeautofill boolean;
+v_srid integer;
+v_featurecat text;
+v_psector_vdefault integer;
+v_arc_id text;
+v_streetaxis text;
+v_streetaxis2 text;
     
 BEGIN
 
@@ -71,7 +73,10 @@ BEGIN
 	v_srid = (SELECT epsg FROM version limit 1);
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
-	
+
+	-- transforming streetaxis name into id
+	v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
+	v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
@@ -361,15 +366,15 @@ BEGIN
 			END IF;
 		END IF;
 
-        -- FEATURE INSERT
+		-- FEATURE INSERT
 		INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, pol_id, sector_id,
 			"state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id,
 			builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link,verified, the_geom, 
-            undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value)
+			undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value)
 		VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, 
 			NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
-			NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.streetaxis_id, 
-			NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
+			NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, v_streetaxis, 
+			NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
 			NEW.featurecat_id, NEW.feature_id,NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,  NEW.uncertain, NEW.num_value);
 
 
@@ -576,10 +581,10 @@ BEGIN
 		connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
 		annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
 		fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-		ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
+		ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
 		descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, 
-		label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, 
-        postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user
+		label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, 
+		postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user
 		WHERE gully_id = OLD.gully_id;
 
 
