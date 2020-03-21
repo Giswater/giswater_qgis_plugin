@@ -14,6 +14,8 @@ $BODY$
 DECLARE 
 v_querytext text;
 v_configtable text;
+v_count integer;
+v_widgettype text;
 
 BEGIN	
 
@@ -34,34 +36,61 @@ BEGIN
 		
 	ELSIF v_configtable = 'config_api_form_fields' THEN 
 	
-		IF TG_OP = 'INSERT' THEN
-			--check dv_querytext is correct
-			IF (NEW.widgettype = 'combo' OR NEW.widgettype = 'typeahead') AND NEW.dv_querytext IS NOT NULL THEN
-				v_querytext = NEW.dv_querytext;
-				EXECUTE v_querytext;
+		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+
+			-- check dv_querytext restrictions
+			IF (NEW.widgettype = 'combo' OR NEW.widgettype = 'typeahead') THEN
+
+				--check dv_querytext is correct
+				IF NEW.dv_querytext IS NOT NULL THEN
+					v_querytext = NEW.dv_querytext;
+					EXECUTE v_querytext;
+				END IF;
+
+				--check that when dv_querytextfilterc exists dv_parent_id also
+				IF NEW.dv_querytext_filterc IS NOT NULL THEN
+
+					EXECUTE 'SELECT column_id FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||quote_literal(NEW.formname)
+						INTO v_widgettype;
+
+					IF v_widgettype IS NULL THEN
+						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3102", "function":"2816","debug":null}}$$);						
+					END IF;	
+				END IF;
 			END IF;
 		
-			--check isautoupdate is FALSE when typeahead
-			IF NEW.widgettype = 'typeahead' AND NEW.isautoupdate = TRUE THEN
-				SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3096", "function":"2816","debug":null}}$$);	
+			--check for typeahead some additional restrictions
+			IF NEW.widgettype = 'typeahead' THEN
+
+				-- isautoupdate is FALSE
+				IF NEW.isautoupdate = TRUE THEN
+					SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3096", "function":"2816","debug":null}}$$);	
+				END IF;
+
+				-- dv_parent_id IS COMBO
+				IF NEW.dv_parent_id IS NOT NULL THEN
+
+					EXECUTE 'SELECT widgettype FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||quote_literal(NEW.formname)
+						INTO v_widgettype;
+	
+					IF v_widgettype != 'combo' THEN
+						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3098", "function":"2816","debug":null}}$$);						
+					END IF;
+				END IF;
+				
+				--query text HAS SAME id THAN idval
+				IF NEW.dv_querytext IS NOT NULL THEN
+				
+					EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
+
+					IF v_count > 0 THEN
+						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3100", "function":"2816","debug":null}}$$);						
+					END IF;
+				END IF;
 			END IF;
 			
 			RETURN NEW;
-
-		ELSIF TG_OP = 'UPDATE' THEN
-			--check dv_querytext is correct
-			IF (NEW.widgettype = 'combo' OR NEW.widgettype = 'typeahead') AND (NEW.dv_querytext != OLD.dv_querytext) AND NEW.dv_querytext IS NOT NULL THEN
-				v_querytext = NEW.dv_querytext;
-				EXECUTE v_querytext;
-			END IF;
 		
-			--check isautoupdate is FALSE when typeahead
-			IF NEW.widgettype = 'typeahead' AND NEW.isautoupdate = TRUE THEN
-				SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3096", "function":"2816","debug":null}}$$);	
-			END IF;
-			
-			RETURN NEW;
-
 		ELSIF TG_OP = 'DELETE' THEN
 			RETURN NULL;
 
