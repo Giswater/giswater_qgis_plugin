@@ -7,6 +7,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+update config_api_form_fields SET dv_parent_id = 'arccat_id' WHERE formname = 'upsert_catalog_arc' and formtype = 'catalog' and column_id ='matcat_id';
+update config_api_form_fields SET dv_parent_id = 'nodecat_id' WHERE formname = 'upsert_catalog_node' and formtype = 'catalog' and column_id ='matcat_id';
+update config_api_form_fields SET dv_parent_id = 'connecat_id' WHERE formname = 'upsert_catalog_connec' and formtype = 'catalog' and column_id ='matcat_id';
+
+INSERT INTO audit_cat_error (id, log_level, error_message, hint_message, message_type) SELECT * FROM config_api_message;
+
+ALTER TABLE config_api_message RENAME TO _config_api_message_;
+
+UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'config_api_message';
 
 --2020/03/13
 UPDATE config_api_form_fields SET dv_querytext_filterc = replace(dv_querytext_filterc,'=','') WHERE dv_querytext_filterc is not null;
@@ -41,3 +50,5 @@ WHERE column_id = 'postnumber2';
 
 -- 2020/03/19
 UPDATE config_param_system SET value = '{"sys_table_id":"v_ui_workcat_polygon_aux", "sys_id_field":"workcat_id", "sys_search_field":"workcat_id", "sys_geom_field":"the_geom", "filter_text":"code"}' WHERE parameter = 'api_search_workcat';
+
+UPDATE typevalue_fk SET target_table = 'audit_cat_error', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';

@@ -11,7 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"layout_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"layout_id"}}$$);
 
-
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, project_type, datatype, widgettype, ismandatory, isdeprecated, standardvalue) 
 VALUES ('sys_transaction_db', '{"status":false, "server":""}', 'system', 'Parameteres for use an additional database to scape transtaction logics of PostgreSQL in order to audit processes step by step', 
 'Additional transactional database:', TRUE, 'utils', 'json', 'linetext', false, false, 'false') 
@@ -33,14 +32,11 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 'sys_id_field'::text, 'id'::text) WHERE parameter = 'api_search_workcat';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 'sys_search_field'::text, 'id'::text) WHERE parameter = 'api_search_workcat';
 
-UPDATE audit_cat_table SET deprecated = true WHERE id = 'v_ui_workcat_polygon_aux';
+UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'v_ui_workcat_polygon_aux';
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2828, 'gw_api_get_visit', 'utils','api function', 'Get visit', 'role_basic',FALSE, FALSE, FALSE)
 ON conflict (id) DO NOTHING;
-
-
-UPDATE audit_cat_table SET isdeprecated=true WHERE id = 'config_api_message';
 
 INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3102, 'If dv_querytext_filterc is not null dv_parent_id is mandatory', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;

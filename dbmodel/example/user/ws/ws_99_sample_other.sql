@@ -85,9 +85,6 @@ INSERT INTO anl_mincut_selector_valve VALUES('GEN_PURP_VALVE');
 INSERT INTO anl_mincut_selector_valve VALUES('THROTTLE_VALVE');
 
 
-refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
-
-
 update ext_rtc_hydrometer SET state_id=1;
 
 INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres');

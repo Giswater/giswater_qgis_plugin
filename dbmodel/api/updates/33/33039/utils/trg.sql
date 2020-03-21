@@ -7,10 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2020/03/14
-
---deprecate config_api_message
-ALTER TABLE audit_cat_error ADD COLUMN message_type text;
-
-
+CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE
+ON audit_cat_error FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('audit_cat_error');
 

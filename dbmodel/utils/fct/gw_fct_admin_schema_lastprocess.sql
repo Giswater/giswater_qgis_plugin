@@ -78,9 +78,11 @@ BEGIN
 		-- inserting version table
 		IF v_sample_exist != 'sample' THEN
 			SELECT sample INTO v_is_sample FROM version ORDER BY id LIMIT 1;
-			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg, v_is_sample);
+			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),
+			(select postgis_version()), v_language, v_epsg, v_is_sample);
 		ELSE
-			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg);
+			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
+			(select postgis_version()), v_language, v_epsg);
 		END IF;
 		
 		v_message='Project sucessfully created';

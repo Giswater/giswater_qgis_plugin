@@ -512,7 +512,7 @@ BEGIN
 						'"line":{},'||
 						'"polygon":{},'||
 						'"missingLayers":{}}'||
-				', "actions":{"hideForm":' || v_hidden_form || '}}}')::json;
+				', "actions":{"hideForm":true}}}')::json;
 	END IF;
 		
 	--  Return	   

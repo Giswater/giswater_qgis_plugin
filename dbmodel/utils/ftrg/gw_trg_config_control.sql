@@ -19,6 +19,7 @@ v_widgettype text;
 
 BEGIN	
 
+
 	-- search path
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
@@ -38,6 +39,8 @@ BEGIN
 	
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
+			/*
+
 			-- check dv_querytext restrictions
 			IF (NEW.widgettype = 'combo' OR NEW.widgettype = 'typeahead') THEN
 
@@ -50,12 +53,18 @@ BEGIN
 				--check that when dv_querytextfilterc exists dv_parent_id also
 				IF NEW.dv_querytext_filterc IS NOT NULL THEN
 
-					EXECUTE 'SELECT column_id FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||quote_literal(NEW.formname)
-						INTO v_widgettype;
+					IF NEW.dv_parent_id IS NULL THEN
+						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100,
+						"lang":"ES"},"feature":{},"data":{"error":"3102", "function":"2816","debug":null}}$$);	
+					ELSE
+						EXECUTE 'SELECT column_id FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||quote_literal(NEW.formname)
+							INTO v_widgettype;
 
-					IF v_widgettype IS NULL THEN
-						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3102", "function":"2816","debug":null}}$$);						
-					END IF;	
+						IF v_widgettype IS NULL THEN
+							SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100,
+							 "lang":"ES"},"feature":{},"data":{"error":"3102", "function":"2816","debug":null}}$$);	
+						END IF;	
+					END IF;
 				END IF;
 			END IF;
 		
@@ -74,7 +83,8 @@ BEGIN
 						INTO v_widgettype;
 	
 					IF v_widgettype != 'combo' THEN
-						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3098", "function":"2816","debug":null}}$$);						
+						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3098",
+						 "function":"2816","debug":null}}$$);						
 					END IF;
 				END IF;
 				
@@ -84,10 +94,12 @@ BEGIN
 					EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
 
 					IF v_count > 0 THEN
-						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3100", "function":"2816","debug":null}}$$);						
+						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3100",
+						 "function":"2816","debug":null}}$$);						
 					END IF;
 				END IF;
 			END IF;
+			*/
 			
 			RETURN NEW;
 		

@@ -111,7 +111,6 @@ update arc set link='https://www.giswater.org';
 update connec set link='https://www.giswater.org';
 update gully set link='https://www.giswater.org';
 
-refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fprocesscat_id":1}}$$)::text;
 
