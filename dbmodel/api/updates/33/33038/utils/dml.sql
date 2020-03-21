@@ -104,7 +104,8 @@ dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunctio
 VALUES ('ve_config_sysfields', 'form', 'widgettype', 12, 'text', 'combo', 'Widgettype', NULL, 
 'widgettype - Widget of the field. Must match with the data type. Advanced configuration on widgetcontrols field is possible
 If widgettype=''text'', you can force values using "maxMinValues":{"min": or "max":} or "regexpControl". In addition you can enable multiline widget using "setQgisMultiline"
-If widgettype=''combo'', you can only make editable combo for specific values of child using comboEnableWhenParent', 
+If widgettype=''combo'', you can only make editable combo for specific values of child using comboEnableWhenParent
+If widgettype=''typeahead'' additional rules must be followed. dv_parent_id must be combo and id/idval on dv_querytext must be the same', 
 NULL, TRUE, NULL, TRUE, NULL, 'SELECT id, idval FROM config_api_typevalue WHERE typevalue=''widgettype_typevalue'' AND addparam->>''createAddfield''=''TRUE''', 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
@@ -167,7 +168,8 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_config_sysfields', 'form', 'dv_parent_id', 22, 'text', 'text', 'Dv parentid', NULL, 'dv_parent_id - Id of the related parent table', NULL, FALSE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_config_sysfields', 'form', 'dv_parent_id', 22, 'text', 'text', 'Dv parentid', NULL, 
+'dv_parent_id - Id of the related parent table. Use only (mandatory in that case) when dv_querytext_filterc IS NOT NULL. For typeahead must be a combo', NULL, FALSE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 

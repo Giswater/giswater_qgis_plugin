@@ -7,4 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2020/03/13
+--2020/03/14
+
+--deprecate config_api_message
+ALTER TABLE audit_cat_error ADD COLUMN message_type text;
+INSERT INTO audit_cat_error (id, log_level, error_message, hint_message, message_type) SELECT * FROM config_api_message;
+ALTER TABLE config_api_message RENAME TO _config_api_message_;
+
+
+
