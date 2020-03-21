@@ -89,7 +89,7 @@ BEGIN
 		SELECT '||quote_literal(result_id_var)||',
 		v_arc.arc_id, node_1, node_2, v_arc.arctype_id, arccat_id, epa_type, v_arc.sector_id, v_arc.state, v_arc.state_type, v_arc.annotation,
 		CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
-		length,
+		(CASE WHEN v_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
 		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
 		v_arc.the_geom,
 		v_arc.expl_id
