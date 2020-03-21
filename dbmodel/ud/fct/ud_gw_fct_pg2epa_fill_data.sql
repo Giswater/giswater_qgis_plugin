@@ -82,25 +82,25 @@ BEGIN
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom)
 	SELECT
 	result_id_var,
-	v_arc_x_node.arc_id, node_1, node_2, v_arc_x_node.sys_elev1, v_arc_x_node.sys_elev2, v_arc_x_node.arc_type, arccat_id, epa_type, v_arc_x_node.sector_id, v_arc_x_node.state, 
-	v_arc_x_node.state_type, v_arc_x_node.annotation, 
+	a.arc_id, node_1, node_2, a.sys_elev1, a.sys_elev2, a.arc_type, arccat_id, epa_type, a.sector_id, a.state, 
+	a.state_type, a.annotation, 
 	CASE
 		WHEN custom_length IS NOT NULL THEN custom_length
-		ELSE st_length2d(v_arc_x_node.the_geom)
+		ELSE st_length2d(a.the_geom)
 	END AS length,
 	CASE
 		WHEN custom_n IS NOT NULL THEN custom_n
 		ELSE n
 	END AS n,
-	v_arc_x_node.expl_id, 
-	v_arc_x_node.the_geom
-	FROM inp_selector_sector, v_arc_x_node
+	a.expl_id, 
+	a.the_geom
+	FROM inp_selector_sector, v_arc a
 		LEFT JOIN value_state_type ON id=state_type
-		LEFT JOIN cat_arc ON v_arc_x_node.arccat_id = cat_arc.id
+		LEFT JOIN cat_arc ON a.arccat_id = cat_arc.id
 		LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
-		LEFT JOIN inp_conduit ON v_arc_x_node.arc_id = inp_conduit.arc_id
+		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
 		WHERE (is_operative IS TRUE)
-		AND v_arc_x_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
+		AND a.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump, inp_conduit
 

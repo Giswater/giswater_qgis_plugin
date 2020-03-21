@@ -41,9 +41,9 @@ BEGIN
 
 		ELSIF v_valvemode = 2 THEN -- inventory
 			UPDATE rpt_inp_arc SET status='CLOSED' 
-				FROM (SELECT rpt_inp_arc.arc_id FROM rpt_inp_arc JOIN v_edit_man_valve ON node_id=node_1 where closed is true
+				FROM (SELECT rpt_inp_arc.arc_id FROM rpt_inp_arc JOIN man_valve ON node_id=node_1 where closed is true
 					UNION
-				    SELECT rpt_inp_arc.arc_id from rpt_inp_arc join v_edit_man_valve ON node_id=node_2  where closed is true) a 
+				    SELECT rpt_inp_arc.arc_id from rpt_inp_arc join man_valve ON node_id=node_2  where closed is true) a 
 				WHERE a.arc_id=rpt_inp_arc.arc_id AND result_id=result_id_var;		
 
 		ELSIF v_valvemode = 1 THEN -- epa tables
