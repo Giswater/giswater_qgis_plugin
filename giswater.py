@@ -1023,7 +1023,7 @@ class Giswater(QObject):
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
-            status = self.check_project_result.populate_audit_check_project(layers)
+            status = self.check_project_result.populate_audit_check_project(layers, "true")
             QApplication.restoreOverrideCursor()
             if not status:
                 return False

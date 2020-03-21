@@ -382,5 +382,5 @@ class Utils(ParentAction):
         layers = self.controller.get_layers()
 
         self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.check_project_result.populate_audit_check_project(layers)
+        self.check_project_result.populate_audit_check_project(layers, "false")
 

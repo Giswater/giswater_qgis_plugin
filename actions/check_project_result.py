@@ -23,7 +23,7 @@ class CheckProjectResult(ApiParent):
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def populate_audit_check_project(self, layers):
+    def populate_audit_check_project(self, layers, init_project):
         """ Fill table 'audit_check_project' with layers data """
 
         sql = ("DELETE FROM audit_check_project "
@@ -55,20 +55,20 @@ class CheckProjectResult(ApiParent):
             return False
 
         # Execute function 'gw_fct_audit_check_project'
-        self.execute_audit_check_project()
+        self.execute_audit_check_project(init_project)
 
         return True
 
 
-    def execute_audit_check_project(self):
+    def execute_audit_check_project(self, init_project):
         """ Execute function 'gw_fct_audit_check_project' """
 
         version = self.get_plugin_version()
         extras = f'"version":"{version}"'
         extras += f', "fprocesscat_id":1'
-        extras += f', "initProject":false'
-        extras += f',"qgisVersion":"{Qgis.QGIS_VERSION}"'
-        extras += f',"osVersion":"{platform.system()} {platform.release()}"'
+        extras += f', "initProject":{init_project}'
+        extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
+        extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:
