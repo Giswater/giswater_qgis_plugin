@@ -58,3 +58,7 @@ ismandatory, widgetcontrols, vdefault, iseditable, dv_orderby_id, dv_isnullvalue
 VALUES ('qgis_form_log_hidden', 'config', 'Hide log form after executing a process', 'role_edit', NULL, 'Hide log form', NULL, NULL, true, 'lyt_other', 
 20, 'utils', false, NULL, NULL, NULL, false, 'boolean', 'check', true, NULL, 'true', NULL, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2830, 'gw_fct_debug', 'utils','Function to manage messages', 'Function to manage messages', 'role_basic',FALSE, FALSE, FALSE)
+ON conflict (id) DO NOTHING;

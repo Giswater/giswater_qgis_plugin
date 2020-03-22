@@ -18,25 +18,23 @@ SELECT SCHEMA_NAME.gw_fct_getmessage($${
 */
 
 DECLARE
-    rec_function record;
-    rec_cat_error record;
+rec_function record;
+rec_cat_error record;
     
-    v_return_text text;
-    v_level integer;
-    v_error_context text;
-    v_txid TEXT;
-    v_result_info json;
-    v_projectype text;
-    v_version text;
-    v_status text;
-    v_error_id integer;
-    v_function_id integer;
-    v_message text;
-    v_variables text;
-	v_debug boolean;
-	v_schemaname text;
-	v_fullmessage text;
-	v_systranstaction_db boolean;
+v_return_text text;
+v_level integer;
+v_error_context text;
+v_txid TEXT;
+v_result_info json;
+v_projectype text;
+v_version text;
+v_status text;
+v_error_id integer;
+v_function_id integer;
+v_message text;
+v_variables text;
+v_schemaname text;
+
 
 BEGIN
     
@@ -50,41 +48,12 @@ BEGIN
 	v_message = lower(((p_data ->>'data')::json->>'debug_msg')::text);
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	
-	-- get system parameters
-	v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'sys_transaction_db')::boolean;
 	SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
-	
-	-- get parameters from user
-	v_debug = (SELECT value::json->>'status' FROM config_param_user WHERE parameter ='debug_mode' AND cur_user=current_user)::boolean;
 	
 	-- get flow parameters
 	SELECT * INTO rec_cat_error FROM audit_cat_error WHERE audit_cat_error.id=v_error_id; 
 	SELECT txid_current() INTO v_txid;
-	
-	-- debug process
-	IF v_debug THEN
-		
-		-- create message
-		v_fullmessage = concat(v_message,' ',v_variables);
-		
-		-- sending to postgreSQL console	
-	   	RAISE NOTICE ' % ', v_fullmessage;
-		
-		-- sending notify
-		IF v_systranstaction_db THEN
-		
-			-- using additional db for transactions
-			INSERT INTO tran.log (channel, cur_user, message) VALUES (replace(current_user,'.','_'), current_user, v_message);
 				
-		ELSE 
-			-- using normal notify with personal channel
-			PERFORM pg_notify(replace(current_user,'.','_'), '{"functionAction":{"functions":[{"name":"debug", "parameters":{"message":'||v_fullmessage||
-			'}]},"user":"'||current_user||'","schema":"'||v_schemaname||'"}');
-		
-		END IF;
-		
-	END IF;
-			
 	-- message process
 	IF v_txid = (SELECT value FROM config_param_user WHERE parameter = 'cur_trans' AND cur_user = current_user) THEN
     

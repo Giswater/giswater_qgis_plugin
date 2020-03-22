@@ -74,9 +74,6 @@ BEGIN
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
 
-	raise notice ' ¡---------------------------> p_formname % p_formtype % p_tabname % p_tablename %  p_idname %  p_id % p_columntype %  p_tgop %  p_filterfield % p_device %',
-	p_formname , p_formtype , p_tabname , p_tablename ,  p_idname ,  p_id , p_columntype ,  p_tgop ,  p_filterfield , p_device;
-	
 	-- setting tabname
 	IF p_tabname IS NULL THEN
 		p_tabname = 'tabname';
@@ -271,13 +268,9 @@ BEGIN
 	
 	-- Convert to json
 	fields := array_to_json(fields_array);
-
-	-- Control NULL's
-	api_version := COALESCE(api_version, '[]');
-	fields := COALESCE(fields, '[]');    
   
 	-- Return
-	RETURN (fields_array);
+	RETURN fields_array;
 
 END;
 $BODY$
