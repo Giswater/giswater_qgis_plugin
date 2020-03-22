@@ -69,28 +69,20 @@ BEGIN
 					IF NEW.isautoupdate = TRUE THEN
 						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3096", "function":"2816","debug":null}}$$);	
 					END IF;
-
-					-- dv_parent_id IS COMBO
-					IF NEW.dv_parent_id IS NOT NULL THEN
-
-						EXECUTE 'SELECT widgettype FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||quote_literal(NEW.formname)
-							INTO v_widgettype;
 		
-						IF v_widgettype != 'combo' THEN
-						--	v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3098", "function":"2816", "debug":null, "variables":"',v_variables,'"}}');
-						--	SELECT gw_fct_getmessage(v_message);
-						END IF;
-					END IF;
-					
-					--query text HAS SAME id THAN idval
+					--query text HAS SAME id THAN idval (with the exception of streetname and streename2
 					IF NEW.dv_querytext IS NOT NULL THEN
-					
-						EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
+	
+						IF NEW.column_id = 'streetname' OR NEW.column_id  ='streename2' THEN
+							-- do nothing (with the exception of streetname and streename2
+						ELSE
+							EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
 
-						IF v_count > 0 THEN
-							v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3100", "function":"2816", "debug":null, "variables":"',v_variables,'"}}');
-							SELECT gw_fct_getmessage(v_message);						
-						END IF;
+							IF v_count > 0 THEN
+								v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3100", "function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+								SELECT gw_fct_getmessage(v_message);						
+							END IF;
+						ENDIF;
 					END IF;
 				END IF;
 			END IF;

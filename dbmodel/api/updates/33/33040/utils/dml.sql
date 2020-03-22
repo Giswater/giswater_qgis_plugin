@@ -26,27 +26,27 @@ UPDATE config_api_form_fields SET layoutname = 'lyt_symbology' WHERE formtype='c
 UPDATE config_api_form_fields SET layoutname = 'lyt_other' WHERE formtype='catalog' AND layoutname = 'other_layout';
 
 
-UPDATE config_api_form_fields SET widgettype ='typeahead',
-dv_querytext= 'select id as id, postnumber as idval from v_ext_address WHERE id IS NOT NULL ',
-dv_querytext_filterc = ' AND v_ext_address.streetname ',
-dv_parent_id = 'streetname'
-WHERE column_id = 'postnumber';
-
-
-UPDATE config_api_form_fields SET widgettype ='typeahead',
-dv_querytext= 'select id as id, postnumber as idval from v_ext_address WHERE id IS NOT NULL ',
-dv_querytext_filterc = ' AND v_ext_address.streetname2 ',
-dv_parent_id = 'streetname2'
+UPDATE  config_api_form_fields SET widgettype ='typeahead',
+dv_querytext = 'SELECT a.postnumber AS id, a.postnumber AS idval FROM ext_address a JOIN ext_streetaxis m ON streetaxis_id=m.id WHERE a.id IS NOT NULL',
+ dv_querytext_filterc = 'AND m.name' WHERE column_id = 'postnumber';
+ 
+UPDATE  config_api_form_fields SET widgettype ='typeahead',
+dv_querytext = 'SELECT a.postnumber AS id, a.postnumber AS idval FROM ext_address a JOIN ext_streetaxis m ON streetaxis_id=m.id WHERE a.id IS NOT NULL', 
+dv_querytext_filterc = 'AND m.name' 
 WHERE column_id = 'postnumber2';
 
 
-UPDATE config_api_form_fields SET column_id = 'streetname', label = 'streetname', widgettype = 'typeahead', dv_querytext = 'SELECT id AS id, name AS idval FROM ext_streetaxis WHERE id IS NOT NULL',
-dv_querytext_filterc = 'AND muni_id', dv_parent_id = 'muni_id' 
+
+UPDATE  config_api_form_fields SET column_id = 'streetname', label = 'streetname', widgettype = 'typeahead',
+dv_querytext = 'SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL', 
+dv_querytext_filterc = 'AND m.name' 
 WHERE column_id = 'streetaxis_id';
 
-UPDATE config_api_form_fields SET column_id = 'streetname2', label = 'streetname2', widgettype = 'typeahead', dv_querytext = 'SELECT id AS id, name AS idval FROM ext_streetaxis WHERE id IS NOT NULL',
-dv_querytext_filterc = 'AND muni_id', dv_parent_id = 'muni_id' 
+UPDATE  config_api_form_fields SET column_id = 'streetname2', label = 'streetname', widgettype = 'typeahead',
+dv_querytext = 'SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL', 
+dv_querytext_filterc = 'AND m.name' 
 WHERE column_id = 'streetaxis2_id';
+
 
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 

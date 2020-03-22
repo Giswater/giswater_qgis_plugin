@@ -30,6 +30,11 @@ SELECT SCHEMA_NAME.gw_api_gettypeahead($${
 "feature":{"tableName":"ve_arc_pipe"},
 "data":{"queryText":"SELECT id AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL",
 	"textToSearch":"FC"}}$$)
+	
+SELECT gw_api_gettypeahead($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+"queryText":"SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL", 
+"queryTextFilter":"AND a.name", "parentId":"muni_id", "parentValue":"Sant Boi del Llobregat", "textToSearch":"A"}}$$);
+	
 */
 
 DECLARE
@@ -44,14 +49,14 @@ DECLARE
 	v_fieldtosearch text; 
 BEGIN
 
-    --  Set search path to local schema
+	-- set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	
-    -- 	get api version
+	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
 
-    --	getting input data 
+	-- getting input data 
 	v_querytext := ((p_data ->>'data')::json->>'queryText')::text;
 	v_parent :=  ((p_data ->>'data')::json->>'parentId')::text;
 	v_querytextparent :=  ((p_data ->>'data')::json->>'queryTextFilter')::text;
@@ -64,9 +69,11 @@ BEGIN
 	IF v_parent IS NULL OR v_querytextparent IS NULL OR v_parentvalue IS NULL OR v_querytextparent = '' THEN
 		v_querytext = v_querytext;
 	ELSE
-		v_querytext = concat (v_querytext, v_querytextparent, ' = ' ,quote_literal(v_parentvalue)); 
+		v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue)); 
 	END IF;
 	v_querytext = concat ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT * FROM (', (v_querytext), ')a WHERE idval ILIKE ''%', v_textosearch, '%'' LIMIT 10)a');
+
+	RAISE NOTICE 'v_querytext %', v_querytext;
 
 	-- execute query text
 	EXECUTE v_querytext INTO v_response;
@@ -78,9 +85,8 @@ BEGIN
 	v_response := COALESCE(v_response, '{}');
 	v_message := COALESCE(v_message, '{}');
 
-    
---    Return
-    RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||
+	-- Return
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||
     	    ', "body": {"data":'|| v_response || '}}')::json;      
 	 
 END;
