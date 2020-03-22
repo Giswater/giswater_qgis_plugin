@@ -177,96 +177,104 @@ DROP VIEW IF EXISTS vu_gully;
 
 -- CREACIO DE LES VU
 --------------------
-
 CREATE OR REPLACE VIEW vu_node AS 
+WITH vu_node as (
  SELECT node.node_id,
-node.code,
-node.top_elev,
-node.custom_top_elev,
-CASE
-WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
-ELSE node.top_elev
-END AS sys_top_elev,
-node.ymax,
-node.custom_ymax,
-CASE
-WHEN node.custom_ymax IS NOT NULL THEN node.custom_ymax
-ELSE node.ymax
-END AS sys_ymax,
-node.elev,
-node.custom_elev,
-CASE
-WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
-WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
-ELSE NULL::numeric(12,3)
-END AS sys_elev,
-node.node_type,
-node_type.type AS sys_type,
-node.nodecat_id,
-cat_node.matcat_id AS cat_matcat_id,
-node.epa_type,
-node.expl_id,
-macroexpl_id,
-node.sector_id,
-sector.macrosector_id,
-node.state,
-node.state_type,
-node.annotation,
-node.observ,
-node.comment,
-node.dma_id,
-dma.macrodma_id,
-node.soilcat_id,
-node.function_type,
-node.category_type,
-node.fluid_type,
-node.location_type,
-node.workcat_id,
-node.workcat_id_end,
-node.buildercat_id,
-node.builtdate,
-node.enddate,
-node.ownercat_id,
-node.muni_id,
-node.postcode,
-c.name as streetname,
-node.postnumber,
-node.postcomplement,
-d.name as streetname2,
-node.postnumber2,
-node.postcomplement2,
-node.descript,
-cat_node.svg,
-node.rotation,
-concat(node_type.link_path, node.link) AS link,
-node.verified,
-node.the_geom,
-node.undelete,
-cat_node.label,
-node.label_x,
-node.label_y,
-node.label_rotation,
-node.publish,
-node.inventory,
-node.uncertain,
-node.xyz_date,
-node.unconnected,
-node.num_value,
-date_trunc('second'::text, node.tstamp) AS tstamp,
-node.insert_user,
-date_trunc('second'::text, lastupdate) AS lastupdate,
-node.lastupdate_user
-   FROM node
- LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
- LEFT JOIN node_type ON node_type.id::text = node.node_type::text
- LEFT JOIN dma ON node.dma_id = dma.dma_id
- LEFT JOIN sector ON node.sector_id = sector.sector_id
- LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
- LEFT JOIN ext_streetaxis c ON c.id = node.streetaxis_id
- LEFT JOIN ext_streetaxis d ON d.id = node.streetaxis2_id;
+    node.code,
+    node.top_elev,
+    node.custom_top_elev,
+        CASE
+            WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+            ELSE node.top_elev
+        END AS sys_top_elev,
+    node.ymax,
+    node.custom_ymax,
+        CASE
+            WHEN node.custom_ymax IS NOT NULL THEN node.custom_ymax
+            ELSE node.ymax
+        END AS sys_ymax,
+    node.elev,
+    node.custom_elev,
+        CASE
+            WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
+            WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
+            ELSE NULL::numeric(12,3)
+        END AS sys_elev,
+    node.node_type,
+    node_type.type AS sys_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    node.epa_type,
+    node.expl_id,
+    exploitation.macroexpl_id,
+    node.sector_id,
+    sector.macrosector_id,
+    node.state,
+    node.state_type,
+    node.annotation,
+    node.observ,
+    node.comment,
+    node.dma_id,
+    dma.macrodma_id,
+    node.soilcat_id,
+    node.function_type,
+    node.category_type,
+    node.fluid_type,
+    node.location_type,
+    node.workcat_id,
+    node.workcat_id_end,
+    node.buildercat_id,
+    node.builtdate,
+    node.enddate,
+    node.ownercat_id,
+    node.muni_id,
+    node.postcode,
+    c.name AS streetname,
+    node.postnumber,
+    node.postcomplement,
+    d.name AS streetname2,
+    node.postnumber2,
+    node.postcomplement2,
+    node.descript,
+    cat_node.svg,
+    node.rotation,
+    concat(node_type.link_path, node.link) AS link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    cat_node.label,
+    node.label_x,
+    node.label_y,
+    node.label_rotation,
+    node.publish,
+    node.inventory,
+    node.uncertain,
+    node.xyz_date,
+    node.unconnected,
+    node.num_value,
+    date_trunc('second'::text, node.tstamp) AS tstamp,
+    node.insert_user,
+    date_trunc('second'::text, node.lastupdate) AS lastupdate,
+    node.lastupdate_user
+    FROM ud_sample.node
+    LEFT JOIN ud_sample.cat_node ON node.nodecat_id::text = cat_node.id::text
+    LEFT JOIN ud_sample.node_type ON node_type.id::text = node.node_type::text
+    LEFT JOIN ud_sample.dma ON node.dma_id = dma.dma_id
+    LEFT JOIN ud_sample.sector ON node.sector_id = sector.sector_id
+    LEFT JOIN ud_sample.exploitation ON node.expl_id = exploitation.expl_id
+    LEFT JOIN ud_sample.ext_streetaxis c ON c.id::text = node.streetaxis_id::text
+    LEFT JOIN ud_sample.ext_streetaxis d ON d.id::text = node.streetaxis2_id::text)
+	SELECT node_id,code,top_elev,custom_top_elev,sys_top_elev,ymax,custom_ymax,sys_ymax,elev,custom_elev,
+		CASE WHEN vu_node.sys_elev IS NOT NULL THEN vu_node.sys_elev
+		ELSE (vu_node.sys_top_elev - vu_node.sys_ymax)::numeric(12,3) END AS sys_elev,
+		node_type,sys_type,nodecat_id,cat_matcat_id,epa_type,expl_id,macroexpl_id,sector_id,macrosector_id,state,state_type,annotation,
+		observ,comment,dma_id,macrodma_id,soilcat_id,function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,
+		buildercat_id,builtdate,enddate,ownercat_id,muni_id,postcode,streetname,postnumber,postcomplement,streetname2,postnumber2,
+		postcomplement2,descript,svg,rotation,link,verified,the_geom,undelete,label,label_x,label_y,label_rotation,publish,inventory,
+		uncertain,xyz_date,unconnected,num_value,tstamp,insert_user,lastupdate,lastupdate_user
+		FROM vu_node;
 
-
-
+		
 CREATE OR REPLACE VIEW vu_arc AS
  SELECT arc.arc_id,
 arc.code,
@@ -557,81 +565,7 @@ CREATE OR REPLACE VIEW vi_parent_arc AS
   WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_node AS 
-SELECT node_id,
-code,
-top_elev,
-custom_top_elev,
-sys_top_elev,
-ymax,
-custom_ymax,
-sys_ymax,
-elev,
-custom_elev,
-CASE
-WHEN vu_node.sys_elev IS NOT NULL THEN vu_node.sys_elev
-ELSE (vu_node.sys_top_elev - vu_node.sys_ymax)::numeric(12,3)
-END AS sys_elev,
-node_type,
-sys_type,
-nodecat_id,
-cat_matcat_id,
-epa_type,
-expl_id,
-macroexpl_id,
-sector_id,
-macrosector_id,
-state,
-state_type,
-annotation,
-observ,
-comment,
-dma_id,
-macrodma_id,
-soilcat_id,
-function_type,
-category_type,
-fluid_type,
-location_type,
-workcat_id,
-workcat_id_end,
-buildercat_id,
-builtdate,
-enddate,
-ownercat_id,
-muni_id,
-postcode,
-streetname,
-postnumber,
-postcomplement,
-streetname2,
-postnumber2,
-postcomplement2,
-descript,
-svg,
-rotation,
-link,
-verified,
-the_geom,
-undelete,
-label,
-label_x,
-label_y,
-label_rotation,
-publish,
-inventory,
-uncertain,
-xyz_date,
-unconnected,
-num_value,
-tstamp,
-insert_user,
-lastupdate,
-lastupdate_user
-FROM vu_node;
-
-
-
-
+SELECT *
 FROM vu_node
 JOIN v_state_node USING (node_id);
 
