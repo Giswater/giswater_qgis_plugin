@@ -28,14 +28,6 @@ BEGIN
 	IF (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter  = 'config_control') THEN
 
 		IF v_configtable = 'audit_cat_param_user' THEN 
-
-			IF TG_OP = 'INSERT' THEN
-				RETURN NEW;
-			ELSIF TG_OP = 'UPDATE' THEN
-				RETURN NEW;
-			ELSIF TG_OP = 'DELETE' THEN
-				RETURN OLD;
-			END IF;
 			
 		ELSIF v_configtable = 'config_api_form_fields' THEN 
 		
@@ -101,17 +93,17 @@ BEGIN
 						END IF;
 					END IF;
 				END IF;
-				
-				RETURN NEW;
-			
-			ELSIF TGOP = 'DELETE' THEN
-			
-				RETURN NULL;
 			END IF;
 		END IF;
 	END IF;
-
-	RETURN NULL;
+	
+	-- return
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		RETURN NEW;
+	ELSIF TG_OP = 'DELETE' THEN
+		RETURN OLD;
+	END IF;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
