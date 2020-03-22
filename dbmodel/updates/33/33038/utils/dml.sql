@@ -96,7 +96,7 @@ false, false, null, false) ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_param_user(id, formname, descript, sys_role_id, label, isenabled, layoutname, layout_order, 
 project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, vdefault)
 VALUES ('debug_mode',null,'Variable to configure the debug mode of user',
-'role_basic', 'Debug mode:', true, null, null,'utils',false, false, 'json','text',true, false, '{"status":false, "mode":"NOTICE"}');
+'role_basic', 'Debug mode:', true, null, null,'utils',false, false, 'boolean','text',true, false, 'false');
 
 -- 2020/03/12
 UPDATE audit_cat_param_user SET layoutname = 'lyt_basic' WHERE layout_id = 1 AND formname = 'config';

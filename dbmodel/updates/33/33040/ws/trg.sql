@@ -27,6 +27,9 @@ ON v_edit_man_pipe  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_arc('man_pipe');
 CREATE TRIGGER gw_trg_edit_inp_arc_pipe INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
 
+CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_valve', 'VALVE');
+
 CREATE TRIGGER gw_trg_edit_inp_arc_virtualvalve INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_virtualvalve FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_virtualvalve');
 

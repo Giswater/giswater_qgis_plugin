@@ -21,7 +21,7 @@ v_version text;
 v_error_id integer;
 v_message text;
 v_variables text;
-v_debug text;
+v_debug boolean;
 v_schemaname text;
 v_fullmessage text;
 v_systranstaction_db boolean;
@@ -40,7 +40,7 @@ BEGIN
 	SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
 	
 	-- get parameters from user
-	v_debug = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'debug_mode' AND cur_user=current_user);
+	v_debug = (SELECT value::boolean FROM config_param_user WHERE parameter = 'debug_mode' AND cur_user=current_user);
 
 	-- debug process
 	IF v_debug THEN

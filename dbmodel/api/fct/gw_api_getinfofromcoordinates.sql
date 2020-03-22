@@ -120,6 +120,8 @@ BEGIN
 
 	FOR v_layer IN EXECUTE v_sql     
 	LOOP
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"Layer", "variables":"',v_layer,'"}}')::json);
+
 		-- Indentify geometry type   
 		v_count=v_count+1;
 

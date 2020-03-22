@@ -58,19 +58,12 @@ BEGIN
 	IF v_insert_double_geom IS NULL THEN v_insert_double_geom=FALSE; END IF;
 	IF v_double_geom_buffer IS NULL THEN v_double_geom_buffer=1; END IF;
 	
-			v_man_table:=(SELECT man_table FROM arc_type WHERE id=v_man_table);
-	END IF;
-
-	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
-
 	-- transforming streetaxis name into id
 	v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
 	v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
-
-
-    -- Control insertions ID
-    IF TG_OP = 'INSERT' THEN
+	
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
 
         -- connec ID
         IF (NEW.connec_id IS NULL) THEN
@@ -101,8 +94,7 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
       	 	 "data":{"error":"1086", "function":"1304","debug_msg":null, "variables":null}}$$);';
 		END IF;				
-
-        END IF;
+	END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
@@ -521,7 +513,7 @@ BEGIN
 			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, 
 			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
-			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=v_streetaxis, 
+			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=v_streetaxis2, 
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, postcode=NEW.postcode, descript=NEW.descript, verified=NEW.verified, 
 			postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,

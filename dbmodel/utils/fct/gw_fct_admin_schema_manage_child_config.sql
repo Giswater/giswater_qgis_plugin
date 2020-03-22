@@ -130,7 +130,7 @@ BEGIN
 		END IF;
 
 		--insert into config_api_form_fields
-		INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname,layout_order, 
+		INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname, layout_order, 
 			label, ismandatory, isparent, iseditable, isautoupdate) 
 		VALUES (v_view_name,'feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
 			rec.column_name, false, false,true,false);

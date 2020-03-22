@@ -194,10 +194,8 @@ BEGIN
 		-------------------- original mode
 		raise notice 'v_header_arc,v_last_arc,%,%',v_header_arc,v_last_arc;
 
-		-------------------- proposed mode
-		PERFORM gw_fct_getmessage((concat(
-		'{"data":{"debug_msg":"The values header_arc and last_arc are:", "variables":"',quote_nullable(v_header_arc),',',quote_nullable(v_last_arc),'"}}'))::json);
-				
+		-------------------- proposed mode	
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"Layer", "variables":"',quote_nullable(v_header_arc),',',quote_nullable(v_last_arc),'"}}')::json);
 
 		EXIT WHEN v_feature.node_1 IS NULL;
 	

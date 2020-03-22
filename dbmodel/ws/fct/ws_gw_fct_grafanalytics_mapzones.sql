@@ -453,7 +453,7 @@ BEGIN
 					EXECUTE v_querytext;
 				
 					-- update config_api_form fields in order to set widget as disabled text
-					v_querytext = 'UPDATE config_api_form_fields SET widgettype = ''text'', iseditable = false WHERE formname = ''feature'' and column_id ='||quote_ident(v_field);
+					v_querytext = 'UPDATE config_api_form_fields SET iseditable = false WHERE formtype = ''feature'' and column_id ='||quote_literal(v_field);
 					EXECUTE v_querytext;
 
 					-- recalculate staticpressure (fprocesscat_id=47)
@@ -488,7 +488,6 @@ BEGIN
 					-- message
 					INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 					VALUES (v_fprocesscat_id, 2, concat('WARNING: Attribute ', v_class ,' on arc/node/connec features have been updated by this process'));
-					
 				ELSE
 					-- message
 					INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -668,9 +667,9 @@ BEGIN
 					  '}}}')::json;
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	 --GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	 --RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

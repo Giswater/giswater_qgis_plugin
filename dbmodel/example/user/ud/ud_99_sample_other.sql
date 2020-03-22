@@ -295,3 +295,22 @@ UPDATE connec SET the_geom  = '0101000020E764000044D7D93156941941F95742A67275514
 WHERE connec_id ='3024';
 
 UPDATE ext_streetaxis SET muni_id = 2 WHERE expl_id  = 2;
+
+
+-- hidden
+UPDATE config_api_form_fields SET hidden = true WHERE column_id 
+IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
+'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1');
+
+UPDATE config_api_form_fields SET hidden = true WHERE column_id IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
+
+-- reorder sample
+UPDATE config_api_form_fields SET layout_order =90, layoutname = 'lyt_data_1' WHERE column_id ='link';
+UPDATE config_api_form_fields SET layout_order =2 , layoutname ='lyt_bot_2' WHERE column_id ='verified';
+UPDATE config_api_form_fields SET layout_order =1 , layoutname ='lyt_bot_2' WHERE column_id ='sector_id';
+UPDATE config_api_form_fields SET layout_order =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE column_id ='dqa_id';
+UPDATE config_api_form_fields SET layout_order =70 , layoutname ='lyt_data_1' WHERE column_id ='macrosector_id';
+UPDATE config_api_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE column_id IN ('expl_id', 'sector_id');
+
+
+

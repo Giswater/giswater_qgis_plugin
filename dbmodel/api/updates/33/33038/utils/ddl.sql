@@ -10,7 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --mandatory update on ddl to save value of editability, typeahead, reg_exp columns
 UPDATE config_api_form_fields  SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'autoupdateReloadFields', (reload_field->>'reload')::json) where reload_field is not null; --reload
-UPDATE config_api_form_fields  SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'typeaheadSearchField', typeahead->>'fieldToSearch') where typeahead is not null; --typeahead
 
 DROP VIEW IF EXISTS ve_config_addfields;
 DROP VIEW IF EXISTS ve_config_sys_fields;
