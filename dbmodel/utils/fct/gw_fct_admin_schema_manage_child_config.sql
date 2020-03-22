@@ -153,12 +153,12 @@ BEGIN
 			v_datatype=rec.datatype_id;
 		END IF;
 
-		IF rec.datatype_id = 'character varying' OR rec.datatype_id = 'integer' OR rec.datatype_id = 'numeric' THEN
-			v_widgettype='text';
-		ELSIF rec.datatype_id = 'boolean' THEN
+		IF  rec.datatype_id = 'boolean' THEN
 			v_widgettype='check';
 		ELSIF rec.datatype_id = 'date' THEN
 			v_widgettype='datepickertime';
+		ELSE 
+			v_widgettype='text';
 		END IF;
 		
 		--insert into config_api_form_fields
