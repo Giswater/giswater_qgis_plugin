@@ -49,6 +49,4 @@ dv_parent_id = 'streetaxis_id'
 WHERE column_id = 'postnumber2';
 
 -- 2020/03/19
-UPDATE config_param_system SET value = '{"sys_table_id":"v_ui_workcat_polygon_aux", "sys_id_field":"workcat_id", "sys_search_field":"workcat_id", "sys_geom_field":"the_geom", "filter_text":"code"}' WHERE parameter = 'api_search_workcat';
-
 UPDATE typevalue_fk SET target_table = 'audit_cat_error', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
