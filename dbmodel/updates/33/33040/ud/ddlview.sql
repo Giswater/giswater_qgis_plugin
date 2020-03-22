@@ -556,10 +556,82 @@ CREATE OR REPLACE VIEW vi_parent_arc AS
     inp_selector_sector
   WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
-
-
 CREATE OR REPLACE VIEW v_node AS 
-SELECT * 
+SELECT node_id,
+code,
+top_elev,
+custom_top_elev,
+sys_top_elev,
+ymax,
+custom_ymax,
+sys_ymax,
+elev,
+custom_elev,
+CASE
+WHEN vu_node.sys_elev IS NOT NULL THEN vu_node.sys_elev
+ELSE (vu_node.sys_top_elev - vu_node.sys_ymax)::numeric(12,3)
+END AS sys_elev,
+node_type,
+sys_type,
+nodecat_id,
+cat_matcat_id,
+epa_type,
+expl_id,
+macroexpl_id,
+sector_id,
+macrosector_id,
+state,
+state_type,
+annotation,
+observ,
+comment,
+dma_id,
+macrodma_id,
+soilcat_id,
+function_type,
+category_type,
+fluid_type,
+location_type,
+workcat_id,
+workcat_id_end,
+buildercat_id,
+builtdate,
+enddate,
+ownercat_id,
+muni_id,
+postcode,
+streetname,
+postnumber,
+postcomplement,
+streetname2,
+postnumber2,
+postcomplement2,
+descript,
+svg,
+rotation,
+link,
+verified,
+the_geom,
+undelete,
+label,
+label_x,
+label_y,
+label_rotation,
+publish,
+inventory,
+uncertain,
+xyz_date,
+unconnected,
+num_value,
+tstamp,
+insert_user,
+lastupdate,
+lastupdate_user
+FROM vu_node;
+
+
+
+
 FROM vu_node
 JOIN v_state_node USING (node_id);
 

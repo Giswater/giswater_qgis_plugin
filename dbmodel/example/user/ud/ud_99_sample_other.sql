@@ -306,7 +306,6 @@ UPDATE config_api_form_fields SET hidden = true WHERE column_id IN ('label_x', '
 
 -- reorder sample
 UPDATE config_api_form_fields SET layout_order =90, layoutname = 'lyt_data_1' WHERE column_id ='link';
-UPDATE config_api_form_fields SET layout_order =2 , layoutname ='lyt_bot_2' WHERE column_id ='verified';
 UPDATE config_api_form_fields SET layout_order =1 , layoutname ='lyt_bot_2' WHERE column_id ='sector_id';
 UPDATE config_api_form_fields SET layout_order =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE column_id ='dqa_id';
 UPDATE config_api_form_fields SET layout_order =70 , layoutname ='lyt_data_1' WHERE column_id ='macrosector_id';
