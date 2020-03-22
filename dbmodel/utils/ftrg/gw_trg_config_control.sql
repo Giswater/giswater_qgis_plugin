@@ -48,14 +48,17 @@ BEGIN
 					IF NEW.dv_querytext_filterc IS NOT NULL THEN
 
 						IF NEW.dv_parent_id IS NULL THEN
-							v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3102", "function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+							v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3102", "function":"2816", 
+							"debug":null, "variables":"',v_variables,'"}}');
 							SELECT gw_fct_getmessage(v_message);
 						ELSE
-							EXECUTE 'SELECT column_id FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||quote_literal(NEW.formname)
+							EXECUTE 'SELECT column_id FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||
+							quote_literal(NEW.formname)
 								INTO v_widgettype;
 
 							IF v_widgettype IS NULL THEN
-								v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3104", "function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+								v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3104", 
+								function":"2816", "debug":null, "variables":"',v_variables,'"}}');
 								SELECT gw_fct_getmessage(v_message);					
 							END IF;	
 						END IF;
@@ -67,7 +70,8 @@ BEGIN
 
 					-- isautoupdate is FALSE
 					IF NEW.isautoupdate = TRUE THEN
-						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3096", "function":"2816","debug":null}}$$);	
+						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+						"data":{"error":"3096", "function":"2816","debug":null}}$$);	
 					END IF;
 		
 					--query text HAS SAME id THAN idval (with the exception of streetname and streename2
@@ -79,10 +83,11 @@ BEGIN
 							EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
 
 							IF v_count > 0 THEN
-								v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3100", "function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+								v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"error":"3100", 
+								"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
 								SELECT gw_fct_getmessage(v_message);						
 							END IF;
-						ENDIF;
+						END IF;
 					END IF;
 				END IF;
 			END IF;

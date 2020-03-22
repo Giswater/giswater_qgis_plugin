@@ -50,7 +50,6 @@ BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
- 
 	-- get input parameters
 	v_schemaname = 'SCHEMA_NAME';
 
@@ -60,31 +59,29 @@ BEGIN
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 
-
 	IF v_cat_feature IS NULL THEN
 
 		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
 
 	END IF;
 
-
 	IF v_action = 'MULTI-DELETE' THEN
+
+		--raise exception 'schemas_array %', schemas_array;
 
 		FOR v_childview IN SELECT child_layer FROM cat_feature
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 
-			EXECUTE 'DELETE FROM config_api_form_fields WHERE formname = '||quote_literal(v_childview);
+			IF v_project_type IS NOT NULL THEN -- only for that existing projects (projecttype not null)
+				EXECUTE 'DELETE FROM config_api_form_fields WHERE formname = '||quote_literal(v_childview);
+			END IF;
 
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
 
 		END LOOP;
 
 	ELSE 
-
-		--RAISE exception 'rec.id,%', (SELECT count(*) FROM cat_feature);
-
-	
 		--if the view should be created for all the features loop over the cat_features
 		IF v_multi_create IS TRUE AND v_project_type IS NOT NULL THEN -- only for that existing projects (projecttype not null)
 				

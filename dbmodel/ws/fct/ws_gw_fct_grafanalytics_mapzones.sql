@@ -451,6 +451,10 @@ BEGIN
 					-- used v_edit_connec because the exploitation filter (same before)
 					v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_connec.arc_id';
 					EXECUTE v_querytext;
+				
+					-- update config_api_form fields in order to set widget as disabled text
+					v_querytext = 'UPDATE config_api_form_fields SET widgettype = ''text'', iseditable = false WHERE formname = ''feature'' and column_id ='||quote_ident(v_field);
+					EXECUTE v_querytext;
 
 					-- recalculate staticpressure (fprocesscat_id=47)
 					IF v_fprocesscat_id=30 THEN 
