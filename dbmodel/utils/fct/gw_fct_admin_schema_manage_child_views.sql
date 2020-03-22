@@ -74,6 +74,10 @@ BEGIN
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 
+			EXECUTE 'DELETE FROM config_api_form_fields WHERE formname = '||quote_literal(v_childview);
+
+			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
+
 		END LOOP;
 
 	ELSE 
