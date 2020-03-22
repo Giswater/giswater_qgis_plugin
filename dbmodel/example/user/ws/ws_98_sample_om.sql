@@ -805,15 +805,6 @@ NULL, NULL, 'Ex.: Parameter code', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
-widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
-dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('visit_arc_leak', 'visit', 'position_id', 8, 'string', 'combo', 'Position id:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT a.id, a.idval FROM (SELECT node_1 AS id, node_1 AS idval FROM arc UNION 
-SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc) a WHERE id IS NOT NULL',
-NULL, NULL, 'arc_id', ' AND arc.arc_id.arc_id=', 
-NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
@@ -841,6 +832,16 @@ VALUES ('visit_arc_leak', 'visit', 'arc_id', 11, 'string', 'text', 'Arc id:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
+dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('visit_arc_leak', 'visit', 'position_id', 8, 'string', 'combo', 'Position id:',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT a.id, a.idval FROM (SELECT node_1 AS id, node_1 AS idval FROM arc UNION 
+SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc) a WHERE id IS NOT NULL',
+NULL, NULL, 'arc_id', ' AND arc.arc_id.arc_id=', 
+NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 

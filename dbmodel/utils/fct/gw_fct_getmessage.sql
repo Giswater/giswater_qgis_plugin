@@ -144,9 +144,9 @@ BEGIN
 			FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
 
 			IF v_message IS NOT NULL THEN
-				RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, concat(rec_cat_error.error_message, ' ',v_message), rec_cat_error.hint_message ;
+				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(rec_cat_error.error_message, ' ',v_message), rec_cat_error.hint_message, v_variables ;
 			ELSE
-				RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
+				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message, v_variables ;
 			END IF;
 
 			RETURN NULL;

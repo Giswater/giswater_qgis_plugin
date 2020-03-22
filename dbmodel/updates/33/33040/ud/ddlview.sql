@@ -789,10 +789,10 @@ CREATE OR REPLACE VIEW v_edit_inp_conduit AS
     inp_conduit.qmax,
     inp_conduit.seepage,
     inp_conduit.custom_n
-   FROM inp_selector_sector,
-    v_arc
-     JOIN inp_conduit ON v_arc.arc_id::text = inp_conduit.arc_id::text
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+   FROM v_arc
+	 JOIN vi_parent_arc USING (arc_id)
+     JOIN inp_conduit ON v_arc.arc_id::text = inp_conduit.arc_id::text;
+	  
 
 
 CREATE OR REPLACE VIEW v_edit_inp_divider AS 
@@ -931,11 +931,10 @@ CREATE OR REPLACE VIEW v_edit_inp_orifice AS
     inp_orifice.geom3,
     inp_orifice.geom4,
     v_arc.expl_id
-   FROM inp_selector_sector,
-    v_arc
-     JOIN inp_orifice ON v_arc.arc_id::text = inp_orifice.arc_id::text
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
+   FROM v_arc
+	 JOIN vi_parent_arc USING (arc_id)
+     JOIN inp_orifice ON v_arc.arc_id::text = inp_orifice.arc_id::text;
+  
   
 CREATE OR REPLACE VIEW v_edit_inp_outfall AS 
  SELECT v_node.node_id,
@@ -1016,11 +1015,10 @@ CREATE OR REPLACE VIEW v_edit_inp_outlet AS
     inp_outlet.cd2,
     inp_outlet.flap,
     v_arc.expl_id
-   FROM inp_selector_sector,
-    v_arc
-     JOIN inp_outlet ON v_arc.arc_id::text = inp_outlet.arc_id::text
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
+   FROM v_arc
+	 JOIN vi_parent_arc USING (arc_id)
+     JOIN inp_outlet ON v_arc.arc_id::text = inp_outlet.arc_id::text;
+	 
   
 CREATE OR REPLACE VIEW v_edit_inp_pump AS 
  SELECT v_arc.arc_id,
@@ -1050,11 +1048,9 @@ CREATE OR REPLACE VIEW v_edit_inp_pump AS
     inp_pump.startup,
     inp_pump.shutoff,
     v_arc.expl_id
-   FROM inp_selector_sector,
-    v_arc
-     JOIN inp_pump ON v_arc.arc_id::text = inp_pump.arc_id::text
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
+   FROM v_arc
+	 JOIN vi_parent_arc USING (arc_id)
+     JOIN inp_pump ON v_arc.arc_id::text = inp_pump.arc_id::text;
 
   
 CREATE OR REPLACE VIEW v_edit_inp_storage AS 
@@ -1119,8 +1115,6 @@ UNION
      JOIN vi_parent_arc a ON a.node_2::text = v_node.node_id::text;
 
  
-
-
 CREATE OR REPLACE VIEW v_edit_inp_virtual AS 
  SELECT v_arc.arc_id,
     v_arc.node_1,
@@ -1133,11 +1127,10 @@ CREATE OR REPLACE VIEW v_edit_inp_virtual AS
     inp_virtual.fusion_node,
     inp_virtual.add_length,
     v_arc.expl_id
-   FROM inp_selector_sector,
-    v_arc
-     JOIN inp_virtual ON v_arc.arc_id::text = inp_virtual.arc_id::text
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
+   FROM v_arc
+	 JOIN vi_parent_arc USING (arc_id)
+     JOIN inp_virtual ON v_arc.arc_id::text = inp_virtual.arc_id::text;
+	 
 
 CREATE OR REPLACE VIEW v_edit_inp_weir AS 
  SELECT v_arc.arc_id,
@@ -1174,10 +1167,9 @@ CREATE OR REPLACE VIEW v_edit_inp_weir AS
     inp_weir.geom4,
     inp_weir.surcharge,
     v_arc.expl_id
-   FROM inp_selector_sector,
-    v_arc
-     JOIN inp_weir ON v_arc.arc_id::text = inp_weir.arc_id::text
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+   FROM v_arc
+     JOIN vi_parent_arc USING (arc_id)
+     JOIN inp_weir ON v_arc.arc_id::text = inp_weir.arc_id::text;
 
 
 -- links

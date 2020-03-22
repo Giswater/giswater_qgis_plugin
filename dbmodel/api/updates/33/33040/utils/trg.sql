@@ -8,12 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+DROP TRIGGER IF EXISTS gw_trg_config_control ON SCHEMA_NAME.audit_cat_param_user;
+CREATE TRIGGER gw_trg_config_control BEFORE INSERT OR UPDATE OR DELETE
+ON SCHEMA_NAME.audit_cat_param_user FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_config_control('audit_cat_param_user');
 
--- 2020/02/28
 DROP TRIGGER IF EXISTS gw_trg_config_control ON config_api_form_fields;
-CREATE TRIGGER gw_trg_edit_config_sysfields INSTEAD OF UPDATE
-ON ve_config_sysfields  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_config_sysfields();
-
-CREATE TRIGGER gw_trg_edit_config_addfields INSTEAD OF UPDATE
-ON ve_config_addfields FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_config_addfields();
- 
+CREATE TRIGGER gw_trg_config_control BEFORE INSERT OR UPDATE OR DELETE
+ON config_api_form_fields FOR EACH ROW EXECUTE PROCEDURE gw_trg_config_control('config_api_form_fields');

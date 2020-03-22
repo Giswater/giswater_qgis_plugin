@@ -35,7 +35,7 @@ WHERE column_id = 'postnumber';
 
 UPDATE config_api_form_fields SET widgettype ='typeahead',
 dv_querytext= 'select id as id, postnumber as idval from v_ext_address WHERE id IS NOT NULL ',
-dv_querytext_filterc = ' AND v_ext_address.streetname ',
+dv_querytext_filterc = ' AND v_ext_address.streetname2 ',
 dv_parent_id = 'streetname2'
 WHERE column_id = 'postnumber2';
 
