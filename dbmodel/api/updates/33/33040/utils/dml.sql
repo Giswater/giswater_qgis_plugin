@@ -33,7 +33,6 @@ dv_querytext_filterc = 'AND m.name'
 WHERE column_id = 'streetaxis2_id';
 
 
-
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('v_edit_arc', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
@@ -98,9 +97,8 @@ UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'cat_arctype_i
 UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'nodetype_id' and formname  like '%ve_node%' or formname  = 'v_edit_node';
 UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'connectype_id' and formname  like '%ve_connec%' or formname  = 'v_edit_connec';
 
--- tothom
-UPDATE ws_sample.config_api_form_fields SET widgettype = 'text' where column_id = 'lastupdate';
-UPDATE ws_sample.config_api_form_fields SET widgettype = 'combo' where column_id = 'macrosector_id';
+UPDATE config_api_form_fields SET widgettype = 'text' where column_id = 'lastupdate';
+UPDATE config_api_form_fields SET widgettype = 'combo' where column_id = 'macrosector_id';
 
 
 

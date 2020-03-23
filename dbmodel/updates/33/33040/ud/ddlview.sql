@@ -256,14 +256,14 @@ WITH vu_node as (
     node.insert_user,
     date_trunc('second'::text, node.lastupdate) AS lastupdate,
     node.lastupdate_user
-    FROM ud_sample.node
-    LEFT JOIN ud_sample.cat_node ON node.nodecat_id::text = cat_node.id::text
-    LEFT JOIN ud_sample.node_type ON node_type.id::text = node.node_type::text
-    LEFT JOIN ud_sample.dma ON node.dma_id = dma.dma_id
-    LEFT JOIN ud_sample.sector ON node.sector_id = sector.sector_id
-    LEFT JOIN ud_sample.exploitation ON node.expl_id = exploitation.expl_id
-    LEFT JOIN ud_sample.ext_streetaxis c ON c.id::text = node.streetaxis_id::text
-    LEFT JOIN ud_sample.ext_streetaxis d ON d.id::text = node.streetaxis2_id::text)
+    FROM node
+    LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+    LEFT JOIN node_type ON node_type.id::text = node.node_type::text
+    LEFT JOIN dma ON node.dma_id = dma.dma_id
+    LEFT JOIN sector ON node.sector_id = sector.sector_id
+    LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
+    LEFT JOIN ext_streetaxis c ON c.id::text = node.streetaxis_id::text
+    LEFT JOIN ext_streetaxis d ON d.id::text = node.streetaxis2_id::text)
 	SELECT node_id,code,top_elev,custom_top_elev,sys_top_elev,ymax,custom_ymax,sys_ymax,elev,custom_elev,
 		CASE WHEN vu_node.sys_elev IS NOT NULL THEN vu_node.sys_elev
 		ELSE (vu_node.sys_top_elev - vu_node.sys_ymax)::numeric(12,3) END AS sys_elev,
