@@ -699,10 +699,11 @@ class ApiCF(ApiParent, QObject):
 
     def set_reg_exp(self, widget, field):
         """ Set regular expression """
-        if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
-            if field['widgetcontrols']['regexpControl'] is not None:
-                reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
-                widget.setValidator(QRegExpValidator(reg_exp))
+        if 'widgetcontrols' in field and field['widgetcontrols']:
+            if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
+                if field['widgetcontrols']['regexpControl'] is not None:
+                    reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
+                    widget.setValidator(QRegExpValidator(reg_exp))
         return widget
 
 

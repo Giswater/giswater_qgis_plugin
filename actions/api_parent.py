@@ -1288,10 +1288,11 @@ class ApiParent(ParentAction):
                     else:
                         widget.setProperty('is_mandatory', True)
                     widget.setText(field['value'])
-                    if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
-                        if field['widgetcontrols']['regexpControl'] is not None:
-                            reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
-                            widget.setValidator(QRegExpValidator(reg_exp))
+                    if 'widgetcontrols' in field and field['widgetcontrols']:
+                        if 'regexpControl' in field['widgetcontrols']:
+                            if field['widgetcontrols']['regexpControl'] is not None:
+                                reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
+                                widget.setValidator(QRegExpValidator(reg_exp))
                     widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
