@@ -1516,11 +1516,6 @@ class MincutParent(ParentAction):
         # Set snapping to 'arc' and 'node'
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.snap_to_arc()
-        layer_settings = self.snapper_manager.snapping_config.individualLayerSettings(self.layer_arc)
-        layer_settings.setType(2)
-        layer_settings.setEnabled(True)
-        self.snapper_manager.snapping_config.setIndividualLayerSettings(self.layer_arc, layer_settings)
-        QgsProject.instance().snappingConfigChanged.emit(self.snapper_manager.snapping_config)
 
         #self.snapper_manager.snap_to_node()
 
