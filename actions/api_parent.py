@@ -1104,8 +1104,9 @@ class ApiParent(ParentAction):
         self.dlg_binfo = BasicInfo()
         self.load_settings(self.dlg_binfo)
 
-        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Select 2 nodes')
-        self.dlg_binfo.lbl_title.setText("Node1: \nNode2:")
+        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Interpolate tool')
+        self.dlg_binfo.lbl_title.setText("Please, use the cursor to select two nodes to proceed with the "
+                                         "interpolation\nNode1: \nNode2:")
 
         self.dlg_binfo.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
         self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
