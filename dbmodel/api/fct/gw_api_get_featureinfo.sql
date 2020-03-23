@@ -62,17 +62,26 @@ BEGIN
 		SELECT gw_api_get_formfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_api_layer_field. System values will be used';
-        
+
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
-			(SELECT a.attname as label, a.attname as column_id, concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
+			(SELECT a.attname as label, 
+			concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
 			(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
 			(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
-			''::TEXT AS tooltip, ''::TEXT as placeholder, false AS iseditable, false as isclickable,
-			row_number()over() AS orderby, null as stylesheet, null as widgetcontrols, null as layout_name,
-			3 AS layoutname, 
+			''::TEXT AS tooltip, 
+			''::TEXT as placeholder, 
+			false AS iseditable,
+			row_number()over() AS orderby, 
+			null as stylesheet, 
 			row_number()over() AS layout_order, 
-			FALSE AS dv_parent_id, FALSE AS isparent, FALSE AS button_function, ''::TEXT AS dv_querytext, ''::TEXT AS dv_querytext_filterc, FALSE AS action_function, FALSE AS isautoupdate
+			FALSE AS isparent, 
+			null AS widgetfunction, 
+			null AS linkedaction, 
+			FALSE AS isautoupdate,
+			''lyt_data_1'' AS layoutname, 
+			null as widgetcontrols,
+			FALSE as hidden
 			FROM pg_attribute a
 			JOIN pg_class t on a.attrelid = t.oid
 			JOIN pg_namespace s on t.relnamespace = s.oid
