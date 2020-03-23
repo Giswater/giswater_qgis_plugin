@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -347,24 +347,27 @@
         <string>Hydrometer values</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Cat period filter :</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QTableView" name="tbl_hydrometer_value">
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Cat period filter :</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QComboBox" name="cmb_cat_period_id_filter"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="lbl_cus_code">
+            <property name="text">
+             <string>Customer code:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cmb_hyd_customer_code"/>
           </item>
           <item>
            <spacer name="horizontalSpacer_4">
@@ -380,6 +383,13 @@
            </spacer>
           </item>
          </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QTableView" name="tbl_hydrometer_value">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
