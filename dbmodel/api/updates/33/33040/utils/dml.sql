@@ -100,7 +100,3 @@ UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'connectype_id
 UPDATE config_api_form_fields SET widgettype = 'text' where column_id = 'lastupdate';
 UPDATE config_api_form_fields SET widgettype = 'combo' where column_id = 'macrosector_id';
 
-
-
-
-

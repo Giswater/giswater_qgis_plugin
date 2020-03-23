@@ -311,5 +311,7 @@ UPDATE config_api_form_fields SET layout_order =4 , layoutname ='lyt_bot_1' , la
 UPDATE config_api_form_fields SET layout_order =70 , layoutname ='lyt_data_1' WHERE column_id ='macrosector_id';
 UPDATE config_api_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE column_id IN ('expl_id', 'sector_id');
 
+update config_api_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
+update config_api_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
 
 

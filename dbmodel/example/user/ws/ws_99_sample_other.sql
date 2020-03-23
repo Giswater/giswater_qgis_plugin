@@ -433,11 +433,10 @@ WHERE node_id = '113766';
 UPDATE anl_mincut_inlet_x_exploitation SET config = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
-
 UPDATE config_api_form_fields SET label = 'Presszone' WHERE column_id = 'presszonecat_id';
+
+update config_api_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
+update config_api_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
 
 -- reconnect planned connecs
 SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[114462, 114461]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
-
-
-

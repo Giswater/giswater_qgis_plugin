@@ -35,18 +35,5 @@ UPDATE config_api_form_fields SET layoutname = 'lyt_symbology' WHERE formtype='c
 UPDATE config_api_form_fields SET layoutname = 'lyt_other' WHERE formtype='catalog' AND layoutname = 'other_layout';
 
 
-UPDATE config_api_form_fields SET widgettype ='typeahead',
-dv_querytext= 'select id as id, postnumber as idval from ext_address WHERE id IS NOT NULL ',
-dv_querytext_filterc = ' AND ext_address.streetaxis_id ',
-dv_parent_id = 'streetaxis_id'
-WHERE column_id = 'postnumber';
-
-
-UPDATE config_api_form_fields SET widgettype ='typeahead',
-dv_querytext= 'select id as id, postnumber as idval from ext_address WHERE id IS NOT NULL ',
-dv_querytext_filterc = ' AND ext_address2.streetaxis_id ',
-dv_parent_id = 'streetaxis_id'
-WHERE column_id = 'postnumber2';
-
 -- 2020/03/19
 UPDATE typevalue_fk SET target_table = 'audit_cat_error', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
