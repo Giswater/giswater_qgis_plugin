@@ -11,8 +11,8 @@ import configparser
 import os.path
 import sys
 
-from giswater.dao.controller import DaoController
-from giswater.actions.update_sql import UpdateSQL
+from giswater_qgis_plugin.dao.controller import DaoController
+from giswater_qgis_plugin.actions.update_sql import UpdateSQL
 
 
 class TestGiswater(QObject):
