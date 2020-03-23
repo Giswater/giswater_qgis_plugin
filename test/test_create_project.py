@@ -1,6 +1,6 @@
 from qgis.core import QgsApplication, QgsProviderRegistry
 
-from test.test_giswater import TestGiswater
+from test_giswater import TestGiswater
 
 
 # dummy instance to replace qgis.utils.iface
@@ -53,7 +53,7 @@ class TestQgis:
         return True
 
 
-    def create_project(self):
+    def create_project(self, project_type='ws'):
 
         print("\nStart create_project")
 
@@ -67,9 +67,12 @@ class TestQgis:
             return False
 
         user = "gisadmin"
-        self.test_giswater.update_sql.init_sql(False, user)
-        self.test_giswater.update_sql.init_dialog_create_project()
-        self.test_giswater.update_sql.create_project_data_schema('test_ws', 'test_ws_title', 'ws', '25831', 'EN', True)
+        self.test_giswater.update_sql.init_sql(False, user, show_dialog=False)
+        self.test_giswater.update_sql.init_dialog_create_project(project_type)
+        project_name = f"test_{project_type}"
+        project_title = f"test_{project_type}"
+        self.test_giswater.update_sql.create_project_data_schema(project_name, project_title, project_type,
+            '25831', 'EN', is_test=True, exec_last_process=True, example_data=True)
 
         print("Finish create_project")
 
