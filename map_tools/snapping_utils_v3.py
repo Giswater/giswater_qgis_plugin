@@ -101,7 +101,7 @@ class SnappingConfigManager(object):
         """ Set snapping to 'arc' """
 
         QgsProject.instance().blockSignals(True)
-        self.snap_to_layer(self.layer_arc, QgsPointLocator.Edge, True)
+        self.snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
