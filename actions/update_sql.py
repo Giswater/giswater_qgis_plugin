@@ -917,8 +917,8 @@ class UpdateSQL(ApiParent):
 
     def load_sample_data(self, project_type=False):
 
-        sql = 'UPDATE ' + self.schema + '.version SET sample=True ' \
-              'WHERE id = (SELECT id FROM ' + self.schema + '.version ORDER BY id DESC LIMIT 1)'
+        sql = (f"UPDATE {self.schema}.version SET sample=True "
+               f"WHERE id = (SELECT id FROM {self.schema}.version ORDER BY id DESC LIMIT 1)")
         self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
@@ -1858,11 +1858,11 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
-        sql = ("SELECT id, id as idval FROM sys_feature_type WHERE net_category=1")
+        sql = "SELECT id, id as idval FROM sys_feature_type WHERE net_category = 1"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
-        sql = ("SELECT id, id as idval FROM om_visit_type")
+        sql = "SELECT id, id as idval FROM om_visit_type"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
 
@@ -1879,19 +1879,19 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_visit_param)
 
         # Manage widgets
-        sql = ("SELECT id, id as idval FROM om_visit_parameter_type")
+        sql = "SELECT id, id as idval FROM om_visit_parameter_type"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
-        sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'")
+        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
-        sql = ("SELECT id, id as idval FROM om_visit_parameter_form_type")
+        sql = "SELECT id, id as idval FROM om_visit_parameter_form_type"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
-        sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'")
+        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
@@ -2056,7 +2056,8 @@ class UpdateSQL(ApiParent):
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
         else:
             # Check if exist column sample in table version
-            sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + schema_name +"';"
+            sql = (f"SELECT column_name FROM information_schema.columns "
+                   f"WHERE table_name = 'version' and column_name = 'sample' and table_schema = '{schema_name}';")
             result = self.controller.get_row(sql)
 
             if result is None:
