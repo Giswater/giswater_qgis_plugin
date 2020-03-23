@@ -1584,7 +1584,7 @@ class ApiCF(ApiParent, QObject):
         sql = (f"SELECT DISTINCT(t1.code), t2.cat_period_id "
                f"FROM ext_cat_period as t1 "
                f"join v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
-               f"ORDER BY t1.code DESC")
+               f"ORDER BY t2.cat_period_id DESC")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return False
