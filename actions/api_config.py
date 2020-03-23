@@ -375,16 +375,17 @@ class ApiConfig(ApiParent):
                     pass
 
                 # Order Widgets
-                if field['layoutname'] == 'lyt_topology':
-                    self.order_widgets_system(field, self.topology_form, lbl,  widget)
-                elif field['layoutname'] == 'lyt_builder':
-                    self.order_widgets_system(field, self.builder_form, lbl,  widget)
-                elif field['layoutname'] == 'lyt_review':
-                    self.order_widgets_system(field, self.review_form, lbl,  widget)
-                elif field['layoutname'] == 'lyt_analysis':
-                    self.order_widgets_system(field, self.analysis_form, lbl,  widget)
-                elif field['layoutname'] == 'lyt_system':
-                    self.order_widgets_system(field, self.system_form, lbl,  widget)
+                if 'layoutname' in field:
+                    if field['layoutname'] == 'lyt_topology':
+                        self.order_widgets_system(field, self.topology_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_builder':
+                        self.order_widgets_system(field, self.builder_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_review':
+                        self.order_widgets_system(field, self.review_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_analysis':
+                        self.order_widgets_system(field, self.analysis_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_system':
+                        self.order_widgets_system(field, self.system_form, lbl,  widget)
 
 
     def get_event_combo_parent(self, row):
