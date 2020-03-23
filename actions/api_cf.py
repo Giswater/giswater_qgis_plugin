@@ -1590,12 +1590,13 @@ class ApiCF(ApiParent, QObject):
         sql = (f"SELECT DISTINCT(t1.code), t2.cat_period_id "
                f"FROM ext_cat_period as t1 "
                f"join v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
-               f"ORDER BY t1.code")
+               f"ORDER BY t2.cat_period_id DESC")
         rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return False
-        rows.append(['', ''])
-        utils_giswater.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, 0)
+
+        utils_giswater.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
+
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
                " WHERE connec_id = '"+str(self.feature_id)+"' "

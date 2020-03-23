@@ -416,8 +416,7 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     records = []
     if rows is None:
         rows = [['', '']]
-    if add_empty:
-        rows.extend([['', '']])
+
     if sort_by > len(rows[0])-1:
         sort_by = 1
 
@@ -438,6 +437,10 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     except:
         pass
     finally:
+        
+        if add_empty:
+            records_sorted.insert(0, ['', ''])
+
         for record in records_sorted:
             combo.addItem(record[index_to_show], record)
             combo.blockSignals(False)
