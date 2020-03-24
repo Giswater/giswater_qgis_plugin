@@ -472,8 +472,7 @@ class ApiCF(ApiParent, QObject):
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout_list.append(layout)
-
-                # Add widgets into layout
+                    # Add widgets into layout
                     layout.addWidget(label, 0, field['layout_order'])
                     layout.addWidget(widget, 1, field['layout_order'])
                 if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
@@ -481,8 +480,6 @@ class ApiCF(ApiParent, QObject):
                     layout.addWidget(widget, 1, field['layout_order'])
                 else:
                     self.put_widgets(self.dlg_cf, field, label, widget)
-                else:
-                    self.controller.log_info("Layout not found", parameter=field['layoutname'])
 
         # Get current feature id
         widget_field_id = self.dlg_cf.findChild(QLineEdit, f'{tab_type}_{self.field_id}')
