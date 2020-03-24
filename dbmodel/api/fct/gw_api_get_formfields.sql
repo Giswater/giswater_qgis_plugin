@@ -28,6 +28,10 @@ SELECT "SCHEMA_NAME".gw_api_get_formfields('go2epa', 'form', 'data', null, null,
 SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 9)
 SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 9)
 SELECT "SCHEMA_NAME".gw_api_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
+
+PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
+UPDATE config_param_user SET value =  'true' WHERE parameter = 'debug_mode' and cur_user = current_user;
 */
 
 DECLARE
@@ -56,10 +60,9 @@ v_editability text;
 v_label text;     
 v_clause text;
 v_device text;
+v_debug text;
        
 BEGIN
-
-	
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -73,6 +76,11 @@ BEGIN
 	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
+
+	v_debug = concat ('formname:', p_formname, ', formtype:', p_formtype ,', tabname:', p_tabname ,', tablename:', p_tablename , ', idname:', p_idname,
+			', id:' ,p_id ,', columntype:', p_columntype ,', tgop:', p_tgop ,', filterfield:', p_filterfield ,', device:', p_device, ', values_array:' ,p_values_array);
+
+	PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
 
 	-- setting tabname
 	IF p_tabname IS NULL THEN
@@ -269,7 +277,9 @@ BEGIN
 	
 	-- Convert to json
 	fields := array_to_json(fields_array);
-  
+	
+	PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_api_get_formfields: ", "variables":"',fields,'"}}')::json);
+	 
 	-- Return
 	RETURN fields_array;
 

@@ -25,6 +25,10 @@ SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', null, '0102000020E764
 arc with nodes
 SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true)
 SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,'UPDATE', true)
+
+PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_featureupsert: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_api_get_featureupsert: ", "variables":"',v_debug,'"}}')::json);
+UPDATE config_param_user SET value =  'true' WHERE parameter = 'debug_mode' and cur_user = current_user;
 */
 
 DECLARE
@@ -116,7 +120,7 @@ BEGIN
 
 	--  get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
-	    
+	
 	--  get config parameters   
 	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
 	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
@@ -337,13 +341,14 @@ BEGIN
 	-- building the form widgets
 	----------------------------
 	IF  p_configtable is TRUE THEN 
-		raise notice 'Configuration fields are defined on config_api_layer_field';
-		
+	
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on config_api_form_fields table <--", "variables":"',v_debug,'"}}')::json);
+
 		-- Call the function of feature fields generation
 		SELECT gw_api_get_formfields( v_formname, 'feature', v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
-		
-	ELSE
-		raise notice 'Configuration fields are NOT defined on config_api_layer_field. System values will be used';
+
+	ELSE	
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_api_form_fields table. System values are used <--", "variables":"',v_debug,'"}}')::json);
 	
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
