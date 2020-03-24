@@ -1,6 +1,6 @@
 from qgis.core import QgsApplication, QgsProviderRegistry
-
 from test_giswater import TestGiswater
+from actions.create_gis_project import CreateGisProject
 
 
 # dummy instance to replace qgis.utils.iface
@@ -15,6 +15,12 @@ class QgisInterfaceDummy(object):
 
 
 class TestQgis:
+
+    def __init__(self):
+
+        self.service_name = "localhost_giswater"
+        self.user = "gisadmin"
+
 
     def load_plugin(self):
         """ Load main plugin class """
@@ -62,12 +68,10 @@ class TestQgis:
             return False
 
         # Connect to a database providing a service_name set in .pg_service.conf
-        service_name = "localhost_giswater"
-        if not self.connect_to_database(service_name):
+        if not self.connect_to_database(self.service_name):
             return False
 
-        user = "gisadmin"
-        self.test_giswater.update_sql.init_sql(False, user, show_dialog=False)
+        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
         self.test_giswater.update_sql.init_dialog_create_project(project_type)
         project_name = f"test_{project_type}"
         project_title = f"test_{project_type}"
@@ -88,17 +92,49 @@ class TestQgis:
             return False
 
         # Connect to a database providing a service_name set in .pg_service.conf
-        service_name = "localhost_giswater"
-        if not self.connect_to_database(service_name):
+        if not self.connect_to_database(self.service_name):
             return False
 
-        user = "gisadmin"
-        self.test_giswater.update_sql.init_sql(False, user, show_dialog=False)
+        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
         self.test_giswater.update_sql.init_dialog_create_project(project_type)
         project_name = f"test_{project_type}"
         self.test_giswater.update_sql.load_updates(project_type, schema_name=project_name)
 
         print("Finish update_project")
+
+        return True
+
+
+    def create_gis_project(self, project_type='ws'):
+
+        print("\nStart create_gis_project")
+
+        # Load main plugin class
+        if not self.load_plugin():
+            return False
+
+        # Connect to a database providing a service_name set in .pg_service.conf
+        service_name = "localhost_giswater"
+        if not self.connect_to_database(service_name):
+            return False
+
+        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
+        self.test_giswater.update_sql.init_dialog_create_project(project_type)
+
+        # Generate QGIS project
+        project_name = f"test_{project_type}"
+        gis_folder = "C:/Users/David/giswater/qgs"
+        gis_file = project_name
+        export_passwd = True
+        roletype = 'admin'
+        sample = True
+        get_database_parameters = False
+        gis = CreateGisProject(self.test_giswater.controller, self.test_giswater.plugin_dir)
+        gis.set_database_parameters("host", "port", "db", "user", "password", "25831")
+        gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd,
+            roletype, sample, get_database_parameters)
+
+        print("Finish create_gis_project")
 
         return True
 
@@ -115,8 +151,14 @@ def test_update_project():
     print(status)
 
 
+def test_create_gis_project():
+    test = TestQgis()
+    status = test.create_gis_project('ws')
+    print(status)
+
+
 if __name__ == '__main__':
     print("MAIN")
     test = TestQgis()
-    test.update_project('ud')
+    test.create_gis_project('ws')
 

@@ -394,8 +394,16 @@ class UpdateSQL(ApiParent):
             self.controller.show_info_box(msg, "Warning")
 
         # Generate QGIS project
+        self.generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
+
+
+    def generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample,
+        get_database_parameters=True):
+        """ Generate QGIS project """
+
         gis = CreateGisProject(self.controller, self.plugin_dir)
-        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
+        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
+            roletype, sample, get_database_parameters)
 
         self.close_dialog(self.dlg_create_gis_project)
         self.close_dialog(self.dlg_readsql)
