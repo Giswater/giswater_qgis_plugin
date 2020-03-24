@@ -5,16 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-from collections import OrderedDict
-
-from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
     QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
     QgsVectorLayer, QgsVectorLayerExporter
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QTabWidget
+from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 
 import os
 from random import randrange
@@ -141,11 +138,9 @@ class AddLayer(object):
         :param group:
         :return:
         """
-        colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
+        colors = {'rnd': QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
         text_result = None
         temp_layers_added = []
-        if del_old_layers:
-            self.delete_layer_from_toc(layer_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == 'setVisibleLayers':
@@ -162,12 +157,20 @@ class AddLayer(object):
                 if counter > 0:
                     counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
+                    try:
+                        if not layer_name:
+                            layer_name = data[k]['layerName']
+                    except KeyError:
+                        layer_name = 'Temporal layer'
+                    if del_old_layers:
+                        self.delete_layer_from_toc(layer_name)
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+                    layer_name = None
                     #TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
-                    if key=='values':
+                    if key == 'values':
                         self.populate_vlayer_old(v_layer, data, k, counter, group)
-                    elif key=='features':
+                    elif key == 'features':
                         self.populate_vlayer(v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']
@@ -175,10 +178,13 @@ class AddLayer(object):
                     elif 'category_field' in data[k] and data[k]['category_field']:
                         cat_field = data[k]['category_field']
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
-                        self.categoryze_layer(v_layer, cat_field, size)
+                        color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
+                                        'EXISTS': QColor(240, 150, 0)}
+                        self.categoryze_layer(v_layer, cat_field, size, color_values)
                     temp_layers_added.append(v_layer)
+                    v_layer.setOpacity(0.7)
                     self.iface.setActiveLayer(v_layer)
-        return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
+        return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
     def set_layers_visible(self, layers):
@@ -188,7 +194,7 @@ class AddLayer(object):
                 self.controller.set_layer_visible(lyr)
 
 
-    def categoryze_layer(self, layer, cat_field, size):
+    def categoryze_layer(self, layer, cat_field, size, color_values, unique_values=None):
         """
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
         :param cat_field: Field to categorize (string)
@@ -198,9 +204,10 @@ class AddLayer(object):
         # get unique values
         fields = layer.fields()
         fni = fields.indexOf(cat_field)
-        unique_values = layer.dataProvider().uniqueValues(fni)
+        if not unique_values:
+            unique_values = layer.dataProvider().uniqueValues(fni)
         categories = []
-        color_values={'NEW':QColor(0, 255, 0), 'DUPLICATED':QColor(255, 0, 0), 'EXISTS':QColor(240, 150, 0)}
+
         for unique_value in unique_values:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
@@ -250,6 +257,21 @@ class AddLayer(object):
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
+    def set_layer_symbology(self, layer, properties=None):
+        renderer = layer.renderer()
+        symbol = renderer.symbol()
+
+        if type(symbol) == QgsLineSymbol:
+            layer.renderer().setSymbol(QgsLineSymbol.createSimple(properties))
+        elif type(symbol) == QgsMarkerSymbol:
+            layer.renderer().setSymbol(QgsMarkerSymbol.createSimple(properties))
+        elif type(symbol) == QgsFillSymbol:
+            layer.renderer().setSymbol(QgsFillSymbol.createSimple(properties))
+
+        layer.triggerRepaint()
+        self.iface.layerTreeView().refreshLayerSymbology(layer.id())
+
+
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
         """ Populate txt_infolog QTextEdit widget
         :param data: Json
@@ -273,11 +295,30 @@ class AddLayer(object):
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
-        qtabwidget = dialog.findChild(QTabWidget,'mainTab')
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
+            self.disable_tabs(dialog)
 
         return text
+
+
+    def disable_tabs(self, dialog):
+        """ Disable all tabs in the dialog except the log one and change the state of the buttons
+        :param dialog: Dialog where tabs are disabled (QDialog)
+        :return:
+        """
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        for x in range(0, qtabwidget.count()-1):
+            qtabwidget.widget(x).setEnabled(False)
+
+        btn_accept = dialog.findChild(QPushButton, 'btn_accept')
+        if btn_accept:
+            btn_accept.hide()
+
+        btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
+        if btn_cancel:
+            utils_giswater.setWidgetText(dialog, btn_accept, 'Close')
 
 
     def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
@@ -390,7 +431,17 @@ class AddLayer(object):
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
           """
-        return self.get_multi_coordinates(feature)
+        coordinates = "("
+        for coords in feature['geometry']['coordinates']:
+            coordinates += "("
+            for cc in coords:
+                coordinates += "("
+                for c in cc:
+                    coordinates += f"{c[0]} {c[1]}, "
+                coordinates = coordinates[:-2] + "), "
+            coordinates = coordinates[:-2] + "), "
+        coordinates = coordinates[:-2] + ")"
+        return coordinates
 
 
     def get_coordinates(self, feature):
@@ -471,8 +522,19 @@ class AddLayer(object):
                 layer = lyr
                 break
         if layer is not None:
+            # Remove layer
             QgsProject.instance().removeMapLayer(layer)
+
+            #Remove group if is void
+            root = QgsProject.instance().layerTreeRoot()
+            group = root.findGroup('GW Temporal Layers')
+            if group:
+                layers = group.findLayers()
+                if not layers:
+                    root.removeChildNode(group)
             self.delete_layer_from_toc(layer_name)
+
+
 
 
     def load_qml(self, layer, qml_path):

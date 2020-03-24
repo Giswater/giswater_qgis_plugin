@@ -433,9 +433,9 @@ class ManageNewPsector(ParentManage):
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
-        self.controller.translate_form(self.dlg_plan_psector, 'plan_psector')
+        # self.controller.translate_form(self.dlg_plan_psector, 'plan_psector')
         # Open dialog
-        self.open_dialog(self.dlg_plan_psector, maximize_button=False)
+        self.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
 
 
     def enable_all(self):
@@ -652,7 +652,7 @@ class ManageNewPsector(ParentManage):
         columns = []
 
         if not rows or rows is None or rows == '':
-            message = "CSV not generated. Check fields from table or view: "
+            message = "CSV not generated. Check fields from table or view"
             self.controller.show_warning(message, parameter=viewname)
             return
         for i in range(0, len(rows)):

@@ -1,20 +1,17 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
-
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QLineEdit, QDialog
 
 import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -49,7 +46,7 @@ class ApiManageComposer(ApiParent):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_getprint', f'$${{{body}}}$$', log_sql=True)
+        complet_result = self.controller.get_json('gw_api_getprint', body, log_sql=True)
         if not complet_result: return False
 
         if complet_result['formTabs']:
@@ -121,7 +118,7 @@ class ApiManageComposer(ApiParent):
                 widget.setStyleSheet("border: 1px solid red")
                 widget.setPlaceholderText(f"Widget '{widget.property('column_id')}' not found in the composer")
             elif type(item) == QgsLayoutItemLabel and item is not None:
-                widget.setStyleSheet("border: 1px solid gray")
+                widget.setStyleSheet(None)
 
 
     def load_composer_values(self, dialog):
@@ -295,8 +292,8 @@ class ApiManageComposer(ApiParent):
         form = '"form":{''}, '
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
-        body = "" + client + form + feature + data
-        complet_result = self.controller.get_json('gw_api_setprint', f'$${{{body}}}$$', log_sql=True)
+        body = "$${" + client + form + feature + data + "}$$"
+        complet_result = self.controller.get_json('gw_api_setprint', body, log_sql=True)
         if not complet_result: return False
 
         result = complet_result['data']

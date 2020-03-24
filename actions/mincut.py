@@ -5,19 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils,  QgsFeatureRequest, QgsFillSymbol, \
+    QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
 
-from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils, QgsFeatureRequest, QgsPrintLayout, \
-    QgsProject, QgsReadWriteContext, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
-from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLineEdit, \
+    QTableView, QTextEdit, QTimeEdit, QWidget
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
-import json
-import os
-import operator
+import json, operator, os, re
+
 from datetime import datetime
 from collections import OrderedDict
 from functools import partial
@@ -74,10 +74,9 @@ class MincutParent(ParentAction):
         
         for row in rows:
             self.states[row['id']] = row['name']
-        
-        
-    def init_mincut_form(self):
-        """ Custom form initial configuration """
+
+
+    def init_map_tool(self):
 
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -92,19 +91,29 @@ class MincutParent(ParentAction):
         self.snapper = self.snapper_manager.get_snapper()
 
         # Refresh canvas, remove all old selections
-        self.remove_selection()      
-
-        self.dlg_mincut = Mincut()
-        self.load_settings(self.dlg_mincut)
-        self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.remove_selection()
 
         # Parametrize list of layers
-        self.layers_connec = self.controller.get_group_layers('connec')                        
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")                
+        self.layers_connec = self.controller.get_group_layers('connec')
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
             self.iface.setActiveLayer(self.layer_arc)
+
+
+    def init_mincut_form(self):
+        """ Custom form initial configuration """
+
+        self.user_current_layer = self.iface.activeLayer()
+        self.init_map_tool()
+        self.add_layer.delete_layer_from_toc('Overlap affected arcs')
+        self.add_layer.delete_layer_from_toc('Other mincuts which overlaps')
+        self.add_layer.delete_layer_from_toc('Overlap affected connecs')
+
+        self.dlg_mincut = Mincut()
+        self.load_settings(self.dlg_mincut)
+        self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
@@ -123,7 +132,7 @@ class MincutParent(ParentAction):
         # Set signals
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)        
         self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
-        self.dlg_mincut.dlg_rejected.connect(self.mincut_close)
+        self.dlg_mincut.dlg_closed.connect(self.mincut_close)
         self.dlg_mincut.btn_start.clicked.connect(self.real_start)
         self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
@@ -214,7 +223,19 @@ class MincutParent(ParentAction):
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
             self.dlg_mincut.cbx_hours_start, self.dlg_mincut.cbx_hours_end))
 
+        self.refresh_tab_hydro()
+
         self.open_dialog(self.dlg_mincut)
+
+
+    def refresh_tab_hydro(self):
+
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        expr_filter = f"result_id={result_mincut_id}"
+        utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer', expr_filter=expr_filter)
+        self.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer')
+
 
     def check_dates_coherence(self, date_from, date_to, time_from, time_to):
         """
@@ -225,6 +246,7 @@ class MincutParent(ParentAction):
         :param widget_to_set: QDateEdit to set coherence date
         :return:
         """
+
         d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(), time_from.time().hour(), time_from.time().minute())
         d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(), time_to.time().hour(), time_to.time().minute())
 
@@ -233,8 +255,8 @@ class MincutParent(ParentAction):
             time_to.setTime(time_from.time())
 
 
-
     def show_notified_list(self):
+
         mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM anl_mincut_result_cat "
                f"WHERE id = '{mincut_id}'")
@@ -289,6 +311,10 @@ class MincutParent(ParentAction):
 
 
     def mincut_close(self):
+
+        self.restore_user_layer()
+        self.remove_selection()
+        self.resetRubberbands()
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
             self.close_dialog(self.dlg_mincut)
@@ -324,12 +350,20 @@ class MincutParent(ParentAction):
         """ Select 'Pan' as current map tool and disconnect snapping """
 
         try:
-            self.canvas.xyCoordinates.disconnect()             
+            self.canvas.xyCoordinates.disconnect()
+        except TypeError as e:
+            print(f"{type(e).__name__} --> {e}")
+
+        try:
             self.emit_point.canvasClicked.disconnect()
-            if action_pan:
-                self.iface.actionPan().trigger()     
+        except TypeError as e:
+            print(f"{type(e).__name__} --> {e}")
+
+        if action_pan:
+            self.iface.actionPan().trigger()
+        try:
             self.vertex_marker.hide()
-        except Exception as e:
+        except AttributeError as e:
             print(f"{type(e).__name__} --> {e}")
 
 
@@ -412,6 +446,7 @@ class MincutParent(ParentAction):
 
 
     def set_real_location(self):
+
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
@@ -479,7 +514,7 @@ class MincutParent(ParentAction):
                       str(forecast_start_predict), str(forecast_end_predict)]
         for data in check_data:
             if data == '':
-                message = "Some mandatory field is missing. Please, review your data"
+                message = "Mandatory field is missing. Please, set a value"
                 self.controller.show_warning(message)
                 return
 
@@ -562,55 +597,139 @@ class MincutParent(ParentAction):
         
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
-
         sql = (f"SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
-        if row:
-            if str(row[0]) == '0' and str(row[1]) == '1':
-                cur_user = self.controller.get_project_user()
-                result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-                sql = f"SELECT gw_fct_mincut_result_overlap('{result_mincut_id_text}', '{cur_user}');"
-                row = self.controller.get_row(sql, commit=True, log_sql=True)
-                if row and row[0]:
-                    self.dlg_binfo = BasicInfo()
-                    self.dlg_binfo.setWindowTitle('Mincut conflict')
-                    msg = (f"Proposed mincut overlaps date-time with other mincuts ({row[0]})<br>"
-                           f"on same macroexploitation and has conflicts at least with one. <br>"
-                           f"<b>It's not possible to continue. You can try to modify start-end values .</b><br>"
-                           f"For more information take a look on v_anl_arc or query: <br>")
-                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
-                    text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
-                            f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
-                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, text)
-                    self.open_dialog(self.dlg_binfo)
-                    self.dlg_binfo.btn_accept.hide()
-                    self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
-                    self.dlg_binfo.btn_close.clicked.connect(self.cancel_overlap)
-                    sql = ("SELECT * FROM selector_audit"
-                           " WHERE fprocesscat_id='31' AND cur_user=current_user")
-                    row = self.controller.get_row(sql, log_sql=False)
-                    if not row:
-                        sql = ("INSERT INTO selector_audit(fprocesscat_id, cur_user) "
-                               " VALUES('31', current_user)")
-                        self.controller.execute_sql(sql, log_sql=False)
-                else:
-                    self.accept_overlap()
-            else:
-                self.accept_overlap()
-        else:
-            self.accept_overlap()
+        if not row or (str(row[0]) != '0' or str(row[1]) != '1'):
+            self.dlg_mincut.closeMainWin = False
+            self.dlg_mincut.mincutCanceled = True
+            self.dlg_mincut.close()
+            self.remove_selection()
+            return
 
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
+        extras = f'"step":"check", '  # check
+        extras += f'"result":"{result_mincut_id_text}"'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        if not result: return
+
+        if result['body']['actions']['overlap'] == 'Conflict':
+            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
+            for layer in result_layer['temp_layers_added']:
+
+                layer_style = {}
+                symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+                if type(symbol) == QgsLineSymbol:
+                    props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
+                             'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
+                             'line_color': '76,119,220,255', 'line_style': 'solid', 'line_width': '1.6',
+                             'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                             'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
+                             'width_map_unit_scale': '3x:0,0,0,0,0,0'}
+                    self.add_layer.set_layer_symbology(layer, props)
+                    # Add border
+                    renderer = layer.renderer()
+                    symbol1 = renderer.symbol()
+                    props2 = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
+                             'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
+                             'line_color': '76,38,0,255', 'line_style': 'solid', 'line_width': '1.8',
+                             'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                             'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
+                             'width_map_unit_scale': '3x:0,0,0,0,0,0'}
+                    symbol2 = QgsLineSymbol.createSimple(props2)
+                    symbol_layer = symbol2.symbolLayer(0)
+                    symbol1.insertSymbolLayer(0, symbol_layer.clone())
+
+                elif type(symbol) == QgsMarkerSymbol:
+                    props = {'angle': '0', 'color': '255,0,0,150', 'horizontal_anchor_point': '1',
+                             'joinstyle': 'bevel', 'name': 'circle', 'offset': '0,0',
+                             'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                             'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
+                             'outline_width': '0', 'outline_width_map_unit_scale': '3x:0,0,0,0,0,0',
+                             'outline_width_unit': 'MM', 'scale_method': 'diameter', 'size': '2.6',
+                             'size_map_unit_scale': '3x:0,0,0,0,0,0', 'size_unit': 'MM', 'vertical_anchor_point': '1'}
+                    self.add_layer.set_layer_symbology(layer, props)
+                    #Add cross
+                    renderer = layer.renderer()
+                    symbol1 = renderer.symbol()
+                    symbol2 = QgsMarkerSymbol.createSimple({'name': 'cross', 'color': 'black', 'size': '4.0'})
+                    symbol_layer = symbol2.symbolLayer(0)
+                    symbol1.appendSymbolLayer(symbol_layer.clone())
+
+                elif type(symbol) == QgsFillSymbol:
+                    props = {'border_width_map_unit_scale': '3x:0,0,0,0,0,0', 'color': '255,112,40,125',
+                             'joinstyle': 'bevel', 'offset': '0,0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                             'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
+                             'outline_width': '0.26', 'outline_width_unit': 'MM', 'style': 'solid'}
+
+                    self.add_layer.set_layer_symbology(layer, props)
+                layer.triggerRepaint()
+                self.iface.layerTreeView().refreshLayerSymbology(layer.id())
+            self.dlg_binfo = BasicInfo()
+            self.load_settings(self.dlg_binfo)
+            self.dlg_binfo.btn_close.setText('Cancel')
+            self.dlg_binfo.btn_accept.setText('Continue')
+            self.dlg_binfo.setWindowTitle('Mincut conflict')
+            self.dlg_binfo.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
+            self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+            self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+
+            self.add_layer.populate_info_text(self.dlg_binfo, result['body']['data'], False)
+
+            self.open_dialog(self.dlg_binfo)
+
+        elif result['body']['actions']['overlap'] == 'Ok':
+            self.mincut_ok(result)
         self.iface.actionPan().trigger()
 
-    def accept_overlap(self):
-        self.dlg_mincut.closeMainWin = True
-        self.dlg_mincut.mincutCanceled = False
-        self.dlg_mincut.close()
-        self.remove_selection()
 
-    def cancel_overlap(self):
-        self.dlg_binfo.close()
+    def force_mincut_overlap(self):
+
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
+        extras = f'"step":"continue", '
+        extras += f'"result":"{result_mincut_id_text}"'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        self.mincut_ok(result)
+
+
+    def mincut_ok(self, result):
+        result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
+        # Set all widgets of the data tab enabled(False)
+        widget_list = self.dlg_mincut.mainTab.widget(0).findChildren(QWidget)
+        for widget in widget_list:
+            if type(widget) in (QCheckBox, QComboBox, QDateEdit, QLineEdit, QTextEdit, QTimeEdit):
+                widget.setEnabled(False)
+
+        self.dlg_mincut.closeMainWin = False
+        self.dlg_mincut.mincutCanceled = True
+
+        polygon = result['body']['data']['geometry']
+        polygon = polygon[9:len(polygon) - 2]
+        polygon = polygon.split(',')
+        if polygon[0] == '':
+            message = "Error on create auto mincut, you need to review data"
+            self.controller.show_warning(message)
+            self.set_cursor_restore()
+            self.task1.setProgress(100)
+            return
+        x1, y1 = polygon[0].split(' ')
+        x2, y2 = polygon[2].split(' ')
+        self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+
+        self.dlg_mincut.btn_accept.hide()
+        self.dlg_mincut.btn_cancel.setText('Close')
+        self.dlg_mincut.btn_cancel.disconnect()
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_mincut))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.restore_user_layer))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(self.resetRubberbands))
+        self.refresh_tab_hydro()
+
+        self.action_mincut.setEnabled(False)
+
+
     def update_result_selector(self, result_mincut_id, commit=True):    
         """ Update table 'anl_mincut_result_selector' """    
             
@@ -824,6 +943,7 @@ class MincutParent(ParentAction):
 
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
+
         self.connec_list = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
@@ -1124,7 +1244,7 @@ class MincutParent(ParentAction):
                f" WHERE customer_code = '{customer_code}'")
         row = self.controller.get_row(sql)
         if not row:
-            message = "Any 'connec_id' found with this 'customer_code'"
+            message = "Any connec_id found with this customer_code"
             self.controller.show_info_box(message, parameter=customer_code)
             return None
         else:
@@ -1354,6 +1474,7 @@ class MincutParent(ParentAction):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
             Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
         """
+
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
@@ -1373,6 +1494,7 @@ class MincutParent(ParentAction):
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
 
+        self.init_map_tool()
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
         # Vertex marker
@@ -1394,6 +1516,7 @@ class MincutParent(ParentAction):
         # Set snapping to 'arc' and 'node'
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.snap_to_arc()
+
         #self.snapper_manager.snap_to_node()
 
         # Set signals
@@ -1422,9 +1545,10 @@ class MincutParent(ParentAction):
             # Get the point. Leave selection
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
             feature_id = self.snapper_manager.get_snapped_feature_id(result)
+            snapped_point = self.snapper_manager.get_snapped_point(result)
             element_id = snapped_feat.attribute(elem_type + '_id')
             layer.select([feature_id])
-            self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
+            self.auto_mincut_execute(element_id, elem_type, snapped_point.x(), snapped_point.y())
             self.set_visible_mincut_layers()
             self.snapper_manager.recover_snapping_options()
 
@@ -1494,6 +1618,7 @@ class MincutParent(ParentAction):
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
+
         self.task1 = GwTask('Calculating mincut')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
@@ -1583,8 +1708,10 @@ class MincutParent(ParentAction):
         self.disconnect_snapping(False)
         self.task1.setProgress(100)
 
+
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
+
         # Need this 3 lines here becouse if between one action and another we activate Pan, we cant open another valve
         # This is a safety measure
 
@@ -1701,6 +1828,7 @@ class MincutParent(ParentAction):
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()
         self.canvas.refresh()
+
         for a in self.iface.attributesToolBar().actions():
             if a.objectName() == 'mActionDeselectAll':
                 a.trigger()
@@ -1762,6 +1890,10 @@ class MincutParent(ParentAction):
             mincut_class_status = str(row[0])
 
         self.set_visible_mincut_layers(True)
+
+        expr_filter = f"result_id={result_mincut_id}"
+        utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro)
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer',  expr_filter=expr_filter)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
@@ -1976,9 +2108,9 @@ class MincutParent(ParentAction):
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM ext_address"
         if expl_id != -1:
-            sql += f" WHERE {self.street_field_expl[0]} = '{expl_id}'"
-        sql += " ORDER BY postcode"
-        rows = self.controller.get_rows(sql)
+            sql += f" WHERE {self.street_field_expl[0]} = '{expl_id}' AND postcode IS NOT NULL"
+        sql += " ORDER BY postcode;"
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return False
 
@@ -2199,13 +2331,13 @@ class MincutParent(ParentAction):
 
         self.street_field_expl = self.controller.get_config('street_field_expl', 'value', 'config_param_system')
         if not self.street_field_expl:
-            message = "Param street_field_expl not found"
-            self.controller.show_warning(message)
+            message = "Parameter not found"
+            self.controller.show_warning(message, parameter='street_field_expl')
             return
         portal_field_postal = self.controller.get_config('portal_field_postal', 'value', 'config_param_system')
         if not portal_field_postal:
-            message = "Param portal_field_postal not found"
-            self.controller.show_warning(message)
+            message = "Param not found"
+            self.controller.show_warning(message, parameter='portal_field_postal')
             return
 
         # Get project variable 'expl_id'

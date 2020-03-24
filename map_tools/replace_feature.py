@@ -272,8 +272,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         # Check null values
         if self.workcat_id_end_aux in (None, 'null'):
-            message = "Workcat_id field is mandatory."
-            self.controller.show_warning(message)
+            message = "Mandatory field is missing. Please, set a value"
+            self.controller.show_warning(message, parameter='Workcat_id')
             return
 
         feature_type_new = utils_giswater.getWidgetText(dialog, dialog.feature_type_new)
@@ -294,7 +294,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
-            sql = f"SELECT {function_name}($${{{body}}}$$)::text"
+            sql = f"SELECT {function_name}({body})::text"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             if not row:
                 message = "Error replacing feature"

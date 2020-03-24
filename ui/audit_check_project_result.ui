@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
+    <width>754</width>
     <height>560</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <item row="0" column="1">
     <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_infolog">
       <attribute name="title">
@@ -41,7 +41,7 @@
        <string>Qgis project log</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="2">
+       <item row="0" column="1">
         <widget class="QScrollArea" name="scrollArea">
          <property name="widgetResizable">
           <bool>true</bool>
@@ -51,27 +51,15 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>100</height>
+            <width>710</width>
+            <height>465</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="grb_critical">
-             <property name="title">
-              <string>Critical</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <layout class="QGridLayout" name="grl_critical"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="1" column="0">
+           <item row="4" column="0">
             <widget class="QGroupBox" name="grb_other">
              <property name="title">
-              <string>Others</string>
+              <string>Others layers</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
@@ -80,7 +68,19 @@
              </layout>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
+            <widget class="QGroupBox" name="grb_critical">
+             <property name="title">
+              <string>Critical layers</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <layout class="QGridLayout" name="grl_critical"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="5" column="0">
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -92,6 +92,37 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="2" column="0">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="lbl_layers">
+               <property name="text">
+                <string>Layers not found on QGIS project that matches with your role</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_checks">
+               <property name="text">
+                <string>Select layer to load</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>

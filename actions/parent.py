@@ -5,10 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsVectorLayerExporter, QgsDataSourceUri, QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsProject, QgsRectangle, QgsVectorLayer
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QVariant
+from qgis.core import QgsVectorLayerExporter, QgsDataSourceUri, QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsVectorLayer
+from qgis.gui import QgsRubberBand
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer, QVariant
 from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget, QSpacerItem, QLabel, QComboBox, QCheckBox, QSizePolicy, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget, QGridLayout
-from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
+from qgis.PyQt.QtGui import QIcon, QColor, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 import configparser, json, os, re, subprocess, sys, webbrowser
@@ -39,6 +40,13 @@ class ParentAction(object):
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
         self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
+        self.rubber_point = QgsRubberBand(self.canvas, 0)
+        self.rubber_point.setColor(Qt.yellow)
+        self.rubber_point.setIconSize(10)
+        self.rubber_polygon = QgsRubberBand(self.canvas, 2)
+        self.rubber_polygon.setColor(Qt.darkRed)
+        self.rubber_polygon.setIconSize(20)
+        self.user_current_layer = None
     
     def set_controller(self, controller):
         """ Set controller class """
@@ -155,8 +163,8 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x()+8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
-        
-        
+
+
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
@@ -164,7 +172,7 @@ class ParentAction(object):
             dlg = self.dlg
             
         # Manage i18n of the dialog                  
-        if dlg_name:      
+        if dlg_name:
             self.controller.manage_translation(dlg_name, dlg)
 
         # Manage stay on top, maximize/minimize button and information button
@@ -230,7 +238,7 @@ class ParentAction(object):
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         schema_name = self.schema_name.replace('"', '')
         query_left = f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
-        query_left += f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+        query_left += f"(SELECT {schema_name}.{tableleft}.{name} FROM {schema_name}.{tableleft}"
         query_left += f" RIGHT JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
         query_left += f" WHERE cur_user = current_user)"
         query_left += f" AND  {field_id_left} > -1"
@@ -262,7 +270,7 @@ class ParentAction(object):
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
 
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
 
         # Order control
         tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
@@ -440,15 +448,18 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())  
             
 
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name'):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
-        
+
+        schema_name = self.schema_name.replace('"', '')
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
-        sql = (f"SELECT * FROM {tableleft} WHERE {name} NOT IN "
-               f"(SELECT {tableleft}.{name} FROM {tableleft}"
-               f" RIGHT JOIN {tableright}"
+        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
+               f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+               f" RIGHT JOIN {schema_name}.{tableright}"
                f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
-               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'")
+               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'"
+               f"  AND  {field_id_l} > -1")
+        sql += aql
         self.fill_table_by_query(qtable, sql)
         
         
@@ -639,14 +650,17 @@ class ParentAction(object):
 
 
     def hide_void_groupbox(self, dialog):
-        """ Hide empty grupbox """
-
+        """ Hide empty groupbox """
+        grb_list = {}
         grbox_list = dialog.findChildren(QGroupBox)
         for grbox in grbox_list:
+
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
+                grb_list[grbox.objectName()] = 0
                 grbox.setVisible(False)
 
+        return grb_list
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
@@ -774,22 +788,31 @@ class ParentAction(object):
                 layer = lyr
                 break
         if layer is not None:
+            # Remove layer
             QgsProject.instance().removeMapLayer(layer)
+
+            # Remove group if is void
+            root = QgsProject.instance().layerTreeRoot()
+            group = root.findGroup('GW Temporal Layers')
+            if group:
+                layers = group.findLayers()
+                if not layers:
+                    root.removeChildNode(group)
             self.delete_layer_from_toc(layer_name)
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
-
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        # f'$${{{body}}}$$'
+        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = f'"feature":{{{feature}}}, '
         filter_fields = f'"filterFields":{{{filter_fields}}}'
-        page_info = '"pageInfo":{}'
+        page_info = f'"pageInfo":{{}}'
         data = f'"data":{{{filter_fields}, {page_info}'
         if extras is not None:
             data += ', ' + extras
-        data += '}'
+        data += f'}}}}$$'
         body = "" + client + form + feature + data
 
         return body
@@ -872,7 +895,7 @@ class ParentAction(object):
             widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         """
         if value is None or bool(re.search("^\d*$", value)):
-            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
         else:
             widget.setStyleSheet("border: 1px solid red")
@@ -885,7 +908,7 @@ class ParentAction(object):
             widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         """
         if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
-            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
         else:
             widget.setStyleSheet("border: 1px solid red")
@@ -1075,3 +1098,51 @@ class ParentAction(object):
     def show_action_name(self, action):
         self.controller.log_info(str(action.objectName()))
 
+
+    def get_points(self, list_coord=None):
+        """ Return list of QgsPoints taken from geometry
+        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+        """
+
+        coords = list_coord.group(1)
+        polygon = coords.split(',')
+        points = []
+
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
+            point = QgsPointXY(float(x), float(y))
+            points.append(point)
+
+        return points
+
+
+    def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+        """ Draw 'line' over canvas following list of points
+         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+         """
+
+        rb = self.rubber_polygon
+        polyline = QgsGeometry.fromPolylineXY(points)
+        rb.setToGeometry(polyline, None)
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.show()
+
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+
+        return rb
+
+    def resetRubberbands(self):
+
+        self.rubber_point.reset(0)
+        self.rubber_polygon.reset(2)
+
+
+    def restore_user_layer(self):
+        if self.user_current_layer:
+            self.iface.setActiveLayer(self.user_current_layer)
+        else:
+            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            if layer: self.iface.setActiveLayer(layer)

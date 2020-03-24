@@ -8,7 +8,6 @@ or (at your option) any later version.
 from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
 
 import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -41,7 +40,7 @@ class Go2EpaOptions(ApiParent):
 
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
-        complet_result = self.controller.get_json('gw_api_getconfig', f'$${{{body}}}$$', log_sql=True)
+        complet_result = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
         if not complet_result: return False
 
         self.construct_form_param_user(self.dlg_options, complet_result['body']['form']['formTabs'], 0, self.epa_options_list)
@@ -70,7 +69,7 @@ class Go2EpaOptions(ApiParent):
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
         body = self.create_body(form=form, extras=extras)
-        result = self.controller.get_json('gw_api_setconfig', f'$${{{body}}}$$', log_sql=True)
+        result = self.controller.get_json('gw_api_setconfig', body, log_sql=True)
         if not result: return False
 
         message = "Values has been updated"
@@ -83,10 +82,10 @@ class Go2EpaOptions(ApiParent):
         for field in complet_result['body']['form']['formTabs'][0]["fields"]:
             if field['isparent']:
                 widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
-                widget.currentIndexChanged.connect(partial(self.fill_child, widget))
+                widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_options, widget))
+                widget.currentIndexChanged.emit(widget.currentIndex())
 
-
-    def fill_child(self, widget):
+    def fill_child(self, dialog, widget):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
@@ -95,19 +94,5 @@ class Go2EpaOptions(ApiParent):
 
         for combo_child in result['fields']:
             if combo_child is not None:
-                self.manage_child(widget, combo_child)
+                self.manage_child(dialog, widget, combo_child)
 
-
-    def manage_child(self, combo_parent, combo_child):
-        child = self.dlg_options.findChild(QComboBox, str(combo_child['widgetname']))
-        if child:
-            child.setEnabled(True)
-            self.populate_combo(child, combo_child)
-            utils_giswater.set_combo_itemData(child, combo_child['selectedId'], 1)
-            if 'editability' not in combo_child:
-                return
-            if str(utils_giswater.get_item_data(self.dlg_options, combo_parent, 0)) in str(combo_child['editability']['trueWhenParentIn']) \
-                    and utils_giswater.get_item_data(self.dlg_options, combo_parent, 0) not in (None, ''):
-                child.setEnabled(True)
-            else:
-                child.setEnabled(False)

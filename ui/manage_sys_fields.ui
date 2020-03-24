@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>594</width>
-            <height>689</height>
+            <width>586</width>
+            <height>672</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -78,22 +78,8 @@
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <layout class="QGridLayout" name="gridLayout_6">
-                <item row="9" column="0">
-                 <widget class="QLabel" name="label_4">
-                  <property name="text">
-                   <string>Hidden:</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="5" column="1">
                  <widget class="QCheckBox" name="ismandatory">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="9" column="1">
-                 <widget class="QCheckBox" name="hidden">
                   <property name="text">
                    <string/>
                   </property>
@@ -109,29 +95,15 @@
                 <item row="2" column="1">
                  <widget class="QLineEdit" name="label"/>
                 </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="lbl_72">
+                <item row="8" column="0">
+                 <widget class="QLabel" name="label_4">
                   <property name="text">
-                   <string>Label:</string>
+                   <string>Hidden:</string>
                   </property>
                  </widget>
                 </item>
                 <item row="8" column="1">
-                 <widget class="QCheckBox" name="iseditable">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="lbl_74">
-                  <property name="text">
-                   <string>Enabled:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QCheckBox" name="isenabled">
+                 <widget class="QCheckBox" name="hidden">
                   <property name="text">
                    <string/>
                   </property>
@@ -151,15 +123,36 @@
                   </property>
                  </widget>
                 </item>
-                <item row="8" column="0">
+                <item row="7" column="0">
                  <widget class="QLabel" name="lbl_56">
                   <property name="text">
                    <string>Editable:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="formname">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="lbl_72">
+                  <property name="text">
+                   <string>Label:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="1">
+                 <widget class="QCheckBox" name="iseditable">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="lbl_60">
+                  <property name="text">
+                   <string>Layout name:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QLineEdit" name="layoutname">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -172,22 +165,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="lbl_60">
-                  <property name="text">
-                   <string>Layout name:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="layout_name">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="layout_order">
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="formname">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -197,6 +176,13 @@
                  <widget class="QLabel" name="lbl_58">
                   <property name="text">
                    <string>Layout order:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QLineEdit" name="layout_order">
+                  <property name="enabled">
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -220,20 +206,10 @@
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
                <layout class="QGridLayout" name="gridLayout_7">
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="placeholder"/>
-                </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="lbl_55">
                   <property name="text">
                    <string>Tooltip:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="lbl_80">
-                  <property name="text">
-                   <string>Editability:</string>
                   </property>
                  </widget>
                 </item>
@@ -244,22 +220,11 @@
                   </property>
                  </widget>
                 </item>
+                <item row="3" column="1">
+                 <widget class="QLineEdit" name="placeholder"/>
+                </item>
                 <item row="2" column="1">
                  <widget class="QPlainTextEdit" name="tooltip"/>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="lbl_57">
-                  <property name="text">
-                   <string>Placeholder:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QPlainTextEdit" name="editability">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;trueWhenParentIn&amp;quot;:[3]}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
                 </item>
                 <item row="4" column="1">
                  <widget class="QPlainTextEdit" name="stylesheet">
@@ -268,17 +233,10 @@
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="1">
-                 <widget class="QPlainTextEdit" name="widgetcontrols">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;minValue&amp;quot;:0.001, &amp;quot;maxValue&amp;quot;:100}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="lbl_79">
+                <item row="3" column="0">
+                 <widget class="QLabel" name="lbl_57">
                   <property name="text">
-                   <string>Widgetcontrols:</string>
+                   <string>Placeholder:</string>
                   </property>
                  </widget>
                 </item>
@@ -289,10 +247,24 @@
                   </property>
                  </widget>
                 </item>
+                <item row="6" column="1">
+                 <widget class="QPlainTextEdit" name="widgetcontrols">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;setQgisMultiline&amp;quot;:true, &amp;quot;minValue&amp;quot;:0.001, &amp;quot;maxValue&amp;quot;:100, &amp;quot;autoupdateReloadFields&amp;quot;:['a', 'b'],  &amp;quot;comboEnableWhenParent&amp;quot;:['a', 'b'], &amp;quot;regexpControl&amp;quot;:&amp;quot;[]&amp;quot;}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="5" column="1">
                  <widget class="QLineEdit" name="widgetdim">
                   <property name="text">
                    <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="lbl_79">
+                  <property name="text">
+                   <string>Widgetcontrols:</string>
                   </property>
                  </widget>
                 </item>

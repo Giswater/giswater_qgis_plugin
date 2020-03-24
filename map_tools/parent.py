@@ -196,17 +196,16 @@ class ParentMapTool(QgsMapTool):
         
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
-            layer_refresh.triggerRepaint()     
-           
-           
+            layer_refresh.triggerRepaint()
+
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
             
-        # Manage i18n of the dialog                  
-        if dlg_name:      
+        # Manage i18n of the dialog
+        if dlg_name:
             self.controller.manage_translation(dlg_name, dlg)
 
         # Manage stay on top, maximize/minimize button and information button
@@ -348,7 +347,7 @@ class ParentMapTool(QgsMapTool):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
@@ -356,7 +355,7 @@ class ParentMapTool(QgsMapTool):
         data = '"data":{' + filter_fields + ', ' + page_info
         if extras:
             data += ', ' + extras
-        data += '}'
+        data += f'}}}}$$'
         body = "" + client + form + feature + data
 
         return body

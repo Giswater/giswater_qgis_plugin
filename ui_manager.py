@@ -107,12 +107,7 @@ def get_ui_class(ui_file_name, subfolder=None):
     return uic.loadUiType(ui_file_path)[0]
 
 
-FORM_CLASS = get_ui_class('add_doc.ui')
-class AddDoc(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('add_element.ui')
+FORM_CLASS = get_ui_class('element.ui')
 class AddElement(GwDialog, FORM_CLASS):
     pass
 
@@ -122,7 +117,7 @@ class AddLot(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_picture.ui')
+FORM_CLASS = get_ui_class('visit_picture.ui')
 class AddPicture(GwDialog, FORM_CLASS):
     pass
 
@@ -243,7 +238,7 @@ class Credentials(GwDialog, FORM_CLASS):
     def __init__(self, subtag=None):
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -255,11 +250,11 @@ class Credentials(GwDialog, FORM_CLASS):
     def show_pass(self):
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.svg'
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.png'
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -279,6 +274,11 @@ class Csv2Pg(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('delete_feature.ui')
 class DelFeature(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('doc.ui')
+class AddDoc(GwDialog, FORM_CLASS):
     pass
 
 
@@ -397,30 +397,11 @@ class ManageVisitParam(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(GwMainWindow, FORM_CLASS):
-    dlg_rejected = QtCore.pyqtSignal()
-    
+
     def __init__(self):
         self.closeMainWin = False
         self.mincutCanceled = True
         super().__init__()
-
-    def closeEvent(self, event):
-        """ Overwrite closeEvent method """
-        # If client don't touch nothing just rejected dialog or press cancel
-        if not self.closeMainWin and self.mincutCanceled:
-            event.accept()
-            self.dlg_rejected.emit()
-            return super(Mincut, self).closeEvent(event)
-        
-        if self.closeMainWin:
-            event.accept()
-            if self.mincutCanceled:
-                self.dlg_rejected.emit()
-                return super(Mincut, self).closeEvent(event)
-        else:
-            event.accept()
-            # QMessageBox.information(self, "", "Press cancel to exit")
-            # event.ignore()
 
 
 FORM_CLASS = get_ui_class('mincut_add_connec.ui')
@@ -493,6 +474,35 @@ class Psector_rapport(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('qm_generator.ui')
+class QmGenerator(GwDialog, FORM_CLASS):
+    def __init__(self, subtag=None):
+        super().__init__()
+        self.txt_pass.setClearButtonEnabled(True)
+        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+        self.action = QAction("show")
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action = QAction(icon, "show")
+        self.action.triggered.connect(self.show_pass)
+        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+
+
+    def show_pass(self):
+        if self.txt_pass.echoMode() == 0:
+            self.txt_pass.setEchoMode(QLineEdit.Password)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+            text = "Show password"
+        elif self.txt_pass.echoMode() == 2:
+            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.png'
+            text = "Hide password"
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action.setIcon(icon)
+            self.action.setText(text)
+
+
 FORM_CLASS = get_ui_class('readsql.ui')
 class Readsql(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
@@ -509,8 +519,8 @@ class ReadsqlCreateGisProject(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_rename.ui')
-class ReadsqlRename(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('readsql_rename_copy.ui')
+class ReadsqlRenameCopy(GwMainWindow, FORM_CLASS):
     pass
 
 

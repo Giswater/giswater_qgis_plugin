@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
@@ -32,9 +31,11 @@ from time import sleep
 from .. import utils_giswater
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
-from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
 from .gw_task import GwTask
+from .i18n_generator import I18NGenerator
+from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
+    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
+
 
 
 class UpdateSQL(ApiParent):
@@ -234,8 +235,10 @@ class UpdateSQL(ApiParent):
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
+        self.dlg_readsql.btn_copy.clicked.connect(partial(self.copy_schema))
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
+        self.dlg_readsql.btn_translation.clicked.connect(partial(self.manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
         self.dlg_readsql.btn_path.clicked.connect(partial(self.select_file_ui))
         self.dlg_readsql.btn_import_ui.clicked.connect(partial(self.execute_import_ui))
@@ -247,6 +250,12 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
         self.dlg_readsql.btn_create_view.clicked.connect(partial(self.create_child_view))
         self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self.update_sys_fields))
+
+
+    def manage_translations(self):
+      
+        qm_gen = I18NGenerator(self.iface, self.settings, self.controller, self.plugin_dir)
+        qm_gen.init_dialog()
 
 
     def info_show_database(self, connection_status=True, username=None, show_dialog=False):
@@ -1227,13 +1236,9 @@ class UpdateSQL(ApiParent):
 
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
-        sql = ("SELECT gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=False)
-        if not row or row[0] is None:
-            self.controller.show_message("No results for: " + sql, 2)
-            return False
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        status = self.populate_functions_dlg(self.dlg_import_inp, complet_result[0]['body']['data'])
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body, schema_name=self.schema)
+        if not complet_result: return False
+        self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
         # Set listeners
         self.dlg_import_inp.btn_run.clicked.connect(partial(self.execute_import_inp, accepted=True, schema_type=schema_type))
@@ -1272,10 +1277,9 @@ class UpdateSQL(ApiParent):
                                                   self.dlg_readsql_create_project.cmb_locale)
 
         client = '"client":{"device":9, "lang":"' + str(locale) + '"}, '
-        data = f'"data":{{{extras}}}'
-        body = "" + client + data
-        sql = f"SELECT gw_fct_admin_schema_lastprocess($${{{body}}}$$)::text"
-        status = self.controller.execute_sql(sql, log_sql=True, commit=False)
+        data = '"data":{' + extras + '}'
+        body = "$${" + client + data + "}$$"
+        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name)
         if status is False:
             self.error_count = self.error_count + 1
 
@@ -1546,7 +1550,7 @@ class UpdateSQL(ApiParent):
 
         if create_project is None or create_project is False:
             close_dlg_rename = True
-            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename)
+            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
                 self.controller.show_info_box(msg, "Info")
@@ -1694,6 +1698,7 @@ class UpdateSQL(ApiParent):
             schema_name = self.get_schema_name()
 
         self.schema = schema_name
+        self.locale = self.project_data_language
 
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
@@ -1796,7 +1801,6 @@ class UpdateSQL(ApiParent):
             self.username = self.get_user_connection(self.get_last_connection())
             role_admin = self.controller.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
-                self.controller.show_message("Connection Failed. You dont have permissions for this connection.", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text',
@@ -1871,6 +1875,7 @@ class UpdateSQL(ApiParent):
         # Open dialog
         self.open_dialog(self.dlg_manage_visit_class)
         return
+
 
     def create_visit_param(self):
         return
@@ -2292,7 +2297,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Create dialog
-        self.dlg_readsql_rename = ReadsqlRename()
+        self.dlg_readsql_rename = ReadsqlRenameCopy()
         self.load_settings(self.dlg_readsql_rename)
 
         schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2393,6 +2398,62 @@ class UpdateSQL(ApiParent):
         return True
 
 
+    def copy_schema(self):
+
+        # Create dialog
+        self.dlg_readsql_copy = ReadsqlRenameCopy()
+        self.load_settings(self.dlg_readsql_copy)
+
+        schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
+        # Set listeners
+        self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self.copy_project_data_schema, schema))
+        self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_copy))
+
+        # Open dialog
+        self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)
+        self.open_dialog(self.dlg_readsql_copy)
+
+
+    def copy_project_data_schema(self, schema):
+
+        new_schema_name = utils_giswater.getWidgetText(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
+        sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
+        rows = self.controller.get_rows(sql, commit=True)
+
+        for row in rows:
+            if str(new_schema_name) == str(row[0]):
+                msg = "This project name alredy exist."
+                self.controller.show_info_box(msg, "Info")
+                return
+            else:
+                continue
+
+        self.task1 = GwTask('Manage schema')
+        QgsApplication.taskManager().addTask(self.task1)
+        self.task1.setProgress(0)
+        extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
+        body = self.create_body(extras=extras)
+        self.task1.setProgress(50)
+        result = self.controller.get_json('gw_fct_clone_schema', body, schema_name=schema, log_sql=True)
+        if not result: return
+        self.task1.setProgress(100)
+
+        # Show message
+        status = (self.error_count == 0)
+        self.manage_result_message(status, parameter="Copy project")
+        if status:
+            self.controller.dao.commit()
+            self.event_change_connection()
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
+            self.close_dialog(self.dlg_readsql_copy)
+        else:
+            self.controller.dao.rollback()
+
+        # Reset count error variable to 0
+        self.error_count = 0
+
+
     def delete_schema(self):
 
         project_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2448,7 +2509,7 @@ class UpdateSQL(ApiParent):
             self.dlg_import_inp.progressBar.setFormat("")
 
             body = self.create_body(extras=extras)
-            sql = ("SELECT " + str(function_name) + "($${" + body + "}$$)::text")
+            sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2736,9 +2797,9 @@ class UpdateSQL(ApiParent):
         body = body.replace('""', 'null')
 
         # Execute query
-        sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_child_views($${" + body + "}$$)::text")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.get_json('gw_fct_admin_manage_child_views', body, schema_name=schema_name)
         self.manage_result_message(status, parameter="Created child view")
+
 
 
     def update_sys_fields(self):
@@ -2920,24 +2981,18 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgettype_typevalue'")
+        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
-        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'datatype_typevalue'")
+        sql = ("SELECT id, idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
-        # Populate action_function combo
-        sql = ("SELECT null as id, null as idval UNION ALL "
-               " SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'action_function_typevalue'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_manage_fields.action_function, rows, 1)
-
         # Populate widgetfunction combo
         sql = ("SELECT null as id, null as idval UNION ALL "
-               " SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgetfunction_typevalue'")
+               " SELECT id, idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
@@ -2955,8 +3010,8 @@ class UpdateSQL(ApiParent):
         self.model_update_table = QSqlTableModel()
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
-        self.fill_table(qtable, 've_config_sys_fields', self.model_update_table, expr_filter)
-        self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sys_fields', schema_name)
+        self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
+        self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name)
 
 
     def manage_update_field(self, form_name):
@@ -3069,8 +3124,13 @@ class UpdateSQL(ApiParent):
                 return
 
             elif row is not None:
-
                 msg = "The column id value is already exists."
+                self.controller.show_info_box(msg, "Info")
+                return
+
+            elif utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.widgettype) == 'combo' and \
+                    utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext) in ('null', None):
+                msg = "Parameter 'Query text:' is mandatory for 'combo' widgets. Please set value."
                 self.controller.show_info_box(msg, "Info")
                 return
 
@@ -3103,8 +3163,7 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
             self.manage_result_message(status, parameter="Created field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3142,8 +3201,7 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
             self.manage_result_message(status, parameter="Update field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3159,8 +3217,7 @@ class UpdateSQL(ApiParent):
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
-            status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
             self.manage_result_message(status, parameter="Delete function")
 
         # Close dialog
@@ -3348,11 +3405,11 @@ class UpdateSQL(ApiParent):
         if row:
             project_version = row[0]
 
-        message = ("Plugin version:          " + str(plugin_version) + "\n"
-                   "Project version:         " + str(project_version) + "\n"
-                   "PostgreSQL version:  " + str(postgresql_version) + "\n"
-                   "Postgis version:         " + str(postgis_version))
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, message)
+        msg = ("Plugin version:          " + str(plugin_version) + "\n"
+               "Project version:         " + str(project_version) + "\n"
+               "PostgreSQL version:  " + str(postgresql_version) + "\n"
+               "Postgis version:         " + str(postgis_version))
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
 
         # Set signals
         self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
@@ -3404,7 +3461,7 @@ class UpdateSQL(ApiParent):
 
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
-            partial(self.set_credentials, self.dlg_credentials, new_connecton=True))
+            partial(self.set_credentials, self.dlg_credentials, new_connection=True))
         self.dlg_credentials.open()
 
 

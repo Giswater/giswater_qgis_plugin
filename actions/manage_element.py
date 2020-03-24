@@ -26,6 +26,7 @@ class ManageElement(ParentManage):
         """ Button 33: Add element """
 
         self.new_element_id = new_element_id
+
         # Create the dialog and signals
         self.dlg_add_element = AddElement()
         self.load_settings(self.dlg_add_element)
@@ -66,7 +67,7 @@ class ManageElement(ParentManage):
         # Manage i18n of the form
         # self.controller.translate_form(self.dlg, 'element')
 
-        utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept)
+        utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
@@ -91,7 +92,7 @@ class ManageElement(ParentManage):
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(self.tab_feature_changed, self.dlg_add_element, table_object))
+            partial(self.tab_feature_changed, self.dlg_add_element, table_object, []))
         self.dlg_add_element.element_id.textChanged.connect(
             partial(self.exist_object, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_insert.clicked.connect(
@@ -106,41 +107,82 @@ class ManageElement(ParentManage):
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
+        # TODO maybe all this values can be in one Json query
         # Fill combo boxes
-        sql = "SELECT DISTINCT(elementtype_id) FROM cat_element ORDER BY elementtype_id"
+        sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.fillComboBox(self.dlg_add_element, "element_type", rows, False)
-        self.populate_combo(self.dlg_add_element, "expl_id", "exploitation", "name")
+        utils_giswater.set_item_data(self.dlg_add_element.element_type, rows, 1)
 
-        # Combo state
+        sql = "SELECT expl_id, name FROM exploitation WHERE expl_id != '0' ORDER BY name"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.expl_id, rows, 1)
+
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
 
-        # Combo state type
         self.filter_state_type()
 
-        sql = ("SELECT location_type"
-               " FROM man_type_location"
+        sql = ("SELECT location_type, location_type FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
-        if rows:
-            utils_giswater.setCurrentIndex(self.dlg_add_element, "location_type", 0)
-        self.populate_combo(self.dlg_add_element, "workcat_id", "cat_work")
-        self.populate_combo(self.dlg_add_element, "buildercat_id", "cat_builder")
-        self.populate_combo(self.dlg_add_element, "ownercat_id", "cat_owner")
-        self.populate_combo(self.dlg_add_element, "verified", "value_verified")
-        self.populate_combo(self.dlg_add_element, "workcat_id_end", "cat_work")
+        utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, 1)
 
-        # Set combo boxes
-        self.set_combo(self.dlg_add_element, 'element_type', 'cat_element', 'elementtype_vdefault', field_id='elementtype_id',field_name='elementtype_id')
-        self.set_combo(self.dlg_add_element, 'elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
-        self.set_combo(self.dlg_add_element, 'state', 'value_state', 'state_vdefault', field_name='name')
-        self.set_combo(self.dlg_add_element, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
-        self.set_combo(self.dlg_add_element, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
-        self.set_combo(self.dlg_add_element, 'verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
+        if rows:
+            utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
+
+
+        sql = "SELECT DISTINCT(id), id FROM cat_owner"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
+
+        sql = "SELECT DISTINCT(id), id FROM cat_builder"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
+
+        sql = "SELECT DISTINCT(id), id FROM cat_work"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
+
+        sql = "SELECT DISTINCT(id), id FROM cat_work"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
+
+        sql = "SELECT DISTINCT(id), id FROM value_verified"
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
+        self.filter_elementcat_id()
+
+        if self.new_element_id:
+            # Set default values
+            elementtype_vdef = self.controller.get_config('elementcat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.element_type, elementtype_vdef, 0)
+
+            elementcat_vdef = self.controller.get_config('elementcat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.elementcat_id, elementcat_vdef, 0)
+
+            state_vdef = self.controller.get_config('state_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.state, state_vdef, 0)
+
+            statetype_vdef = self.controller.get_config('statetype_1_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.state_type, statetype_vdef, 0)
+
+            owner_vdef = self.controller.get_config('ownercat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.ownercat_id, owner_vdef, 0)
+
+            builtdate_vdef = self.controller.get_config('builtdate_vdefault')[0]
+            utils_giswater.setWidgetText(self.dlg_add_element, self.dlg_add_element.builtdate, builtdate_vdef)
+
+            workcat_vdef = self.controller.get_config('workcat_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id, workcat_vdef, 0)
+
+            workcatend_vdef = self.controller.get_config('workcat_id_end_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id_end, workcatend_vdef, 0)
+
+            verified_vdef = self.controller.get_config('verified_vdefault')[0]
+            utils_giswater.set_combo_itemData(self.dlg_add_element.verified, verified_vdef, 0)
+
 
         # Adding auto-completion to a QLineEdit for default feature
         self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
@@ -160,7 +202,11 @@ class ManageElement(ParentManage):
         # If is a new element dont need set enddate
         if self.new_element_id is True:
             utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
+
         self.update_location_cmb()
+        if not self.new_element_id:
+            self.exist_object(self.dlg_add_element, 'element')
+
         # Open the dialog    
         self.open_dialog(self.dlg_add_element, maximize_button=False)
         return self.dlg_add_element
@@ -177,14 +223,14 @@ class ManageElement(ParentManage):
     def update_location_cmb(self):
 
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
-        sql = (f"SELECT location_type FROM man_type_location"
+        sql = (f"SELECT location_type, location_type FROM man_type_location"
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
-        utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
+        utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
-            utils_giswater.setCurrentIndex(self.dlg_add_element, "location_type", 0)
+            utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
 
 
     def fill_tbl_new_element(self, dialog, geom_type, feature_id):
@@ -209,17 +255,17 @@ class ManageElement(ParentManage):
         # Get values from dialog
         element_id = utils_giswater.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
         code = utils_giswater.getWidgetText(self.dlg_add_element, "code", return_string_null=False)
-        elementcat_id = utils_giswater.getWidgetText(self.dlg_add_element, "elementcat_id", return_string_null=False)
-        ownercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "ownercat_id", return_string_null=False)
-        location_type = utils_giswater.getWidgetText(self.dlg_add_element, "location_type", return_string_null=False)
-        buildercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "buildercat_id", return_string_null=False)
+        elementcat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.elementcat_id)
+        ownercat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.ownercat_id)
+        location_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.location_type)
+        buildercat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.buildercat_id)
         builtdate = utils_giswater.getWidgetText(self.dlg_add_element, "builtdate", return_string_null=False)
-        workcat_id = utils_giswater.getWidgetText(self.dlg_add_element, "workcat_id", return_string_null=False)
-        workcat_id_end = utils_giswater.getWidgetText(self.dlg_add_element, "workcat_id_end", return_string_null=False)
+        workcat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id)
+        workcat_id_end = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
         comment = utils_giswater.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
         observ = utils_giswater.getWidgetText(self.dlg_add_element, "observ", return_string_null=False)
         link = utils_giswater.getWidgetText(self.dlg_add_element, "link", return_string_null=False)
-        verified = utils_giswater.getWidgetText(self.dlg_add_element, "verified", return_string_null=False)
+        verified = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.verified)
         rotation = utils_giswater.getWidgetText(self.dlg_add_element, "rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
@@ -234,33 +280,13 @@ class ManageElement(ParentManage):
         if num_elements == '':
             self.controller.show_warning(message, parameter="num_elements")
             return
-        state_value = utils_giswater.getWidgetText(self.dlg_add_element, 'state', return_string_null=False)
-        if state_value == '':
+        state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state)
+        if state == '':
             self.controller.show_warning(message, parameter="state_id")
             return            
-        expl_value = utils_giswater.getWidgetText(self.dlg_add_element, 'expl_id', return_string_null=False)
-        if expl_value == '':
-            self.controller.show_warning(message, parameter="expl_id")
-            return  
-                    
-        # Manage fields state, state_type, expl_id
-        sql = (f"SELECT id FROM value_state"
-               f" WHERE name = '{state_value}'")
-        row = self.controller.get_row(sql)
-        if row:
-            state = row[0]
 
-        sql = (f"SELECT id FROM value_state_type "
-               f"WHERE name = '{state_value}'")
-        row = self.controller.get_row(sql)
-        if row:
-            state_type = row[0]
-
-        sql = (f"SELECT expl_id FROM exploitation"
-               f" WHERE name = '{expl_value}'")
-        row = self.controller.get_row(sql)
-        if row:
-            expl_id = row[0]
+        state_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state_type)
+        expl_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
         srid = self.controller.plugin_settings_value('srid')   
@@ -269,7 +295,7 @@ class ManageElement(ParentManage):
         sql = (f"SELECT DISTINCT(element_id)"
                f" FROM {table_object}"
                f" WHERE element_id = '{element_id}'")
-        row = self.controller.get_row(sql, log_info=False, log_sql=True)
+        row = self.controller.get_row(sql, log_info=False)
 
         
         if row is None:
@@ -281,13 +307,12 @@ class ManageElement(ParentManage):
                 sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
                               f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
                               f"'{link}', '{undelete}'")
-
             else:
-                sql = ("INSERT INTO v_edit_element (element_id, , elementcat_id, num_elements, state, state_type"
+                sql = ("INSERT INTO v_edit_element (element_id, elementcat_id, num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
-                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code")
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
 
-                sql_values = (f" VALUES ('{element_id}', '{num_elements}', '{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
+                sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', '{state_type}', "
                               f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
                               f"'{link}', '{undelete}'")
 
@@ -347,7 +372,7 @@ class ManageElement(ParentManage):
                 return
             sql = (f"UPDATE element"
                    f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
-                   f", expl_id = '{expl_id}', rotation = '{rotation}'"
+                   f", state_type = '{state_type}', expl_id = '{expl_id}', rotation = '{rotation}'"
                    f", comment = '{comment}', observ = '{observ}'"
                    f", link = '{link}', undelete = '{undelete}'")
             if builtdate:
@@ -420,12 +445,13 @@ class ManageElement(ParentManage):
 
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
-        
-        sql = (f"SELECT DISTINCT(id) FROM cat_element"
-               f" WHERE elementtype_id = '{utils_giswater.getWidgetText(self.dlg_add_element, 'element_type')}'"
+        element_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.element_type, 1)
+        sql = (f"SELECT DISTINCT(id), id FROM cat_element"
+               f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.fillComboBox(self.dlg_add_element, "elementcat_id", rows, False)
+        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        utils_giswater.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
+
 
 
     def edit_element(self):

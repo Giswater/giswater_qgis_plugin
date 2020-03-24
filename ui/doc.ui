@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>add_doc</class>
- <widget class="QDialog" name="add_doc">
+ <class>dlg_doc</class>
+ <widget class="QDialog" name="dlg_doc">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -38,28 +38,73 @@
          <attribute name="title">
           <string>Document</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
           <item>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="2" column="1">
-             <widget class="QDateTimeEdit" name="date">
-              <property name="displayFormat">
-               <string>dd/MM/yyyy</string>
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
+            <item>
+             <widget class="QLabel" name="lbl_doc_id">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
               </property>
-              <property name="calendarPopup">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="text">
+               <string>Doc id:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::AutoText</enum>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>38</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="doc_id">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="frame">
                <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Date:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_doc_type">
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
+            <item>
+             <widget class="QLabel" name="lbl_doc_type">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -96,57 +141,31 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="doc_id">
-              <property name="enabled">
-               <bool>true</bool>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
-              <property name="frame">
-               <bool>true</bool>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
               </property>
-             </widget>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>24</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
-            <item row="1" column="1">
+            <item>
              <widget class="QComboBox" name="doc_type"/>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_doc_id">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>50</weight>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>Doc id:</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
             </item>
            </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_17">
             <item alignment="Qt::AlignTop">
-             <widget class="QLabel" name="label_observ">
+             <widget class="QLabel" name="lbl_observ">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -189,7 +208,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_18">
             <item alignment="Qt::AlignTop">
-             <widget class="QLabel" name="label_link">
+             <widget class="QLabel" name="lbl_link">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -251,7 +270,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="path_doc">
+             <widget class="QPushButton" name="btn_path_doc">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -270,7 +289,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="path_url">
+             <widget class="QPushButton" name="btn_path_url">
               <property name="maximumSize">
                <size>
                 <width>33</width>
@@ -336,7 +355,7 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="tab_3">
+            <widget class="QWidget" name="tab_arc">
              <attribute name="title">
               <string>Arc</string>
              </attribute>
@@ -350,7 +369,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_4">
+            <widget class="QWidget" name="tab_node">
              <attribute name="title">
               <string>Node</string>
              </attribute>
@@ -364,7 +383,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_5">
+            <widget class="QWidget" name="tab_connec">
              <attribute name="title">
               <string>Connec</string>
              </attribute>
@@ -378,7 +397,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_6">
+            <widget class="QWidget" name="tab_gully">
              <attribute name="title">
               <string>Gully</string>
              </attribute>
@@ -410,7 +429,7 @@
         <item row="0" column="1">
          <widget class="QPushButton" name="btn_accept">
           <property name="text">
-           <string>Ok</string>
+           <string>Accept</string>
           </property>
          </widget>
         </item>

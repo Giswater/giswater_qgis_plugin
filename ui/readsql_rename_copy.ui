@@ -35,14 +35,14 @@
     <item row="0" column="0" colspan="3">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lbl_rename_copy">
         <property name="text">
          <string>Please, set a new project name:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="schema_rename"/>
+       <widget class="QLineEdit" name="schema_rename_copy"/>
       </item>
      </layout>
     </item>

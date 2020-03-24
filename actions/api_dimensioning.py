@@ -1,20 +1,15 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: latin-1 -*-
-from qgis.core import Qgis, QgsPointXY
+from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
-
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
-    QSpacerItem, QWidget
+from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem
 
-import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -69,7 +64,7 @@ class ApiDimensioning(ApiParent):
         self.create_map_tips()
         body = self.create_body()
         # Get layers under mouse clicked
-        complet_result = [self.controller.get_json('gw_api_getdimensioning', f'$${{{body}}}$$', log_sql=True)]
+        complet_result = [self.controller.get_json('gw_api_getdimensioning', body, log_sql=True)]
         if not complet_result: return False
 
         layout_list = []
@@ -79,12 +74,14 @@ class ApiDimensioning(ApiParent):
             if widget.objectName() == 'id':
                 utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature_id)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
-           # Take the QGridLayout with the intention of adding a QSpacerItem later
-            if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+            # Take the QGridLayout with the intention of adding a QSpacerItem later
+            if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                 layout_list.append(layout)
 
             # Add widgets into layout
-            if field['layoutname'] in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+                layout.addWidget(label, 0, field['layout_order'])
+                layout.addWidget(widget, 1, field['layout_order'])
+            if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                 layout.addWidget(label, 0, field['layout_order'])
                 layout.addWidget(widget, 1, field['layout_order'])
             else:
@@ -127,7 +124,7 @@ class ApiDimensioning(ApiParent):
 
         feature = '"tableName":"v_edit_dimensions"'
         body = self.create_body(feature=feature, filter_fields=fields)
-        row = self.controller.get_json('gw_api_setdimensioning', f'$${{{body}}}$$', log_sql=True)
+        row = self.controller.get_json('gw_api_setdimensioning', body, log_sql=True)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)

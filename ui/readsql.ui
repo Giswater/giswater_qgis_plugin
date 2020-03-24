@@ -947,13 +947,20 @@
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>QGIS templates</string>
+           <string>Plugin files generator</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_14">
            <item row="0" column="0">
             <widget class="QPushButton" name="btn_create_qgis_template">
              <property name="text">
-              <string>Update QGIS templates</string>
+              <string>QGIS templates</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="btn_translation">
+             <property name="text">
+              <string>Translation files</string>
              </property>
             </widget>
            </item>

@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 """
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
+# -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView
@@ -1165,7 +1164,7 @@ class ManageVisit(ParentManage, QObject):
         # ask for deletion
         message = "Are you sure you want to delete these records?"
         if any_docs:
-            message += "\nSome events have documents:"
+            message += "\nSome events have documents"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, list_id)
         if not answer:
@@ -1245,7 +1244,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def document_insert(self):
-        """Insert a docmet related to the current visit."""
+        """Insert a document related to the current visit."""
         
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()

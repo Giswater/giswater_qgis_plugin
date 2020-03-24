@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
@@ -19,6 +18,7 @@ from .. import utils_giswater
 from .parent import ParentAction
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+
 
 class ParentManage(ParentAction, object):
 
@@ -174,6 +174,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
             utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
             utils_giswater.setWidgetText(dialog, "state", state)
+            utils_giswater.set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
             utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
@@ -536,8 +537,8 @@ class ParentManage(ParentAction, object):
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            message = "Table_object is not a table name or QTableView"
-            self.controller.log_info(message)
+            msg = "Table_object is not a table name or QTableView"
+            self.controller.log_info(msg)
             return None
 
         expr = self.set_table_model(dialog, widget, geom_type, expr_filter)
@@ -580,8 +581,8 @@ class ParentManage(ParentAction, object):
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            message = "Table_object is not a table name or QTableView"
-            self.controller.log_info(message)
+            msg = "Table_object is not a table name or QTableView"
+            self.controller.log_info(msg)
             return expr
 
         if expr_filter:
@@ -647,8 +648,8 @@ class ParentManage(ParentAction, object):
         elif type(table_object) is QTableView:
             widget = table_object
         else:
-            message = "Table_object is not a table name or QTableView"
-            self.controller.log_info(message)
+            msg = "Table_object is not a table name or QTableView"
+            self.controller.log_info(msg)
             return
 
         # Control when QTableView is void or has no model
@@ -860,6 +861,15 @@ class ParentManage(ParentAction, object):
         field_id = self.geom_type + "_id"
 
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
+        expr_filter = f"{field_id} = '{feature_id}'"
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return None
+
+        # Select features of layers applying @expr
+        self.select_features_by_ids(self.geom_type, expr)
+
         if feature_id == 'null':
             message = "You need to enter a feature id"
             self.controller.show_info_box(message)
@@ -880,7 +890,7 @@ class ParentManage(ParentAction, object):
                 self.ids.append(str(feature_id))
 
         # Set expression filter with features in the list
-        expr_filter = f'"{field_id}" IN ('
+        expr_filter = f'"{field_id}" IN (  '
         for i in range(len(self.ids)):
             expr_filter += f"'{self.ids[i]}', "
         expr_filter = expr_filter[:-2] + ")"
@@ -1072,7 +1082,7 @@ class ParentManage(ParentAction, object):
         dialog.close()
 
         if table_object == "doc":
-            self.manage_document()
+            self.manage_document(row=widget.model().record(row))
             utils_giswater.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
         elif table_object == "element":
             self.manage_element(new_element_id=False)

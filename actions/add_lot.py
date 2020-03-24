@@ -6,9 +6,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 from qgis.core import QgsPointXY
-from qgis.PyQt.QtCore import QStringListModel
-
-from qgis.PyQt.QtCore import QDate, QSortFilterProxyModel, Qt, QDateTime
+from qgis.PyQt.QtCore import QStringListModel, QDate, QSortFilterProxyModel, Qt, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout
@@ -439,8 +437,8 @@ class AddNewLot(ParentManage):
         enddate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
 
         if enddate == '':
-            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
-            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.startdate.setStyleSheet(None)
+            self.dlg_lot.enddate.setStyleSheet(None)
             return
 
         # Transform text dates as QDate
@@ -450,8 +448,8 @@ class AddNewLot(ParentManage):
         enddate = QDate.fromString(enddate, self.lot_date_format)
 
         if startdate <= enddate:
-            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
-            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.startdate.setStyleSheet(None)
+            self.dlg_lot.enddate.setStyleSheet(None)
         else:
             self.dlg_lot.startdate.setStyleSheet("border: 1px solid red")
             self.dlg_lot.enddate.setStyleSheet("border: 1px solid red")
@@ -1660,7 +1658,7 @@ class AddNewLot(ParentManage):
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        message = "El fitxer csv ha estat exportat correctament"
+        message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 
 
@@ -1832,7 +1830,7 @@ class AddNewLot(ParentManage):
 
         selected_list = self.tbl_load.selectionModel().selectedRows(0)
         if selected_list == 0 or str(selected_list) == '[]':
-            message = "Any load selected"
+            message = "Any record selected"
             self.controller.show_info_box(message)
             return
 

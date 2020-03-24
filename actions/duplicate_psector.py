@@ -7,8 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 
-import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -17,14 +15,17 @@ from ..ui_manager import DupPsector
 
 
 class DuplicatePsector(ParentManage, QObject):
+
     is_duplicated = pyqtSignal()
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Workcat end' of toolbar 'edit' """
+
         QObject.__init__(self)
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
     def manage_duplicate_psector(self, psector_id=None):
+
         # Create the dialog and signals
         self.dlg_duplicate_psector = DupPsector()
         self.load_settings(self.dlg_duplicate_psector)
@@ -46,6 +47,7 @@ class DuplicatePsector(ParentManage, QObject):
 
 
     def duplicate_psector(self):
+
         id_psector = utils_giswater.get_item_data(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
         new_psector_name = utils_giswater.getWidgetText(self.dlg_duplicate_psector,
                                                         self.dlg_duplicate_psector.new_psector_name)
@@ -55,9 +57,10 @@ class DuplicatePsector(ParentManage, QObject):
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
-        complet_result = self.controller.get_json('gw_fct_duplicate_psector', f'$${{{body}}}$$')
+        complet_result = self.controller.get_json('gw_fct_duplicate_psector', body)
         if not complet_result:
-            self.controller.show_message("Function gw_fct_duplicate_psector executed with no result ", 3)
+            message = 'Function gw_fct_duplicate_psector executed with no result'
+            self.controller.show_message(message, 3)
             return
 
         # Populate tab info
@@ -65,10 +68,11 @@ class DuplicatePsector(ParentManage, QObject):
         for k, v in list(data.items()):
             if str(k) == "info":
                 change_tab = self.add_layer.populate_info_text(self.dlg_duplicate_psector, data)
+
         # Close dialog
         if not change_tab:
             self.close_dialog(self.dlg_duplicate_psector)
         else:
             utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
-
+            self.dlg_duplicate_psector.setWindowTitle(f'SUCCESS IN DUPLICATING PSECTOR')
         self.is_duplicated.emit()

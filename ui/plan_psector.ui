@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="toolTip">
+      <string>test1</string>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -27,7 +30,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_10">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lbl_psector_id">
            <property name="text">
             <string>psector_id:</string>
            </property>
@@ -46,6 +49,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="toolTip">
+            <string>tooltip original name puesto en el ui</string>
+           </property>
            <property name="text">
             <string>Name:</string>
            </property>
@@ -122,6 +128,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QLabel" name="label_4">
+           <property name="toolTip">
+            <string>tooltip original ext code puesto en el ui</string>
+           </property>
            <property name="text">
             <string>Ext code:</string>
            </property>
@@ -601,6 +610,9 @@
       <attribute name="title">
        <string>Relations</string>
       </attribute>
+      <attribute name="toolTip">
+       <string>test2</string>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -708,8 +720,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>620</width>
-              <height>484</height>
+              <width>146</width>
+              <height>122</height>
              </rect>
             </property>
             <attribute name="label">

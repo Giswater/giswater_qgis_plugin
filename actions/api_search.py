@@ -1,12 +1,10 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsPointXY
 from qgis.PyQt.QtCore import QStringListModel
 
@@ -61,7 +59,7 @@ class ApiSearch(ApiParent):
 
         body = self.create_body()
         function_name = "gw_api_getsearch"
-        complet_list = self.controller.get_json(function_name, f'$${{{body}}}$$')
+        complet_list = self.controller.get_json(function_name, body)
         if not complet_list:
             return False
 
@@ -73,7 +71,7 @@ class ApiSearch(ApiParent):
                 first_tab = tab['tabName']
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(tab['tabName'])
-            main_tab.addTab(tab_widget, tab['tabtext'])
+            main_tab.addTab(tab_widget, tab['tabLabel'])
             gridlayout = QGridLayout()
             tab_widget.setLayout(gridlayout)
             x = 0
@@ -120,7 +118,7 @@ class ApiSearch(ApiParent):
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         for line_edit in line_list:
             line_edit.setReadOnly(False)
-            line_edit.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
+            line_edit.setStyleSheet(None)
 
         # Get selected row
         row = completer.popup().currentIndex().row()
@@ -284,7 +282,7 @@ class ApiSearch(ApiParent):
             extras_search += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             extras_search_add += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
-            result = self.controller.get_json('gw_api_setsearch', f'$${{{body}}}$$', log_sql=True)
+            result = self.controller.get_json('gw_api_setsearch', body, log_sql=True)
             if not result: return False
 
             if result:
@@ -316,7 +314,7 @@ class ApiSearch(ApiParent):
 
             extras_search_add += f', "{line_edit_add.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
-            result = self.controller.get_json('gw_api_setsearch_add', f'$${{{body}}}$$', log_sql=True)
+            result = self.controller.get_json('gw_api_setsearch_add', body, log_sql=True)
             if not result: return False
 
             if result:
@@ -377,7 +375,7 @@ class ApiSearch(ApiParent):
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         body = self.create_body(feature=feature)
-        result = [self.controller.get_json('gw_api_getinfofromid', f'$${{{body}}}$$', log_sql=True)]
+        result = [self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)]
         if not result: return
 
         self.hydro_info_dlg = ApiBasicInfo()
@@ -543,7 +541,7 @@ class ApiSearch(ApiParent):
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
-
+        widget.setStyleSheet(None)
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
         else:
@@ -576,13 +574,16 @@ class ApiSearch(ApiParent):
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
         self.refresh_map_canvas()
+        qtable.model().select()
 
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
         folder_path = utils_giswater.getWidgetText(dialog, path)
         if folder_path is None or folder_path == 'null':
+            path.setStyleSheet("border: 1px solid red")
             return
+        path.setStyleSheet(None)
         if folder_path.find('.csv') == -1:
             folder_path += '.csv'
         if qtable_1:
@@ -635,7 +636,7 @@ class ApiSearch(ApiParent):
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
         self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
-        message = "Values has been updated"
+        message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 
 

@@ -1,11 +1,10 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
 
@@ -19,6 +18,7 @@ from functools import partial
 from .. import utils_giswater
 from .api_config import ApiConfig
 from .api_manage_composer import ApiManageComposer
+from .check_project_result import CheckProjectResult
 from .gw_toolbox import GwToolBox
 from .parent import ParentAction
 from .manage_visit import ManageVisit
@@ -31,7 +31,6 @@ class Utils(ParentAction):
         """ Class to control toolbar 'om_ws' """
 
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.toolbox = GwToolBox(iface, settings, controller, plugin_dir)
 
@@ -252,8 +251,8 @@ class Utils(ParentAction):
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             if complet_result[0]['status'] == "Accepted":
                 self.add_layer.populate_info_text(dialog, complet_result[0]['body']['data'])
-            message = complet_result[0]['message']['text']
-            self.controller.show_info_box(message)
+            msg = complet_result[0]['message']['text']
+            self.controller.show_info_box(msg)
 
 
     def insert_into_db(self, dialog, csvfile, delimiter, _unicode):
@@ -374,4 +373,14 @@ class Utils(ParentAction):
 
         self.api_composer = ApiManageComposer(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_composer.composer()
+
+
+    def utils_show_check_project_result(self):
+        """ Show dialog with audit check project result """
+
+        # Return layers in the same order as listed in TOC
+        layers = self.controller.get_layers()
+
+        self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.check_project_result.populate_audit_check_project(layers, "false")
 

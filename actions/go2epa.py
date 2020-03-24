@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
-
 from qgis.core import Qgis, QgsApplication
 from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
@@ -592,7 +590,7 @@ class Go2Epa(ApiParent):
         self.save_user_values()
         
         self.dlg_go2epa.txt_infolog.clear()
-        self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
+        self.dlg_go2epa.txt_file_rpt.setStyleSheet(None)
         status = self.check_fields()
         if status is False:
             return
@@ -646,7 +644,7 @@ class Go2Epa(ApiParent):
             if self.imports_canceled:
                 break
 
-            complet_result = self.controller.get_json('gw_fct_pg2epa_main', f'$${{{body}}}$$', log_sql=True, commit=True)
+            complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
             if not complet_result:
                 self.controller.show_warning("NOT ROW FOR: " + sql)
                 message = "Export failed"
@@ -666,13 +664,13 @@ class Go2Epa(ApiParent):
             if export_inp is True:
                 if complet_result['status'] == "Accepted":
                     self.add_layer.add_temp_layer(self.dlg_go2epa, complet_result['body']['data'], 'INP results', True, True, 1, False)
-                message = complet_result['message']['text']
-                
+
                 # Get values from complet_result['body']['file'] and insert into INP file
                 if 'file' not in complet_result['body']:
                     self.show_widgets(False)
                     return
                 self.insert_into_inp(self.file_inp, complet_result['body']['file'])
+                message = complet_result['message']['text']
                 common_msg += "Export INP finished. "
 
             # Execute epa
@@ -725,7 +723,7 @@ class Go2Epa(ApiParent):
                     extras += f', "currentStep":"{counter}"'
                     extras += f', "continue":"{_continue}"'
                     body = self.create_body(extras=extras)
-                    sql = f"SELECT {function_name}($${{{body}}}$$)::text"
+                    sql = f"SELECT {function_name}({body})::text"
                     row = self.controller.get_row(sql, commit=True)
                     if not row or row[0] is None:
                         self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -864,7 +862,7 @@ class Go2Epa(ApiParent):
                 writer = csv.writer(output, lineterminator='\n')
                 writer.writerows(all_rows)
             message = "File created successfully"
-            self.controller.show_info(message, parameter=path, duration=10)
+            self.controller.show_info(message, parameter=path)
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=path)

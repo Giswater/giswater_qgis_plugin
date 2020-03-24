@@ -5,26 +5,25 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-from json import JSONDecodeError
-
-from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
-from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
+from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
+from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QApplication, QCheckBox, QDockWidget
-from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget
+from qgis.PyQt.QtWidgets import QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 
 import configparser
+import json
 import os.path
 import sys
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+from json import JSONDecodeError
 
-from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
+from .actions.check_project_result import CheckProjectResult
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
 from .actions.master import Master
@@ -50,7 +49,6 @@ from .map_tools.replace_feature import ReplaceFeatureMapTool
 from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
-from .ui_manager import AuditCheckProjectResult
 
 
 class Giswater(QObject):
@@ -83,14 +81,10 @@ class Giswater(QObject):
         self.plugin_name = self.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
-        # Initialize svg giswater directory
-        svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
-
         # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
         if not os.path.exists(setting_file):
-            message = "Config file not found at: " + setting_file
+            message = f"Config file not found at: {setting_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return
 
@@ -150,6 +144,12 @@ class Giswater(QObject):
         self.action_info = None
 
 
+    def set_info_button_visible(self, visible=True):
+
+        if self.action:
+            self.action.setVisible(visible)
+
+
     def enable_python_console(self):
         """ Enable Python console and Log Messages panel if parameter 'enable_python_console' = True """
 
@@ -180,6 +180,7 @@ class Giswater(QObject):
         if function_name is None:
             return
 
+        action = None
         try:
             action = self.actions[index_action]
 
@@ -208,7 +209,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.master, function_name)
                 action.triggered.connect(callback_function)
             # Utils toolbar actions
-            elif int(index_action) in (206, 58, 83, 99):
+            elif int(index_action) in (206, 58, 83, 99, 59):
                 callback_function = getattr(self.utils, function_name)
                 action.triggered.connect(callback_function)
             # Tm Basic toolbar actions
@@ -324,7 +325,7 @@ class Giswater(QObject):
             return None
 
         # Buttons NOT checkable (normally because they open a form)
-        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 86, 64, 65, 66, 67, 68, 69,
+        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 59, 86, 64, 65, 66, 67, 68, 69,
                         74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305)
 
         if int(index_action) in list_actions:
@@ -385,6 +386,7 @@ class Giswater(QObject):
 
     def manage_toolbars_common(self):
         """ Manage actions of the common plugin toolbars """
+
         self.toolbar_basic("basic")
         self.toolbar_utils("utils")
 
@@ -393,6 +395,8 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
+        list_actions = None
         if self.controller.get_project_type() == 'ws':
             list_actions = ['37', '41', '48', '86', '32']
         elif self.controller.get_project_type() == 'ud':
@@ -408,8 +412,10 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
+        list_actions = None
         if self.controller.get_project_type() in ('ws', 'ud'):
-            list_actions = ['206', '99', '83', '58']
+            list_actions = ['206', '99', '83', '58', '59']
         elif self.controller.get_project_type() in ('tm', 'pl'):
             list_actions = ['206', '99', '83', '58']
         self.manage_toolbar(toolbar_id, list_actions)
@@ -426,6 +432,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -435,6 +442,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -454,6 +462,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['71', '72']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -463,6 +472,7 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
@@ -472,12 +482,14 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
         list_actions = ['45', '46', '47', '38', '49', '50']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
 
     def save_toolbars_position(self):
+
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
@@ -522,6 +534,7 @@ class Giswater(QObject):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
         """
+
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
@@ -631,6 +644,7 @@ class Giswater(QObject):
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
 
+        sql = None
         self.feature_cat = {}
         if self.wsoftware.upper() == 'WS':
             sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
@@ -710,6 +724,9 @@ class Giswater(QObject):
                         if self.plugin_dir in mod.__file__:
                             del sys.modules[mod_name]
 
+            else:
+                self.set_info_button_visible()
+
         except Exception as e:
             print(str(e))
         finally:
@@ -770,6 +787,45 @@ class Giswater(QObject):
                 self.enable_action(enable, index_action)
 
 
+    def check_project(self, show_warning):
+        """ # Check if loaded project is valid for Giswater """
+
+        # Check if table 'v_edit_node' is loaded
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        if not self.layer_node and show_warning:
+            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            if layer_arc or layer_connec:
+                title = "Giswater plugin cannot be loaded"
+                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
+                self.controller.show_warning(msg, 20, title=title)
+                return False
+
+        return True
+
+
+    def manage_controller(self, show_warning, force_commit=False):
+        """ Set new database connection. If force_commit=True then force commit before opening project """
+
+        try:
+            if self.controller.dao and force_commit:
+                self.controller.log_info("Force commit")
+                self.controller.dao.commit()
+        except Exception as e:
+            self.controller.log_info(str(e))
+        finally:
+            self.connection_status, not_version = self.controller.set_database_connection()
+            if not self.connection_status or not_version:
+                message = self.controller.last_error
+                if show_warning:
+                    if message:
+                        self.controller.show_warning(message, 15)
+                    self.controller.log_warning(str(self.controller.layer_source))
+                return False
+
+            return True
+
+
     def project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
@@ -782,34 +838,23 @@ class Giswater(QObject):
         # Unload plugin before reading opened project
         self.unload(False)
 
-        # Check if table 'v_edit_node' is loaded
-        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        if not layer_node and show_warning:
-            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
-            if layer_arc or layer_connec:
-                title = "Giswater plugin cannot be loaded"
-                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
-                self.controller.show_warning(msg, 20, title=title)
-                return
-
-        self.connection_status, not_version = self.controller.set_database_connection()
-        if not self.connection_status or not_version:
-            message = self.controller.last_error
-            if show_warning:
-                if message:
-                    self.controller.show_warning(message, 15)
-                self.controller.log_warning(str(self.controller.layer_source))
+        # Check if loaded project is valid for Giswater
+        if not self.check_project(show_warning):
             return
 
-        # Manage locale and corresponding 'i18n' file
-        self.controller.manage_translation(self.plugin_name)
+        # Force commit before opening project and set new database connection
+        if not self.manage_controller(show_warning):
+            return
 
+        # Manage schema name
         self.controller.get_current_user()
-        layer_source = self.controller.get_layer_source(layer_node)
+        layer_source = self.controller.get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
+
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
@@ -897,12 +942,17 @@ class Giswater(QObject):
         # Put add layers button into toc
         self.add_layers_button()
 
+        # Hide info button if giswater project is loaded
+        if show_warning:
+            self.set_info_button_visible(False)
+
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
 
 
     def get_buttons_to_hide(self):
+
         self.list_to_hide = []
         try:
             #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
@@ -1012,8 +1062,8 @@ class Giswater(QObject):
 
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            layers = self.controller.get_layers()
-            status = self.populate_audit_check_project(layers)
+            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+            status = self.check_project_result.populate_audit_check_project(layers, "true")
             QApplication.restoreOverrideCursor()
             if not status:
                 return False
@@ -1103,140 +1153,10 @@ class Giswater(QObject):
             return
 
         # Update table 'selector_expl' of current user (delete and insert)
-        sql = ("DELETE FROM selector_expl WHERE current_user = cur_user;"
-               "\nINSERT INTO selector_expl (expl_id, cur_user)"
-               " VALUES(" + expl_id + ", current_user);")
+        sql = (f"DELETE FROM selector_expl WHERE current_user = cur_user;"
+               f"\nINSERT INTO selector_expl (expl_id, cur_user) "
+               f"VALUES({expl_id}, current_user);")
         self.controller.execute_sql(sql)
-
-
-    def populate_audit_check_project(self, layers):
-        """ Fill table 'audit_check_project' with layers data """
-
-        sql = ("DELETE FROM audit_check_project"
-               " WHERE user_name = current_user AND fprocesscat_id = 1")
-        self.controller.execute_sql(sql)
-        sql = ""
-        for layer in layers:
-            if layer is None: continue
-            if layer.providerType() in ('memory', 'ogr'): continue
-            layer_source = self.controller.get_layer_source(layer)
-            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
-            # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
-            uri = layer.dataProvider().dataSourceUri()
-            if 'SELECT row_number() over ()' in str(uri): continue
-            schema_name = layer_source['schema']
-            if schema_name is not None:
-                schema_name = schema_name.replace('"', '')
-                table_name = layer_source['table']
-                db_name = layer_source['db']
-                host_name = layer_source['host']
-                table_user = layer_source['user']
-                sql += ("\nINSERT INTO audit_check_project "
-                        "(table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user) "
-                        "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1, '"+str(table_user)+"');")
-
-        status = self.controller.execute_sql(sql)
-        if not status:
-            return False
-
-        version = self.parent.get_plugin_version()
-        extras = f'"version":"{version}"'
-        extras += f', "fprocesscat_id":1'
-        body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_audit_check_project', f'$${{{body}}}$$', log_sql=True)
-        if not result: return True
-
-        self.dlg_audit_project = AuditCheckProjectResult()
-        self.parent.load_settings(self.dlg_audit_project)
-        self.dlg_audit_project.rejected.connect(partial(self.parent.save_settings, self.dlg_audit_project))
-
-        # Populate info_log and missing layers
-        critical_level = 0
-        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
-            'gw_fct_audit_check_project_result', True, False, 0, True)
-
-        if 'missingLayers' in result['body']['data']:
-            critical_level = self.get_missing_layers(self.dlg_audit_project,
-                result['body']['data']['missingLayers'], critical_level)
-
-        self.parent.hide_void_groupbox(self.dlg_audit_project)
-
-        if int(critical_level) > 0 or text_result:
-            row = self.controller.get_config('qgis_form_initproject_hidden')
-            if row and row[0].lower() == 'false':
-                self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
-                self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
-                self.parent.open_dialog(self.dlg_audit_project)
-
-        return True
-
-
-    def update_config(self, state):
-        """ Set qgis_form_initproject_hidden True or False into config_param_user """
-
-        value = {0:"False", 2:"True"}
-        sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-               f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
-               f" ON CONFLICT  (parameter, cur_user) "
-               f" DO UPDATE SET value='{value[state]}'")
-        self.controller.execute_sql(sql, log_sql=True)
-
-
-    def get_missing_layers(self, dialog, m_layers, critical_level):
-
-        grl_critical = dialog.findChild(QGridLayout, "grl_critical")
-        grl_others = dialog.findChild(QGridLayout, "grl_others")
-        for pos, item in enumerate(m_layers):
-            try:
-                if not item: continue
-                widget = dialog.findChild(QCheckBox, f"{item['layer']}")
-                # If it is the case that a layer is necessary for two functions,
-                # and the widget has already been put in another iteration
-                if widget: continue
-                label = QLabel()
-                label.setObjectName(f"lbl_{item['layer']}")
-                label.setText(f'<b>{item["layer"]}</b><font size="2";> {item["qgis_message"]}</font>')
-
-                critical_level = int(item['criticity']) if int(item['criticity']) > critical_level else critical_level
-                widget = QCheckBox()
-                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                widget.setObjectName(f"{item['layer']}")
-                widget.setProperty('field_id', item['id'])
-                widget.setProperty('field_the_geom', item['field_the_geom'])
-
-                if int(item['criticity']) == 3:
-                    grl_critical.addWidget(label, pos, 0)
-                    grl_critical.addWidget(widget, pos, 1)
-                else:
-                    grl_others.addWidget(label, pos, 0)
-                    grl_others.addWidget(widget, pos, 1)
-            except KeyError as e:
-                description = "Key on returned json from ddbb is missed"
-                self.controller.manage_exception(None, description)
-
-        return critical_level
-
-
-    def add_selected_layers(self):
-
-        checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
-        schemaname = self.schema_name.replace('"','')
-        for check in checks:
-            if check.isChecked():
-                try:
-                    the_geom = check.property('field_the_geom')
-                except KeyError as e:
-                    sql = (f"SELECT attname FROM pg_attribute a "
-                           f" JOIN pg_class t on a.attrelid = t.oid "
-                           f" JOIN pg_namespace s on t.relnamespace = s.oid "
-                           f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
-                           f" AND s.nspname = '{schemaname}' "
-                           f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
-                           f" ORDER BY a.attnum limit 1")
-                    the_geom = self.controller.get_row(sql, commit=True)
-                if not the_geom: the_geom = None
-                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom, check.property('field_id'), None)
-        self.parent.close_dialog(self.dlg_audit_project)
 
 
     def project_read_pl(self, show_warning=True):
@@ -1302,7 +1222,7 @@ class Giswater(QObject):
         # Check if metadata file exists
         metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
         if not os.path.exists(metadata_file):
-            message = "Metadata file not found: " + metadata_file
+            message = f"Metadata file not found: {metadata_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return default_value
 
@@ -1312,7 +1232,7 @@ class Giswater(QObject):
             metadata.read(metadata_file)
             value = metadata.get('general', parameter)
         except configparser.NoOptionError:
-            message = "Parameter not found: " + parameter
+            message = f"Parameter not found: {parameter}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
             value = default_value
         finally:
@@ -1379,13 +1299,11 @@ class Giswater(QObject):
         for layer_name in layers:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
-                # msg = f"Layer {layer_name} does not found, therefore, not configured."
-                # self.controller.show_warning(msg)
                 continue
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":""'
+            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', f'$${{{body}}}$$')
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:
@@ -1415,6 +1333,9 @@ class Giswater(QObject):
                             layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
                                                      QgsFieldConstraints.ConstraintStrengthHard)
 
+                if 'ismandatory' in field and not field['ismandatory']:
+                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
 
@@ -1460,7 +1381,7 @@ class Giswater(QObject):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = '"form":{' + form + '}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
@@ -1468,7 +1389,7 @@ class Giswater(QObject):
         data = '"data":{' + filter_fields + ', ' + page_info
         if extras is not None:
             data += ', ' + extras
-        data += '}'
+        data += f'}}}}$$'
         body = "" + client + form + feature + data
 
         return body

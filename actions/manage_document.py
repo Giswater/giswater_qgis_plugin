@@ -30,7 +30,7 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None):
+    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None, row=None):
         """ Button 34: Add document """
 
         # Create the dialog and signals
@@ -76,8 +76,12 @@ class ManageDocument(ParentManage):
         # Fill combo boxes
         self.populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
 
-        # Set current date
-        utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', None)
+        # Set current/selected date and link
+        if row:
+            utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
+            utils_giswater.setWidgetText(self.dlg_add_doc, 'txt_path', row.value('path'))
+        else:
+            utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', None)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
@@ -89,8 +93,8 @@ class ManageDocument(ParentManage):
         viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
         # Set signals
-        self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "txt_path"))
+        self.dlg_add_doc.btn_path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "txt_path"))
         self.dlg_add_doc.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object, tablename, qtable, item_id))        
         self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
         self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
@@ -106,9 +110,8 @@ class ManageDocument(ParentManage):
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
-
         # Open the dialog
-        self.open_dialog(self.dlg_add_doc, maximize_button=False)
+        self.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
         return self.dlg_add_doc
 
 
@@ -132,7 +135,7 @@ class ManageDocument(ParentManage):
         doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=True)
         date = utils_giswater.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
         observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
-        path = utils_giswater.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
+        path = utils_giswater.getWidgetText(self.dlg_add_doc, "txt_path", return_string_null=False)
 
         if doc_type == 'null':
             message = "You need to insert doc_type"

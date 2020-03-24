@@ -186,7 +186,7 @@ class CadAddPoint(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select an element and click it to set radius"
+            message = "Click two points over canvas and draw a line"
             self.controller.show_info(message)
 
         # Store user snapping configuration

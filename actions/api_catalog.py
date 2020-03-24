@@ -1,10 +1,9 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: latin-1 -*-
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
 
@@ -41,7 +40,7 @@ class ApiCatalog(ApiParent):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         body = self.create_body(form, feature)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -64,7 +63,7 @@ class ApiCatalog(ApiParent):
             label.setText(field['label'].capitalize())
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
-            if field['layout_id'] == 1:
+            if field['position'] == 'layout_data_1':
                 self.filter_form.addWidget(label, field['layout_order'], 0)
                 self.filter_form.addWidget(widget, field['layout_order'], 1)
 
@@ -111,7 +110,7 @@ class ApiCatalog(ApiParent):
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
@@ -129,7 +128,7 @@ class ApiCatalog(ApiParent):
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']

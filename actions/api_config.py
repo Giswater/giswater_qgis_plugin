@@ -1,18 +1,17 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-
+from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
 
 import json
 import operator
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -45,13 +44,8 @@ class ApiConfig(ApiParent):
         cur_user = self.controller.get_current_user()
 
         self.list_update = []
-
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        body += '"form":{"formName":"config"}, '
-        body += '"feature":{}, '
-        body += '"data":{}'
-
-        complet_list = self.controller.get_json('gw_api_getconfig', f'$${{{body}}}$$', log_sql=True)
+        body = self.create_body(form='"formName":"config"')
+        complet_list = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
         if not complet_list: return False
 
         self.dlg_config = ApiConfigUi()
@@ -120,10 +114,10 @@ class ApiConfig(ApiParent):
         self.analysis_form = QGridLayout()
         self.system_form = QGridLayout()
 
-        self.node_mantype_form = QGridLayout()
-        self.arc_mantype_form = QGridLayout()
-        self.connec_mantype_form = QGridLayout()
-        self.gully_mantype_form = QGridLayout()
+        self.fluid_type_form = QGridLayout()
+        self.location_type_form = QGridLayout()
+        self.category_type_form = QGridLayout()
+        self.function_type_form = QGridLayout()
 
         self.addfields_form = QGridLayout()
 
@@ -151,10 +145,10 @@ class ApiConfig(ApiParent):
         groupBox_16.setLayout(self.analysis_form)
         groupBox_17.setLayout(self.system_form)
 
-        groupBox_18.setLayout(self.node_mantype_form)
-        groupBox_19.setLayout(self.arc_mantype_form)
-        groupBox_20.setLayout(self.connec_mantype_form)
-        groupBox_21.setLayout(self.gully_mantype_form)
+        groupBox_18.setLayout(self.fluid_type_form)
+        groupBox_19.setLayout(self.location_type_form)
+        groupBox_20.setLayout(self.category_type_form)
+        groupBox_21.setLayout(self.function_type_form)
 
         groupBox_22 .setLayout(self.addfields_form)
 
@@ -257,11 +251,18 @@ class ApiConfig(ApiParent):
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, chk, chk, field))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datepickertime':
-                    widget = QDateEdit()
+                    widget = QgsDateTimeEdit()
+                    widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
-                    if field['value']: field['value'] = field['value'].replace('/', '-')
+                    widget.setDisplayFormat('dd/MM/yyyy')
+
+                    if field['value']:
+                        field['value'] = field['value'].replace('/', '-')
                     date = QDate.fromString(field['value'], 'yyyy-MM-dd')
-                    widget.setDate(date)
+                    if date:
+                        widget.setDate(date)
+                    else:
+                        widget.clear()
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
@@ -279,49 +280,39 @@ class ApiConfig(ApiParent):
                 # Set signals
                 chk.stateChanged.connect(partial(self.get_values_checked_param_user, chk, widget, field))
 
-                if field['layout_id'] == 1:
+                if field['layoutname'] == 'lyt_basic':
                     self.order_widgets(field, self.basic_form, lbl, chk, widget)
-                elif field['layout_id'] == 2:
+                elif field['layoutname'] == 'lyt_om':
                     self.order_widgets(field, self.om_form, lbl, chk, widget)
-                elif field['layout_id'] == 3:
+                elif field['layoutname'] == 'lyt_inventory':
                     self.order_widgets(field, self.inventory_form, lbl, chk, widget)
-                elif field['layout_id'] == 4:
+                elif field['layoutname'] == 'lyt_mapzones':
                     self.order_widgets(field, self.mapzones_form, lbl, chk, widget)
-                elif field['layout_id'] == 5:
+                elif field['layoutname'] == 'lyt_edit':
                     self.order_widgets(field, self.cad_form, lbl, chk, widget)
-                elif field['layout_id'] == 6:
+                elif field['layoutname'] == 'lyt_epa':
                     self.order_widgets(field, self.epa_form, lbl, chk, widget)
-                elif field['layout_id'] == 7:
+                elif field['layoutname'] == 'lyt_masterplan':
                     self.order_widgets(field, self.masterplan_form, lbl, chk, widget)
-                elif field['layout_id'] == 8:
+                elif field['layoutname'] == 'lyt_other':
                     self.order_widgets(field, self.other_form, lbl, chk, widget)
-                elif field['layout_id'] == 9:
+                elif field['layoutname'] == 'lyt_node_vdef':
                     self.order_widgets(field, self.node_type_form, lbl, chk, widget)
-                elif field['layout_id'] == 10:
+                elif field['layoutname'] == 'lyt_arc_vdef':
                     self.order_widgets(field, self.cat_form, lbl, chk, widget)
-                elif field['layout_id'] == 11:
+                elif field['layoutname'] == 'lyt_utils_vdef':
                     self.order_widgets(field, self.utils_form, lbl, chk, widget)
-                elif field['layout_id'] == 12:
+                elif field['layoutname'] == 'lyt_connec_gully_vdef':
                     self.order_widgets(field, self.connec_form, lbl, chk, widget)
-                elif field['layout_id'] == 13:
-                    self.order_widgets(field, self.topology_form, lbl, chk, widget)
-                elif field['layout_id'] == 14:
-                    self.order_widgets(field, self.builder_form, lbl, chk, widget)
-                elif field['layout_id'] == 15:
-                    self.order_widgets(field, self.review_form, lbl, chk, widget)
-                elif field['layout_id'] == 16:
-                    self.order_widgets(field, self.analysis_form, lbl, chk, widget)
-                elif field['layout_id'] == 17:
-                    self.order_widgets(field, self.system_form, lbl, chk, widget)
-                elif field['layout_id'] == 18:
-                    self.order_widgets(field, self.node_mantype_form, lbl, chk, widget)
-                elif field['layout_id'] == 19:
-                    self.order_widgets(field, self.arc_mantype_form, lbl, chk, widget)
-                elif field['layout_id'] == 20:
-                    self.order_widgets(field, self.connec_mantype_form, lbl, chk, widget)
-                elif field['layout_id'] == 21:
-                    self.order_widgets(field, self.gully_mantype_form, lbl, chk, widget)
-                elif field['layout_id'] == 22:
+                elif field['layoutname'] == 'lyt_fluid_type':
+                    self.order_widgets(field, self.fluid_type_form, lbl, chk, widget)
+                elif field['layoutname'] == 'lyt_location_type':
+                    self.order_widgets(field, self.location_type_form, lbl, chk, widget)
+                elif field['layoutname'] == 'lyt_category_type':
+                    self.order_widgets(field, self.category_type_form, lbl, chk, widget)
+                elif field['layoutname'] == 'lyt_function_type':
+                    self.order_widgets(field, self.function_type_form, lbl, chk, widget)
+                elif field['layoutname'] == 'lyt_addfields':
                     self.order_widgets(field, self.addfields_form, lbl, chk, widget)
 
 
@@ -384,40 +375,17 @@ class ApiConfig(ApiParent):
                     pass
 
                 # Order Widgets
-                if field['layout_id'] == 1:
-                    self.order_widgets_system(field, self.basic_form, lbl,  widget)
-                elif field['layout_id'] == 2:
-                    self.order_widgets_system(field, self.om_form, lbl,  widget)
-                elif field['layout_id'] == 3:
-                    self.order_widgets_system(field, self.inventory_form, lbl,  widget)
-                elif field['layout_id'] == 4:
-                    self.order_widgets_system(field, self.mapzones_form, lbl,  widget)
-                elif field['layout_id'] == 5:
-                    self.order_widgets_system(field, self.cad_form, lbl,  widget)
-                elif field['layout_id'] == 6:
-                    self.order_widgets_system(field, self.epa_form, lbl,  widget)
-                elif field['layout_id'] == 7:
-                    self.order_widgets_system(field, self.masterplan_form, lbl,  widget)
-                elif field['layout_id'] == 8:
-                    self.order_widgets_system(field, self.other_form, lbl,  widget)
-                elif field['layout_id'] == 9:
-                    self.order_widgets_system(field, self.node_type_form, lbl,  widget)
-                elif field['layout_id'] == 10:
-                    self.order_widgets_system(field, self.cat_form, lbl,  widget)
-                elif field['layout_id'] == 11:
-                    self.order_widgets_system(field, self.utils_form, lbl,  widget)
-                elif field['layout_id'] == 12:
-                    self.order_widgets_system(field, self.connec_form, lbl,  widget)
-                elif field['layout_id'] == 13:
-                    self.order_widgets_system(field, self.topology_form, lbl,  widget)
-                elif field['layout_id'] == 14:
-                    self.order_widgets_system(field, self.builder_form, lbl,  widget)
-                elif field['layout_id'] == 15:
-                    self.order_widgets_system(field, self.review_form, lbl,  widget)
-                elif field['layout_id'] == 16:
-                    self.order_widgets_system(field, self.analysis_form, lbl,  widget)
-                elif field['layout_id'] == 17:
-                    self.order_widgets_system(field, self.system_form, lbl,  widget)
+                if 'layoutname' in field:
+                    if field['layoutname'] == 'lyt_topology':
+                        self.order_widgets_system(field, self.topology_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_builder':
+                        self.order_widgets_system(field, self.builder_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_review':
+                        self.order_widgets_system(field, self.review_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_analysis':
+                        self.order_widgets_system(field, self.analysis_form, lbl,  widget)
+                    elif field['layoutname'] == 'lyt_system':
+                        self.order_widgets_system(field, self.system_form, lbl,  widget)
 
 
     def get_event_combo_parent(self, row):
@@ -425,7 +393,8 @@ class ApiConfig(ApiParent):
         for field in row[0]["fields"]:
             if field['isparent']:
                 widget = self.dlg_config.findChild(QComboBox, field['widgetname'])
-                widget.currentIndexChanged.connect(partial(self.fill_child, widget))
+                if widget:
+                    widget.currentIndexChanged.connect(partial(self.fill_child, widget))
 
 
     def populate_combo(self, widget, field):
@@ -508,13 +477,12 @@ class ApiConfig(ApiParent):
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
             elem['widget_type'] = 'datepickertime'
-
+        elif type(widget) is QgsDateTimeEdit:
+            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+            elem['widget_type'] = 'datepickertime'
+            
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
-        if 'sys_role_id' in field:
-            elem['sys_role_id'] = str(field['sys_role_id'])
-        else:
-            elem['sys_role_id'] = 'role_admin'
 
         self.list_update.append(elem)
 
@@ -530,13 +498,14 @@ class ApiConfig(ApiParent):
             value = utils_giswater.isChecked(self.dlg_config, chk)
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-
+        elif type(widget) is QgsDateTimeEdit:
+            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
         if chk.isChecked():
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
             elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
             elem['value'] = value
-            elem['sys_role_id'] = str(field['sys_role_id'])
+
             self.list_update.append(elem)
 
 
@@ -557,7 +526,6 @@ class ApiConfig(ApiParent):
         elem['chk'] = str('')
         elem['isChecked'] = str('')
         elem['value'] = value
-        elem['sysRoleId'] = 'role_admin'
 
         self.list_update.append(elem)
 
@@ -565,11 +533,9 @@ class ApiConfig(ApiParent):
     def update_values(self):
 
         my_json = json.dumps(self.list_update)
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        body += '"form":{"formName":"config"}, '
-        body += '"feature":{}, '
-        body += f'"data":{{"fields":{my_json}}}'
-        result = self.controller.get_json('gw_api_setconfig', f'$${{{body}}}$$')
+        extras = f'"fields":{my_json}'
+        body = self.create_body(form='"formName":"config"', extras=extras)
+        result = self.controller.get_json('gw_api_setconfig', body, log_sql=True)
         if not result: return False
 
         message = "Values has been updated"

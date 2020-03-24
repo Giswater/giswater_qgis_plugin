@@ -10,7 +10,7 @@ from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
-from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView, QPushButton
+from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
 
 import os
 import json
@@ -54,7 +54,7 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
         if not complet_result:
             return False
 
@@ -67,7 +67,7 @@ class GwToolBox(ApiParent):
 
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$')
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
         if not complet_result :
             return False
 
@@ -75,6 +75,7 @@ class GwToolBox(ApiParent):
 
 
     def open_function(self, index):
+
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
         self.alias_function = index.sibling(index.row(), 0).data()
@@ -96,7 +97,7 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', f'$${{{body}}}$$', log_sql=True)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body, log_sql=True)
         if not complet_result: return False
 
         status = self.populate_functions_dlg(self.dlg_functions, complet_result['body']['data'])
@@ -120,6 +121,7 @@ class GwToolBox(ApiParent):
 
 
     def remove_layers(self):
+
         root = QgsProject.instance().layerTreeRoot()
         for layer in reversed(self.temp_layers_added):
             self.temp_layers_added.remove(layer)
@@ -180,6 +182,7 @@ class GwToolBox(ApiParent):
 
     def load_parametric_values(self, dialog, function):
         """ Load QGIS settings related with parametric toolbox options """
+
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
@@ -214,6 +217,7 @@ class GwToolBox(ApiParent):
 
     def save_parametric_values(self, dialog, function):
         """ Save QGIS settings related with parametric toolbox options """
+
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
@@ -230,6 +234,7 @@ class GwToolBox(ApiParent):
 
 
     def execute_function(self, dialog, combo, result):
+
         dialog.btn_cancel.setEnabled(False)
         dialog.progressBar.setMaximum(0)
         dialog.progressBar.setMinimum(0)
@@ -300,7 +305,7 @@ class GwToolBox(ApiParent):
                         widget = dialog.findChild(QWidget, field['widgetname'])
                         param_name = widget.objectName()
                         if type(widget) in ('', QLineEdit):
-                            widget.setStyleSheet("border: 1px solid gray")
+                            widget.setStyleSheet(None)
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""','null')
                             if value is '' and widget.property('is_mandatory'):
@@ -342,7 +347,7 @@ class GwToolBox(ApiParent):
             extras += '}'
 
         body = self.create_body(feature=feature_field, extras=extras)
-        sql = f"SELECT {function_name}($${{{body}}}$$)::text"
+        sql = f"SELECT {function_name}({body})::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
@@ -354,7 +359,7 @@ class GwToolBox(ApiParent):
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function,True, True, 1, True)
+        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function, True, True, 1, True)
 
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
@@ -373,6 +378,7 @@ class GwToolBox(ApiParent):
             msg += f"<b>DB call: </b>{sql}<br>"
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
         self.remove_layers()
+
 
     def execute_no_parametric(self, dialog, function_name):
 
@@ -434,7 +440,9 @@ class GwToolBox(ApiParent):
 
         return status
 
+
     def populate_cmb_type(self, feature_types):
+
         feat_types = []
         for item in feature_types:
             elem = []
@@ -490,6 +498,7 @@ class GwToolBox(ApiParent):
 
 
     def populate_layer_combo(self):
+
         geom_type = utils_giswater.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
         self.layers = self.get_all_group_layers(geom_type)
@@ -576,6 +585,4 @@ class GwToolBox(ApiParent):
             return json['alias'].upper()
         except KeyError:
             return 0
-
-
 

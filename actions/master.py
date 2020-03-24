@@ -10,9 +10,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
-import json
 import operator
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -315,7 +313,7 @@ class Master(ParentAction):
                   f'", "resultType":"{result_type}", "resultId":"{result_id}"}}')
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_plan_result', f'$${{{body}}}$$', log_sql=True)
+        result = self.controller.get_json('gw_fct_plan_result', body, log_sql=True)
         if not result: return False
 
         if result['status'] == "Accepted":
@@ -351,7 +349,7 @@ class Master(ParentAction):
         # TODO pending translation
         # Manage i18n of the form and open it
         # self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
-        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector", maximize_button=False)
+        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector",  maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
@@ -442,7 +440,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_merm,dlg_name="plan_estimate_result_manager")
+        self.open_dialog(self.dlg_merm, dlg_name="plan_estimate_result_manager")
 
 
     def charge_plan_estimate_result(self, dialog):
@@ -485,5 +483,4 @@ class Master(ParentAction):
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
-
 

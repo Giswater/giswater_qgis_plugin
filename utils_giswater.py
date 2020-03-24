@@ -74,7 +74,7 @@ def getText(dialog, widget, return_string_null=True):
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
-        elif type(widget) is QTextEdit:
+        elif type(widget) is QTextEdit or type(widget) is QPlainTextEdit:
             text = widget.toPlainText()
         if text:
             elem_text = text
@@ -191,7 +191,8 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
 
     text = None
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is HyperLinkLabel \
-            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton:
+            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton \
+            or type(widget) is QPlainTextEdit:
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)
@@ -407,7 +408,7 @@ def set_combo_itemData(combo, value, item1):
     return False
 
 
-def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1):
+def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1, add_empty=False):
     """ Populate @combo with list @rows and show field @index_to_show
     :param sort_by: sort combo by this element (column)
     """
@@ -436,6 +437,10 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     except:
         pass
     finally:
+        
+        if add_empty:
+            records_sorted.insert(0, ['', ''])
+
         for record in records_sorted:
             combo.addItem(record[index_to_show], record)
             combo.blockSignals(False)
@@ -505,8 +510,7 @@ def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
             if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
                 widget.setReadOnly(not enable)
                 if enable:
-                    widget.setStyleSheet("QWidget { background: rgb(255, 255, 255);"
-                                         " color: rgb(0, 0, 0)}")
+                    widget.setStyleSheet(None)
                 else:
                     widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                          " color: rgb(100, 100, 100)}")
@@ -560,6 +564,28 @@ def set_regexp_date_validator(widget, button=None, regex_type=1):
                           "((29)([-])(02)([-])([0-9][0-9][0][48]))|"
                           "((29)([-])(02)([-])([0-9][0-9][2468][048]))|"
                           "((29)([-])(02)([-])([0-9][0-9][13579][26])))")
+    elif regex_type == 3:
+        widget.setPlaceholderText("yyyy/mm/dd")
+        placeholder = "yyyy/mm/dd"
+        reg_exp = QRegExp("(((\d{4})([/])(0[13578]|10|12)([/])(0[1-9]|[12][0-9]|3[01]))|"
+                          "((\d{4})([/])(0[469]|11)([/])([0][1-9]|[12][0-9]|30))|"
+                          "((\d{4})([/])(02)([/])(0[1-9]|1[0-9]|2[0-8]))|"
+                          "(([02468][048]00)([/])(02)([/])(29))|"
+                          "(([13579][26]00)([/])(02)([/])(29))|"
+                          "(([0-9][0-9][0][48])([/])(02)([/])(29))|"
+                          "(([0-9][0-9][2468][048])([/])(02)([/])(29))|"
+                          "(([0-9][0-9][13579][26])([/])(02)([/])(29)))")
+    elif regex_type == 4:
+        widget.setPlaceholderText("dd/mm/yyyy")
+        placeholder = "dd/mm/yyyy"
+        reg_exp = QRegExp("(((0[1-9]|[12][0-9]|3[01])([/])(0[13578]|10|12)([/])(\d{4}))|"
+                          "(([0][1-9]|[12][0-9]|30)([/])(0[469]|11)([/])(\d{4}))|"
+                          "((0[1-9]|1[0-9]|2[0-8])([/])(02)([/])(\d{4}))|"
+                          "((29)(-)(02)([/])([02468][048]00))|"
+                          "((29)([/])(02)([/])([13579][26]00))|"
+                          "((29)([/])(02)([/])([0-9][0-9][0][48]))|"
+                          "((29)([/])(02)([/])([0-9][0-9][2468][048]))|"
+                          "((29)([/])(02)([/])([0-9][0-9][13579][26])))")
 
     widget.setValidator(QRegExpValidator(reg_exp))
     widget.textChanged.connect(partial(eval_regex, widget, reg_exp, button, placeholder))
@@ -569,10 +595,10 @@ def eval_regex(widget, reg_exp, button, placeholder, text):
 
     is_valid = False
     if reg_exp.exactMatch(text) is True:
-        widget.setStyleSheet("border: 1px solid gray")
+        widget.setStyleSheet(None)
         is_valid = True
     elif str(text) == '':
-        widget.setStyleSheet("border: 1px solid gray")
+        widget.setStyleSheet(None)
         widget.setPlaceholderText(placeholder)
         is_valid = True
     elif reg_exp.exactMatch(text) is False:

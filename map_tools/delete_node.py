@@ -21,7 +21,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import ArcFusion
+from ..ui_manager import ArcFusion, BasicInfo
 from functools import partial
 
 
@@ -86,27 +86,22 @@ class DeleteNodeMapTool(ParentMapTool):
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
         enddate = self.dlg_fusion.enddate.date()
         enddate_str = enddate.toString('yyyy-MM-dd')
-
+        feature_id = f'"id":["{self.node_id}"]'
+        extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
+        body = self.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
-        function_name = "gw_fct_arc_fusion"
-        row = self.controller.check_function(function_name)
-        if not row:
-            message = "Database function not found"
-            self.controller.show_warning(message, parameter=function_name)
-            return
+        result = self.controller.get_json('gw_fct_arc_fusion', body)
+        if not result: return
 
-        sql = f"SELECT {function_name} ('{self.node_id}', '{workcat_id_end}', '{enddate_str}');"
-        status = self.controller.execute_sql(sql, log_sql=True)
-        if status:
-            message = "Arc sucessfully fusioned. Node have been downgraded to state=0"
-            self.controller.show_info(message)
+        text_result = self.populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)
 
-            # Refresh map canvas
-            self.refresh_map_canvas()
+        if not text_result: self.dlg_fusion.close()
+        # Refresh map canvas
+        self.refresh_map_canvas()
 
         # Deactivate map tool
         self.deactivate()
-        self.dlg_fusion.close()
+
         self.set_action_pan()
 
 
