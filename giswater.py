@@ -787,6 +787,45 @@ class Giswater(QObject):
                 self.enable_action(enable, index_action)
 
 
+    def check_project(self, show_warning):
+        """ # Check if loaded project is valid for Giswater """
+
+        # Check if table 'v_edit_node' is loaded
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        if not self.layer_node and show_warning:
+            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            if layer_arc or layer_connec:
+                title = "Giswater plugin cannot be loaded"
+                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
+                self.controller.show_warning(msg, 20, title=title)
+                return False
+
+        return True
+
+
+    def manage_controller(self, show_warning, force_commit=False):
+        """ Set new database connection. If force_commit=True then force commit before opening project """
+
+        try:
+            if self.controller.dao and force_commit:
+                self.controller.log_info("Force commit")
+                self.controller.dao.commit()
+        except Exception as e:
+            self.controller.log_info(str(e))
+        finally:
+            self.connection_status, not_version = self.controller.set_database_connection()
+            if not self.connection_status or not_version:
+                message = self.controller.last_error
+                if show_warning:
+                    if message:
+                        self.controller.show_warning(message, 15)
+                    self.controller.log_warning(str(self.controller.layer_source))
+                return False
+
+            return True
+
+
     def project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
@@ -799,34 +838,23 @@ class Giswater(QObject):
         # Unload plugin before reading opened project
         self.unload(False)
 
-        # Check if table 'v_edit_node' is loaded
-        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        if not layer_node and show_warning:
-            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
-            if layer_arc or layer_connec:
-                title = "Giswater plugin cannot be loaded"
-                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
-                self.controller.show_warning(msg, 20, title=title)
-                return
-
-        self.connection_status, not_version = self.controller.set_database_connection()
-        if not self.connection_status or not_version:
-            message = self.controller.last_error
-            if show_warning:
-                if message:
-                    self.controller.show_warning(message, 15)
-                self.controller.log_warning(str(self.controller.layer_source))
+        # Check if loaded project is valid for Giswater
+        if not self.check_project(show_warning):
             return
 
-        # Manage locale and corresponding 'i18n' file
-        self.controller.manage_translation(self.plugin_name)
+        # Force commit before opening project and set new database connection
+        if not self.manage_controller(show_warning):
+            return
 
+        # Manage schema name
         self.controller.get_current_user()
-        layer_source = self.controller.get_layer_source(layer_node)
+        layer_source = self.controller.get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
+
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
