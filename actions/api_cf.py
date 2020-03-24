@@ -81,7 +81,7 @@ class ApiCF(ApiParent, QObject):
         for layer in complet_list['body']['data']['layersNames']:
             layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
             icon = None
-            icon_path = self.icon_folder + layer['icon'] + '.svg'
+            icon_path = self.icon_folder + layer['icon'] + '.png'
             if os.path.exists(str(icon_path)):
                 icon = QIcon(icon_path)
                 sub_menu = main_menu.addMenu(icon, layer_name.name())
@@ -860,9 +860,9 @@ class ApiCF(ApiParent, QObject):
         fields_reload = ""
         list_mandatory = []
         for field in complet_result['body']['data']['fields']:
-            if p_widget and field['widgetname'] == p_widget.objectName():
+            if p_widget and (field['widgetname'] == p_widget.objectName()):
                 if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
-                    fields_reload == field['widgetcontrols']['autoupdateReloadFields']
+                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
 
             if field['ismandatory'] == True:
                 widget_name = 'data_' + field['column_id']
@@ -1058,9 +1058,9 @@ class ApiCF(ApiParent, QObject):
                 value = field["value"]
                 utils_giswater.setText(dialog, widget, value)
                 if not field['iseditable']:
-                    widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                    widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
                 else:
-                    widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
+                    widget.setStyleSheet(None)
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
                 self.controller.show_message(field['message']['text'], level)
