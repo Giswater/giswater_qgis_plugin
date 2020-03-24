@@ -100,3 +100,9 @@ UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'connectype_id
 UPDATE config_api_form_fields SET widgettype = 'text' where column_id = 'lastupdate';
 UPDATE config_api_form_fields SET widgettype = 'combo' where column_id = 'macrosector_id';
 
+-- 2020/03/24
+UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 'sys_table_id'::text, 'cat_work'::text) WHERE parameter = 'api_search_workcat';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 'sys_id_field'::text, 'id'::text) WHERE parameter = 'api_search_workcat';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 'sys_search_field'::text, 'id'::text) WHERE parameter = 'api_search_workcat';
+
+UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'v_ui_workcat_polygon_aux';
