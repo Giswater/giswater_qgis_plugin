@@ -44,6 +44,7 @@ class DaoController(object):
         self.current_user = None
         self.min_log_level = 20
         self.min_message_level = 0
+        self.last_error = None
 
         if create_logger:
             self.set_logger(logger_name)
@@ -360,8 +361,11 @@ class DaoController(object):
         if text:        
             msg = self.tr(text, context_name)
             if parameter:
-                msg += ": " + str(parameter)             
-        self.iface.messageBar().pushMessage(title, msg, message_level, duration)
+                msg += ": " + str(parameter)
+        try:
+            self.iface.messageBar().pushMessage(title, msg, message_level, duration)
+        except AttributeError:
+            pass
             
 
     def show_info(self, text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):

@@ -108,8 +108,11 @@ class Giswater(QObject):
     def set_signals(self):
         """ Define widget and event signals """
 
-        self.iface.projectRead.connect(self.project_read)
-        self.iface.newProjectCreated.connect(self.project_new)
+        try:
+            self.iface.projectRead.connect(self.project_read)
+            self.iface.newProjectCreated.connect(self.project_new)
+        except AttributeError as e:
+            print(f"set_signals: {e}")
 
 
     def set_info_button(self):
@@ -605,10 +608,33 @@ class Giswater(QObject):
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
+        # Initialize plugin
+        self.init_plugin()
+
         # Force project read (to work with PluginReloader)
         self.project_read(False)
 
+
+    def init_plugin(self, enable_toolbars=True):
+        """ Plugin main initialization function """
+
+        # Set controller (no database connection yet)
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=True)
+        self.controller.set_plugin_dir(self.plugin_dir)
+        self.controller.set_qgis_settings(self.qgis_settings)
+        self.controller.set_giswater(self)
+
+        # Set main information button (always visible)
         self.set_info_button()
+
+        if enable_toolbars:
+            self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.basic.set_giswater(self)
+            self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
 
 
     def manage_feature_cat(self):
@@ -621,8 +647,8 @@ class Giswater(QObject):
         sql = None
         self.feature_cat = {}
         if self.wsoftware.upper() == 'WS':
-            sql = ("SELECT cat_feature.* FROM cat_feature JOIN " 
-                  "(SELECT id, active FROM node_type UNION "
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
+                   "(SELECT id, active FROM node_type UNION "
                    "SELECT id, active FROM arc_type UNION "
                    "SELECT id, active FROM connec_type) a USING (id) "
                    "WHERE a.active IS TRUE ORDER BY id")
@@ -761,6 +787,45 @@ class Giswater(QObject):
                 self.enable_action(enable, index_action)
 
 
+    def check_project(self, show_warning):
+        """ # Check if loaded project is valid for Giswater """
+
+        # Check if table 'v_edit_node' is loaded
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        if not self.layer_node and show_warning:
+            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            if layer_arc or layer_connec:
+                title = "Giswater plugin cannot be loaded"
+                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
+                self.controller.show_warning(msg, 20, title=title)
+                return False
+
+        return True
+
+
+    def manage_controller(self, show_warning, force_commit=False):
+        """ Set new database connection. If force_commit=True then force commit before opening project """
+
+        try:
+            if self.controller.dao and force_commit:
+                self.controller.log_info("Force commit")
+                self.controller.dao.commit()
+        except Exception as e:
+            self.controller.log_info(str(e))
+        finally:
+            self.connection_status, not_version = self.controller.set_database_connection()
+            if not self.connection_status or not_version:
+                message = self.controller.last_error
+                if show_warning:
+                    if message:
+                        self.controller.show_warning(message, 15)
+                    self.controller.log_warning(str(self.controller.layer_source))
+                return False
+
+            return True
+
+
     def project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
@@ -773,39 +838,23 @@ class Giswater(QObject):
         # Unload plugin before reading opened project
         self.unload(False)
 
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
-        self.controller.set_plugin_dir(self.plugin_dir)
-        self.controller.set_qgis_settings(self.qgis_settings)
-        self.controller.set_giswater(self)
-
-        # Check if table 'v_edit_node' is loaded
-        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        if not layer_node and show_warning:
-            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
-            if layer_arc or layer_connec:
-                title = "Giswater plugin cannot be loaded"
-                msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
-                self.controller.show_warning(msg, 20, title=title)
-                return
-
-        self.connection_status, not_version = self.controller.set_database_connection()
-        if not self.connection_status or not_version:
-            message = self.controller.last_error
-            if show_warning:
-                if message:
-                    self.controller.show_warning(message, 15)
-                self.controller.log_warning(str(self.controller.layer_source))
+        # Check if loaded project is valid for Giswater
+        if not self.check_project(show_warning):
             return
 
-        # Manage locale and corresponding 'i18n' file
-        self.controller.manage_translation(self.plugin_name)
+        # Force commit before opening project and set new database connection
+        if not self.manage_controller(show_warning):
+            return
 
+        # Manage schema name
         self.controller.get_current_user()
-        layer_source = self.controller.get_layer_source(layer_node)
+        layer_source = self.controller.get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
+
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
@@ -825,11 +874,6 @@ class Giswater(QObject):
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
-        # Set common plugin toolbars (one action class per toolbar)
-        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic.set_giswater(self)
-        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
-
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
         if self.wsoftware is None:
@@ -848,10 +892,6 @@ class Giswater(QObject):
             return
 
         # Set custom plugin toolbars (one action class per toolbar)
-        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
