@@ -107,7 +107,7 @@ def get_ui_class(ui_file_name, subfolder=None):
     return uic.loadUiType(ui_file_path)[0]
 
 
-FORM_CLASS = get_ui_class('add_element.ui')
+FORM_CLASS = get_ui_class('element.ui')
 class AddElement(GwDialog, FORM_CLASS):
     pass
 
@@ -117,7 +117,7 @@ class AddLot(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_picture.ui')
+FORM_CLASS = get_ui_class('visit_picture.ui')
 class AddPicture(GwDialog, FORM_CLASS):
     pass
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>add_element</class>
- <widget class="QDialog" name="add_element">
+ <class>dlg_element</class>
+ <widget class="QDialog" name="dlg_element">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -41,7 +41,7 @@
         <item>
          <widget class="QPushButton" name="btn_accept">
           <property name="text">
-           <string>Ok</string>
+           <string>Accept</string>
           </property>
          </widget>
         </item>
@@ -59,7 +59,7 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="tab_element">
          <attribute name="title">
           <string>Element</string>
          </attribute>
@@ -103,7 +103,7 @@
           <item row="0" column="0">
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="3" column="1">
-             <widget class="QLabel" name="label_elementcat_id">
+             <widget class="QLabel" name="lbl_elementcat_id">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -147,7 +147,7 @@
              <widget class="QComboBox" name="elementcat_id"/>
             </item>
             <item row="0" column="1">
-             <widget class="QLabel" name="label_element_id">
+             <widget class="QLabel" name="lbl_element_id">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -179,7 +179,7 @@
              </widget>
             </item>
             <item row="6" column="1">
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="lbl_state_type">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -202,7 +202,7 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLabel" name="label_element_type">
+             <widget class="QLabel" name="lbl_element_type">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -240,7 +240,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lbl_code">
               <property name="text">
                <string> Code:</string>
               </property>
@@ -270,7 +270,7 @@
              </widget>
             </item>
             <item row="5" column="1">
-             <widget class="QLabel" name="label_state">
+             <widget class="QLabel" name="lbl_state">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -311,7 +311,7 @@
              <widget class="QComboBox" name="state"/>
             </item>
             <item row="4" column="1">
-             <widget class="QLabel" name="label_num_elements">
+             <widget class="QLabel" name="lbl_num_elements">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -355,7 +355,7 @@
              <widget class="QComboBox" name="ownercat_id"/>
             </item>
             <item row="8" column="1">
-             <widget class="QLabel" name="label_owner">
+             <widget class="QLabel" name="lbl_owner">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -371,7 +371,7 @@
              </widget>
             </item>
             <item row="7" column="1">
-             <widget class="QLabel" name="label_expl_id">
+             <widget class="QLabel" name="lbl_expl_id">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -407,7 +407,7 @@
              </widget>
             </item>
             <item row="10" column="1">
-             <widget class="QLabel" name="label_buildercat_id">
+             <widget class="QLabel" name="lbl_buildercat_id">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -420,7 +420,7 @@
              </widget>
             </item>
             <item row="9" column="1">
-             <widget class="QLabel" name="label_location_type">
+             <widget class="QLabel" name="lbl_location_type">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -436,7 +436,7 @@
              <widget class="QComboBox" name="expl_id"/>
             </item>
             <item row="13" column="1">
-             <widget class="QLabel" name="label_workcat_id_end">
+             <widget class="QLabel" name="lbl_workcat_id_end">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -467,7 +467,7 @@
              <widget class="QLineEdit" name="builtdate"/>
             </item>
             <item row="11" column="1">
-             <widget class="QLabel" name="label_builtdate">
+             <widget class="QLabel" name="lbl_builtdate">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -483,7 +483,7 @@
              <widget class="QComboBox" name="workcat_id"/>
             </item>
             <item row="12" column="1">
-             <widget class="QLabel" name="label_workcat_id">
+             <widget class="QLabel" name="lbl_workcat_id">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -506,7 +506,7 @@
              <widget class="QLineEdit" name="comment"/>
             </item>
             <item row="14" column="1">
-             <widget class="QLabel" name="label_comment">
+             <widget class="QLabel" name="lbl_comment">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -519,7 +519,7 @@
              </widget>
             </item>
             <item row="15" column="1">
-             <widget class="QLabel" name="label_observ">
+             <widget class="QLabel" name="lbl_observ">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -535,7 +535,7 @@
              <widget class="QLineEdit" name="observ"/>
             </item>
             <item row="18" column="1">
-             <widget class="QLabel" name="label_rotation">
+             <widget class="QLabel" name="lbl_rotation">
               <property name="text">
                <string>Rotation:</string>
               </property>
@@ -548,7 +548,7 @@
              <widget class="QLineEdit" name="link"/>
             </item>
             <item row="16" column="1">
-             <widget class="QLabel" name="label_link">
+             <widget class="QLabel" name="lbl_link">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -561,7 +561,7 @@
              </widget>
             </item>
             <item row="17" column="1">
-             <widget class="QLabel" name="label_verified">
+             <widget class="QLabel" name="lbl_verified">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -584,7 +584,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_2">
+        <widget class="QWidget" name="tab_relations">
          <attribute name="title">
           <string>Relations</string>
          </attribute>
@@ -634,7 +634,7 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="tab_3">
+            <widget class="QWidget" name="tab_arc">
              <attribute name="title">
               <string>Arc</string>
              </attribute>
@@ -648,7 +648,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_4">
+            <widget class="QWidget" name="tab_node">
              <attribute name="title">
               <string>Node</string>
              </attribute>
@@ -662,7 +662,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_5">
+            <widget class="QWidget" name="tab_connec">
              <attribute name="title">
               <string>Connec</string>
              </attribute>
@@ -676,7 +676,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_6">
+            <widget class="QWidget" name="tab_gully">
              <attribute name="title">
               <string>Gully</string>
              </attribute>
