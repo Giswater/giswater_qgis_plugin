@@ -150,6 +150,7 @@ class ConnecMapTool(ParentMapTool):
                 if answer:
                     # Create link
                     self.link_selected_features('connec', layer)
+                    self.cancel_map_tool()
                     
             layer = self.snapper_manager.layer_gully
             if layer:
@@ -164,6 +165,7 @@ class ConnecMapTool(ParentMapTool):
                     if answer:
                         # Create link
                         self.link_selected_features('gully', layer)
+                        self.cancel_map_tool()
 
         # Force reload dataProvider of layer
         self.controller.indexing_spatial_layer('v_edit_link')
