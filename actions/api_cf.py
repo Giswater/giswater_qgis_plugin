@@ -81,7 +81,7 @@ class ApiCF(ApiParent, QObject):
         for layer in complet_list['body']['data']['layersNames']:
             layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
             icon = None
-            icon_path = self.icon_folder + layer['icon'] + '.svg'
+            icon_path = self.icon_folder + layer['icon'] + '.png'
             if os.path.exists(str(icon_path)):
                 icon = QIcon(icon_path)
                 sub_menu = main_menu.addMenu(icon, layer_name.name())
