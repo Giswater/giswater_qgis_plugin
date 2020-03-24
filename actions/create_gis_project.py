@@ -140,7 +140,7 @@ class CreateGisProject():
             self.controller.show_warning("Error getting database parameters")
             return False
 
-        set_database_params(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'],
+        self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'],
             layer_source['password'], self.controller.get_srid('v_edit_node', schema))
 
         return True

@@ -1408,7 +1408,7 @@ class UpdateSQL(ApiParent):
 
 
     def create_project_data_schema(self, project_name_schema=None, project_title_schema=None,  project_type=None,
-            project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=False):
+            project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
 
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
