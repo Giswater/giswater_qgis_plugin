@@ -468,23 +468,26 @@ class ApiCF(ApiParent, QObject):
             if widget is None: continue
 
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+            if layout:
+                # Take the QGridLayout with the intention of adding a QSpacerItem later
+                if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    layout_list.append(layout)
 
-            # Take the QGridLayout with the intention of adding a QSpacerItem later
-            if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                layout_list.append(layout)
-
-            # Add widgets into layout
-                layout.addWidget(label, 0, field['layout_order'])
-                layout.addWidget(widget, 1, field['layout_order'])
-            if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                layout.addWidget(label, 0, field['layout_order'])
-                layout.addWidget(widget, 1, field['layout_order'])
-            else:
-                self.put_widgets(self.dlg_cf, field, label, widget)
+                # Add widgets into layout
+                    layout.addWidget(label, 0, field['layout_order'])
+                    layout.addWidget(widget, 1, field['layout_order'])
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    layout.addWidget(label, 0, field['layout_order'])
+                    layout.addWidget(widget, 1, field['layout_order'])
+                else:
+                    self.put_widgets(self.dlg_cf, field, label, widget)
+                else:
+                    self.controller.log_info("Layout not found", parameter=field['layoutname'])
 
         # Get current feature id
         widget_field_id = self.dlg_cf.findChild(QLineEdit, f'{tab_type}_{self.field_id}')
-        self.feature_id = widget_field_id.text()
+        if widget_field_id:
+            self.feature_id = widget_field_id.text()
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -556,7 +559,8 @@ class ApiCF(ApiParent, QObject):
 
 
     def get_feature(self, tab_type):
-        # Get current QgsFeature
+        """ Get current QgsFeature """
+
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
         self.feature = self.get_feature_by_expr(self.layer, expr_filter)
         return self.feature
@@ -564,6 +568,7 @@ class ApiCF(ApiParent, QObject):
 
     def api_action_zoom_in(self, canvas, layer):
         """ Zoom in """
+
         if not self.feature:
             self.get_feature(self.tab_type)
         layer.selectByIds([self.feature.id()])
@@ -579,8 +584,10 @@ class ApiCF(ApiParent, QObject):
         layer.selectByIds([self.feature.id()])
         canvas.zoomToSelected(layer)
 
+
     def api_action_zoom_out(self, canvas, layer):
         """ Zoom out """
+
         if not self.feature:
             self.get_feature(self.tab_type)
         layer.selectByIds([self.feature.id()])
@@ -600,6 +607,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def get_last_value(self):
+
         widgets = self.dlg_cf.tab_data.findChildren(QWidget)
         for widget in widgets:
             if widget.hasFocus():
@@ -610,6 +618,7 @@ class ApiCF(ApiParent, QObject):
 
     def start_editing(self, layer):
         """ start or stop the edition based on your current status """
+
         self.iface.setActiveLayer(layer)
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
@@ -626,6 +635,7 @@ class ApiCF(ApiParent, QObject):
         """ discard changes in current layer """
 
         self.iface.actionRollbackEdits().trigger()
+
 
     def set_widgets(self, dialog, complet_result, field):
         """
@@ -644,6 +654,7 @@ class ApiCF(ApiParent, QObject):
             def manage_doubleSpinbox(self, dialog, complet_result, field)
             def manage_tableView(self, dialog, complet_result, field)
          """
+        
         widget = None
         label = None
         if field['label']:
@@ -677,6 +688,7 @@ class ApiCF(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
+
         widget = self.add_lineedit(field)
         widget = self.set_widget_size(widget, field)
         widget = self.set_min_max_values(widget, field)
@@ -686,8 +698,10 @@ class ApiCF(ApiParent, QObject):
 
         return widget
 
+
     def set_min_max_values(self, widget, field):
-        # Set max and min values allowed
+        """ Set max and min values allowed """
+
         if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
             if 'min' in field['widgetcontrols']['maxMinValues']:
                 widget.setProperty('minValue', field['widgetcontrols']['maxMinValues']['min'])
@@ -695,16 +709,19 @@ class ApiCF(ApiParent, QObject):
         if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
             if 'max' in field['widgetcontrols']['maxMinValues']:
                 widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
+                
         return widget
 
 
     def set_reg_exp(self, widget, field):
         """ Set regular expression """
+
         if 'widgetcontrols' in field and field['widgetcontrols']:
             if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
                 if field['widgetcontrols']['regexpControl'] is not None:
                     reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
                     widget.setValidator(QRegExpValidator(reg_exp))
+
         return widget
 
 
@@ -851,6 +868,7 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
+        
         if _json == '' or str(_json) == '{}':
             self.close_dialog(dialog)
             return
@@ -865,7 +883,7 @@ class ApiCF(ApiParent, QObject):
                 if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
                     fields_reload = field['widgetcontrols']['autoupdateReloadFields']
 
-            if field['ismandatory'] == True:
+            if field['ismandatory']:
                 widget_name = 'data_' + field['column_id']
                 widget = self.dlg_cf.findChild(QWidget, widget_name)
                 widget.setStyleSheet(None)
@@ -874,10 +892,11 @@ class ApiCF(ApiParent, QObject):
                     widget.setStyleSheet("border: 1px solid red")
                     list_mandatory.append(widget_name)
 
-        if list_mandatory != []:
+        if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
             return
+        
         # If we create a new feature
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
@@ -985,6 +1004,7 @@ class ApiCF(ApiParent, QObject):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
          """
+        
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
@@ -994,6 +1014,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def check_min_max_value(self,dialog, widget, btn_accept):
+        
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or \
@@ -1006,6 +1027,7 @@ class ApiCF(ApiParent, QObject):
         except ValueError as e:
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
+
 
     def check_tab_data(self, dialog):
         """ Check if current tab name is tab_data """
@@ -1053,6 +1075,7 @@ class ApiCF(ApiParent, QObject):
         :param result: row with info (json)
         :param p_widget: Widget that has changed
         """
+        
         if not p_widget: return
 
         for field in result['body']['data']['fields']:
@@ -1179,8 +1202,6 @@ class ApiCF(ApiParent, QObject):
             self.tab_element_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
-            # if self.geom_type in ('arc', 'node'):
-            #     self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
             self.fill_tab_relations()
             self.tab_relations_loaded = True
         # Tab 'Conections'
@@ -1223,8 +1244,10 @@ class ApiCF(ApiParent, QObject):
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show elements """
+        
         if not self.feature:
             self.get_feature(self.tab_type)
+            
         # Get widgets
         self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
         btn_open_element = self.dlg_cf.findChild(QPushButton, "btn_open_element")
@@ -1263,7 +1286,6 @@ class ApiCF(ApiParent, QObject):
             break
 
         # Open selected element
-
         self.manage_element(dialog, element_id)
 
 
@@ -1339,11 +1361,8 @@ class ApiCF(ApiParent, QObject):
             list_object_id = list_object_id + str(object_id) + ", "
             row_index += str(row + 1) + ", "
 
-        row_index = row_index[:-2]
-        inf_text = inf_text[:-2]
         list_object_id = list_object_id[:-2]
         list_id = list_id[:-2]
-
         message = "Are you sure you want to delete these records?"
         answer = self.controller.ask_question(message, "Delete records", list_object_id)
         if answer:
@@ -1474,7 +1493,7 @@ class ApiCF(ApiParent, QObject):
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            print("FAIL open_relation")
+            self.controller.log_info("FAIL open_relation")
             return
         self.draw(complet_result)
 
@@ -1482,6 +1501,7 @@ class ApiCF(ApiParent, QObject):
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """
+        
         filter_ = f"node_id='{self.feature_id}'"
         self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream", filter_)
         self.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
@@ -1508,7 +1528,7 @@ class ApiCF(ApiParent, QObject):
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            print("FAIL open_up_down_stream")
+            self.controller.log_info("FAIL open_up_down_stream")
             return
         self.draw(complet_result)
 
@@ -1527,8 +1547,8 @@ class ApiCF(ApiParent, QObject):
 
 
     def open_selected_hydro(self, qtable=None):
-        selected_list = qtable.selectionModel().selectedRows()
 
+        selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
@@ -1546,7 +1566,7 @@ class ApiCF(ApiParent, QObject):
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            print("FAIL open_selected_hydro")
+            self.controller.log_info("FAIL open_selected_hydro")
             return
 
 
@@ -1620,7 +1640,6 @@ class ApiCF(ApiParent, QObject):
     def fill_tbl_hydrometer_values(self, qtable, table_name):
         """ Fill the table control to show hydrometers values """
 
-        filter_ = ""
         cat_period = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
         customer_code = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
         filter_ = f"connec_id::text = '{self.feature_id}' "
@@ -2094,6 +2113,7 @@ class ApiCF(ApiParent, QObject):
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
         """ Fill tab 'Document' """
+        
         table_document = "v_ui_doc_x_" + self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_columns_config(self.tbl_document, table_document)
@@ -2101,8 +2121,10 @@ class ApiCF(ApiParent, QObject):
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
+        
         if not self.feature:
             self.get_feature(self.tab_type)
+            
         # Get widgets
         txt_doc_id = self.dlg_cf.findChild(QLineEdit, "txt_doc_id")
         doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
@@ -2369,7 +2391,7 @@ class ApiCF(ApiParent, QObject):
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            print("FAIL open_rpt_result")
+            self.controller.log_info("FAIL open_rpt_result")
             return
 
         self.draw(complet_result)
@@ -2606,6 +2628,7 @@ class ApiCF(ApiParent, QObject):
 
     def get_id(self, dialog, action, option, point, event):
         """ Get selected attribute from snapped feature """
+        
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
         options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id']}
 
@@ -2633,6 +2656,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def cancel_snapping_tool(self, dialog, action):
+        
         self.disconnect_snapping(False)
         dialog.blockSignals(False)
         action.setChecked(False)
@@ -2649,7 +2673,7 @@ class ApiCF(ApiParent, QObject):
                 self.iface.actionPan().trigger()
             self.vertex_marker.hide()
         except Exception as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
 
     """ OTHER FUNCTIONS """
@@ -2678,7 +2702,7 @@ class ApiCF(ApiParent, QObject):
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            print("FAIL open_node")
+            self.controller.log_info("FAIL open_node")
             return
 
         self.draw(complet_result)
