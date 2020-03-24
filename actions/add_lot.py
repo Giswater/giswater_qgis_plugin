@@ -437,8 +437,8 @@ class AddNewLot(ParentManage):
         enddate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
 
         if enddate == '':
-            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
-            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.startdate.setStyleSheet(None)
+            self.dlg_lot.enddate.setStyleSheet(None)
             return
 
         # Transform text dates as QDate
@@ -448,8 +448,8 @@ class AddNewLot(ParentManage):
         enddate = QDate.fromString(enddate, self.lot_date_format)
 
         if startdate <= enddate:
-            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
-            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.startdate.setStyleSheet(None)
+            self.dlg_lot.enddate.setStyleSheet(None)
         else:
             self.dlg_lot.startdate.setStyleSheet("border: 1px solid red")
             self.dlg_lot.enddate.setStyleSheet("border: 1px solid red")

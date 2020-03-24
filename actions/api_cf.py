@@ -868,7 +868,7 @@ class ApiCF(ApiParent, QObject):
             if field['ismandatory'] == True:
                 widget_name = 'data_' + field['column_id']
                 widget = self.dlg_cf.findChild(QWidget, widget_name)
-                widget.setStyleSheet("border: 1px solid gray")
+                widget.setStyleSheet(None)
                 value = utils_giswater.getWidgetText(self.dlg_cf, widget)
                 if value in ('null', None, ''):
                     widget.setStyleSheet("border: 1px solid red")
@@ -1001,7 +1001,7 @@ class ApiCF(ApiParent, QObject):
                 widget.setStyleSheet("border: 1px solid red")
                 btn_accept.setEnabled(False)
             else:
-                widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+                widget.setStyleSheet(None)
                 btn_accept.setEnabled(True)
         except ValueError as e:
             widget.setStyleSheet("border: 1px solid red")

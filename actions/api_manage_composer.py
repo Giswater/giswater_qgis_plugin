@@ -118,7 +118,7 @@ class ApiManageComposer(ApiParent):
                 widget.setStyleSheet("border: 1px solid red")
                 widget.setPlaceholderText(f"Widget '{widget.property('column_id')}' not found in the composer")
             elif type(item) == QgsLayoutItemLabel and item is not None:
-                widget.setStyleSheet("border: 1px solid gray")
+                widget.setStyleSheet(None)
 
 
     def load_composer_values(self, dialog):

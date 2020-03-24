@@ -895,7 +895,7 @@ class ParentAction(object):
             widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         """
         if value is None or bool(re.search("^\d*$", value)):
-            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
         else:
             widget.setStyleSheet("border: 1px solid red")
@@ -908,7 +908,7 @@ class ParentAction(object):
             widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         """
         if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
-            widget.setStyleSheet("QLineEdit{background:rgb(255, 255, 255); color:rgb(0, 0, 0)}")
+            widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
         else:
             widget.setStyleSheet("border: 1px solid red")

@@ -118,7 +118,7 @@ class ApiSearch(ApiParent):
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         for line_edit in line_list:
             line_edit.setReadOnly(False)
-            line_edit.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
+            line_edit.setStyleSheet(None)
 
         # Get selected row
         row = completer.popup().currentIndex().row()

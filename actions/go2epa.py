@@ -590,7 +590,7 @@ class Go2Epa(ApiParent):
         self.save_user_values()
         
         self.dlg_go2epa.txt_infolog.clear()
-        self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
+        self.dlg_go2epa.txt_file_rpt.setStyleSheet(None)
         status = self.check_fields()
         if status is False:
             return

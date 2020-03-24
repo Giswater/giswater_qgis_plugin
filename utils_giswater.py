@@ -510,8 +510,7 @@ def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
             if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
                 widget.setReadOnly(not enable)
                 if enable:
-                    widget.setStyleSheet("QWidget { background: rgb(255, 255, 255);"
-                                         " color: rgb(0, 0, 0)}")
+                    widget.setStyleSheet(None)
                 else:
                     widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                          " color: rgb(100, 100, 100)}")
@@ -596,10 +595,10 @@ def eval_regex(widget, reg_exp, button, placeholder, text):
 
     is_valid = False
     if reg_exp.exactMatch(text) is True:
-        widget.setStyleSheet("border: 1px solid gray")
+        widget.setStyleSheet(None)
         is_valid = True
     elif str(text) == '':
-        widget.setStyleSheet("border: 1px solid gray")
+        widget.setStyleSheet(None)
         widget.setPlaceholderText(placeholder)
         is_valid = True
     elif reg_exp.exactMatch(text) is False:
