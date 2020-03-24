@@ -1263,7 +1263,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body)
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:
@@ -1293,6 +1293,9 @@ class Giswater(QObject):
                             layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
                                                      QgsFieldConstraints.ConstraintStrengthHard)
 
+                if 'ismandatory' in field and not field['ismandatory']:
+                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
 
