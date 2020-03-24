@@ -491,13 +491,14 @@ class ApiCF(ApiParent, QObject):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
-        # Find combo parents:
+        # Manage combo parents and children:
         for field in result['fields']:
             if field['isparent']:
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
                         widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
+                        self.fill_child(self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id)
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
@@ -948,6 +949,8 @@ class ApiCF(ApiParent, QObject):
 
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
+            if widget.property('keepDisbled'):
+                continue
             for field in result['fields']:
                 if widget.objectName() == field['widgetname']:
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
@@ -957,7 +960,7 @@ class ApiCF(ApiParent, QObject):
                             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
+                            widget.setStyleSheet(None)
                     elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
                         widget.setEnabled(field['iseditable'])
                         widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(

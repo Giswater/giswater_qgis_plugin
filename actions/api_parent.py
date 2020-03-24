@@ -792,7 +792,28 @@ class ApiParent(ParentAction):
 
         for combo_child in result['body']['data']:
             if combo_child is not None:
-                self.populate_child(dialog, combo_child)
+                self.manage_child(dialog, widget, combo_child)
+
+
+    def manage_child(self, dialog, combo_parent, combo_child):
+        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+        if child:
+            child.setEnabled(True)
+
+            self.populate_child(dialog, combo_child)
+            if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
+                    'comboEnableWhenParent' not in combo_child['widgetcontrols']:
+                return
+            #
+            if (str(utils_giswater.get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['comboEnableWhenParent'])) \
+                    and (utils_giswater.get_item_data(dialog, combo_parent, 0) not in (None, '')):
+                # The keepDisbled property is used to keep the edition enabled or disabled,
+                # when we activate the layer and call the "enable_all" function
+                child.setProperty('keepDisbled', False)
+                child.setEnabled(True)
+            else:
+                child.setProperty('keepDisbled', True)
+                child.setEnabled(False)
 
 
     def populate_child(self, dialog, combo_child):
