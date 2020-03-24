@@ -34,7 +34,7 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vdef
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_vdefault', '2', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('workcat_vdefault', 'work1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('ownercat_vdefault', 'owner1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('soilcat_vdefault', 'Standard Soil', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('soilcat_vdefault', 'soil1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('qgis_template_folder_path', NULL, current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_downgrade_force', 'FALSE', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_division_dsbl', 'FALSE', current_user);

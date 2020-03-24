@@ -45,7 +45,7 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('connecat_vde
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('nodecat_vdefault', 'AIR VALVE DN50', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pavementcat_vdefault', 'Asphalt', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('elementcat_vdefault', 'COVER', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('soilcat_vdefault', 'Standard soil', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('soilcat_vdefault', 'soil1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_vdefault', '2', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('ownercat_vdefault', 'owner1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('wtpcat_vdefault', 'ETAP', current_user);

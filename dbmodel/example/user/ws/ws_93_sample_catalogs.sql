@@ -185,9 +185,9 @@ INSERT INTO cat_presszone VALUES ('Medium-Expl_02', 'Medium-Expl_02', '2');
 INSERT INTO cat_presszone VALUES ('Low-Expl_02', 'Low-Expl_02', '2');
 
 
-INSERT INTO cat_soil VALUES ('Standard soil', 'Standard soil', NULL, 5.00, 0.20, 0.00, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');
-INSERT INTO cat_soil VALUES ('soil1', 'Standard soil 1', NULL, 7.00, 0.25, 0.60, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');
-INSERT INTO cat_soil VALUES ('soil2', 'Standard soil 2', NULL, 7.00, 0.20, 0.25, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');
+INSERT INTO cat_soil VALUES ('soil1', 'soil 1', NULL, 7.00, 0.25, 0.60, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');
+INSERT INTO cat_soil VALUES ('soil2', 'soil 2', NULL, 7.00, 0.20, 0.25, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');
+INSERT INTO cat_soil VALUES ('soil3', 'soil 3', NULL, 5.00, 0.20, 0.00, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');
 
 INSERT INTO cat_work VALUES ('work1', 'Description work1', NULL, NULL, NULL, '2017-12-06');
 INSERT INTO cat_work VALUES ('work2', 'Description work2', NULL, NULL, NULL, '2017-12-09');
