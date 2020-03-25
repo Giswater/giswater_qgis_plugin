@@ -34,6 +34,7 @@ class CheckProjectResult(ApiParent):
             if layer is None: continue
             if layer.providerType() != 'postgres': continue
             layer_source = self.controller.get_layer_source(layer)
+            layer_source['schema'] = layer_source['schema'].replace('"', '')
             if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
             uri = layer.dataProvider().dataSourceUri()
