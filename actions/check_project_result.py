@@ -95,7 +95,7 @@ class CheckProjectResult(ApiParent):
         # Populate info_log and missing layers
         critical_level = 0
         text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
-            'gw_fct_audit_check_project_result', True, False, 0, True)
+            'gw_fct_audit_check_project_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project,

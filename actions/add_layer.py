@@ -126,7 +126,7 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
+    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers', disable_tabs=True):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
@@ -146,7 +146,7 @@ class AddLayer(object):
             if str(k) == 'setVisibleLayers':
                 self.set_layers_visible(v)
             elif str(k) == "info":
-                text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
+                text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
             elif k in ('point', 'line', 'polygon'):
                 if 'values' in data[k]:
                     key = 'values'
@@ -272,7 +272,7 @@ class AddLayer(object):
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
-    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
+    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1, disable_tabs=True):
         """ Populate txt_infolog QTextEdit widget
         :param data: Json
         :param force_tab: Force show tab (boolean)
@@ -298,6 +298,7 @@ class AddLayer(object):
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
+        if disable_tabs:
             self.disable_tabs(dialog)
 
         return text
