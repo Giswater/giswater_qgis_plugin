@@ -117,16 +117,6 @@ class LotUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('visit_picture.ui')
-class AddPicture(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('add_sum.ui')
-class AddSum(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('visit.ui')
 class VisitUi(GwDialog, FORM_CLASS):
     pass
@@ -162,40 +152,39 @@ class ConfigUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_dimensioning.ui')
-class ApiDimensioningUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('dimensioning.ui')
+class DimensioningUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_epa_options.ui')
-class ApiEpaOptions(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('options.ui')
+class OptionsUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_import_inp.ui')
-class ApiImportInp(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_importinp.ui')
+class ImportInpUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_search.ui')
-class ApiSearchUi(GwDockWidget, FORM_CLASS):
+FORM_CLASS = get_ui_class('search.ui')
+class SearchUi(GwDockWidget, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_selector.ui')
-class ApiSelector(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('selector.ui')
+class SelectorUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_toolbox.ui')
-class ApiDlgToolbox(GwDockWidget, FORM_CLASS):
+FORM_CLASS = get_ui_class('toolbox_docker.ui')
+class ToolboxDockerUi(GwDockWidget, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_toolbox_functions.ui')
-class ApiFunctionTb(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('toolbox.ui')
+class ToolboxUi(GwDialog, FORM_CLASS):
     pass
-
 
 
 FORM_CLASS = get_ui_class('arc_fusion.ui')
@@ -203,8 +192,8 @@ class ArcFusion(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('audit_check_project_result.ui')
-class AuditCheckProjectResult(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('project_check.ui')
+class ProjectCheckUi(GwDialog, FORM_CLASS):
     pass
 
 

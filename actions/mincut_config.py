@@ -21,7 +21,7 @@ from .. import utils_giswater
 
 from .api_parent import ApiParent
 from .parent import ParentAction
-from ..ui_manager import ApiSelector, Mincut_edit
+from ..ui_manager import SelectorUi, Mincut_edit
 
 
 class MincutConfig(ParentAction):
@@ -236,7 +236,7 @@ class MincutConfig(ParentAction):
             value=model.data(model.index(x, i))
             selected_mincuts.append(value)
         selector_values = f'{{"mincut": {{"ids":{selected_mincuts}}}}}'
-        self.dlg_selector = ApiSelector()
+        self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))

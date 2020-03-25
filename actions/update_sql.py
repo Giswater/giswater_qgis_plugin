@@ -34,7 +34,7 @@ from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ApiImportInp, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
+    ReadsqlCreateGisProject, ImportInpUi, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
 
 
 class UpdateSQL(ApiParent):
@@ -1211,7 +1211,7 @@ class UpdateSQL(ApiParent):
     def execute_import_data(self, schema_type=''):
 
         # Create dialog
-        self.dlg_import_inp = ApiImportInp()
+        self.dlg_import_inp = ImportInpUi()
         self.load_settings(self.dlg_import_inp)
 
         self.dlg_import_inp.progressBar.setVisible(False)

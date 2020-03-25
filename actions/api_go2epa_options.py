@@ -12,7 +12,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .api_parent import ApiParent
-from ..ui_manager import ApiEpaOptions
+from ..ui_manager import OptionsUi
 
 
 class Go2EpaOptions(ApiParent):
@@ -35,7 +35,7 @@ class Go2EpaOptions(ApiParent):
         self.epa_options_list = []
         
         # Create dialog
-        self.dlg_options = ApiEpaOptions()
+        self.dlg_options = OptionsUi()
         self.load_settings(self.dlg_options)
 
         form = '"formName":"epaoptions"'

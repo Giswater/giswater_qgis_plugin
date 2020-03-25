@@ -20,7 +20,7 @@ from functools import partial
 from .. import utils_giswater
 from .add_layer import AddLayer
 from .api_parent import ApiParent
-from ..ui_manager import ApiDlgToolbox, ApiFunctionTb
+from ..ui_manager import ToolboxDockerUi, ToolboxUi
 
 
 class GwToolBox(ApiParent):
@@ -48,7 +48,7 @@ class GwToolBox(ApiParent):
             self.controller.show_warning("Function not found in database", parameter=function_name)
             return
 
-        self.dlg_toolbox = ApiDlgToolbox()
+        self.dlg_toolbox = ToolboxDockerUi()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
@@ -84,7 +84,7 @@ class GwToolBox(ApiParent):
         if self.alias_function in self.no_clickable_items:
             return
 
-        self.dlg_functions = ApiFunctionTb()
+        self.dlg_functions = ToolboxUi()
         self.load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(False)
 

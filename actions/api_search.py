@@ -29,7 +29,7 @@ from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
-from ..ui_manager import ApiSearchUi, ApiBasicInfo, ListItems
+from ..ui_manager import SearchUi, ApiBasicInfo, ListItems
 
 
 class ApiSearch(ApiParent):
@@ -49,7 +49,7 @@ class ApiSearch(ApiParent):
     def api_search(self):
         
         # Dialog
-        self.dlg_search = ApiSearchUi()
+        self.dlg_search = SearchUi()
         self.load_settings(self.dlg_search)
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)

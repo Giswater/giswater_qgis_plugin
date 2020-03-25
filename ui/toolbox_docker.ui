@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>toolbox</class>
- <widget class="QDockWidget" name="toolbox">
+ <class>dlg_toolbox_docker</class>
+ <widget class="QDockWidget" name="dlg_toolbox_docker">
   <property name="geometry">
    <rect>
     <x>0</x>

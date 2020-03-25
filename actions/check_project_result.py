@@ -12,7 +12,7 @@ import platform
 from functools import partial
 
 from .api_parent import ApiParent
-from ..ui_manager import AuditCheckProjectResult
+from ..ui_manager import ProjectCheckUi
 
 
 class CheckProjectResult(ApiParent):
@@ -87,7 +87,7 @@ class CheckProjectResult(ApiParent):
         """ Show dialog with audit check project result """
 
         # Create dialog
-        self.dlg_audit_project = AuditCheckProjectResult()
+        self.dlg_audit_project = ProjectCheckUi()
         self.load_settings(self.dlg_audit_project)
         self.dlg_audit_project.rejected.connect(partial(self.save_settings, self.dlg_audit_project))
 

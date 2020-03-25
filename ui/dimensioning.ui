@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>api_dimensioning</class>
- <widget class="QMainWindow" name="api_dimensioning">
+ <class>dlg_dimensioning</class>
+ <widget class="QMainWindow" name="dlg_dimensioning">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -24,7 +24,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="lyt_other"/>
+          <layout class="QGridLayout" name="other_layout"/>
          </item>
         </layout>
        </widget>
@@ -36,13 +36,13 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="lyt_depth"/>
+          <layout class="QGridLayout" name="depth_layout"/>
          </item>
         </layout>
        </widget>
       </item>
       <item row="1" column="0">
-       <layout class="QGridLayout" name="lyt_top_1"/>
+       <layout class="QGridLayout" name="top_layout"/>
       </item>
       <item row="2" column="0">
        <widget class="QGroupBox" name="grb_distance">
@@ -51,7 +51,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="lyt_distance"/>
+          <layout class="QGridLayout" name="distance_layout"/>
          </item>
         </layout>
        </widget>
@@ -63,7 +63,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_6">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="lyt_symbology"/>
+          <layout class="QGridLayout" name="symbology_layout"/>
          </item>
         </layout>
        </widget>

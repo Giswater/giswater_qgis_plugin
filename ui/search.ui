@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SearchPlus</class>
- <widget class="QDockWidget" name="SearchPlus">
+ <class>dlg_search</class>
+ <widget class="QDockWidget" name="dlg_search">
   <property name="geometry">
    <rect>
     <x>0</x>

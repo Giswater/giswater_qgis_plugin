@@ -15,7 +15,7 @@ from functools import partial
 from .. import utils_giswater
 from .api_parent import ApiParent
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiDimensioningUi
+from ..ui_manager import DimensioningUi
 
 
 class ApiDimensioning(ApiParent):
@@ -39,7 +39,7 @@ class ApiDimensioning(ApiParent):
 
 
     def open_form(self, new_feature=None, layer=None, new_feature_id=None):
-        self.dlg_dim = ApiDimensioningUi()
+        self.dlg_dim = DimensioningUi()
         self.load_settings(self.dlg_dim)
 
         # Set signals
