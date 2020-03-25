@@ -375,7 +375,7 @@ class ApiSearch(ApiParent):
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         body = self.create_body(feature=feature)
-        result = [self.controller.get_json('gw_api_getinfofromid', body, log_sql=False)]
+        result = [self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)]
         if not result: return
 
         self.hydro_info_dlg = ApiBasicInfo()

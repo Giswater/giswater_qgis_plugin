@@ -572,8 +572,6 @@ class Giswater(QObject):
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
 
-        self.controller.log_info("set_controllers")
-
         self.edit.set_controller(self.controller)
         self.go2epa.set_controller(self.controller)
         self.master.set_controller(self.controller)
@@ -923,7 +921,6 @@ class Giswater(QObject):
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
 
-        self.controller.log_info("manage_map_tools")
         # Set objects for map tools classes
         self.manage_map_tools()
 
@@ -937,13 +934,11 @@ class Giswater(QObject):
         self.manage_expl_id()
 
         # Manage layer fields
-        self.controller.log_info("get_layers_to_config")
         self.get_layers_to_config()
         self.set_layer_config(self.available_layers)
 
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
-            self.controller.log_info("NotifyFunctions")
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
             self.notify.set_controller(self.controller)
             list_channels = ['desktop', self.controller.current_user]
@@ -956,7 +951,6 @@ class Giswater(QObject):
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
 
         # Put add layers button into toc
-        self.controller.log_info("add_layers_button")
         self.add_layers_button()
 
         # Hide info button if giswater project is loaded
@@ -1063,7 +1057,7 @@ class Giswater(QObject):
         for layer in layers_list:
             layer_source = self.controller.get_layer_source(layer)
             # Collect only the layers of the work scheme
-            if 'schema' in layer_source and layer_source['schema'] == self.schema_name:
+            if 'schema' in layer_source and layer_source['schema'].replace("'", '') == self.schema_name:
                 layers_name.append(layer.name())
 
         self.set_layer_config(layers_name)
@@ -1080,10 +1074,9 @@ class Giswater(QObject):
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.controller.log_info("CheckProjectResult")
-            #self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
-            #self.check_project_result.set_controller(self.controller)
-            #status = self.check_project_result.populate_audit_check_project(layers, "true")
-            status = True
+            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.check_project_result.set_controller(self.controller)
+            status = self.check_project_result.populate_audit_check_project(layers, "true")
             QApplication.restoreOverrideCursor()
             if not status:
                 return False
@@ -1277,7 +1270,7 @@ class Giswater(QObject):
         for layer in all_layers_toc:
             layer_source = self.controller.get_layer_source(layer)
             # Filter to take only the layers of the current schema
-            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
+            if 'schema' not in layer_source or layer_source['schema'].replace("'", '') != self.schema_name: continue
             table_name = f"{self.controller.get_layer_source_table_name(layer)}"
             self.available_layers.append(table_name)
 
@@ -1323,7 +1316,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=False)
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:

@@ -538,9 +538,6 @@ class ManageVisit(ParentManage, QObject):
     def edit_visit(self, geom_type=None, feature_id=None):
         """ Button 65: Edit visit """
 
-        self.controller.log_info(self.controller.schema_name)
-        self.controller.log_info(self.schema_name)
-
         # Create the dialog
         self.dlg_man = VisitManagement()
         self.load_settings(self.dlg_man)
