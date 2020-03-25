@@ -59,7 +59,10 @@ class CadApiInfo(ParentMapTool):
             cur_user = self.controller.get_current_user()
             pos = self.controller.plugin_settings_value(f"docker_info_{cur_user}")
             print(f"POS -> {pos} --> {type(pos)}")
-            docker.position = pos if type(pos) is int else 2
+            if type(pos) is int and pos in (1, 2, 4, 8):
+                docker.position = pos
+            else:
+                docker.position = 2
 
             # If user want to dock the dialog, we reset rubberbands for each info
             # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands

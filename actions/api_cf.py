@@ -547,7 +547,7 @@ class ApiCF(ApiParent, QObject):
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-        self.dlg_cf.dlg_closed.connect(partial(self.close_docker, docker))
+        self.dlg_cf.dlg_closed.connect(partial(self.close_docker, docker, False))
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         if docker:
@@ -571,13 +571,15 @@ class ApiCF(ApiParent, QObject):
         return self.complet_result, self.dlg_cf
 
 
-    def close_docker(self, docker):
-        """1=Left,  2=right, 8=bottom, 4= top"""
-        if docker:
+    def close_docker(self, docker, save_pos=True):
+        """1=Left,  2=right, 8=bottom, 4=top"""
+        if docker and save_pos:
             cur_user = self.controller.get_current_user()
             x = self.iface.mainWindow().dockWidgetArea(docker)
+            print(f"X --> {x}")
             self.controller.plugin_settings_set_value("docker_info_" + cur_user, x)
             self.iface.removeDockWidget(docker)
+        del docker
 
 
     def get_feature(self, tab_type):
