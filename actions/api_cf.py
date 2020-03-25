@@ -591,11 +591,6 @@ class ApiCF(ApiParent, QObject):
         canvas.zoomOut()
 
 
-    def roll_back(self):
-        print(f"TEST10")
-        self.layer.rollBack()
-
-
     def set_vdefault_edition(self):
         if 'toggledition' in self.complet_result[0]['body']:
             force_open = self.complet_result[0]['body']['toggledition']
